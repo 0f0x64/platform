@@ -24,17 +24,6 @@ namespace dx
 		aspect = height/width;
 		iaspect = width / height;
 
-		/**
-		#ifdef EditMode
-				GetClientRect(hWnd, &rc);
-				winW = rc.right - rc.left;
-				winH = rc.bottom - rc.top;
-		#else
-				winW = width;
-				winH = height;
-		#endif
-		*/
-
 		DXGI_SWAP_CHAIN_DESC sd;
 		ZeroMemory(&sd, sizeof(sd));
 		sd.BufferCount = 2;
