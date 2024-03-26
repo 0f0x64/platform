@@ -1,10 +1,13 @@
 // global defines
 
-#define EditMode false
+#define EditMode true
 #define DebugMode false
+#define DirectXDebugMode false
 
 #define FRAMES_PER_SECOND 60
-#define FRAME_LEN 1000 / FRAMES_PER_SECOND
+#define FRAME_LEN 1000. / (double) FRAMES_PER_SECOND
+
+float DEMO_DURATION = 5; //in seconds
 
 // windows environment
 
@@ -34,8 +37,9 @@ HWND hWnd;
 
 void Loop()
 {
-	dx::Clear();
+	dx::Clear(XMVECTORF32{ 0, 0, 1, 1 });
 	dx::Present();
+
 }
 
 
@@ -49,42 +53,51 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	RegisterClassEx(&wcex);
 	hWnd = CreateWindow("fx", "fx", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInst, NULL);
 	SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) & (~WS_CAPTION));
-	
+
 	ShowWindow(hWnd, SW_MAXIMIZE);
 	UpdateWindow(hWnd);
 	SetFocus(hWnd);
 	ShowCursor(EditMode);
 
-	timer::StartCounter();
-
-	dx::InitDevice();
+	dx::init::Device();
 
 	MSG msg = { 0 };
 
-	while (WM_QUIT != msg.message && !GetAsyncKeyState(VK_ESCAPE))
+	timer::StartCounter();
+
+	while (true)
 	{
+		double time = timer::GetCounter();
+		
+		#if EditMode
+			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+		#else
+			PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
+			if (GetAsyncKeyState(VK_ESCAPE)) break;
+			if (timer::currentFrameTime / 1000 > DEMO_DURATION) break;
+		#endif
 
-		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)&& msg.message != WM_QUIT)
+		if (msg.message == WM_QUIT)	break;
+
+		if (time >= timer::nextFrameTime)
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);				
+			timer::frameBeginTime = timer::GetCounter();
+			Loop();
+			timer::frameEndTime = timer::GetCounter();
+			timer::frameRenderingDuration = timer::frameEndTime - timer::frameBeginTime;
+			timer::nextFrameTime = timer::frameBeginTime + FRAME_LEN;
 		}
-	
-		timer::currentTime = timer::GetCounter();
-		timer::fp_delta = timer::currentTime - timer::prevtick;
 
-		Loop();
-
-		auto frameTime = timer::GetCounter() - timer::currentTime;
-		auto freeTime = FRAME_LEN - frameTime;
-
-		if (freeTime > .1)
-		{
-			Sleep(min((int)freeTime, (int)FRAME_LEN));
-		}
+		Sleep(min(FRAME_LEN, max(FRAME_LEN - (DWORD)timer::frameRenderingDuration,0)));
+		
 	}
 
-    return (int) msg.wParam;
+	return 0;
+
 }
 
 #if EditMode

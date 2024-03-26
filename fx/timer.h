@@ -1,14 +1,13 @@
 namespace timer
 {
-
-	double prevtick = 0.0;
-	double fp_delta = 0.0;
-
 	double PCFreq = 0.0;
-	__int64 CounterStart = 0;
+	__int64 counterStart = 0;
 
-	double StartTime = 0;
-	double currentTime = 0;
+	double startTime = 0;
+	double frameBeginTime = 0;
+	double frameEndTime = 0;
+	double nextFrameTime = 0;
+	double frameRenderingDuration = 0.0;
 
 	void StartCounter()
 	{
@@ -18,14 +17,14 @@ namespace timer
 		PCFreq = double(li.QuadPart) / 1000.0;
 
 		QueryPerformanceCounter(&li);
-		CounterStart = li.QuadPart;
+		counterStart = li.QuadPart;
 	}
 
 	double GetCounter()
 	{
 		LARGE_INTEGER li;
 		QueryPerformanceCounter(&li);
-		return double(li.QuadPart - CounterStart) / PCFreq;
+		return double(li.QuadPart - counterStart) / PCFreq;
 	}
 
 }
