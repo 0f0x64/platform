@@ -16,7 +16,7 @@ namespace dx
 	ID3D11ShaderResourceView*	depthStencilSRView = NULL;
 	ID3D11DepthStencilState*	pDSState[4];
 
-	//camwera
+	//camera
 	XMMATRIX View;
 	XMMATRIX Projection;
 	XMMATRIX DepthView;
@@ -24,6 +24,47 @@ namespace dx
 
 	ID3D11SamplerState* pSampler[13];
 
+	//constBuf
+
+	ID3D11Buffer* pConstantBufferV;
+	ID3D11Buffer* pConstantBufferP;
+
+	struct cbFrame
+	{
+		XMFLOAT4 time;
+		XMFLOAT4 aspectRatio;
+		
+		XMMATRIX View;
+		XMMATRIX iView;
+		XMMATRIX Proj;
+		XMMATRIX iProj;
+		XMMATRIX iVP;
+
+		XMFLOAT4 DepthViewVector;
+		XMMATRIX DepthView;
+		XMMATRIX DepthProj;
+		XMMATRIX iDepthVP;
+	};
+
+	//shaders
+
+	typedef struct {
+		ID3D11VertexShader* pVs;
+		ID3D11PixelShader* pPs;
+		ID3DBlob* pVSBlob;
+		ID3DBlob* pPSBlob;
+	} shaderStruct;
+
+	shaderStruct Shader[255];
+
+	ID3DBlob* pErrorBlob;
+
+	//---------------------------
+
+	void Log(const char* message)
+	{
+		OutputDebugString(message);
+	}
 
 	int width;
 	int height;
@@ -136,9 +177,6 @@ namespace dx
 				bSDesc.RenderTarget[0].BlendOp = (D3D11_BLEND_OP)(i + 1);
 				device->CreateBlendState(&bSDesc, &blendState[3][i]);
 			}
-
-
-
 		}
 
 		void Depth()
@@ -289,7 +327,7 @@ namespace dx
 		}
 
 
-		HRESULT Device()
+		void Device()
 		{
 			HRESULT hr = S_OK;
 
@@ -316,53 +354,191 @@ namespace dx
 
 			hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
 			#if DebugMode
-				if (FAILED(hr)) {
-					MessageBox(hWnd, "device not created", "dx11error", MB_OK); return S_FALSE;
-				}
+				if (FAILED(hr)) { Log ("device not created"); return; }
 			#endif	
 
 			ID3D11Texture2D* pBackBuffer = NULL;
 			hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 			#if DebugMode
-				if (FAILED(hr)) {
-					MessageBox(hWnd, "swapchain error", "dx11error", MB_OK); return S_FALSE;
-				}
+				if (FAILED(hr)) { Log("swapchain error"); return; }
 			#endif		
 
 			hr = device->CreateRenderTargetView(pBackBuffer, NULL, &renderTargetView);
 			#if DebugMode
-				if (FAILED(hr)) {
-					MessageBox(hWnd, "rt not created", "dx11error", MB_OK); return S_FALSE;
-				}
+				if (FAILED(hr)) {Log ("rt not created"); return; }
 			#endif	
 
 			pBackBuffer->Release();
 
+		}
+
+		int roundUp(int n, int r)
+		{
+			return 	n - (n % r) + r;
+		}
+
+		void ConstBuf()
+		{
+			D3D11_BUFFER_DESC bd;
+			ZeroMemory(&bd, sizeof(bd));
+			bd.Usage = D3D11_USAGE_DEFAULT;
+			bd.ByteWidth = roundUp(sizeof(cbFrame), 16);
+			bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			bd.CPUAccessFlags = 0;
+			bd.StructureByteStride = 16;
+
+			HRESULT hr = device->CreateBuffer(&bd, NULL, &pConstantBufferV);
+			#if DebugMode
+				if (FAILED(hr)) { Log ("constant bufferV fail"); return; }
+			#endif	
+
+			bd.ByteWidth = roundUp(sizeof(cbFrame), 16);
+			hr = device->CreateBuffer(&bd, NULL, &pConstantBufferP);
+			#if DebugMode
+				if (FAILED(hr)) { Log("constant bufferP fail"); return; }
+			#endif		
+		}
+
+		void Init()
+		{
+			Device();
 			SetTextureOptions();
-
 			Rasterizer();
-
 			Depth();
-
 			BlendState();
-
 			Viewport();
-
 			Camera();
-
-			return S_OK;
+			ConstBuf();
 		}
 
 	}
 
+#if EditMode
+
+	bool CompileShaderFromFile(shaderStruct* shader, LPCWSTR source_vs, LPCWSTR source_ps)
+	{
+		HRESULT hr = S_OK;
+		ID3DBlob* pErrorBlob;
+
+		hr = D3DCompileFromFile(source_vs, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &shader->pVSBlob, &pErrorBlob);
+		#if DebugMode
+				if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer());  return false; }
+		#endif
+
+		hr = D3DCompileFromFile(source_ps, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &shader->pPSBlob, &pErrorBlob);
+		#if DebugMode
+				if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer());  return false; }
+		#endif
+
+		hr = device->CreateVertexShader(shader->pVSBlob->GetBufferPointer(), shader->pVSBlob->GetBufferSize(), NULL, &shader->pVs);
+		#if DebugMode
+				if (FAILED(hr)) { Log("vs creation fail"); return false; }
+		#endif
+		hr = device->CreatePixelShader(shader->pPSBlob->GetBufferPointer(), shader->pPSBlob->GetBufferSize(), NULL, &shader->pPs);
+		#if DebugMode
+				if (FAILED(hr)) { Log("ps creation fail"); return false; }
+		#endif
+
+		return true;
+	}
+
+#else
+
+	bool CompileShader(int n, char* shaderText)
+	{
+		HRESULT hr = S_OK;
+
+		Shader[n].pVSBlob = NULL;
+		hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "VS", "vs_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &Shader[n].pVSBlob, &pErrorBlob);
+		
+		#if DebugMode
+			if (FAILED(hr))
+			{
+				char* e = (char*)pErrorBlob->GetBufferPointer(); 
+				return false;
+			}
+		#endif	
+
+		if (Shader[n].pVs) Shader[n].pVs->Release();
+		hr = device->CreateVertexShader(Shader[n].pVSBlob->GetBufferPointer(), Shader[n].pVSBlob->GetBufferSize(), NULL, &Shader[n].pVs);
+		
+		#if DebugMode
+			if (FAILED(hr))
+			{
+				if (Shader[n].pVs) Shader[n].pVs->Release();
+				Log ("vs fail");
+				return false;
+			}
+		#endif		
+
+			/*
+		D3D11_INPUT_ELEMENT_DESC layout[] =
+		{
+			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+			{ "TEXCOORD",1, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+		};
+
+		UINT numElements = ARRAYSIZE(layout);
+
+		if (pVertexLayout[n] != NULL) pVertexLayout[n]->Release();
+
+		hr = device->CreateInputLayout(layout, numElements, Shader[n].pVSBlob->GetBufferPointer(), Shader[n].pVSBlob->GetBufferSize(), &pVertexLayout[n]);
+		#if DebugMode
+			if (FAILED(hr)) { Log("input layout fail");  return; }
+		#endif	
+		*/
+
+		Shader[n].pPSBlob = NULL;
+		hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "PS", "ps_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &Shader[n].pPSBlob, &pErrorBlob);
+
+		#if DebugMode
+			if (hr != S_OK) { Log("vs fail"); return false; }
+		#endif	
+
+		if (Shader[n].pPs) Shader[n].pPs->Release();
+		hr = device->CreatePixelShader(Shader[n].pPSBlob->GetBufferPointer(), Shader[n].pPSBlob->GetBufferSize(), NULL, &Shader[n].pPs);
+		
+		#if DebugMode
+			if (FAILED(hr)) { Log("ps fail\n");return false; }
+		#endif
+
+
+		return true;
+	}
+
+#endif
+
 	void Clear(XMVECTORF32 col)
 	{
-		dx::context->ClearRenderTargetView(dx::renderTargetView, col);
-
+		context->ClearRenderTargetView(renderTargetView, col);
 	}
 
 	void Present()
 	{
-		dx::swapChain->Present(1, 0);
+		swapChain->Present(1, 0);
+	}
+
+	//todo: check previously setted shader, same for IA, const, etc
+	void SetShader(int n)
+	{
+		context->VSSetShader(Shader[n].pVs, NULL, 0);
+		context->PSSetShader(Shader[n].pPs, NULL, 0);
+	}
+
+	void NullDrawer(int shader, int instances, int quadCount)
+	{
+
+		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		context->IASetInputLayout(NULL);
+		context->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
+
+		SetShader(shader);
+
+		context->VSSetConstantBuffers(0, 1, &pConstantBufferV);
+		context->PSSetConstantBuffers(0, 1, &pConstantBufferP);
+
+		context->DrawInstanced(quadCount * 6, instances, 0, 0);
+
 	}
 }

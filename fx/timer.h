@@ -12,7 +12,12 @@ namespace timer
 	void StartCounter()
 	{
 		LARGE_INTEGER li;
-		if (!QueryPerformanceFrequency(&li)) MessageBox(hWnd, "timer fail", NULL, 0);
+
+		#if Debug
+			if (!QueryPerformanceFrequency(&li)) MessageBox(hWnd, "timer fail", NULL, 0);
+		#else
+			QueryPerformanceFrequency(&li);
+		#endif	
 
 		PCFreq = double(li.QuadPart) / 1000.0;
 

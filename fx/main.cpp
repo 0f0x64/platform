@@ -1,11 +1,11 @@
 // global defines
 
 #define EditMode true
-#define DebugMode false
+#define DebugMode true
 #define DirectXDebugMode false
 
 #define FRAMES_PER_SECOND 60
-#define FRAME_LEN 1000. / (double) FRAMES_PER_SECOND
+#define FRAME_LEN 1000. / (float) FRAMES_PER_SECOND
 
 float DEMO_DURATION = 5; //in seconds
 
@@ -33,15 +33,22 @@ HWND hWnd;
 
 #include <Xaudio2.h>
 
+#if EditMode
+	#include "editor.h"
+#endif
+
 // --------------
 
 void Loop()
 {
-	dx::Clear(XMVECTORF32{ 0, 0, 1, 1 });
+//	double t = timer::frameBeginTime * .01;
+	dx::Clear(XMVECTORF32{ .3f,.3f,.3f, 1.f });
+
+	//dx::NullDrawer(0, 1, 1);
+
 	dx::Present();
 
 }
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -59,7 +66,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetFocus(hWnd);
 	ShowCursor(EditMode);
 
-	dx::init::Device();
+	dx::init::Init();
+	
+	#if EditMode
+		editor::Init();
+	#endif	
+	
+	//dx::CompileShader(0, shaderText);
+	dx::CompileShaderFromFile(&dx::Shader[0], L"../shader.h", L"../shader.h");
 
 	MSG msg = { 0 };
 
@@ -92,11 +106,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			timer::nextFrameTime = timer::frameBeginTime + FRAME_LEN;
 		}
 
-		Sleep(min(FRAME_LEN, max(FRAME_LEN - (DWORD)timer::frameRenderingDuration,0)));
+		Sleep((DWORD)min(FRAME_LEN, max(FRAME_LEN - timer::frameRenderingDuration,0)));
 		
 	}
 
-	return 0;
+	ExitProcess(0);
 
 }
 
