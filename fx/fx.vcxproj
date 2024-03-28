@@ -223,7 +223,7 @@
   <ItemGroup>
     <ClInclude Include="dx.h" />
     <ClInclude Include="editor.h" />
-    <ClInclude Include="shader.h" />
+    <ClInclude Include="projectFiles\shader.hlsl" />
     <ClInclude Include="timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

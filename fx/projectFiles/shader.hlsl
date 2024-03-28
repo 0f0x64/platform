@@ -12,15 +12,15 @@ struct VS_OUTPUT
 VS_OUTPUT VS(uint vID : SV_VertexID)
 {
 	VS_OUTPUT output = (VS_OUTPUT)0;
-	float2 quad[6] = { 0,0, 1,0, 0,1, 1,0, 1,1, 0,1 };
-	float2 p = quad[vID);
-	output.Pos = float4(p, 0, 1);
-	output.uv = p;
+	float2 quad[6] = { -1,-1, 1,-1, -1,1, 1,-1, 1,1, -1,1 };
+	float2 p = quad[vID];
+	output.pos = float4(p, 0, 1);
+	output.uv = p/2.+.5;
 	return output;
 };
 
 float4 PS(VS_OUTPUT input) : SV_Target
 {
-	float4 color = float4(0,1,0,1);
-	return fcolor;
+	float4 color = float4(input.uv,0,1);
+	return color;
 };

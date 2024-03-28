@@ -16,6 +16,9 @@ namespace dx
 	ID3D11ShaderResourceView*	depthStencilSRView = NULL;
 	ID3D11DepthStencilState*	pDSState[4];
 
+	//viewport
+	D3D11_VIEWPORT vp;
+
 	//camera
 	XMMATRIX View;
 	XMMATRIX Projection;
@@ -66,8 +69,8 @@ namespace dx
 		OutputDebugString(message);
 	}
 
-	int width;
-	int height;
+	int width = 1920/4;
+	int height = 1080/4;
 	float aspect;
 	float iaspect;
 
@@ -75,7 +78,6 @@ namespace dx
 	{
 		void Viewport()
 		{
-			D3D11_VIEWPORT vp;
 			vp.Width = (FLOAT)width;
 			vp.Height = (FLOAT)height;
 			vp.MinDepth = 0.0f;
@@ -333,6 +335,10 @@ namespace dx
 
 			width = GetSystemMetrics(SM_CXSCREEN);
 			height = GetSystemMetrics(SM_CYSCREEN);
+#if EditMode
+			width = 1920 / 4;
+			height = 1080 / 4;
+#endif
 
 			aspect = float(height) / float(width);
 			iaspect = float(width) / float(height);
@@ -524,6 +530,17 @@ namespace dx
 	{
 		context->VSSetShader(Shader[n].pVs, NULL, 0);
 		context->PSSetShader(Shader[n].pPs, NULL, 0);
+	}
+
+	void SetRT()
+	{
+		context->RSSetViewports(1, &vp);
+		context->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+	}
+
+	void SetZBuffer()
+	{
+		context->OMSetDepthStencilState(dx::pDSState[0], 1);
 	}
 
 	void NullDrawer(int shader, int instances, int quadCount)

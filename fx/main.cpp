@@ -41,10 +41,14 @@ HWND hWnd;
 
 void Loop()
 {
+	
 //	double t = timer::frameBeginTime * .01;
 	dx::Clear(XMVECTORF32{ .3f,.3f,.3f, 1.f });
 
-	//dx::NullDrawer(0, 1, 1);
+	dx::SetRT();
+
+	dx::SetZBuffer();
+	dx::NullDrawer(0, 1, 1);
 
 	dx::Present();
 
@@ -58,22 +62,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW),brush, NULL, "fx", NULL };
 	RegisterClassEx(&wcex);
-	hWnd = CreateWindow("fx", "fx", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInst, NULL);
-	SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) & (~WS_CAPTION));
+	//hWnd = CreateWindow("fx", "fx", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInst, NULL);
+	hWnd = CreateWindow("fx", "fx", WS_OVERLAPPEDWINDOW , CW_USEDEFAULT, 0, dx::width, dx::height, NULL, NULL, hInst, NULL);
 
-	ShowWindow(hWnd, SW_MAXIMIZE);
+	dx::init::Init();
+
+	//SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) & (~WS_CAPTION));
+	ShowWindow(hWnd, EditMode ? SW_SHOW: SW_MAXIMIZE);
 	UpdateWindow(hWnd);
 	SetFocus(hWnd);
 	ShowCursor(EditMode);
 
-	dx::init::Init();
-	
+	SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
 	#if EditMode
 		editor::Init();
 	#endif	
 	
-	//dx::CompileShader(0, shaderText);
-	dx::CompileShaderFromFile(&dx::Shader[0], L"../shader.h", L"../shader.h");
+	dx::CompileShaderFromFile(&dx::Shader[0], L"../fx/projectFiles/shader.hlsl", L"../fx/projectFiles/shader.hlsl");
 
 	MSG msg = { 0 };
 
@@ -84,6 +90,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		double time = timer::GetCounter();
 		
 		#if EditMode
+			
+			editor::WatchFiles();
+
 			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
 				TranslateMessage(&msg);
@@ -100,7 +109,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		if (time >= timer::nextFrameTime)
 		{
 			timer::frameBeginTime = timer::GetCounter();
+
 			Loop();
+
 			timer::frameEndTime = timer::GetCounter();
 			timer::frameRenderingDuration = timer::frameEndTime - timer::frameBeginTime;
 			timer::nextFrameTime = timer::frameBeginTime + FRAME_LEN;

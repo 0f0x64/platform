@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\projectFiles">
+      <UniqueIdentifier>{48d34976-4b74-47cc-95fa-1381348bf0e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -26,11 +29,11 @@
     <ClInclude Include="dx.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="shader.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="editor.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\shader.hlsl">
+      <Filter>Source Files\projectFiles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
