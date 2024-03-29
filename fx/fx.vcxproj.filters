@@ -32,8 +32,19 @@
     <ClInclude Include="editor.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="projectFiles\shader.hlsl">
+    <ClInclude Include="projectFiles\loop.h">
       <Filter>Source Files\projectFiles</Filter>
     </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="projectFiles\quad.hlsl">
+      <Filter>Source Files\projectFiles</Filter>
+    </FxCompile>
+    <FxCompile Include="projectFiles\simple.hlsl">
+      <Filter>Source Files\projectFiles</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

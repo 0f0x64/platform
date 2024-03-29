@@ -172,6 +172,9 @@
       <AdditionalDependencies>d3d10.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;xaudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/CRINKLER /ENTRY:WinMain %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <Manifest>
+      <EnableDpiAwareness>false</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -223,8 +226,21 @@
   <ItemGroup>
     <ClInclude Include="dx.h" />
     <ClInclude Include="editor.h" />
-    <ClInclude Include="projectFiles\shader.hlsl" />
+    <ClInclude Include="projectFiles\loop.h" />
+    <ClInclude Include="settings.h" />
     <ClInclude Include="timer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="projectFiles\quad.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Crinkler|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="projectFiles\simple.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Crinkler|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

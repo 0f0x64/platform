@@ -52,13 +52,17 @@ namespace dx
 	//shaders
 
 	typedef struct {
-		ID3D11VertexShader* pVs;
-		ID3D11PixelShader* pPs;
-		ID3DBlob* pVSBlob;
-		ID3DBlob* pPSBlob;
-	} shaderStruct;
+		ID3D11VertexShader* pShader;
+		ID3DBlob* pBlob;
+	} VertexShader;
 
-	shaderStruct Shader[255];
+	typedef struct {
+		ID3D11PixelShader* pShader;
+		ID3DBlob* pBlob;
+	} PixelShader;
+
+	VertexShader VS[255];
+	PixelShader PS[255];
 
 	ID3DBlob* pErrorBlob;
 
@@ -69,8 +73,8 @@ namespace dx
 		OutputDebugString(message);
 	}
 
-	int width = 1920/4;
-	int height = 1080/4;
+	int width;
+	int height;
 	float aspect;
 	float iaspect;
 
@@ -333,13 +337,6 @@ namespace dx
 		{
 			HRESULT hr = S_OK;
 
-			width = GetSystemMetrics(SM_CXSCREEN);
-			height = GetSystemMetrics(SM_CYSCREEN);
-#if EditMode
-			width = 1920 / 4;
-			height = 1080 / 4;
-#endif
-
 			aspect = float(height) / float(width);
 			iaspect = float(width) / float(height);
 
@@ -360,18 +357,18 @@ namespace dx
 
 			hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
 			#if DebugMode
-				if (FAILED(hr)) { Log ("device not created"); return; }
+				if (FAILED(hr)) { Log ("device not created\n"); return; }
 			#endif	
 
 			ID3D11Texture2D* pBackBuffer = NULL;
 			hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
 			#if DebugMode
-				if (FAILED(hr)) { Log("swapchain error"); return; }
+				if (FAILED(hr)) { Log("swapchain error\n"); return; }
 			#endif		
 
 			hr = device->CreateRenderTargetView(pBackBuffer, NULL, &renderTargetView);
 			#if DebugMode
-				if (FAILED(hr)) {Log ("rt not created"); return; }
+				if (FAILED(hr)) {Log ("rt not created\n"); return; }
 			#endif	
 
 			pBackBuffer->Release();
@@ -395,13 +392,13 @@ namespace dx
 
 			HRESULT hr = device->CreateBuffer(&bd, NULL, &pConstantBufferV);
 			#if DebugMode
-				if (FAILED(hr)) { Log ("constant bufferV fail"); return; }
+				if (FAILED(hr)) { Log ("constant bufferV fail\n"); return; }
 			#endif	
 
 			bd.ByteWidth = roundUp(sizeof(cbFrame), 16);
 			hr = device->CreateBuffer(&bd, NULL, &pConstantBufferP);
 			#if DebugMode
-				if (FAILED(hr)) { Log("constant bufferP fail"); return; }
+				if (FAILED(hr)) { Log("constant bufferP fail\n"); return; }
 			#endif		
 		}
 
@@ -421,31 +418,57 @@ namespace dx
 
 #if EditMode
 
-	bool CompileShaderFromFile(shaderStruct* shader, LPCWSTR source_vs, LPCWSTR source_ps)
+	void CompilerLog(LPCWSTR source, HRESULT hr,const char* message)
+	{
+		#if DebugMode
+			if (FAILED(hr)) 
+			{ 
+				Log((char*)pErrorBlob->GetBufferPointer());
+			}
+			else
+			{
+				char shaderName[1024];
+				WideCharToMultiByte(CP_ACP, NULL, source, -1, shaderName, sizeof(shaderName), NULL, NULL);
+
+				Log(message);
+				Log((char*)shaderName);
+				Log("\n");
+			}
+		#endif
+	}
+
+	void CompileVertexShaderFromFile(VertexShader* shader, LPCWSTR source)
 	{
 		HRESULT hr = S_OK;
-		ID3DBlob* pErrorBlob;
 
-		hr = D3DCompileFromFile(source_vs, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &shader->pVSBlob, &pErrorBlob);
-		#if DebugMode
-				if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer());  return false; }
-		#endif
+		hr = D3DCompileFromFile(source, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &shader->pBlob, &pErrorBlob);
+		CompilerLog(source,hr,"vertex shader compiled: ");
 
-		hr = D3DCompileFromFile(source_ps, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &shader->pPSBlob, &pErrorBlob);
-		#if DebugMode
-				if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer());  return false; }
-		#endif
+		if (hr == S_OK)
+		{
+			hr = device->CreateVertexShader(shader->pBlob->GetBufferPointer(), shader->pBlob->GetBufferSize(), NULL, &shader->pShader);
+			#if DebugMode
+				if (FAILED(hr)) { Log("vs creation fail\n"); return; }
+			#endif
+		}
 
-		hr = device->CreateVertexShader(shader->pVSBlob->GetBufferPointer(), shader->pVSBlob->GetBufferSize(), NULL, &shader->pVs);
-		#if DebugMode
-				if (FAILED(hr)) { Log("vs creation fail"); return false; }
-		#endif
-		hr = device->CreatePixelShader(shader->pPSBlob->GetBufferPointer(), shader->pPSBlob->GetBufferSize(), NULL, &shader->pPs);
-		#if DebugMode
-				if (FAILED(hr)) { Log("ps creation fail"); return false; }
-		#endif
+	}
 
-		return true;
+	void CompilePixelShaderFromFile(PixelShader* shader, LPCWSTR source)
+	{
+		HRESULT hr = S_OK;
+
+		hr = D3DCompileFromFile(source, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &shader->pBlob, &pErrorBlob);
+		CompilerLog(source, hr,"pixel shader compiled: ");
+
+		if (hr == S_OK)
+		{
+			hr = device->CreatePixelShader(shader->pBlob->GetBufferPointer(), shader->pBlob->GetBufferSize(), NULL, &shader->pShader);
+			#if DebugMode
+				if (FAILED(hr)) { Log("vs creation fail\n"); return; }
+			#endif
+		}
+
 	}
 
 #else
@@ -458,11 +481,7 @@ namespace dx
 		hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "VS", "vs_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &Shader[n].pVSBlob, &pErrorBlob);
 		
 		#if DebugMode
-			if (FAILED(hr))
-			{
-				char* e = (char*)pErrorBlob->GetBufferPointer(); 
-				return false;
-			}
+			if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer());  return false; }
 		#endif	
 
 		if (Shader[n].pVs) Shader[n].pVs->Release();
@@ -528,8 +547,8 @@ namespace dx
 	//todo: check previously setted shader, same for IA, const, etc
 	void SetShader(int n)
 	{
-		context->VSSetShader(Shader[n].pVs, NULL, 0);
-		context->PSSetShader(Shader[n].pPs, NULL, 0);
+		context->VSSetShader(VS[n].pShader, NULL, 0);
+		context->PSSetShader(PS[n].pShader, NULL, 0);
 	}
 
 	void SetRT()

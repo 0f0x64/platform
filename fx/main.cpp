@@ -1,13 +1,4 @@
-// global defines
-
-#define EditMode true
-#define DebugMode true
-#define DirectXDebugMode false
-
-#define FRAMES_PER_SECOND 60
-#define FRAME_LEN 1000. / (float) FRAMES_PER_SECOND
-
-float DEMO_DURATION = 5; //in seconds
+#include "settings.h"
 
 // windows environment
 
@@ -39,47 +30,36 @@ HWND hWnd;
 
 // --------------
 
-void Loop()
-{
-	
-//	double t = timer::frameBeginTime * .01;
-	dx::Clear(XMVECTORF32{ .3f,.3f,.3f, 1.f });
+#include "projectFiles\loop.h"
 
-	dx::SetRT();
 
-	dx::SetZBuffer();
-	dx::NullDrawer(0, 1, 1);
-
-	dx::Present();
-
-}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	SetProcessDPIAware();
 	hInst = (HINSTANCE)GetModuleHandle(0);
 
+	dx::width = GetSystemMetrics(SM_CXSCREEN);
+	dx::height = GetSystemMetrics(SM_CYSCREEN);
+
+	int w = dx::width;
+	int h = dx::height;
+
 	HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW),brush, NULL, "fx", NULL };
 	RegisterClassEx(&wcex);
-	//hWnd = CreateWindow("fx", "fx", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInst, NULL);
-	hWnd = CreateWindow("fx", "fx", WS_OVERLAPPEDWINDOW , CW_USEDEFAULT, 0, dx::width, dx::height, NULL, NULL, hInst, NULL);
+	hWnd = CreateWindow("fx", "fx", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
 
-	dx::init::Init();
-
-	//SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) & (~WS_CAPTION));
 	ShowWindow(hWnd, EditMode ? SW_SHOW: SW_MAXIMIZE);
 	UpdateWindow(hWnd);
 	SetFocus(hWnd);
 	ShowCursor(EditMode);
 
-	SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-
 	#if EditMode
 		editor::Init();
 	#endif	
-	
-	dx::CompileShaderFromFile(&dx::Shader[0], L"../fx/projectFiles/shader.hlsl", L"../fx/projectFiles/shader.hlsl");
+
+	dx::init::Init();
 
 	MSG msg = { 0 };
 
@@ -110,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			timer::frameBeginTime = timer::GetCounter();
 
-			Loop();
+			Loop::mainLoop();
 
 			timer::frameEndTime = timer::GetCounter();
 			timer::frameRenderingDuration = timer::frameEndTime - timer::frameBeginTime;

@@ -15,12 +15,6 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
 	float2 quad[6] = { -1,-1, 1,-1, -1,1, 1,-1, 1,1, -1,1 };
 	float2 p = quad[vID];
 	output.pos = float4(p, 0, 1);
-	output.uv = p/2.+.5;
+	output.uv = p / 2. + .5;
 	return output;
-};
-
-float4 PS(VS_OUTPUT input) : SV_Target
-{
-	float4 color = float4(input.uv,0,1);
-	return color;
 };
