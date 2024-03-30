@@ -1,4 +1,4 @@
-#define EditMode true
+#define EditMode false
 #define DebugMode true
 #define DirectXDebugMode false
 

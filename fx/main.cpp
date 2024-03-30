@@ -81,7 +81,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		#else
 			PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
 			if (GetAsyncKeyState(VK_ESCAPE)) break;
-			if (timer::currentFrameTime / 1000 > DEMO_DURATION) break;
+			if (timer::frameBeginTime / 1000 > DEMO_DURATION) break;
 		#endif
 
 		if (msg.message == WM_QUIT)	break;

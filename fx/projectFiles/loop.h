@@ -18,18 +18,16 @@ namespace Loop
 	};
 
 #else
-	namespace shadersI {
-		#include "generated\quad.h"
-		#include "generated\simple.h"
-	};
+		#include "generated\shaders.h"
 #endif
 
 
 #if EditMode
 	void CreateShaders()
 	{
+		int shadersCount = sizeof(shaderNameList) / sizeof(const char*);
 		int i = 0;
-		while (*shaderNameList[i] != 0)
+		while (i<shadersCount)
 		{
 			dx::CompileVertexShaderFromFile(&dx::VS[vsCounter++], shaderNameList[i]);
 			dx::CompilePixelShaderFromFile(&dx::PS[psCounter++], shaderNameList[i]);
@@ -38,14 +36,7 @@ namespace Loop
 #else
 	void CreateShaders()
 	{
-		auto i = shaders::0;
-
-		/*int i = 0;
-		while (*shaderNameList[i] != 0)
-		{
-			dx::CompileVertexShaderFromFile(&dx::VS[vsCounter++], shaders[i]);
-			dx::CompilePixelShaderFromFile(&dx::PS[psCounter++], shaders[i]);
-		}*/
+		shadersData::CompileAll();
 	}
 
 #endif
@@ -73,7 +64,8 @@ namespace Loop
 		dx::SetCB();
 
 		dx::SetVS(shaders::quad);
-		dx::SetVS(shaders::simple);
+		dx::SetPS(shaders::simple);
+
 
 		dx::NullDrawer(1, 1);
 

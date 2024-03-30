@@ -491,63 +491,50 @@ namespace dx
 
 #else
 
-	bool CompileShader(int n, char* shaderText)
+	void CompileShader(int n, const char* shaderText)
 	{
 		HRESULT hr = S_OK;
 
-		Shader[n].pVSBlob = NULL;
-		hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "VS", "vs_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &Shader[n].pVSBlob, &pErrorBlob);
+		VS[n].pBlob = NULL;
+		hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "VS", "vs_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &VS[n].pBlob, &pErrorBlob);
 		
 		#if DebugMode
-			if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer());  return false; }
+			if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer());}
 		#endif	
 
-		if (Shader[n].pVs) Shader[n].pVs->Release();
-		hr = device->CreateVertexShader(Shader[n].pVSBlob->GetBufferPointer(), Shader[n].pVSBlob->GetBufferSize(), NULL, &Shader[n].pVs);
-		
-		#if DebugMode
-			if (FAILED(hr))
+			if (hr == S_OK)
 			{
-				if (Shader[n].pVs) Shader[n].pVs->Release();
-				Log ("vs fail");
-				return false;
+				if (VS[n].pShader) VS[n].pShader->Release();
+
+				hr = device->CreateVertexShader(VS[n].pBlob->GetBufferPointer(), VS[n].pBlob->GetBufferSize(), NULL, &VS[n].pShader);
+
+				#if DebugMode
+				if (FAILED(hr))
+				{
+					if (VS[n].pShader) VS[n].pShader->Release();
+					Log("vs fail");
+				}
+				#endif		
 			}
-		#endif		
 
-			/*
-		D3D11_INPUT_ELEMENT_DESC layout[] =
-		{
-			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-			{ "TEXCOORD",1, DXGI_FORMAT_R32G32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-		};
 
-		UINT numElements = ARRAYSIZE(layout);
-
-		if (pVertexLayout[n] != NULL) pVertexLayout[n]->Release();
-
-		hr = device->CreateInputLayout(layout, numElements, Shader[n].pVSBlob->GetBufferPointer(), Shader[n].pVSBlob->GetBufferSize(), &pVertexLayout[n]);
-		#if DebugMode
-			if (FAILED(hr)) { Log("input layout fail");  return; }
-		#endif	
-		*/
-
-		Shader[n].pPSBlob = NULL;
-		hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "PS", "ps_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &Shader[n].pPSBlob, &pErrorBlob);
+		PS[n].pBlob = NULL;
+		hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "PS", "ps_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &PS[n].pBlob, &pErrorBlob);
 
 		#if DebugMode
-			if (hr != S_OK) { Log("vs fail"); return false; }
+			if (hr != S_OK) { Log("vs fail");}
 		#endif	
 
-		if (Shader[n].pPs) Shader[n].pPs->Release();
-		hr = device->CreatePixelShader(Shader[n].pPSBlob->GetBufferPointer(), Shader[n].pPSBlob->GetBufferSize(), NULL, &Shader[n].pPs);
-		
-		#if DebugMode
-			if (FAILED(hr)) { Log("ps fail\n");return false; }
-		#endif
+			if (hr == S_OK)
+			{
+				if (PS[n].pShader) PS[n].pShader->Release();
+				hr = device->CreatePixelShader(PS[n].pBlob->GetBufferPointer(), PS[n].pBlob->GetBufferSize(), NULL, &PS[n].pShader);
 
+				#if DebugMode
+					if (FAILED(hr)) { Log("ps fail\n"); }
+				#endif
 
-		return true;
+			}
 	}
 
 #endif

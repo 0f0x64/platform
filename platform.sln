@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.34301.259
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "platform", "fx\fx.vcxproj", "{6F404B08-B1DB-4EAF-B14C-941C4C032963}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D} = {E021A02D-CB7B-4445-8CAA-4958AA8CF72D}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataAssembler", "DataAssembler\DataAssembler.vcxproj", "{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}"
 EndProject
@@ -31,8 +34,8 @@ Global
 		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release|x86.Build.0 = Release|Win32
 		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Crinkler|x64.ActiveCfg = Debug|x64
 		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Crinkler|x64.Build.0 = Debug|x64
-		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Crinkler|x86.ActiveCfg = Debug|Win32
-		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Crinkler|x86.Build.0 = Debug|Win32
+		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Crinkler|x86.ActiveCfg = Crinkler|Win32
+		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Crinkler|x86.Build.0 = Crinkler|Win32
 		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Debug|x64.ActiveCfg = Debug|x64
 		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Debug|x64.Build.0 = Debug|x64
 		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Debug|x86.ActiveCfg = Debug|Win32

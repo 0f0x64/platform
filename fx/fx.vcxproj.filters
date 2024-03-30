@@ -44,14 +44,11 @@
     <ClInclude Include="settings.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="generated\quad.h">
-      <Filter>Source Files\generated</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\simple.h">
-      <Filter>Source Files\generated</Filter>
-    </ClInclude>
     <ClInclude Include="projectFiles\shaders.h">
       <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\shaders.h">
+      <Filter>Source Files\generated</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

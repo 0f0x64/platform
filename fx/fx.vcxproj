@@ -132,6 +132,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d10.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;xaudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>$(TargetDir)DataAssembler.exe</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -149,6 +152,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d10.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;xaudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>$(TargetDir)DataAssembler.exe</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Crinkler|Win32'">
     <ClCompile>
@@ -175,6 +181,9 @@
     <Manifest>
       <EnableDpiAwareness>false</EnableDpiAwareness>
     </Manifest>
+    <PreBuildEvent>
+      <Command>$(TargetDir)DataAssembler.exe</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -226,8 +235,7 @@
   <ItemGroup>
     <ClInclude Include="dx.h" />
     <ClInclude Include="editor.h" />
-    <ClInclude Include="generated\quad.h" />
-    <ClInclude Include="generated\simple.h" />
+    <ClInclude Include="generated\shaders.h" />
     <ClInclude Include="projectFiles\loop.h" />
     <ClInclude Include="projectFiles\shaders.h" />
     <ClInclude Include="settings.h" />
