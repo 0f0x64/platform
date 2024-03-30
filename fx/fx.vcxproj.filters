@@ -16,6 +16,12 @@
     <Filter Include="Source Files\projectFiles">
       <UniqueIdentifier>{48d34976-4b74-47cc-95fa-1381348bf0e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\generated">
+      <UniqueIdentifier>{5d051027-66fd-480c-ba4d-8a03f468ba02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\projectFiles\shaders">
+      <UniqueIdentifier>{03958e32-959e-42e5-b59b-263cdacc9678}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -38,13 +44,22 @@
     <ClInclude Include="settings.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="generated\quad.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\simple.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\shaders.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="projectFiles\quad.hlsl">
-      <Filter>Source Files\projectFiles</Filter>
+    <FxCompile Include="projectFiles\shaders\quad.hlsl">
+      <Filter>Source Files\projectFiles\shaders</Filter>
     </FxCompile>
-    <FxCompile Include="projectFiles\simple.hlsl">
-      <Filter>Source Files\projectFiles</Filter>
+    <FxCompile Include="projectFiles\shaders\simple.hlsl">
+      <Filter>Source Files\projectFiles\shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

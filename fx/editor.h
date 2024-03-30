@@ -1,7 +1,3 @@
-
-#define SECONDARY_DISPLAY_IF_AVAILABLE true
-#define MAIN_DISPLAY_DENOMINATOR 3
-
 #include <libloaderapi.h>
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
@@ -76,7 +72,6 @@ namespace editor
 	}
 
 	bool isWatching = false;
-	char path[MAX_PATH] = "../fx/projectFiles";
 	HANDLE file = NULL;
 	OVERLAPPED overlapped;
 	BOOL success = false;
@@ -89,10 +84,10 @@ namespace editor
 		if (!isWatching)//init
 		{
 			dx::Log("watching for changes: ");
-			dx::Log(path);
+			dx::Log(shadersPath);
 			dx::Log("\n");
 
-			file = CreateFile(path,
+			file = CreateFile(shadersPath,
 				FILE_LIST_DIRECTORY,
 				FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
 				NULL,
@@ -145,7 +140,7 @@ namespace editor
 						offset += event->NextEntryOffset;
 					} while (event->NextEntryOffset != 0);
 
-					char* s = strstr(fileName, ".hlsl~RF");//VS only hack!
+					char* s = strstr(fileName, ".hlsl~RF");//visual studio only hack!
 					if (s)
 					{
 						char s2[nameBufLen];
@@ -158,18 +153,10 @@ namespace editor
 						dx::Log(s2);
 						dx::Log("\n");
 
-						char s3[nameBufLen];
+						//? detect vertex/pixel shader and slot
 
-						strcpy(s3, path);
-						strcat(s3, "/");
-						strcat(s3, s2);
-
-						int len = MultiByteToWideChar(CP_ACP, 0, s3, -1,NULL, 0);
-						wchar_t shaderPath [nameBufLen];
-						MultiByteToWideChar(CP_ACP, 0, s3, -1,shaderPath, len);
-						
-						dx::CompileVertexShaderFromFile(&dx::VS[0], shaderPath);
-						dx::CompilePixelShaderFromFile(&dx::PS[0], shaderPath);
+						dx::CompileVertexShaderFromFile(&dx::VS[0], s2);
+						dx::CompilePixelShaderFromFile(&dx::PS[0], s2);
 
 					}
 

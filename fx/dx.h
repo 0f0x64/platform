@@ -437,8 +437,24 @@ namespace dx
 		#endif
 	}
 
-	void CompileVertexShaderFromFile(VertexShader* shader, LPCWSTR source)
+	wchar_t shaderPathW[MAX_PATH];
+
+	LPCWSTR nameToPatchLPCWSTR(const char* name)
 	{
+		char path[MAX_PATH] = shadersPath;
+		strcat(path, name);
+		strcat(path, ".hlsl");
+
+		int len = MultiByteToWideChar(CP_ACP, 0, path, -1, NULL, 0);
+		MultiByteToWideChar(CP_ACP, 0, path, -1, shaderPathW, len);
+
+		return shaderPathW;
+	}
+
+	void CompileVertexShaderFromFile(VertexShader* shader, const char* name)
+	{
+		LPCWSTR source = nameToPatchLPCWSTR(name);
+
 		HRESULT hr = S_OK;
 
 		hr = D3DCompileFromFile(source, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &shader->pBlob, &pErrorBlob);
@@ -454,8 +470,10 @@ namespace dx
 
 	}
 
-	void CompilePixelShaderFromFile(PixelShader* shader, LPCWSTR source)
+	void CompilePixelShaderFromFile(PixelShader* shader, const char* name)
 	{
+		LPCWSTR source = nameToPatchLPCWSTR(name);
+
 		HRESULT hr = S_OK;
 
 		hr = D3DCompileFromFile(source, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &shader->pBlob, &pErrorBlob);
@@ -545,11 +563,16 @@ namespace dx
 	}
 
 	//todo: check previously setted shader, same for IA, const, etc
-	void SetShader(int n)
+	void SetVS(int n)
 	{
 		context->VSSetShader(VS[n].pShader, NULL, 0);
+	}
+
+	void SetPS(int n)
+	{
 		context->PSSetShader(PS[n].pShader, NULL, 0);
 	}
+
 
 	void SetRT()
 	{
@@ -562,19 +585,21 @@ namespace dx
 		context->OMSetDepthStencilState(dx::pDSState[0], 1);
 	}
 
-	void NullDrawer(int shader, int instances, int quadCount)
+	void SetIA()
 	{
-
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		context->IASetInputLayout(NULL);
 		context->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
+	}
 
-		SetShader(shader);
-
+	void SetCB()
+	{
 		context->VSSetConstantBuffers(0, 1, &pConstantBufferV);
 		context->PSSetConstantBuffers(0, 1, &pConstantBufferP);
+	}
 
+	void NullDrawer(int instances, int quadCount)
+	{
 		context->DrawInstanced(quadCount * 6, instances, 0, 0);
-
 	}
 }
