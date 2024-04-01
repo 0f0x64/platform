@@ -2,38 +2,40 @@ namespace Loop
 {
 	bool isInit = false;
 
-	int vsCounter = 0;
-	int psCounter = 0;
-
-	#define shader(VariableName) VariableName
-	enum shaders {
-		#include "projectFiles\shaders.h"
-	};
-
 #if EditMode
-	#undef shader
-	#define shader(VariableName) # VariableName
-	const char* shaderNameList[] = {
-		#include "projectFiles\shaders.h"
-	};
 
-#else
-		#include "generated\shaders.h"
-#endif
-
-
-#if EditMode
 	void CreateShaders()
 	{
-		int shadersCount = sizeof(shaderNameList) / sizeof(const char*);
+		shaders::vsCount = sizeof(shaders::vsList) / sizeof(const char*);
 		int i = 0;
-		while (i<shadersCount)
+		while (i<shaders::vsCount)
 		{
-			dx::CompileVertexShaderFromFile(&dx::VS[vsCounter++], shaderNameList[i]);
-			dx::CompilePixelShaderFromFile(&dx::PS[psCounter++], shaderNameList[i]);
+			char fileName[255];
+			strcpy(fileName, "/vs/");
+			strcat(fileName, shaders::vsList[i]);
+			strcat(fileName, ".hlsl");
+			dx::CompileVertexShaderFromFile(&dx::VS[i], fileName);
+			i++;
+			
 		}
+
+		shaders::psCount = sizeof(shaders::psList) / sizeof(const char*);
+		i = 0;
+		while (i < shaders::psCount)
+		{
+			char fileName[255];
+			strcpy(fileName, "/ps/");
+			strcat(fileName, shaders::psList[i]);
+			strcat(fileName, ".hlsl");
+			dx::CompilePixelShaderFromFile(&dx::PS[i], fileName);
+			i++;
+		}
+
 	}
 #else
+
+	#include "generated\processedShaders.h"
+
 	void CreateShaders()
 	{
 		shadersData::CompileAll();
@@ -43,9 +45,6 @@ namespace Loop
 
 	void Init()
 	{
-		vsCounter = 0;
-		psCounter = 0;
-
 		CreateShaders();
 
 		isInit = true;
@@ -63,10 +62,12 @@ namespace Loop
 
 		dx::SetCB();
 
-		dx::SetVS(shaders::quad);
-		dx::SetPS(shaders::simple);
+		dx::SetVS(shaders::vertex::quad);
+		dx::SetPS(shaders::pixel::simple);
+		dx::NullDrawer(1, 1);
 
-
+		dx::SetVS(shaders::vertex::quad2);
+		dx::SetPS(shaders::pixel::simple2);
 		dx::NullDrawer(1, 1);
 
 		dx::Present();

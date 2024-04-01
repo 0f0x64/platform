@@ -75,7 +75,7 @@ namespace editor
 	HANDLE file = NULL;
 	OVERLAPPED overlapped;
 	BOOL success = false;
-	const int changeBufLen = 1024;
+	const int changeBufLen = 1024*4;
 	const int nameBufLen = 1024;
 	uint8_t change_buf[changeBufLen];
 
@@ -126,6 +126,7 @@ namespace editor
 				{
 				case FILE_NOTIFY_CHANGE_FILE_NAME:
 				case FILE_ACTION_MODIFIED:
+				case FILE_ACTION_RENAMED_NEW_NAME:
 				{
 					char fileName[nameBufLen];
 					DWORD offset = 0;
@@ -134,31 +135,65 @@ namespace editor
 					{
 						memset(fileName, NULL, nameBufLen);
 						event = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(&change_buf[offset]);
-
 						WideCharToMultiByte(CP_ACP, NULL, event->FileName, event->FileNameLength / sizeof(WCHAR), fileName, sizeof(fileName), NULL, NULL);
+
+						char* s = strstr(fileName, ".hlsl~RF");//visual studio only hack!
+						if (s)
+						{
+							char s2[nameBufLen];
+							memset(s2, NULL, nameBufLen);
+							ptrdiff_t bytes = ((char*)s) - ((char*)fileName) + 5;//.hlsl length = 5
+							memcpy(s2, fileName, bytes);
+							s2[bytes + 1] = 0;
+
+							dx::Log("Modified:  ");
+							dx::Log(s2);
+							dx::Log("\n");
+					
+							char pureName[255];
+							strcpy(pureName, s2 + 3);
+							pureName[strlen(pureName) - 5] = 0;
+
+							char s3[255];
+							strcpy(s3, "/");
+							strcat(s3, s2);
+
+							//? detect vertex/pixel shader and slot
+							if (s2[0] == 'v')
+							{
+								int i = 0;
+								while (i < shaders::vsCount)
+								{
+									if (!strcmp(shaders::vsList[i], pureName))
+									{
+										dx::CompileVertexShaderFromFile(&dx::VS[i], s3);
+										break;
+									}
+									i++;
+								}
+			
+							}
+							
+							if (s2[0] == 'p')
+							{
+								int i = 0;
+								while (i < shaders::psCount)
+								{
+									if (!strcmp(shaders::psList[i], pureName))
+									{
+										dx::CompilePixelShaderFromFile(&dx::PS[i], s3);
+										break;
+									}
+									i++;
+								}
+
+							}
+
+						}
 
 						offset += event->NextEntryOffset;
 					} while (event->NextEntryOffset != 0);
 
-					char* s = strstr(fileName, ".hlsl~RF");//visual studio only hack!
-					if (s)
-					{
-						char s2[nameBufLen];
-						memset(s2, NULL, nameBufLen);
-						ptrdiff_t bytes = ((char*)s) - ((char*)fileName)+5;//.hlsl length = 5
-						memcpy(s2, fileName, bytes);
-						s2[bytes + 1] = 0;
-
-						dx::Log("Modified: ");
-						dx::Log(s2);
-						dx::Log("\n");
-
-						//? detect vertex/pixel shader and slot
-
-						dx::CompileVertexShaderFromFile(&dx::VS[0], s2);
-						dx::CompilePixelShaderFromFile(&dx::PS[0], s2);
-
-					}
 
 				}
 				break;
@@ -169,10 +204,12 @@ namespace editor
 			}
 
 			// Queue the next event
+			
 			BOOL success = ReadDirectoryChangesW(
-				file, change_buf, 1024, TRUE,
-				FILE_NOTIFY_CHANGE_LAST_WRITE,
+				file, change_buf, changeBufLen, TRUE,
+				FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME,
 				NULL, &overlapped, NULL);
+				
 		}
 	}
 

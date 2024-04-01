@@ -1,0 +1,1 @@
+cbuffer ConstantBuffer:register(b0){float4 time;};struct VS_OUTPUT{float4 pos:SV_POSITION;float2 uv:TEXCOORD0;};float4 PS(VS_OUTPUT V):SV_Target{return float4(V.uv,0,1);}

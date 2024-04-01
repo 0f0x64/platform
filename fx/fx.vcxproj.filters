@@ -19,8 +19,14 @@
     <Filter Include="Source Files\generated">
       <UniqueIdentifier>{5d051027-66fd-480c-ba4d-8a03f468ba02}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\projectFiles\shaders">
+    <Filter Include="Source Files\projectFiles\shadersSource">
       <UniqueIdentifier>{03958e32-959e-42e5-b59b-263cdacc9678}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\projectFiles\shadersSource\vs">
+      <UniqueIdentifier>{1d05ceaa-bb05-4a0d-89a6-7dc50c820dd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\projectFiles\shadersSource\ps">
+      <UniqueIdentifier>{a5c9fc64-11cc-4e2e-ae8d-d51df701188e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -44,19 +50,31 @@
     <ClInclude Include="settings.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="projectFiles\shaders.h">
+    <ClInclude Include="projectFiles\vsList.h">
       <Filter>Source Files\projectFiles</Filter>
     </ClInclude>
-    <ClInclude Include="generated\shaders.h">
+    <ClInclude Include="generated\processedShaders.h">
       <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\psList.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="shaders.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="projectFiles\shaders\quad.hlsl">
-      <Filter>Source Files\projectFiles\shaders</Filter>
+    <FxCompile Include="projectFiles\shaders\ps\simple.hlsl">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </FxCompile>
-    <FxCompile Include="projectFiles\shaders\simple.hlsl">
-      <Filter>Source Files\projectFiles\shaders</Filter>
+    <FxCompile Include="projectFiles\shaders\vs\quad.hlsl">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </FxCompile>
+    <FxCompile Include="projectFiles\shaders\vs\quad2.hlsl">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </FxCompile>
+    <FxCompile Include="projectFiles\shaders\ps\simple2.hlsl">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

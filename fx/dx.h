@@ -441,9 +441,9 @@ namespace dx
 
 	LPCWSTR nameToPatchLPCWSTR(const char* name)
 	{
-		char path[MAX_PATH] = shadersPath;
+		char path[MAX_PATH];
+		strcpy(path, shadersPath);
 		strcat(path, name);
-		strcat(path, ".hlsl");
 
 		int len = MultiByteToWideChar(CP_ACP, 0, path, -1, NULL, 0);
 		MultiByteToWideChar(CP_ACP, 0, path, -1, shaderPathW, len);
@@ -491,32 +491,38 @@ namespace dx
 
 #else
 
-	void CompileShader(int n, const char* shaderText)
+	void CompileVertexShader(int n, const char* shaderText)
 	{
 		HRESULT hr = S_OK;
 
 		VS[n].pBlob = NULL;
 		hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "VS", "vs_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &VS[n].pBlob, &pErrorBlob);
-		
+
 		#if DebugMode
-			if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer());}
+			if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer()); }
 		#endif	
 
-			if (hr == S_OK)
+		if (hr == S_OK)
+		{
+			if (VS[n].pShader) VS[n].pShader->Release();
+
+			hr = device->CreateVertexShader(VS[n].pBlob->GetBufferPointer(), VS[n].pBlob->GetBufferSize(), NULL, &VS[n].pShader);
+
+			#if DebugMode
+			if (FAILED(hr))
 			{
 				if (VS[n].pShader) VS[n].pShader->Release();
-
-				hr = device->CreateVertexShader(VS[n].pBlob->GetBufferPointer(), VS[n].pBlob->GetBufferSize(), NULL, &VS[n].pShader);
-
-				#if DebugMode
-				if (FAILED(hr))
-				{
-					if (VS[n].pShader) VS[n].pShader->Release();
-					Log("vs fail");
-				}
-				#endif		
+				Log("vs fail");
 			}
+			#endif		
+		}
 
+	}
+
+
+	void CompilePixelShader(int n, const char* shaderText)
+	{
+		HRESULT hr = S_OK;
 
 		PS[n].pBlob = NULL;
 		hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "PS", "ps_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &PS[n].pBlob, &pErrorBlob);

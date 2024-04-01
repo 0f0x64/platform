@@ -1,4 +1,4 @@
-#define USE_SHADER_MINIFIER
+#include "..\fx\settings.h"
 
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -9,15 +9,19 @@
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 
-#include <shellapi.h>
-
 #include <fstream>
 #include <string>
 using namespace std;
 
+string shaderFile = "..\\fx\\generated\\processedShaders.h";//final output
+
+string inVPath = "..\\fx\\projectFiles\\shaders\\vs\\";
+string inPPath = "..\\fx\\projectFiles\\shaders\\ps\\";
+string outVPath = "..\\fx\\generated\\vs\\";
+string outPPath = "..\\fx\\generated\\ps\\";
+
 void Log(const char* message)
 {
-	//OutputDebugString(message);
 	printf("%s", message);
 }
 
@@ -30,111 +34,96 @@ void SelfLocate()
 	SetCurrentDirectory((LPSTR)pathToExe);
 }
 
-int vsCounter = 0;
-int psCounter = 0;
+#define EditMode true //define EditMode for true branch selection in main poject
+#include "..\fx\shaders.h"
 
-#define shader(VariableName) VariableName
-enum shaders {
-    #include "..\fx\projectFiles\shaders.h"
-};
+void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
+{
+	Log(shaderName.c_str());
+	Log("\n");
 
-#undef shader
-#define shader(VariableName) # VariableName
-const char* shaderNameList[] = {
-    #include "..\fx\projectFiles\shaders.h"
-};
+	ofile << "const char* " << shaderName.c_str() << " = \"";
+
+#ifdef USE_SHADER_MINIFIER
+	string _pathToExe = pathToExe;
+
+	string minifierCmdLine = _pathToExe + "\\shader_minifier.exe "+ inPath + shaderName + ".hlsl" + " -o " + outPath + shaderName + ".hlsl " + 
+	"--hlsl --format text --no-remove-unused --preserve-all-globals --no-inlining --preserve-externals --preprocess";
+
+	STARTUPINFO si;
+	ZeroMemory(&si, sizeof(STARTUPINFO));
+	PROCESS_INFORMATION pi;
+
+	if (CreateProcess(NULL, const_cast<char*>(minifierCmdLine.c_str()), NULL, NULL, FALSE, NULL, NULL, pathToExe, &si, &pi))
+	{
+		WaitForSingleObject(pi.hProcess, INFINITE);
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	};
+
+	string inFilePath = outPath + shaderName + ".hlsl";
+
+	char ch;
+	ifstream ifile(inFilePath);
+
+	if (ifile.is_open())
+	{
+		while (ifile.get(ch))
+		{
+			ofile << ch;
+		}
+	}
+
+	ofile << "\";\n\n";
+
+#else
+
+	string inFilePath = inPath + shaderName + ".hlsl";
+
+	ofile << "\\\n";
+
+	string s;
+	ifstream ifile(inFilePath);
+
+	while (getline(ifile, s))
+	{
+		ofile << s << "\\" << endl;
+	}
+
+	ofile << "\";\n\n";
+
+#endif
+
+}
 
 int main()
 {
 
 	Log("\n---Collecting used shaders and create shader file for runtime\n\n");
 
-	int shadersCount = sizeof(shaderNameList) / sizeof(const char*);
+	int vShadersCount = sizeof(shaders::vsList) / sizeof(const char*);
+	int pShadersCount = sizeof(shaders::psList) / sizeof(const char*);
 
-	const char* shaderFile = "..\\fx\\generated\\shaders.h";
 	SelfLocate();
-	remove(shaderFile);
+	remove(shaderFile.c_str());
 
-	ofstream ofile(shaderFile);
+	ofstream ofile (shaderFile);
 
 	ofile << "//automatically generated file: all used shaders as const char* strings\n\n";
 	ofile << "namespace shadersData {\n\n";
 
 	int i = 0;
-	while (i < shadersCount)
+	while (i < vShadersCount)
 	{
-		Log(shaderNameList[i]);
-		Log("\n");
-
-		ofile << "const char* " << shaderNameList[i] << " = \"";
-
-		char inFilePath[4096];
-		strcpy(inFilePath, "..\\fx\\projectFiles\\shaders\\");
-		strcat(inFilePath, shaderNameList[i]);
-		strcat(inFilePath, ".hlsl");
-
-	#ifdef USE_SHADER_MINIFIER
-		char  minifierCmdLine[4096];
-		strcpy(minifierCmdLine, pathToExe);
-		strcat(minifierCmdLine, "\\shader_minifier.exe ");
-		strcat(minifierCmdLine, "..\\fx\\projectFiles\\shaders\\");
-		strcat(minifierCmdLine, shaderNameList[i]);
-		strcat(minifierCmdLine, ".hlsl");
-
-		strcat(minifierCmdLine, " ");
-		strcat(minifierCmdLine, "-o ");
-
-		strcat(minifierCmdLine, "..\\fx\\generated\\");
-		strcat(minifierCmdLine, shaderNameList[i]);
-		strcat(minifierCmdLine, ".hlsl ");
-
-		strcat(minifierCmdLine,	"--hlsl --format text --no-remove-unused --preserve-all-globals --no-inlining --preserve-externals");
-
-		STARTUPINFO si;
-		ZeroMemory(&si, sizeof(STARTUPINFO));
-		PROCESS_INFORMATION pi;
-		if (CreateProcess(NULL, minifierCmdLine, NULL, NULL, FALSE, NULL, NULL, pathToExe, &si, &pi))
-		{
-			WaitForSingleObject(pi.hProcess, INFINITE);
-			CloseHandle(pi.hProcess);
-			CloseHandle(pi.hThread);
-		};
-
-		strcpy(inFilePath, "..\\fx\\generated\\");
-		strcat(inFilePath, shaderNameList[i]);
-		strcat(inFilePath, ".hlsl");
-
-		char ch;
-		ifstream ifile(inFilePath);
-		if (ifile.is_open())
-		{
-			while (ifile.get(ch))
-			{
-				ofile << ch;
-			}
-		}
-
-		ofile << "\";\n\n";
-
-	#else
-		ofile << "\\\n";
-
-		string s;
-		ifstream ifile(inFilePath);
-
-		while (getline(ifile, s))
-		{
-			ofile << s << "\\" << endl;
-		}
-
-		ofile << "\";\n\n";
-
-	#endif
-
-
-
-		i++;
+		Process(shaders::vsList[i], inVPath, outVPath, ofile); i++;
 	}
+
+	i = 0;
+	while (i < pShadersCount)
+	{
+		Process(shaders::psList[i], inPPath, outPPath, ofile); i++;
+	}
+
 
 	ofile << "\n";
 
@@ -143,16 +132,22 @@ int main()
 	ofile << "void CompileAll ()\n" << "{\n";
 
 	i = 0;
-	while (i < shadersCount)
+	while (i < vShadersCount)
 	{
-		ofile << "dx::CompileShader (" <<  i  <<  ", " <<  shaderNameList[i] <<  ");\n";
-		i++;
+		ofile << "dx::CompileVertexShader (" <<  i  <<  ", " << shaders::vsList[i] <<  ");\n";	i++;
 	}
 
-	ofile << "};\n\n" << "\n};";
+	i = 0;
+	while (i < pShadersCount)
+	{
+		ofile << "dx::CompilePixelShader (" << i << ", " << shaders::psList[i] << ");\n";	i++;
+	}
+
+
+	ofile << "};\n\n\n};";
 	
 	ofile.close();
     
-	Log("\n---competed!\n");
-	Log("\n");
+	Log("\n---competed!\n\n");
+
 }

@@ -4,46 +4,43 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.34301.259
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "platform", "fx\fx.vcxproj", "{6F404B08-B1DB-4EAF-B14C-941C4C032963}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D} = {E021A02D-CB7B-4445-8CAA-4958AA8CF72D}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataAssembler", "DataAssembler\DataAssembler.vcxproj", "{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Crinkler|x64 = Crinkler|x64
-		Crinkler|x86 = Crinkler|x86
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Editor|x64 = Editor|x64
+		Editor|x86 = Editor|x86
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Crinkler|x64.ActiveCfg = Crinkler|x64
-		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Crinkler|x64.Build.0 = Crinkler|x64
-		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Crinkler|x86.ActiveCfg = Crinkler|Win32
-		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Crinkler|x86.Build.0 = Crinkler|Win32
 		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Debug|x64.ActiveCfg = Debug|x64
 		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Debug|x64.Build.0 = Debug|x64
 		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Debug|x86.ActiveCfg = Debug|Win32
 		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Debug|x86.Build.0 = Debug|Win32
-		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release|x64.ActiveCfg = Release|x64
-		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release|x64.Build.0 = Release|x64
-		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release|x86.ActiveCfg = Release|Win32
-		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release|x86.Build.0 = Release|Win32
-		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Crinkler|x64.ActiveCfg = Debug|x64
-		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Crinkler|x64.Build.0 = Debug|x64
-		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Crinkler|x86.ActiveCfg = Crinkler|Win32
-		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Crinkler|x86.Build.0 = Crinkler|Win32
+		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Editor|x64.ActiveCfg = Release|x64
+		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Editor|x64.Build.0 = Release|x64
+		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Editor|x86.ActiveCfg = Release|Win32
+		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Editor|x86.Build.0 = Release|Win32
+		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release|x64.ActiveCfg = Crinkler|x64
+		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release|x64.Build.0 = Crinkler|x64
+		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release|x86.ActiveCfg = Crinkler|Win32
+		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release|x86.Build.0 = Crinkler|Win32
 		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Debug|x64.ActiveCfg = Debug|x64
 		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Debug|x64.Build.0 = Debug|x64
 		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Debug|x86.ActiveCfg = Debug|Win32
 		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Debug|x86.Build.0 = Debug|Win32
-		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Release|x64.ActiveCfg = Release|x64
-		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Release|x64.Build.0 = Release|x64
-		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Release|x86.ActiveCfg = Release|Win32
-		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Release|x86.Build.0 = Release|Win32
+		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Editor|x64.ActiveCfg = Release|x64
+		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Editor|x64.Build.0 = Release|x64
+		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Editor|x86.ActiveCfg = Release|Win32
+		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Editor|x86.Build.0 = Release|Win32
+		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Release|x64.ActiveCfg = Debug|x64
+		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Release|x64.Build.0 = Debug|x64
+		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Release|x86.ActiveCfg = Crinkler|Win32
+		{E021A02D-CB7B-4445-8CAA-4958AA8CF72D}.Release|x86.Build.0 = Crinkler|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

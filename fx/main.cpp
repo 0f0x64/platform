@@ -5,7 +5,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #define WINDOWS_IGNORE_PACKING_MISMATCH
 
-#include "windows.h"
+#include <windows.h>
 
 HINSTANCE hInst;
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -24,6 +24,8 @@ HWND hWnd;
 
 #include <Xaudio2.h>
 
+#include "shaders.h"
+
 #if EditMode
 	#include "editor.h"
 #endif
@@ -33,7 +35,6 @@ HWND hWnd;
 #include "projectFiles\loop.h"
 
 
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	SetProcessDPIAware();
@@ -41,9 +42,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	dx::width = GetSystemMetrics(SM_CXSCREEN);
 	dx::height = GetSystemMetrics(SM_CYSCREEN);
-
-	int w = dx::width;
-	int h = dx::height;
 
 	HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW),brush, NULL, "fx", NULL };
@@ -81,7 +79,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		#else
 			PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
 			if (GetAsyncKeyState(VK_ESCAPE)) break;
-			if (timer::frameBeginTime / 1000 > DEMO_DURATION) break;
+			if (timer::frameBeginTime / 1000. > DEMO_DURATION) break;
 		#endif
 
 		if (msg.message == WM_QUIT)	break;
