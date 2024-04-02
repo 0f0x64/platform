@@ -1,8 +1,3 @@
-namespace shaders {
-
-	int vsCount = 0;
-	int psCount = 0;
-
 	#define shader(VariableName) VariableName
 	enum vertex {
 		#include "projectFiles\vsList.h"
@@ -24,5 +19,3 @@ namespace shaders {
 		};
 
 	#endif
-
-};

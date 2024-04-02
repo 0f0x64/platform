@@ -24,8 +24,6 @@ HWND hWnd;
 
 #include <Xaudio2.h>
 
-#include "shaders.h"
-
 #if EditMode
 	#include "editor.h"
 #endif

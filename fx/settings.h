@@ -17,7 +17,7 @@
 #ifdef EDITOR_DEBUG
 	#define EditMode true
 	#define DebugMode true
-	#define DirectXDebugMode false
+	#define DirectXDebugMode true
 	#define USE_SHADER_MINIFIER false
 	#define SECONDARY_DISPLAY_IF_AVAILABLE true
 #endif

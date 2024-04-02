@@ -1,0 +1,4 @@
+generate psList/vsList
+move psList/vsList to generated
+select proper videocard (force nvidia) #define
+can vs exclude .hlsl from build permanently?

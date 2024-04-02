@@ -2,30 +2,32 @@ namespace Loop
 {
 	bool isInit = false;
 
+	using namespace dx;
+
 #if EditMode
 
 	void CreateShaders()
 	{
-		shaders::vsCount = sizeof(shaders::vsList) / sizeof(const char*);
+		Shaders::vsCount = sizeof(Shaders::vsList) / sizeof(const char*);
 		int i = 0;
-		while (i<shaders::vsCount)
+		while (i<Shaders::vsCount)
 		{
 			char fileName[255];
 			strcpy(fileName, "/vs/");
-			strcat(fileName, shaders::vsList[i]);
+			strcat(fileName, Shaders::vsList[i]);
 			strcat(fileName, ".hlsl");
 			dx::Shaders::Compiler::Vertex(i, fileName);
 			i++;
 			
 		}
 
-		shaders::psCount = sizeof(shaders::psList) / sizeof(const char*);
+		Shaders::psCount = sizeof(Shaders::psList) / sizeof(const char*);
 		i = 0;
-		while (i < shaders::psCount)
+		while (i < Shaders::psCount)
 		{
 			char fileName[255];
 			strcpy(fileName, "/ps/");
-			strcat(fileName, shaders::psList[i]);
+			strcat(fileName, Shaders::psList[i]);
 			strcat(fileName, ".hlsl");
 			dx::Shaders::Compiler::Pixel(i, fileName);
 			i++;
@@ -44,10 +46,17 @@ namespace Loop
 
 #endif
 
+	enum texList {
+		rtt,
+		tex1,
+		tex2
+	};
+
 	void Init()
 	{
 		CreateShaders();
-
+		Textures::Create(texList::rtt, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2(1024, 1024), true,false);
+		Textures::Create(texList::tex1, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2(1024, 1024), true, false);
 		isInit = true;
 	}
 
@@ -55,23 +64,36 @@ namespace Loop
 	{
 		if (!isInit) Init();
 
-		//	double t = timer::frameBeginTime * .01;
-		dx::SetIA();
-		dx::SetRT();
-		dx::Depth::SetDepthBuffer();
-		dx::Clear(XMVECTORF32{ .3f,.3f,.3f, 1.f });
+		Depth::SetDepthBuffer();
+		CB::Update();
+		CB::Set();
 
-		dx::CB::Set();
+		SetIA();
 
-		dx::Shaders::SetVS(shaders::vertex::quad);
-		dx::Shaders::SetPS(shaders::pixel::simple);
-		dx::NullDrawer(1, 1);
+		//dx::context->PSSetShaderResources(0, 0, NULL);
+		ID3D11ShaderResourceView* const null[128] = { NULL };
+		//context->PSSetShaderResources(0, 128, null);
 
-		dx::Shaders::SetVS(shaders::vertex::quad2);
-		dx::Shaders::SetPS(shaders::pixel::simple2);
-		dx::NullDrawer(1, 1);
+		SetRT(0);
+		
+		ClearRT(0,0.f, 0.f, .15f, 1.f);
 
-		dx::Present();
+		Shaders::SetVS(Shaders::vertex::quad);
+		Shaders::SetPS(Shaders::pixel::simple);
+		NullDrawer(1, 1);
+
+
+		SetRT2Screen();
+		Depth::SetDepthBuffer();
+		Clear(1.0f,0.f,.15f,1.f);
+
+		Textures::Set(texList::rtt, 0);
+		Shaders::SetVS(Shaders::vertex::quad2);
+		Shaders::SetPS(Shaders::pixel::simple2);
+
+		NullDrawer(1, 1);
+
+		Present();
 
 	}
 

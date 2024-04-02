@@ -35,7 +35,7 @@ void SelfLocate()
 }
 
 #define EditMode true //define EditMode for true branch selection in main poject
-#include "..\fx\shaders.h"
+#include "..\fx\shadersReflection.h"
 
 void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 {
@@ -101,8 +101,8 @@ int main()
 
 	Log("\n---Collecting used shaders and create shader file for runtime\n\n");
 
-	int vShadersCount = sizeof(shaders::vsList) / sizeof(const char*);
-	int pShadersCount = sizeof(shaders::psList) / sizeof(const char*);
+	int vShadersCount = sizeof(vsList) / sizeof(const char*);
+	int pShadersCount = sizeof(psList) / sizeof(const char*);
 
 	SelfLocate();
 	remove(shaderFile.c_str());
@@ -115,13 +115,13 @@ int main()
 	int i = 0;
 	while (i < vShadersCount)
 	{
-		Process(shaders::vsList[i], inVPath, outVPath, ofile); i++;
+		Process(vsList[i], inVPath, outVPath, ofile); i++;
 	}
 
 	i = 0;
 	while (i < pShadersCount)
 	{
-		Process(shaders::psList[i], inPPath, outPPath, ofile); i++;
+		Process(psList[i], inPPath, outPPath, ofile); i++;
 	}
 
 
@@ -134,13 +134,13 @@ int main()
 	i = 0;
 	while (i < vShadersCount)
 	{
-		ofile << "dx::Shaders::Compiler::Vertex (" <<  i  <<  ", " << shaders::vsList[i] <<  ");\n";	i++;
+		ofile << "dx::Shaders::Compiler::Vertex (" <<  i  <<  ", " << vsList[i] <<  ");\n";	i++;
 	}
 
 	i = 0;
 	while (i < pShadersCount)
 	{
-		ofile << "dx::Shaders::Compiler::Pixel (" << i << ", " << shaders::psList[i] << ");\n";	i++;
+		ofile << "dx::Shaders::Compiler::Pixel (" << i << ", " << psList[i] << ");\n";	i++;
 	}
 
 

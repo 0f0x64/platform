@@ -59,8 +59,11 @@
     <ClInclude Include="projectFiles\psList.h">
       <Filter>Source Files\projectFiles</Filter>
     </ClInclude>
-    <ClInclude Include="shaders.h">
+    <ClInclude Include="shadersReflection.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\texList.h">
+      <Filter>Source Files\projectFiles</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -76,5 +79,10 @@
     <FxCompile Include="projectFiles\shaders\ps\simple2.hlsl">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt">
+      <Filter>Source Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

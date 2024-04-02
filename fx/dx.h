@@ -45,7 +45,7 @@ namespace dx
 		ID3D11Buffer* vertex;
 		ID3D11Buffer* pixel;
 
-		struct frame
+		struct frameConst
 		{
 			XMFLOAT4 time;
 			XMFLOAT4 aspectRatio;
@@ -62,6 +62,8 @@ namespace dx
 			XMMATRIX iDepthVP;
 		};
 
+		frameConst frame;
+
 		int roundUp(int n, int r)
 		{
 			return 	n - (n % r) + r;
@@ -72,28 +74,28 @@ namespace dx
 			D3D11_BUFFER_DESC bd;
 			ZeroMemory(&bd, sizeof(bd));
 			bd.Usage = D3D11_USAGE_DEFAULT;
-			bd.ByteWidth = roundUp(sizeof(CB::frame), 16);
+			bd.ByteWidth = roundUp(sizeof(CB::frameConst), 16);
 			bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 			bd.CPUAccessFlags = 0;
 			bd.StructureByteStride = 16;
 
 			HRESULT hr = device->CreateBuffer(&bd, NULL, &CB::vertex);
-#if DebugMode
+			#if DebugMode
 			if (FAILED(hr)) { Log("constant bufferV fail\n"); return; }
-#endif	
+			#endif	
 
-			bd.ByteWidth = roundUp(sizeof(CB::frame), 16);
+			bd.ByteWidth = roundUp(sizeof(CB::frameConst), 16);
 			hr = device->CreateBuffer(&bd, NULL, &CB::pixel);
-#if DebugMode
+			#if DebugMode
 			if (FAILED(hr)) { Log("constant bufferP fail\n"); return; }
-#endif		
+			#endif		
 		}
 
 		void Update()
 		{
-			//	ObjectInfo.Pos = XMFLOAT4(xGs, 0, yGs, 1);
-			//	ObjectInfo.info = XMFLOAT4(distance, index, gx, gy);
-			//	dx::g_pImmediateContext->UpdateSubresource(pConstantBufferObjectInfo, 0, NULL, &ObjectInfo, 0, 0);
+			frame.time = XMFLOAT4((float)(timer::frameBeginTime*.01), 0, 0, 0);
+			context->UpdateSubresource(vertex, 0, NULL, &frame, 0, 0);
+			context->UpdateSubresource(pixel, 0, NULL, &frame, 0, 0);
 		}
 
 		void Set()
@@ -333,7 +335,7 @@ namespace dx
 	}
 
 	namespace Textures {
-	
+
 		ID3D11SamplerState* pSampler[13];
 
 		void InitSampler()
@@ -378,6 +380,194 @@ namespace dx
 			sampDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
 			dx::device->CreateSamplerState(&sampDesc, &pSampler[index]);
 
+		}
+
+		typedef struct {
+			ID3D11Texture2D* pTexture;
+			ID3D11ShaderResourceView* TextureResView;
+			ID3D11RenderTargetView* RenderTargetView[16][6];//16 for possible mips? // 6 for cubemap
+
+			ID3D11Texture2D* pDepth;
+			ID3D11ShaderResourceView* DepthResView;
+			ID3D11DepthStencilView* DepthStencilView[16];
+		} tex;
+
+		enum tType { flat, cube };
+
+		DXGI_FORMAT dxTFormat[4] = { DXGI_FORMAT_R8G8B8A8_UNORM ,DXGI_FORMAT_R8G8B8A8_SNORM ,DXGI_FORMAT_R16G16B16A16_FLOAT ,DXGI_FORMAT_R32G32B32A32_FLOAT };
+		enum tFormat { u8, s8, s16, s32 };
+
+		tex texture[255];
+		D3D11_TEXTURE2D_DESC tdesc;
+		D3D11_SHADER_RESOURCE_VIEW_DESC svDesc;
+		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+
+		void CreateTex(int i, tType type, tFormat format, XMFLOAT2 size, bool mipMaps)
+		{
+			//if (texture[i].pTexture) texture[i].pTexture->Release();
+			//if (texture[i].TextureResView) texture[i].TextureResView->Release();
+
+			tdesc.Width = (UINT)size.x;
+			tdesc.Height = (UINT)size.y;
+			tdesc.MipLevels = mipMaps ? (UINT)(log2(size.x)) : 0;
+			tdesc.ArraySize = 1;
+			tdesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+			tdesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+			tdesc.CPUAccessFlags = 0;
+			tdesc.SampleDesc.Count = 1;
+			tdesc.SampleDesc.Quality = 0;
+			tdesc.Usage = D3D11_USAGE_DEFAULT;
+			tdesc.Format = dxTFormat[format];
+
+			if (type == cube)
+			{
+				tdesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE | tdesc.MiscFlags;
+				tdesc.ArraySize = 6;
+			}
+
+			HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &texture[i].pTexture);
+#ifdef DebugMode
+			if (FAILED(hr)) { Log("CreateTexture2D error\n"); return; }
+#endif	
+		}
+
+		void ShaderRes(int i, tType type)
+		{
+			svDesc.Format = tdesc.Format;
+			svDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+
+			if (type == cube)
+			{
+				svDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+				svDesc.TextureCube.MostDetailedMip = 0;
+				svDesc.TextureCube.MipLevels = -1;
+
+			}
+			else
+			{
+				svDesc.Texture2D.MipLevels = -1;
+				svDesc.Texture2D.MostDetailedMip = 0;
+			}
+
+			HRESULT hr = device->CreateShaderResourceView(texture[i].pTexture, &svDesc, &texture[i].TextureResView);
+#ifdef DebugMode
+			if (FAILED(hr)) { Log("CreateShaderResourceView error\n"); return; }
+#endif	
+		}
+
+		void rtView(int i, tType type)
+		{
+			renderTargetViewDesc.Format = tdesc.Format;
+			renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+			if (type == cube)
+			{
+				renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+				renderTargetViewDesc.Texture2DArray.ArraySize = 1;
+				renderTargetViewDesc.Texture2DArray.MipSlice = 0;
+
+				for (int j = 0; j < 6; j++)
+				{
+					renderTargetViewDesc.Texture2DArray.FirstArraySlice = j;
+					HRESULT hr = device->CreateRenderTargetView(texture[i].pTexture, &renderTargetViewDesc, &texture[i].RenderTargetView[0][j]);
+#ifdef DebugMode
+					if (FAILED(hr)) { Log("CreateRenderTargetView error\n"); return; }
+#endif	
+				}
+			}
+			else
+			{
+				for (unsigned int m = 0; m < tdesc.MipLevels; m++)
+				{
+					renderTargetViewDesc.Texture2D.MipSlice = m;
+					HRESULT hr = device->CreateRenderTargetView(texture[i].pTexture, &renderTargetViewDesc, &texture[i].RenderTargetView[m][0]);
+#ifdef DebugMode
+					if (FAILED(hr)) { Log("CreateRenderTargetView error\n"); return; }
+#endif	
+				}
+			}
+
+		}
+
+		void Depth(int i)
+		{
+			tdesc.ArraySize = 1;
+			tdesc.Format = DXGI_FORMAT_R32_TYPELESS;
+			tdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+			tdesc.MiscFlags = 0;
+			HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &texture[i].pDepth);
+#ifdef DebugMode
+			if (FAILED(hr)) { Log("CreateDepthStencilView error\n"); return; }
+#endif	
+
+			descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+			descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			descDSV.Flags = 0;
+
+			for (unsigned int m = 0; m < tdesc.MipLevels; m++)
+			{
+				descDSV.Texture2D.MipSlice = m;
+				HRESULT hr = device->CreateDepthStencilView(texture[i].pDepth, &descDSV, &texture[i].DepthStencilView[m]);
+#ifdef DebugMode
+				if (FAILED(hr)) { Log("CreateDepthStencilView error\n"); return; }
+#endif			
+
+			}
+
+		}
+
+		void shaderResDepth(int i)
+		{
+			svDesc.Format = DXGI_FORMAT_R32_FLOAT;
+			svDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			svDesc.Texture2D.MostDetailedMip = 0;
+			svDesc.Texture2D.MipLevels = 1;
+
+			HRESULT hr = device->CreateShaderResourceView(texture[i].pDepth, &svDesc, &texture[i].DepthResView);
+#ifdef DebugMode
+			if (FAILED(hr)) { Log("CreateShaderResourceView for Depth error\n"); return; }
+#endif			
+		}
+
+		void Create(int i, tType type, tFormat format, XMFLOAT2 size, bool mipMaps, bool depth)
+		{
+			ZeroMemory(&tdesc, sizeof(tdesc));
+			ZeroMemory(&svDesc, sizeof(svDesc));
+			ZeroMemory(&renderTargetViewDesc, sizeof(renderTargetViewDesc));
+			ZeroMemory(&descDSV, sizeof(descDSV));
+
+			CreateTex(i, type, format, size, mipMaps);
+			ShaderRes(i, type);
+			rtView(i, type);
+			if (depth)
+			{
+				Depth(i);
+				shaderResDepth(i);
+			}
+		}
+
+		void CreateMipMap(int i)
+		{
+			context->GenerateMips(texture[i].TextureResView);
+		}
+
+		enum tAssignType{vertex,pixel,both};
+
+		void Set(byte tex, byte slot, tAssignType tA = tAssignType::both)
+		{
+			//if (tA == tAssignType::both || tA == tAssignType::vertex)
+			{
+				//context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
+				//context->VSSetSamplers(slot, 1, &pSampler[0]);
+			}
+
+			//if (tA == tAssignType::both || tA == tAssignType::pixel)
+			{
+				context->PSSetShaderResources(slot, 1, &texture[tex].TextureResView);
+				context->PSSetSamplers(slot, 1, &pSampler[0]);
+			}
 		}
 
 		void Init()
@@ -434,6 +624,11 @@ namespace dx
 	}
 
 	namespace Shaders {
+
+		int vsCount = 0;
+		int psCount = 0;
+
+		#include "shadersReflection.h"
 
 		typedef struct {
 			ID3D11VertexShader* pShader;
@@ -606,9 +801,14 @@ namespace dx
 		CB::Init();
 	}
 
-	void Clear(XMVECTORF32 col)
+	void Clear(float r,float g,float b,float a)
 	{
-		context->ClearRenderTargetView(renderTargetView, col);
+		context->ClearRenderTargetView(renderTargetView, XMVECTORF32{ r,g,b,a });
+	}
+
+	void ClearRT(int rt, float r, float g, float b, float a)
+	{
+		context->ClearRenderTargetView(Textures::texture[rt].RenderTargetView[0][0], XMVECTORF32{ r,g,b,a });
 	}
 
 	void Present()
@@ -616,10 +816,18 @@ namespace dx
 		swapChain->Present(1, 0);
 	}
 
-	void SetRT()
+	void SetRT2Screen()
 	{
 		context->RSSetViewports(1, &Viewport::vp);
-		context->OMSetRenderTargets(1, &renderTargetView, Depth::depthStencilView);
+		//context->OMSetRenderTargets(1, &renderTargetView, Depth::depthStencilView);
+		context->OMSetRenderTargets(1, &renderTargetView, 0);
+	}
+
+	void SetRT(int tex)
+	{
+		context->RSSetViewports(1, &Viewport::vp);
+		//context->OMSetRenderTargets(1, &Textures::texture[tex].RenderTargetView[0][0], Textures::texture[i].DepthStencilView[0]);
+		context->OMSetRenderTargets(1, &Textures::texture[tex].RenderTargetView[0][0], 0);
 	}
 
 	void SetIA()

@@ -162,9 +162,9 @@ namespace editor
 							if (s2[0] == 'v')
 							{
 								int i = 0;
-								while (i < shaders::vsCount)
+								while (i < dx::Shaders::vsCount)
 								{
-									if (!strcmp(shaders::vsList[i], pureName))
+									if (!strcmp(dx::Shaders::vsList[i], pureName))
 									{
 										dx::Shaders::Compiler::Vertex(i, s3);
 										break;
@@ -177,9 +177,9 @@ namespace editor
 							if (s2[0] == 'p')
 							{
 								int i = 0;
-								while (i < shaders::psCount)
+								while (i < dx::Shaders::psCount)
 								{
-									if (!strcmp(shaders::psList[i], pureName))
+									if (!strcmp(dx::Shaders::psList[i], pureName))
 									{
 										dx::Shaders::Compiler::Pixel(i, s3);
 										break;

@@ -305,9 +305,10 @@
     <ClInclude Include="generated\processedShaders.h" />
     <ClInclude Include="projectFiles\loop.h" />
     <ClInclude Include="projectFiles\psList.h" />
+    <ClInclude Include="projectFiles\texList.h" />
     <ClInclude Include="projectFiles\vsList.h" />
     <ClInclude Include="settings.h" />
-    <ClInclude Include="shaders.h" />
+    <ClInclude Include="shadersReflection.h" />
     <ClInclude Include="timer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -343,6 +344,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Crinkler|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
