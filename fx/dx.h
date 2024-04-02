@@ -2,85 +2,112 @@ using namespace DirectX;
 
 namespace dx
 {
-	D3D_DRIVER_TYPE				driverType = D3D_DRIVER_TYPE_NULL;
-	ID3D11Device*				device = NULL;
-	ID3D11DeviceContext*		context = NULL;
-	IDXGISwapChain*				swapChain = NULL;
-	
-	ID3D11RenderTargetView*		renderTargetView = NULL;
-	ID3D11RasterizerState*		rasterState[3];
-	ID3D11BlendState*			blendState [4][5];
 
-	ID3D11Texture2D*			depthStencil = NULL;
-	ID3D11DepthStencilView*		depthStencilView = NULL;
-	ID3D11ShaderResourceView*	depthStencilSRView = NULL;
-	ID3D11DepthStencilState*	pDSState[4];
+	#if DebugMode
+		void Log(const char* message)
+		{
+			#if EditMode
+				OutputDebugString(message);
+			#else	
+				MessageBox(hWnd, message, "", MB_OK);
+			#endif	
+		}
+	#endif
 
-	//viewport
-	D3D11_VIEWPORT vp;
-
-	//camera
-	XMMATRIX View;
-	XMMATRIX Projection;
-	XMMATRIX DepthView;
-	XMMATRIX DepthProjection;
-
-	ID3D11SamplerState* pSampler[13];
-
-	//constBuf
-
-	ID3D11Buffer* pConstantBufferV;
-	ID3D11Buffer* pConstantBufferP;
-
-	struct cbFrame
-	{
-		XMFLOAT4 time;
-		XMFLOAT4 aspectRatio;
-		
-		XMMATRIX View;
-		XMMATRIX iView;
-		XMMATRIX Proj;
-		XMMATRIX iProj;
-		XMMATRIX iVP;
-
-		XMFLOAT4 DepthViewVector;
-		XMMATRIX DepthView;
-		XMMATRIX DepthProj;
-		XMMATRIX iDepthVP;
-	};
-
-	//shaders
-
-	typedef struct {
-		ID3D11VertexShader* pShader;
-		ID3DBlob* pBlob;
-	} VertexShader;
-
-	typedef struct {
-		ID3D11PixelShader* pShader;
-		ID3DBlob* pBlob;
-	} PixelShader;
-
-	VertexShader VS[255];
-	PixelShader PS[255];
-
-	ID3DBlob* pErrorBlob;
-
-	//---------------------------
-
-	void Log(const char* message)
-	{
-		OutputDebugString(message);
-	}
+	ID3D11Device* device = NULL;
+	ID3D11DeviceContext* context = NULL;
+	IDXGISwapChain* swapChain = NULL;
+	ID3D11RenderTargetView* renderTargetView = NULL;
 
 	int width;
 	int height;
 	float aspect;
 	float iaspect;
 
-	namespace init
+	namespace Camera
 	{
-		void Viewport()
+		XMMATRIX View;
+		XMMATRIX Projection;
+		XMMATRIX DepthView;
+		XMMATRIX DepthProjection;
+
+		void Set()
+		{
+			View = XMMatrixTranslation(0, 0, 1);
+			DepthView = View;
+			Projection = XMMatrixPerspectiveFovLH(XM_PIDIV4, width / (FLOAT)height, 0.01f, 100.0f);
+			DepthProjection = Projection;
+		}
+	}
+
+	namespace CB
+	{
+		ID3D11Buffer* vertex;
+		ID3D11Buffer* pixel;
+
+		struct frame
+		{
+			XMFLOAT4 time;
+			XMFLOAT4 aspectRatio;
+
+			XMMATRIX View;
+			XMMATRIX iView;
+			XMMATRIX Proj;
+			XMMATRIX iProj;
+			XMMATRIX iVP;
+
+			XMFLOAT4 DepthViewVector;
+			XMMATRIX DepthView;
+			XMMATRIX DepthProj;
+			XMMATRIX iDepthVP;
+		};
+
+		int roundUp(int n, int r)
+		{
+			return 	n - (n % r) + r;
+		}
+
+		void Init()
+		{
+			D3D11_BUFFER_DESC bd;
+			ZeroMemory(&bd, sizeof(bd));
+			bd.Usage = D3D11_USAGE_DEFAULT;
+			bd.ByteWidth = roundUp(sizeof(CB::frame), 16);
+			bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			bd.CPUAccessFlags = 0;
+			bd.StructureByteStride = 16;
+
+			HRESULT hr = device->CreateBuffer(&bd, NULL, &CB::vertex);
+#if DebugMode
+			if (FAILED(hr)) { Log("constant bufferV fail\n"); return; }
+#endif	
+
+			bd.ByteWidth = roundUp(sizeof(CB::frame), 16);
+			hr = device->CreateBuffer(&bd, NULL, &CB::pixel);
+#if DebugMode
+			if (FAILED(hr)) { Log("constant bufferP fail\n"); return; }
+#endif		
+		}
+
+		void Update()
+		{
+			//	ObjectInfo.Pos = XMFLOAT4(xGs, 0, yGs, 1);
+			//	ObjectInfo.info = XMFLOAT4(distance, index, gx, gy);
+			//	dx::g_pImmediateContext->UpdateSubresource(pConstantBufferObjectInfo, 0, NULL, &ObjectInfo, 0, 0);
+		}
+
+		void Set()
+		{
+			context->VSSetConstantBuffers(0, 1, &vertex);
+			context->PSSetConstantBuffers(0, 1, &pixel);
+		}
+	}
+
+	namespace Viewport {
+
+		D3D11_VIEWPORT vp;
+
+		void Set()
 		{
 			vp.Width = (FLOAT)width;
 			vp.Height = (FLOAT)height;
@@ -90,32 +117,14 @@ namespace dx
 			vp.TopLeftY = 0;
 			context->RSSetViewports(1, &vp);
 		}
+	};
 
-		void Rasterizer()
-		{
-			D3D11_RASTERIZER_DESC rasterizerState;
-			rasterizerState.FillMode = D3D11_FILL_SOLID;
-			rasterizerState.CullMode = D3D11_CULL_NONE;
-			rasterizerState.FrontCounterClockwise = true;
-			rasterizerState.DepthBias = false;
-			rasterizerState.DepthBiasClamp = 0;
-			rasterizerState.SlopeScaledDepthBias = 0;
-			rasterizerState.DepthClipEnable = false;
-			rasterizerState.ScissorEnable = true;
-			rasterizerState.MultisampleEnable = false;
-			rasterizerState.AntialiasedLineEnable = true;
-			device->CreateRasterizerState(&rasterizerState, &rasterState[0]);
+	namespace Blend
+	{
 
-			rasterizerState.CullMode = D3D11_CULL_FRONT;
-			device->CreateRasterizerState(&rasterizerState, &rasterState[1]);
+		ID3D11BlendState* blendState[4][5];
 
-			rasterizerState.CullMode = D3D11_CULL_BACK;
-			device->CreateRasterizerState(&rasterizerState, &rasterState[2]);
-
-			context->RSSetState(rasterState[0]);
-		}
-
-		void BlendState()
+		void Init()
 		{
 			D3D11_BLEND_DESC bSDesc;
 
@@ -184,8 +193,45 @@ namespace dx
 				device->CreateBlendState(&bSDesc, &blendState[3][i]);
 			}
 		}
+	}
 
-		void Depth()
+	namespace Rasterizer {
+
+		ID3D11RasterizerState* rasterState[3];
+
+		void Init()
+		{
+			D3D11_RASTERIZER_DESC rasterizerState;
+			rasterizerState.FillMode = D3D11_FILL_SOLID;
+			rasterizerState.CullMode = D3D11_CULL_NONE;
+			rasterizerState.FrontCounterClockwise = true;
+			rasterizerState.DepthBias = false;
+			rasterizerState.DepthBiasClamp = 0;
+			rasterizerState.SlopeScaledDepthBias = 0;
+			rasterizerState.DepthClipEnable = false;
+			rasterizerState.ScissorEnable = true;
+			rasterizerState.MultisampleEnable = false;
+			rasterizerState.AntialiasedLineEnable = true;
+			device->CreateRasterizerState(&rasterizerState, &rasterState[0]);
+
+			rasterizerState.CullMode = D3D11_CULL_FRONT;
+			device->CreateRasterizerState(&rasterizerState, &rasterState[1]);
+
+			rasterizerState.CullMode = D3D11_CULL_BACK;
+			device->CreateRasterizerState(&rasterizerState, &rasterState[2]);
+
+			context->RSSetState(rasterState[0]);
+		}
+	}
+
+	namespace Depth {
+
+		ID3D11Texture2D* depthStencil = NULL;
+		ID3D11DepthStencilView* depthStencilView = NULL;
+		ID3D11ShaderResourceView* depthStencilSRView = NULL;
+		ID3D11DepthStencilState* pDSState[4];
+
+		void Init()
 		{
 			D3D11_TEXTURE2D_DESC descDepth;
 			ZeroMemory(&descDepth, sizeof(descDepth));
@@ -203,9 +249,9 @@ namespace dx
 
 			HRESULT hr = device->CreateTexture2D(&descDepth, NULL, &depthStencil);
 			#if DebugMode
-				if (FAILED(hr)) {
-					MessageBox(hWnd, "depth texture error", "dx11error", MB_OK); return;
-				}
+			if (FAILED(hr)) {
+				MessageBox(hWnd, "depth texture error", "dx11error", MB_OK); return;
+			}
 			#endif		
 
 			D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
@@ -217,9 +263,9 @@ namespace dx
 
 			hr = device->CreateDepthStencilView(depthStencil, &descDSV, &depthStencilView);
 			#if DebugMode
-				if (FAILED(hr)) {
-					MessageBox(hWnd, "depthview error", "dx11error", MB_OK); return;
-				}
+			if (FAILED(hr)) {
+				MessageBox(hWnd, "depthview error", "dx11error", MB_OK); return;
+			}
 			#endif
 
 			D3D11_SHADER_RESOURCE_VIEW_DESC sr_desc;
@@ -229,11 +275,11 @@ namespace dx
 			sr_desc.Texture2D.MipLevels = 1;
 
 			hr = device->CreateShaderResourceView(depthStencil, &sr_desc, &depthStencilSRView);
-			
+
 			#if DebugMode
-				if (FAILED(hr)) {
-					MessageBox(hWnd, "depth shader resview error", "dx11error", MB_OK); return;
-				}
+			if (FAILED(hr)) {
+				MessageBox(hWnd, "depth shader resview error", "dx11error", MB_OK); return;
+			}
 			#endif
 
 			context->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
@@ -280,15 +326,17 @@ namespace dx
 			device->CreateDepthStencilState(&dsDesc, &pDSState[3]);//write
 		}
 
-		void Camera()
+		void SetDepthBuffer()
 		{
-			View = XMMatrixTranslation(0, 0, 1);
-			DepthView = View;
-			Projection = XMMatrixPerspectiveFovLH(XM_PIDIV4, width / (FLOAT)height, 0.01f, 100.0f);
-			DepthProjection = Projection;
+			context->OMSetDepthStencilState(dx::Depth::pDSState[0], 1);
 		}
+	}
 
-		void SetTextureOptions()
+	namespace Textures {
+	
+		ID3D11SamplerState* pSampler[13];
+
+		void InitSampler()
 		{
 			D3D11_SAMPLER_DESC sampDesc;
 			ZeroMemory(&sampDesc, sizeof(sampDesc));
@@ -332,8 +380,17 @@ namespace dx
 
 		}
 
+		void Init()
+		{
+			InitSampler();
+		}
+}
 
-		void Device()
+	namespace Device {
+
+		D3D_DRIVER_TYPE	driverType = D3D_DRIVER_TYPE_NULL;
+
+		void Init()
 		{
 			HRESULT hr = S_OK;
 
@@ -357,7 +414,7 @@ namespace dx
 
 			hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
 			#if DebugMode
-				if (FAILED(hr)) { Log ("device not created\n"); return; }
+				if (FAILED(hr)) { Log("device not created\n"); return; }
 			#endif	
 
 			ID3D11Texture2D* pBackBuffer = NULL;
@@ -368,182 +425,186 @@ namespace dx
 
 			hr = device->CreateRenderTargetView(pBackBuffer, NULL, &renderTargetView);
 			#if DebugMode
-				if (FAILED(hr)) {Log ("rt not created\n"); return; }
+				if (FAILED(hr)) { Log("rt not created\n"); return; }
 			#endif	
 
 			pBackBuffer->Release();
 
 		}
-
-		int roundUp(int n, int r)
-		{
-			return 	n - (n % r) + r;
-		}
-
-		void ConstBuf()
-		{
-			D3D11_BUFFER_DESC bd;
-			ZeroMemory(&bd, sizeof(bd));
-			bd.Usage = D3D11_USAGE_DEFAULT;
-			bd.ByteWidth = roundUp(sizeof(cbFrame), 16);
-			bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			bd.CPUAccessFlags = 0;
-			bd.StructureByteStride = 16;
-
-			HRESULT hr = device->CreateBuffer(&bd, NULL, &pConstantBufferV);
-			#if DebugMode
-				if (FAILED(hr)) { Log ("constant bufferV fail\n"); return; }
-			#endif	
-
-			bd.ByteWidth = roundUp(sizeof(cbFrame), 16);
-			hr = device->CreateBuffer(&bd, NULL, &pConstantBufferP);
-			#if DebugMode
-				if (FAILED(hr)) { Log("constant bufferP fail\n"); return; }
-			#endif		
-		}
-
-		void Init()
-		{
-			Device();
-			SetTextureOptions();
-			Rasterizer();
-			Depth();
-			BlendState();
-			Viewport();
-			Camera();
-			ConstBuf();
-		}
-
 	}
 
-#if EditMode
+	namespace Shaders {
 
-	void CompilerLog(LPCWSTR source, HRESULT hr,const char* message)
-	{
-		#if DebugMode
-			if (FAILED(hr)) 
-			{ 
-				Log((char*)pErrorBlob->GetBufferPointer());
-			}
-			else
+		typedef struct {
+			ID3D11VertexShader* pShader;
+			ID3DBlob* pBlob;
+		} VertexShader;
+
+		typedef struct {
+			ID3D11PixelShader* pShader;
+			ID3DBlob* pBlob;
+		} PixelShader;
+
+		VertexShader VS[255];
+		PixelShader PS[255];
+
+		ID3DBlob* pErrorBlob;
+
+		namespace Compiler {
+
+			#if EditMode
+
+			void CompilerLog(LPCWSTR source, HRESULT hr, const char* message)
 			{
-				char shaderName[1024];
-				WideCharToMultiByte(CP_ACP, NULL, source, -1, shaderName, sizeof(shaderName), NULL, NULL);
-
-				Log(message);
-				Log((char*)shaderName);
-				Log("\n");
-			}
-		#endif
-	}
-
-	wchar_t shaderPathW[MAX_PATH];
-
-	LPCWSTR nameToPatchLPCWSTR(const char* name)
-	{
-		char path[MAX_PATH];
-		strcpy(path, shadersPath);
-		strcat(path, name);
-
-		int len = MultiByteToWideChar(CP_ACP, 0, path, -1, NULL, 0);
-		MultiByteToWideChar(CP_ACP, 0, path, -1, shaderPathW, len);
-
-		return shaderPathW;
-	}
-
-	void CompileVertexShaderFromFile(VertexShader* shader, const char* name)
-	{
-		LPCWSTR source = nameToPatchLPCWSTR(name);
-
-		HRESULT hr = S_OK;
-
-		hr = D3DCompileFromFile(source, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &shader->pBlob, &pErrorBlob);
-		CompilerLog(source,hr,"vertex shader compiled: ");
-
-		if (hr == S_OK)
-		{
-			hr = device->CreateVertexShader(shader->pBlob->GetBufferPointer(), shader->pBlob->GetBufferSize(), NULL, &shader->pShader);
 			#if DebugMode
-				if (FAILED(hr)) { Log("vs creation fail\n"); return; }
+				if (FAILED(hr))
+				{
+					Log((char*)pErrorBlob->GetBufferPointer());
+				}
+				else
+				{
+					char shaderName[1024];
+					WideCharToMultiByte(CP_ACP, NULL, source, -1, shaderName, sizeof(shaderName), NULL, NULL);
+
+					Log(message);
+					Log((char*)shaderName);
+					Log("\n");
+				}
 			#endif
-		}
-
-	}
-
-	void CompilePixelShaderFromFile(PixelShader* shader, const char* name)
-	{
-		LPCWSTR source = nameToPatchLPCWSTR(name);
-
-		HRESULT hr = S_OK;
-
-		hr = D3DCompileFromFile(source, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &shader->pBlob, &pErrorBlob);
-		CompilerLog(source, hr,"pixel shader compiled: ");
-
-		if (hr == S_OK)
-		{
-			hr = device->CreatePixelShader(shader->pBlob->GetBufferPointer(), shader->pBlob->GetBufferSize(), NULL, &shader->pShader);
-			#if DebugMode
-				if (FAILED(hr)) { Log("vs creation fail\n"); return; }
-			#endif
-		}
-
-	}
-
-#else
-
-	void CompileVertexShader(int n, const char* shaderText)
-	{
-		HRESULT hr = S_OK;
-
-		VS[n].pBlob = NULL;
-		hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "VS", "vs_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &VS[n].pBlob, &pErrorBlob);
-
-		#if DebugMode
-			if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer()); }
-		#endif	
-
-		if (hr == S_OK)
-		{
-			if (VS[n].pShader) VS[n].pShader->Release();
-
-			hr = device->CreateVertexShader(VS[n].pBlob->GetBufferPointer(), VS[n].pBlob->GetBufferSize(), NULL, &VS[n].pShader);
-
-			#if DebugMode
-			if (FAILED(hr))
-			{
-				if (VS[n].pShader) VS[n].pShader->Release();
-				Log("vs fail");
 			}
-			#endif		
-		}
 
-	}
+			wchar_t shaderPathW[MAX_PATH];
 
-
-	void CompilePixelShader(int n, const char* shaderText)
-	{
-		HRESULT hr = S_OK;
-
-		PS[n].pBlob = NULL;
-		hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "PS", "ps_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &PS[n].pBlob, &pErrorBlob);
-
-		#if DebugMode
-			if (hr != S_OK) { Log("vs fail");}
-		#endif	
-
-			if (hr == S_OK)
+			LPCWSTR nameToPatchLPCWSTR(const char* name)
 			{
-				if (PS[n].pShader) PS[n].pShader->Release();
-				hr = device->CreatePixelShader(PS[n].pBlob->GetBufferPointer(), PS[n].pBlob->GetBufferSize(), NULL, &PS[n].pShader);
+				char path[MAX_PATH];
+				strcpy(path, shadersPath);
+				strcat(path, name);
+
+				int len = MultiByteToWideChar(CP_ACP, 0, path, -1, NULL, 0);
+				MultiByteToWideChar(CP_ACP, 0, path, -1, shaderPathW, len);
+
+				return shaderPathW;
+			}
+
+			void Vertex(int i, const char* name)
+			{
+				LPCWSTR source = nameToPatchLPCWSTR(name);
+
+				HRESULT hr = S_OK;
+				
+				hr = D3DCompileFromFile(source, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &VS[i].pBlob, &pErrorBlob);
+				CompilerLog(source, hr, "vertex shader compiled: ");
+
+				if (hr == S_OK)
+				{
+					hr = device->CreateVertexShader(VS[i].pBlob->GetBufferPointer(), VS[i].pBlob->GetBufferSize(), NULL, &VS[i].pShader);
+					#if DebugMode
+						if (FAILED(hr)) { Log("vs creation fail\n"); return; }
+					#endif
+				}
+
+			}
+
+			void Pixel(int i, const char* name)
+			{
+				LPCWSTR source = nameToPatchLPCWSTR(name);
+
+				HRESULT hr = S_OK;
+
+				hr = D3DCompileFromFile(source, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &PS[i].pBlob, &pErrorBlob);
+				CompilerLog(source, hr, "pixel shader compiled: ");
+
+				if (hr == S_OK)
+				{
+					hr = device->CreatePixelShader(PS[i].pBlob->GetBufferPointer(), PS[i].pBlob->GetBufferSize(), NULL, &PS[i].pShader);
+					#if DebugMode
+						if (FAILED(hr)) { Log("vs creation fail\n"); return; }
+					#endif
+				}
+
+			}
+
+			#else
+
+			void Vertex(int n, const char* shaderText)
+			{
+				HRESULT hr = S_OK;
+
+				VS[n].pBlob = NULL;
+				hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "VS", "vs_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &VS[n].pBlob, &pErrorBlob);
 
 				#if DebugMode
-					if (FAILED(hr)) { Log("ps fail\n"); }
-				#endif
+					if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer()); }
+				#endif	
+
+				if (hr == S_OK)
+				{
+					if (VS[n].pShader) VS[n].pShader->Release();
+
+					hr = device->CreateVertexShader(VS[n].pBlob->GetBufferPointer(), VS[n].pBlob->GetBufferSize(), NULL, &VS[n].pShader);
+
+					#if DebugMode
+					if (FAILED(hr))
+					{
+						if (VS[n].pShader) VS[n].pShader->Release();
+						Log("vs fail");
+					}
+					#endif		
+				}
 
 			}
+
+
+			void Pixel(int n, const char* shaderText)
+			{
+				HRESULT hr = S_OK;
+
+				PS[n].pBlob = NULL;
+				hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "PS", "ps_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &PS[n].pBlob, &pErrorBlob);
+
+				#if DebugMode
+				if (hr != S_OK) { Log("vs fail"); }
+				#endif	
+
+				if (hr == S_OK)
+				{
+					if (PS[n].pShader) PS[n].pShader->Release();
+					hr = device->CreatePixelShader(PS[n].pBlob->GetBufferPointer(), PS[n].pBlob->GetBufferSize(), NULL, &PS[n].pShader);
+
+					#if DebugMode
+					if (FAILED(hr)) { Log("ps fail\n"); }
+					#endif
+
+				}
+			}
+
+			#endif
+		}
+
+		//todo: check previously setted shader, same for IA, const, etc
+		void SetVS(int n)
+		{
+			context->VSSetShader(VS[n].pShader, NULL, 0);
+		}
+
+		void SetPS(int n)
+		{
+			context->PSSetShader(PS[n].pShader, NULL, 0);
+		}
 	}
 
-#endif
+	void Init()
+	{
+		Device::Init();
+		Textures::Init();
+		Rasterizer::Init();
+		Depth::Init();
+		Blend::Init();
+		Viewport::Set();
+		Camera::Set();
+		CB::Init();
+	}
 
 	void Clear(XMVECTORF32 col)
 	{
@@ -555,27 +616,10 @@ namespace dx
 		swapChain->Present(1, 0);
 	}
 
-	//todo: check previously setted shader, same for IA, const, etc
-	void SetVS(int n)
-	{
-		context->VSSetShader(VS[n].pShader, NULL, 0);
-	}
-
-	void SetPS(int n)
-	{
-		context->PSSetShader(PS[n].pShader, NULL, 0);
-	}
-
-
 	void SetRT()
 	{
-		context->RSSetViewports(1, &vp);
-		context->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-	}
-
-	void SetZBuffer()
-	{
-		context->OMSetDepthStencilState(dx::pDSState[0], 1);
+		context->RSSetViewports(1, &Viewport::vp);
+		context->OMSetRenderTargets(1, &renderTargetView, Depth::depthStencilView);
 	}
 
 	void SetIA()
@@ -585,14 +629,9 @@ namespace dx
 		context->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
 	}
 
-	void SetCB()
-	{
-		context->VSSetConstantBuffers(0, 1, &pConstantBufferV);
-		context->PSSetConstantBuffers(0, 1, &pConstantBufferP);
-	}
-
 	void NullDrawer(int instances, int quadCount)
 	{
 		context->DrawInstanced(quadCount * 6, instances, 0, 0);
 	}
+
 }

@@ -14,7 +14,7 @@ namespace Loop
 			strcpy(fileName, "/vs/");
 			strcat(fileName, shaders::vsList[i]);
 			strcat(fileName, ".hlsl");
-			dx::CompileVertexShaderFromFile(&dx::VS[i], fileName);
+			dx::Shaders::Compiler::Vertex(i, fileName);
 			i++;
 			
 		}
@@ -27,11 +27,12 @@ namespace Loop
 			strcpy(fileName, "/ps/");
 			strcat(fileName, shaders::psList[i]);
 			strcat(fileName, ".hlsl");
-			dx::CompilePixelShaderFromFile(&dx::PS[i], fileName);
+			dx::Shaders::Compiler::Pixel(i, fileName);
 			i++;
 		}
 
 	}
+
 #else
 
 	#include "generated\processedShaders.h"
@@ -57,17 +58,17 @@ namespace Loop
 		//	double t = timer::frameBeginTime * .01;
 		dx::SetIA();
 		dx::SetRT();
-		dx::SetZBuffer();
+		dx::Depth::SetDepthBuffer();
 		dx::Clear(XMVECTORF32{ .3f,.3f,.3f, 1.f });
 
-		dx::SetCB();
+		dx::CB::Set();
 
-		dx::SetVS(shaders::vertex::quad);
-		dx::SetPS(shaders::pixel::simple);
+		dx::Shaders::SetVS(shaders::vertex::quad);
+		dx::Shaders::SetPS(shaders::pixel::simple);
 		dx::NullDrawer(1, 1);
 
-		dx::SetVS(shaders::vertex::quad2);
-		dx::SetPS(shaders::pixel::simple2);
+		dx::Shaders::SetVS(shaders::vertex::quad2);
+		dx::Shaders::SetPS(shaders::pixel::simple2);
 		dx::NullDrawer(1, 1);
 
 		dx::Present();

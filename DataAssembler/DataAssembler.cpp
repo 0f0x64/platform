@@ -134,13 +134,13 @@ int main()
 	i = 0;
 	while (i < vShadersCount)
 	{
-		ofile << "dx::CompileVertexShader (" <<  i  <<  ", " << shaders::vsList[i] <<  ");\n";	i++;
+		ofile << "dx::Shaders::Compiler::Vertex (" <<  i  <<  ", " << shaders::vsList[i] <<  ");\n";	i++;
 	}
 
 	i = 0;
 	while (i < pShadersCount)
 	{
-		ofile << "dx::CompilePixelShader (" << i << ", " << shaders::psList[i] << ");\n";	i++;
+		ofile << "dx::Shaders::Compiler::Pixel (" << i << ", " << shaders::psList[i] << ");\n";	i++;
 	}
 
 

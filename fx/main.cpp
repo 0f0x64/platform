@@ -57,7 +57,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		editor::Init();
 	#endif	
 
-	dx::init::Init();
+	dx::Init();
 
 	MSG msg = { 0 };
 

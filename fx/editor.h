@@ -158,7 +158,7 @@ namespace editor
 							strcpy(s3, "/");
 							strcat(s3, s2);
 
-							//? detect vertex/pixel shader and slot
+							// detect vertex/pixel shader and slot
 							if (s2[0] == 'v')
 							{
 								int i = 0;
@@ -166,7 +166,7 @@ namespace editor
 								{
 									if (!strcmp(shaders::vsList[i], pureName))
 									{
-										dx::CompileVertexShaderFromFile(&dx::VS[i], s3);
+										dx::Shaders::Compiler::Vertex(i, s3);
 										break;
 									}
 									i++;
@@ -181,7 +181,7 @@ namespace editor
 								{
 									if (!strcmp(shaders::psList[i], pureName))
 									{
-										dx::CompilePixelShaderFromFile(&dx::PS[i], s3);
+										dx::Shaders::Compiler::Pixel(i, s3);
 										break;
 									}
 									i++;
@@ -216,7 +216,6 @@ namespace editor
 	void Init()
 	{
 		SelfLocate();
-		//SetRenderWindowPos();
 		SetRenderWindowPosition();
 	}
 }
