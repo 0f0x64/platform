@@ -40,7 +40,7 @@ namespace dx
 		}
 	}
 
-	namespace CB
+	namespace ConstBuf
 	{
 		ID3D11Buffer* vertex;
 		ID3D11Buffer* pixel;
@@ -74,18 +74,18 @@ namespace dx
 			D3D11_BUFFER_DESC bd;
 			ZeroMemory(&bd, sizeof(bd));
 			bd.Usage = D3D11_USAGE_DEFAULT;
-			bd.ByteWidth = roundUp(sizeof(CB::frameConst), 16);
+			bd.ByteWidth = roundUp(sizeof(ConstBuf::frameConst), 16);
 			bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 			bd.CPUAccessFlags = 0;
 			bd.StructureByteStride = 16;
 
-			HRESULT hr = device->CreateBuffer(&bd, NULL, &CB::vertex);
+			HRESULT hr = device->CreateBuffer(&bd, NULL, &ConstBuf::vertex);
 			#if DebugMode
 			if (FAILED(hr)) { Log("constant bufferV fail\n"); return; }
 			#endif	
 
-			bd.ByteWidth = roundUp(sizeof(CB::frameConst), 16);
-			hr = device->CreateBuffer(&bd, NULL, &CB::pixel);
+			bd.ByteWidth = roundUp(sizeof(ConstBuf::frameConst), 16);
+			hr = device->CreateBuffer(&bd, NULL, &ConstBuf::pixel);
 			#if DebugMode
 			if (FAILED(hr)) { Log("constant bufferP fail\n"); return; }
 			#endif		
@@ -328,13 +328,15 @@ namespace dx
 			device->CreateDepthStencilState(&dsDesc, &pDSState[3]);//write
 		}
 
-		void SetDepthBuffer()
+		void Mode()
 		{
 			context->OMSetDepthStencilState(dx::Depth::pDSState[0], 1);
 		}
 	}
 
 	namespace Textures {
+
+		#define max_tex 255
 
 		ID3D11SamplerState* pSampler[13];
 
@@ -382,6 +384,15 @@ namespace dx
 
 		}
 
+		enum tType { flat, cube };
+
+		DXGI_FORMAT dxTFormat[4] = { DXGI_FORMAT_R8G8B8A8_UNORM ,DXGI_FORMAT_R8G8B8A8_SNORM ,DXGI_FORMAT_R16G16B16A16_FLOAT ,DXGI_FORMAT_R32G32B32A32_FLOAT };
+		enum tFormat { u8, s8, s16, s32 };
+		D3D11_TEXTURE2D_DESC tdesc;
+		D3D11_SHADER_RESOURCE_VIEW_DESC svDesc;
+		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+
 		typedef struct {
 			ID3D11Texture2D* pTexture;
 			ID3D11ShaderResourceView* TextureResView;
@@ -390,27 +401,31 @@ namespace dx
 			ID3D11Texture2D* pDepth;
 			ID3D11ShaderResourceView* DepthResView;
 			ID3D11DepthStencilView* DepthStencilView[16];
+
+			tType type;
+			tFormat format;
+			XMFLOAT2 size;
+			bool mipMaps;
+			bool depth;
+	
 		} tex;
 
-		enum tType { flat, cube };
 
-		DXGI_FORMAT dxTFormat[4] = { DXGI_FORMAT_R8G8B8A8_UNORM ,DXGI_FORMAT_R8G8B8A8_SNORM ,DXGI_FORMAT_R16G16B16A16_FLOAT ,DXGI_FORMAT_R32G32B32A32_FLOAT };
-		enum tFormat { u8, s8, s16, s32 };
 
-		tex texture[255];
-		D3D11_TEXTURE2D_DESC tdesc;
-		D3D11_SHADER_RESOURCE_VIEW_DESC svDesc;
-		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
+		tex texture[max_tex];
 
-		void CreateTex(int i, tType type, tFormat format, XMFLOAT2 size, bool mipMaps)
+		byte currentRT = 0;
+
+
+		void CreateTex(int i)
 		{
 			//if (texture[i].pTexture) texture[i].pTexture->Release();
 			//if (texture[i].TextureResView) texture[i].TextureResView->Release();
+			auto cTex = texture[i];
 
-			tdesc.Width = (UINT)size.x;
-			tdesc.Height = (UINT)size.y;
-			tdesc.MipLevels = mipMaps ? (UINT)(log2(size.x)) : 0;
+			tdesc.Width = (UINT)cTex.size.x;
+			tdesc.Height = (UINT)cTex.size.y;
+			tdesc.MipLevels = cTex.mipMaps ? (UINT)(log2(max(cTex.size.x, cTex.size.y))) : 0;
 			tdesc.ArraySize = 1;
 			tdesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 			tdesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
@@ -418,9 +433,9 @@ namespace dx
 			tdesc.SampleDesc.Count = 1;
 			tdesc.SampleDesc.Quality = 0;
 			tdesc.Usage = D3D11_USAGE_DEFAULT;
-			tdesc.Format = dxTFormat[format];
+			tdesc.Format = dxTFormat[cTex.format];
 
-			if (type == cube)
+			if (cTex.type == cube)
 			{
 				tdesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE | tdesc.MiscFlags;
 				tdesc.ArraySize = 6;
@@ -432,12 +447,12 @@ namespace dx
 #endif	
 		}
 
-		void ShaderRes(int i, tType type)
+		void ShaderRes(int i)
 		{
 			svDesc.Format = tdesc.Format;
 			svDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
-			if (type == cube)
+			if (texture[i].type == cube)
 			{
 				svDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 				svDesc.TextureCube.MostDetailedMip = 0;
@@ -456,13 +471,13 @@ namespace dx
 #endif	
 		}
 
-		void rtView(int i, tType type)
+		void rtView(int i)
 		{
 			renderTargetViewDesc.Format = tdesc.Format;
 			renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 			renderTargetViewDesc.Texture2D.MipSlice = 0;
 
-			if (type == cube)
+			if (texture[i].type == cube)
 			{
 				renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
 				renderTargetViewDesc.Texture2DArray.ArraySize = 1;
@@ -538,14 +553,28 @@ namespace dx
 			ZeroMemory(&renderTargetViewDesc, sizeof(renderTargetViewDesc));
 			ZeroMemory(&descDSV, sizeof(descDSV));
 
-			CreateTex(i, type, format, size, mipMaps);
-			ShaderRes(i, type);
-			rtView(i, type);
+			texture[i].type = type;
+			texture[i].format = format;
+			texture[i].size = size;
+			texture[i].mipMaps = mipMaps;
+			texture[i].depth  = depth;
+
+			CreateTex(i);
+			ShaderRes(i);
+			rtView(i);
+
 			if (depth)
 			{
 				Depth(i);
 				shaderResDepth(i);
 			}
+
+		}
+
+		void UnbindAll()
+		{
+			ID3D11ShaderResourceView* const null[128] = { NULL };
+			context->PSSetShaderResources(0, 128, null);
 		}
 
 		void CreateMipMap(int i)
@@ -553,22 +582,61 @@ namespace dx
 			context->GenerateMips(texture[i].TextureResView);
 		}
 
+		void SetViewport(byte texId, byte level = 0)
+		{
+			XMFLOAT2 size = Textures::texture[texId].size;
+			float denom = powf(2, level);
+			
+			D3D11_VIEWPORT vp;
+
+			vp.Width = (FLOAT)size.x / denom;
+			vp.Height = (FLOAT)size.y / denom;
+			vp.MinDepth = 0.0f;
+			vp.MaxDepth = 1.0f;
+			vp.TopLeftX = 0;
+			vp.TopLeftY = 0;
+
+			context->RSSetViewports(1, &vp);
+		}
+
 		enum tAssignType{vertex,pixel,both};
 
 		void Set(byte tex, byte slot, tAssignType tA = tAssignType::both)
 		{
-			//if (tA == tAssignType::both || tA == tAssignType::vertex)
+			if (tA == tAssignType::both || tA == tAssignType::vertex)
 			{
-				//context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
-				//context->VSSetSamplers(slot, 1, &pSampler[0]);
+//				context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
+	//			context->VSSetSamplers(slot, 1, &pSampler[0]);
 			}
 
-			//if (tA == tAssignType::both || tA == tAssignType::pixel)
+			if (tA == tAssignType::both || tA == tAssignType::pixel)
 			{
 				context->PSSetShaderResources(slot, 1, &texture[tex].TextureResView);
 				context->PSSetSamplers(slot, 1, &pSampler[0]);
 			}
 		}
+
+		namespace RenderTargets {
+
+			const byte mainRT = max_tex;
+
+			void Set(byte texId = mainRT, byte level = 0)
+			{
+				currentRT = texId;
+
+				if (texId == mainRT)
+				{
+					Viewport::Set();
+					context->OMSetRenderTargets(1, &renderTargetView, Depth::depthStencilView);
+				}
+				else
+				{
+					Textures::SetViewport(texId, level);
+					context->OMSetRenderTargets(1, &Textures::texture[texId].RenderTargetView[0][0], Textures::texture[texId].depth ? Textures::texture[texId].DepthStencilView[0] : 0);
+				}
+			}
+
+		};
 
 		void Init()
 		{
@@ -613,7 +681,7 @@ namespace dx
 				if (FAILED(hr)) { Log("swapchain error\n"); return; }
 			#endif		
 
-			hr = device->CreateRenderTargetView(pBackBuffer, NULL, &renderTargetView);
+			hr = device->CreateRenderTargetView(pBackBuffer, NULL, &Textures::texture[0].RenderTargetView[0][0]);
 			#if DebugMode
 				if (FAILED(hr)) { Log("rt not created\n"); return; }
 			#endif	
@@ -787,6 +855,12 @@ namespace dx
 		{
 			context->PSSetShader(PS[n].pShader, NULL, 0);
 		}
+
+		void Set(int v, int p)
+		{
+			SetVS(v);
+			SetPS(p);
+		}
 	}
 
 	void Init()
@@ -798,17 +872,21 @@ namespace dx
 		Blend::Init();
 		Viewport::Set();
 		Camera::Set();
-		CB::Init();
+		ConstBuf::Init();
 	}
 
-	void Clear(float r,float g,float b,float a)
+	namespace Draw
 	{
-		context->ClearRenderTargetView(renderTargetView, XMVECTORF32{ r,g,b,a });
-	}
+		void Clear(float r, float g, float b, float a)
+		{
+			context->ClearRenderTargetView(Textures::texture[Textures::currentRT].RenderTargetView[0][0], XMVECTORF32{ r,g,b,a });
+		}
 
-	void ClearRT(int rt, float r, float g, float b, float a)
-	{
-		context->ClearRenderTargetView(Textures::texture[rt].RenderTargetView[0][0], XMVECTORF32{ r,g,b,a });
+
+		void NullDrawer(int instances, int quadCount)
+		{
+			context->DrawInstanced(quadCount * 6, instances, 0, 0);
+		}
 	}
 
 	void Present()
@@ -816,30 +894,11 @@ namespace dx
 		swapChain->Present(1, 0);
 	}
 
-	void SetRT2Screen()
-	{
-		context->RSSetViewports(1, &Viewport::vp);
-		//context->OMSetRenderTargets(1, &renderTargetView, Depth::depthStencilView);
-		context->OMSetRenderTargets(1, &renderTargetView, 0);
-	}
-
-	void SetRT(int tex)
-	{
-		context->RSSetViewports(1, &Viewport::vp);
-		//context->OMSetRenderTargets(1, &Textures::texture[tex].RenderTargetView[0][0], Textures::texture[i].DepthStencilView[0]);
-		context->OMSetRenderTargets(1, &Textures::texture[tex].RenderTargetView[0][0], 0);
-	}
-
 	void SetIA()
 	{
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		context->IASetInputLayout(NULL);
 		context->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
-	}
-
-	void NullDrawer(int instances, int quadCount)
-	{
-		context->DrawInstanced(quadCount * 6, instances, 0, 0);
 	}
 
 }

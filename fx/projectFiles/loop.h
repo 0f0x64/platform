@@ -47,7 +47,7 @@ namespace Loop
 #endif
 
 	enum texList {
-		rtt,
+		mainRT,
 		tex1,
 		tex2
 	};
@@ -55,44 +55,43 @@ namespace Loop
 	void Init()
 	{
 		CreateShaders();
-		Textures::Create(texList::rtt, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2(1024, 1024), true,false);
+		Textures::Create(texList::mainRT, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2(dx::width, dx::height), false,true);
 		Textures::Create(texList::tex1, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2(1024, 1024), true, false);
+		Textures::Create(texList::tex2, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2(1024, 1024), true, false);
 		isInit = true;
 	}
 
+	#define RT Textures::RenderTargets
+	#define CB ConstBuf
+	#define VS Shaders::vertex
+	#define PS Shaders::pixel
+	#define TEX texList
+
 	void mainLoop()
 	{
+		SetIA();
+
 		if (!isInit) Init();
 
-		Depth::SetDepthBuffer();
 		CB::Update();
 		CB::Set();
 
-		SetIA();
+		Textures::UnbindAll();
+		Depth::Mode();
 
-		//dx::context->PSSetShaderResources(0, 0, NULL);
-		ID3D11ShaderResourceView* const null[128] = { NULL };
-		//context->PSSetShaderResources(0, 128, null);
+		RT::Set(TEX::mainRT);
+		Draw::Clear(0.f, 0.f, .15f, 1.f);
+		Shaders::Set(VS::quad,PS::simple);
+		Draw::NullDrawer(1, 1);
 
-		SetRT(0);
-		
-		ClearRT(0,0.f, 0.f, .15f, 1.f);
+		//Textures::CreateMipMap(TEX::rtt);
 
-		Shaders::SetVS(Shaders::vertex::quad);
-		Shaders::SetPS(Shaders::pixel::simple);
-		NullDrawer(1, 1);
-
-
-		SetRT2Screen();
-		Depth::SetDepthBuffer();
-		Clear(1.0f,0.f,.15f,1.f);
-
-		Textures::Set(texList::rtt, 0);
-		Shaders::SetVS(Shaders::vertex::quad2);
-		Shaders::SetPS(Shaders::pixel::simple2);
-
-		NullDrawer(1, 1);
-
+/*		RT::Set(TEX::mainRT);
+		Draw::Clear(1.0f,0.f,.15f,1.f);
+		Textures::Set(TEX::rtt, 0);
+		Shaders::Set(VS::quad2, PS::simple2);
+		Draw::NullDrawer(1, 1);
+		*/
 		Present();
 
 	}
