@@ -55,9 +55,10 @@ namespace Loop
 	void Init()
 	{
 		CreateShaders();
-		Textures::Create(texList::mainRT, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2(dx::width, dx::height), false,true);
+		Textures::Create(texList::mainRT, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2((float)dx::width, (float)dx::height), false,true);
 		Textures::Create(texList::tex1, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2(1024, 1024), true, false);
 		Textures::Create(texList::tex2, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2(1024, 1024), true, false);
+		
 		isInit = true;
 	}
 
@@ -77,21 +78,22 @@ namespace Loop
 		CB::Set();
 
 		Textures::UnbindAll();
-		Depth::Mode();
+		Depth::Set(Depth::Mode::off);
 
-		RT::Set(TEX::mainRT);
+		RT::Set(TEX::tex1);
 		Draw::Clear(0.f, 0.f, .15f, 1.f);
 		Shaders::Set(VS::quad,PS::simple);
 		Draw::NullDrawer(1, 1);
+		Textures::CreateMipMap();
 
-		//Textures::CreateMipMap(TEX::rtt);
-
-/*		RT::Set(TEX::mainRT);
+		RT::Set(TEX::mainRT);
 		Draw::Clear(1.0f,0.f,.15f,1.f);
-		Textures::Set(TEX::rtt, 0);
+		
+		Textures::Set(TEX::tex1, 0);
 		Shaders::Set(VS::quad2, PS::simple2);
+		Sampler::Set(Sampler::to::ps, 0, Sampler::type::Linear, Sampler::addr::clamp, Sampler::addr::wrap);
 		Draw::NullDrawer(1, 1);
-		*/
+		
 		Present();
 
 	}

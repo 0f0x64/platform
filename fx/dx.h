@@ -1,3 +1,16 @@
+
+//because crinkler 
+typedef unsigned long uint32;
+typedef long int32;
+static inline int32 log2(float x)
+{
+	uint32 ix = (uint32&)x;
+	uint32 exp = (ix >> 23) & 0xFF;
+	int32 log2 = int32(exp) - 127;
+
+	return log2;
+}
+
 using namespace DirectX;
 
 namespace dx
@@ -12,13 +25,13 @@ namespace dx
 				MessageBox(hWnd, message, "", MB_OK);
 			#endif	
 		}
+
 	#endif
 
 	ID3D11Device* device = NULL;
 	ID3D11DeviceContext* context = NULL;
 	IDXGISwapChain* swapChain = NULL;
-	ID3D11RenderTargetView* renderTargetView = NULL;
-
+	
 	int width;
 	int height;
 	float aspect;
@@ -104,22 +117,6 @@ namespace dx
 			context->PSSetConstantBuffers(0, 1, &pixel);
 		}
 	}
-
-	namespace Viewport {
-
-		D3D11_VIEWPORT vp;
-
-		void Set()
-		{
-			vp.Width = (FLOAT)width;
-			vp.Height = (FLOAT)height;
-			vp.MinDepth = 0.0f;
-			vp.MaxDepth = 1.0f;
-			vp.TopLeftX = 0;
-			vp.TopLeftY = 0;
-			context->RSSetViewports(1, &vp);
-		}
-	};
 
 	namespace Blend
 	{
@@ -228,64 +225,10 @@ namespace dx
 
 	namespace Depth {
 
-		ID3D11Texture2D* depthStencil = NULL;
-		ID3D11DepthStencilView* depthStencilView = NULL;
-		ID3D11ShaderResourceView* depthStencilSRView = NULL;
 		ID3D11DepthStencilState* pDSState[4];
 
 		void Init()
 		{
-			D3D11_TEXTURE2D_DESC descDepth;
-			ZeroMemory(&descDepth, sizeof(descDepth));
-			descDepth.Width = width;
-			descDepth.Height = height;
-			descDepth.MipLevels = 1;
-			descDepth.ArraySize = 1;
-			descDepth.Format = DXGI_FORMAT_R32_TYPELESS;
-			descDepth.SampleDesc.Count = 1;
-			descDepth.SampleDesc.Quality = 0;
-			descDepth.Usage = D3D11_USAGE_DEFAULT;
-			descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-			descDepth.CPUAccessFlags = 0;
-			descDepth.MiscFlags = 0;
-
-			HRESULT hr = device->CreateTexture2D(&descDepth, NULL, &depthStencil);
-			#if DebugMode
-			if (FAILED(hr)) {
-				MessageBox(hWnd, "depth texture error", "dx11error", MB_OK); return;
-			}
-			#endif		
-
-			D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
-			ZeroMemory(&descDSV, sizeof(descDSV));
-			descDSV.Format = DXGI_FORMAT_D32_FLOAT;
-			descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-			descDSV.Texture2D.MipSlice = 0;
-			descDSV.Flags = 0;
-
-			hr = device->CreateDepthStencilView(depthStencil, &descDSV, &depthStencilView);
-			#if DebugMode
-			if (FAILED(hr)) {
-				MessageBox(hWnd, "depthview error", "dx11error", MB_OK); return;
-			}
-			#endif
-
-			D3D11_SHADER_RESOURCE_VIEW_DESC sr_desc;
-			sr_desc.Format = DXGI_FORMAT_R32_FLOAT;
-			sr_desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			sr_desc.Texture2D.MostDetailedMip = 0;
-			sr_desc.Texture2D.MipLevels = 1;
-
-			hr = device->CreateShaderResourceView(depthStencil, &sr_desc, &depthStencilSRView);
-
-			#if DebugMode
-			if (FAILED(hr)) {
-				MessageBox(hWnd, "depth shader resview error", "dx11error", MB_OK); return;
-			}
-			#endif
-
-			context->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-
 			D3D11_DEPTH_STENCIL_DESC dsDesc;
 			// Depth test parameters
 			dsDesc.DepthEnable = false;
@@ -328,61 +271,86 @@ namespace dx
 			device->CreateDepthStencilState(&dsDesc, &pDSState[3]);//write
 		}
 
-		void Mode()
+		enum Mode {
+			off, on, readonly, writeonly
+		};
+
+		void Set(Mode m)
 		{
-			context->OMSetDepthStencilState(dx::Depth::pDSState[0], 1);
+			context->OMSetDepthStencilState(dx::Depth::pDSState[m], 1);
 		}
 	}
 
-	namespace Textures {
+	namespace Sampler {
 
-		#define max_tex 255
+		ID3D11SamplerState* pSampler[3][2][2];//filter, addressU, addressV
+		ID3D11SamplerState* pSamplerComp;//for shadowmapping
 
-		ID3D11SamplerState* pSampler[13];
+		enum type {	Linear, Point, MinPointMagLinear };
+		enum addr {	clamp, wrap	};
 
-		void InitSampler()
+		void Init()
 		{
 			D3D11_SAMPLER_DESC sampDesc;
 			ZeroMemory(&sampDesc, sizeof(sampDesc));
 
 			sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-			sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 			sampDesc.MinLOD = 0;
 			sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-			int filter[] = { D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR };
-			int index = 0;
+			D3D11_FILTER filter[] = { D3D11_FILTER_MIN_MAG_MIP_LINEAR,
+									  D3D11_FILTER_MIN_MAG_MIP_POINT, 
+									  D3D11_FILTER_MIN_POINT_MAG_MIP_LINEAR};
 
-			for (int f = 0; f < 3; f++)
+			D3D11_TEXTURE_ADDRESS_MODE address[] = { D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_WRAP};
+			
+			constexpr byte fc = sizeof(filter) / sizeof(D3D11_FILTER);
+			constexpr byte ac = sizeof(address) / sizeof(D3D11_TEXTURE_ADDRESS_MODE);
+
+			sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+
+			for (byte f = 0; f < fc; f++)
 			{
 				sampDesc.Filter = (D3D11_FILTER)filter[f];
 
-				sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-				sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-				HRESULT h = dx::device->CreateSamplerState(&sampDesc, &pSampler[index++]);
-
-				sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-				sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-				h = dx::device->CreateSamplerState(&sampDesc, &pSampler[index++]);
-
-				sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-				sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-				h = dx::device->CreateSamplerState(&sampDesc, &pSampler[index++]);
-
-				sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-				sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-				h = dx::device->CreateSamplerState(&sampDesc, &pSampler[index++]);
+				for (byte u = 0; u < ac; u++)
+				{
+					for (byte v = 0; v < ac; v++)
+					{
+						sampDesc.AddressU = address[u];
+						sampDesc.AddressV = address[v];
+						HRESULT h = dx::device->CreateSamplerState(&sampDesc, &pSampler[f][u][v]);
+					}
+				}
 			}
-
 
 			sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
 			sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
 			for (int x = 0; x < 4; x++) sampDesc.BorderColor[x] = 0;
 			sampDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
 			sampDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
-			dx::device->CreateSamplerState(&sampDesc, &pSampler[index]);
+			dx::device->CreateSamplerState(&sampDesc, &pSamplerComp);
 
 		}
+
+		enum to {vs,ps};
+
+		void Set(to shader, byte slot, type filter, addr addressU, addr addressV)
+		{
+			if (shader == vs) context->VSSetSamplers(slot, 1, &Sampler::pSampler[filter][addressU][addressV]);
+			if (shader == ps) context->PSSetSamplers(slot, 1, &Sampler::pSampler[filter][addressU][addressV]);
+		}
+
+		void SetComp(byte slot)
+		{
+			context->PSSetSamplers(slot, 1, &Sampler::pSamplerComp);
+		}
+
+	}
+
+	namespace Textures {
+
+		#define max_tex 255
 
 		enum tType { flat, cube };
 
@@ -408,14 +376,11 @@ namespace dx
 			bool mipMaps;
 			bool depth;
 	
-		} tex;
+		} textureDesc;
 
-
-
-		tex texture[max_tex];
+		textureDesc texture[max_tex];
 
 		byte currentRT = 0;
-
 
 		void CreateTex(int i)
 		{
@@ -442,7 +407,7 @@ namespace dx
 			}
 
 			HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &texture[i].pTexture);
-#ifdef DebugMode
+#if DebugMode
 			if (FAILED(hr)) { Log("CreateTexture2D error\n"); return; }
 #endif	
 		}
@@ -466,7 +431,7 @@ namespace dx
 			}
 
 			HRESULT hr = device->CreateShaderResourceView(texture[i].pTexture, &svDesc, &texture[i].TextureResView);
-#ifdef DebugMode
+#if DebugMode
 			if (FAILED(hr)) { Log("CreateShaderResourceView error\n"); return; }
 #endif	
 		}
@@ -487,7 +452,7 @@ namespace dx
 				{
 					renderTargetViewDesc.Texture2DArray.FirstArraySlice = j;
 					HRESULT hr = device->CreateRenderTargetView(texture[i].pTexture, &renderTargetViewDesc, &texture[i].RenderTargetView[0][j]);
-#ifdef DebugMode
+#if DebugMode
 					if (FAILED(hr)) { Log("CreateRenderTargetView error\n"); return; }
 #endif	
 				}
@@ -498,7 +463,7 @@ namespace dx
 				{
 					renderTargetViewDesc.Texture2D.MipSlice = m;
 					HRESULT hr = device->CreateRenderTargetView(texture[i].pTexture, &renderTargetViewDesc, &texture[i].RenderTargetView[m][0]);
-#ifdef DebugMode
+#if DebugMode
 					if (FAILED(hr)) { Log("CreateRenderTargetView error\n"); return; }
 #endif	
 				}
@@ -513,7 +478,7 @@ namespace dx
 			tdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 			tdesc.MiscFlags = 0;
 			HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &texture[i].pDepth);
-#ifdef DebugMode
+#if DebugMode
 			if (FAILED(hr)) { Log("CreateDepthStencilView error\n"); return; }
 #endif	
 
@@ -525,7 +490,7 @@ namespace dx
 			{
 				descDSV.Texture2D.MipSlice = m;
 				HRESULT hr = device->CreateDepthStencilView(texture[i].pDepth, &descDSV, &texture[i].DepthStencilView[m]);
-#ifdef DebugMode
+#if DebugMode
 				if (FAILED(hr)) { Log("CreateDepthStencilView error\n"); return; }
 #endif			
 
@@ -541,7 +506,7 @@ namespace dx
 			svDesc.Texture2D.MipLevels = 1;
 
 			HRESULT hr = device->CreateShaderResourceView(texture[i].pDepth, &svDesc, &texture[i].DepthResView);
-#ifdef DebugMode
+#if DebugMode
 			if (FAILED(hr)) { Log("CreateShaderResourceView for Depth error\n"); return; }
 #endif			
 		}
@@ -582,6 +547,12 @@ namespace dx
 			context->GenerateMips(texture[i].TextureResView);
 		}
 
+		void CreateMipMap()
+		{
+			context->GenerateMips(texture[currentRT].TextureResView);
+		}
+
+
 		void SetViewport(byte texId, byte level = 0)
 		{
 			XMFLOAT2 size = Textures::texture[texId].size;
@@ -605,43 +576,29 @@ namespace dx
 		{
 			if (tA == tAssignType::both || tA == tAssignType::vertex)
 			{
-//				context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
-	//			context->VSSetSamplers(slot, 1, &pSampler[0]);
+				context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
 			}
 
 			if (tA == tAssignType::both || tA == tAssignType::pixel)
 			{
 				context->PSSetShaderResources(slot, 1, &texture[tex].TextureResView);
-				context->PSSetSamplers(slot, 1, &pSampler[0]);
 			}
 		}
 
 		namespace RenderTargets {
 
-			const byte mainRT = max_tex;
+			const byte mainRT = 0;
 
 			void Set(byte texId = mainRT, byte level = 0)
 			{
 				currentRT = texId;
-
-				if (texId == mainRT)
-				{
-					Viewport::Set();
-					context->OMSetRenderTargets(1, &renderTargetView, Depth::depthStencilView);
-				}
-				else
-				{
-					Textures::SetViewport(texId, level);
-					context->OMSetRenderTargets(1, &Textures::texture[texId].RenderTargetView[0][0], Textures::texture[texId].depth ? Textures::texture[texId].DepthStencilView[0] : 0);
-				}
+				Textures::SetViewport(texId, level);
+				context->OMSetRenderTargets(1, &Textures::texture[texId].RenderTargetView[0][0], Textures::texture[texId].depth ? Textures::texture[texId].DepthStencilView[0] : 0);
 			}
 
 		};
 
-		void Init()
-		{
-			InitSampler();
-		}
+
 }
 
 	namespace Device {
@@ -866,13 +823,11 @@ namespace dx
 	void Init()
 	{
 		Device::Init();
-		Textures::Init();
 		Rasterizer::Init();
 		Depth::Init();
 		Blend::Init();
-		Viewport::Set();
-		Camera::Set();
 		ConstBuf::Init();
+		Sampler::Init();
 	}
 
 	namespace Draw
