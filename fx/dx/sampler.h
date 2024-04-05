@@ -50,17 +50,21 @@ namespace Sampler {
 
 	}
 
-	enum to { vs, ps };
+	enum to { vertex, pixel };
 
-	void Set(to shader, byte slot, type filter, addr addressU, addr addressV)
-	{
-		if (shader == vs) context->VSSetSamplers(slot, 1, &Sampler::pSampler[filter][addressU][addressV]);
-		if (shader == ps) context->PSSetSamplers(slot, 1, &Sampler::pSampler[filter][addressU][addressV]);
-	}
+	struct {
 
-	void SetComp(byte slot)
-	{
-		context->PSSetSamplers(slot, 1, &Sampler::pSamplerComp);
-	}
+		void Set(to shader, byte slot, type filter, addr addressU, addr addressV)
+		{
+			if (shader == vertex) context->VSSetSamplers(slot, 1, &Sampler::pSampler[filter][addressU][addressV]);
+			if (shader == pixel) context->PSSetSamplers(slot, 1, &Sampler::pSampler[filter][addressU][addressV]);
+		}
+
+		void SetComp(byte slot)
+		{
+			context->PSSetSamplers(slot, 1, &Sampler::pSamplerComp);
+		}
+
+	} Api;
 
 }

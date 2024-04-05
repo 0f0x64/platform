@@ -1,4 +1,4 @@
-namespace IA {
+struct {
 
 	void Set()
 	{
@@ -6,4 +6,5 @@ namespace IA {
 		context->IASetInputLayout(NULL);
 		context->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
 	}
-}
+
+} IA;

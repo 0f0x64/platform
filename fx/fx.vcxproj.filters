@@ -95,6 +95,12 @@
     <ClInclude Include="dx\draw.h">
       <Filter>Source Files\dx</Filter>
     </ClInclude>
+    <ClInclude Include="generated\psList.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\vsList.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="projectFiles\shaders\ps\simple.hlsl">

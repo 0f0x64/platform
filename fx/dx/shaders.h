@@ -201,19 +201,21 @@ namespace Shaders {
 	}
 
 	//todo: check previously setted shader, same for IA, const, etc
-	void SetVS(int n)
-	{
-		context->VSSetShader(VS[n].pShader, NULL, 0);
-	}
+	struct {
+		void SetVS(int n)
+		{
+			context->VSSetShader(VS[n].pShader, NULL, 0);
+		}
 
-	void SetPS(int n)
-	{
-		context->PSSetShader(PS[n].pShader, NULL, 0);
-	}
+		void SetPS(int n)
+		{
+			context->PSSetShader(PS[n].pShader, NULL, 0);
+		}
 
-	void Set(int v, int p)
-	{
-		SetVS(v);
-		SetPS(p);
-	}
+		void Set(int v, int p)
+		{
+			SetVS(v);
+			SetPS(p);
+		}
+	} Api;
 }

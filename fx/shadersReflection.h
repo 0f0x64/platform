@@ -1,4 +1,4 @@
-	#define shader(VariableName) VariableName,
+	#define Shader(VariableName) VariableName,
 	enum vertex {
 		#include "generated\vsList.h"
 	};
@@ -9,8 +9,8 @@
 
 	#if EditMode
 
-		#undef shader
-		#define shader(VariableName) #VariableName ,
+		#undef Shader
+		#define Shader(VariableName) #VariableName ,
 		const char* vsList[] = {
 			#include "generated\vsList.h"
 		};

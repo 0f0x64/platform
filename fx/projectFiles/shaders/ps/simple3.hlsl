@@ -16,10 +16,10 @@ float4 PS(VS_OUTPUT input) : SV_Target
 {
     float4 color = float4(input.uv, sin(input.uv.x * 12), 1);
      
-    float2 uv = input.uv * 5;
+    float2 uv = input.uv ;
     uv.y -= 2;
     color = tex1.Sample(sam1, uv);
-    color.rgb = dot(color.rgb,1);
+    
     return color;
 }
 

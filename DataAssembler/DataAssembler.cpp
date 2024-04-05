@@ -117,7 +117,7 @@ void catToFile(const std::filesystem::path &sandbox, ofstream &ofile, std::vecto
 		o = fName.find(".hlsl");
 		fName.erase(o, o + 5);
 
-		ofile << "shader(" << fName.c_str() << ")\n";
+		ofile << "Shader(" << fName.c_str() << ")\n";
 		outputName.push_back(fName);
 		counter++;
 	}

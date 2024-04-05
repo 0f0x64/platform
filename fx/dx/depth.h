@@ -46,12 +46,19 @@ namespace Depth {
 		device->CreateDepthStencilState(&dsDesc, &pDSState[3]);//write
 	}
 
-	enum Mode {
-		off, on, readonly, writeonly
-	};
-
-	void Set(Mode m)
+	namespace Mode
 	{
-		context->OMSetDepthStencilState(dx::Depth::pDSState[m], 1);
+		enum DepthMode {
+			off, on, readonly, writeonly
+		};
 	}
+
+	struct {
+	
+		void Set(Mode::DepthMode m)
+			{
+				context->OMSetDepthStencilState(Depth::pDSState[m], 1);
+			}
+
+		} Api;
 }

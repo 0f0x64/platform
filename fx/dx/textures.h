@@ -1,6 +1,7 @@
 namespace Textures {
 
 #define max_tex 255
+#define mainRTIndex 0
 
 	enum tType { flat, cube };
 
@@ -197,12 +198,6 @@ namespace Textures {
 		context->GenerateMips(texture[i].TextureResView);
 	}
 
-	void CreateMipMap()
-	{
-		context->GenerateMips(texture[currentRT].TextureResView);
-	}
-
-
 	void SetViewport(byte texId, byte level = 0)
 	{
 		XMFLOAT2 size = Textures::texture[texId].size;
@@ -222,29 +217,40 @@ namespace Textures {
 
 	enum tAssignType { vertex, pixel, both };
 
-	void Set(byte tex, byte slot, tAssignType tA = tAssignType::both)
-	{
-		if (tA == tAssignType::both || tA == tAssignType::vertex)
+	struct {
+
+		void Set(byte tex, byte slot, tAssignType tA = tAssignType::both)
 		{
-			context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
+			if (tA == tAssignType::both || tA == tAssignType::vertex)
+			{
+				context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
+			}
+
+			if (tA == tAssignType::both || tA == tAssignType::pixel)
+			{
+				context->PSSetShaderResources(slot, 1, &texture[tex].TextureResView);
+			}
 		}
 
-		if (tA == tAssignType::both || tA == tAssignType::pixel)
-		{
-			context->PSSetShaderResources(slot, 1, &texture[tex].TextureResView);
-		}
-	}
+	} Api;
 
 	namespace RenderTargets {
 
-		const byte mainRT = 0;
+		struct {
 
-		void Set(byte texId = mainRT, byte level = 0)
-		{
-			currentRT = texId;
-			Textures::SetViewport(texId, level);
-			context->OMSetRenderTargets(1, &Textures::texture[texId].RenderTargetView[0][0], Textures::texture[texId].depth ? Textures::texture[texId].DepthStencilView[0] : 0);
-		}
+			void Set(byte texId = mainRTIndex, byte level = 0)
+			{
+				currentRT = texId;
+				Textures::SetViewport(texId, level);
+				context->OMSetRenderTargets(1, &Textures::texture[texId].RenderTargetView[0][0], Textures::texture[texId].depth ? Textures::texture[texId].DepthStencilView[0] : 0);
+			}
+
+			void CreateMipMap()
+			{
+				context->GenerateMips(texture[currentRT].TextureResView);
+			}
+
+		} Api;
 
 	};
 

@@ -1,3 +1,3 @@
-shader(simple)
-shader(simple2)
-shader(simple3)
+Shader(simple)
+Shader(simple2)
+Shader(simple3)
