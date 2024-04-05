@@ -1,9 +1,9 @@
 	#define shader(VariableName) VariableName,
 	enum vertex {
-		#include "projectFiles\vsList.h"
+		#include "generated\vsList.h"
 	};
 	enum pixel {
-		#include "projectFiles\psList.h"
+		#include "generated\psList.h"
 	};
 
 
@@ -12,10 +12,10 @@
 		#undef shader
 		#define shader(VariableName) #VariableName ,
 		const char* vsList[] = {
-			#include "projectFiles\vsList.h"
+			#include "generated\vsList.h"
 		};
 		const char* psList[] = {
-			#include "projectFiles\psList.h"
+			#include "generated\psList.h"
 		};
 
 	#endif

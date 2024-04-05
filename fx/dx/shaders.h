@@ -195,6 +195,10 @@ namespace Shaders {
 
 	}
 
+	void Init()
+	{
+		Compiler::CreateShaders();
+	}
 
 	//todo: check previously setted shader, same for IA, const, etc
 	void SetVS(int n)

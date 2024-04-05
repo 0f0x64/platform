@@ -321,9 +321,7 @@
     <ClInclude Include="editor.h" />
     <ClInclude Include="generated\processedShaders.h" />
     <ClInclude Include="projectFiles\loop.h" />
-    <ClInclude Include="projectFiles\psList.h" />
     <ClInclude Include="projectFiles\texList.h" />
-    <ClInclude Include="projectFiles\vsList.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="shadersReflection.h" />
     <ClInclude Include="timer.h" />
@@ -344,6 +342,12 @@
       </DeploymentContent>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Blink|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Crinkler|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="projectFiles\shaders\ps\simple3.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Blink|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Crinkler|Win32'">true</ExcludedFromBuild>

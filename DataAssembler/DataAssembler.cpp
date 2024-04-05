@@ -22,6 +22,9 @@ string inPPath = "..\\fx\\projectFiles\\shaders\\ps\\";
 string outVPath = "..\\fx\\generated\\vs\\";
 string outPPath = "..\\fx\\generated\\ps\\";
 
+string vsListFile = "..\\fx\\generated\\vsList.h";
+string psListFile = "..\\fx\\generated\\psList.h";
+
 void Log(const char* message)
 {
 	printf("%s", message);
@@ -36,8 +39,11 @@ void SelfLocate()
 	SetCurrentDirectory((LPSTR)pathToExe);
 }
 
-#define EditMode true //define EditMode for true branch selection in main poject
-#include "..\fx\shadersReflection.h"
+//#define EditMode true //define EditMode for true branch selection in main poject
+//#include "..\fx\shadersReflection.h"
+
+std::vector <std::string> vsList;
+std::vector <std::string> psList;
 
 void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 {
@@ -98,33 +104,49 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 
 }
 
-int main()
+int vShadersCount = 0;
+int pShadersCount = 0;
+
+void catToFile(const std::filesystem::path &sandbox, ofstream &ofile, std::vector <std::string> &outputName, int &counter)
 {
-	SelfLocate();
-
-	const std::filesystem::path sandbox{ "..\\fx\\projectFiles\\shaders\\vs\\" };
-
-	int i = 0;
-
 	for (auto const& cat : std::filesystem::directory_iterator{ sandbox })
 	{
-
 		std::string fName = cat.path().string();
 		auto o = fName.rfind("\\", fName.length());
 		fName.erase(0, o + 1);
 		o = fName.find(".hlsl");
 		fName.erase(o, o + 5);
-		
 
+		ofile << "shader(" << fName.c_str() << ")\n";
+		outputName.push_back(fName);
+		counter++;
 	}
+}
 
+int main()
+{
+	SelfLocate();
 
-	
+	const std::filesystem::path vsSandbox{ "..\\fx\\projectFiles\\shaders\\vs\\" };
+	const std::filesystem::path psSandbox{ "..\\fx\\projectFiles\\shaders\\ps\\" };
+
+	int i = 0;
+
+	Log("\n---scan shader source dir and create macro definitions\n\n");
+
+	remove(vsListFile.c_str());
+	ofstream vsfile(vsListFile);
+	catToFile(vsSandbox, vsfile, vsList, vShadersCount);
+	vsfile.close();
+
+	remove(psListFile.c_str());
+	ofstream psfile(psListFile);
+	catToFile(psSandbox, psfile, psList, pShadersCount);
+	psfile.close();
 
 	Log("\n---Collecting used shaders and create shader file for runtime\n\n");
 
-	int vShadersCount = sizeof(vsList) / sizeof(const char*);
-	int pShadersCount = sizeof(psList) / sizeof(const char*);
+
 
 
 	remove(shaderFile.c_str());

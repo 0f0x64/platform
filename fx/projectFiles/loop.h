@@ -6,9 +6,8 @@ namespace Loop
 
 	void Init()
 	{
-		Shaders::Compiler::CreateShaders();
+		Shaders::Init();
 		Textures::Init();
-
 		isInit = true;
 	}
 
@@ -41,7 +40,7 @@ namespace Loop
 		Draw::Clear(1.0f,0.f,.15f,1.f);
 		
 		Textures::Set(TEX::tex1, 0);
-		Shaders::Set(VS::quad2, PS::simple2);
+		Shaders::Set(VS::quad2, PS::simple3);
 		Sampler::Set(Sampler::to::ps, 0, Sampler::type::Linear, Sampler::addr::clamp, Sampler::addr::wrap);
 		Draw::NullDrawer(1, 1);
 		
