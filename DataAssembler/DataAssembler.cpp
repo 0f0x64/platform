@@ -4,13 +4,15 @@
 
 #include <iostream>
 #include <windows.h>
+#include <string>
+#include <filesystem>
 
 #include <libloaderapi.h>
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
 
 #include <fstream>
-#include <string>
+
 using namespace std;
 
 string shaderFile = "..\\fx\\generated\\processedShaders.h";//final output
@@ -98,13 +100,33 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 
 int main()
 {
+	SelfLocate();
+
+	const std::filesystem::path sandbox{ "..\\fx\\projectFiles\\shaders\\vs\\" };
+
+	int i = 0;
+
+	for (auto const& cat : std::filesystem::directory_iterator{ sandbox })
+	{
+
+		std::string fName = cat.path().string();
+		auto o = fName.rfind("\\", fName.length());
+		fName.erase(0, o + 1);
+		o = fName.find(".hlsl");
+		fName.erase(o, o + 5);
+		
+
+	}
+
+
+	
 
 	Log("\n---Collecting used shaders and create shader file for runtime\n\n");
 
 	int vShadersCount = sizeof(vsList) / sizeof(const char*);
 	int pShadersCount = sizeof(psList) / sizeof(const char*);
 
-	SelfLocate();
+
 	remove(shaderFile.c_str());
 
 	ofstream ofile (shaderFile);
@@ -112,7 +134,7 @@ int main()
 	ofile << "//automatically generated file: all used shaders as const char* strings\n\n";
 	ofile << "namespace shadersData {\n\n";
 
-	int i = 0;
+	i = 0;
 	while (i < vShadersCount)
 	{
 		Process(vsList[i], inVPath, outVPath, ofile); i++;

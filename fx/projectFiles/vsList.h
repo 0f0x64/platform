@@ -1,2 +1,2 @@
-shader(quad),
+shader(quad)
 shader(quad2)

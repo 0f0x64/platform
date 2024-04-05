@@ -1,2 +1,2 @@
-shader(simple),
+shader(simple)
 shader(simple2)

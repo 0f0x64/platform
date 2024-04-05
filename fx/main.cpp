@@ -20,7 +20,7 @@ HWND hWnd;
 #include <d3dcompiler.h>
 #include "DirectXMath.h"
 #include <DirectXPackedVector.h>
-#include "dx.h"
+#include "dx\dx.h"
 
 #include <Xaudio2.h>
 

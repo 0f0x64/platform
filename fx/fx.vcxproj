@@ -306,7 +306,18 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="dx.h" />
+    <ClInclude Include="dx\blend.h" />
+    <ClInclude Include="dx\camera.h" />
+    <ClInclude Include="dx\constBuf.h" />
+    <ClInclude Include="dx\depth.h" />
+    <ClInclude Include="dx\device.h" />
+    <ClInclude Include="dx\draw.h" />
+    <ClInclude Include="dx\dx.h" />
+    <ClInclude Include="dx\IA.h" />
+    <ClInclude Include="dx\rasterizer.h" />
+    <ClInclude Include="dx\sampler.h" />
+    <ClInclude Include="dx\shaders.h" />
+    <ClInclude Include="dx\textures.h" />
     <ClInclude Include="editor.h" />
     <ClInclude Include="generated\processedShaders.h" />
     <ClInclude Include="projectFiles\loop.h" />

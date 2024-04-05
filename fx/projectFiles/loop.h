@@ -4,61 +4,11 @@ namespace Loop
 
 	using namespace dx;
 
-#if EditMode
-
-	void CreateShaders()
-	{
-		Shaders::vsCount = sizeof(Shaders::vsList) / sizeof(const char*);
-		int i = 0;
-		while (i<Shaders::vsCount)
-		{
-			char fileName[255];
-			strcpy(fileName, "/vs/");
-			strcat(fileName, Shaders::vsList[i]);
-			strcat(fileName, ".hlsl");
-			dx::Shaders::Compiler::Vertex(i, fileName);
-			i++;
-			
-		}
-
-		Shaders::psCount = sizeof(Shaders::psList) / sizeof(const char*);
-		i = 0;
-		while (i < Shaders::psCount)
-		{
-			char fileName[255];
-			strcpy(fileName, "/ps/");
-			strcat(fileName, Shaders::psList[i]);
-			strcat(fileName, ".hlsl");
-			dx::Shaders::Compiler::Pixel(i, fileName);
-			i++;
-		}
-
-	}
-
-#else
-
-	#include "generated\processedShaders.h"
-
-	void CreateShaders()
-	{
-		shadersData::CompileAll();
-	}
-
-#endif
-
-	enum texList {
-		mainRT,
-		tex1,
-		tex2
-	};
-
 	void Init()
 	{
-		CreateShaders();
-		Textures::Create(texList::mainRT, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2((float)dx::width, (float)dx::height), false,true);
-		Textures::Create(texList::tex1, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2(1024, 1024), true, false);
-		Textures::Create(texList::tex2, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2(1024, 1024), true, false);
-		
+		Shaders::Compiler::CreateShaders();
+		Textures::Init();
+
 		isInit = true;
 	}
 
@@ -66,21 +16,22 @@ namespace Loop
 	#define CB ConstBuf
 	#define VS Shaders::vertex
 	#define PS Shaders::pixel
-	#define TEX texList
+	#define TEX Textures::list
 
 	void mainLoop()
 	{
-		SetIA();
+		
+		IA::Set();
 
 		if (!isInit) Init();
 
 		CB::Update();
 		CB::Set();
 
-		Textures::UnbindAll();
 		Depth::Set(Depth::Mode::off);
 
 		RT::Set(TEX::tex1);
+		Textures::UnbindAll();
 		Draw::Clear(0.f, 0.f, .15f, 1.f);
 		Shaders::Set(VS::quad,PS::simple);
 		Draw::NullDrawer(1, 1);
@@ -94,7 +45,7 @@ namespace Loop
 		Sampler::Set(Sampler::to::ps, 0, Sampler::type::Linear, Sampler::addr::clamp, Sampler::addr::wrap);
 		Draw::NullDrawer(1, 1);
 		
-		Present();
+		Draw::Present();
 
 	}
 
