@@ -81,6 +81,8 @@ namespace editor
 
 	void WatchFiles()
 	{
+		int shaderExtensionLen = strlen(dx::Shaders::Compiler::shaderExtension);
+
 		if (!isWatching)//init
 		{
 			dx::Log("watching for changes: ");
@@ -137,12 +139,16 @@ namespace editor
 						event = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(&change_buf[offset]);
 						WideCharToMultiByte(CP_ACP, NULL, event->FileName, event->FileNameLength / sizeof(WCHAR), fileName, sizeof(fileName), NULL, NULL);
 
-						char* s = strstr(fileName, ".hlsl~RF");//visual studio only hack!
+						char modifedExt[nameBufLen];
+						strcpy(modifedExt, dx::Shaders::Compiler::shaderExtension);
+						strcat(modifedExt, "~RF");//visual studio only hack!
+
+						char* s = strstr(fileName, modifedExt);
 						if (s)
 						{
 							char s2[nameBufLen];
 							memset(s2, NULL, nameBufLen);
-							ptrdiff_t bytes = ((char*)s) - ((char*)fileName) + 5;//.hlsl length = 5
+							ptrdiff_t bytes = ((char*)s) - ((char*)fileName) + shaderExtensionLen;//.hlsl length = 5
 							memcpy(s2, fileName, bytes);
 							s2[bytes + 1] = 0;
 
@@ -151,8 +157,8 @@ namespace editor
 							dx::Log("\n");
 					
 							char pureName[255];
-							strcpy(pureName, s2 + 3);
-							pureName[strlen(pureName) - 5] = 0;
+							strcpy(pureName, s2 + 3);// 3= len vs/ps with backslash
+							pureName[strlen(pureName) - shaderExtensionLen] = 0;
 
 							char s3[255];
 							strcpy(s3, "/");

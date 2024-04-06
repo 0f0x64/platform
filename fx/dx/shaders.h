@@ -24,6 +24,8 @@ namespace Shaders {
 
 #if EditMode
 
+		const char* shaderExtension = ".shader";
+
 		void CompilerLog(LPCWSTR source, HRESULT hr, const char* message)
 		{
 		#if DebugMode
@@ -162,7 +164,7 @@ namespace Shaders {
 				char fileName[255];
 				strcpy(fileName, "/vs/");
 				strcat(fileName, Shaders::vsList[i]);
-				strcat(fileName, ".hlsl");
+				strcat(fileName, shaderExtension);
 				dx::Shaders::Compiler::Vertex(i, fileName);
 				i++;
 
@@ -175,7 +177,7 @@ namespace Shaders {
 				char fileName[255];
 				strcpy(fileName, "/ps/");
 				strcat(fileName, Shaders::psList[i]);
-				strcat(fileName, ".hlsl");
+				strcat(fileName, shaderExtension);
 				dx::Shaders::Compiler::Pixel(i, fileName);
 				i++;
 			}

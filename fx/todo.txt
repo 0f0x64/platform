@@ -1,3 +1,2 @@
 select proper videocard (force nvidia) #define
-can vs exclude .hlsl from build permanently?
 blend refactor + blendset

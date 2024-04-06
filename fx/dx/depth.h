@@ -53,12 +53,33 @@ namespace Depth {
 		};
 	}
 
+	void Set(Mode::DepthMode m)
+	{
+		context->OMSetDepthStencilState(Depth::pDSState[m], 1);
+	}
+
 	struct {
-	
-		void Set(Mode::DepthMode m)
+
+			void Off()
 			{
-				context->OMSetDepthStencilState(Depth::pDSState[m], 1);
+				context->OMSetDepthStencilState(Depth::pDSState[Mode::DepthMode::off], 1);
 			}
+
+			void On()
+			{
+				context->OMSetDepthStencilState(Depth::pDSState[Mode::DepthMode::on], 1);
+			}
+
+			void ReadOnly()
+			{
+				context->OMSetDepthStencilState(Depth::pDSState[Mode::DepthMode::readonly], 1);
+			}
+
+			void WriteOnly()
+			{
+				context->OMSetDepthStencilState(Depth::pDSState[Mode::DepthMode::writeonly], 1);
+			}
+
 
 		} Api;
 }

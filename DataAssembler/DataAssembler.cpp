@@ -25,6 +25,8 @@ string outPPath = "..\\fx\\generated\\ps\\";
 string vsListFile = "..\\fx\\generated\\vsList.h";
 string psListFile = "..\\fx\\generated\\psList.h";
 
+const char* shaderExtension = ".shader";
+
 void Log(const char* message)
 {
 	printf("%s", message);
@@ -55,8 +57,11 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 #ifdef USE_SHADER_MINIFIER
 	string _pathToExe = pathToExe;
 
-	string minifierCmdLine = _pathToExe + "\\shader_minifier.exe "+ inPath + shaderName + ".hlsl" + " -o " + outPath + shaderName + ".hlsl " + 
-	"--hlsl --format text --no-remove-unused --preserve-all-globals --no-inlining --preserve-externals --preprocess";
+	string minifierCmdLine = _pathToExe + "\\shader_minifier.exe " + inPath + shaderName + shaderExtension +
+		" --hlsl --format text --no-remove-unused --preserve-all-globals --no-inlining --preserve-externals" +
+		" -o " + outPath + shaderName + shaderExtension;
+	
+
 
 	STARTUPINFO si;
 	ZeroMemory(&si, sizeof(STARTUPINFO));
@@ -69,7 +74,7 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 		CloseHandle(pi.hThread);
 	};
 
-	string inFilePath = outPath + shaderName + ".hlsl";
+	string inFilePath = outPath + shaderName + shaderExtension;
 
 	char ch;
 	ifstream ifile(inFilePath);
@@ -86,7 +91,7 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 
 #else
 
-	string inFilePath = inPath + shaderName + ".hlsl";
+	string inFilePath = inPath + shaderName + shaderExtension;
 
 	ofile << "\\\n";
 
@@ -114,7 +119,7 @@ void catToFile(const std::filesystem::path &sandbox, ofstream &ofile, std::vecto
 		std::string fName = cat.path().string();
 		auto o = fName.rfind("\\", fName.length());
 		fName.erase(0, o + 1);
-		o = fName.find(".hlsl");
+		o = fName.find(shaderExtension);
 		fName.erase(o, o + 5);
 
 		ofile << "Shader(" << fName.c_str() << ")\n";
@@ -145,9 +150,6 @@ int main()
 	psfile.close();
 
 	Log("\n---Collecting used shaders and create shader file for runtime\n\n");
-
-
-
 
 	remove(shaderFile.c_str());
 

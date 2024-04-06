@@ -1,4 +1,4 @@
-cbuffer ConstantBuffer : register(b0)
+cbuffer ConstantBuffer:register(b0)
 {
     float4 time;
 };
@@ -14,7 +14,7 @@ float4 PS(VS_OUTPUT input) : SV_Target
     float pi = 3.141519;
     
     float c = 0;
-    for (int i = 1; i < 5;i++)
+    for (int i = 1; i < 3;i++)
     {
         float2 uv = 2 * ((input.uv) - .5)*pi;
         uv += float2(sin(time.x * .13 * sin(i*.4)), sin(time.x * .12 * sin(i*.5)));
@@ -22,7 +22,7 @@ float4 PS(VS_OUTPUT input) : SV_Target
     }
     
 
-    return float4(c, c, saturate(c * 2) + .4, 1)+.3;
+    return float4(c, c, saturate(c * 2) , 1);
 
 }
 

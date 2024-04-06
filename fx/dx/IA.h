@@ -7,4 +7,4 @@ struct {
 		context->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
 	}
 
-} IA;
+} InputAssembler;

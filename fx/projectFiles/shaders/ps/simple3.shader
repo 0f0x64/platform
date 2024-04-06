@@ -19,6 +19,7 @@ float4 PS(VS_OUTPUT input) : SV_Target
     float2 uv = input.uv ;
     uv.y -= 2;
     color = tex1.Sample(sam1, uv);
+    color.a = dot(color.rgb, 1);
     
     return color;
 }

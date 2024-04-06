@@ -108,23 +108,26 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="projectFiles\shaders\ps\simple.hlsl">
+    <None Include="projectFiles\shaders\ps\simple.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
-    <None Include="projectFiles\shaders\ps\simple2.hlsl">
+    <None Include="projectFiles\shaders\ps\simple2.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
-    <None Include="projectFiles\shaders\ps\simple3.hlsl">
+    <None Include="projectFiles\shaders\ps\simple3.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
-    <None Include="projectFiles\shaders\vs\quad.hlsl">
+    <None Include="projectFiles\shaders\ps\simple4.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\quad.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
-    <None Include="projectFiles\shaders\vs\quad2.hlsl">
+    <None Include="projectFiles\shaders\vs\quad2.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
-    <None Include="projectFiles\shaders\ps\simple4.hlsl">
-      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    <None Include="projectFiles\shaders\vs\quad3.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -12,59 +12,65 @@ namespace Loop
 	}
 
 	//shortcuts
-
-	//resources
 	#define tex Textures::list
-	#define rt Textures::RenderTargets::Api
+	#define rt Textures::RenderTargets::Api.Set
+	#define createMips Textures::RenderTargets::Api.CreateMipMap()
 	#define cb ConstBuf::Api
 	#define vs Shaders::vertex
 	#define ps Shaders::pixel
-	
-	
 	#define depth Depth::Api
-	#define depthmode Depth::Mode
-	#define depthOff depth.Set(depthmode::off);
-	#define depthOn depth.Set(depthmode::on);
-	#define depthR depth.Set(depthmode::readonly);
-	#define depthW depth.Set(depthmode::writeonly);
-
-	#define texture Textures::Api
-	#define shader Shaders::Api
+	#define texture Textures::Api.Set
+	#define shader Shaders::Api.Set
 	#define draw Draw
-	#define sampler Sampler::Api
+	#define sampler Sampler::Api.Set
+	#define ia InputAssembler
 
-	#define pSamplerLU(slot) sampler.Set(Sampler::to::pixel, slot , Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::clamp)
-	#define pSamplerLV(slot) sampler.Set(Sampler::to::pixel, slot , Sampler::type::Linear, Sampler::addr::clamp, Sampler::addr::wrap)
-	#define pSamplerLUV(slot) sampler.Set(Sampler::to::pixel, slot , Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::wrap)
+	#define pSampler_L_U(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::clamp)
+	#define pSampler_L_V(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Linear, Sampler::addr::clamp, Sampler::addr::wrap)
+	#define pSampler_L_UV(slot) sampler(Sampler::to::pixel, slot , Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::wrap)
+	 
+	#define pSampler_P_U(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Point, Sampler::addr::wrap, Sampler::addr::clamp)
+	#define pSampler_P_V(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Point, Sampler::addr::clamp, Sampler::addr::wrap)
+	#define pSampler_P_UV(slot) sampler(Sampler::to::pixel, slot , Sampler::type::Point, Sampler::addr::wrap, Sampler::addr::wrap)
+
+	#define pSampler_PL_U(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::MinPointMagLinear, Sampler::addr::wrap, Sampler::addr::clamp)
+	#define pSampler_PL_V(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::MinPointMagLinear, Sampler::addr::clamp, Sampler::addr::wrap)
+	#define pSampler_PL_UV(slot) sampler(Sampler::to::pixel, slot , Sampler::type::MinPointMagLinear, Sampler::addr::wrap, Sampler::addr::wrap)
+
 
 	void mainLoop()
 	{
 		
-		IA.Set();
+		ia.Set();
 
 		if (!isInit) Init();
 
 		cb.Update();
 		cb.Set();
 
-		//depth.Set(depthmode::off);
-		depthOff;
+		depth.Off();
 
-		rt.Set(tex::tex1);
+		rt(tex::tex1);
 
 		draw.Clear(0.f, 0.f, .15f, 1.f);
-		shader.Set(vs::quad,ps::simple);
+		shader(vs::quad,ps::simple);
 		draw.NullDrawer(1, 1);
-		rt.CreateMipMap();
+		createMips;
 
-		rt.Set(tex::mainRT);
-		draw.Clear(1.0f,0.f,.15f,1.f);
-		
-		texture.Set(tex::tex1, 0);
-		shader.Set(vs::quad2, ps::simple3);
-		pSamplerLUV(0);
+		rt(tex::mainRT);
+		draw.Clear(0.2f,0.2f,0.2f,1.f);
 
+		texture(tex::tex1, 0);
+		pSampler_L_UV(0);
+
+		shader(vs::quad2, ps::simple3);
+		dx::Blend::Set(dx::Blend::mode::on, dx::Blend::op::add);
 		draw.NullDrawer(1, 1);
+
+		shader(vs::quad3, ps::simple3);
+		dx::Blend::Set(dx::Blend::mode::alpha, dx::Blend::op::add);
+		draw.NullDrawer(1, 1);
+
 
 		draw.Present();
 
