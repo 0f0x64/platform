@@ -103,25 +103,28 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="projectFiles\shaders\ps\simple.hlsl">
-      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
-    </FxCompile>
-    <FxCompile Include="projectFiles\shaders\vs\quad.hlsl">
-      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
-    </FxCompile>
-    <FxCompile Include="projectFiles\shaders\vs\quad2.hlsl">
-      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
-    </FxCompile>
-    <FxCompile Include="projectFiles\shaders\ps\simple2.hlsl">
-      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
-    </FxCompile>
-    <FxCompile Include="projectFiles\shaders\ps\simple3.hlsl">
-      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="todo.txt">
       <Filter>Source Files</Filter>
     </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="projectFiles\shaders\ps\simple.hlsl">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\simple2.hlsl">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\simple3.hlsl">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\quad.hlsl">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\quad2.hlsl">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\simple4.hlsl">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
   </ItemGroup>
 </Project>

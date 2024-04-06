@@ -139,6 +139,9 @@ float4 PS(VS_OUTPUT input) : SV_Target\
 \
 ";
 
+const char* simple4 = "\
+";
+
 
 void CompileAll ()
 {
@@ -147,6 +150,7 @@ dx::Shaders::Compiler::Vertex (1, quad2);
 dx::Shaders::Compiler::Pixel (0, simple);
 dx::Shaders::Compiler::Pixel (1, simple2);
 dx::Shaders::Compiler::Pixel (2, simple3);
+dx::Shaders::Compiler::Pixel (3, simple4);
 };
 
 
