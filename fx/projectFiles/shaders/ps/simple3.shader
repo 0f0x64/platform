@@ -6,6 +6,12 @@ cbuffer ConstantBuffer : register(b0)
     float4 time;
 };
 
+cbuffer ConstantBuffer : register(b3)
+{
+    float4 tone;
+};
+
+
 struct VS_OUTPUT
 {
     float4 pos : SV_POSITION;
@@ -20,6 +26,7 @@ float4 PS(VS_OUTPUT input) : SV_Target
     uv.y -= 2;
     color = tex1.Sample(sam1, uv);
     color.a = dot(color.rgb, 1);
+    color *= tone;
     
     return color;
 }

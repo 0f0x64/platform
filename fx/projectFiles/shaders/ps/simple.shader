@@ -22,7 +22,7 @@ float4 PS(VS_OUTPUT input) : SV_Target
     }
     
 
-    return float4(c, c, saturate(c * 2) , 1);
+    return float4(c, c, c , 1);
 
 }
 

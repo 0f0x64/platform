@@ -193,11 +193,6 @@ namespace Textures {
 		context->PSSetShaderResources(0, 128, null);
 	}
 
-	void CreateMipMap(int i)
-	{
-		context->GenerateMips(texture[i].TextureResView);
-	}
-
 	void SetViewport(byte texId, byte level = 0)
 	{
 		XMFLOAT2 size = Textures::texture[texId].size;
@@ -232,6 +227,12 @@ namespace Textures {
 			}
 		}
 
+		void CreateMipMap()
+		{
+			context->GenerateMips(texture[currentRT].TextureResView);
+		}
+
+
 	} Api;
 
 	namespace RenderTargets {
@@ -243,11 +244,6 @@ namespace Textures {
 				currentRT = texId;
 				Textures::SetViewport(texId, level);
 				context->OMSetRenderTargets(1, &Textures::texture[texId].RenderTargetView[0][0], Textures::texture[texId].depth ? Textures::texture[texId].DepthStencilView[0] : 0);
-			}
-
-			void CreateMipMap()
-			{
-				context->GenerateMips(texture[currentRT].TextureResView);
 			}
 
 		} Api;

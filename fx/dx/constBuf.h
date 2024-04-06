@@ -1,68 +1,89 @@
 namespace ConstBuf
 {
 
-	ID3D11Buffer* vertex;
-	ID3D11Buffer* pixel;
+	ID3D11Buffer* vertex[5];
+	ID3D11Buffer* pixel[5];
 
-	struct frameConst
-	{
-		XMFLOAT4 time;
-		XMFLOAT4 aspectRatio;
+	#define constCount 32
 
-		XMMATRIX View;
-		XMMATRIX iView;
-		XMMATRIX Proj;
-		XMMATRIX iProj;
-		XMMATRIX iVP;
-
-		XMFLOAT4 DepthViewVector;
-		XMMATRIX DepthView;
-		XMMATRIX DepthProj;
-		XMMATRIX iDepthVP;
-	};
-
-	frameConst frame;
+	XMFLOAT4 frame[constCount];
+	XMMATRIX object[constCount];
+	XMMATRIX camera[2][constCount];
+	XMFLOAT4 params[constCount];
+	XMFLOAT4 external[64][constCount];
 
 	int roundUp(int n, int r)
 	{
 		return 	n - (n % r) + r;
 	}
 
-	void Init()
+	void CreateCB(int i, int size)
 	{
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(bd));
 		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.ByteWidth = roundUp(sizeof(frameConst), 16);
+		bd.ByteWidth = roundUp(size, 16);
 		bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bd.CPUAccessFlags = 0;
 		bd.StructureByteStride = 16;
 
-		HRESULT hr = device->CreateBuffer(&bd, NULL, &vertex);
+		HRESULT hr = device->CreateBuffer(&bd, NULL, &vertex[i]);
 		#if DebugMode
 			if (FAILED(hr)) { Log("constant bufferV fail\n"); return; }
 		#endif	
 
-		bd.ByteWidth = roundUp(sizeof(frameConst), 16);
-		hr = device->CreateBuffer(&bd, NULL, &pixel);
+		hr = device->CreateBuffer(&bd, NULL, &pixel[i]);
 		#if DebugMode
 			if (FAILED(hr)) { Log("constant bufferP fail\n"); return; }
 		#endif		
 	}
 
+	void Init()
+	{
+		CreateCB(0, sizeof(frame));
+		CreateCB(1, sizeof(object));
+		CreateCB(2, sizeof(camera));
+		CreateCB(3, sizeof(params));
+		CreateCB(4, sizeof(external));
+	}
+
 	struct
 	{
-		void Update()
+		void UpdateFrame()
 		{
-			ConstBuf::frame.time = XMFLOAT4((float)(timer::frameBeginTime * .01), 0, 0, 0);
-			context->UpdateSubresource(ConstBuf::vertex, 0, NULL, &ConstBuf::frame, 0, 0);
-			context->UpdateSubresource(ConstBuf::pixel, 0, NULL, &ConstBuf::frame, 0, 0);
+			context->UpdateSubresource(ConstBuf::vertex[0], 0, NULL, &frame, 0, 0);
+			context->UpdateSubresource(ConstBuf::pixel[0], 0, NULL, &frame, 0, 0);
 		}
 
-		void Set()
+		void UpdateObject()
 		{
-			context->VSSetConstantBuffers(0, 1, &ConstBuf::vertex);
-			context->PSSetConstantBuffers(0, 1, &ConstBuf::pixel);
+			context->UpdateSubresource(ConstBuf::vertex[1], 0, NULL, &object, 0, 0);
+			context->UpdateSubresource(ConstBuf::pixel[1], 0, NULL, &object, 0, 0);
+		}
+
+		void UpdateCamera()
+		{
+			context->UpdateSubresource(ConstBuf::vertex[2], 0, NULL, &camera, 0, 0);
+			context->UpdateSubresource(ConstBuf::pixel[2], 0, NULL, &camera, 0, 0);
+		}
+
+		void UpdateParams()
+		{
+			context->UpdateSubresource(ConstBuf::vertex[3], 0, NULL, &params, 0, 0);
+			context->UpdateSubresource(ConstBuf::pixel[3], 0, NULL, &params, 0, 0);
+		}
+
+		void UpdateExternal()
+		{
+			context->UpdateSubresource(ConstBuf::vertex[4], 0, NULL, &external, 0, 0);
+			context->UpdateSubresource(ConstBuf::pixel[4], 0, NULL, &external, 0, 0);
+		}
+
+
+		void Set(int i)
+		{
+			context->VSSetConstantBuffers(i, 1, &ConstBuf::vertex[i]);
+			context->PSSetConstantBuffers(i, 1, &ConstBuf::pixel[i]);
 		}
 	} Api;
 } 
