@@ -1,12 +1,12 @@
 Texture2D tex1 : register(t0);
 SamplerState sam1 : register(s0);
 
-cbuffer ConstantBuffer : register(b0)
+cbuffer c1 : register(b0)
 {
     float4 time;
 };
 
-cbuffer ConstantBuffer : register(b3)
+cbuffer c2 : register(b3)
 {
     float4 tone;
 };
@@ -17,6 +17,7 @@ struct VS_OUTPUT
     float4 pos : SV_POSITION;
     float2 uv : TEXCOORD0;
 };
+
 
 float4 PS(VS_OUTPUT input) : SV_Target
 {

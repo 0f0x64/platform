@@ -25,8 +25,7 @@ namespace Loop
 	#define ia InputAssembler
 
 	#define constant ConstBuf
-	#define cb ConstBuf::Api
-
+	
 	#define pSampler_L_U(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::clamp)
 	#define pSampler_L_V(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Linear, Sampler::addr::clamp, Sampler::addr::wrap)
 	#define pSampler_L_UV(slot) sampler(Sampler::to::pixel, slot , Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::wrap)
@@ -46,49 +45,75 @@ namespace Loop
 		
 		ia.Set();
 
-		for (int i=0;i<5;i++) cb.Set(i);
+		for (int i=0;i<5;i++) ConstBuf::Api.Set(i);
 
 		isInit = true;
 	}
 
 	void Precalc()
 	{
+		ConstBuf::Api.Update(0, ConstBuf::global);
+
 		isPrecalc = true;
 	}
 
-	void mainLoop()
+	void frameConst()
 	{
-		constant::frame[0] = XMFLOAT4((float)(timer::frameBeginTime * .01), 0, 0, 0);
-		cb.UpdateFrame();
+		constant::frame[0].x = (float)(timer::frameBeginTime * .01);
+		ConstBuf::Api.Update(1, ConstBuf::frame);
+	}
 
-		if (!isInit) Init();
-		if (!isPrecalc) Precalc();
-	
+	void Scene1()
+	{
 		depth.Off();
 		rt(tex::tex1);
 
-		shader(vs::quad,ps::simple);
+		shader(vs::quad, ps::simple);
 		draw.NullDrawer(1, 1);
 		createMips();
 
 		rt(tex::mainRT);
-		draw.Clear(0.2f,0.2f,0.2f,1.f);
+		Camera::Set();
+		depth.On();
+		draw.Clear(0.2f, 0.2f, 0.2f, 1.f);
+		draw.ClearDepth();
 
 		texture(tex::tex1, 0);
 		pSampler_L_UV(0);
 
 		shader(vs::quad2, ps::simple3);
-		constant::params[0] = XMFLOAT4(1, 0, 0, 1);
-		cb.UpdateParams();
-		blend(blendMode::on, blendOp::add);
+		constant::drawer[0] = XMFLOAT4(1, 0, 0, 1);
+		blend(blendMode::off, blendOp::add);
 		draw.NullDrawer(1, 1);
 
-		shader(vs::quad3, ps::simple3);
-		constant::params[0] = XMFLOAT4(0, 1, 0, 1);
-		cb.UpdateParams();
-		blend(blendMode::alpha, blendOp::add);
+		shader(vs::quad2, ps::simple3);
+		constant::drawer[0] = XMFLOAT4(0, 1, 0, 1);
+		blend(blendMode::off, blendOp::add);
+		draw.NullDrawer(1, 1);
+	}
+
+	void Scene2()
+	{
+		draw.Clear(1.2f, 0.2f, 0.2f, 1.f);
+		draw.ClearDepth();
+		depth.Off();
+		rt(tex::mainRT);
+
+		shader(vs::quad, ps::simple);
 		draw.NullDrawer(1, 1);
 
+	}
+
+	void mainLoop()
+	{
+		frameConst();
+
+		if (!isInit) Init();
+		if (!isPrecalc) Precalc();
+
+		Scene2();
+
+		Textures::UnbindAll();
 		draw.Present();
 
 	}

@@ -103,20 +103,21 @@ namespace Textures {
 			{
 				renderTargetViewDesc.Texture2DArray.FirstArraySlice = j;
 				HRESULT hr = device->CreateRenderTargetView(texture[i].pTexture, &renderTargetViewDesc, &texture[i].RenderTargetView[0][j]);
-#if DebugMode
+				#if DebugMode
 				if (FAILED(hr)) { Log("CreateRenderTargetView error\n"); return; }
-#endif	
+				#endif	
 			}
 		}
 		else
 		{
+
 			for (unsigned int m = 0; m < tdesc.MipLevels; m++)
 			{
 				renderTargetViewDesc.Texture2D.MipSlice = m;
 				HRESULT hr = device->CreateRenderTargetView(texture[i].pTexture, &renderTargetViewDesc, &texture[i].RenderTargetView[m][0]);
-#if DebugMode
+				#if DebugMode
 				if (FAILED(hr)) { Log("CreateRenderTargetView error\n"); return; }
-#endif	
+			#endif	
 			}
 		}
 
@@ -137,7 +138,7 @@ namespace Textures {
 		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		descDSV.Flags = 0;
 
-		for (unsigned int m = 0; m < tdesc.MipLevels; m++)
+		for (unsigned int m = 0; m < max(1,tdesc.MipLevels); m++)
 		{
 			descDSV.Texture2D.MipSlice = m;
 			HRESULT hr = device->CreateDepthStencilView(texture[i].pDepth, &descDSV, &texture[i].DepthStencilView[m]);
@@ -177,7 +178,7 @@ namespace Textures {
 
 		CreateTex(i);
 		ShaderRes(i);
-		rtView(i);
+		if (i>0) rtView(i);
 
 		if (depth)
 		{
@@ -190,6 +191,7 @@ namespace Textures {
 	void UnbindAll()
 	{
 		ID3D11ShaderResourceView* const null[128] = { NULL };
+		context->VSSetShaderResources(0, 128, null);
 		context->PSSetShaderResources(0, 128, null);
 	}
 
@@ -243,7 +245,8 @@ namespace Textures {
 			{
 				currentRT = texId;
 				Textures::SetViewport(texId, level);
-				context->OMSetRenderTargets(1, &Textures::texture[texId].RenderTargetView[0][0], Textures::texture[texId].depth ? Textures::texture[texId].DepthStencilView[0] : 0);
+				auto depthStencil = Textures::texture[texId].depth ? Textures::texture[texId].DepthStencilView[0] : 0;
+				context->OMSetRenderTargets(1, &Textures::texture[texId].RenderTargetView[0][0], depthStencil);
 			}
 
 		} Api;

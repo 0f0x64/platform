@@ -37,8 +37,8 @@ namespace dx
 	float aspect;
 	float iaspect;
 
-	#include "camera.h"
 	#include "constBuf.h"
+	#include "camera.h"
 	#include "blend.h"
 	#include "rasterizer.h"
 	#include "depth.h"

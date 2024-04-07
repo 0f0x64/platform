@@ -1,4 +1,4 @@
-cbuffer ConstantBuffer : register(b0)
+cbuffer ConstantBuffer : register(b1)
 {
     float4 time;
 };
@@ -17,6 +17,6 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     float2 quad[6] = { -1, -1, 1, -1, -1, 1, 1, -1, 1, 1, -1, 1 };
     float2 p = quad[vID];
     output.pos = float4(p, 0, 1);
-    output.uv = p / 2. + .5;
+    output.uv = p / 3. + .5;
     return output;
 }

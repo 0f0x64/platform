@@ -1,17 +1,16 @@
 namespace ConstBuf
 {
 
-	ID3D11Buffer* vertex[5];
-	ID3D11Buffer* pixel[5];
+	ID3D11Buffer* buffer[5];
 
 	#define constCount 32
 
-	XMFLOAT4 frame[constCount];
-	XMMATRIX object[constCount];
-	XMMATRIX camera[2][constCount];
-	XMFLOAT4 params[constCount];
-	XMFLOAT4 external[64][constCount];
-
+	XMFLOAT4 global[64][constCount];//update once per start
+	XMFLOAT4 frame[constCount];//update per frame
+	XMMATRIX camera[2][3];//update per camera set
+	XMFLOAT4 drawer[constCount];//update per draw call
+	XMMATRIX drawerMat[constCount];//update per draw call
+		
 	int roundUp(int n, int r)
 	{
 		return 	n - (n % r) + r;
@@ -27,63 +26,34 @@ namespace ConstBuf
 		bd.CPUAccessFlags = 0;
 		bd.StructureByteStride = 16;
 
-		HRESULT hr = device->CreateBuffer(&bd, NULL, &vertex[i]);
+		HRESULT hr = device->CreateBuffer(&bd, NULL, &buffer[i]);
 		#if DebugMode
 			if (FAILED(hr)) { Log("constant bufferV fail\n"); return; }
 		#endif	
-
-		hr = device->CreateBuffer(&bd, NULL, &pixel[i]);
-		#if DebugMode
-			if (FAILED(hr)) { Log("constant bufferP fail\n"); return; }
-		#endif		
 	}
 
 	void Init()
 	{
-		CreateCB(0, sizeof(frame));
-		CreateCB(1, sizeof(object));
+		CreateCB(0, sizeof(global));
+		CreateCB(1, sizeof(frame));
 		CreateCB(2, sizeof(camera));
-		CreateCB(3, sizeof(params));
-		CreateCB(4, sizeof(external));
+		CreateCB(3, sizeof(drawer));
+		CreateCB(4, sizeof(drawerMat));
 	}
 
 	struct
 	{
-		void UpdateFrame()
+		template <typename T>
+		void Update(int i, T* data)
 		{
-			context->UpdateSubresource(ConstBuf::vertex[0], 0, NULL, &frame, 0, 0);
-			context->UpdateSubresource(ConstBuf::pixel[0], 0, NULL, &frame, 0, 0);
-		}
-
-		void UpdateObject()
-		{
-			context->UpdateSubresource(ConstBuf::vertex[1], 0, NULL, &object, 0, 0);
-			context->UpdateSubresource(ConstBuf::pixel[1], 0, NULL, &object, 0, 0);
-		}
-
-		void UpdateCamera()
-		{
-			context->UpdateSubresource(ConstBuf::vertex[2], 0, NULL, &camera, 0, 0);
-			context->UpdateSubresource(ConstBuf::pixel[2], 0, NULL, &camera, 0, 0);
-		}
-
-		void UpdateParams()
-		{
-			context->UpdateSubresource(ConstBuf::vertex[3], 0, NULL, &params, 0, 0);
-			context->UpdateSubresource(ConstBuf::pixel[3], 0, NULL, &params, 0, 0);
-		}
-
-		void UpdateExternal()
-		{
-			context->UpdateSubresource(ConstBuf::vertex[4], 0, NULL, &external, 0, 0);
-			context->UpdateSubresource(ConstBuf::pixel[4], 0, NULL, &external, 0, 0);
+			context->UpdateSubresource(ConstBuf::buffer[i], 0, NULL, data, 0, 0);
 		}
 
 
 		void Set(int i)
 		{
-			context->VSSetConstantBuffers(i, 1, &ConstBuf::vertex[i]);
-			context->PSSetConstantBuffers(i, 1, &ConstBuf::pixel[i]);
+			context->VSSetConstantBuffers(i, 1, &ConstBuf::buffer[i]);
+			context->PSSetConstantBuffers(i, 1, &ConstBuf::buffer[i]);
 		}
 	} Api;
 } 

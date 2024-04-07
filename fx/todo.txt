@@ -1,1 +1,2 @@
 select proper videocard (force nvidia) #define
+reflect shader variables(constbuf)

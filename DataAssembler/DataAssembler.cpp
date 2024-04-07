@@ -54,7 +54,7 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 
 	ofile << "const char* " << shaderName.c_str() << " = \"";
 
-#ifdef USE_SHADER_MINIFIER
+#if USE_SHADER_MINIFIER
 	string _pathToExe = pathToExe;
 
 	string minifierCmdLine = _pathToExe + "\\shader_minifier.exe " + inPath + shaderName + shaderExtension +
