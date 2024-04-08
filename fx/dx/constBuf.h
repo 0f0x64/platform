@@ -5,7 +5,7 @@ namespace ConstBuf
 
 	#define constCount 32
 
-	XMFLOAT4 global[64][constCount];//update once per start
+	XMFLOAT4 global[constCount];//update once per start
 	XMFLOAT4 frame[constCount];//update per frame
 	XMMATRIX camera[2][3];//update per camera set
 	XMFLOAT4 drawer[constCount];//update per draw call

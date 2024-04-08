@@ -175,10 +175,13 @@ namespace Textures {
 		texture[i].size = size;
 		texture[i].mipMaps = mipMaps;
 		texture[i].depth = depth;
-
-		CreateTex(i);
-		ShaderRes(i);
-		if (i>0) rtView(i);
+		if (i > 0)
+		{
+			CreateTex(i);
+			ShaderRes(i);
+			//if (i>0) 
+			rtView(i);
+		}
 
 		if (depth)
 		{

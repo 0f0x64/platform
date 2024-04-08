@@ -94,10 +94,12 @@ namespace Loop
 
 	void Scene2()
 	{
+		rt(tex::mainRT);
+		blend(blendMode::off, blendOp::add);
 		draw.Clear(1.2f, 0.2f, 0.2f, 1.f);
 		draw.ClearDepth();
 		depth.Off();
-		rt(tex::mainRT);
+
 
 		shader(vs::quad, ps::simple);
 		draw.NullDrawer(1, 1);
