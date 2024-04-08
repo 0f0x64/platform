@@ -1,2 +1,46 @@
-select proper videocard (force nvidia) #define
+includes: https://asawicki.info/news_1515_implementing_id3d10include
+
+select proper videocard (force nvidia) #define ?
+
 reflect shader variables(constbuf)
+
+ID3D11ShaderReflection* pReflector = NULL;
+				D3DReflect(VS[i].pBlob->GetBufferPointer(), VS[i].pBlob->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&pReflector);
+				D3D11_SHADER_DESC shaderDesc;
+				pReflector->GetDesc(&shaderDesc);
+
+				for (UINT i = 0U; i < shaderDesc.ConstantBuffers; ++i)
+				{
+					ID3D11ShaderReflectionConstantBuffer* constBuffReflection = pReflector->GetConstantBufferByIndex(i);
+					D3D11_SHADER_BUFFER_DESC shaderBuffDesc;
+					constBuffReflection->GetDesc(&shaderBuffDesc);
+
+					for (UINT j = 0U; j < shaderBuffDesc.Variables; ++j)
+					{
+						ID3D11ShaderReflectionVariable* variableRefl = constBuffReflection->GetVariableByIndex(j);
+						D3D11_SHADER_VARIABLE_DESC shaderVarDesc;
+						variableRefl->GetDesc(&shaderVarDesc);
+						int t = 22;
+					}
+
+				}
+
+win errors handling
+
+static void LogWin32Error(DWORD err, const char* msg)
+{
+    OutputDebugStringA(msg);
+    OutputDebugStringA("!\n");
+
+    LPWSTR str;
+    if (FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
+        err, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), (LPWSTR)&str, 0, NULL))
+    {
+        OutputDebugStringW(str);
+        LocalFree(str);
+    }
+}
+static void LogWin32LastError(const char* msg)
+{
+    LogWin32Error(GetLastError(), msg);
+}

@@ -12,7 +12,7 @@ namespace Rasterizer {
 		rasterizerState.DepthBiasClamp = 0;
 		rasterizerState.SlopeScaledDepthBias = 0;
 		rasterizerState.DepthClipEnable = false;
-		rasterizerState.ScissorEnable = true;
+		rasterizerState.ScissorEnable = false;
 		rasterizerState.MultisampleEnable = false;
 		rasterizerState.AntialiasedLineEnable = true;
 		device->CreateRasterizerState(&rasterizerState, &rasterState[0]);

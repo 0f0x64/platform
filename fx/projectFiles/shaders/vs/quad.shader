@@ -1,8 +1,12 @@
-cbuffer ConstantBuffer : register(b1)
+cbuffer c1 : register(b1)
 {
     float4 time;
 };
 
+cbuffer c2 : register(b2)
+{
+    float4x4 camera[2][3];
+};
 
 struct VS_OUTPUT
 {

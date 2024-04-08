@@ -6,7 +6,7 @@ cbuffer c1 : register(b0)
     float4 time;
 };
 
-cbuffer c2 : register(b3)
+cbuffer params : register(b3)
 {
     float4 tone;
 };

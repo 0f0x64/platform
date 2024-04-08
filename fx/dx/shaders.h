@@ -3,7 +3,7 @@ namespace Shaders {
 	int vsCount = 0;
 	int psCount = 0;
 
-#include "shadersReflection.h"
+	#include "shadersReflection.h"
 
 	typedef struct {
 		ID3D11VertexShader* pShader;
@@ -22,7 +22,7 @@ namespace Shaders {
 
 	namespace Compiler {
 
-#if EditMode
+	#if EditMode
 
 		const char* shaderExtension = ".shader";
 
@@ -71,9 +71,10 @@ namespace Shaders {
 			if (hr == S_OK)
 			{
 				hr = device->CreateVertexShader(VS[i].pBlob->GetBufferPointer(), VS[i].pBlob->GetBufferSize(), NULL, &VS[i].pShader);
-#if DebugMode
-				if (FAILED(hr)) { Log("vs creation fail\n"); return; }
-#endif
+
+				#if DebugMode
+								if (FAILED(hr)) { Log("vs creation fail\n"); return; }
+				#endif
 			}
 
 		}
@@ -90,14 +91,14 @@ namespace Shaders {
 			if (hr == S_OK)
 			{
 				hr = device->CreatePixelShader(PS[i].pBlob->GetBufferPointer(), PS[i].pBlob->GetBufferSize(), NULL, &PS[i].pShader);
-#if DebugMode
-				if (FAILED(hr)) { Log("vs creation fail\n"); return; }
-#endif
+				#if DebugMode
+					if (FAILED(hr)) { Log("vs creation fail\n"); return; }
+				#endif
 			}
 
 		}
 
-#else
+	#else
 
 		void Vertex(int n, const char* shaderText)
 		{
@@ -151,9 +152,9 @@ namespace Shaders {
 			}
 		}
 
-#endif
+	#endif
 
-#if EditMode
+	#if EditMode
 
 		void CreateShaders()
 		{
@@ -184,16 +185,16 @@ namespace Shaders {
 
 		}
 
-#else
+	#else
 
-#include "generated\processedShaders.h"
+	#include "generated\processedShaders.h"
 
 		void CreateShaders()
 		{
 			shadersData::CompileAll();
 		}
 
-#endif
+	#endif
 
 	}
 

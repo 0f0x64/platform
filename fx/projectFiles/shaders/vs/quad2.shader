@@ -1,4 +1,4 @@
-cbuffer c1:register(b1)
+cbuffer c1 : register(b1)
 {
     float4 time;
 };
@@ -8,9 +8,11 @@ cbuffer c2 : register(b2)
     float4x4 camera[2][3];
 };
 
-cbuffer c3: register(b3)
+cbuffer params : register(b3)
 {
     float4 tone;
+    float4 tone2;
+    float4 tone3;
 };
 
 

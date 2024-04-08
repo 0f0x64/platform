@@ -38,6 +38,14 @@ namespace Loop
 	#define pSampler_PL_V(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::MinPointMagLinear, Sampler::addr::clamp, Sampler::addr::wrap)
 	#define pSampler_PL_UV(slot) sampler(Sampler::to::pixel, slot , Sampler::type::MinPointMagLinear, Sampler::addr::wrap, Sampler::addr::wrap)
 
+
+	//#include "..\generated\constBufReflect.h"
+
+	void pSet(int param, float value)
+	{
+		constant::drawer[param] = XMFLOAT4(value, 0, 0, 1);
+	}
+
 	void Init()
 	{
 		Shaders::Init();
@@ -63,6 +71,7 @@ namespace Loop
 		ConstBuf::Api.Update(1, ConstBuf::frame);
 	}
 
+	
 	void Scene1()
 	{
 		depth.Off();
@@ -83,6 +92,10 @@ namespace Loop
 
 		shader(vs::quad2, ps::simple3);
 		constant::drawer[0] = XMFLOAT4(1, 0, 0, 1);
+
+		//auto p = params.quad2;
+		//pSet(p.tone3, 1);
+
 		blend(blendMode::off, blendOp::add);
 		draw.NullDrawer(1, 1);
 
@@ -97,8 +110,8 @@ namespace Loop
 		rt(tex::mainRT);
 		blend(blendMode::off, blendOp::add);
 		draw.Clear(1.2f, 0.2f, 0.2f, 1.f);
-		draw.ClearDepth();
-		depth.Off();
+		//draw.ClearDepth();
+		//depth.Off();
 
 
 		shader(vs::quad, ps::simple);
@@ -113,7 +126,7 @@ namespace Loop
 		if (!isInit) Init();
 		if (!isPrecalc) Precalc();
 
-		Scene2();
+		Scene1();
 
 		Textures::UnbindAll();
 		draw.Present();

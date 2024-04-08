@@ -3,11 +3,15 @@
 namespace shadersData {
 
 const char* quad = "\
-cbuffer ConstantBuffer : register(b1)\
+cbuffer c1 : register(b1)\
 {\
     float4 time;\
 };\
 \
+cbuffer c2 : register(b2)\
+{\
+    float4x4 camera[2][3];\
+};\
 \
 struct VS_OUTPUT\
 {\
@@ -28,7 +32,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)\
 ";
 
 const char* quad2 = "\
-cbuffer c1:register(b1)\
+cbuffer c1 : register(b1)\
 {\
     float4 time;\
 };\
@@ -38,9 +42,11 @@ cbuffer c2 : register(b2)\
     float4x4 camera[2][3];\
 };\
 \
-cbuffer c3: register(b3)\
+cbuffer params : register(b3)\
 {\
     float4 tone;\
+    float4 tone2;\
+    float4 tone3;\
 };\
 \
 \
@@ -162,7 +168,7 @@ cbuffer c1 : register(b0)\
     float4 time;\
 };\
 \
-cbuffer c2 : register(b3)\
+cbuffer params : register(b3)\
 {\
     float4 tone;\
 };\

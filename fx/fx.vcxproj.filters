@@ -101,6 +101,9 @@
     <ClInclude Include="generated\vsList.h">
       <Filter>Source Files\generated</Filter>
     </ClInclude>
+    <ClInclude Include="generated\constBufReflect.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

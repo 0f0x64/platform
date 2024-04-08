@@ -28,19 +28,18 @@ namespace Device {
 #if DebugMode
 		if (FAILED(hr)) { Log("device not created\n"); return; }
 #endif	
-
-		ID3D11Texture2D* pBackBuffer = NULL;
-		hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer);
+		Textures::texture[0].pTexture = NULL;
+		hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&Textures::texture[0].pTexture);
 #if DebugMode
 		if (FAILED(hr)) { Log("swapchain error\n"); return; }
 #endif		
 
-		hr = device->CreateRenderTargetView(pBackBuffer, NULL, &Textures::texture[0].RenderTargetView[0][0]);
+		hr = device->CreateRenderTargetView(Textures::texture[0].pTexture, NULL, &Textures::texture[0].RenderTargetView[0][0]);
 #if DebugMode
 		if (FAILED(hr)) { Log("rt not created\n"); return; }
 #endif	
 
-		pBackBuffer->Release();
+		Textures::texture[0].pTexture->Release();
 
 	}
 }
