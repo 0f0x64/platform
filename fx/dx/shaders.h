@@ -20,6 +20,9 @@ namespace Shaders {
 
 	ID3DBlob* pErrorBlob;
 
+	
+
+
 	namespace Compiler {
 
 	#if EditMode
@@ -98,70 +101,6 @@ namespace Shaders {
 
 		}
 
-	#else
-
-		void Vertex(int n, const char* shaderText)
-		{
-			HRESULT hr = S_OK;
-
-			VS[n].pBlob = NULL;
-			hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &VS[n].pBlob, &pErrorBlob);
-
-			#if DebugMode
-			if (FAILED(hr)) { 
-				auto m = (char*)pErrorBlob->GetBufferPointer();
-				Log(m); 
-			}
-			#endif	
-
-			if (hr == S_OK)
-			{
-				if (VS[n].pShader) VS[n].pShader->Release();
-
-				hr = device->CreateVertexShader(VS[n].pBlob->GetBufferPointer(), VS[n].pBlob->GetBufferSize(), NULL, &VS[n].pShader);
-
-				#if DebugMode
-				if (FAILED(hr))
-				{
-					if (VS[n].pShader) VS[n].pShader->Release();
-					Log("vs fail");
-				}
-			#endif		
-			}
-
-		}
-
-
-		void Pixel(int n, const char* shaderText)
-		{
-			HRESULT hr = S_OK;
-
-			PS[n].pBlob = NULL;
-			hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &PS[n].pBlob, &pErrorBlob);
-
-			#if DebugMode
-			if (FAILED(hr)) {
-				auto m = (char*)pErrorBlob->GetBufferPointer();
-				Log(m);
-			}
-			#endif	
-
-			if (hr == S_OK)
-			{
-				if (PS[n].pShader) PS[n].pShader->Release();
-				hr = device->CreatePixelShader(PS[n].pBlob->GetBufferPointer(), PS[n].pBlob->GetBufferSize(), NULL, &PS[n].pShader);
-
-				#if DebugMode
-				if (FAILED(hr)) { Log("ps fail\n"); }
-				#endif
-
-			}
-		}
-
-	#endif
-
-	#if EditMode
-
 		void CreateShaders()
 		{
 			Shaders::vsCount = sizeof(Shaders::vsList) / sizeof(const char*);
@@ -193,7 +132,122 @@ namespace Shaders {
 
 	#else
 
-	#include "generated\processedShaders.h"
+		void Vertex(int n, const char* shaderText);
+		void Pixel(int n, const char* shaderText);
+			
+		#include "generated\processedShaders.h"
+
+		//----------
+
+		class CShaderInclude : public ID3DInclude
+		{
+		public:
+
+			HRESULT __stdcall Open(
+				D3D_INCLUDE_TYPE IncludeType,
+				LPCSTR pFileName,
+				LPCVOID pParentData,
+				LPCVOID* ppData,
+				UINT* pBytes);
+
+			HRESULT __stdcall Close(LPCVOID pData);
+		};
+
+		HRESULT __stdcall CShaderInclude::Open(
+			D3D_INCLUDE_TYPE IncludeType,
+			LPCSTR pFileName,
+			LPCVOID pParentData,
+			LPCVOID* ppData,
+			UINT* pBytes)
+		{
+			char name[255];
+			strcpy(name, strstr((char*)pFileName, "lib/") + 4);
+			int i = 0;
+			while (name[i] != '.') i++;
+			name[i] = 0;
+
+			#include"..\generated\libList.h"
+
+			int j = 0;
+			while (strcmp(libName[j], name))
+			{
+				j++;
+			}
+
+			*ppData = libPtr[j];
+			*pBytes = strlen(libPtr[j]);
+
+			return S_OK;
+
+		}
+
+		HRESULT __stdcall CShaderInclude::Close(LPCVOID pData)
+		{
+			return S_OK;
+		}
+
+		CShaderInclude includeObj;
+
+		//---------
+
+		void Vertex(int n, const char* shaderText)
+		{
+			HRESULT hr = S_OK;
+
+			VS[n].pBlob = NULL;
+			hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, &includeObj, "VS", "vs_4_1", NULL, NULL, &VS[n].pBlob, &pErrorBlob);
+
+#if DebugMode
+			if (FAILED(hr)) {
+				auto m = (char*)pErrorBlob->GetBufferPointer();
+				Log(m);
+			}
+#endif	
+
+			if (hr == S_OK)
+			{
+				if (VS[n].pShader) VS[n].pShader->Release();
+
+				hr = device->CreateVertexShader(VS[n].pBlob->GetBufferPointer(), VS[n].pBlob->GetBufferSize(), NULL, &VS[n].pShader);
+
+#if DebugMode
+				if (FAILED(hr))
+				{
+					if (VS[n].pShader) VS[n].pShader->Release();
+					Log("vs fail");
+				}
+#endif		
+			}
+
+		}
+
+
+		void Pixel(int n, const char* shaderText)
+		{
+			HRESULT hr = S_OK;
+
+			PS[n].pBlob = NULL;
+			auto a = strlen(shaderText);
+			hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, &includeObj, "PS", "ps_4_1", NULL, NULL, &PS[n].pBlob, &pErrorBlob);
+
+#if DebugMode
+			if (FAILED(hr)) {
+				auto m = (char*)pErrorBlob->GetBufferPointer();
+				Log(m);
+			}
+#endif	
+
+			if (hr == S_OK)
+			{
+				if (PS[n].pShader) PS[n].pShader->Release();
+				hr = device->CreatePixelShader(PS[n].pBlob->GetBufferPointer(), PS[n].pBlob->GetBufferSize(), NULL, &PS[n].pShader);
+
+#if DebugMode
+				if (FAILED(hr)) { Log("ps fail\n"); }
+#endif
+
+			}
+		}
 
 		void CreateShaders()
 		{

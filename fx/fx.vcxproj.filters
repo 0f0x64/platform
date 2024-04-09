@@ -107,6 +107,9 @@
     <ClInclude Include="generated\constBufReflect.h">
       <Filter>Source Files\generated</Filter>
     </ClInclude>
+    <ClInclude Include="generated\libList.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">
@@ -118,9 +121,6 @@
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
     <None Include="projectFiles\shaders\ps\simple2.shader">
-      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
-    </None>
-    <None Include="projectFiles\shaders\ps\simple3.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
     <None Include="projectFiles\shaders\ps\simple4.shader">
@@ -137,6 +137,9 @@
     </None>
     <None Include="projectFiles\shaders\lib\noise.shader">
       <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\simple3.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
   </ItemGroup>
 </Project>

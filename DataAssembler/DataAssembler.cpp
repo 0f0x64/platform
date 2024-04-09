@@ -20,11 +20,13 @@ string constReflectFile = "..\\fx\\generated\\constBufReflect.h";//final output
 
 string inVPath = "..\\fx\\projectFiles\\shaders\\vs\\";
 string inPPath = "..\\fx\\projectFiles\\shaders\\ps\\";
+string inLibPath = "..\\fx\\projectFiles\\shaders\\lib\\";
 string outVPath = "..\\fx\\generated\\vs\\";
 string outPPath = "..\\fx\\generated\\ps\\";
 
 string vsListFile = "..\\fx\\generated\\vsList.h";
 string psListFile = "..\\fx\\generated\\psList.h";
+string libListFile = "..\\fx\\generated\\libList.h";
 
 const char* shaderExtension = ".shader";
 
@@ -44,6 +46,7 @@ void SelfLocate()
 
 std::vector <std::string> vsList;
 std::vector <std::string> psList;
+std::vector <std::string> libList;
 
 void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 {
@@ -91,19 +94,41 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 
 	string inFilePath = inPath + shaderName + shaderExtension;
 
-	ofile << "\\\n\0";
+	//ofile << "\\\n";
 
 	string s;
 	ifstream ifile(inFilePath);
 
 	while (getline(ifile, s))
 	{
-		ofile << s << "\\" << endl;
+		//ofile << s << "\\" << endl;
+		ofile << s ;
 	}
 
 	ofile << "\";\n\n";
 
 #endif
+
+}
+
+void ProcessLib(string shaderName, string inPath, string outPath, ofstream& ofile)
+{
+	Log(shaderName.c_str());
+	Log("\n");
+
+	ofile << "const char* " << shaderName.c_str() << " = \"";
+
+	string inFilePath = inPath + shaderName + shaderExtension;
+
+	string s;
+	ifstream ifile(inFilePath);
+
+	while (getline(ifile, s))
+	{
+		ofile << s;
+	}
+	ofile << "\\n";
+	ofile << "\";\n\n";
 
 }
 
@@ -207,6 +232,8 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 int vShadersCount = 0;
 int pShadersCount = 0;
+int libShadersCount = 0;
+int libShadersCount2 = 0;
 
 void catToFile(const std::filesystem::path &sandbox, ofstream &ofile, std::vector <std::string> &outputName, int &counter)
 {
@@ -224,12 +251,45 @@ void catToFile(const std::filesystem::path &sandbox, ofstream &ofile, std::vecto
 	}
 }
 
+void catToFileLib(const std::filesystem::path& sandbox, ofstream& ofile, std::vector <std::string>& outputName, int& counter)
+{
+	for (auto const& cat : std::filesystem::directory_iterator{ sandbox })
+	{
+		std::string fName = cat.path().string();
+		auto o = fName.rfind("\\", fName.length());
+		fName.erase(0, o + 1);
+		o = fName.find(shaderExtension);
+		fName.erase(o, o + 5);
+
+		ofile << '"' << fName.c_str() << '"' << ", ";
+		outputName.push_back(fName);
+		counter++;
+	}
+}
+
+void catToFileLibPtr(const std::filesystem::path& sandbox, ofstream& ofile, std::vector <std::string>& outputName, int& counter)
+{
+	for (auto const& cat : std::filesystem::directory_iterator{ sandbox })
+	{
+		std::string fName = cat.path().string();
+		auto o = fName.rfind("\\", fName.length());
+		fName.erase(0, o + 1);
+		o = fName.find(shaderExtension);
+		fName.erase(o, o + 5);
+
+		ofile << "shadersData::" << fName.c_str() << ", ";
+		outputName.push_back(fName);
+		counter++;
+	}
+}
+
 int main()
 {
 	SelfLocate();
 
 	const std::filesystem::path vsSandbox{ "..\\fx\\projectFiles\\shaders\\vs\\" };
 	const std::filesystem::path psSandbox{ "..\\fx\\projectFiles\\shaders\\ps\\" };
+	const std::filesystem::path libSandbox{ "..\\fx\\projectFiles\\shaders\\lib\\" };
 
 	int i = 0;
 
@@ -244,6 +304,20 @@ int main()
 	ofstream psfile(psListFile);
 	catToFile(psSandbox, psfile, psList, pShadersCount);
 	psfile.close();
+
+	remove(libListFile.c_str());
+	ofstream libfile(libListFile);
+	libfile << "const char* libName [] = {";
+	catToFileLib(libSandbox, libfile, libList, libShadersCount);
+	libfile << "};\n";
+
+	libfile << "const char* libPtr [] = {";
+	catToFileLibPtr(libSandbox, libfile, libList, libShadersCount2);
+	libfile << "};\n";
+
+	libfile << "int libCount = " << to_string(libShadersCount) << ";";
+
+	libfile.close();
 
 	Log("\n---Collecting used shaders and create shader file for runtime\n\n");
 
@@ -274,6 +348,13 @@ int main()
 		i++;
 	}
 
+	i = 0;
+	while (i < libShadersCount)
+	{
+		ProcessLib(libList[i], inLibPath, outPPath, ofile);
+		i++;
+	}
+
 	oReflect << "};\n";
 
 	ofile << "\n";
@@ -285,13 +366,13 @@ int main()
 	i = 0;
 	while (i < vShadersCount)
 	{
-		ofile << "dx::Shaders::Compiler::Vertex (" <<  i  <<  ", " << vsList[i] <<  ");\n";	i++;
+		ofile << "Vertex (" <<  i  <<  ", " << vsList[i] <<  ");\n";	i++;
 	}
 
 	i = 0;
 	while (i < pShadersCount)
 	{
-		ofile << "dx::Shaders::Compiler::Pixel (" << i << ", " << psList[i] << ");\n";	i++;
+		ofile << "Pixel (" << i << ", " << psList[i] << ");\n";	i++;
 	}
 
 

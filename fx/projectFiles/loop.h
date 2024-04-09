@@ -111,7 +111,7 @@ namespace Loop
 		blend(blendMode::off, blendOp::add);
 		draw.Clear(1.2f, 0.2f, 0.2f, 1.f);
 		//draw.ClearDepth();
-		//depth.Off();
+		depth.Off();
 
 
 		shader(vs::quad, ps::simple);
@@ -126,7 +126,7 @@ namespace Loop
 		if (!isInit) Init();
 		if (!isPrecalc) Precalc();
 
-		Scene2();
+		Scene1();
 
 		Textures::UnbindAll();
 		draw.Present();

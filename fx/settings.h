@@ -1,6 +1,6 @@
 #ifdef FINAL_RELEASE_CRINKLER
 	#define EditMode false
-	#define DebugMode true
+	#define DebugMode false
 	#define DirectXDebugMode false
 	#define SECONDARY_DISPLAY_IF_AVAILABLE false
 #endif
