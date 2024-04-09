@@ -21,5 +21,7 @@ float4 PS(VS_OUTPUT input) : SV_Target
     color = tex1.Sample(sam1, uv);
 
     return color;
-}
+} 
+
+
 

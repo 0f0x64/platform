@@ -126,7 +126,7 @@ namespace Loop
 		if (!isInit) Init();
 		if (!isPrecalc) Precalc();
 
-		Scene1();
+		Scene2();
 
 		Textures::UnbindAll();
 		draw.Present();

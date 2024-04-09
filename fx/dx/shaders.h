@@ -65,7 +65,7 @@ namespace Shaders {
 
 			HRESULT hr = S_OK;
 
-			hr = D3DCompileFromFile(source, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &VS[i].pBlob, &pErrorBlob);
+			hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", "vs_4_1", NULL, NULL, &VS[i].pBlob, &pErrorBlob);
 			CompilerLog(source, hr, "vertex shader compiled: ");
 
 			if (hr == S_OK)
@@ -85,7 +85,7 @@ namespace Shaders {
 
 			HRESULT hr = S_OK;
 
-			hr = D3DCompileFromFile(source, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &PS[i].pBlob, &pErrorBlob);
+			hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS", "ps_4_1", NULL, NULL, &PS[i].pBlob, &pErrorBlob);
 			CompilerLog(source, hr, "pixel shader compiled: ");
 
 			if (hr == S_OK)
@@ -105,10 +105,13 @@ namespace Shaders {
 			HRESULT hr = S_OK;
 
 			VS[n].pBlob = NULL;
-			hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "VS", "vs_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &VS[n].pBlob, &pErrorBlob);
+			hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &VS[n].pBlob, &pErrorBlob);
 
 			#if DebugMode
-			if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer()); }
+			if (FAILED(hr)) { 
+				auto m = (char*)pErrorBlob->GetBufferPointer();
+				Log(m); 
+			}
 			#endif	
 
 			if (hr == S_OK)
@@ -134,10 +137,13 @@ namespace Shaders {
 			HRESULT hr = S_OK;
 
 			PS[n].pBlob = NULL;
-			hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "PS", "ps_4_1", D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR, NULL, &PS[n].pBlob, &pErrorBlob);
+			hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &PS[n].pBlob, &pErrorBlob);
 
 			#if DebugMode
-			if (hr != S_OK) { Log("vs fail"); }
+			if (FAILED(hr)) {
+				auto m = (char*)pErrorBlob->GetBufferPointer();
+				Log(m);
+			}
 			#endif	
 
 			if (hr == S_OK)

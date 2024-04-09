@@ -31,6 +31,9 @@
     <Filter Include="Source Files\dx">
       <UniqueIdentifier>{0f21f16a-86d3-4e2f-be72-eb8c8b1c31a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\projectFiles\shadersSource\lib">
+      <UniqueIdentifier>{7b41ce91-85a6-4bd9-938c-a7484811232a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -131,6 +134,9 @@
     </None>
     <None Include="projectFiles\shaders\vs\quad3.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\noise.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
     </None>
   </ItemGroup>
 </Project>

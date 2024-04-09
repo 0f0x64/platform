@@ -124,11 +124,10 @@ float4 PS(VS_OUTPUT input) : SV_Target\
         uv += float2(sin(time.x * .13 * sin(i*.4)), sin(time.x * .12 * sin(i*.5)));\
         c += sin((atan2(uv.x, uv.y) * 12 - time.x * .3)) * (sin(1/length(uv * 2) + 5)) * saturate(1/pow(length(uv),3))*2;\
     }\
-    //return 1;\
-    return float4(c, c, c , 1);\
 \
-}\
+    return float4(c, c, c, 1.);\
 \
+} \
 ";
 
 const char* simple2 = "\
@@ -155,11 +154,15 @@ float4 PS(VS_OUTPUT input) : SV_Target\
     color = tex1.Sample(sam1, uv);\
 \
     return color;\
-}\
+} \
+\
+\
 \
 ";
 
 const char* simple3 = "\
+\
+\
 Texture2D tex1 : register(t0);\
 SamplerState sam1 : register(s0);\
 \
@@ -180,8 +183,7 @@ struct VS_OUTPUT\
     float2 uv : TEXCOORD0;\
 };\
 \
-\
-float4 PS(VS_OUTPUT input) : SV_Target\
+float4 PS (VS_OUTPUT input) : SV_Target\
 {\
     float4 color = float4(input.uv, sin(input.uv.x * 12), 1);\
      \
@@ -191,8 +193,13 @@ float4 PS(VS_OUTPUT input) : SV_Target\
     color.a = dot(color.rgb, 1);\
     color *= tone;\
     \
+    //color = noise(float3(uv*12, 8));\
+    \
     return color;\
 }\
+\
+\
+\
 \
 ";
 

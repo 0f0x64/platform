@@ -91,7 +91,7 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 
 	string inFilePath = inPath + shaderName + shaderExtension;
 
-	ofile << "\\\n";
+	ofile << "\\\n\0";
 
 	string s;
 	ifstream ifile(inFilePath);
@@ -179,7 +179,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 	if (type == sType::vertex)
 	{
 		pBlob = NULL;
-		hr = D3DCompileFromFile(source, NULL, NULL, "VS", "vs_4_1", D3DCOMPILE_SKIP_OPTIMIZATION , NULL, &pBlob, &pErrorBlob);
+		hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", "vs_4_1", D3DCOMPILE_SKIP_OPTIMIZATION , NULL, &pBlob, &pErrorBlob);
 		if (FAILED(hr))
 		{
 			char* m = (char*)pErrorBlob->GetBufferPointer();
@@ -189,7 +189,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 	if (type == sType::pixel)
 	{
 		pBlob = NULL;
-		hr = D3DCompileFromFile(source, NULL, NULL, "PS", "ps_4_1", D3DCOMPILE_SKIP_OPTIMIZATION, NULL, &pBlob, &pErrorBlob);
+		hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS", "ps_4_1", D3DCOMPILE_SKIP_OPTIMIZATION, NULL, &pBlob, &pErrorBlob);
 		if (FAILED(hr))
 		{
 			char* m = (char*)pErrorBlob->GetBufferPointer();
