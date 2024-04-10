@@ -1,3 +1,3 @@
-const char* libName [] = {"noise", };
-const char* libPtr [] = {shadersData::noise, };
-int libCount = 1;
+const char* libName [] = {"noise", "sinwave", };
+const char* libPtr [] = {shadersData::noise, shadersData::sinwave, };
+int libCount = 2;

@@ -53,13 +53,14 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 	Log(shaderName.c_str());
 	Log("\n");
 
-	ofile << "const char* " << shaderName.c_str() << " = \"";
+	ofile << "const char* " << shaderName.c_str() << " = ";
 
 #if USE_SHADER_MINIFIER
 	string _pathToExe = pathToExe;
 
-	string minifierCmdLine = _pathToExe + "\\shader_minifier.exe " + inPath + shaderName + shaderExtension +
-		" --hlsl --format text --no-remove-unused --preserve-all-globals --no-inlining --preserve-externals" +
+	string minifierCmdLine = _pathToExe + "\\shader_minifier.exe " +
+		inPath + shaderName + shaderExtension +
+		" --hlsl --format text --no-remove-unused --preserve-all-globals --no-inlining --preserve-externals " +
 		" -o " + outPath + shaderName + shaderExtension;
 	
 
@@ -94,18 +95,18 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 
 	string inFilePath = inPath + shaderName + shaderExtension;
 
-	//ofile << "\\\n";
+	ofile << "\n";
 
 	string s;
 	ifstream ifile(inFilePath);
 
 	while (getline(ifile, s))
 	{
-		//ofile << s << "\\" << endl;
-		ofile << s ;
+		ofile << '"' << s << "\\n" << '"' << endl;
+		
 	}
 
-	ofile << "\";\n\n";
+	ofile << ";\n\n";
 
 #endif
 
@@ -116,7 +117,9 @@ void ProcessLib(string shaderName, string inPath, string outPath, ofstream& ofil
 	Log(shaderName.c_str());
 	Log("\n");
 
-	ofile << "const char* " << shaderName.c_str() << " = \"";
+	ofile << "const char* " << shaderName.c_str() << " = ";
+
+	ofile << "\n";
 
 	string inFilePath = inPath + shaderName + shaderExtension;
 
@@ -125,10 +128,9 @@ void ProcessLib(string shaderName, string inPath, string outPath, ofstream& ofil
 
 	while (getline(ifile, s))
 	{
-		ofile << s;
+		ofile << '"' << s << "\\n" << '"' << endl;
 	}
-	ofile << "\\n";
-	ofile << "\";\n\n";
+	ofile << ";\n\n";
 
 }
 
@@ -235,7 +237,7 @@ int pShadersCount = 0;
 int libShadersCount = 0;
 int libShadersCount2 = 0;
 
-void catToFile(const std::filesystem::path &sandbox, ofstream &ofile, std::vector <std::string> &outputName, int &counter)
+void catToFile(const std::filesystem::path& sandbox, ofstream& ofile, std::vector <std::string>& outputName, int& counter, const char* preStr, const char* postStr)
 {
 	for (auto const& cat : std::filesystem::directory_iterator{ sandbox })
 	{
@@ -243,41 +245,9 @@ void catToFile(const std::filesystem::path &sandbox, ofstream &ofile, std::vecto
 		auto o = fName.rfind("\\", fName.length());
 		fName.erase(0, o + 1);
 		o = fName.find(shaderExtension);
-		fName.erase(o, o + 5);
+		fName.erase(o, o + strlen(shaderExtension));
 
-		ofile << "Shader(" << fName.c_str() << ")\n";
-		outputName.push_back(fName);
-		counter++;
-	}
-}
-
-void catToFileLib(const std::filesystem::path& sandbox, ofstream& ofile, std::vector <std::string>& outputName, int& counter)
-{
-	for (auto const& cat : std::filesystem::directory_iterator{ sandbox })
-	{
-		std::string fName = cat.path().string();
-		auto o = fName.rfind("\\", fName.length());
-		fName.erase(0, o + 1);
-		o = fName.find(shaderExtension);
-		fName.erase(o, o + 5);
-
-		ofile << '"' << fName.c_str() << '"' << ", ";
-		outputName.push_back(fName);
-		counter++;
-	}
-}
-
-void catToFileLibPtr(const std::filesystem::path& sandbox, ofstream& ofile, std::vector <std::string>& outputName, int& counter)
-{
-	for (auto const& cat : std::filesystem::directory_iterator{ sandbox })
-	{
-		std::string fName = cat.path().string();
-		auto o = fName.rfind("\\", fName.length());
-		fName.erase(0, o + 1);
-		o = fName.find(shaderExtension);
-		fName.erase(o, o + 5);
-
-		ofile << "shadersData::" << fName.c_str() << ", ";
+		ofile << preStr << fName.c_str() << postStr;
 		outputName.push_back(fName);
 		counter++;
 	}
@@ -297,24 +267,23 @@ int main()
 
 	remove(vsListFile.c_str());
 	ofstream vsfile(vsListFile);
-	catToFile(vsSandbox, vsfile, vsList, vShadersCount);
+	catToFile(vsSandbox, vsfile, vsList, vShadersCount, "Shader(", ")\n");
 	vsfile.close();
 
 	remove(psListFile.c_str());
 	ofstream psfile(psListFile);
-	catToFile(psSandbox, psfile, psList, pShadersCount);
+	catToFile(psSandbox, psfile, psList, pShadersCount, "Shader(", ")\n");
 	psfile.close();
 
 	remove(libListFile.c_str());
 	ofstream libfile(libListFile);
 	libfile << "const char* libName [] = {";
-	catToFileLib(libSandbox, libfile, libList, libShadersCount);
+	catToFile(libSandbox, libfile, libList, libShadersCount, "\"", "\", ");
 	libfile << "};\n";
 
 	libfile << "const char* libPtr [] = {";
-	catToFileLibPtr(libSandbox, libfile, libList, libShadersCount2);
+	catToFile(libSandbox, libfile, libList, libShadersCount2, "shadersData::", ", ");
 	libfile << "};\n";
-
 	libfile << "int libCount = " << to_string(libShadersCount) << ";";
 
 	libfile.close();

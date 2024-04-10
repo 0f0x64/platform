@@ -143,48 +143,41 @@ namespace Shaders {
 		{
 		public:
 
-			HRESULT __stdcall Open(
+			HRESULT __stdcall CShaderInclude::Open(
 				D3D_INCLUDE_TYPE IncludeType,
 				LPCSTR pFileName,
 				LPCVOID pParentData,
 				LPCVOID* ppData,
-				UINT* pBytes);
-
-			HRESULT __stdcall Close(LPCVOID pData);
-		};
-
-		HRESULT __stdcall CShaderInclude::Open(
-			D3D_INCLUDE_TYPE IncludeType,
-			LPCSTR pFileName,
-			LPCVOID pParentData,
-			LPCVOID* ppData,
-			UINT* pBytes)
-		{
-			char name[255];
-			strcpy(name, strstr((char*)pFileName, "lib/") + 4);
-			int i = 0;
-			while (name[i] != '.') i++;
-			name[i] = 0;
-
-			#include"..\generated\libList.h"
-
-			int j = 0;
-			while (strcmp(libName[j], name))
+				UINT* pBytes)
 			{
-				j++;
+				char name[255];
+				strcpy(name, strstr((char*)pFileName, "lib/") + 4);
+				int i = 0;
+				while (name[i] != '.') i++;
+				name[i] = 0;
+
+				#include"..\generated\libList.h"
+
+				int j = 0;
+				while (strcmp(libName[j], name))
+				{
+					j++;
+				}
+
+				*ppData = libPtr[j];
+				*pBytes = strlen(libPtr[j]);
+
+				return S_OK;
+
 			}
 
-			*ppData = libPtr[j];
-			*pBytes = strlen(libPtr[j]);
+			HRESULT __stdcall CShaderInclude::Close(LPCVOID pData)
+			{
+				return S_OK;
+			}
+		};
 
-			return S_OK;
-
-		}
-
-		HRESULT __stdcall CShaderInclude::Close(LPCVOID pData)
-		{
-			return S_OK;
-		}
+		
 
 		CShaderInclude includeObj;
 

@@ -441,6 +441,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="projectFiles\shaders\lib\noise.shader" />
+    <None Include="projectFiles\shaders\lib\sinwave.shader" />
     <None Include="projectFiles\shaders\ps\simple.shader">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ExcludedFromBuild>

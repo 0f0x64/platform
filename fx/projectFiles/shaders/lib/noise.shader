@@ -5,7 +5,6 @@ float hash(float n)
      
 float noise(float3 x)
 {
-        // The noise function returns a value in the range -1.0f -> 1.0f
     float3 p = floor(x);
     float3 f = frac(x);
      
@@ -17,3 +16,4 @@ float noise(float3 x)
                lerp(lerp(hash(n + 113.0), hash(n + 114.0), f.x),
                lerp(hash(n + 170.0), hash(n + 171.0), f.x), f.y), f.z);
 }
+ 

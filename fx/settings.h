@@ -19,7 +19,7 @@
 	#define SECONDARY_DISPLAY_IF_AVAILABLE true
 #endif
 
-#define USE_SHADER_MINIFIER false
+#define USE_SHADER_MINIFIER true
 
 #define FRAMES_PER_SECOND 60
 #define FRAME_LEN 1000. / (float) FRAMES_PER_SECOND

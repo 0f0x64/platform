@@ -141,5 +141,8 @@
     <None Include="projectFiles\shaders\ps\simple3.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
+    <None Include="projectFiles\shaders\lib\sinwave.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
   </ItemGroup>
 </Project>
