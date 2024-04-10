@@ -1,19 +1,5 @@
-cbuffer c1 : register(b1)
-{
-    float4 time;
-};
-
-cbuffer c2 : register(b2)
-{
-    float4x4 camera[2][3];
-};
-
-struct VS_OUTPUT
-{
-    float4 pos : SV_POSITION;
-    float2 uv : TEXCOORD0;
-};
-
+#include <../lib/constBuf.shader>
+#include <../lib/io.shader>
 
 VS_OUTPUT VS(uint vID : SV_VertexID)
 {

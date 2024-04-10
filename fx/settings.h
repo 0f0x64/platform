@@ -7,7 +7,7 @@
 
 #ifdef EDITOR
 	#define EditMode false
-	#define DebugMode true
+	#define DebugMode false
 	#define DirectXDebugMode false
 	#define SECONDARY_DISPLAY_IF_AVAILABLE true
 #endif

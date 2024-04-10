@@ -76,7 +76,7 @@ namespace Shaders {
 				hr = device->CreateVertexShader(VS[i].pBlob->GetBufferPointer(), VS[i].pBlob->GetBufferSize(), NULL, &VS[i].pShader);
 
 				#if DebugMode
-								if (FAILED(hr)) { Log("vs creation fail\n"); return; }
+					if (FAILED(hr)) { Log("vs creation fail\n"); return; }
 				#endif
 			}
 
@@ -130,65 +130,63 @@ namespace Shaders {
 
 		}
 
-	#else
+#else
 
 		void Vertex(int n, const char* shaderText);
 		void Pixel(int n, const char* shaderText);
-			
+
 		#include "generated\processedShaders.h"
 
-		//----------
+		#include "..\generated\libList.h"
 
-		class CShaderInclude : public ID3DInclude
+		int getPtrIndex(const char* shaderName)
 		{
-		public:
+			int j = 0; while (strcmp(libName[j], shaderName)) j++;
+			return j;
+		}
 
-			HRESULT __stdcall CShaderInclude::Open(
-				D3D_INCLUDE_TYPE IncludeType,
-				LPCSTR pFileName,
-				LPCVOID pParentData,
-				LPCVOID* ppData,
-				UINT* pBytes)
-			{
-				char name[255];
-				strcpy(name, strstr((char*)pFileName, "lib/") + 4);
-				int i = 0;
-				while (name[i] != '.') i++;
-				name[i] = 0;
-
-				#include"..\generated\libList.h"
-
-				int j = 0;
-				while (strcmp(libName[j], name))
-				{
-					j++;
-				}
-
-				*ppData = libPtr[j];
-				*pBytes = strlen(libPtr[j]);
-
-				return S_OK;
-
-			}
-
-			HRESULT __stdcall CShaderInclude::Close(LPCVOID pData)
-			{
-				return S_OK;
-			}
-		};
-
-		
-
-		CShaderInclude includeObj;
-
+		char* outText;
 		//---------
+		char* processIncludes(const char* shaderText)
+		{
+			if (!outText) outText = new char[64000];
+			strcpy(outText, shaderText);
+			char* inc = outText;
+
+			while (true)
+			{
+				inc = strstr(inc, "#include");
+				if (inc == NULL) break; 
+
+				char* b1 = strstr(inc, "lib/") + 4;
+				char* b2 = strstr(b1, ".");
+				char* incEnd = strstr(b2, ">");
+				char name[255];
+				int sz = b2 - b1;
+				memcpy(name, b1, sz);
+				name[sz] = 0;
+				int aa = strlen(name);
+
+				int index = getPtrIndex(name);
+				const char* includePtr = libPtr[index];
+				int includeSize = strlen(libPtr[index]);
+
+				int textSize = strlen(outText);
+				memmove(inc + includeSize-1, incEnd + 1, textSize - (incEnd - outText)+1);
+				memcpy(inc, includePtr, includeSize);
+
+			}
+
+			return outText;
+		}
 
 		void Vertex(int n, const char* shaderText)
 		{
 			HRESULT hr = S_OK;
 
 			VS[n].pBlob = NULL;
-			hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, &includeObj, "VS", "vs_4_1", NULL, NULL, &VS[n].pBlob, &pErrorBlob);
+			auto ptr = processIncludes(shaderText);
+			hr = D3DCompile(ptr, strlen(ptr), NULL, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &VS[n].pBlob, &pErrorBlob);
 
 #if DebugMode
 			if (FAILED(hr)) {
@@ -220,8 +218,8 @@ namespace Shaders {
 			HRESULT hr = S_OK;
 
 			PS[n].pBlob = NULL;
-			auto a = strlen(shaderText);
-			hr = D3DCompile(shaderText, strlen(shaderText), NULL, NULL, &includeObj, "PS", "ps_4_1", NULL, NULL, &PS[n].pBlob, &pErrorBlob);
+			auto ptr = processIncludes(shaderText);
+			hr = D3DCompile(ptr, strlen(ptr), NULL, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &PS[n].pBlob, &pErrorBlob);
 
 #if DebugMode
 			if (FAILED(hr)) {

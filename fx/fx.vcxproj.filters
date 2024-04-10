@@ -117,31 +117,22 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <None Include="projectFiles\shaders\ps\simple.shader">
-      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
-    </None>
-    <None Include="projectFiles\shaders\ps\simple2.shader">
-      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
-    </None>
-    <None Include="projectFiles\shaders\ps\simple4.shader">
+    <None Include="projectFiles\shaders\ps\simpleFx.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
     <None Include="projectFiles\shaders\vs\quad.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
-    <None Include="projectFiles\shaders\vs\quad2.shader">
+    <None Include="projectFiles\shaders\vs\meshOut.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
-    <None Include="projectFiles\shaders\vs\quad3.shader">
-      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
-    </None>
-    <None Include="projectFiles\shaders\lib\noise.shader">
-      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
-    </None>
-    <None Include="projectFiles\shaders\ps\simple3.shader">
+    <None Include="projectFiles\shaders\ps\simpleTex.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
-    <None Include="projectFiles\shaders\lib\sinwave.shader">
+    <None Include="projectFiles\shaders\lib\constBuf.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\io.shader">
       <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
     </None>
   </ItemGroup>

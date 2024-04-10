@@ -16,4 +16,3 @@ float noise(float3 x)
                lerp(lerp(hash(n + 113.0), hash(n + 114.0), f.x),
                lerp(hash(n + 170.0), hash(n + 171.0), f.x), f.y), f.z);
 }
- 

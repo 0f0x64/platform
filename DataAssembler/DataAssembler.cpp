@@ -23,6 +23,7 @@ string inPPath = "..\\fx\\projectFiles\\shaders\\ps\\";
 string inLibPath = "..\\fx\\projectFiles\\shaders\\lib\\";
 string outVPath = "..\\fx\\generated\\vs\\";
 string outPPath = "..\\fx\\generated\\ps\\";
+string outLibPath = "..\\fx\\generated\\lib\\";
 
 string vsListFile = "..\\fx\\generated\\vsList.h";
 string psListFile = "..\\fx\\generated\\psList.h";
@@ -59,8 +60,8 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 	string _pathToExe = pathToExe;
 
 	string minifierCmdLine = _pathToExe + "\\shader_minifier.exe " +
-		inPath + shaderName + shaderExtension +
 		" --hlsl --format text --no-remove-unused --preserve-all-globals --no-inlining --preserve-externals " +
+		inPath + shaderName + shaderExtension +
 		" -o " + outPath + shaderName + shaderExtension;
 	
 
@@ -78,18 +79,19 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 
 	string inFilePath = outPath + shaderName + shaderExtension;
 
-	char ch;
+	string s;
 	ifstream ifile(inFilePath);
 
 	if (ifile.is_open())
 	{
-		while (ifile.get(ch))
+		while (getline(ifile, s))
 		{
-			ofile << ch;
+			ofile << '"' << s << "\\n" << '"' << endl;
+
 		}
 	}
 
-	ofile << "\";\n\n";
+	ofile << ";\n\n";
 
 #else
 
@@ -111,29 +113,6 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 #endif
 
 }
-
-void ProcessLib(string shaderName, string inPath, string outPath, ofstream& ofile)
-{
-	Log(shaderName.c_str());
-	Log("\n");
-
-	ofile << "const char* " << shaderName.c_str() << " = ";
-
-	ofile << "\n";
-
-	string inFilePath = inPath + shaderName + shaderExtension;
-
-	string s;
-	ifstream ifile(inFilePath);
-
-	while (getline(ifile, s))
-	{
-		ofile << '"' << s << "\\n" << '"' << endl;
-	}
-	ofile << ";\n\n";
-
-}
-
 
 #include <d3dcompiler.h>
 #include <d3d11shader.h>
@@ -320,7 +299,7 @@ int main()
 	i = 0;
 	while (i < libShadersCount)
 	{
-		ProcessLib(libList[i], inLibPath, outPPath, ofile);
+		Process(libList[i], inLibPath, outLibPath, ofile);
 		i++;
 	}
 

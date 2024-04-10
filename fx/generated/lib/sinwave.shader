@@ -1,0 +1,1 @@
+float wave(float3 f){return sin(f.x)*cos(f.y)/5;}

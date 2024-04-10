@@ -25,7 +25,7 @@ namespace Loop
 	#define ia InputAssembler
 
 	#define constant ConstBuf
-	
+		
 	#define pSampler_L_U(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::clamp)
 	#define pSampler_L_V(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Linear, Sampler::addr::clamp, Sampler::addr::wrap)
 	#define pSampler_L_UV(slot) sampler(Sampler::to::pixel, slot , Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::wrap)
@@ -39,9 +39,9 @@ namespace Loop
 	#define pSampler_PL_UV(slot) sampler(Sampler::to::pixel, slot , Sampler::type::MinPointMagLinear, Sampler::addr::wrap, Sampler::addr::wrap)
 
 
-	//#include "..\generated\constBufReflect.h"
+	#include "..\generated\constBufReflect.h"
 
-	void pSet(int param, float value)
+	void param(int param, float value)
 	{
 		constant::drawer[param] = XMFLOAT4(value, 0, 0, 1);
 	}
@@ -53,22 +53,22 @@ namespace Loop
 		
 		ia.Set();
 
-		for (int i=0;i<5;i++) ConstBuf::Api.Set(i);
+		for (int i=0;i<6;i++) ConstBuf::Api.Set(i);
 
 		isInit = true;
 	}
 
 	void Precalc()
 	{
-		ConstBuf::Api.Update(0, ConstBuf::global);
+		ConstBuf::Api.Update(5, ConstBuf::global);
 
 		isPrecalc = true;
 	}
 
 	void frameConst()
 	{
-		constant::frame[0].x = (float)(timer::frameBeginTime * .01);
-		ConstBuf::Api.Update(1, ConstBuf::frame);
+		constant::frame.time = XMFLOAT4((float)(timer::frameBeginTime * .01),0,0,0);
+		ConstBuf::Api.UpdateFrame();
 	}
 
 	
@@ -77,7 +77,7 @@ namespace Loop
 		depth.Off();
 		rt(tex::tex1);
 
-		shader(vs::quad, ps::simple);
+		shader(vs::quad, ps::simpleFx);
 		draw.NullDrawer(1, 1);
 		createMips();
 
@@ -90,16 +90,13 @@ namespace Loop
 		texture(tex::tex1, 0);
 		pSampler_L_UV(0);
 
-		shader(vs::quad2, ps::simple3);
+		shader(vs::meshOut, ps::simpleTex);
 		constant::drawer[0] = XMFLOAT4(1, 0, 0, 1);
-
-		//auto p = params.quad2;
-		//pSet(p.tone3, 1);
 
 		blend(blendMode::off, blendOp::add);
 		draw.NullDrawer(1, 1);
 
-		shader(vs::quad2, ps::simple3);
+		shader(vs::meshOut, ps::simpleTex);
 		constant::drawer[0] = XMFLOAT4(0, 1, 0, 1);
 		blend(blendMode::off, blendOp::add);
 		draw.NullDrawer(1, 1);
@@ -114,7 +111,7 @@ namespace Loop
 		depth.Off();
 
 
-		shader(vs::quad, ps::simple);
+		shader(vs::quad, ps::simpleFx);
 		draw.NullDrawer(1, 1);
 
 	}

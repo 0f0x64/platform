@@ -22,8 +22,7 @@ namespace Device {
 		sd.OutputWindow = hWnd;
 		sd.SampleDesc.Count = 1;
 		sd.SampleDesc.Quality = 0;
-		//sd.Windowed = EditMode;
-		sd.Windowed = true;
+		sd.Windowed = EditMode;
 
 		hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
 #if DebugMode

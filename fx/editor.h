@@ -148,7 +148,7 @@ namespace editor
 						{
 							char s2[nameBufLen];
 							memset(s2, NULL, nameBufLen);
-							ptrdiff_t bytes = ((char*)s) - ((char*)fileName) + shaderExtensionLen;//.hlsl length = 5
+							ptrdiff_t bytes = ((char*)s) - ((char*)fileName) + shaderExtensionLen;
 							memcpy(s2, fileName, bytes);
 							s2[bytes + 1] = 0;
 
@@ -193,6 +193,11 @@ namespace editor
 									i++;
 								}
 
+							}
+
+							if (s2[0] == 'l')
+							{
+								dx::Shaders::Compiler::CreateShaders();
 							}
 
 						}

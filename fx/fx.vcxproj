@@ -65,7 +65,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
+    <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>NotSet</CharacterSet>
@@ -240,22 +240,22 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ExceptionHandling>false</ExceptionHandling>
       <BufferSecurityCheck>true</BufferSecurityCheck>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
       <WholeProgramOptimization>false</WholeProgramOptimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <AdditionalDependencies>d3d10.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;xaudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
@@ -277,7 +277,7 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <ExceptionHandling>false</ExceptionHandling>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalOptions>/d2noftol3 /QIfist %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/d2noftol3 %(AdditionalOptions)</AdditionalOptions>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
       <Optimization>MaxSpeed</Optimization>
@@ -440,20 +440,17 @@
     <ClInclude Include="timer.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="projectFiles\shaders\lib\noise.shader" />
-    <None Include="projectFiles\shaders\lib\sinwave.shader" />
-    <None Include="projectFiles\shaders\ps\simple.shader">
+    <None Include="projectFiles\shaders\lib\constBuf.shader" />
+    <None Include="projectFiles\shaders\lib\io.shader" />
+    <None Include="projectFiles\shaders\ps\simpleFx.shader">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </DeploymentContent>
     </None>
-    <None Include="projectFiles\shaders\ps\simple2.shader" />
-    <None Include="projectFiles\shaders\ps\simple3.shader" />
-    <None Include="projectFiles\shaders\ps\simple4.shader" />
+    <None Include="projectFiles\shaders\ps\simpleTex.shader" />
     <None Include="projectFiles\shaders\vs\quad.shader" />
-    <None Include="projectFiles\shaders\vs\quad2.shader" />
-    <None Include="projectFiles\shaders\vs\quad3.shader" />
+    <None Include="projectFiles\shaders\vs\meshOut.shader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

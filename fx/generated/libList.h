@@ -1,3 +1,3 @@
-const char* libName [] = {"noise", "sinwave", };
-const char* libPtr [] = {shadersData::noise, shadersData::sinwave, };
-int libCount = 2;
+const char* libName [] = {"constBuf", "io", "noise", "sinwave", };
+const char* libPtr [] = {shadersData::constBuf, shadersData::io, shadersData::noise, shadersData::sinwave, };
+int libCount = 4;

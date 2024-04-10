@@ -1,13 +1,12 @@
-cbuffer ConstantBuffer:register(b1)
-{
-    float4 time;
-};
+#include <../lib/constBuf.shader>
+#include <../lib/io.shader>
 
-struct VS_OUTPUT
+//[
+cbuffer params : register(b3)
 {
-    float4 pos : SV_POSITION;
-    float2 uv : TEXCOORD0;
+    float4 p1;
 };
+//]
 
 float4 PS(VS_OUTPUT input) : SV_Target
 {

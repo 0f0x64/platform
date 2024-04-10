@@ -1,16 +1,37 @@
 namespace ConstBuf
 {
 
-	ID3D11Buffer* buffer[5];
+	ID3D11Buffer* buffer[6];
 
 	#define constCount 32
 
-	XMFLOAT4 global[constCount];//update once per start
-	XMFLOAT4 frame[constCount];//update per frame
-	XMMATRIX camera[2][3];//update per camera set
-	XMFLOAT4 drawer[constCount];//update per draw call
-	XMMATRIX drawerMat[constCount];//update per draw call
+	//b0
+	XMFLOAT4 global[constCount];//update once on start
+	
+	//b1
+	struct {
+		XMFLOAT4 time;
+	} frame;//update per frame
+	
+	//b2 
+	struct {
+		XMMATRIX world[2];
+		XMMATRIX view[2];
+		XMMATRIX proj[2];
+	} camera;//update per camera set
+
+	//b3 - use "params" label in shader
+	XMFLOAT4 drawerV[constCount];//update per draw call
+	
+	//b4 - use "params" label in shader
+	XMFLOAT4 drawerP[constCount];//update per draw call
+
+	//b5
+	struct {
+		XMMATRIX model;
+	} drawerMat;//update per draw call
 		
+
 	int roundUp(int n, int r)
 	{
 		return 	n - (n % r) + r;
@@ -34,11 +55,13 @@ namespace ConstBuf
 
 	void Init()
 	{
-		CreateCB(0, sizeof(global));
-		CreateCB(1, sizeof(frame));
-		CreateCB(2, sizeof(camera));
-		CreateCB(3, sizeof(drawer));
-		CreateCB(4, sizeof(drawerMat));
+		CreateCB(0, sizeof(drawerV));
+		CreateCB(1, sizeof(drawerP));
+		CreateCB(2, sizeof(drawerMat));
+		CreateCB(3, sizeof(camera));
+		CreateCB(4, sizeof(frame));
+		CreateCB(5, sizeof(global));
+
 	}
 
 	struct
@@ -47,6 +70,11 @@ namespace ConstBuf
 		void Update(int i, T* data)
 		{
 			context->UpdateSubresource(ConstBuf::buffer[i], 0, NULL, data, 0, 0);
+		}
+
+		void UpdateFrame()
+		{
+			context->UpdateSubresource(ConstBuf::buffer[4], 0, NULL, &frame, 0, 0);
 		}
 
 
