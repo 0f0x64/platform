@@ -52,7 +52,7 @@ namespace Depth
 	};
 	
 
-	void Set(mode m)
+	void Set(int m)
 	{
 		context->OMSetDepthStencilState(pDSState[m], 1);
 	}

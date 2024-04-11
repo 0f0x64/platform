@@ -22,58 +22,53 @@ namespace Loop
 		ConstBuf::UpdateFrame();
 	}
 
-
 	void Scene1()
 	{
 		//two dynamic texures
-		Textures::SetRT(Textures::list::tex1);
-		Depth::Set(Depth::mode::off);
-		quad.set();
-		simpleFx.params.r = 0;
-		simpleFx.params.g = 1;
-		simpleFx.params.b = 0;
-		simpleFx.set();
-		Draw::NullDrawer(1, 1);
-		Textures::CreateMipMap();
+		api.rt(tex::tex1);
+		api.depth(depthmode::off);
+		vs::quad.set();
+		ps::simpleFx.params.r = 0;
+		ps::simpleFx.params.g = 1;
+		ps::simpleFx.params.b = 0;
+		ps::simpleFx.set();
+		api.draw(1, 1);
+		api.mips();
 
-		Textures::SetRT(Textures::list::tex2);
-		simpleFx.params.r = 1;
-		simpleFx.params.g = 0;
-		simpleFx.params.b = 0;
-		simpleFx.set();
-		Draw::NullDrawer(1, 1);
-		Textures::CreateMipMap();
+		api.rt(tex::tex2);
+		ps::simpleFx.params.r = 1;
+		ps::simpleFx.params.g = 0;
+		ps::simpleFx.params.b = 0;
+		ps::simpleFx.set();
+		api.draw(1, 1);
+		api.mips();
 
 		//-two planes
-		Textures::SetRT(Textures::list::mainRT);
-		Camera::Set();
-		Depth::Set(Depth::mode::on);
+		api.rt(tex::mainRT);
+		api.cam();
+		api.depth(Depth::mode::on);
 
-		simpleTex.samplers.sam1Filter = Sampler::type::linear;
-		simpleTex.samplers.sam1AddressU = Sampler::addr::wrap;
-		simpleTex.samplers.sam1AddressV = Sampler::addr::wrap;
+		ps::simpleTex.samplers.sam1Filter = filter::linear;
+		ps::simpleTex.samplers.sam1AddressU = addr::wrap;
+		ps::simpleTex.samplers.sam1AddressV = addr::wrap;
 
-		Draw::Clear(0.2f, 0.2f, 0.2f, 1.f);
-		Draw::ClearDepth();
+		api.clear(0.2f, 0.2f, 0.2f, 1.f);
+		api.clearDepth();
 
-		meshOut.params.tone = 1;
-		meshOut.set();
-		simpleTex.textures.tex1 = Textures::list::tex1;
-		simpleTex.textures.tex2 = Textures::list::tex2;
-		simpleTex.params.mix = 0;
+		vs::meshOut.params.tone = 1;
+		vs::meshOut.set();
+		ps::simpleTex.textures.tex1 = tex::tex1;
+		ps::simpleTex.textures.tex2 = tex::tex2;
+		ps::simpleTex.params.mix = 0;
+		ps::simpleTex.set();
+		api.blend(blendmode::off, blendop::add);
+		api.draw(1, 1);
 
-		simpleTex.set();
-		Blend::Set(Blend::mode::off, Blend::op::add);
-		Draw::NullDrawer(1, 1);
-
-		meshOut.params.tone = 0;
-		meshOut.set();
-		simpleTex.textures.tex1 = Textures::list::tex1;
-		simpleTex.textures.tex2 = Textures::list::tex2;
-		simpleTex.params.mix = 1;
-		simpleTex.set();
-		Blend::Set(Blend::mode::off, Blend::op::add);
-		Draw::NullDrawer(1, 1);
+		ps::simpleTex.params.mix = 1;
+		ps::simpleTex.set();
+		vs::meshOut.params.tone = 0;
+		vs::meshOut.set();
+		api.draw(1, 1);
 	}
 
 	void mainLoop()

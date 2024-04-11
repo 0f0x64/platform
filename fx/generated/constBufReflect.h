@@ -1,3 +1,5 @@
+namespace vs{
+
 struct { 
 
 struct 
@@ -14,6 +16,8 @@ memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 
 } meshOut;
 
+}namespace vs{
+
 struct { 
 
 void set () {
@@ -21,6 +25,8 @@ Shaders::SetVS(1);
 }
 
 } quad;
+
+}namespace ps{
 
 struct { 
 
@@ -37,6 +43,8 @@ memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
 } simpleFx;
+
+}namespace ps{
 
 struct { 
 
@@ -68,3 +76,4 @@ Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, 
 
 } simpleTex;
 
+}

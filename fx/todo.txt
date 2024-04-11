@@ -1,6 +1,18 @@
-includes: https://asawicki.info/news_1515_implementing_id3d10include
+copy texture
+scirrors?
+cube texture
+mrt set
+compare sampler support
+camera interface (from-to interpolation)
 
 select proper videocard (force nvidia) #define ?
+
+
+
+
+
+
+
 
 
 win errors handling
@@ -23,22 +35,6 @@ static void LogWin32LastError(const char* msg)
     LogWin32Error(GetLastError(), msg);
 }
 
-
-	struct  {
-
-		float x,y;
-		int texture1, texture2;
-		int sampler1, sampler2;
-
-		void Set()
-		{
-			ConstBuf::drawerV[0] = x;
-			ConstBuf::drawerV[1] = y;
-			Textures::SetTexture(texture1, 0, Textures::tAssignType::vertex);
-			Shaders::SetVS(Shaders::vertex::meshOut);
-		}
-
-	} meshOut;
 
 
 

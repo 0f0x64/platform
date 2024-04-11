@@ -51,7 +51,7 @@ namespace Blend
 	enum mode { off, on, alpha };
 	enum op { add, sub, revsub, min, max };
 
-	void Set(mode m, op blend)
+	void Set(int m, int blend)
 	{
 		float blendFactor2[4];
 		blendFactor2[0] = 0.0f;

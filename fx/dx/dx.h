@@ -61,5 +61,28 @@ namespace dx
 		Textures::Init();
 	}
 
+	struct {
+		void rt(int i) { Textures::SetRT(i); }
+		void mips() { Textures::CreateMipMap(); }
+		void depth(int i) { Depth::Set(i); }
+		void draw(int instances, int quadcount) { Draw::NullDrawer(instances, quadcount); }
+		void cam() { Camera::Set(); }
+		void clear(float r, float g, float b, float a) { Draw::Clear(r, g, b, a); }
+		void clearDepth() { Draw::ClearDepth(); }
+		void blend(int mode, int op) { Blend::Set(mode, op); }
+	} api;
+
+	namespace blendmode { enum { off, on, alpha }; }
+	namespace blendop { enum { add, sub, revsub, min, max }; }
+	namespace depthmode { enum { off, on, readonly, writeonly }; }
+	namespace filter { enum { linear, point, minPoint_magLinear }; }
+	namespace addr { enum { clamp, wrap }; }
+	
+	#define Texture(name,type,format,width,height,mip,depth) name,
+	namespace tex {
+		enum {
+			#include "..\projectFiles\texList.h"	
+		};
+	};
 
 }

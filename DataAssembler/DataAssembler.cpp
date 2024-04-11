@@ -217,6 +217,9 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType type, int sIndex)
 {
+	ofile << "namespace ";
+	if (type == sType::vertex) ofile << "vs{\n\n";
+	if (type == sType::pixel) ofile << "ps{\n\n";
 
 	ofile << "struct { \n\n";
 	
@@ -400,6 +403,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 	ofile << "}\n";
 
 	ofile << "\n} " << shaderName << ";\n\n";
+	ofile << "}";
 }
 
 int vShadersCount = 0;
