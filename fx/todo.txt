@@ -24,26 +24,21 @@ static void LogWin32LastError(const char* msg)
 }
 
 
-struct meshOut {
+	struct  {
 
-	void Set()
-	{
-		Shaders::Api.Set(Shaders::vertex::meshOut);
-	}
+		float x,y;
+		int texture1, texture2;
+		int sampler1, sampler2;
 
-	void SetParams(float x, float y)
-	{
-		ConstBuf::drawerV[0] = XMFLOAT4(x, 0, 0, 0);
-		ConstBuf::drawerV[1] = XMFLOAT4(y, 0, 0, 0);
-	}
+		void Set()
+		{
+			ConstBuf::drawerV[0] = x;
+			ConstBuf::drawerV[1] = y;
+			Textures::SetTexture(texture1, 0, Textures::tAssignType::vertex);
+			Shaders::SetVS(Shaders::vertex::meshOut);
+		}
 
-	void SetTextures(int i)
-	{
-		Textures::Api.Set(i, 0, dx::Textures::tAssignType::vertex);
-	}
-
-
-};
+	} meshOut;
 
 
 

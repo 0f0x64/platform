@@ -2,6 +2,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+#include <cassert>
 #include <iostream>
 #include <windows.h>
 #include <string>
@@ -115,6 +116,9 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 
 }
 
+enum sType { vertex, pixel };
+
+/*
 #include <d3dcompiler.h>
 #include <d3d11shader.h>
 #pragma comment(lib, "d3d10.lib")
@@ -175,8 +179,6 @@ void reflect(ofstream& ofile, string &shaderName)
 	}
 }
 
-enum sType {vertex,pixel};
-
 void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType type)
 {
 	string inFilePath = inPath + shaderName + shaderExtension;
@@ -210,6 +212,122 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 
 
+}*/
+
+void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType type)
+{
+	ofile << "struct { \n\n";
+
+	string inFilePath = inPath + shaderName + shaderExtension;
+	ifstream in(inFilePath);
+	
+	string t2d = "Texture2D ";
+	string cb = "cbuffer ";
+	string cbName = "params";
+	string cType = "float ";
+
+#define found res != string::npos
+#define notFound res == string::npos
+
+	if (in.is_open())
+	{
+		string s;
+		while (getline(in, s))
+		{
+			auto res = s.find(t2d);
+			if (found)
+			{
+				string name = "";
+				auto nameStart = s.find_first_not_of(" ", t2d.length());
+				unsigned int i = nameStart;
+				while (i < s.length())
+				{
+					if (s.at(i) == ' ' || s.at(i) == ':') break;
+					name.push_back(s.at(i));
+					i++;
+				}
+
+				ofile << "int " << name << ";\n";
+			}
+
+			res = s.find(cb);
+			if (found)
+			{
+				res = s.find(cbName, res);
+				if (found)
+				{
+					unsigned int pos = 0;
+					while (true)
+					{
+						res = s.find("{");
+						if (found)
+						{
+							pos = res;
+							break;
+						}
+
+						pos = 0;
+						assert(getline(in, s)) ;
+					}
+					
+					while (true)
+					{
+						unsigned int endCB = s.length();
+						auto res = s.find("}",pos);
+						if (found) endCB = res;
+						if (pos >= endCB) break;
+
+						res = s.find(cType,pos);
+						if (found)
+						{
+							pos = res + cType.length();
+							bool done = false;
+							char div = ' ';
+							while (!done)
+							{
+								string name = "";
+								auto nameStart = s.find_first_not_of(div, pos);
+								unsigned int i = nameStart;
+								while (i < endCB)
+								{
+									if (s.at(i) == ' ')
+									{
+										while (i < endCB)
+										{
+											if (s.at(i) != ' ') break;
+											i++;
+										}
+									}
+
+									if (s.at(i) == ';')
+									{
+										pos = i;
+										done = true;
+										break;
+									}
+									if (s.at(i) == ',')
+									{
+										pos = i + 1;
+										break;
+									}
+									name.push_back(s.at(i));
+									i++;
+								}
+								ofile << "float " << name << ";\n";
+							}
+						}
+						else
+						{
+							assert(getline(in, s));
+							pos = 0;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ofile << "\n} " << shaderName << ";\n\n";
 }
 
 int vShadersCount = 0;
@@ -279,8 +397,6 @@ int main()
 	ofile << "//automatically generated file: all used shaders as const char* strings\n\n";
 	ofile << "namespace shadersData {\n\n";
 
-	oReflect << "struct params {\n";
-
 	i = 0;
 	while (i < vShadersCount)
 	{
@@ -303,8 +419,6 @@ int main()
 		Process(libList[i], inLibPath, outLibPath, ofile);
 		i++;
 	}
-
-	oReflect << "};\n";
 
 	ofile << "\n\n};";
 

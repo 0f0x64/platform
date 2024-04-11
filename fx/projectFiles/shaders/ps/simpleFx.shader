@@ -4,7 +4,7 @@
 //[
 cbuffer params : register(b1)
 {
-    float p1;
+    float p1; float p2;
 };
 //]
 

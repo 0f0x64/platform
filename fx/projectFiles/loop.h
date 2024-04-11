@@ -7,26 +7,6 @@ namespace Loop
 
 	#include "..\generated\constBufReflect.h"
 
-	struct meshOut {
-
-		void Set()
-		{
-			Shaders::SetVS(Shaders::vertex::meshOut);
-		}
-
-		void SetParams(float x, float y)
-		{
-			ConstBuf::drawerV[0] = x;
-			ConstBuf::drawerV[1] = y;
-		}
-
-		void SetTextures(int i)
-		{
-			Textures::SetTexture(i, 0, dx::Textures::tAssignType::vertex);
-		}
-
-	};
-
 	void param(int param, float value)
 	{
 		ConstBuf::drawerV[param] = value;
@@ -47,7 +27,7 @@ namespace Loop
 		ConstBuf::UpdateFrame();
 	}
 
-	
+		
 	void Scene1()
 	{
 		Depth::Off();
@@ -76,6 +56,7 @@ namespace Loop
 		ConstBuf::drawerV[0] = 0;
 		ConstBuf::drawerP[0] = 0;
 		Blend::Set(Blend::mode::off, Blend::op::add);
+
 		Draw::NullDrawer(1, 1);
 	}
 

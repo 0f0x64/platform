@@ -4,7 +4,7 @@
 //[
 cbuffer params : register(b0)
 {
-    float tone;
+    float tone, x1, x2;
 }
 //]
 
