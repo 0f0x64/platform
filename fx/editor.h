@@ -81,7 +81,9 @@ namespace editor
 
 	void WatchFiles()
 	{
-		int shaderExtensionLen = strlen(dx::Shaders::Compiler::shaderExtension);
+		using namespace dx;
+
+		int shaderExtensionLen = strlen(dx::Shaders::shaderExtension);
 
 		if (!isWatching)//init
 		{
@@ -140,7 +142,7 @@ namespace editor
 						WideCharToMultiByte(CP_ACP, NULL, event->FileName, event->FileNameLength / sizeof(WCHAR), fileName, sizeof(fileName), NULL, NULL);
 
 						char modifedExt[nameBufLen];
-						strcpy(modifedExt, dx::Shaders::Compiler::shaderExtension);
+						strcpy(modifedExt, Shaders::shaderExtension);
 						strcat(modifedExt, "~RF");//visual studio only hack!
 
 						char* s = strstr(fileName, modifedExt);
@@ -152,9 +154,9 @@ namespace editor
 							memcpy(s2, fileName, bytes);
 							s2[bytes + 1] = 0;
 
-							dx::Log("Modified:  ");
-							dx::Log(s2);
-							dx::Log("\n");
+							Log("Modified:  ");
+							Log(s2);
+							Log("\n");
 					
 							char pureName[255];
 							strcpy(pureName, s2 + 3);// 3= len vs/ps with backslash
@@ -168,11 +170,11 @@ namespace editor
 							if (s2[0] == 'v')
 							{
 								int i = 0;
-								while (i < dx::Shaders::vsCount)
+								while (i < Shaders::vsCount)
 								{
-									if (!strcmp(dx::Shaders::vsList[i], pureName))
+									if (!strcmp(Shaders::vsList[i], pureName))
 									{
-										dx::Shaders::Compiler::Vertex(i, s3);
+										Shaders::CreateVS(i, s3);
 										break;
 									}
 									i++;
@@ -183,11 +185,11 @@ namespace editor
 							if (s2[0] == 'p')
 							{
 								int i = 0;
-								while (i < dx::Shaders::psCount)
+								while (i < Shaders::psCount)
 								{
-									if (!strcmp(dx::Shaders::psList[i], pureName))
+									if (!strcmp(Shaders::psList[i], pureName))
 									{
-										dx::Shaders::Compiler::Pixel(i, s3);
+										Shaders::CreatePS(i, s3);
 										break;
 									}
 									i++;
@@ -197,7 +199,7 @@ namespace editor
 
 							if (s2[0] == 'l')
 							{
-								dx::Shaders::Compiler::CreateShaders();
+								Shaders::CreateShaders();
 							}
 
 						}

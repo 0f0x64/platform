@@ -5,9 +5,9 @@ Texture2D tex1 : register(t0);
 SamplerState sam1 : register(s0);
 
 //[
-cbuffer params : register(b3)
+cbuffer params : register(b1)
 {
-    float4 tone;
+    float tone;
 }
 //]
 

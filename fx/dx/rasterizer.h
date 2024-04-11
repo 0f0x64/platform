@@ -1,4 +1,5 @@
-namespace Rasterizer {
+namespace Rasterizer 
+{
 
 	ID3D11RasterizerState* rasterState[3];
 
@@ -25,4 +26,5 @@ namespace Rasterizer {
 
 		context->RSSetState(rasterState[0]);
 	}
+
 }

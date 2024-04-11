@@ -2,9 +2,9 @@
 #include <../lib/io.shader>
 
 //[
-cbuffer params : register(b3)
+cbuffer params : register(b1)
 {
-    float4 p1;
+    float p1;
 };
 //]
 

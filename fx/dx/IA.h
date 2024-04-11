@@ -1,4 +1,5 @@
-struct {
+namespace InputAssembler
+{
 
 	void Set()
 	{
@@ -7,4 +8,4 @@ struct {
 		context->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
 	}
 
-} InputAssembler;
+}

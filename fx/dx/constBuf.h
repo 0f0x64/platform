@@ -3,16 +3,16 @@ namespace ConstBuf
 
 	ID3D11Buffer* buffer[6];
 
-	#define constCount 32
+#define constCount 32
 
 	//b0
 	XMFLOAT4 global[constCount];//update once on start
-	
+
 	//b1
 	struct {
-		XMFLOAT4 time;
+		float time;
 	} frame;//update per frame
-	
+
 	//b2 
 	struct {
 		XMMATRIX world[2];
@@ -21,16 +21,16 @@ namespace ConstBuf
 	} camera;//update per camera set
 
 	//b3 - use "params" label in shader
-	XMFLOAT4 drawerV[constCount];//update per draw call
-	
+	float drawerV[constCount];//update per draw call
+
 	//b4 - use "params" label in shader
-	XMFLOAT4 drawerP[constCount];//update per draw call
+	float drawerP[constCount];//update per draw call
 
 	//b5
 	struct {
 		XMMATRIX model;
 	} drawerMat;//update per draw call
-		
+
 
 	int roundUp(int n, int r)
 	{
@@ -48,9 +48,9 @@ namespace ConstBuf
 		bd.StructureByteStride = 16;
 
 		HRESULT hr = device->CreateBuffer(&bd, NULL, &buffer[i]);
-		#if DebugMode
-			if (FAILED(hr)) { Log("constant bufferV fail\n"); return; }
-		#endif	
+#if DebugMode
+		if (FAILED(hr)) { Log("constant bufferV fail\n"); return; }
+#endif	
 	}
 
 	void Init()
@@ -64,25 +64,33 @@ namespace ConstBuf
 
 	}
 
-	struct
-	{
 		template <typename T>
 		void Update(int i, T* data)
 		{
-			context->UpdateSubresource(ConstBuf::buffer[i], 0, NULL, data, 0, 0);
+			context->UpdateSubresource(buffer[i], 0, NULL, data, 0, 0);
 		}
 
 		void UpdateFrame()
 		{
-			context->UpdateSubresource(ConstBuf::buffer[4], 0, NULL, &frame, 0, 0);
+			context->UpdateSubresource(buffer[4], 0, NULL, &frame, 0, 0);
 		}
 
-
-		void Set(int i)
+		void SetVP(int i)
 		{
-			context->VSSetConstantBuffers(i, 1, &ConstBuf::buffer[i]);
-			context->PSSetConstantBuffers(i, 1, &ConstBuf::buffer[i]);
+			context->VSSetConstantBuffers(i, 1, &buffer[i]);
+			context->PSSetConstantBuffers(i, 1, &buffer[i]);
 		}
-	} Api;
+
+		void SetV(int i)
+		{
+			context->VSSetConstantBuffers(i, 1, &buffer[i]);
+		}
+
+		void SetP(int i)
+		{
+			context->PSSetConstantBuffers(i, 1, &buffer[i]);
+		}
+
+
 } 
 

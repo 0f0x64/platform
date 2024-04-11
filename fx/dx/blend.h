@@ -61,4 +61,4 @@ namespace Blend
 
 		context->OMSetBlendState(blendState[m][blend], blendFactor2, 0xffffffff);
 	}
-}
+} 

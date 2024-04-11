@@ -431,6 +431,7 @@
     <ClInclude Include="generated\constBufReflect.h" />
     <ClInclude Include="generated\libList.h" />
     <ClInclude Include="generated\processedShaders.h" />
+    <ClInclude Include="generated\processedShadersCompile.h" />
     <ClInclude Include="generated\psList.h" />
     <ClInclude Include="generated\vsList.h" />
     <ClInclude Include="projectFiles\loop.h" />

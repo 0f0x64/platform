@@ -1,7 +1,8 @@
-namespace Textures {
+namespace Textures
+{
 
-#define max_tex 255
-#define mainRTIndex 0
+	#define max_tex 255
+	#define mainRTIndex 0
 
 	enum tType { flat, cube };
 
@@ -225,9 +226,7 @@ namespace Textures {
 
 	enum tAssignType { vertex, pixel, both };
 
-	struct {
-
-		void Set(byte tex, byte slot, tAssignType tA = tAssignType::both)
+		void SetTexture(byte tex, byte slot, tAssignType tA = tAssignType::both)
 		{
 			if (tA == tAssignType::both || tA == tAssignType::vertex)
 			{
@@ -246,35 +245,27 @@ namespace Textures {
 		}
 
 
-	} Api;
-
-	namespace RenderTargets {
-
-		struct {
-
-			void Set(byte texId = mainRTIndex, byte level = 0)
+		void SetRT(byte texId = mainRTIndex, byte level = 0)
 			{
 				currentRT = texId;
 				
-				auto depthStencil = Textures::texture[texId].depth ? Textures::texture[texId].DepthStencilView[0] : 0;
-				context->OMSetRenderTargets(1, &Textures::texture[texId].RenderTargetView[0][0], depthStencil);
-				Textures::SetViewport(texId, level);
+				auto depthStencil = texture[texId].depth ? texture[texId].DepthStencilView[0] : 0;
+				context->OMSetRenderTargets(1, &texture[texId].RenderTargetView[0][0], depthStencil);
+				SetViewport(texId, level);
 			}
 
-		} Api;
-
-	};
+	
 
 	#define Texture(name,type,format,width,height,mip,depth) name,
 	enum list {
-		#include "projectFiles\texList.h"
+		#include "..\projectFiles\texList.h"
 	};
 
 	void Init()
 	{
 		#undef Texture
 		#define Texture(name,type,format,width,height,mip,depth) Textures::Create(list::name, Textures::tType::type,Textures::tFormat::format, XMFLOAT2((float)width,(float)height),mip,depth);
-		#include "projectFiles\texList.h"
+		#include "..\projectFiles\texList.h"
 	}
 
-}
+} 

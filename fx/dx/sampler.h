@@ -1,4 +1,5 @@
-namespace Sampler {
+namespace Sampler
+{
 
 	ID3D11SamplerState* pSampler[3][2][2];//filter, addressU, addressV
 	ID3D11SamplerState* pSamplerComp;//for shadowmapping
@@ -52,19 +53,17 @@ namespace Sampler {
 
 	enum to { vertex, pixel };
 
-	struct {
-
 		void Set(to shader, byte slot, type filter, addr addressU, addr addressV)
 		{
-			if (shader == vertex) context->VSSetSamplers(slot, 1, &Sampler::pSampler[filter][addressU][addressV]);
-			if (shader == pixel) context->PSSetSamplers(slot, 1, &Sampler::pSampler[filter][addressU][addressV]);
+			if (shader == vertex) context->VSSetSamplers(slot, 1, &pSampler[filter][addressU][addressV]);
+			if (shader == pixel) context->PSSetSamplers(slot, 1, &pSampler[filter][addressU][addressV]);
 		}
 
 		void SetComp(byte slot)
 		{
-			context->PSSetSamplers(slot, 1, &Sampler::pSamplerComp);
+			context->PSSetSamplers(slot, 1, &pSamplerComp);
 		}
 
-	} Api;
+
 
 }

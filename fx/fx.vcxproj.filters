@@ -110,6 +110,9 @@
     <ClInclude Include="generated\libList.h">
       <Filter>Source Files\generated</Filter>
     </ClInclude>
+    <ClInclude Include="generated\processedShadersCompile.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

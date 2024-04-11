@@ -1,118 +1,92 @@
 namespace Loop
 {
-	bool isInit = false;
+	
 	bool isPrecalc = false;
 
 	using namespace dx;
 
-	//shortcuts
-	#define tex Textures::list
-	#define vs Shaders::vertex
-	#define ps Shaders::pixel
-	
-	#define rt Textures::RenderTargets::Api.Set
-	#define createMips Textures::Api.CreateMipMap
-	
-	#define blend Blend::Set
-	#define blendMode Blend::mode
-	#define blendOp Blend::op
-
-	#define depth Depth::Api
-	#define texture Textures::Api.Set
-	#define shader Shaders::Api.Set
-	#define draw Draw
-	#define sampler Sampler::Api.Set
-	#define ia InputAssembler
-
-	#define constant ConstBuf
-		
-	#define pSampler_L_U(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::clamp)
-	#define pSampler_L_V(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Linear, Sampler::addr::clamp, Sampler::addr::wrap)
-	#define pSampler_L_UV(slot) sampler(Sampler::to::pixel, slot , Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::wrap)
-	 
-	#define pSampler_P_U(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Point, Sampler::addr::wrap, Sampler::addr::clamp)
-	#define pSampler_P_V(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::Point, Sampler::addr::clamp, Sampler::addr::wrap)
-	#define pSampler_P_UV(slot) sampler(Sampler::to::pixel, slot , Sampler::type::Point, Sampler::addr::wrap, Sampler::addr::wrap)
-
-	#define pSampler_PL_U(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::MinPointMagLinear, Sampler::addr::wrap, Sampler::addr::clamp)
-	#define pSampler_PL_V(slot) sampler(Sampler::to::pixel, slot ,  Sampler::type::MinPointMagLinear, Sampler::addr::clamp, Sampler::addr::wrap)
-	#define pSampler_PL_UV(slot) sampler(Sampler::to::pixel, slot , Sampler::type::MinPointMagLinear, Sampler::addr::wrap, Sampler::addr::wrap)
-
-
 	#include "..\generated\constBufReflect.h"
+
+	struct meshOut {
+
+		void Set()
+		{
+			Shaders::SetVS(Shaders::vertex::meshOut);
+		}
+
+		void SetParams(float x, float y)
+		{
+			ConstBuf::drawerV[0] = x;
+			ConstBuf::drawerV[1] = y;
+		}
+
+		void SetTextures(int i)
+		{
+			Textures::SetTexture(i, 0, dx::Textures::tAssignType::vertex);
+		}
+
+	};
 
 	void param(int param, float value)
 	{
-		constant::drawer[param] = XMFLOAT4(value, 0, 0, 1);
-	}
-
-	void Init()
-	{
-		Shaders::Init();
-		Textures::Init();
-		
-		ia.Set();
-
-		for (int i=0;i<6;i++) ConstBuf::Api.Set(i);
-
-		isInit = true;
+		ConstBuf::drawerV[param] = value;
 	}
 
 	void Precalc()
 	{
-		ConstBuf::Api.Update(5, ConstBuf::global);
+		InputAssembler::Set();
+		ConstBuf::Update(5, ConstBuf::global);
 
+		for (int i = 0; i < 6; i++) ConstBuf::SetVP(i);
 		isPrecalc = true;
 	}
 
 	void frameConst()
 	{
-		constant::frame.time = XMFLOAT4((float)(timer::frameBeginTime * .01),0,0,0);
-		ConstBuf::Api.UpdateFrame();
+		ConstBuf::frame.time = (float)(timer::frameBeginTime * .01);
+		ConstBuf::UpdateFrame();
 	}
 
 	
 	void Scene1()
 	{
-		depth.Off();
-		rt(tex::tex1);
+		Depth::Off();
+		Textures::SetRT(Textures::list::tex1);
+		Shaders::Set(Shaders::vertex::quad, Shaders::pixel::simpleFx);
+		Draw::NullDrawer(1, 1);
+		Textures::CreateMipMap();
 
-		shader(vs::quad, ps::simpleFx);
-		draw.NullDrawer(1, 1);
-		createMips();
-
-		rt(tex::mainRT);
+		Textures::SetRT(Textures::list::mainRT);
 		Camera::Set();
-		depth.On();
-		draw.Clear(0.2f, 0.2f, 0.2f, 1.f);
-		draw.ClearDepth();
+		Depth::On();
+		Draw::Clear(0.2f, 0.2f, 0.2f, 1.f);
+		Draw::ClearDepth();
 
-		texture(tex::tex1, 0);
-		pSampler_L_UV(0);
+		Textures::SetTexture(Textures::list::tex1, 0);
+		Sampler::Set(Sampler::to::pixel, 0, Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::wrap);
 
-		shader(vs::meshOut, ps::simpleTex);
-		constant::drawer[0] = XMFLOAT4(1, 0, 0, 1);
+		Shaders::Set(Shaders::vertex::meshOut, Shaders::pixel::simpleTex);
+		ConstBuf::drawerV[0] = 1;
+		ConstBuf::drawerP[0] = 1;
 
-		blend(blendMode::off, blendOp::add);
-		draw.NullDrawer(1, 1);
+		Blend::Set(Blend::mode::off, Blend::op::add);
+		Draw::NullDrawer(1, 1);
 
-		shader(vs::meshOut, ps::simpleTex);
-		constant::drawer[0] = XMFLOAT4(0, 1, 0, 1);
-		blend(blendMode::off, blendOp::add);
-		draw.NullDrawer(1, 1);
+		Shaders::Set(Shaders::vertex::meshOut, Shaders::pixel::simpleTex);
+		ConstBuf::drawerV[0] = 0;
+		ConstBuf::drawerP[0] = 0;
+		Blend::Set(Blend::mode::off, Blend::op::add);
+		Draw::NullDrawer(1, 1);
 	}
 
 	void Scene2()
 	{
-		rt(tex::mainRT);
-		blend(blendMode::off, blendOp::add);
-		draw.Clear(1.2f, 0.2f, 0.2f, 1.f);
-		//draw.ClearDepth();
-		depth.Off();
-
-
-		shader(vs::quad, ps::simpleFx);
-		draw.NullDrawer(1, 1);
+		Textures::SetRT(Textures::list::mainRT);
+		Blend::Set(Blend::mode::off, Blend::op::add);
+		Draw::Clear(1.2f, 0.2f, 0.2f, 1.f);
+		Depth::Off();
+		Shaders::Set(Shaders::vertex::quad, Shaders::pixel::simpleFx);
+		Draw::NullDrawer(1, 1);
 
 	}
 
@@ -120,13 +94,12 @@ namespace Loop
 	{
 		frameConst();
 
-		if (!isInit) Init();
 		if (!isPrecalc) Precalc();
 
 		Scene1();
 
 		Textures::UnbindAll();
-		draw.Present();
+		Draw::Present();
 
 	}
 

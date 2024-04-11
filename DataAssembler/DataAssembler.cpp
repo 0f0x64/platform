@@ -16,6 +16,7 @@
 using namespace std;
 
 string shaderFile = "..\\fx\\generated\\processedShaders.h";//final output
+string shaderCompilerFile = "..\\fx\\generated\\processedShadersCompile.h";//final output
 string constReflectFile = "..\\fx\\generated\\constBufReflect.h";//final output
 
 string inVPath = "..\\fx\\projectFiles\\shaders\\vs\\";
@@ -305,28 +306,33 @@ int main()
 
 	oReflect << "};\n";
 
-	ofile << "\n";
+	ofile << "\n\n};";
+
+	ofile.close();
 
 	//-- compiler function
 
-	ofile << "void CompileAll ()\n" << "{\n";
+	remove(shaderCompilerFile.c_str());
+	ofstream oSCfile(shaderCompilerFile);
+
+	oSCfile << "void CompileAll ()\n" << "{\n";
 
 	i = 0;
 	while (i < vShadersCount)
 	{
-		ofile << "Vertex (" <<  i  <<  ", " << vsList[i] <<  ");\n";	i++;
+		oSCfile << "CreateVS (" <<  i  <<  ", shadersData::" << vsList[i] <<  ");\n";	i++;
 	}
 
 	i = 0;
 	while (i < pShadersCount)
 	{
-		ofile << "Pixel (" << i << ", " << psList[i] << ");\n";	i++;
+		oSCfile << "CreatePS (" << i << ", shadersData::" << psList[i] << ");\n";	i++;
 	}
 
+	oSCfile << "\n\n};";
 
-	ofile << "};\n\n\n};";
-	
-	ofile.close();
+	oSCfile.close();
+
 	oReflect.close();
     
 	Log("\n---competed!\n\n");

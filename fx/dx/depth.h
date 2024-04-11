@@ -1,4 +1,5 @@
-namespace Depth {
+namespace Depth
+{
 
 	ID3D11DepthStencilState* pDSState[4];
 
@@ -46,40 +47,36 @@ namespace Depth {
 		device->CreateDepthStencilState(&dsDesc, &pDSState[3]);//write
 	}
 
-	namespace Mode
+	enum mode {
+		off, on, readonly, writeonly
+	};
+	
+
+	void Set(mode m)
 	{
-		enum DepthMode {
-			off, on, readonly, writeonly
-		};
+		context->OMSetDepthStencilState(pDSState[m], 1);
 	}
 
-	void Set(Mode::DepthMode m)
+
+	void Off()
 	{
-		context->OMSetDepthStencilState(Depth::pDSState[m], 1);
+		context->OMSetDepthStencilState(pDSState[mode::off], 1);
 	}
 
-	struct {
+	void On()
+	{
+		context->OMSetDepthStencilState(pDSState[mode::on], 1);
+	}
 
-			void Off()
-			{
-				context->OMSetDepthStencilState(Depth::pDSState[Mode::DepthMode::off], 1);
-			}
+	void ReadOnly()
+	{
+		context->OMSetDepthStencilState(pDSState[mode::readonly], 1);
+	}
 
-			void On()
-			{
-				context->OMSetDepthStencilState(Depth::pDSState[Mode::DepthMode::on], 1);
-			}
-
-			void ReadOnly()
-			{
-				context->OMSetDepthStencilState(Depth::pDSState[Mode::DepthMode::readonly], 1);
-			}
-
-			void WriteOnly()
-			{
-				context->OMSetDepthStencilState(Depth::pDSState[Mode::DepthMode::writeonly], 1);
-			}
+	void WriteOnly()
+	{
+		context->OMSetDepthStencilState(pDSState[mode::writeonly], 1);
+	}
 
 
-		} Api;
 }

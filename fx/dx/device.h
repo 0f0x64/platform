@@ -1,4 +1,5 @@
-namespace Device {
+namespace Device
+{
 
 	D3D_DRIVER_TYPE	driverType = D3D_DRIVER_TYPE_NULL;
 
@@ -42,4 +43,5 @@ namespace Device {
 		Textures::texture[0].pTexture->Release();
 
 	}
+
 }

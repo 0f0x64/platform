@@ -57,6 +57,8 @@ namespace dx
 		Blend::Init();
 		ConstBuf::Init();
 		Sampler::Init();
+		Shaders::Init();
+		Textures::Init();
 	}
 
 

@@ -1,9 +1,17 @@
 namespace Shaders {
 
+	#include "shadersReflection.h"
+
+	#if !EditMode
+
+	#include "..\generated\processedShaders.h"
+	#include "..\generated\libList.h"
+
+	#endif
+
 	int vsCount = 0;
 	int psCount = 0;
 
-	#include "shadersReflection.h"
 
 	typedef struct {
 		ID3D11VertexShader* pShader;
@@ -19,11 +27,6 @@ namespace Shaders {
 	PixelShader PS[255];
 
 	ID3DBlob* pErrorBlob;
-
-	
-
-
-	namespace Compiler {
 
 	#if EditMode
 
@@ -62,7 +65,7 @@ namespace Shaders {
 			return shaderPathW;
 		}
 
-		void Vertex(int i, const char* name)
+		void CreateVS(int i, const char* name)
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name);
 
@@ -82,7 +85,7 @@ namespace Shaders {
 
 		}
 
-		void Pixel(int i, const char* name)
+		void CreatePS(int i, const char* name)
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name);
 
@@ -103,28 +106,28 @@ namespace Shaders {
 
 		void CreateShaders()
 		{
-			Shaders::vsCount = sizeof(Shaders::vsList) / sizeof(const char*);
+			vsCount = sizeof(vsList) / sizeof(const char*);
 			int i = 0;
-			while (i < Shaders::vsCount)
+			while (i < vsCount)
 			{
 				char fileName[255];
 				strcpy(fileName, "/vs/");
-				strcat(fileName, Shaders::vsList[i]);
+				strcat(fileName, vsList[i]);
 				strcat(fileName, shaderExtension);
-				dx::Shaders::Compiler::Vertex(i, fileName);
+				CreateVS(i, fileName);
 				i++;
 
 			}
 
-			Shaders::psCount = sizeof(Shaders::psList) / sizeof(const char*);
+			psCount = sizeof(psList) / sizeof(const char*);
 			i = 0;
-			while (i < Shaders::psCount)
+			while (i < psCount)
 			{
 				char fileName[255];
 				strcpy(fileName, "/ps/");
-				strcat(fileName, Shaders::psList[i]);
+				strcat(fileName, psList[i]);
 				strcat(fileName, shaderExtension);
-				dx::Shaders::Compiler::Pixel(i, fileName);
+				CreatePS(i, fileName);
 				i++;
 			}
 
@@ -132,12 +135,7 @@ namespace Shaders {
 
 #else
 
-		void Vertex(int n, const char* shaderText);
-		void Pixel(int n, const char* shaderText);
 
-		#include "generated\processedShaders.h"
-
-		#include "..\generated\libList.h"
 
 		int getPtrIndex(const char* shaderName)
 		{
@@ -180,7 +178,7 @@ namespace Shaders {
 			return outText;
 		}
 
-		void Vertex(int n, const char* shaderText)
+		void CreateVS(int n, const char* shaderText)
 		{
 			HRESULT hr = S_OK;
 
@@ -213,7 +211,7 @@ namespace Shaders {
 		}
 
 
-		void Pixel(int n, const char* shaderText)
+		void CreatePS(int n, const char* shaderText)
 		{
 			HRESULT hr = S_OK;
 
@@ -240,22 +238,22 @@ namespace Shaders {
 			}
 		}
 
+		#include "..\generated\processedShadersCompile.h"
+
 		void CreateShaders()
 		{
-			shadersData::CompileAll();
+			CompileAll();
 		}
 
 	#endif
 
-	}
-
 	void Init()
 	{
-		Compiler::CreateShaders();
+		CreateShaders();
 	}
 
 	//todo: check previously setted shader, same for IA, const, etc
-	struct {
+
 		void SetVS(int n)
 		{
 			context->VSSetShader(VS[n].pShader, NULL, 0);
@@ -271,5 +269,5 @@ namespace Shaders {
 			SetVS(v);
 			SetPS(p);
 		}
-	} Api;
+
 }
