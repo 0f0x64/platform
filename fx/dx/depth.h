@@ -58,25 +58,4 @@ namespace Depth
 	}
 
 
-	void Off()
-	{
-		context->OMSetDepthStencilState(pDSState[mode::off], 1);
-	}
-
-	void On()
-	{
-		context->OMSetDepthStencilState(pDSState[mode::on], 1);
-	}
-
-	void ReadOnly()
-	{
-		context->OMSetDepthStencilState(pDSState[mode::readonly], 1);
-	}
-
-	void WriteOnly()
-	{
-		context->OMSetDepthStencilState(pDSState[mode::writeonly], 1);
-	}
-
-
 }

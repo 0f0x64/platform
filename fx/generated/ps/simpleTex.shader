@@ -1,8 +1,7 @@
 #include<../lib/constBuf.shader>
 #include<../lib/io.shader>
-Texture2D albedo:register(t0),metalness:register(t1);SamplerState sam1:register(s0);cbuffer params:register(b1)
+Texture2D tex1:register(t0),tex2:register(t1);SamplerState sam1:register(s0);cbuffer params:register(b1)
 {
-float tone;
-float p2;
+float mix;
 }
-float4 PS(VS_OUTPUT s):SV_Target{float4 p=float4(s.uv,sin(s.uv.x*12),1);float2 f=s.uv*5;f.y-=2;p=albedo.Sample(sam1,f);return p;}
+float4 PS(VS_OUTPUT t):SV_Target{float2 f=t.uv;f.y-=2;float4 s=tex1.Sample(sam1,f),m=tex2.Sample(sam1,f);return lerp(s,m,mix);}

@@ -214,20 +214,36 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 }*/
 
-void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType type)
-{
-	ofile << "struct { \n\n";
 
+void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType type, int sIndex)
+{
+
+	ofile << "struct { \n\n";
+	
 	string inFilePath = inPath + shaderName + shaderExtension;
 	ifstream in(inFilePath);
-	
+
 	string t2d = "Texture2D ";
+	string smp = "SamplerState ";
 	string cb = "cbuffer ";
 	string cbName = "params";
 	string cType = "float ";
 
-#define found res != string::npos
-#define notFound res == string::npos
+	string params = "struct \n{\n";
+	string textures = "struct \n{\n";
+	string samplers = "struct \n{\n";
+
+	string texturesSet = "";
+	int texturesCounter = 0;
+	string samplersSet = "";
+	int samplersCounter = 0;
+
+	#define found res != string::npos
+	#define notFound res == string::npos
+
+	bool isParams = false;
+	bool isSamplers = false;
+	bool isTextures = false;
 
 	if (in.is_open())
 	{
@@ -237,8 +253,34 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 			auto res = s.find(t2d);
 			if (found)
 			{
+				isTextures = true;
 				string name = "";
 				auto nameStart = s.find_first_not_of(" ", t2d.length());
+				unsigned int i = nameStart;
+
+				while (i < s.length())
+				{
+					if (s.at(i) == ' ' || s.at(i) == ':') break;
+					name.push_back(s.at(i));
+					i++;
+				}
+
+				textures += "int " + name + ";\n";
+
+				texturesSet = texturesSet + "Textures::SetTexture(textures." + name + ", " + to_string(texturesCounter)+ ", ";
+				if (sIndex == sType::vertex) texturesSet += "Textures::tAssignType::vertex";
+				if (sIndex == sType::pixel) texturesSet += "Textures::tAssignType::pixel";
+				texturesSet +="); \n";
+				texturesCounter++;
+
+			}
+
+			res = s.find(smp);
+			if (found)
+			{
+				isSamplers = true;
+				string name = "";
+				auto nameStart = s.find_first_not_of(" ", smp.length());
 				unsigned int i = nameStart;
 				while (i < s.length())
 				{
@@ -247,7 +289,12 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 					i++;
 				}
 
-				ofile << "int " << name << ";\n";
+				samplers += "int " + name + "Filter;\n" + "int " + name + "AddressU;\n" + "int " + name + "AddressV;\n";
+
+				if (sIndex == sType::vertex) samplersSet += "Sampler::Set(Sampler::to::vertex, ";
+				if (sIndex == sType::pixel) samplersSet += "Sampler::Set(Sampler::to::pixel, ";
+				samplersSet += to_string(samplersCounter) + ", " + "samplers." + name + "Filter, " + "samplers." + name + "AddressU, " + "samplers." + name + "AddressV"+ "); \n";
+				samplersCounter++;
 			}
 
 			res = s.find(cb);
@@ -256,6 +303,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 				res = s.find(cbName, res);
 				if (found)
 				{
+					isParams = true;
 					unsigned int pos = 0;
 					while (true)
 					{
@@ -267,26 +315,26 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 						}
 
 						pos = 0;
-						assert(getline(in, s)) ;
+						assert(getline(in, s));
 					}
-					
+
 					while (true)
 					{
 						unsigned int endCB = s.length();
-						auto res = s.find("}",pos);
+						auto res = s.find("}", pos);
 						if (found) endCB = res;
 						if (pos >= endCB) break;
 
-						res = s.find(cType,pos);
+						res = s.find(cType, pos);
 						if (found)
 						{
 							pos = res + cType.length();
 							bool done = false;
-							char div = ' ';
+
 							while (!done)
 							{
 								string name = "";
-								auto nameStart = s.find_first_not_of(div, pos);
+								auto nameStart = s.find_first_not_of(' ', pos);
 								unsigned int i = nameStart;
 								while (i < endCB)
 								{
@@ -313,7 +361,9 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 									name.push_back(s.at(i));
 									i++;
 								}
-								ofile << "float " << name << ";\n";
+								params.append("float ");
+								params.append(name);
+								params.append(";\n");
 							}
 						}
 						else
@@ -326,6 +376,28 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 			}
 		}
 	}
+
+	if (isParams) ofile << params << "} params;\n\n";
+	if (isTextures) ofile << textures << "} textures;\n\n";
+	if (isSamplers) ofile << samplers << "} samplers;\n\n";
+
+	ofile << "void set () {\n";
+	if (type == sType::vertex) ofile << "Shaders::SetVS(";
+	if (type == sType::pixel) ofile << "Shaders::SetPS(";
+	ofile << sIndex << ");\n";
+	if (type == sType::vertex && isParams)
+	{
+		ofile << "memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));\n";
+		ofile << texturesSet;
+		ofile << samplersSet;
+	}
+	if (type == sType::pixel && isParams)
+	{
+		ofile << "memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));\n";
+		ofile << texturesSet;
+		ofile << samplersSet;
+	}
+	ofile << "}\n";
 
 	ofile << "\n} " << shaderName << ";\n\n";
 }
@@ -401,7 +473,7 @@ int main()
 	while (i < vShadersCount)
 	{
 		Process(vsList[i], inVPath, outVPath, ofile); 
-		ConstBufReflector(vsList[i], inVPath, oReflect, sType::vertex);
+		ConstBufReflector(vsList[i], inVPath, oReflect, sType::vertex, i);
 		i++;
 	}
 
@@ -409,7 +481,7 @@ int main()
 	while (i < pShadersCount)
 	{
 		Process(psList[i], inPPath, outPPath, ofile); 
-		ConstBufReflector(psList[i], inPPath, oReflect,sType::pixel);
+		ConstBufReflector(psList[i], inPPath, oReflect,sType::pixel, i);
 		i++;
 	}
 

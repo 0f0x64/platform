@@ -4,7 +4,7 @@ namespace Sampler
 	ID3D11SamplerState* pSampler[3][2][2];//filter, addressU, addressV
 	ID3D11SamplerState* pSamplerComp;//for shadowmapping
 
-	enum type { Linear, Point, MinPointMagLinear };
+	enum type { linear, point, minPoint_magLinear };
 	enum addr { clamp, wrap };
 
 	void Init()
@@ -53,16 +53,16 @@ namespace Sampler
 
 	enum to { vertex, pixel };
 
-		void Set(to shader, byte slot, type filter, addr addressU, addr addressV)
-		{
-			if (shader == vertex) context->VSSetSamplers(slot, 1, &pSampler[filter][addressU][addressV]);
-			if (shader == pixel) context->PSSetSamplers(slot, 1, &pSampler[filter][addressU][addressV]);
-		}
+	void Set(to shader, int slot, int filter, int addressU, int addressV)
+	{
+		if (shader == vertex) context->VSSetSamplers(slot, 1, &pSampler[filter][addressU][addressV]);
+		if (shader == pixel) context->PSSetSamplers(slot, 1, &pSampler[filter][addressU][addressV]);
+	}
 
-		void SetComp(byte slot)
-		{
-			context->PSSetSamplers(slot, 1, &pSamplerComp);
-		}
+	void SetComp(byte slot)
+	{
+		context->PSSetSamplers(slot, 1, &pSamplerComp);
+	}
 
 
 

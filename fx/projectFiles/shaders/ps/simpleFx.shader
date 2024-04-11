@@ -4,7 +4,7 @@
 //[
 cbuffer params : register(b1)
 {
-    float p1; float p2;
+    float r, g, b;
 };
 //]
 
@@ -20,6 +20,6 @@ float4 PS(VS_OUTPUT input) : SV_Target
         c += sin((atan2(uv.x, uv.y) * 12 - time.x * .3)) * (sin(1/length(uv * 2) + 5)) * saturate(1/pow(length(uv),3))*2;
     }
 
-    return float4(c, c, c, 1.);
+    return float4(c*r, c*g, c*b, 1.);
 
 } 

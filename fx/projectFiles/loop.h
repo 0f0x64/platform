@@ -7,11 +7,6 @@ namespace Loop
 
 	#include "..\generated\constBufReflect.h"
 
-	void param(int param, float value)
-	{
-		ConstBuf::drawerV[param] = value;
-	}
-
 	void Precalc()
 	{
 		InputAssembler::Set();
@@ -27,48 +22,58 @@ namespace Loop
 		ConstBuf::UpdateFrame();
 	}
 
-		
+
 	void Scene1()
 	{
-		Depth::Off();
+		//two dynamic texures
 		Textures::SetRT(Textures::list::tex1);
-		Shaders::Set(Shaders::vertex::quad, Shaders::pixel::simpleFx);
+		Depth::Set(Depth::mode::off);
+		quad.set();
+		simpleFx.params.r = 0;
+		simpleFx.params.g = 1;
+		simpleFx.params.b = 0;
+		simpleFx.set();
 		Draw::NullDrawer(1, 1);
 		Textures::CreateMipMap();
 
+		Textures::SetRT(Textures::list::tex2);
+		simpleFx.params.r = 1;
+		simpleFx.params.g = 0;
+		simpleFx.params.b = 0;
+		simpleFx.set();
+		Draw::NullDrawer(1, 1);
+		Textures::CreateMipMap();
+
+		//-two planes
 		Textures::SetRT(Textures::list::mainRT);
 		Camera::Set();
-		Depth::On();
+		Depth::Set(Depth::mode::on);
+
+		simpleTex.samplers.sam1Filter = Sampler::type::linear;
+		simpleTex.samplers.sam1AddressU = Sampler::addr::wrap;
+		simpleTex.samplers.sam1AddressV = Sampler::addr::wrap;
+
 		Draw::Clear(0.2f, 0.2f, 0.2f, 1.f);
 		Draw::ClearDepth();
 
-		Textures::SetTexture(Textures::list::tex1, 0);
-		Sampler::Set(Sampler::to::pixel, 0, Sampler::type::Linear, Sampler::addr::wrap, Sampler::addr::wrap);
+		meshOut.params.tone = 1;
+		meshOut.set();
+		simpleTex.textures.tex1 = Textures::list::tex1;
+		simpleTex.textures.tex2 = Textures::list::tex2;
+		simpleTex.params.mix = 0;
 
-		Shaders::Set(Shaders::vertex::meshOut, Shaders::pixel::simpleTex);
-		ConstBuf::drawerV[0] = 1;
-		ConstBuf::drawerP[0] = 1;
-
+		simpleTex.set();
 		Blend::Set(Blend::mode::off, Blend::op::add);
 		Draw::NullDrawer(1, 1);
 
-		Shaders::Set(Shaders::vertex::meshOut, Shaders::pixel::simpleTex);
-		ConstBuf::drawerV[0] = 0;
-		ConstBuf::drawerP[0] = 0;
+		meshOut.params.tone = 0;
+		meshOut.set();
+		simpleTex.textures.tex1 = Textures::list::tex1;
+		simpleTex.textures.tex2 = Textures::list::tex2;
+		simpleTex.params.mix = 1;
+		simpleTex.set();
 		Blend::Set(Blend::mode::off, Blend::op::add);
-
 		Draw::NullDrawer(1, 1);
-	}
-
-	void Scene2()
-	{
-		Textures::SetRT(Textures::list::mainRT);
-		Blend::Set(Blend::mode::off, Blend::op::add);
-		Draw::Clear(1.2f, 0.2f, 0.2f, 1.f);
-		Depth::Off();
-		Shaders::Set(Shaders::vertex::quad, Shaders::pixel::simpleFx);
-		Draw::NullDrawer(1, 1);
-
 	}
 
 	void mainLoop()
