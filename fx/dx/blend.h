@@ -48,9 +48,6 @@ namespace Blend
 		CreateMixStates(2);
 	}
 
-	enum mode { off, on, alpha };
-	enum op { add, sub, revsub, min, max };
-
 	void Set(int m, int blend)
 	{
 		float blendFactor2[4];

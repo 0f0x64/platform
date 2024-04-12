@@ -78,6 +78,7 @@ namespace dx
 	namespace filter { enum { linear, point, minPoint_magLinear }; }
 	namespace addr { enum { clamp, wrap }; }
 	
+	#undef Texture
 	#define Texture(name,type,format,width,height,mip,depth) name,
 	namespace tex {
 		enum {

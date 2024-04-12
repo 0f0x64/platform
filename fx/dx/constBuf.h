@@ -3,33 +3,34 @@ namespace ConstBuf
 
 	ID3D11Buffer* buffer[6];
 
-#define constCount 32
+	#define constCount 32
 
-	//b0
-	XMFLOAT4 global[constCount];//update once on start
+	//b0 - use "params" label in shader
+	float drawerV[constCount];//update per draw call
 
-	//b1
+	//b1 - use "params" label in shader
+	float drawerP[constCount];//update per draw call
+
+	//b2
 	struct {
-		float time;
-	} frame;//update per frame
+		XMMATRIX model;
+	} drawerMat;//update per draw call
 
-	//b2 
+	//b3 
 	struct {
 		XMMATRIX world[2];
 		XMMATRIX view[2];
 		XMMATRIX proj[2];
 	} camera;//update per camera set
 
-	//b3 - use "params" label in shader
-	float drawerV[constCount];//update per draw call
-
-	//b4 - use "params" label in shader
-	float drawerP[constCount];//update per draw call
+	//b4
+	struct {
+		float time;
+	} frame;//update per frame
 
 	//b5
-	struct {
-		XMMATRIX model;
-	} drawerMat;//update per draw call
+	XMFLOAT4 global[constCount];//update once on start
+
 
 
 	int roundUp(int n, int r)
@@ -61,7 +62,6 @@ namespace ConstBuf
 		CreateCB(3, sizeof(camera));
 		CreateCB(4, sizeof(frame));
 		CreateCB(5, sizeof(global));
-
 	}
 
 		template <typename T>
