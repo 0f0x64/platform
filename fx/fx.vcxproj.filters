@@ -28,11 +28,11 @@
     <Filter Include="Source Files\projectFiles\shadersSource\ps">
       <UniqueIdentifier>{a5c9fc64-11cc-4e2e-ae8d-d51df701188e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\dx">
-      <UniqueIdentifier>{0f21f16a-86d3-4e2f-be72-eb8c8b1c31a3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\projectFiles\shadersSource\lib">
       <UniqueIdentifier>{7b41ce91-85a6-4bd9-938c-a7484811232a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dx11">
+      <UniqueIdentifier>{0f21f16a-86d3-4e2f-be72-eb8c8b1c31a3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -62,42 +62,6 @@
     <ClInclude Include="projectFiles\texList.h">
       <Filter>Source Files\projectFiles</Filter>
     </ClInclude>
-    <ClInclude Include="dx\dx.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
-    <ClInclude Include="dx\shaders.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
-    <ClInclude Include="dx\textures.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
-    <ClInclude Include="dx\blend.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
-    <ClInclude Include="dx\constBuf.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
-    <ClInclude Include="dx\camera.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
-    <ClInclude Include="dx\rasterizer.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
-    <ClInclude Include="dx\depth.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
-    <ClInclude Include="dx\sampler.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
-    <ClInclude Include="dx\device.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
-    <ClInclude Include="dx\IA.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
-    <ClInclude Include="dx\draw.h">
-      <Filter>Source Files\dx</Filter>
-    </ClInclude>
     <ClInclude Include="generated\psList.h">
       <Filter>Source Files\generated</Filter>
     </ClInclude>
@@ -112,6 +76,42 @@
     </ClInclude>
     <ClInclude Include="generated\processedShadersCompile.h">
       <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\blend.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\camera.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\constBuf.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\depth.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\device.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\draw.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\dx.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\IA.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\rasterizer.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\sampler.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\shaders.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\textures.h">
+      <Filter>Source Files\dx11</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -137,6 +137,9 @@
     </None>
     <None Include="projectFiles\shaders\lib\io.shader">
       <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\cubemapCreator.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
   </ItemGroup>
 </Project>

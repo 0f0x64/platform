@@ -12,7 +12,6 @@ namespace Shaders {
 	int vsCount = 0;
 	int psCount = 0;
 
-
 	typedef struct {
 		ID3D11VertexShader* pShader;
 		ID3DBlob* pBlob;
@@ -104,7 +103,7 @@ namespace Shaders {
 
 		}
 
-		void CreateShaders()
+		void Init()
 		{
 			vsCount = sizeof(vsList) / sizeof(const char*);
 			int i = 0;
@@ -144,7 +143,7 @@ namespace Shaders {
 		}
 
 		char* outText;
-		//---------
+
 		char* processIncludes(const char* shaderText)
 		{
 			if (!outText) outText = new char[64000];
@@ -240,34 +239,16 @@ namespace Shaders {
 
 		#include "..\generated\processedShadersCompile.h"
 
-		void CreateShaders()
-		{
-			CompileAll();
-		}
-
 	#endif
 
-	void Init()
+	void SetVS(int n)
 	{
-		CreateShaders();
+		context->VSSetShader(VS[n].pShader, NULL, 0);
 	}
 
-	//todo: check previously setted shader, same for IA, const, etc
-
-		void SetVS(int n)
-		{
-			context->VSSetShader(VS[n].pShader, NULL, 0);
-		}
-
-		void SetPS(int n)
-		{
-			context->PSSetShader(PS[n].pShader, NULL, 0);
-		}
-
-		void Set(int v, int p)
-		{
-			SetVS(v);
-			SetPS(p);
-		}
+	void SetPS(int n)
+	{
+		context->PSSetShader(PS[n].pShader, NULL, 0);
+	}
 
 }

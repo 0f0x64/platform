@@ -6,14 +6,23 @@ const char* meshOut = "#include<../lib/constBuf.shader>\n"
 "#include<../lib/io.shader>\n"
 "cbuffer params:register(b0)\n"
 "{\n"
-"float tone,x1,x2;\n"
+"float gX,gY;\n"
 "}\n"
-"VS_OUTPUT VS(uint V:SV_VertexID){VS_OUTPUT f=(VS_OUTPUT)0;float2 m[6]={-1,-1,1,-1,-1,1,1,-1,1,1,-1,1},b=m[V];float4 p=float4(b/4,0,1);p.xyz=lerp(p.xyz,p.xzy,tone);p=mul(p,view[0]);p=mul(p,proj[0]);f.pos=p;f.uv=b/2.+.5;return f;}\n"
+"VS_OUTPUT VS(uint g:SV_VertexID){VS_OUTPUT f=(VS_OUTPUT)0;float2 m[6]={-1,-1,1,-1,-1,1,1,-1,1,1,-1,1},b=m[g];float V=g/3%uint(gX),v=floor(g/3/uint(gX));V/=gX;v/=gY;b.x=V-.5;b.y=v-.5;float4 X=float4(b/4,0,1);X=mul(X,view[0]);X=mul(X,proj[0]);f.pos=X;f.uv=b/2.+.5;return f;}\n"
 ;
 
 const char* quad = "#include<../lib/constBuf.shader>\n"
 "#include<../lib/io.shader>\n"
-"VS_OUTPUT VS(uint V:SV_VertexID){VS_OUTPUT f=(VS_OUTPUT)0;float2 B[6]={-1,-1,1,-1,-1,1,1,-1,1,1,-1,1},b=B[V];f.pos=float4(b,0,1);f.uv=b/3.+.5;return f;}\n"
+"VS_OUTPUT VS(uint V:SV_VertexID){VS_OUTPUT f=(VS_OUTPUT)0;float2 B[6]={-1,-1,1,-1,-1,1,1,-1,1,1,-1,1},b=B[V];f.pos=float4(b,0,1);f.uv=b/2.+.5;return f;}\n"
+;
+
+const char* cubemapCreator = "#include<../lib/constBuf.shader>\n"
+"#include<../lib/io.shader>\n"
+"cbuffer params:register(b1)\n"
+"{\n"
+"float p;\n"
+"}\n"
+"struct PS_OUTPUT{float4 face0:SV_Target0;float4 face1:SV_Target1;float4 face2:SV_Target2;float4 face3:SV_Target3;float4 face4:SV_Target4;float4 face5:SV_Target5;};PS_OUTPUT PS(VS_OUTPUT f):SV_Target{float2 P=f.uv;float4 p=float4(P,0,1);PS_OUTPUT o;o.face0=p;o.face1=p;o.face2=p;o.face3=p;o.face4=p;o.face5=p;return o;}\n"
 ;
 
 const char* simpleFx = "#include<../lib/constBuf.shader>\n"
@@ -27,11 +36,11 @@ const char* simpleFx = "#include<../lib/constBuf.shader>\n"
 
 const char* simpleTex = "#include<../lib/constBuf.shader>\n"
 "#include<../lib/io.shader>\n"
-"Texture2D tex1:register(t0),tex2:register(t1);SamplerState sam1:register(s0);cbuffer params:register(b1)\n"
+"TextureCube env:register(t0);Texture2D tex2:register(t1);SamplerState sam1:register(s0);cbuffer params:register(b1)\n"
 "{\n"
 "float mix;\n"
 "}\n"
-"float4 PS(VS_OUTPUT t):SV_Target{float2 f=t.uv;f.y-=2;float4 s=tex1.Sample(sam1,f),m=tex2.Sample(sam1,f);return lerp(s,m,mix);}\n"
+"float4 PS(VS_OUTPUT e):SV_Target{float2 s=e.uv;return env.SampleLevel(sam1,normalize(float3((s-.5)*2,1)),0);}\n"
 ;
 
 const char* constBuf = "cbuffer global:register(b5)\n"

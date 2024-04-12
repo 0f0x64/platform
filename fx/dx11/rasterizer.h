@@ -27,4 +27,9 @@ namespace Rasterizer
 		context->RSSetState(rasterState[0]);
 	}
 
+	void SetCull(int i)
+	{
+		context->RSSetState(rasterState[i]);
+	}
+
 }

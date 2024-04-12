@@ -13,7 +13,7 @@ static inline int32 log2(float x)
 
 using namespace DirectX;
 
-namespace dx
+namespace dx11
 {
 
 	#if DebugMode
@@ -70,6 +70,9 @@ namespace dx
 		void clear(float r, float g, float b, float a) { Draw::Clear(r, g, b, a); }
 		void clearDepth() { Draw::ClearDepth(); }
 		void blend(int mode, int op) { Blend::Set(mode, op); }
+		void cull(int i) { Rasterizer::SetCull(i); }
+		void copyColor(int dst, int src) { Textures::CopyColor(dst, src); }
+		void copyDepth(int dst, int src) { Textures::CopyDepth(dst, src); }
 	} api;
 
 	namespace blendmode { enum { off, on, alpha }; }
@@ -77,6 +80,7 @@ namespace dx
 	namespace depthmode { enum { off, on, readonly, writeonly }; }
 	namespace filter { enum { linear, point, minPoint_magLinear }; }
 	namespace addr { enum { clamp, wrap }; }
+	namespace cullmode { enum { off, front, back }; }
 	
 	#undef Texture
 	#define Texture(name,type,format,width,height,mip,depth) name,

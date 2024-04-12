@@ -4,9 +4,8 @@ struct {
 
 struct 
 {
-float tone;
-float x1;
-float x2;
+float gX;
+float gY;
 } params;
 
 void set () {
@@ -16,7 +15,9 @@ memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 
 } meshOut;
 
-}namespace vs{
+}
+
+namespace vs{
 
 struct { 
 
@@ -26,7 +27,27 @@ Shaders::SetVS(1);
 
 } quad;
 
-}namespace ps{
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+float p;
+} params;
+
+void set () {
+Shaders::SetPS(0);
+memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+}
+
+} cubemapCreator;
+
+}
+
+namespace ps{
 
 struct { 
 
@@ -38,13 +59,15 @@ float b;
 } params;
 
 void set () {
-Shaders::SetPS(0);
+Shaders::SetPS(1);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
 } simpleFx;
 
-}namespace ps{
+}
+
+namespace ps{
 
 struct { 
 
@@ -55,7 +78,7 @@ float mix;
 
 struct 
 {
-int tex1;
+int env;
 int tex2;
 } textures;
 
@@ -67,9 +90,9 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetPS(1);
+Shaders::SetPS(2);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
-Textures::SetTexture(textures.tex1, 0, Textures::tAssignType::pixel); 
+Textures::SetTexture(textures.env, 0, Textures::tAssignType::pixel); 
 Textures::SetTexture(textures.tex2, 1, Textures::tAssignType::pixel); 
 Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
@@ -77,3 +100,4 @@ Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, 
 } simpleTex;
 
 }
+

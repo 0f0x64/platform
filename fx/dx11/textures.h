@@ -13,6 +13,8 @@ namespace Textures
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV;
 
+	ID3D11RenderTargetView* mrtView[8];
+
 	typedef struct {
 		ID3D11Texture2D* pTexture;
 		ID3D11ShaderResourceView* TextureResView;
@@ -224,35 +226,47 @@ namespace Textures
 		context->RSSetViewports(1, &vp);
 	}
 
+	void CopyColor(int dst, int src)
+	{
+		context->CopyResource(texture[dst].pTexture, texture[src].pTexture);
+	}
+
+	void CopyDepth(int dst, int src)
+	{
+		context->CopyResource(texture[dst].pDepth, texture[src].pDepth);
+	}
+
 	enum tAssignType { vertex, pixel, both };
 
-		void SetTexture(byte tex, byte slot, tAssignType tA = tAssignType::both)
+	void SetTexture(byte tex, byte slot, tAssignType tA = tAssignType::both)
+	{
+		if (tA == tAssignType::both || tA == tAssignType::vertex)
 		{
-			if (tA == tAssignType::both || tA == tAssignType::vertex)
-			{
-				context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
-			}
-
-			if (tA == tAssignType::both || tA == tAssignType::pixel)
-			{
-				context->PSSetShaderResources(slot, 1, &texture[tex].TextureResView);
-			}
+			context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
 		}
 
-		void CreateMipMap()
+		if (tA == tAssignType::both || tA == tAssignType::pixel)
 		{
-			context->GenerateMips(texture[currentRT].TextureResView);
+			context->PSSetShaderResources(slot, 1, &texture[tex].TextureResView);
 		}
+	}
+
+	void CreateMipMap()
+	{
+		context->GenerateMips(texture[currentRT].TextureResView);
+	}
 
 
-		void SetRT(byte texId = mainRTIndex, byte level = 0)
-			{
-				currentRT = texId;
-				
-				auto depthStencil = texture[texId].depth ? texture[texId].DepthStencilView[0] : 0;
-				context->OMSetRenderTargets(1, &texture[texId].RenderTargetView[0][0], depthStencil);
-				SetViewport(texId, level);
-			}
+	void SetRT(byte texId = mainRTIndex, byte level = 0)
+		{
+			currentRT = texId;
+			
+			int count = texture[texId].type == tType::cube ? 6 : 1;
+
+			auto depthStencil = texture[texId].depth ? texture[texId].DepthStencilView[0] : 0;
+			context->OMSetRenderTargets(count, &texture[texId].RenderTargetView[0][0], depthStencil);
+			SetViewport(texId, level);
+		}
 
 	
 

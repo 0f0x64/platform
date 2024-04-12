@@ -1,7 +1,6 @@
-copy texture
-scirrors?
 cube texture
 mrt set
+
 compare sampler support
 camera interface (from-to interpolation)
 

@@ -37,7 +37,7 @@ namespace Sampler
 				{
 					sampDesc.AddressU = address[u];
 					sampDesc.AddressV = address[v];
-					HRESULT h = dx::device->CreateSamplerState(&sampDesc, &pSampler[f][u][v]);
+					HRESULT h = device->CreateSamplerState(&sampDesc, &pSampler[f][u][v]);
 				}
 			}
 		}
@@ -47,7 +47,7 @@ namespace Sampler
 		for (int x = 0; x < 4; x++) sampDesc.BorderColor[x] = 0;
 		sampDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
 		sampDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
-		dx::device->CreateSamplerState(&sampDesc, &pSamplerComp);
+		device->CreateSamplerState(&sampDesc, &pSamplerComp);
 
 	}
 
@@ -59,7 +59,7 @@ namespace Sampler
 		if (shader == pixel) context->PSSetSamplers(slot, 1, &pSampler[filter][addressU][addressV]);
 	}
 
-	void SetComp(byte slot)
+	void SetComp(int slot)
 	{
 		context->PSSetSamplers(slot, 1, &pSamplerComp);
 	}

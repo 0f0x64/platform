@@ -415,18 +415,18 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="dx\blend.h" />
-    <ClInclude Include="dx\camera.h" />
-    <ClInclude Include="dx\constBuf.h" />
-    <ClInclude Include="dx\depth.h" />
-    <ClInclude Include="dx\device.h" />
-    <ClInclude Include="dx\draw.h" />
-    <ClInclude Include="dx\dx.h" />
-    <ClInclude Include="dx\IA.h" />
-    <ClInclude Include="dx\rasterizer.h" />
-    <ClInclude Include="dx\sampler.h" />
-    <ClInclude Include="dx\shaders.h" />
-    <ClInclude Include="dx\textures.h" />
+    <ClInclude Include="dx11\blend.h" />
+    <ClInclude Include="dx11\camera.h" />
+    <ClInclude Include="dx11\constBuf.h" />
+    <ClInclude Include="dx11\depth.h" />
+    <ClInclude Include="dx11\device.h" />
+    <ClInclude Include="dx11\draw.h" />
+    <ClInclude Include="dx11\dx.h" />
+    <ClInclude Include="dx11\IA.h" />
+    <ClInclude Include="dx11\rasterizer.h" />
+    <ClInclude Include="dx11\sampler.h" />
+    <ClInclude Include="dx11\shaders.h" />
+    <ClInclude Include="dx11\textures.h" />
     <ClInclude Include="editor.h" />
     <ClInclude Include="generated\constBufReflect.h" />
     <ClInclude Include="generated\libList.h" />
@@ -443,6 +443,7 @@
   <ItemGroup>
     <None Include="projectFiles\shaders\lib\constBuf.shader" />
     <None Include="projectFiles\shaders\lib\io.shader" />
+    <None Include="projectFiles\shaders\ps\cubemapCreator.shader" />
     <None Include="projectFiles\shaders\ps\simpleFx.shader">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ExcludedFromBuild>

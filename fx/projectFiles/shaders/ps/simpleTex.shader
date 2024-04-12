@@ -1,7 +1,7 @@
 #include <../lib/constBuf.shader>
 #include <../lib/io.shader>
 
-Texture2D tex1 : register(t0);
+TextureCube env : register(t0);
 Texture2D tex2 : register(t1);
 
 SamplerState sam1 : register(s0);
@@ -17,11 +17,9 @@ float4 PS(VS_OUTPUT input) : SV_Target
 {
      
     float2 uv = input.uv;
-    uv.y -= 2;
-    float4 color1 = tex1.Sample(sam1, uv);
-    float4 color2 = tex2.Sample(sam1, uv);
-
-    float4 color = lerp(color1,color2,mix);
     
+    float4 color = env.SampleLevel(sam1, float4(normalize(input.wpos.xyz),0), 0);
+   
+   
     return color;
 }

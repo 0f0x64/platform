@@ -47,11 +47,6 @@ namespace Depth
 		device->CreateDepthStencilState(&dsDesc, &pDSState[3]);//write
 	}
 
-	enum mode {
-		off, on, readonly, writeonly
-	};
-	
-
 	void Set(int m)
 	{
 		context->OMSetDepthStencilState(pDSState[m], 1);

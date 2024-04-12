@@ -1,3 +1,5 @@
+using namespace dx11;
+
 #include <libloaderapi.h>
 #include <shlwapi.h>
 #pragma comment(lib, "Shlwapi.lib")
@@ -35,8 +37,8 @@ namespace editor
 					SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) & (~WS_CAPTION));//no header
 					ShowWindow(hWnd, SW_MAXIMIZE);
 
-					dx::width = dm.dmPelsWidth;
-					dx::height = dm.dmPelsHeight;
+					width = dm.dmPelsWidth;
+					height = dm.dmPelsHeight;
 
 					return;
 				}
@@ -51,8 +53,8 @@ namespace editor
 					int h = (rc.bottom - rc.top) / MAIN_DISPLAY_DENOMINATOR;
 					SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, w, h, SWP_NOMOVE);//window on top
 
-					dx::width = dm.dmPelsWidth;
-					dx::height = dm.dmPelsHeight;
+					width = dm.dmPelsWidth;
+					height = dm.dmPelsHeight;
 
 					return;
 				}
@@ -81,15 +83,14 @@ namespace editor
 
 	void WatchFiles()
 	{
-		using namespace dx;
 
-		int shaderExtensionLen = strlen(dx::Shaders::shaderExtension);
+		int shaderExtensionLen = strlen(Shaders::shaderExtension);
 
 		if (!isWatching)//init
 		{
-			dx::Log("watching for changes: ");
-			dx::Log(shadersPath);
-			dx::Log("\n");
+			Log("watching for changes: ");
+			Log(shadersPath);
+			Log("\n");
 
 			file = CreateFile(shadersPath,
 				FILE_LIST_DIRECTORY,
@@ -199,7 +200,7 @@ namespace editor
 
 							if (s2[0] == 'l')
 							{
-								Shaders::CreateShaders();
+								Shaders::Init();
 							}
 
 						}

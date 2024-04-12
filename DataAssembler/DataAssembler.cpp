@@ -226,7 +226,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 	string inFilePath = inPath + shaderName + shaderExtension;
 	ifstream in(inFilePath);
 
-	string t2d = "Texture2D ";
+	string tt[2];
 	string smp = "SamplerState ";
 	string cb = "cbuffer ";
 	string cbName = "params";
@@ -253,29 +253,37 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 		string s;
 		while (getline(in, s))
 		{
-			auto res = s.find(t2d);
-			if (found)
+			tt[0] = "Texture2D ";
+			tt[1] = "TextureCube ";
+
+			unsigned int res;
+
+			for (int t = 0; t < 2;t++)
 			{
-				isTextures = true;
-				string name = "";
-				auto nameStart = s.find_first_not_of(" ", t2d.length());
-				unsigned int i = nameStart;
-
-				while (i < s.length())
+				res = s.find(tt[t]);
+				if (found)
 				{
-					if (s.at(i) == ' ' || s.at(i) == ':') break;
-					name.push_back(s.at(i));
-					i++;
+					isTextures = true;
+					string name = "";
+					auto nameStart = s.find_first_not_of(" ", tt[t].length());
+					unsigned int i = nameStart;
+
+					while (i < s.length())
+					{
+						if (s.at(i) == ' ' || s.at(i) == ':') break;
+						name.push_back(s.at(i));
+						i++;
+					}
+
+					textures += "int " + name + ";\n";
+
+					texturesSet += "Textures::SetTexture(textures." + name + ", " + to_string(texturesCounter) + ", ";
+					if (type == sType::vertex) texturesSet += "Textures::tAssignType::vertex";
+					if (type == sType::pixel) texturesSet += "Textures::tAssignType::pixel";
+					texturesSet += "); \n";
+					texturesCounter++;
+
 				}
-
-				textures += "int " + name + ";\n";
-
-				texturesSet = texturesSet + "Textures::SetTexture(textures." + name + ", " + to_string(texturesCounter)+ ", ";
-				if (sIndex == sType::vertex) texturesSet += "Textures::tAssignType::vertex";
-				if (sIndex == sType::pixel) texturesSet += "Textures::tAssignType::pixel";
-				texturesSet +="); \n";
-				texturesCounter++;
-
 			}
 
 			res = s.find(smp);
@@ -294,8 +302,8 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 				samplers += "int " + name + "Filter;\n" + "int " + name + "AddressU;\n" + "int " + name + "AddressV;\n";
 
-				if (sIndex == sType::vertex) samplersSet += "Sampler::Set(Sampler::to::vertex, ";
-				if (sIndex == sType::pixel) samplersSet += "Sampler::Set(Sampler::to::pixel, ";
+				if (type == sType::vertex) samplersSet += "Sampler::Set(Sampler::to::vertex, ";
+				if (type == sType::pixel) samplersSet += "Sampler::Set(Sampler::to::pixel, ";
 				samplersSet += to_string(samplersCounter) + ", " + "samplers." + name + "Filter, " + "samplers." + name + "AddressU, " + "samplers." + name + "AddressV"+ "); \n";
 				samplersCounter++;
 			}
@@ -403,7 +411,8 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 	ofile << "}\n";
 
 	ofile << "\n} " << shaderName << ";\n\n";
-	ofile << "}";
+	ofile << "}\n\n";
+
 }
 
 int vShadersCount = 0;
@@ -505,7 +514,7 @@ int main()
 	remove(shaderCompilerFile.c_str());
 	ofstream oSCfile(shaderCompilerFile);
 
-	oSCfile << "void CompileAll ()\n" << "{\n";
+	oSCfile << "void Init ()\n" << "{\n\n";
 
 	i = 0;
 	while (i < vShadersCount)
@@ -519,7 +528,7 @@ int main()
 		oSCfile << "CreatePS (" << i << ", shadersData::" << psList[i] << ");\n";	i++;
 	}
 
-	oSCfile << "\n\n};";
+	oSCfile << "\n};";
 
 	oSCfile.close();
 

@@ -4,31 +4,31 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #define WINDOWS_IGNORE_PACKING_MISMATCH
-
 #include <windows.h>
-
 HINSTANCE hInst;
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 HWND hWnd;
 
-// gfx & sound
-
 #include <math.h>
 #include "timer.h"
+
+// gfx 
 
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include "DirectXMath.h"
 #include <DirectXPackedVector.h>
-#include "dx\dx.h"
+#include "dx11\dx.h"
+
+// sound
 
 #include <Xaudio2.h>
+
+using namespace dx11;
 
 #if EditMode
 	#include "editor.h"
 #endif
-
-// --------------
 
 #include "projectFiles\loop.h"
 
@@ -38,8 +38,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetProcessDPIAware();
 	hInst = (HINSTANCE)GetModuleHandle(0);
 
-	dx::width = GetSystemMetrics(SM_CXSCREEN);
-	dx::height = GetSystemMetrics(SM_CYSCREEN);
+	width = GetSystemMetrics(SM_CXSCREEN);
+	height = GetSystemMetrics(SM_CYSCREEN);
 
 	HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW),brush, NULL, "fx", NULL };
@@ -55,7 +55,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		editor::Init();
 	#endif	
 
-	dx::Init();
+	Init();
 
 	MSG msg = { 0 };
 

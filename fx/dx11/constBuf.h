@@ -31,8 +31,6 @@ namespace ConstBuf
 	//b5
 	XMFLOAT4 global[constCount];//update once on start
 
-
-
 	int roundUp(int n, int r)
 	{
 		return 	n - (n % r) + r;
@@ -75,10 +73,9 @@ namespace ConstBuf
 			context->UpdateSubresource(buffer[4], 0, NULL, &frame, 0, 0);
 		}
 
-		void SetVP(int i)
+		void UpdateCamera()
 		{
-			context->VSSetConstantBuffers(i, 1, &buffer[i]);
-			context->PSSetConstantBuffers(i, 1, &buffer[i]);
+			context->UpdateSubresource(ConstBuf::buffer[3], 0, NULL, &camera, 0, 0);
 		}
 
 		void SetV(int i)
