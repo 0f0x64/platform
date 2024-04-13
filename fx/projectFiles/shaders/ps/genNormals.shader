@@ -14,19 +14,12 @@ float4 PS(VS_OUTPUT input) : SV_Target
     sgY *= a;
     sgX *= a;
     float2 uv = input.uv;
-    uv.y = 1 - uv.y;
 
     float4 pt0 = geo.Sample(sam1, uv + float2(-1. / sgX, 0));
     float4 pt1 = geo.Sample(sam1, uv + float2(1. / sgX, 0));
     float4 pt2 = geo.Sample(sam1, uv + float2(0, -1. / sgY));
     float4 pt3 = geo.Sample(sam1, uv + float2(0, 1. / sgY));
     float3 n = normalize(cross(pt0.xyz - pt1.xyz, pt2.xyz - pt3.xyz));
-
-    //float3 n = normalize(pos1 - pos);
-    
-   // n.xz *= -1;
-    
-
     
     float3 color = n;
     return float4(color, 1);

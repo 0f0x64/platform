@@ -24,15 +24,19 @@ PS_OUTPUT PS(VS_OUTPUT input)
 {
 
     float2 uv = input.uv;
-    float4 color = float4(uv,0,1);
+    float4 color = 1;//    float4(uv, 0, 1);
 
     PS_OUTPUT cube;
-    color.xyz = saturate((sin(uv.x * 32) * sin(uv.y * 32 )) * 100).xxx;
-    cube.c0 = color * float4(0, 0, 1 ,1);
-    cube.c1 = color * float4(0, 1, 0, 1);
-    cube.c2 = color * float4(0, 1, 1, 1);
-    cube.c3 = color * float4(1, 0, 0, 1);
-    cube.c4 = color * float4(1, 0, 1, 1);
-    cube.c5 = color * float4(1, 1, 0, 1);
+    float a = PI*4;
+    float walls = saturate(1 - 2 * length(uv - .5));
+    color.xyz = saturate(-sign(max(sin(uv.x * a), sin(uv.y * a))));
+    cube.c0 = walls * float4(0, 0, 1 ,1);
+    cube.c1 = walls * float4(0, 1, 0, 1);
+    float top = saturate(-sign(max(sin(uv.x * a), sin(uv.y * a)))) * 12;
+    cube.c2 = top;
+    float floor = saturate(-sign((sin(uv.x * a * 4) * sin(uv.y * a * 4)))) * (1 - length(uv - .5)*2);
+    cube.c3 = float4(.5, .5, .35, 1)*floor;
+    cube.c4 = walls * float4(1, 0, 0, 1);
+    cube.c5 = walls * float4(1, 0, 1, 1);
     return cube;
 }

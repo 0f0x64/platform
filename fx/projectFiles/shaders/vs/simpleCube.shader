@@ -30,7 +30,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     float3 pos = float3(sin(a.x), sin(a.y / 2), cos(a.x));
     pos.xz *= cos(a.y / 2);
     pos = rotY(pos, 45 * PI / 180.);
-    pos = clamp(pos, -.5, .5)*5;
+    pos = clamp(pos, -.5, .5)*6;
 
     //---
     output.wpos = float4(pos, 0);
