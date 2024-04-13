@@ -8,12 +8,28 @@ float gX;
 float gY;
 } params;
 
+struct 
+{
+int positions;
+int normals;
+} textures;
+
+struct 
+{
+int sam1Filter;
+int sam1AddressU;
+int sam1AddressV;
+} samplers;
+
 void set () {
 Shaders::SetVS(0);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
+Textures::SetTexture(textures.positions, 0, Textures::tAssignType::vertex); 
+Textures::SetTexture(textures.normals, 1, Textures::tAssignType::vertex); 
+Sampler::Set(Sampler::to::vertex, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
-} meshOut;
+} objViewer;
 
 }
 
@@ -29,6 +45,55 @@ Shaders::SetVS(1);
 
 }
 
+namespace vs{
+
+struct { 
+
+struct 
+{
+float gX;
+float gY;
+} params;
+
+void set () {
+Shaders::SetVS(2);
+memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
+}
+
+} simpleCube;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+int env;
+int normals;
+int albedo;
+} textures;
+
+struct 
+{
+int sam1Filter;
+int sam1AddressU;
+int sam1AddressV;
+} samplers;
+
+void set () {
+Shaders::SetPS(0);
+Textures::SetTexture(textures.env, 0, Textures::tAssignType::pixel); 
+Textures::SetTexture(textures.normals, 1, Textures::tAssignType::pixel); 
+Textures::SetTexture(textures.albedo, 2, Textures::tAssignType::pixel); 
+Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+}
+
+} basic;
+
+}
+
 namespace ps{
 
 struct { 
@@ -39,11 +104,83 @@ float p;
 } params;
 
 void set () {
-Shaders::SetPS(0);
+Shaders::SetPS(1);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
 } cubemapCreator;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+int env;
+} textures;
+
+struct 
+{
+int sam1Filter;
+int sam1AddressU;
+int sam1AddressV;
+} samplers;
+
+void set () {
+Shaders::SetPS(2);
+Textures::SetTexture(textures.env, 0, Textures::tAssignType::pixel); 
+Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+}
+
+} cubeMapViewer;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+int geo;
+} textures;
+
+struct 
+{
+int sam1Filter;
+int sam1AddressU;
+int sam1AddressV;
+} samplers;
+
+void set () {
+Shaders::SetPS(3);
+Textures::SetTexture(textures.geo, 0, Textures::tAssignType::pixel); 
+Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+}
+
+} genNormals;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+float sx;
+float sy;
+float sz;
+} params;
+
+void set () {
+Shaders::SetPS(4);
+memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+}
+
+} obj1;
 
 }
 
@@ -59,45 +196,11 @@ float b;
 } params;
 
 void set () {
-Shaders::SetPS(1);
+Shaders::SetPS(5);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
 } simpleFx;
-
-}
-
-namespace ps{
-
-struct { 
-
-struct 
-{
-float mix;
-} params;
-
-struct 
-{
-int env;
-int tex2;
-} textures;
-
-struct 
-{
-int sam1Filter;
-int sam1AddressU;
-int sam1AddressV;
-} samplers;
-
-void set () {
-Shaders::SetPS(2);
-memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
-Textures::SetTexture(textures.env, 0, Textures::tAssignType::pixel); 
-Textures::SetTexture(textures.tex2, 1, Textures::tAssignType::pixel); 
-Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
-}
-
-} simpleTex;
 
 }
 

@@ -258,15 +258,23 @@ namespace Textures
 
 
 	void SetRT(byte texId = mainRTIndex, byte level = 0)
-		{
-			currentRT = texId;
-			
-			int count = texture[texId].type == tType::cube ? 6 : 1;
+	{
+		currentRT = texId;
+		
+		auto depthStencil = texture[texId].depth ? texture[texId].DepthStencilView[0] : 0;
 
-			auto depthStencil = texture[texId].depth ? texture[texId].DepthStencilView[0] : 0;
-			context->OMSetRenderTargets(count, &texture[texId].RenderTargetView[0][0], depthStencil);
-			SetViewport(texId, level);
+		if (texture[texId].type == tType::flat)
+		{
+			context->OMSetRenderTargets(1, &texture[texId].RenderTargetView[0][0], depthStencil);
 		}
+
+		if (texture[texId].type == tType::cube)
+		{
+			context->OMSetRenderTargets(6, &texture[texId].RenderTargetView[0][0], 0);
+		}
+
+		SetViewport(texId, level);
+	}
 
 	
 

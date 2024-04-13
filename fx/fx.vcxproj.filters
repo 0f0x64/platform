@@ -56,9 +56,6 @@
     <ClInclude Include="generated\processedShaders.h">
       <Filter>Source Files\generated</Filter>
     </ClInclude>
-    <ClInclude Include="shadersReflection.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="projectFiles\texList.h">
       <Filter>Source Files\projectFiles</Filter>
     </ClInclude>
@@ -113,6 +110,9 @@
     <ClInclude Include="dx11\textures.h">
       <Filter>Source Files\dx11</Filter>
     </ClInclude>
+    <ClInclude Include="dx11\shadersReflection.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">
@@ -126,10 +126,10 @@
     <None Include="projectFiles\shaders\vs\quad.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
-    <None Include="projectFiles\shaders\vs\meshOut.shader">
+    <None Include="projectFiles\shaders\vs\simpleCube.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
-    <None Include="projectFiles\shaders\ps\simpleTex.shader">
+    <None Include="projectFiles\shaders\ps\cubeMapViewer.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
     <None Include="projectFiles\shaders\lib\constBuf.shader">
@@ -139,6 +139,24 @@
       <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
     </None>
     <None Include="projectFiles\shaders\ps\cubemapCreator.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\obj1.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\constants.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\objViewer.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\utils.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\basic.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\genNormals.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
   </ItemGroup>

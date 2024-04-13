@@ -426,6 +426,7 @@
     <ClInclude Include="dx11\rasterizer.h" />
     <ClInclude Include="dx11\sampler.h" />
     <ClInclude Include="dx11\shaders.h" />
+    <ClInclude Include="dx11\shadersReflection.h" />
     <ClInclude Include="dx11\textures.h" />
     <ClInclude Include="editor.h" />
     <ClInclude Include="generated\constBufReflect.h" />
@@ -437,22 +438,27 @@
     <ClInclude Include="projectFiles\loop.h" />
     <ClInclude Include="projectFiles\texList.h" />
     <ClInclude Include="settings.h" />
-    <ClInclude Include="shadersReflection.h" />
     <ClInclude Include="timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="projectFiles\shaders\lib\constants.shader" />
     <None Include="projectFiles\shaders\lib\constBuf.shader" />
     <None Include="projectFiles\shaders\lib\io.shader" />
+    <None Include="projectFiles\shaders\lib\utils.shader" />
+    <None Include="projectFiles\shaders\ps\basic.shader" />
     <None Include="projectFiles\shaders\ps\cubemapCreator.shader" />
+    <None Include="projectFiles\shaders\ps\genNormals.shader" />
+    <None Include="projectFiles\shaders\ps\obj1.shader" />
     <None Include="projectFiles\shaders\ps\simpleFx.shader">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </DeploymentContent>
     </None>
-    <None Include="projectFiles\shaders\ps\simpleTex.shader" />
+    <None Include="projectFiles\shaders\ps\cubeMapViewer.shader" />
+    <None Include="projectFiles\shaders\vs\objViewer.shader" />
     <None Include="projectFiles\shaders\vs\quad.shader" />
-    <None Include="projectFiles\shaders\vs\meshOut.shader" />
+    <None Include="projectFiles\shaders\vs\simpleCube.shader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

@@ -1,3 +1,6 @@
+Shader(basic)
 Shader(cubemapCreator)
+Shader(cubeMapViewer)
+Shader(genNormals)
+Shader(obj1)
 Shader(simpleFx)
-Shader(simpleTex)

@@ -16,19 +16,17 @@ namespace Blend
 
 	void Init()
 	{
+		ZeroMemory(&bSDesc, sizeof(D3D11_BLEND_DESC));
 		//all additional rt's without alphablend
-		for (int x = 1; x < 8; x++)
+		for (int x = 0; x < 8; x++)
 		{
 			bSDesc.RenderTarget[x].BlendEnable = false;
+			bSDesc.RenderTarget[x].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		}
 
-		ZeroMemory(&bSDesc, sizeof(D3D11_BLEND_DESC));
-		bSDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		bSDesc.AlphaToCoverageEnable = false;
 		bSDesc.IndependentBlendEnable = true;
 
-
-		bSDesc.RenderTarget[0].BlendEnable = FALSE;
 		CreateMixStates(0);
 
 		bSDesc.RenderTarget[0].BlendEnable = TRUE;

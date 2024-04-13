@@ -4,4 +4,4 @@ TextureCube env:register(t0);Texture2D tex2:register(t1);SamplerState sam1:regis
 {
 float mix;
 }
-float4 PS(VS_OUTPUT e):SV_Target{float2 s=e.uv;return env.SampleLevel(sam1,normalize(float3((s-.5)*2,1)),0);}
+float4 PS(VS_OUTPUT s):SV_Target{float2 e=s.uv;return env.SampleLevel(sam1,float4(normalize(s.wpos.xyz),0),0);}

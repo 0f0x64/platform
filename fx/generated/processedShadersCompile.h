@@ -1,10 +1,14 @@
 void Init ()
 {
 
-CreateVS (0, shadersData::meshOut);
+CreateVS (0, shadersData::objViewer);
 CreateVS (1, shadersData::quad);
-CreatePS (0, shadersData::cubemapCreator);
-CreatePS (1, shadersData::simpleFx);
-CreatePS (2, shadersData::simpleTex);
+CreateVS (2, shadersData::simpleCube);
+CreatePS (0, shadersData::basic);
+CreatePS (1, shadersData::cubemapCreator);
+CreatePS (2, shadersData::cubeMapViewer);
+CreatePS (3, shadersData::genNormals);
+CreatePS (4, shadersData::obj1);
+CreatePS (5, shadersData::simpleFx);
 
 };

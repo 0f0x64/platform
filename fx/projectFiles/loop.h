@@ -81,46 +81,99 @@ namespace Loop
 		api.draw(1, 1);
 	}
 	*/
-	void ShowCube()
+	void ShowCubemap()
 	{
 		api.blend(blendmode::off, blendop::add);
-		api.cull(cullmode::off);
+		api.cull(cullmode::back);
 		api.rt(tex::mainRT);
 		api.cam();
 		api.depth(depthmode::on);
 		api.clear(0.2f, 0.2f, 0.2f, 1.f);
 		api.clearDepth();
 
-		vs::meshOut.set();
-
-		ps::simpleTex.textures.env = tex::env;
-		ps::simpleTex.params.mix = 0;
-		ps::simpleTex.set();
-
-		ps::simpleTex.samplers.sam1Filter = filter::linear;
-		ps::simpleTex.samplers.sam1AddressU = addr::wrap;
-		ps::simpleTex.samplers.sam1AddressV = addr::wrap;
-
-		ps::simpleTex.set();
-		float gX = 4;
-		float gY = 4;
-		vs::meshOut.params.gX = gX;
-		vs::meshOut.params.gY = gY;
+		ps::cubeMapViewer.textures.env = tex::env;
+		ps::cubeMapViewer.samplers.sam1Filter = filter::linear;
+		ps::cubeMapViewer.samplers.sam1AddressU = addr::wrap;
+		ps::cubeMapViewer.samplers.sam1AddressV = addr::wrap;
+		ps::cubeMapViewer.set();
+		int gX = 4;
+		int gY = 3;
+		vs::simpleCube.params.gX = (float)gX;
+		vs::simpleCube.params.gY = (float)gY;
+		vs::simpleCube.set();
 		api.draw(1, gX*gY);
 
 	}
 
+	void ShowObject()
+	{
+		api.blend(blendmode::off, blendop::add);
+		api.cull(cullmode::back);
+		api.rt(tex::mainRT);
+		api.cam();
+		api.depth(depthmode::on);
+
+		float gX = Textures::texture[tex::obj1pos].size.x;
+		float gY = Textures::texture[tex::obj1pos].size.y;
+		vs::objViewer.textures.positions = tex::obj1pos;
+		vs::objViewer.samplers.sam1Filter = filter::linear;
+		vs::objViewer.samplers.sam1AddressU = addr::wrap;
+		vs::objViewer.samplers.sam1AddressV = addr::wrap;
+		vs::objViewer.params.gX = (float)gX;
+		vs::objViewer.params.gY = (float)gY;
+		vs::objViewer.set();
+
+		ps::basic.textures.env = tex::env;
+		ps::basic.textures.normals = tex::obj1nrml;
+		ps::basic.samplers.sam1Filter = filter::linear;
+		ps::basic.samplers.sam1AddressU = addr::wrap;
+		ps::basic.samplers.sam1AddressV = addr::wrap;
+		ps::basic.set();
+		api.draw(1, (int)gX * (int)gY);
+	}
+
 	void CalcCubemap()
 	{
-		api.cull(cullmode::off);
+		api.blend(blendmode::off, blendop::add);
 		api.rt(tex::env);
+		api.cull(cullmode::off);
 		api.depth(depthmode::off);
+		api.clearDepth();
+		api.clear(sin(timer::GetCounter()*.01), 0, 0, 1);
 
 		vs::quad.set();
 		ps::cubemapCreator.set();
 		api.draw(1, 1);
 		api.mips();
 	}
+
+	void CalcObject()
+	{
+		api.blend(blendmode::off, blendop::add);
+		api.cull(cullmode::off);
+		api.rt(tex::obj1pos);
+		api.depth(depthmode::off);
+
+		//pos
+		vs::quad.set();
+		ps::obj1.set();
+		api.draw(1, 1);
+		api.mips();
+
+		//normals
+		api.rt(tex::obj1nrml);
+		vs::quad.set();
+
+		ps::genNormals.samplers.sam1Filter = filter::linear;
+		ps::genNormals.samplers.sam1AddressU = addr::wrap;
+		ps::genNormals.samplers.sam1AddressV = addr::wrap;
+
+		ps::genNormals.textures.geo = tex::obj1pos;
+		ps::genNormals.set();
+		api.draw(1, 1);
+		api.mips();
+	}
+
 
 	void mainLoop()
 	{
@@ -129,7 +182,11 @@ namespace Loop
 		if (!isPrecalc) Precalc();
 
 		CalcCubemap();
-		ShowCube();
+
+		CalcObject();
+
+		ShowCubemap();
+		ShowObject();
 
 		Textures::UnbindAll();
 		Draw::Present();
