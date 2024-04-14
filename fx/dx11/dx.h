@@ -73,6 +73,7 @@ namespace dx11
 		void cull(int i) { Rasterizer::SetCull(i); }
 		void copyColor(int dst, int src) { Textures::CopyColor(dst, src); }
 		void copyDepth(int dst, int src) { Textures::CopyDepth(dst, src); }
+		void present() { Draw::Present(); }
 	} api;
 
 	namespace blendmode { enum { off, on, alpha }; }

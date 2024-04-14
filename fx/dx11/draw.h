@@ -23,6 +23,7 @@ namespace Draw
 
 	void Present()
 	{
+		Textures::UnbindAll();
 		swapChain->Present(1, 0);
 	}
 

@@ -3,7 +3,7 @@ namespace Camera
 	void Set()
 	{
 		float t = (float)(timer::frameBeginTime * .0002);
-		XMVECTOR Eye = XMVectorSet(sinf(t)*2, sin(t*.5), cosf(t)*2, 0.0f)*(1+sin(t)*.25);
+		XMVECTOR Eye = XMVectorSet(sinf(t)*2.f, sinf(t*.5f), cosf(t)*2.f, 0.0f)*(1.f+sinf(t)*.25f);
 		XMVECTOR At = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 		XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 

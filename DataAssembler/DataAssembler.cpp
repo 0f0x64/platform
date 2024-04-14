@@ -441,9 +441,9 @@ int main()
 {
 	SelfLocate();
 
-	const std::filesystem::path vsSandbox{ "..\\fx\\projectFiles\\shaders\\vs\\" };
-	const std::filesystem::path psSandbox{ "..\\fx\\projectFiles\\shaders\\ps\\" };
-	const std::filesystem::path libSandbox{ "..\\fx\\projectFiles\\shaders\\lib\\" };
+	const std::filesystem::path vsSandbox{ inVPath };
+	const std::filesystem::path psSandbox{ inPPath };
+	const std::filesystem::path libSandbox{ inLibPath };
 
 	int i = 0;
 
@@ -532,9 +532,7 @@ int main()
 	oSCfile << "\n};";
 
 	oSCfile.close();
-
 	oReflect.close();
-    
 	Log("\n---competed!\n\n");
 
 }

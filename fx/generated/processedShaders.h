@@ -26,12 +26,12 @@ const char* simpleCube = "#include<../lib/constBuf.shader>\n"
 "{\n"
 "float gX,gY;\n"
 "}\n"
-"float3 rotY(float3 V,float f){float3x3 g;g[0]=float3(cos(f),0,sin(f));g[1]=float3(0,1,0);g[2]=float3(-sin(f),0,cos(f));return mul(V,g);}VS_OUTPUT VS(uint f:SV_VertexID){VS_OUTPUT g=(VS_OUTPUT)0;float4 s=getGrid(f,1,float2(gX,gY));float2 V=s.xy-.5,c=V*PI*2;float3 r=float3(sin(c.x),sin(c.y/2),cos(c.x));r.xz*=cos(c.y/2);r=rotY(r,45*PI/180.);r=clamp(r,-.5,.5)*5;g.wpos=float4(r,0);g.pos=mul(float4(r,1),mul(view[0],proj[0]));g.uv=s.xy;return g;}\n"
+"float3 rotY(float3 V,float f){float3x3 g;g[0]=float3(cos(f),0,sin(f));g[1]=float3(0,1,0);g[2]=float3(-sin(f),0,cos(f));return mul(V,g);}VS_OUTPUT VS(uint f:SV_VertexID){VS_OUTPUT g=(VS_OUTPUT)0;float4 s=getGrid(f,1,float2(gX,gY));float2 V=s.xy-.5,c=V*PI*2;float3 r=float3(sin(c.x),sin(c.y/2),cos(c.x));r.xz*=cos(c.y/2);r=rotY(r,45*PI/180.);r=clamp(r,-.5,.5)*6;g.wpos=float4(r,0);g.pos=mul(float4(r,1),mul(view[0],proj[0]));g.uv=s.xy;return g;}\n"
 ;
 
 const char* basic = "#include<../lib/constBuf.shader>\n"
 "#include<../lib/io.shader>\n"
-"TextureCube env:register(t0);Texture2D normals:register(t1);TextureCube albedo:register(t2);SamplerState sam1:register(s0);float4 PS(VS_OUTPUT n):SV_Target{float3 e=normals.SampleLevel(sam1,n.uv,1).xyz,f=n.vpos.xyz;f=mul(view[0],float4(f,1));f=normalize(f);float3 P=reflect(f,e);return env.SampleLevel(sam1,P,0);}\n"
+"TextureCube env:register(t0);Texture2D normals:register(t1);TextureCube albedo:register(t2);SamplerState sam1:register(s0);float3 FresnelSchlick(float3 s,float3 f,float3 P){float t=dot(-P,f);return saturate(s+(1.-s)*pow(1.-saturate(t),5.));}float4 PS(VS_OUTPUT f):SV_Target{float2 s=f.uv;float3 t=float3(1,.5,.3);float P=0,C=1;float3 T=.04,v=normals.SampleLevel(sam1,f.uv,1).xyz,r=f.vpos.xyz;r=normalize(mul(view[0],float4(r,1)));r=normalize(r);float3 F=reflect(r,v),l=env.SampleLevel(sam1,F,P*10)*2,p=env.SampleLevel(sam1,-v,8.5)*2,B=lerp(t,0,C);T=lerp(T,T*t,C);float3 S=FresnelSchlick(T,r,-v);S*=lerp(saturate(1-P),1,C);float3 a=l*S,n=saturate(1.-S);n=t*n*p;float3 V=n+a;return float4(V,1);}\n"
 ;
 
 const char* cubemapCreator = "#include<../lib/constBuf.shader>\n"
@@ -41,7 +41,7 @@ const char* cubemapCreator = "#include<../lib/constBuf.shader>\n"
 "{\n"
 "float p;\n"
 "}\n"
-"struct PS_OUTPUT{float4 c0:SV_Target0;float4 c1:SV_Target1;float4 c2:SV_Target2;float4 c3:SV_Target3;float4 c4:SV_Target4;float4 c5:SV_Target5;};PS_OUTPUT PS(VS_OUTPUT c){float2 P=c.uv;float4 f=float4(P,0,1);PS_OUTPUT p;f.xyz=saturate(sin(P.x*32)*sin(P.y*32)*100).xxx;p.c0=f*float4(0,0,1,1);p.c1=f*float4(0,1,0,1);p.c2=f*float4(0,1,1,1);p.c3=f*float4(1,0,0,1);p.c4=f*float4(1,0,1,1);p.c5=f*float4(1,1,0,1);return p;}\n"
+"struct PS_OUTPUT{float4 c0:SV_Target0;float4 c1:SV_Target1;float4 c2:SV_Target2;float4 c3:SV_Target3;float4 c4:SV_Target4;float4 c5:SV_Target5;};PS_OUTPUT PS(VS_OUTPUT c){float2 s=c.uv;float4 f=1;PS_OUTPUT P;float x=PI*4,y=saturate(1-2*length(s-.5));f.xyz=saturate(-sign(max(sin(s.x*x),sin(s.y*x))));P.c0=y*float4(0,0,1,1);P.c1=y*float4(0,1,0,1);float p=saturate(-sign(max(sin(s.x*x),sin(s.y*x))))*12;P.c2=p;float l=saturate(-sign(sin(s.x*x*4)*sin(s.y*x*4)))*(1-length(s-.5)*2);P.c3=float4(.5,.5,.35,1)*l;P.c4=y*float4(1,0,0,1);P.c5=y*float4(1,0,1,1);return P;}\n"
 ;
 
 const char* cubeMapViewer = "#include<../lib/constBuf.shader>\n"
@@ -52,7 +52,7 @@ const char* cubeMapViewer = "#include<../lib/constBuf.shader>\n"
 const char* genNormals = "#include<../lib/constBuf.shader>\n"
 "#include<../lib/io.shader>\n"
 "#include<../lib/constants.shader>\n"
-"Texture2D geo:register(t0);SamplerState sam1:register(s0);float4 PS(VS_OUTPUT o):SV_Target{uint f,l;geo.GetDimensions(f,l);float g=1;l*=g;f*=g;float2 s=o.uv;s.y=1-s.y;float4 P=geo.Sample(sam1,s+float2(-1./f,0)),y=geo.Sample(sam1,s+float2(1./f,0)),B=geo.Sample(sam1,s+float2(0,-1./l)),D=geo.Sample(sam1,s+float2(0,1./l));float3 n=normalize(cross(P.xyz-y.xyz,B.xyz-D.xyz)),V=n;return float4(V,1);}\n"
+"Texture2D geo:register(t0);SamplerState sam1:register(s0);float4 PS(VS_OUTPUT o):SV_Target{uint f,l;geo.GetDimensions(f,l);float g=1;l*=g;f*=g;float2 P=o.uv;float4 s=geo.Sample(sam1,P+float2(-1./f,0)),B=geo.Sample(sam1,P+float2(1./f,0)),D=geo.Sample(sam1,P+float2(0,-1./l)),G=geo.Sample(sam1,P+float2(0,1./l));float3 n=normalize(cross(s.xyz-B.xyz,D.xyz-G.xyz)),V=n;return float4(V,1);}\n"
 ;
 
 const char* obj1 = "#include<../lib/constBuf.shader>\n"
@@ -62,7 +62,7 @@ const char* obj1 = "#include<../lib/constBuf.shader>\n"
 "{\n"
 "float sx,sy,sz;\n"
 "};\n"
-"float3 sphere(float2 s){float2 f=s*PI*2;float3 r=float3(sin(f.x),sin(f.y/2),cos(f.x));r.xz*=cos(f.y/2);r=clamp(r,-.5,.5);r*=.45;return r;}float4 PS(VS_OUTPUT f):SV_Target{float2 r=f.uv-.5;float3 s=sphere(r)*2;return float4(s,1.);}\n"
+"float3 sphere(float2 s){float2 f=s*PI*2;f.x*=-1;float3 y=float3(sin(f.x),sin(f.y/2),cos(f.x));y.xz*=cos(f.y/2);y*=.45;float b=64;y/=1-pow(abs(sin(s.x*b)+cos(s.y*b/2)),8)*.00021;b=64+11112*sin(s.x*12)*cos(s.y*22);y/=1-pow(abs(sin(s.x*b)+cos(s.y*b/2)),8)*2.1e-5;return y;}float4 PS(VS_OUTPUT s):SV_Target{float2 f=s.uv-.5;float3 b=sphere(f)*2;return float4(b,1.);}\n"
 ;
 
 const char* simpleFx = "#include<../lib/constBuf.shader>\n"

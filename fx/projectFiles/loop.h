@@ -19,77 +19,11 @@ namespace Loop
 		ConstBuf::frame.time = (float)(timer::frameBeginTime * .01);
 		ConstBuf::UpdateFrame();
 	}
-	/*
-	void Scene1()
-	{
-		//two dynamic texures
-		api.cull(cullmode::off);
-		api.rt(tex::tex1);
-		api.depth(depthmode::off);
-			
-			vs::quad.set();
-
-			ps::simpleFx.params.r = 0;
-			ps::simpleFx.params.g = 1;
-			ps::simpleFx.params.b = 0;
-			ps::simpleFx.set();
-		
-		api.draw(1, 1);
-		api.mips();
-
-		api.copyColor(tex::tex2, tex::tex1);
-		/*api.rt(tex::tex2);
-
-			ps::simpleFx.params.r = 1;
-			ps::simpleFx.params.g = 0;
-			ps::simpleFx.params.b = 0;
-			ps::simpleFx.set();
-
-		api.draw(1, 1);
-		api.mips();
-
-		//-two planes
-		api.cull(cullmode::off);
-		api.rt(tex::mainRT);
-		api.cam();
-		api.depth(depthmode::on);
-
-			ps::simpleTex.samplers.sam1Filter = filter::linear;
-			ps::simpleTex.samplers.sam1AddressU = addr::wrap;
-			ps::simpleTex.samplers.sam1AddressV = addr::wrap;
-
-		api.clear(0.2f, 0.2f, 0.2f, 1.f);
-		api.clearDepth();
-
-			vs::meshOut.params.tone = 1;
-			vs::meshOut.set();
-
-			ps::simpleTex.textures.tex1 = tex::tex1;
-			ps::simpleTex.textures.tex2 = tex::tex2;
-			ps::simpleTex.params.mix = 0;
-			ps::simpleTex.set();
-
-		api.blend(blendmode::off, blendop::add);
-		api.draw(1, 1);
-
-			ps::simpleTex.params.mix = 1;
-			ps::simpleTex.set();
-
-			vs::meshOut.params.tone = 0;
-			vs::meshOut.set();
-
-		api.draw(1, 1);
-	}
-	*/
-	void ShowCubemap()
+	
+	void ShowCubemap(int envTex)
 	{
 		api.blend(blendmode::off, blendop::add);
 		api.cull(cullmode::back);
-		api.rt(tex::mainRT);
-		api.cam();
-		api.depth(depthmode::on);
-		api.clear(0.2f, 0.2f, 0.2f, 1.f);
-		api.clearDepth();
 
 		ps::cubeMapViewer.textures.env = tex::env;
 		ps::cubeMapViewer.samplers.sam1Filter = filter::linear;
@@ -105,26 +39,23 @@ namespace Loop
 
 	}
 
-	void ShowObject()
+	void ShowObject(int geometry, int normals, int quality)
 	{
-		api.blend(blendmode::off, blendop::add);
-		api.cull(cullmode::back);
-		api.rt(tex::mainRT);
-		api.cam();
-		api.depth(depthmode::on);
+		int denom = (int)pow(2, quality);
 
-		float gX = Textures::texture[tex::obj1pos].size.x;
-		float gY = Textures::texture[tex::obj1pos].size.y;
-		vs::objViewer.textures.positions = tex::obj1pos;
+		float gX = Textures::texture[tex::obj1pos].size.x/denom;
+		float gY = Textures::texture[tex::obj1pos].size.y/denom;
+
+		vs::objViewer.textures.positions = geometry;
 		vs::objViewer.samplers.sam1Filter = filter::linear;
 		vs::objViewer.samplers.sam1AddressU = addr::wrap;
 		vs::objViewer.samplers.sam1AddressV = addr::wrap;
-		vs::objViewer.params.gX = (float)gX;
-		vs::objViewer.params.gY = (float)gY;
+		vs::objViewer.params.gX = gX;
+		vs::objViewer.params.gY = gY;
 		vs::objViewer.set();
 
 		ps::basic.textures.env = tex::env;
-		ps::basic.textures.normals = tex::obj1nrml;
+		ps::basic.textures.normals = normals;
 		ps::basic.samplers.sam1Filter = filter::linear;
 		ps::basic.samplers.sam1AddressU = addr::wrap;
 		ps::basic.samplers.sam1AddressV = addr::wrap;
@@ -132,14 +63,13 @@ namespace Loop
 		api.draw(1, (int)gX * (int)gY);
 	}
 
-	void CalcCubemap()
+	void CalcCubemap(int targetTexture)
 	{
 		api.blend(blendmode::off, blendop::add);
-		api.rt(tex::env);
+		api.rt(targetTexture);
 		api.cull(cullmode::off);
 		api.depth(depthmode::off);
-		api.clearDepth();
-		api.clear(sin(timer::GetCounter()*.01), 0, 0, 1);
+		api.clear(sinf((float)timer::GetCounter()*.01f), 0, 0, 1);
 
 		vs::quad.set();
 		ps::cubemapCreator.set();
@@ -147,11 +77,11 @@ namespace Loop
 		api.mips();
 	}
 
-	void CalcObject()
+	void CalcObject(int targetGeoTexture,int targetNrmlTexture)
 	{
 		api.blend(blendmode::off, blendop::add);
 		api.cull(cullmode::off);
-		api.rt(tex::obj1pos);
+		api.rt(targetGeoTexture);
 		api.depth(depthmode::off);
 
 		//pos
@@ -161,14 +91,14 @@ namespace Loop
 		api.mips();
 
 		//normals
-		api.rt(tex::obj1nrml);
+		api.rt(targetNrmlTexture);
 		vs::quad.set();
 
 		ps::genNormals.samplers.sam1Filter = filter::linear;
 		ps::genNormals.samplers.sam1AddressU = addr::wrap;
 		ps::genNormals.samplers.sam1AddressV = addr::wrap;
 
-		ps::genNormals.textures.geo = tex::obj1pos;
+		ps::genNormals.textures.geo = targetGeoTexture;
 		ps::genNormals.set();
 		api.draw(1, 1);
 		api.mips();
@@ -181,15 +111,22 @@ namespace Loop
 
 		if (!isPrecalc) Precalc();
 
-		CalcCubemap();
+		CalcCubemap(tex::env);
+		CalcObject(tex::obj1pos,tex::obj1nrml);
 
-		CalcObject();
+		api.blend(blendmode::off, blendop::add);
+		api.rt(tex::mainRT);
+		api.cam();
+		api.depth(depthmode::on);
+		api.clear(0.2f, 0.2f, 0.2f, 1.f);
+		api.clearDepth();
 
-		ShowCubemap();
-		ShowObject();
+		ShowCubemap(tex::env);
 
-		Textures::UnbindAll();
-		Draw::Present();
+		api.cull(cullmode::back);
+		ShowObject(tex::obj1pos,tex::obj1nrml,0);
+
+		api.present();
 
 	}
 
