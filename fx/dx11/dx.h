@@ -11,10 +11,15 @@ static inline int32 log2(float x)
 	return log2;
 }
 
-using namespace DirectX;
-
 namespace dx11
 {
+
+	#include <d3d11.h>
+	#include <d3dcompiler.h>
+	#include "DirectXMath.h"
+	#include <DirectXPackedVector.h>
+
+	using namespace DirectX;
 
 	#if DebugMode
 		void Log(const char* message)

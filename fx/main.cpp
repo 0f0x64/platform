@@ -12,16 +12,7 @@ HWND hWnd;
 #include <math.h>
 #include "timer.h"
 
-// gfx 
-
-#include <d3d11.h>
-#include <d3dcompiler.h>
-#include "DirectXMath.h"
-#include <DirectXPackedVector.h>
 #include "dx11\dx.h"
-
-// sound
-
 #include <Xaudio2.h>
 
 using namespace dx11;
