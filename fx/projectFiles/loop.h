@@ -49,7 +49,7 @@ namespace Loop
 		vs::objViewer.textures.positions = geometry;
 		vs::objViewer.samplers.sam1Filter = filter::linear;
 		vs::objViewer.samplers.sam1AddressU = addr::wrap;
-		vs::objViewer.samplers.sam1AddressV = addr::wrap;
+		vs::objViewer.samplers.sam1AddressV = addr::clamp;
 		vs::objViewer.params.gX = gX;
 		vs::objViewer.params.gY = gY;
 		vs::objViewer.set();
@@ -122,9 +122,9 @@ namespace Loop
 		api.clearDepth();
 
 		ShowCubemap(tex::env);
-
 		api.cull(cullmode::back);
-		ShowObject(tex::obj1pos,tex::obj1nrml,0);
+		//api.cull(cullmode::wireframe);
+		ShowObject(tex::obj1pos,tex::obj1nrml,6);
 
 		api.present();
 

@@ -19,7 +19,7 @@ const char* objViewer =
 "}\n"
 "//]\n"
 "\n"
-"flo at3 rotY(float3 p, float a)\n"
+"float3 rotY(float3 p, float a)\n"
 "{\n"
 "    float3x3 r;\n"
 "    r[0] = float3(cos(a), 0, sin(a));\n"

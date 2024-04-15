@@ -76,6 +76,7 @@ namespace dx11
 		void clearDepth() { Draw::ClearDepth(); }
 		void blend(int mode, int op) { Blend::Set(mode, op); }
 		void cull(int i) { Rasterizer::SetCull(i); }
+		void setScissors(float left, float top, float right, float bottom) { Rasterizer::setScissors(left, top, right, bottom); }
 		void copyColor(int dst, int src) { Textures::CopyColor(dst, src); }
 		void copyDepth(int dst, int src) { Textures::CopyDepth(dst, src); }
 		void present() { Draw::Present(); }
@@ -86,7 +87,7 @@ namespace dx11
 	namespace depthmode { enum { off, on, readonly, writeonly }; }
 	namespace filter { enum { linear, point, minPoint_magLinear }; }
 	namespace addr { enum { clamp, wrap }; }
-	namespace cullmode { enum { off, front, back }; }
+	namespace cullmode { enum { off, front, back, wireframe }; }
 	
 	#undef Texture
 	#define Texture(name,type,format,width,height,mip,depth) name,
