@@ -29,6 +29,7 @@ namespace Shaders {
 
 	#if EditMode
 
+		bool firstRun = true;
 		const char* shaderExtension = ".shader";
 
 		void CompilerLog(LPCWSTR source, HRESULT hr, const char* message)
@@ -37,6 +38,7 @@ namespace Shaders {
 			if (FAILED(hr))
 			{
 				Log((char*)pErrorBlob->GetBufferPointer());
+				if (firstRun) ExitProcess(0);
 			}
 			else
 			{
@@ -130,6 +132,7 @@ namespace Shaders {
 				i++;
 			}
 
+			firstRun = false;
 		}
 
 #else

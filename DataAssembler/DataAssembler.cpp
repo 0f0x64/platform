@@ -326,7 +326,13 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 						}
 
 						pos = 0;
-						assert(getline(in, s));
+
+						if (!getline(in, s)) 
+						{
+							Log(shaderName.c_str());
+							Log(" unexpected eof: unclosed bracket in constant buffer\n");
+							ExitProcess(-1);
+						};
 					}
 
 					while (true)
@@ -379,7 +385,13 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 						}
 						else
 						{
-							assert(getline(in, s));
+							if (!getline(in, s))
+							{
+								Log(shaderName.c_str());
+								Log(" unexpected eof: <float> type not found in constant buffer\n");
+								ExitProcess(-1);
+							};
+
 							pos = 0;
 						}
 					}

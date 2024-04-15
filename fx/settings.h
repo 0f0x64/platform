@@ -3,13 +3,15 @@
 	#define DebugMode false
 	#define DirectXDebugMode false
 	#define SECONDARY_DISPLAY_IF_AVAILABLE false
+	#define USE_SHADER_MINIFIER true
 #endif
 
 #ifdef EDITOR
 	#define EditMode false
 	#define DebugMode false
 	#define DirectXDebugMode false
-	#define SECONDARY_DISPLAY_IF_AVAILABLE true
+	#define SECONDARY_DISPLAY_IF_AVAILABLE false
+#define USE_SHADER_MINIFIER false
 #endif
 
 #ifdef EDITOR_DEBUG
@@ -17,9 +19,8 @@
 	#define DebugMode true
 	#define DirectXDebugMode false
 	#define SECONDARY_DISPLAY_IF_AVAILABLE true
+	#define USE_SHADER_MINIFIER false
 #endif
-
-#define USE_SHADER_MINIFIER true
 
 #define FRAMES_PER_SECOND 60
 #define FRAME_LEN 1000. / (float) FRAMES_PER_SECOND
