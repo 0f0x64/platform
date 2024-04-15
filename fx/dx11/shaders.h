@@ -70,7 +70,7 @@ namespace Shaders {
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name);
 
-			HRESULT hr = S_OK;
+			HRESULT hr;
 
 			hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", "vs_4_1", NULL, NULL, &VS[i].pBlob, &pErrorBlob);
 			CompilerLog(source, hr, "vertex shader compiled: ");
@@ -78,10 +78,7 @@ namespace Shaders {
 			if (hr == S_OK)
 			{
 				hr = device->CreateVertexShader(VS[i].pBlob->GetBufferPointer(), VS[i].pBlob->GetBufferSize(), NULL, &VS[i].pShader);
-
-				#if DebugMode
-					if (FAILED(hr)) { Log("vs creation fail\n"); return; }
-				#endif
+				LogIfError("vs creation fail\n");
 			}
 
 		}
@@ -90,7 +87,7 @@ namespace Shaders {
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name);
 
-			HRESULT hr = S_OK;
+			HRESULT hr;
 
 			hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS", "ps_4_1", NULL, NULL, &PS[i].pBlob, &pErrorBlob);
 			CompilerLog(source, hr, "pixel shader compiled: ");
@@ -98,9 +95,7 @@ namespace Shaders {
 			if (hr == S_OK)
 			{
 				hr = device->CreatePixelShader(PS[i].pBlob->GetBufferPointer(), PS[i].pBlob->GetBufferSize(), NULL, &PS[i].pShader);
-				#if DebugMode
-					if (FAILED(hr)) { Log("vs creation fail\n"); return; }
-				#endif
+				LogIfError("vs creation fail\n");
 			}
 
 		}
@@ -182,32 +177,19 @@ namespace Shaders {
 
 		void CreateVS(int n, const char* shaderText)
 		{
-			HRESULT hr = S_OK;
+			HRESULT hr;
 
 			VS[n].pBlob = NULL;
 			auto ptr = processIncludes(shaderText);
 			hr = D3DCompile(ptr, strlen(ptr), NULL, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &VS[n].pBlob, &pErrorBlob);
 
-#if DebugMode
-			if (FAILED(hr)) {
-				auto m = (char*)pErrorBlob->GetBufferPointer();
-				Log(m);
-			}
-#endif	
+			LogBlobIfError;
 
 			if (hr == S_OK)
 			{
 				if (VS[n].pShader) VS[n].pShader->Release();
-
 				hr = device->CreateVertexShader(VS[n].pBlob->GetBufferPointer(), VS[n].pBlob->GetBufferSize(), NULL, &VS[n].pShader);
-
-#if DebugMode
-				if (FAILED(hr))
-				{
-					if (VS[n].pShader) VS[n].pShader->Release();
-					Log("vs fail");
-				}
-#endif		
+				LogIfError("vs fail\n"); 
 			}
 
 		}
@@ -221,22 +203,13 @@ namespace Shaders {
 			auto ptr = processIncludes(shaderText);
 			hr = D3DCompile(ptr, strlen(ptr), NULL, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &PS[n].pBlob, &pErrorBlob);
 
-#if DebugMode
-			if (FAILED(hr)) {
-				auto m = (char*)pErrorBlob->GetBufferPointer();
-				Log(m);
-			}
-#endif	
+			LogBlobIfError;
 
 			if (hr == S_OK)
 			{
 				if (PS[n].pShader) PS[n].pShader->Release();
 				hr = device->CreatePixelShader(PS[n].pBlob->GetBufferPointer(), PS[n].pBlob->GetBufferSize(), NULL, &PS[n].pShader);
-
-#if DebugMode
-				if (FAILED(hr)) { Log("ps fail\n"); }
-#endif
-
+				LogIfError("ps fail\n");
 			}
 		}
 

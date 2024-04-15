@@ -7,6 +7,13 @@ TextureCube albedo : register(t2);
 
 SamplerState sam1 : register(s0);
 
+//[
+cbuffer params : register(b1)
+{
+    float r,g,b,a;
+};
+//]
+
 float3 FresnelSchlick(float3 F0, float3 v, float3 n)
 {
     float cosTheta = dot(-n, v);
@@ -18,8 +25,8 @@ float4 PS(VS_OUTPUT input) : SV_Target
 {
     float2 uv = input.uv;
     float3 albedo = float3(1, .5, .3);
-    float roughness = 0;//    saturate(sign(sin(uv.x * 8) * sin(uv.y * 8)));
-    float metalness = 1;//    saturate(sign(sin(uv.x * 32) * sin(uv.y * 32)));
+    float roughness = 0;
+    float metalness = 1;
     float3 F0 = .04;
     
     float3 nrml = normals.SampleLevel(sam1, input.uv,1).xyz;
@@ -39,7 +46,7 @@ float4 PS(VS_OUTPUT input) : SV_Target
     diffK = albedo * diffK * diffR;
 
     float3 color = diffK + specK;
-   
+
 
     return float4(color, 1);
 }

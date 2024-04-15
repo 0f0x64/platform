@@ -5,7 +5,7 @@ namespace Device
 
 	void Init()
 	{
-		HRESULT hr = S_OK;
+		HRESULT hr;
 
 		aspect = float(height) / float(width);
 		iaspect = float(width) / float(height);
@@ -26,19 +26,14 @@ namespace Device
 		sd.Windowed = EditMode;
 
 		hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
-		#if DebugMode
-				if (FAILED(hr)) { Log("device not created\n"); return; }
-		#endif	
+		LogIfError("device not created\n");
+
 		Textures::texture[0].pTexture = NULL;
 		hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&Textures::texture[0].pTexture);
-		#if DebugMode
-				if (FAILED(hr)) { Log("swapchain error\n"); return; }
-		#endif		
+		LogIfError("swapchain error\n");
 
 		hr = device->CreateRenderTargetView(Textures::texture[0].pTexture, NULL, &Textures::texture[0].RenderTargetView[0][0]);
-		#if DebugMode
-				if (FAILED(hr)) { Log("rt not created\n"); return; }
-		#endif	
+		LogIfError("rt not created\n");
 
 		Textures::texture[0].pTexture->Release();
 

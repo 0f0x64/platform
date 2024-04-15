@@ -12,7 +12,7 @@ namespace Camera
 		ConstBuf::camera.proj[0] = XMMatrixTranspose(XMMatrixPerspectiveFovLH(XM_PIDIV4*2.4, width / (FLOAT)height, 0.01f, 100.0f));
 
 		ConstBuf::UpdateCamera();
-		ConstBuf::SetV(3);
-		ConstBuf::SetP(3);
+		ConstBuf::SetToVertex(3);
+		ConstBuf::SetToPixel(3);
 	}
 }

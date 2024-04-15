@@ -1,7 +1,7 @@
 namespace ConstBuf
 {
 
-	ID3D11Buffer* buffer[6];
+	ID3D11Buffer* buffer[7];
 
 	#define constCount 32
 
@@ -31,6 +31,10 @@ namespace ConstBuf
 	//b5
 	XMFLOAT4 global[constCount];//update once on start
 
+	//b6
+	XMFLOAT4 float4array[256];
+
+
 	int roundUp(int n, int r)
 	{
 		return 	n - (n % r) + r;
@@ -47,9 +51,7 @@ namespace ConstBuf
 		bd.StructureByteStride = 16;
 
 		HRESULT hr = device->CreateBuffer(&bd, NULL, &buffer[i]);
-#if DebugMode
-		if (FAILED(hr)) { Log("constant bufferV fail\n"); return; }
-#endif	
+		LogIfError("constant bufferV fail\n");
 	}
 
 	void Init()
@@ -60,33 +62,34 @@ namespace ConstBuf
 		CreateCB(3, sizeof(camera));
 		CreateCB(4, sizeof(frame));
 		CreateCB(5, sizeof(global));
+		CreateCB(6, sizeof(float4array));
 	}
 
-		template <typename T>
-		void Update(int i, T* data)
-		{
-			context->UpdateSubresource(buffer[i], 0, NULL, data, 0, 0);
-		}
+	template <typename T>
+	void Update(int i, T* data)
+	{
+		context->UpdateSubresource(buffer[i], 0, NULL, data, 0, 0);
+	}
 
-		void UpdateFrame()
-		{
-			context->UpdateSubresource(buffer[4], 0, NULL, &frame, 0, 0);
-		}
+	void UpdateFrame()
+	{
+		context->UpdateSubresource(buffer[4], 0, NULL, &frame, 0, 0);
+	}
 
-		void UpdateCamera()
-		{
-			context->UpdateSubresource(ConstBuf::buffer[3], 0, NULL, &camera, 0, 0);
-		}
+	void UpdateCamera()
+	{
+		context->UpdateSubresource(ConstBuf::buffer[3], 0, NULL, &camera, 0, 0);
+	}
 
-		void SetV(int i)
-		{
-			context->VSSetConstantBuffers(i, 1, &buffer[i]);
-		}
+	void SetToVertex(int i)
+	{
+		context->VSSetConstantBuffers(i, 1, &buffer[i]);
+	}
 
-		void SetP(int i)
-		{
-			context->PSSetConstantBuffers(i, 1, &buffer[i]);
-		}
+	void SetToPixel(int i)
+	{
+		context->PSSetConstantBuffers(i, 1, &buffer[i]);
+	}
 
 
 } 

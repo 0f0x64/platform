@@ -7,10 +7,10 @@ namespace Loop
 
 	void Precalc()
 	{
-		InputAssembler::Set();
+		api.setIA(topology::triList);
 		ConstBuf::Update(5, ConstBuf::global);
 
-		for (int i = 0; i < 6; i++) { ConstBuf::SetV(i); ConstBuf::SetP(i); }
+		for (int i = 0; i < 6; i++) { ConstBuf::SetToVertex(i); ConstBuf::SetToPixel(i); }
 		isPrecalc = true;
 	}
 
@@ -35,7 +35,7 @@ namespace Loop
 		vs::simpleCube.params.gX = (float)gX;
 		vs::simpleCube.params.gY = (float)gY;
 		vs::simpleCube.set();
-		api.draw(1, gX*gY);
+		api.draw(gX*gY);
 
 	}
 
@@ -59,8 +59,9 @@ namespace Loop
 		ps::basic.samplers.sam1Filter = filter::linear;
 		ps::basic.samplers.sam1AddressU = addr::wrap;
 		ps::basic.samplers.sam1AddressV = addr::wrap;
+
 		ps::basic.set();
-		api.draw(1, (int)gX * (int)gY);
+		api.draw((int)gX * (int)gY);
 	}
 
 	void CalcCubemap(int targetTexture)
@@ -87,7 +88,7 @@ namespace Loop
 		//pos
 		vs::quad.set();
 		ps::obj1.set();
-		api.draw(1, 1);
+		api.draw(1);
 		api.mips();
 
 		//normals
@@ -100,16 +101,55 @@ namespace Loop
 
 		ps::genNormals.textures.geo = targetGeoTexture;
 		ps::genNormals.set();
-		api.draw(1, 1);
+		api.draw(1);
 		api.mips();
 	}
 
+	int pCounter = 0;
+
+	void SetPoint(float x, float y, float z = 0)
+	{
+		ConstBuf::float4array[pCounter].x = x;
+		ConstBuf::float4array[pCounter].y = y;
+		ConstBuf::float4array[pCounter].z = z;
+		ConstBuf::float4array[pCounter].w = 1;
+		pCounter++;
+
+	}
+
+	void ShowLine()
+	{
+		api.setIA(topology::lineList);
+		api.blend(blendmode::off);
+		api.cull(cullmode::off);
+		api.depth(depthmode::off);
+
+		pCounter = 0;
+		for (int i = 0; i < 128; i++)
+		{
+			float x = ((i / 128.f)-.5f)*2;
+			SetPoint(x, 0);
+			SetPoint(x, 0.1);
+		}
+		ConstBuf::Update(6, ConstBuf::float4array);
+
+		vs::lineDrawer.set();
+		ps::colorFill.params.r = 1;
+		ps::colorFill.params.g = 1;
+		ps::colorFill.params.b = 1;
+		ps::colorFill.params.a = 1;
+		ps::colorFill.set();
+		api.drawLine(128,1);
+
+	}
 
 	void mainLoop()
 	{
 		frameConst();
 
 		if (!isPrecalc) Precalc();
+
+		api.setIA(topology::triList);
 
 		CalcCubemap(tex::env);
 		CalcObject(tex::obj1pos,tex::obj1nrml);
@@ -123,8 +163,9 @@ namespace Loop
 
 		ShowCubemap(tex::env);
 		api.cull(cullmode::back);
-		//api.cull(cullmode::wireframe);
-		ShowObject(tex::obj1pos,tex::obj1nrml,6);
+		ShowObject(tex::obj1pos,tex::obj1nrml,0);
+
+		ShowLine();
 
 		api.present();
 

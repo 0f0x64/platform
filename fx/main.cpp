@@ -3,7 +3,7 @@
 // windows environment
 
 #define _CRT_SECURE_NO_WARNINGS
-#define WINDOWS_IGNORE_PACKING_MISMATCH
+//#define WINDOWS_IGNORE_PACKING_MISMATCH
 #include <windows.h>
 HINSTANCE hInst;
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);

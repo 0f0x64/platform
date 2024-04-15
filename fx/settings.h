@@ -7,10 +7,10 @@
 #endif
 
 #ifdef EDITOR
-	#define EditMode false
-	#define DebugMode false
+	#define EditMode true
+	#define DebugMode true
 	#define DirectXDebugMode false
-	#define SECONDARY_DISPLAY_IF_AVAILABLE false
+	#define SECONDARY_DISPLAY_IF_AVAILABLE true
 #define USE_SHADER_MINIFIER false
 #endif
 

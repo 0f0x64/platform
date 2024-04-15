@@ -2,7 +2,6 @@ namespace Blend
 {
 
 	ID3D11BlendState* blendState[3][5];
-
 	D3D11_BLEND_DESC bSDesc;
 
 	void CreateMixStates(int j)
@@ -10,14 +9,16 @@ namespace Blend
 		for (int i = 0; i < 5; i++)
 		{
 			bSDesc.RenderTarget[0].BlendOp = (D3D11_BLEND_OP)(i + 1);
-			device->CreateBlendState(&bSDesc, &blendState[j][i]);
+			HRESULT hr = device->CreateBlendState(&bSDesc, &blendState[j][i]);
+			LogIfError("CreateblendState error\n");
 		}
 	}
 
 	void Init()
 	{
 		ZeroMemory(&bSDesc, sizeof(D3D11_BLEND_DESC));
-		//all additional rt's without alphablend
+
+		//all additional rt's without alphablend!
 		for (int x = 0; x < 8; x++)
 		{
 			bSDesc.RenderTarget[x].BlendEnable = false;
@@ -44,16 +45,14 @@ namespace Blend
 		bSDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
 		bSDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 		CreateMixStates(2);
+
+		float blendFactor[4] = { .0f,.0f,.0f,.0f };
+		context->OMSetBlendState(blendState[0][0], blendFactor, 0xffffffff);
 	}
 
 	void Set(int m, int blend)
 	{
-		float blendFactor2[4];
-		blendFactor2[0] = 0.0f;
-		blendFactor2[1] = 0.0f;
-		blendFactor2[2] = 0.0f;
-		blendFactor2[3] = 0.0f;
-
-		context->OMSetBlendState(blendState[m][blend], blendFactor2, 0xffffffff);
+		float blendFactor[4] = { .0f,.0f,.0f,.0f };
+		context->OMSetBlendState(blendState[m][blend], blendFactor, 0xffffffff);
 	}
 } 

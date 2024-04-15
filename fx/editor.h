@@ -88,6 +88,7 @@ namespace editor
 
 		if (!isWatching)//init
 		{
+
 			Log("watching for changes: ");
 			Log(shadersPath);
 			Log("\n");

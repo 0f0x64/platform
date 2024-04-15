@@ -59,9 +59,8 @@ namespace Textures
 		}
 
 		HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &texture[i].pTexture);
-		#if DebugMode
-				if (FAILED(hr)) { Log("CreateTexture2D error\n"); return; }
-		#endif	
+
+		LogIfError("CreateTexture2D error");
 	}
 
 	void ShaderRes(int i)
@@ -83,9 +82,7 @@ namespace Textures
 		}
 
 		HRESULT hr = device->CreateShaderResourceView(texture[i].pTexture, &svDesc, &texture[i].TextureResView);
-		#if DebugMode
-				if (FAILED(hr)) { Log("CreateShaderResourceView error\n"); return; }
-		#endif	
+		LogIfError("CreateShaderResourceView error\n");
 	}
 
 	void rtView(int i)
@@ -104,9 +101,7 @@ namespace Textures
 			{
 				renderTargetViewDesc.Texture2DArray.FirstArraySlice = j;
 				HRESULT hr = device->CreateRenderTargetView(texture[i].pTexture, &renderTargetViewDesc, &texture[i].RenderTargetView[0][j]);
-				#if DebugMode
-				if (FAILED(hr)) { Log("CreateRenderTargetView error\n"); return; }
-				#endif	
+				LogIfError("CreateRenderTargetView error\n");
 			}
 		}
 		else
@@ -116,9 +111,7 @@ namespace Textures
 			{
 				renderTargetViewDesc.Texture2D.MipSlice = m;
 				HRESULT hr = device->CreateRenderTargetView(texture[i].pTexture, &renderTargetViewDesc, &texture[i].RenderTargetView[m][0]);
-				#if DebugMode
-				if (FAILED(hr)) { Log("CreateRenderTargetView error\n"); return; }
-			#endif	
+				LogIfError("CreateRenderTargetView error\n");
 			}
 		}
 
@@ -153,10 +146,7 @@ namespace Textures
 		{
 			descDSV.Texture2D.MipSlice = m;
 			HRESULT hr = device->CreateDepthStencilView(texture[i].pDepth, &descDSV, &texture[i].DepthStencilView[m]);
-			#if DebugMode
-				if (FAILED(hr)) { Log("CreateDepthStencilView error\n"); return; }
-			#endif			
-
+			LogIfError("CreateDepthStencilView error\n");
 		}
 
 	}
@@ -169,9 +159,7 @@ namespace Textures
 		svDesc.Texture2D.MipLevels = 1;
 
 		HRESULT hr = device->CreateShaderResourceView(texture[i].pDepth, &svDesc, &texture[i].DepthResView);
-		#if DebugMode
-			if (FAILED(hr)) { Log("CreateShaderResourceView for Depth error\n"); return; }
-		#endif			
+		LogIfError("CreateShaderResourceView for Depth error\n");
 	}
 
 	void Create(int i, tType type, tFormat format, XMFLOAT2 size, bool mipMaps, bool depth)

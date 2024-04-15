@@ -40,7 +40,6 @@ namespace Rasterizer
 		rasterizerState.FillMode = D3D11_FILL_WIREFRAME;
 		device->CreateRasterizerState(&rasterizerState, &rasterState[3]);
 
-
 		context->RSSetState(rasterState[0]);
 		setScissors(0, 0, 1, 1);
 	}

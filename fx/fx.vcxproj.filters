@@ -159,5 +159,11 @@
     <None Include="projectFiles\shaders\ps\genNormals.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
+    <None Include="projectFiles\shaders\ps\colorFill.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\lineDrawer.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
   </ItemGroup>
 </Project>

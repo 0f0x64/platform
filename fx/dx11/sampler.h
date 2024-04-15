@@ -37,7 +37,8 @@ namespace Sampler
 				{
 					sampDesc.AddressU = address[u];
 					sampDesc.AddressV = address[v];
-					HRESULT h = device->CreateSamplerState(&sampDesc, &pSampler[f][u][v]);
+					HRESULT hr = device->CreateSamplerState(&sampDesc, &pSampler[f][u][v]);
+					LogIfError("CreateSamplerStatw error\n");
 				}
 			}
 		}

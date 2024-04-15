@@ -11,14 +11,27 @@ namespace Draw
 		context->ClearDepthStencilView(Textures::texture[Textures::currentRT].DepthStencilView[0], D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
-	void NullDrawer(int instances, int quadCount)
+	void NullDrawer(int quadCount, int instances)
 	{
 		ConstBuf::Update(0, ConstBuf::drawerV);
-		ConstBuf::SetV(0);
+		ConstBuf::SetToVertex(0);
 		ConstBuf::Update(1, ConstBuf::drawerP);
-		ConstBuf::SetP(1);
+		ConstBuf::SetToPixel(1);
 
 		context->DrawInstanced(quadCount * 6, instances, 0, 0);
+	}
+
+	void LineNullDrawer(int lineCount, int instances)
+	{
+		ConstBuf::Update(0, ConstBuf::drawerV);
+		ConstBuf::SetToVertex(0);
+		ConstBuf::Update(1, ConstBuf::drawerP);
+		ConstBuf::SetToPixel(1);
+
+		ConstBuf::Update(6, ConstBuf::float4array);
+		ConstBuf::SetToVertex(6);
+
+		context->DrawInstanced(lineCount*2 , instances, 0, 0);
 	}
 
 	void Present()
