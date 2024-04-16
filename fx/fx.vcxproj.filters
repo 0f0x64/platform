@@ -165,5 +165,11 @@
     <None Include="projectFiles\shaders\vs\lineDrawer.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
+    <None Include="projectFiles\shaders\vs\box.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\box_ps.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
   </ItemGroup>
 </Project>

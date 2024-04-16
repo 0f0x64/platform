@@ -1,3 +1,4 @@
+Shader(box)
 Shader(lineDrawer)
 Shader(objViewer)
 Shader(quad)

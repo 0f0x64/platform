@@ -4,6 +4,25 @@ struct {
 
 struct 
 {
+float gX;
+float gY;
+} params;
+
+void set () {
+Shaders::SetVS(0);
+memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
+}
+
+} box;
+
+}
+
+namespace vs{
+
+struct { 
+
+struct 
+{
 float x1;
 float y1;
 float x2;
@@ -11,7 +30,7 @@ float y2;
 } params;
 
 void set () {
-Shaders::SetVS(0);
+Shaders::SetVS(1);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 }
 
@@ -43,7 +62,7 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetVS(1);
+Shaders::SetVS(2);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 Textures::SetTexture(textures.positions, 0, Textures::tAssignType::vertex); 
 Textures::SetTexture(textures.normals, 1, Textures::tAssignType::vertex); 
@@ -59,7 +78,7 @@ namespace vs{
 struct { 
 
 void set () {
-Shaders::SetVS(2);
+Shaders::SetVS(3);
 }
 
 } quad;
@@ -77,7 +96,7 @@ float gY;
 } params;
 
 void set () {
-Shaders::SetVS(3);
+Shaders::SetVS(4);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 }
 
@@ -130,6 +149,28 @@ struct {
 
 struct 
 {
+float Aspect;
+float iAspect;
+float ResolutionX;
+float ResolutionY;
+float emboss;
+} params;
+
+void set () {
+Shaders::SetPS(1);
+memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+}
+
+} box_ps;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
 float r;
 float g;
 float b;
@@ -137,7 +178,7 @@ float a;
 } params;
 
 void set () {
-Shaders::SetPS(1);
+Shaders::SetPS(2);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
@@ -155,7 +196,7 @@ float p;
 } params;
 
 void set () {
-Shaders::SetPS(2);
+Shaders::SetPS(3);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
@@ -180,7 +221,7 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetPS(3);
+Shaders::SetPS(4);
 Textures::SetTexture(textures.env, 0, Textures::tAssignType::pixel); 
 Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
@@ -206,7 +247,7 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetPS(4);
+Shaders::SetPS(5);
 Textures::SetTexture(textures.geo, 0, Textures::tAssignType::pixel); 
 Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
@@ -227,7 +268,7 @@ float sz;
 } params;
 
 void set () {
-Shaders::SetPS(5);
+Shaders::SetPS(6);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
@@ -247,7 +288,7 @@ float b;
 } params;
 
 void set () {
-Shaders::SetPS(6);
+Shaders::SetPS(7);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 

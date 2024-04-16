@@ -1,4 +1,5 @@
 Shader(basic)
+Shader(box_ps)
 Shader(colorFill)
 Shader(cubemapCreator)
 Shader(cubeMapViewer)

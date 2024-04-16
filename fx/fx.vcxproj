@@ -194,6 +194,7 @@
     <None Include="projectFiles\shaders\lib\io.shader" />
     <None Include="projectFiles\shaders\lib\utils.shader" />
     <None Include="projectFiles\shaders\ps\basic.shader" />
+    <None Include="projectFiles\shaders\ps\box_ps.shader" />
     <None Include="projectFiles\shaders\ps\colorFill.shader" />
     <None Include="projectFiles\shaders\ps\cubemapCreator.shader" />
     <None Include="projectFiles\shaders\ps\genNormals.shader" />
@@ -205,6 +206,7 @@
       </DeploymentContent>
     </None>
     <None Include="projectFiles\shaders\ps\cubeMapViewer.shader" />
+    <None Include="projectFiles\shaders\vs\box.shader" />
     <None Include="projectFiles\shaders\vs\lineDrawer.shader" />
     <None Include="projectFiles\shaders\vs\objViewer.shader" />
     <None Include="projectFiles\shaders\vs\quad.shader" />

@@ -117,6 +117,16 @@ namespace Loop
 
 	}
 
+	void SetBox(float x, float y, float w, float h)
+	{
+		ConstBuf::float4array[pCounter].x = x;
+		ConstBuf::float4array[pCounter].y = y;
+		ConstBuf::float4array[pCounter].z = w;
+		ConstBuf::float4array[pCounter].w = h;
+		pCounter++;
+
+	}
+
 	void ShowLine()
 	{
 		api.setIA(topology::lineList);
@@ -143,6 +153,34 @@ namespace Loop
 
 	}
 
+	void ShowBox()
+	{
+		api.setIA(topology::triList);
+		api.blend(blendmode::alpha,blendop::add);
+		api.cull(cullmode::off);
+		api.depth(depthmode::off);
+
+		pCounter = 0;
+		SetBox(-.5, 0, .1,.05);
+		SetBox(-.25, 0, .1, .1);
+		SetBox(0, 0, .15*aspect, .15);
+		SetBox(.25, 0, .05, .1);
+		SetBox(.5, 0, .05, .2);
+
+		ConstBuf::Update(6, ConstBuf::float4array);
+		ConstBuf::SetToVertex(6);
+
+		vs::box.set();
+		ps::box_ps.params.Aspect = aspect;
+		ps::box_ps.params.iAspect = iaspect;
+		ps::box_ps.params.emboss = 0;
+		ps::box_ps.params.ResolutionX = width;
+		ps::box_ps.params.ResolutionY = height;
+		ps::box_ps.set();
+		api.draw(1,5);
+
+	}
+
 	void mainLoop()
 	{
 		frameConst();
@@ -163,9 +201,11 @@ namespace Loop
 
 		ShowCubemap(tex::env);
 		api.cull(cullmode::back);
-		ShowObject(tex::obj1pos,tex::obj1nrml,0);
+		//ShowObject(tex::obj1pos,tex::obj1nrml,0);
 
-		ShowLine();
+		//ShowLine();
+
+		ShowBox();
 
 		api.present();
 
