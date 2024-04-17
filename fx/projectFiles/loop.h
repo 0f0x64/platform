@@ -3,10 +3,18 @@ namespace Loop
 	
 	bool isPrecalc = false;
 
-	#include "..\generated\constBufReflect.h"
+
+
+	//----------
+
+	
 
 	void Precalc()
 	{
+
+
+		//---
+
 		api.setIA(topology::triList);
 		ConstBuf::Update(5, ConstBuf::global);
 
@@ -105,81 +113,7 @@ namespace Loop
 		api.mips();
 	}
 
-	int pCounter = 0;
-
-	void SetPoint(float x, float y, float z = 0)
-	{
-		ConstBuf::float4array[pCounter].x = x;
-		ConstBuf::float4array[pCounter].y = y;
-		ConstBuf::float4array[pCounter].z = z;
-		ConstBuf::float4array[pCounter].w = 1;
-		pCounter++;
-
-	}
-
-	void SetBox(float x, float y, float w, float h)
-	{
-		ConstBuf::float4array[pCounter].x = x;
-		ConstBuf::float4array[pCounter].y = y;
-		ConstBuf::float4array[pCounter].z = w;
-		ConstBuf::float4array[pCounter].w = h;
-		pCounter++;
-
-	}
-
-	void ShowLine()
-	{
-		api.setIA(topology::lineList);
-		api.blend(blendmode::off);
-		api.cull(cullmode::off);
-		api.depth(depthmode::off);
-
-		pCounter = 0;
-		for (int i = 0; i < 128; i++)
-		{
-			float x = ((i / 128.f)-.5f)*2;
-			SetPoint(x, 0);
-			SetPoint(x, 0.1);
-		}
-		ConstBuf::Update(6, ConstBuf::float4array);
-
-		vs::lineDrawer.set();
-		ps::colorFill.params.r = 1;
-		ps::colorFill.params.g = 1;
-		ps::colorFill.params.b = 1;
-		ps::colorFill.params.a = 1;
-		ps::colorFill.set();
-		api.drawLine(128,1);
-
-	}
-
-	void ShowBox()
-	{
-		api.setIA(topology::triList);
-		api.blend(blendmode::alpha,blendop::add);
-		api.cull(cullmode::off);
-		api.depth(depthmode::off);
-
-		pCounter = 0;
-		SetBox(-.5, 0, .1,.05);
-		SetBox(-.25, 0, .1, .1);
-		SetBox(0, 0, .15*aspect, .15);
-		SetBox(.25, 0, .05, .1);
-		SetBox(.5, 0, .05, .2);
-
-		ConstBuf::Update(6, ConstBuf::float4array);
-		ConstBuf::SetToVertex(6);
-
-		vs::box.set();
-		ps::box_ps.params.Aspect = aspect;
-		ps::box_ps.params.iAspect = iaspect;
-		ps::box_ps.params.emboss = 0;
-		ps::box_ps.params.ResolutionX = width;
-		ps::box_ps.params.ResolutionY = height;
-		ps::box_ps.set();
-		api.draw(1,5);
-
-	}
+	
 
 	void mainLoop()
 	{
@@ -203,11 +137,9 @@ namespace Loop
 		api.cull(cullmode::back);
 		//ShowObject(tex::obj1pos,tex::obj1nrml,0);
 
-		//ShowLine();
 
-		ShowBox();
 
-		api.present();
+
 
 	}
 

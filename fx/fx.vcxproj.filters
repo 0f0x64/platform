@@ -34,6 +34,9 @@
     <Filter Include="Source Files\dx11">
       <UniqueIdentifier>{0f21f16a-86d3-4e2f-be72-eb8c8b1c31a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\editor">
+      <UniqueIdentifier>{f48baced-bedb-4d0b-864d-cc9f8c0d8038}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -42,9 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="timer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="editor.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="projectFiles\loop.h">
@@ -113,6 +113,18 @@
     <ClInclude Include="dx11\shadersReflection.h">
       <Filter>Source Files\dx11</Filter>
     </ClInclude>
+    <ClInclude Include="editor\editor.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\hotReload.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\editorWindow.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\uiDraw.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">
@@ -170,6 +182,12 @@
     </None>
     <None Include="projectFiles\shaders\ps\box_ps.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\letter_ps.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\letter.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
   </ItemGroup>
 </Project>

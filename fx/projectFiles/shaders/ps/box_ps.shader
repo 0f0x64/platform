@@ -4,12 +4,13 @@
 //[
 cbuffer params : register(b1)
 {
-    float Aspect;
-    float iAspect;
-    float ResolutionX;
-    float ResolutionY;
-    float emboss;
-};
+    float aspect;
+    float rad;
+    float r, g, b, a;
+    float soft;
+    float edge;
+    float outlineBrightness;
+}
 //]
 
 float roundedBoxSDF(float2 CenterPosition, float2 Size, float Radius)
@@ -17,38 +18,25 @@ float roundedBoxSDF(float2 CenterPosition, float2 Size, float Radius)
     return length(max(abs(CenterPosition) - Size + Radius, 0.0)) - Radius;
 }
 
-float calcRA(float2 uv, float2 sz, float r)
+float calcRA(float2 uv, float2 sz, float radius)
 {
-    float2 s = sz;
-    float r1 = min(s.x, s.y) * (0.001 + r );
-    float r2 = roundedBoxSDF(uv, s*.5, r1)  / r1;
-    return r2;
+    float2 ca = float2(1, aspect);
+    float2 s = sz*ca;
+    float r1 = min(s.x, s.y) * (0.001 + radius);
+    float r2 = roundedBoxSDF(uv*ca*sz, s*.5, r1)  / r1;
+    return -r2;
 
-}
-
-float sdRoundBox(float2 p, float2 sz, float rb)
-{
-    p = abs(p) - sz;
-    p = max(p, p.yx - rb);
-    float a = 0.5 * (p.x + p.y);
-    float b = 0.5 * (p.x - p.y);
-    return a - sqrt(rb * rb * 0.5 - b * b);
 }
 
 float4 PS(VS_OUTPUT_POS_UV input) : SV_Target
 {
-    float2 uv = input.uv;
-    float2 sz = input.sz;
-    float2 nsz = normalize(sz);
-    float ratio = nsz.x / nsz.y;
+    float4 color = float4(r, g, b, a);
     float2 uvs = (input.uv - .5);
-
-    float2 ca = float2(1,Aspect);
-
-    float d = calcRA(uvs*sz*ca, sz*ca, .5);
-    float c = sign(-d) - saturate(-d*.4 );
-    c *= pow(dot(atan(uvs-.1), -.25), 1);
-    c += .25;
-    
-    return float4(c, c, c, saturate(-d*10));
+    float d = calcRA(uvs, input.sz, rad);
+    float embossMask = sign(d) - saturate(d * edge * input.sz);
+    float emboss = embossMask * dot(atan(uvs - .1), -.25);
+    color.rgb += emboss;
+    float outline = sign(d) - saturate(d * 64 * input.sz); // * float3(r, g, b);
+    color.rgb += outline*outlineBrightness;
+    return float4(color.rgb, saturate(d*soft)*color.a);
 }

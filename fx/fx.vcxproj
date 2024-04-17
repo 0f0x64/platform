@@ -176,7 +176,10 @@
     <ClInclude Include="dx11\shaders.h" />
     <ClInclude Include="dx11\shadersReflection.h" />
     <ClInclude Include="dx11\textures.h" />
-    <ClInclude Include="editor.h" />
+    <ClInclude Include="editor\editor.h" />
+    <ClInclude Include="editor\editorWindow.h" />
+    <ClInclude Include="editor\hotReload.h" />
+    <ClInclude Include="editor\uiDraw.h" />
     <ClInclude Include="generated\constBufReflect.h" />
     <ClInclude Include="generated\libList.h" />
     <ClInclude Include="generated\processedShaders.h" />
@@ -198,6 +201,7 @@
     <None Include="projectFiles\shaders\ps\colorFill.shader" />
     <None Include="projectFiles\shaders\ps\cubemapCreator.shader" />
     <None Include="projectFiles\shaders\ps\genNormals.shader" />
+    <None Include="projectFiles\shaders\ps\letter_ps.shader" />
     <None Include="projectFiles\shaders\ps\obj1.shader" />
     <None Include="projectFiles\shaders\ps\simpleFx.shader">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -207,6 +211,7 @@
     </None>
     <None Include="projectFiles\shaders\ps\cubeMapViewer.shader" />
     <None Include="projectFiles\shaders\vs\box.shader" />
+    <None Include="projectFiles\shaders\vs\letter.shader" />
     <None Include="projectFiles\shaders\vs\lineDrawer.shader" />
     <None Include="projectFiles\shaders\vs\objViewer.shader" />
     <None Include="projectFiles\shaders\vs\quad.shader" />

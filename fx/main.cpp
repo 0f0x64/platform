@@ -17,8 +17,10 @@ HWND hWnd;
 
 using namespace dx11;
 
+#include "generated\constBufReflect.h"
+
 #if EditMode
-	#include "editor.h"
+	#include "editor\editor.h"
 #endif
 
 #include "projectFiles\loop.h"
@@ -48,6 +50,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	Init();
 
+	#if EditMode
+		editor::ui::Init();
+	#endif	
+
 	MSG msg = { 0 };
 
 	timer::StartCounter();
@@ -65,10 +71,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
+
 		#else
+
 			PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
 			if (GetAsyncKeyState(VK_ESCAPE)) break;
 			if (timer::frameBeginTime / 1000. > DEMO_DURATION) break;
+
 		#endif
 
 		if (msg.message == WM_QUIT)	break;
@@ -78,6 +87,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			timer::frameBeginTime = timer::GetCounter();
 
 			Loop::mainLoop();
+
+			#if EditMode
+				editor::ui::Draw();
+			#endif	
+
+			api.present();
 
 			timer::frameEndTime = timer::GetCounter();
 			timer::frameRenderingDuration = timer::frameEndTime - timer::frameBeginTime;

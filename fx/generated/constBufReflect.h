@@ -2,18 +2,30 @@ namespace vs{
 
 struct { 
 
-struct 
-{
-float gX;
-float gY;
-} params;
-
 void set () {
 Shaders::SetVS(0);
-memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 }
 
 } box;
+
+}
+
+namespace vs{
+
+struct { 
+
+struct 
+{
+float width;
+float height;
+} params;
+
+void set () {
+Shaders::SetVS(1);
+memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
+}
+
+} letter;
 
 }
 
@@ -30,7 +42,7 @@ float y2;
 } params;
 
 void set () {
-Shaders::SetVS(1);
+Shaders::SetVS(2);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 }
 
@@ -62,7 +74,7 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetVS(2);
+Shaders::SetVS(3);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 Textures::SetTexture(textures.positions, 0, Textures::tAssignType::vertex); 
 Textures::SetTexture(textures.normals, 1, Textures::tAssignType::vertex); 
@@ -78,7 +90,7 @@ namespace vs{
 struct { 
 
 void set () {
-Shaders::SetVS(3);
+Shaders::SetVS(4);
 }
 
 } quad;
@@ -96,7 +108,7 @@ float gY;
 } params;
 
 void set () {
-Shaders::SetVS(4);
+Shaders::SetVS(5);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 }
 
@@ -149,11 +161,15 @@ struct {
 
 struct 
 {
-float Aspect;
-float iAspect;
-float ResolutionX;
-float ResolutionY;
-float emboss;
+float aspect;
+float rad;
+float r;
+float g;
+float b;
+float a;
+float soft;
+float edge;
+float outlineBrightness;
 } params;
 
 void set () {
@@ -262,13 +278,49 @@ struct {
 
 struct 
 {
+float r;
+float g;
+float b;
+float a;
+float bold;
+} params;
+
+struct 
+{
+int tex;
+} textures;
+
+struct 
+{
+int s1Filter;
+int s1AddressU;
+int s1AddressV;
+} samplers;
+
+void set () {
+Shaders::SetPS(6);
+memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+Textures::SetTexture(textures.tex, 0, Textures::tAssignType::pixel); 
+Sampler::Set(Sampler::to::pixel, 0, samplers.s1Filter, samplers.s1AddressU, samplers.s1AddressV); 
+}
+
+} letter_ps;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
 float sx;
 float sy;
 float sz;
 } params;
 
 void set () {
-Shaders::SetPS(6);
+Shaders::SetPS(7);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
@@ -288,7 +340,7 @@ float b;
 } params;
 
 void set () {
-Shaders::SetPS(7);
+Shaders::SetPS(8);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
