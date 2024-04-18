@@ -179,6 +179,7 @@
     <ClInclude Include="editor\editor.h" />
     <ClInclude Include="editor\editorWindow.h" />
     <ClInclude Include="editor\hotReload.h" />
+    <ClInclude Include="editor\timeLine.h" />
     <ClInclude Include="editor\uiDraw.h" />
     <ClInclude Include="generated\constBufReflect.h" />
     <ClInclude Include="generated\libList.h" />

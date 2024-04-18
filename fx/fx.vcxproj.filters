@@ -125,6 +125,9 @@
     <ClInclude Include="editor\uiDraw.h">
       <Filter>Source Files\editor</Filter>
     </ClInclude>
+    <ClInclude Include="editor\timeLine.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

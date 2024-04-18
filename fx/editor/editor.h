@@ -17,10 +17,19 @@ namespace editor
 	#include "editorWindow.h"
 	#include "hotReload.h"
 	#include "uiDraw.h"
+	#include "timeLine.h"
 
 	void Init()
 	{
 		SelfLocate();
 		SetRenderWindowPosition();
+	}
+
+	void Process()
+	{
+		api.cull(cullmode::off);
+		api.depth(depthmode::off);
+
+		TimeLine::Show();
 	}
 }

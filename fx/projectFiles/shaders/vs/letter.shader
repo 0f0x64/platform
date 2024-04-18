@@ -19,7 +19,7 @@ VS_OUTPUT_POS_UV VS(uint vID : SV_VertexID, uint iID : SV_InstanceID)
 {
     VS_OUTPUT_POS_UV output;
     float2 quad[6] = { 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1 };
-    float2 p = (quad[vID] - float2(0,1)) * float2(width, height) + pos_size[iID].xy;
+    float2 p = (quad[vID] - float2(0, 1)) * float2(width, height) + pos_size[iID].xy * float2(2, -2) - float2(1,-1);
     output.pos = float4(p, 0, 1);
     output.uv = float2(quad[vID].x, 1- quad[vID].y);
     output.uv.y /= 96.;

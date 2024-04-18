@@ -94,7 +94,7 @@ namespace ui
 				*(unsigned char*)(m_targaData + index + 0) = targaImage[k + 2];  // Red.
 				*(unsigned char*)(m_targaData + index + 1) = targaImage[k + 1];  // Green.
 				*(unsigned char*)(m_targaData + index + 2) = targaImage[k + 0];  // Blue
-				*(unsigned char*)(m_targaData + index + 3) = 1;// targaImage[k + 3];  // Alpha
+				*(unsigned char*)(m_targaData + index + 3) = targaImage[k + 3];  // Alpha
 
 				// Increment the indexes into the targa data.
 				k += 4;
@@ -112,7 +112,7 @@ namespace ui
 		return true;
 	}
 
-	char* image;
+	
 	float kerningTable[255];
 
 	void LoadTGA()
@@ -149,7 +149,11 @@ namespace ui
 				for (int x = w; x >= 0; x--)
 				{
 					unsigned char pixel = *(unsigned char*)(m_targaData + ((yOfs + y) * fontW + x) * 4);
-					if (pixel > 0) lineMax = max(lineMax, x);
+					if (pixel > 0)
+					{
+						lineMax = x;
+						break;
+					}
 				}
 				rowMax = max(rowMax, lineMax);
 			}
@@ -161,19 +165,11 @@ namespace ui
 		kerningTable[0] = 0.5f / float(fontW);
 
 	}
+
+
 	int pCounter = 0;
 
-	void SetPoint(float x, float y, float z = 0)
-	{
-		ConstBuf::float4array[pCounter].x = x;
-		ConstBuf::float4array[pCounter].y = y;
-		ConstBuf::float4array[pCounter].z = z;
-		ConstBuf::float4array[pCounter].w = 1;
-		pCounter++;
-
-	}
-
-	void SetBox(float x, float y, float w, float h)
+	void SetFloat4Const(float x, float y, float w = 0, float h = 0)
 	{
 		ConstBuf::float4array[pCounter].x = x;
 		ConstBuf::float4array[pCounter].y = y;
@@ -194,9 +190,10 @@ namespace ui
 		for (int i = 0; i < 128; i++)
 		{
 			float x = ((i / 128.f) - .5f) * 2;
-			SetPoint(x, 0);
-			SetPoint(x, 0.1);
+			SetFloat4Const(x, 0);
+			SetFloat4Const(x, 0.1);
 		}
+
 		ConstBuf::Update(6, ConstBuf::float4array);
 
 		vs::lineDrawer.set();
@@ -248,18 +245,18 @@ namespace ui
 			box::a = 1.f;
 			box::width = .25f;
 			box::height = .25f;
-			box::rounded = .25f;
-			box::soft = 100.f;
-			box::edge = 10.f;
-			box::outlineBrightness = 0.f;
+			box::rounded = .1f;
+			box::soft = 11.1f;
+			box::edge =11.f;
+			box::outlineBrightness = 1110.f;
 
 			text::r = .9f;
 			text::g = .9f;
 			text::b = .9f;
 			text::a = 1.f;
-			text::width = .25;
-			text::height = .25;
-			text::tracking = 0.5;
+			text::width = .035;
+			text::height = .035;
+			text::tracking = 0.1;
 			text::forceWidth = false;
 			text::fWidthValue = kerningTable[0] * text::width;
 
@@ -277,7 +274,7 @@ namespace ui
 		using namespace style;
 
 		pCounter = 0;
-		SetBox(x, y, w, h);
+		SetFloat4Const(x, y, w, h);
 
 		ConstBuf::Update(6, ConstBuf::float4array);
 		ConstBuf::SetToVertex(6);
@@ -330,7 +327,7 @@ namespace ui
 
 		for (unsigned int i = 0; i < strlen(str); i++)
 		{
-			SetBox(x + offset, y, (float)(str[i] - 32), 0);
+			SetFloat4Const(x + offset, y, (float)(str[i] - 32), 0);
 			offset += getLetterOffset(str[i]);
 		}
 
@@ -381,9 +378,12 @@ namespace ui
 		CalcKerning();
 	}
 
+	//ShowButtonWithText("bla Bla-bla", 0, 0, .5, .5);
+
+
 	void Draw()
 	{
-		ShowButtonWithText("bla Bla-bla", 0, 0, .5, .5);
+
 	}
 
 }
