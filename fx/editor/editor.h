@@ -27,9 +27,10 @@ namespace editor
 
 	void Process()
 	{
+		api.rt(tex::mainRT);
 		api.cull(cullmode::off);
 		api.depth(depthmode::off);
 
-		TimeLine::Show();
+		TimeLine::Draw();
 	}
 }

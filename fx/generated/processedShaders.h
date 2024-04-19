@@ -75,7 +75,7 @@ const char* lineDrawer =
 "\n"
 "cbuffer geo : register(b6)\n"
 "{\n"
-"    float4 position[256];\n"
+"    float4 position[4000];\n"
 "}\n"
 "\n"
 "//]\n"

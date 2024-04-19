@@ -33,4 +33,4 @@
 #define vShadersPath "../fx/projectFiles/shaders/vs/"
 #define pShadersPath "../fx/projectFiles/shaders/ps/"
 
-#define MAIN_DISPLAY_DENOMINATOR 3
+#define MAIN_DISPLAY_DENOMINATOR 1

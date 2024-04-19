@@ -21,7 +21,7 @@ namespace Draw
 		context->DrawInstanced(quadCount * 6, instances, 0, 0);
 	}
 
-	void LineNullDrawer(int lineCount, int instances)
+	void LineNullDrawer(int vertexCount, int instances)
 	{
 		ConstBuf::Update(0, ConstBuf::drawerV);
 		ConstBuf::SetToVertex(0);
@@ -31,7 +31,7 @@ namespace Draw
 		ConstBuf::Update(6, ConstBuf::float4array);
 		ConstBuf::SetToVertex(6);
 
-		context->DrawInstanced(lineCount*2 , instances, 0, 0);
+		context->DrawInstanced(vertexCount , instances, 0, 0);
 	}
 
 	void Present()

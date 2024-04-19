@@ -10,7 +10,7 @@ cbuffer params : register(b0)
 
 cbuffer geo : register(b6)
 {
-    float4 position[256];
+    float4 position[4000];
 }
 
 //]

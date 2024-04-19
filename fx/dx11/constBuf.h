@@ -32,7 +32,8 @@ namespace ConstBuf
 	XMFLOAT4 global[constCount];//update once on start
 
 	//b6
-	XMFLOAT4 float4array[256];
+	#define float4ArraySize 4000
+	XMFLOAT4 float4array[float4ArraySize];
 
 
 	int roundUp(int n, int r)
