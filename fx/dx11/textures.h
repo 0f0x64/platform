@@ -16,6 +16,7 @@ namespace Textures
 	ID3D11RenderTargetView* mrtView[8];
 
 	typedef struct {
+
 		ID3D11Texture2D* pTexture;
 		ID3D11ShaderResourceView* TextureResView;
 		ID3D11RenderTargetView* RenderTargetView[16][6];//16 for possible mips? // 6 for cubemap
@@ -106,7 +107,6 @@ namespace Textures
 		}
 		else
 		{
-
 			for (unsigned int m = 0; m < tdesc.MipLevels; m++)
 			{
 				renderTargetViewDesc.Texture2D.MipSlice = m;
@@ -114,7 +114,6 @@ namespace Textures
 				LogIfError("CreateRenderTargetView error\n");
 			}
 		}
-
 	}
 
 	void Depth(int i)
@@ -148,7 +147,6 @@ namespace Textures
 			HRESULT hr = device->CreateDepthStencilView(texture[i].pDepth, &descDSV, &texture[i].DepthStencilView[m]);
 			LogIfError("CreateDepthStencilView error\n");
 		}
-
 	}
 
 	void shaderResDepth(int i)
@@ -187,7 +185,6 @@ namespace Textures
 			Depth(i);
 			shaderResDepth(i);
 		}
-
 	}
 
 	void UnbindAll()
@@ -263,8 +260,6 @@ namespace Textures
 
 		SetViewport(texId, level);
 	}
-
-	
 
 	#define Texture(name,type,format,width,height,mip,depth) name,
 	enum list {

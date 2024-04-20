@@ -187,32 +187,11 @@ struct {
 
 struct 
 {
-float r;
-float g;
-float b;
-float a;
-} params;
-
-void set () {
-Shaders::SetPS(2);
-memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
-}
-
-} colorFill;
-
-}
-
-namespace ps{
-
-struct { 
-
-struct 
-{
 float p;
 } params;
 
 void set () {
-Shaders::SetPS(3);
+Shaders::SetPS(2);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
@@ -237,7 +216,7 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetPS(4);
+Shaders::SetPS(3);
 Textures::SetTexture(textures.env, 0, Textures::tAssignType::pixel); 
 Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
@@ -263,7 +242,7 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetPS(5);
+Shaders::SetPS(4);
 Textures::SetTexture(textures.geo, 0, Textures::tAssignType::pixel); 
 Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
@@ -298,13 +277,34 @@ int s1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetPS(6);
+Shaders::SetPS(5);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 Textures::SetTexture(textures.tex, 0, Textures::tAssignType::pixel); 
 Sampler::Set(Sampler::to::pixel, 0, samplers.s1Filter, samplers.s1AddressU, samplers.s1AddressV); 
 }
 
 } letter_ps;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+float r;
+float g;
+float b;
+float a;
+} params;
+
+void set () {
+Shaders::SetPS(6);
+memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+}
+
+} lineDrawer_ps;
 
 }
 

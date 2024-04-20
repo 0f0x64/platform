@@ -183,6 +183,7 @@
     <ClInclude Include="editor\style.h" />
     <ClInclude Include="editor\timeLine.h" />
     <ClInclude Include="editor\uiDraw.h" />
+    <ClInclude Include="editor\wndProc.h" />
     <ClInclude Include="generated\constBufReflect.h" />
     <ClInclude Include="generated\libList.h" />
     <ClInclude Include="generated\processedShaders.h" />
@@ -201,7 +202,7 @@
     <None Include="projectFiles\shaders\lib\utils.shader" />
     <None Include="projectFiles\shaders\ps\basic.shader" />
     <None Include="projectFiles\shaders\ps\box_ps.shader" />
-    <None Include="projectFiles\shaders\ps\colorFill.shader" />
+    <None Include="projectFiles\shaders\ps\lineDrawer_ps.shader" />
     <None Include="projectFiles\shaders\ps\cubemapCreator.shader" />
     <None Include="projectFiles\shaders\ps\genNormals.shader" />
     <None Include="projectFiles\shaders\ps\letter_ps.shader" />

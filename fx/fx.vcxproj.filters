@@ -37,6 +37,9 @@
     <Filter Include="Source Files\editor">
       <UniqueIdentifier>{f48baced-bedb-4d0b-864d-cc9f8c0d8038}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\projectFiles\shadersSource\ui">
+      <UniqueIdentifier>{9a898832-04c4-4db4-9929-0b27abf85e4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -134,6 +137,9 @@
     <ClInclude Include="editor\style.h">
       <Filter>Source Files\editor</Filter>
     </ClInclude>
+    <ClInclude Include="editor\wndProc.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">
@@ -180,23 +186,23 @@
     <None Include="projectFiles\shaders\ps\genNormals.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
-    <None Include="projectFiles\shaders\ps\colorFill.shader">
-      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
-    </None>
-    <None Include="projectFiles\shaders\vs\lineDrawer.shader">
-      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
-    </None>
     <None Include="projectFiles\shaders\vs\box.shader">
-      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
-    </None>
-    <None Include="projectFiles\shaders\ps\box_ps.shader">
-      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
-    </None>
-    <None Include="projectFiles\shaders\ps\letter_ps.shader">
-      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
     </None>
     <None Include="projectFiles\shaders\vs\letter.shader">
-      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\lineDrawer.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\box_ps.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\lineDrawer_ps.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\letter_ps.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
     </None>
   </ItemGroup>
 </Project>

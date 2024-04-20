@@ -296,24 +296,6 @@ const char* box_ps =
 "}\n"
 ;
 
-const char* colorFill = 
-"#include <../lib/io.shader>\n"
-"\n"
-"//[\n"
-"cbuffer params : register(b1)\n"
-"{\n"
-"    float r,g,b,a;\n"
-"};\n"
-"//]\n"
-"\n"
-"\n"
-"\n"
-"float4 PS(VS_OUTPUT_POSONLY input) : SV_Target\n"
-"{\n"
-"    return float4(r, g, b, a);\n"
-"}\n"
-;
-
 const char* cubemapCreator = 
 "#include <../lib/constBuf.shader>\n"
 "#include <../lib/io.shader>\n"
@@ -426,6 +408,24 @@ const char* letter_ps =
 "//    color.a = .5;\n"
 "    color *= float4(r, g, b, a);\n"
 "    return float4(color);\n"
+"}\n"
+;
+
+const char* lineDrawer_ps = 
+"#include <../lib/io.shader>\n"
+"\n"
+"//[\n"
+"cbuffer params : register(b1)\n"
+"{\n"
+"    float r,g,b,a;\n"
+"};\n"
+"//]\n"
+"\n"
+"\n"
+"\n"
+"float4 PS(VS_OUTPUT_POSONLY input) : SV_Target\n"
+"{\n"
+"    return float4(r, g, b, a);\n"
 "}\n"
 ;
 

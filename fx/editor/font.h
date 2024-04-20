@@ -78,7 +78,7 @@ void LoadFont()
 	LoadTarga("..\\ui_font\\font.tga", th, tw);
 
 	int rowPitch = (tw * 4) * sizeof(unsigned char);
-	context->UpdateSubresource(dx11::Textures::texture[tex::font].pTexture, 0, NULL, m_targaData, rowPitch, 0);
+	context->UpdateSubresource(dx11::Textures::texture[fontTextureIndex].pTexture, 0, NULL, m_targaData, rowPitch, 0);
 
 }
 

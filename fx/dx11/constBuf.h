@@ -36,7 +36,7 @@ namespace ConstBuf
 		return 	n - (n % r) + r;
 	}
 
-	void CreateCB(ID3D11Buffer* &buf, int size)
+	void Create(ID3D11Buffer* &buf, int size)
 	{
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(bd));
@@ -52,12 +52,12 @@ namespace ConstBuf
 
 	void Init()
 	{
-		CreateCB(buffer[0], sizeof(drawerV));
-		CreateCB(buffer[1], sizeof(drawerP));
-		CreateCB(buffer[2], sizeof(drawerMat));
-		CreateCB(buffer[3], sizeof(camera));
-		CreateCB(buffer[4], sizeof(frame));
-		CreateCB(buffer[5], sizeof(global));
+		Create(buffer[0], sizeof(drawerV));
+		Create(buffer[1], sizeof(drawerP));
+		Create(buffer[2], sizeof(drawerMat));
+		Create(buffer[3], sizeof(camera));
+		Create(buffer[4], sizeof(frame));
+		Create(buffer[5], sizeof(global));
 	}
 
 	template <typename T>

@@ -1,4 +1,7 @@
 check unused shaders & includes
+
+refactor api for working with external resources - use pouinters instead indicies
+
 mrt set
 
 compare sampler support

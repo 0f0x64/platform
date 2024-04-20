@@ -9,7 +9,6 @@ static inline int32 log2(float x)
 	return log2;
 }
 
-
 namespace dx11
 {
 

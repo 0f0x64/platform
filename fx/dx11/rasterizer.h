@@ -14,7 +14,6 @@ namespace Rasterizer
 		context->RSSetScissorRects(1, &rect);
 	}
 
-
 	void Init()
 	{
 		D3D11_RASTERIZER_DESC rasterizerState;
@@ -43,7 +42,5 @@ namespace Rasterizer
 		context->RSSetState(rasterState[0]);
 		setScissors(0, 0, 1, 1);
 	}
-
-
 
 }
