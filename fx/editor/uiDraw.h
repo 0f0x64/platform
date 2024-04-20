@@ -2,6 +2,33 @@ namespace ui
 {
 	using namespace dx11;
 
+	ID3D11Buffer* f4arrayBuf;
+	#define float4ArraySize 4000
+	XMFLOAT4 float4array[float4ArraySize];
+
+	void CreateConstBuf()
+	{
+		ConstBuf::CreateCB(f4arrayBuf, sizeof(float4array));
+	}
+
+	void f4arrayUpdateAndSet()
+	{
+		context->UpdateSubresource(f4arrayBuf, 0, NULL, float4array, 0, 0);
+		context->VSSetConstantBuffers(6, 1, &f4arrayBuf);
+	}
+
+	void LineNullDrawer(int vertexCount, int instances)
+	{
+		ConstBuf::Update(0, ConstBuf::drawerV);
+		ConstBuf::SetToVertex(0);
+		ConstBuf::Update(1, ConstBuf::drawerP);
+		ConstBuf::SetToPixel(1);
+
+		f4arrayUpdateAndSet();
+
+		context->DrawInstanced(vertexCount, instances, 0, 0);
+	}
+
 	#include "font.h"
 	#include "style.h"
 
@@ -9,10 +36,10 @@ namespace ui
 
 	void SetFloat4Const(float x, float y, float w = 0, float h = 0)
 	{
-		ConstBuf::float4array[pCounter].x = x;
-		ConstBuf::float4array[pCounter].y = y;
-		ConstBuf::float4array[pCounter].z = w;
-		ConstBuf::float4array[pCounter].w = h;
+		float4array[pCounter].x = x;
+		float4array[pCounter].y = y;
+		float4array[pCounter].z = w;
+		float4array[pCounter].w = h;
 		pCounter++;
 	}
 
@@ -51,7 +78,7 @@ namespace ui
 			if (pCounter > float4ArraySize-2 || i == count - 1)
 			{
 				vs::lineDrawer.set();
-				api.drawLine(pCounter, 1);
+				LineNullDrawer(pCounter, 1);
 				pCounter = 0;
 			}
 		}
@@ -72,8 +99,7 @@ namespace ui
 		pCounter = 0;
 		SetFloat4Const(x, y, w, h);
 
-		ConstBuf::Update(6, ConstBuf::float4array);
-		ConstBuf::SetToVertex(6);
+		f4arrayUpdateAndSet();
 		vs::box.set();
 
 		ps::box_ps.params.aspect = aspect;
@@ -137,8 +163,7 @@ namespace ui
 			offset += getLetterOffset(str[i])/2.f;
 		}
 
-		ConstBuf::Update(6, ConstBuf::float4array);
-		ConstBuf::SetToVertex(6);
+		f4arrayUpdateAndSet();
 
 		vs::letter.set();
 
@@ -176,6 +201,7 @@ namespace ui
 	{
 		LoadFont();
 		CalcKerning();
+		CreateConstBuf();
 	}
 
 	void Draw()

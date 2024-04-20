@@ -1,7 +1,7 @@
 namespace ConstBuf
 {
 
-	ID3D11Buffer* buffer[7];
+	ID3D11Buffer* buffer[6];
 
 	#define constCount 32
 
@@ -31,17 +31,12 @@ namespace ConstBuf
 	//b5
 	XMFLOAT4 global[constCount];//update once on start
 
-	//b6
-	#define float4ArraySize 4000
-	XMFLOAT4 float4array[float4ArraySize];
-
-
 	int roundUp(int n, int r)
 	{
 		return 	n - (n % r) + r;
 	}
 
-	void CreateCB(int i, int size)
+	void CreateCB(ID3D11Buffer* &buf, int size)
 	{
 		D3D11_BUFFER_DESC bd;
 		ZeroMemory(&bd, sizeof(bd));
@@ -51,19 +46,18 @@ namespace ConstBuf
 		bd.CPUAccessFlags = 0;
 		bd.StructureByteStride = 16;
 
-		HRESULT hr = device->CreateBuffer(&bd, NULL, &buffer[i]);
+		HRESULT hr = device->CreateBuffer(&bd, NULL, &buf);
 		LogIfError("constant bufferV fail\n");
 	}
 
 	void Init()
 	{
-		CreateCB(0, sizeof(drawerV));
-		CreateCB(1, sizeof(drawerP));
-		CreateCB(2, sizeof(drawerMat));
-		CreateCB(3, sizeof(camera));
-		CreateCB(4, sizeof(frame));
-		CreateCB(5, sizeof(global));
-		CreateCB(6, sizeof(float4array));
+		CreateCB(buffer[0], sizeof(drawerV));
+		CreateCB(buffer[1], sizeof(drawerP));
+		CreateCB(buffer[2], sizeof(drawerMat));
+		CreateCB(buffer[3], sizeof(camera));
+		CreateCB(buffer[4], sizeof(frame));
+		CreateCB(buffer[5], sizeof(global));
 	}
 
 	template <typename T>

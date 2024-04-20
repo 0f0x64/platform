@@ -226,7 +226,7 @@ namespace Textures
 
 	enum tAssignType { vertex, pixel, both };
 
-	void SetTexture(byte tex, byte slot, tAssignType tA = tAssignType::both)
+	void SetTexture(int tex, int slot, tAssignType tA = tAssignType::both)
 	{
 		if (tA == tAssignType::both || tA == tAssignType::vertex)
 		{

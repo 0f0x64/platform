@@ -95,7 +95,6 @@ namespace dx11
 		void mips() { Textures::CreateMipMap(); }
 		void depth(int i) { Depth::Set(i); }
 		void draw(int quadcount, int instances = 1) { Draw::NullDrawer(quadcount, instances); }
-		void drawLine(int linecount, int instances = 1) { Draw::LineNullDrawer(linecount, instances); }
 		void cam() { Camera::Set(); }
 		void clear(float r, float g, float b, float a) { Draw::Clear(r, g, b, a); }
 		void clearDepth() { Draw::ClearDepth(); }

@@ -21,19 +21,6 @@ namespace Draw
 		context->DrawInstanced(quadCount * 6, instances, 0, 0);
 	}
 
-	void LineNullDrawer(int vertexCount, int instances)
-	{
-		ConstBuf::Update(0, ConstBuf::drawerV);
-		ConstBuf::SetToVertex(0);
-		ConstBuf::Update(1, ConstBuf::drawerP);
-		ConstBuf::SetToPixel(1);
-
-		ConstBuf::Update(6, ConstBuf::float4array);
-		ConstBuf::SetToVertex(6);
-
-		context->DrawInstanced(vertexCount , instances, 0, 0);
-	}
-
 	void Present()
 	{
 		Textures::UnbindAll();
