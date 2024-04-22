@@ -1,6 +1,8 @@
 namespace TimeLine
 {
 
+	const int TIME_KEY = VK_LMENU;
+
 	const int frame = SAMPLES_IN_FRAME;
 	const int second = SAMPLING_FREQ;
 	const int minute = (SAMPLING_FREQ * FRAMES_PER_SECOND);
@@ -9,9 +11,11 @@ namespace TimeLine
 	float screenLeft = .25f;
 	float screenRight = .75f;
 	
-	int zoomOut = timelineLen;
+	int zoomOut = timelineLen/ (screenRight- screenLeft);
 
 	int posLast = 0;
+
+	bool play = false;
 
 	float TimeToScreen(int time)
 	{
@@ -27,10 +31,10 @@ namespace TimeLine
 
 	int pos = (-ScreenToTime(screenLeft));
 
-	int timeCursor = 0;
+
 	int timeCursorLast = 0;
 
-	char timeStr[10];
+	char timeStr[16];
 
 	void TimeToStr(int time)
 	{
@@ -45,6 +49,26 @@ namespace TimeLine
 		strcpy(timeStr, minStr);
 		strcat(timeStr, ":");
 		strcat(timeStr, secStr);
+	}
+
+	void TimeToStrWithFrame(int time)
+	{
+		char minStr[4];
+		char secStr[4];
+		char frameStr[4];
+
+		int _min = time / (minute);
+		int _sec = (time % (minute)) / (second);
+		int _frame = time % (second) / (frame);
+
+		_itoa(_min, minStr, 10);
+		_itoa(_sec, secStr, 10);
+		_itoa(_frame, frameStr, 10);
+		strcpy(timeStr, minStr);
+		strcat(timeStr, ":");
+		strcat(timeStr, secStr);
+		strcat(timeStr, ":");
+		strcat(timeStr, frameStr);
 	}
 
 	int GetAdaptiveStep(int minTimeStep)
@@ -70,7 +94,7 @@ namespace TimeLine
 
 		int screenEnd = ScreenToTime(right);
 		int end = min(timelineLen, screenEnd);
-		int start = ScreenToTime(left) / step;
+		int start = (int)ceil(ScreenToTime(left) / (double)step);
 		int iter = (int)ceil(end / (double)step);
 
 		api.setIA(topology::lineList);
@@ -81,9 +105,9 @@ namespace TimeLine
 		{
 			int time = i * step;
 			float x = TimeToScreen(time) - left + screenLeft;
-			float h = ui::style::text::height / 8.f;
-			if (time % (second) == 0) h *= 2;
-			if (time % (minute) == 0) h *= 2;
+			float h = ui::style::text::height / 4.f;
+			if (time % (second) == 0) h *= 1.5;
+			if (time % (minute) == 0) h *= 1.5;
 
 			ui::Line::buffer[counter].x = x;
 			ui::Line::buffer[counter].y = 1;
@@ -94,25 +118,30 @@ namespace TimeLine
 		}
 
 		ui::Line::Draw(counter);
-
-
 	}
 
 	void DrawCursor()
 	{
-		float cursor = TimeToScreen(timeCursor-pos);
+		float cursor = TimeToScreen(timer::timeCursor-pos);
+
+		if (cursor<screenLeft || cursor > screenRight) return;
+
 		ui::Line::buffer[0].x = cursor;
 		ui::Line::buffer[0].y = 1;
 		ui::Line::buffer[0].x1 = cursor;
-		ui::Line::buffer[0].y1 = 1 - 1;
+		ui::Line::buffer[0].y1 = 1 - ui::style::text::height*2. - (float)(isKeyDown(TIME_KEY));
 
 		api.blend(blendmode::alpha);
 		ui::Line::Draw(1,1,1,1,.75f+.25f*sinf(timer::frameBeginTime*.01));
 
 		ui::style::Base();
 		api.setIA(topology::triList);
-		TimeToStr(timeCursor);
+		TimeToStrWithFrame(timer::timeCursor);
 		ui::text::Draw(timeStr, cursor, 1 - ui::style::text::height * 2);
+
+		TimeToStrWithFrame(pos+ScreenToTime(.5));
+		ui::text::Draw(timeStr, cursor, 1 - ui::style::text::height * 4);
+
 	}
 
 	void DrawTimeStamps()
@@ -153,34 +182,49 @@ namespace TimeLine
 
 	void lbDown()
 	{
-		timeCursorLast = timeCursor;
+		if (!isKeyDown(TIME_KEY)) return;
+
+		editor::ui::mousePos = editor::ui::GetCusorPos();
+		timer::timeCursor = ScreenToTime(editor::ui::mousePos.x) + pos;
+		timeCursorLast = timer::timeCursor;
+		editor::ui::mouseLastPos = editor::ui::mousePos;
 	}
 
 	void rbDown()
 	{
+		if (!isKeyDown(TIME_KEY)) return;
 		posLast = pos;
 	}
 
-	void lbDouble()
+	void reTime()
 	{
-		editor::ui::mousePos = editor::ui::GetCusorPos();
-		timeCursor = ScreenToTime(editor::ui::mousePos.x)+pos;
-		timeCursorLast = timeCursor;
-		editor::ui::mouseLastPos = editor::ui::mousePos;
+		timer::startTime = timer::frameBeginTime - timer::timeCursor / (double)second * 1000.;
+	}
+
+	void Space()
+	{
+		play = !play;
+		reTime();
 	}
 
 	void Wheel(int delta)
 	{
-		auto c = TimeToScreen(pos-timeCursor);
+		if (!isKeyDown(TIME_KEY)) return;
+		auto c = TimeToScreen(pos-timer::timeCursor);
 
-		if (delta < 0) zoomOut *= 1.1;
-		if (delta > 0) zoomOut /= 1.1;
+		if (delta < 0) zoomOut *= 1.2;
+		if (delta > 0) zoomOut /= 1.2;
 
-		zoomOut = min(zoomOut, timelineLen);
+		zoomOut = min(zoomOut, timelineLen / (screenRight - screenLeft));
 		zoomOut = max(zoomOut, 1000);
 
-		pos = ScreenToTime(c)+timeCursor;
+		pos = ScreenToTime(c)+timer::timeCursor;
 
+	}
+
+	float lerp(float x, float y, float a)
+	{
+		return x * (1 - a) + y * a;
 	}
 
 	void Draw()
@@ -192,27 +236,41 @@ namespace TimeLine
 		auto rightM = ScreenToTime(screenRight - margin) + pos;
 		auto leftM = ScreenToTime(screenLeft + margin) + pos;
 
-		if (ui::lbDown == true)
+		if (ui::lbDown && isKeyDown(TIME_KEY))
 		{
-			timeCursor = timeCursorLast + delta * ScreenToTime(1.);
+			timer::timeCursor = timeCursorLast + delta * ScreenToTime(1.);
 
-			if (timeCursor > rightM) pos += timeCursor - rightM;
-			if (timeCursor < leftM) pos -= leftM - timeCursor;
+			if (timer::timeCursor > rightM) pos += timer::timeCursor - rightM;
+			if (timer::timeCursor < leftM) pos -= leftM - timer::timeCursor;
+
+			reTime();
 		}
 
-		if (ui::rbDown == true)
+		if (ui::rbDown && isKeyDown(TIME_KEY))
 		{
 			pos = posLast - delta * ScreenToTime(1.);
 		}
 
 		pos = max(pos, -ScreenToTime(screenLeft));
 		pos = min(pos, timelineLen - ScreenToTime(screenRight));
-		timeCursor = max(timeCursor, 0);
-		timeCursor = min(timeCursor, timelineLen);
+		timer::timeCursor = max(timer::timeCursor, 0);
+		timer::timeCursor = min(timer::timeCursor, timelineLen);
 
-		DrawMakers();
-		DrawCursor();
-		DrawTimeStamps();
+		//if (isKeyDown(TIME_KEY))
+		{
+			DrawMakers();
+			DrawCursor();
+			DrawTimeStamps();
+		}
+
+		if (play)
+		{
+			timer::timeCursor=(timer::frameBeginTime - timer::startTime)*second/1000.;
+			if (timer::timeCursor > rightM) pos += timer::timeCursor - rightM;
+
+			pos = lerp(pos, timer::timeCursor - ScreenToTime(.5), .15);
+
+		}
 	}
 
 }

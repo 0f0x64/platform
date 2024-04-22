@@ -24,7 +24,7 @@ void SetRenderWindowPosition()
 				GetMonitorInfo(MonitorFromWindow(hWnd, 0), &monitorInfo);
 				const auto rc = monitorInfo.rcMonitor;
 				SetWindowPos(hWnd, HWND_TOPMOST, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, 0);
-				SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) & (~WS_CAPTION));//no header
+				//SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) & (~WS_CAPTION));//no header
 				ShowWindow(hWnd, SW_MAXIMIZE);
 
 				width = dm.dmPelsWidth;

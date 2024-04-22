@@ -8,6 +8,7 @@ namespace timer
 	double frameEndTime = 0;
 	double nextFrameTime = 0;
 	double frameRenderingDuration = 0.0;
+	int timeCursor = 0;
 
 	void StartCounter()
 	{

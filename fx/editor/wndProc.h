@@ -1,4 +1,3 @@
-
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -38,9 +37,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 	case WM_CHAR:
+		break;
 	case WM_KEYDOWN:
 	{
-		break;
+		switch (wParam)
+		{
+			case VK_SPACE:
+				editor::TimeLine::Space();
+				break;
+		}
 	}
 	case WM_LBUTTONUP:
 		editor::ui::lbDown = false;
@@ -48,7 +53,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_LBUTTONDBLCLK:
 		editor::ui::dblClk = true;
-		editor::TimeLine::lbDouble();
 	case WM_LBUTTONDOWN:
 	{
 		editor::ui::mouseLastPos = editor::ui::GetCusorPos();

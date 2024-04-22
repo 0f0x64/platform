@@ -14,6 +14,13 @@ namespace editor
 		SetCurrentDirectory((LPSTR)name);
 	}
 
+	bool ALT = false;
+
+	bool isKeyDown(int key)
+	{
+		return GetKeyState(key) & 0x8000;
+	}
+
 	#include "editorWindow.h"
 	#include "hotReload.h"
 	#include "uiDraw.h"

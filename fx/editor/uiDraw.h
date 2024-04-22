@@ -21,14 +21,10 @@ namespace ui
 
 		RECT r;
 		GetClientRect(hWnd, &r);
-		float c = (r.bottom - r.top) / float(dx11::height);
-		float c2 = (r.right - r.left) / float(dx11::width);
-		p.y /= c;
-		p.x /= c2;
 
 		editor::ui::point2df pos;
-		pos.x = p.x / float(dx11::width);
-		pos.y = p.y / float(dx11::height);
+		pos.x = p.x/(float)(r.right - r.left);
+		pos.y = p.y/(float)(r.bottom - r.top);
 
 		return pos;
 	}
