@@ -120,8 +120,8 @@ namespace ui
 
 			for (int i = 0; i < count; i++)
 			{
-				ConstBuffer::SetFloat4Const(buffer[i].x, buffer[i].y);
-				ConstBuffer::SetFloat4Const(buffer[i].x1, buffer[i].y1);
+				ConstBuffer::SetFloat4Const(buffer[i].x, floor(buffer[i].y * height) / height);
+				ConstBuffer::SetFloat4Const(buffer[i].x1, floor(buffer[i].y1 * height) / height);
 
 				if (ConstBuffer::pCounter > float4ArraySize - 2 || i == count - 1)
 				{

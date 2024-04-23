@@ -39,24 +39,7 @@ namespace TimeLine
 
 	char timeStr[16];
 
-	void TimeToStr(int time)
-	{
-		char minStr[3];
-		char secStr[3];
-
-		int _min = time / (minute);
-		int _sec = (time % (minute)) / (second);
-
-		_itoa(_min, minStr, 10);
-		_itoa(_sec, secStr, 10);
-		strcpy(timeStr, minStr);
-		strcat(timeStr, ":");
-		if (_sec < 10) strcat(timeStr, "0");
-		strcat(timeStr, secStr);
-
-	}
-
-	void TimeToStrWithFrame(int time)
+	void TimeToStr(int time, bool frames =  false)
 	{
 		char minStr[4];
 		char secStr[4];
@@ -73,6 +56,9 @@ namespace TimeLine
 		strcat(timeStr, ":");
 		if (_sec < 10) strcat(timeStr, "0");
 		strcat(timeStr, secStr);
+
+		if (!frames) return;
+
 		strcat(timeStr, ":");
 		if (_frame < 10) strcat(timeStr, "0");
 		strcat(timeStr, frameStr);
@@ -83,7 +69,6 @@ namespace TimeLine
 		int step = minute;
 		if (second * 30 > minTimeStep) step = second * 30;
 		if (second * 15 > minTimeStep) step = second * 15;
-		if (second * 10 > minTimeStep) step = second * 10;
 		if (second * 5  > minTimeStep) step = second * 5;
 		if (second > minTimeStep) step = second;
 		if (frame > minTimeStep) step = frame;
@@ -97,7 +82,7 @@ namespace TimeLine
 		float left = screenLeft + TimeToScreen(pos);
 		
 		float right = screenRight + TimeToScreen(pos);
-		int minTimeStep = ScreenToTime(16.f / width);
+		int minTimeStep = ScreenToTime(0.003125);
 		int step = GetAdaptiveStep(minTimeStep);
 
 		int screenEnd = ScreenToTime(right);
@@ -112,11 +97,15 @@ namespace TimeLine
 
 		for (int i = start; i < iter; i++)
 		{
+			float baseH = ui::style::text::height / 4.f;
 			int time = i * step;
 			float x = TimeToScreen(time) - left + screenLeft;
-			float h = ui::style::text::height / 4.f;
-			if (time % (second) == 0) h *= 1.5;
-			if (time % (minute) == 0) h *= 1.5;
+			float h = baseH*1.5;
+			if (time % (second) == 0) h = baseH*1.5;
+			if (time % (second*5) == 0) h = baseH * 1.5;
+			if (time % (second * 15) == 0) h = baseH * 2.;
+			if (time % (second * 30) == 0) h = baseH * 2.5;
+			if (time % (minute) == 0) h = baseH * 2.5;
 
 			ui::Line::buffer[counter].x = x;
 			ui::Line::buffer[counter].y = y;
@@ -151,7 +140,7 @@ namespace TimeLine
 
 		ui::style::Base();
 		api.setIA(topology::triList);
-		TimeToStrWithFrame(timer::timeCursor);
+		TimeToStr(timer::timeCursor, true);
 		ui::text::Draw(timeStr, cursor, y - ui::style::text::height * 2);
 	}
 
@@ -173,7 +162,6 @@ namespace TimeLine
 		ps::letter_ps.samplers.s1AddressV = addr::clamp;
 		ps::letter_ps.textures.tex = ui::fontTextureIndex;
 
-		//int minTimeStep = ScreenToTime(ui::style::text::height * 5.f);
 		int minTimeStep = ScreenToTime(ui::style::text::height * 2.f);
 		int step = GetAdaptiveStep(minTimeStep);
 		int iter = (int)ceil(end / (double)step);
@@ -199,6 +187,10 @@ namespace TimeLine
 
 		editor::ui::mousePos = editor::ui::GetCusorPos();
 		timer::timeCursor = ScreenToTime(editor::ui::mousePos.x) + pos;
+
+		timer::timeCursor = max(timer::timeCursor, 0);
+		timer::timeCursor = min(timer::timeCursor, timelineLen);
+
 		timeCursorLast = timer::timeCursor;
 		editor::ui::mouseLastPos = editor::ui::mousePos;
 	}
@@ -228,7 +220,7 @@ namespace TimeLine
 
 		auto c = TimeToScreen(pos-timer::timeCursor);
 
-		zoomOut *= delta<0 ? 1.2 : 1/1.2;
+		zoomOut *= delta<0 ? 1.05 : 1/1.05;
 
 		zoomOut = min(zoomOut, timelineLen / (screenRight - screenLeft));
 		zoomOut = max(zoomOut, 1000);
@@ -239,11 +231,6 @@ namespace TimeLine
 		editor::ui::mouseLastPos.x = editor::ui::mousePos.x;
 
 		
-	}
-
-	float lerp(float x, float y, float a)
-	{
-		return x * (1 - a) + y * a;
 	}
 
 	void Draw()

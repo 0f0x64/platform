@@ -43,8 +43,10 @@ void SetRenderWindowPosition()
 				int h = (rc.bottom - rc.top) / MAIN_DISPLAY_DENOMINATOR;
 				SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, w, h, SWP_NOMOVE);//window on top
 
-				width = dm.dmPelsWidth;
-				height = dm.dmPelsHeight;
+				width = w;
+				height = h;
+				//width = dm.dmPelsWidth;
+				//height = dm.dmPelsHeight;
 
 				return;
 			}
