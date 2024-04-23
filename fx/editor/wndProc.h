@@ -48,7 +48,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		}
 	}
 	case WM_LBUTTONUP:
-		editor::ui::lbDown = false;
 		break;
 
 	case WM_LBUTTONDBLCLK:
@@ -56,19 +55,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 	{
 		editor::ui::mouseLastPos = editor::ui::GetCusorPos();
-		editor::ui::lbDown = true;
 		editor::TimeLine::lbDown();
 		break;
 	}
 
 	case WM_RBUTTONUP:
-		editor::ui::rbDown = false;
 		break;
 
 	case WM_RBUTTONDOWN:
 	{
 		editor::ui::mouseLastPos = editor::ui::GetCusorPos();
-		editor::ui::rbDown = true;
 		editor::TimeLine::rbDown();
 		break;
 	}
@@ -76,6 +72,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_SYSKEYDOWN:
 	{
+
 		break;
 	}
 

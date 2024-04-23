@@ -29,6 +29,17 @@ namespace ui
 		return pos;
 	}
 
+	void SetCusorPos(point2df pos)
+	{
+		POINT p;
+		RECT r;
+		GetClientRect(hWnd, &r);
+		p.x = pos.x * (float)(r.right - r.left);
+		p.y = pos.y * (float)(r.bottom - r.top);
+		ClientToScreen(hWnd, &p);
+		SetCursorPos(p.x, p.y);
+	}
+
 	using namespace dx11;
 
 	const int fontTextureIndex = 254;
