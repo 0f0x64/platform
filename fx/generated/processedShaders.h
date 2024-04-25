@@ -19,7 +19,7 @@ const char* box =
 "{\n"
 "    VS_OUTPUT_POS_UV output;\n"
 "    float2 quad[6] = { 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 1 };\n"
-"    float2 p = (quad[vID] - float2(0, 1)) * pos_size[iID].zw + pos_size[iID].xy * float2(2, -2) - float2(1, -1);\n"
+"    float2 p = (quad[vID] - float2(0, 1)) * pos_size[iID].zw*2. + pos_size[iID].xy * float2(2, -2) - float2(1, -1);\n"
 "    output.pos = float4(p, 0, 1);\n"
 "    output.uv = quad [vID];\n"
 "    output.uv.y = 1 - output.uv.y;\n"

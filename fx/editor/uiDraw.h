@@ -34,8 +34,8 @@ namespace ui
 		POINT p;
 		RECT r;
 		GetClientRect(hWnd, &r);
-		p.x = pos.x * (float)(r.right - r.left);
-		p.y = pos.y * (float)(r.bottom - r.top);
+		p.x = (int)(pos.x * (float)(r.right - r.left));
+		p.y = (int)(pos.y * (float)(r.bottom - r.top));
 		ClientToScreen(hWnd, &p);
 		SetCursorPos(p.x, p.y);
 	}
@@ -43,7 +43,7 @@ namespace ui
 	using namespace dx11;
 
 	const int fontTextureIndex = 254;
-	const int float4ArraySize = 100;
+	const int float4ArraySize = 32;
 
 	#include "font.h"
 	#include "style.h"
@@ -120,8 +120,8 @@ namespace ui
 
 			for (int i = 0; i < count; i++)
 			{
-				ConstBuffer::SetFloat4Const(buffer[i].x, floor(buffer[i].y * height) / height);
-				ConstBuffer::SetFloat4Const(buffer[i].x1, floor(buffer[i].y1 * height) / height);
+				ConstBuffer::SetFloat4Const(buffer[i].x, floorf(buffer[i].y * height) / height);
+				ConstBuffer::SetFloat4Const(buffer[i].x1, floorf(buffer[i].y1 * height) / height);
 
 				if (ConstBuffer::pCounter > float4ArraySize - 2 || i == count - 1)
 				{
