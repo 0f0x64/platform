@@ -4,6 +4,8 @@ namespace ui
 	int cursorID = 0;
 	bool lbDown = false;
 	bool rbDown = false;
+	bool LeftDown = false;
+	bool RightDown = false;
 	
 	typedef struct {
 		float x;

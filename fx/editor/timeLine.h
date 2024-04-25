@@ -1,22 +1,21 @@
 namespace TimeLine
 {
-	bool bpmMode = true;
-
 	const int TIME_KEY = VK_LMENU;
 
 	const int frame = SAMPLES_IN_FRAME;
 	const int second = SAMPLING_FREQ;
-	const int minute = (SAMPLING_FREQ * FRAMES_PER_SECOND);
+	const int minute = SAMPLING_FREQ * FRAMES_PER_SECOND;
 	const int timelineLen = minute * 10;
 
-	float bpm = 130;
-	float bpmMaj = 6;
-	float bpmMin = 8;
+	float bpm = 120;
+	float bpmMaj = 4;
+	float bpmMin = 4;
 
-	float screenLeft = .0f;
-	float screenRight = 1.0f;
+	float screenLeft = .25f;
+	float screenRight = .75f;
+	float scrollMargin = .05f;
 	
-	int zoomOut = (int)(timelineLen/ (screenRight- screenLeft));
+	int zoomOut = (int)(timelineLen / (screenRight- screenLeft));
 	int timeCursorLast = 0;
 	int posLast = 0;
 
@@ -38,8 +37,7 @@ namespace TimeLine
 		return (int)(x * zoomOut);
 	}
 
-	int pos = (-ScreenToTime(screenLeft));
-		
+	int pos = (-ScreenToTime(screenLeft));	
 	
 	int GetAdaptiveStepTime(int minTimeStep)
 	{
@@ -49,6 +47,7 @@ namespace TimeLine
 		if (second * 5 > minTimeStep) step = second * 5;
 		if (second > minTimeStep) step = second;
 		if (frame > minTimeStep) step = frame;
+
 		return step;
 	}
 
@@ -61,7 +60,6 @@ namespace TimeLine
 		if (grid * bpmMaj * 5 > minTimeStep) step = grid * bpmMaj * 5;
 		if (grid * bpmMaj  > minTimeStep) step = grid * bpmMaj ;
 		if (grid > minTimeStep) step = grid;
-
 
 		return step;
 	}
@@ -95,8 +93,8 @@ namespace TimeLine
 
 	void BPMToStr(int time)
 	{
-		int grid = 4*minute / (bpm*bpmMin);
-		int _maj = time / (grid*bpmMaj);
+		int grid = (int)(4*minute / (bpm*bpmMin));
+		int _maj = (int)(time / (grid*bpmMaj));
 		int _min = (time % (int)(grid * bpmMaj)) / (grid);
 
 		char majStr[8];
@@ -132,7 +130,7 @@ namespace TimeLine
 		ui::Line::buffer[counter].y1 = y1;
 	}
 
-	void bpmGrid(float y)
+	void DrawBPMGrid(float y)
 	{
 		float left = screenLeft + TimeToScreen(pos);
 		float right = screenRight + TimeToScreen(pos);
@@ -154,18 +152,17 @@ namespace TimeLine
 
 		for (int i = 0; i < iter; i++)
 		{
-			int time = (i+start) * step;
+			int time = (int)( (i+start) * step);
 			float x = TimeToScreen(time) - left + screenLeft;
-			float x1 = TimeToScreen((i + start + 1) * step) - left + screenLeft;
+			float x1 = TimeToScreen((int)((i + start + 1) * step)) - left + screenLeft;
 
-			editor::ui::style::box::a = 1.;
-			editor::ui::style::box::r = .1 * ((i+start) % 2) + .15;
-			editor::ui::style::box::g = .1 * ((i+start) % 2) + .15;
-			editor::ui::style::box::b = .1 * ((i+start) % 2) + .15;
+			editor::ui::style::box::a = 1.f;
+			editor::ui::style::box::r = .1f * ((i+start) % 2) + .15f;
+			editor::ui::style::box::g = .1f * ((i+start) % 2) + .15f;
+			editor::ui::style::box::b = .1f * ((i+start) % 2) + .15f;
 
-			ui::Box::Draw(x, y - editor::ui::style::text::height*.75 , x1 - x, editor::ui::style::text::height/1.5 );
+			ui::Box::Draw(x, y - editor::ui::style::text::height*.75f , x1 - x, editor::ui::style::text::height/1.5f );
 		}
-
 	}
 
 	void DrawMakers(float y)
@@ -194,7 +191,6 @@ namespace TimeLine
 		}
 
 		ui::Line::Draw(iter);
-
 	}
 
 	void DrawCursor(float y)
@@ -282,13 +278,22 @@ namespace TimeLine
 
 		for (int i = 0; i < iter; i++)
 		{
-			int time = (i + start) * step;
+			int time = (int)((i + start) * step);
 			float x = TimeToScreen(time) - left + screenLeft;
 			BPMToStr(time);
 			ui::text::Draw(timeStr, x, y);
 		}
 	}
 
+	int Quantize(int x, int q)
+	{
+		return ((int)(x / q)) * q;
+	}
+
+	void reTime()
+	{
+		timer::startTime = timer::frameBeginTime - timer::timeCursor / (double)second * 1000.;
+	}
 
 	void lbDown()
 	{
@@ -309,11 +314,6 @@ namespace TimeLine
 		posLast = pos;
 	}
 
-	void reTime()
-	{
-		timer::startTime = timer::frameBeginTime - timer::timeCursor / (double)second * 1000.;
-	}
-
 	void Space()
 	{
 		play = !play;
@@ -327,26 +327,47 @@ namespace TimeLine
 		if (!isKeyDown(TIME_KEY)) return;
 
 		float c = TimeToScreen(pos-timer::timeCursor);
-
 		zoomOut = (int)(zoomOut * (delta < 0 ? 1.05 : 1./1.05));
 		zoomOut = (int)clamp((float)zoomOut, 1000.f, timelineLen / (screenRight - screenLeft));
-
 		pos = ScreenToTime(c)+timer::timeCursor;
+
 		posLast = pos;
 		timeCursorLast = timer::timeCursor;
 		editor::ui::mouseLastPos.x = editor::ui::mousePos.x;
+	}
+
+	void Left()
+	{
+		timer::timeCursor -= frame;
+		timer::timeCursor = Quantize(timer::timeCursor, frame);
+		timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
+		if (TimeToScreen(timer::timeCursor - pos) < screenLeft + scrollMargin)	pos -= frame;
+		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
+	}
+
+	void Right()
+	{
+		timer::timeCursor += frame;
+		timer::timeCursor = Quantize(timer::timeCursor, frame);
+		timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
+		if (TimeToScreen(timer::timeCursor - pos) > screenRight - scrollMargin)	pos += frame;
+		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 	}
 
 	void Draw()
 	{
 		editor::ui::lbDown = isKeyDown(VK_LBUTTON) ? true : false;
 		editor::ui::rbDown = isKeyDown(VK_RBUTTON) ? true : false;
+		editor::ui::LeftDown = isKeyDown(VK_LEFT) ? true : false;
+		editor::ui::RightDown = isKeyDown(VK_RIGHT) ? true : false;
+
+		if (editor::ui::LeftDown) Left();
+		if (editor::ui::RightDown) Right();
 
 		editor::ui::mousePos = editor::ui::GetCusorPos();
 		
 		float delta = editor::ui::mousePos.x - editor::ui::mouseLastPos.x;
 
-		float scrollMargin = .05f;
 		int rightM = ScreenToTime(screenRight - scrollMargin) + pos;
 		int leftM = ScreenToTime(screenLeft + scrollMargin) + pos;
 
@@ -388,18 +409,20 @@ namespace TimeLine
 			}
 		}
 
+		api.setScissors(screenLeft, 0, screenRight, 1);
+
 		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 		timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
 
-		bpmMode = false;
 		DrawMakers(1);
 		DrawTimeStamps(1 - ui::style::text::height * 1.25f);
 
-		bpmMode = true;
-		bpmGrid(0.025);
-		DrawGridStamps(.025 - ui::style::text::height * .75f);
+		DrawBPMGrid(0.025);
+		DrawGridStamps(.025f - ui::style::text::height * .75f);
 
 		DrawCursor(1);
+
+		api.setScissors(0, 0, 1, 1);
 
 	}
 

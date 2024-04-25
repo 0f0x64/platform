@@ -45,6 +45,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case VK_SPACE:
 				editor::TimeLine::Space();
 				break;
+			case VK_LEFT:
+			//	editor::TimeLine::Left();
+				break;
+			case VK_RIGHT:
+			//	editor::TimeLine::Right();
+				break;
+
 		}
 	}
 	case WM_LBUTTONUP:
