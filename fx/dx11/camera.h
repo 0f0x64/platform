@@ -1,16 +1,27 @@
 namespace Camera 
 {
-	void Set()
+	typedef struct {
+		float x;
+		float y;
+		float z;
+	} vec3;
+
+	typedef struct {
+		vec3 eye;
+		vec3 at;
+		vec3 up;
+		float angle;
+	} camData;
+
+	void Set(camData cam)
 	{
-		float t = timer::timeCursor*.00001f;
+		XMVECTOR Eye = XMVectorSet(cam.eye.x, cam.eye.y, cam.eye.z, 0.0f);
+		XMVECTOR At = XMVectorSet(cam.at.x, cam.at.y, cam.at.z, 0.0f);
+		XMVECTOR Up = XMVectorSet(cam.up.x, cam.up.y, cam.up.z, 0.0f);
 
-		XMVECTOR Eye = XMVectorSet(sinf(t)*2.f, sinf(t*.5f), cosf(t)*2.f, 0.0f)*(1.f+sinf(t)*.25f);
-		XMVECTOR At = XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-		XMVECTOR Up = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-		ConstBuf::camera.world[0] = XMMatrixIdentity();//world
+		ConstBuf::camera.world[0] = XMMatrixIdentity();
 		ConstBuf::camera.view[0] = XMMatrixTranspose(XMMatrixLookAtLH(Eye, At, Up));
-		ConstBuf::camera.proj[0] = XMMatrixTranspose(XMMatrixPerspectiveFovLH(XM_PIDIV4*2.4, width / (FLOAT)height, 0.01f, 100.0f));
+		ConstBuf::camera.proj[0] = XMMatrixTranspose(XMMatrixPerspectiveFovLH(cam.angle, width / (FLOAT)height, 0.01f, 100.0f));
 
 		ConstBuf::UpdateCamera();
 		ConstBuf::SetToVertex(3);

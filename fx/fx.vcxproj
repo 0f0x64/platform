@@ -190,8 +190,10 @@
     <ClInclude Include="generated\processedShadersCompile.h" />
     <ClInclude Include="generated\psList.h" />
     <ClInclude Include="generated\vsList.h" />
+    <ClInclude Include="projectFiles\camera.h" />
     <ClInclude Include="projectFiles\loop.h" />
     <ClInclude Include="projectFiles\texList.h" />
+    <ClInclude Include="projectFiles\uitils.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="timer.h" />
   </ItemGroup>

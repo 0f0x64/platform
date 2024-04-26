@@ -140,6 +140,12 @@
     <ClInclude Include="editor\wndProc.h">
       <Filter>Source Files\editor</Filter>
     </ClInclude>
+    <ClInclude Include="projectFiles\uitils.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\camera.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

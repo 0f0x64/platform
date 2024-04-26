@@ -5,14 +5,14 @@ namespace TimeLine
 	const int frame = SAMPLES_IN_FRAME;
 	const int second = SAMPLING_FREQ;
 	const int minute = SAMPLING_FREQ * FRAMES_PER_SECOND;
-	const int timelineLen = minute * 10;
+	const int timelineLen = minute * 5;
 
 	float bpm = 120;
 	float bpmMaj = 4;
 	float bpmMin = 4;
 
-	float screenLeft = .25f;
-	float screenRight = .75f;
+	float screenLeft = .0f;
+	float screenRight = 1.f;
 	float scrollMargin = .05f;
 	
 	int zoomOut = (int)(timelineLen / (screenRight- screenLeft));
@@ -39,9 +39,9 @@ namespace TimeLine
 
 	int pos = (-ScreenToTime(screenLeft));	
 	
-	int GetAdaptiveStepTime(int minTimeStep)
+	double GetAdaptiveStepTime(int minTimeStep)
 	{
-		int step = minute;
+		double step = minute;
 		if (second * 30 > minTimeStep) step = second * 30;
 		if (second * 15 > minTimeStep) step = second * 15;
 		if (second * 5 > minTimeStep) step = second * 5;
@@ -113,12 +113,12 @@ namespace TimeLine
 	float getHeight(int time)
 	{
 		float baseH = ui::style::text::height / 4.f;
-		float h = baseH * 1.5f;
-		if (time % (second) == 0) h = baseH * 1.5f;
+		float h = baseH * .75f;
+		if (time % (second) == 0) h = baseH * 1.25f;
 		if (time % (second * 5) == 0) h = baseH * 1.5f;
 		if (time % (second * 15) == 0) h = baseH * 2.f;
 		if (time % (second * 30) == 0) h = baseH * 2.5f;
-		if (time % (minute) == 0) h = baseH * 2.5f;
+		if (time % (minute) == 0) h = baseH * 3.f;
 		return h;
 	}
 
@@ -130,25 +130,25 @@ namespace TimeLine
 		ui::Line::buffer[counter].y1 = y1;
 	}
 
+	float left;
+	float right;
+	int screenEnd;
+	int end;
+	double step;
+	int start;
+	int iter;
+
+	void calcIterVars()
+	{
+		start = (int)(floor(ScreenToTime(left) / step));
+		start = max(start, 0);
+		iter = (int)ceil(end / step) - start;
+	}
+
 	void DrawBPMGrid(float y)
 	{
-		float left = screenLeft + TimeToScreen(pos);
-		float right = screenRight + TimeToScreen(pos);
-		int minTimeStep = ScreenToTime(ui::style::text::height * 1.f);
-		double step = GetAdaptiveStepBPM(minTimeStep);
-
-		int screenEnd = ScreenToTime(right);
-		int end = min(timelineLen, screenEnd);
-		int start = (int)floor(ScreenToTime(left) / step);
-		start = max(start, 0);
-		int iter = (int)ceil(end / step)-start;
-
-		api.blend(blendmode::alpha);
-		api.setIA(topology::triList);
-
-		editor::ui::style::box::outlineBrightness = 0;
-		editor::ui::style::box::edge = 100;
-		editor::ui::style::box::rounded = .001;
+		step = GetAdaptiveStepBPM(ScreenToTime(ui::style::text::height * 1.f));
+		calcIterVars();
 
 		for (int i = 0; i < iter; i++)
 		{
@@ -167,23 +167,12 @@ namespace TimeLine
 
 	void DrawMakers(float y)
 	{
-		float left = screenLeft + TimeToScreen(pos);
-		float right = screenRight + TimeToScreen(pos);
-		int minTimeStep = ScreenToTime(8.f / width);
-		int step = GetAdaptiveStepTime(minTimeStep);
-
-		int screenEnd = ScreenToTime(right);
-		int end = min(timelineLen, screenEnd);
-		int start = (int)ceil(ScreenToTime(left) / (double)step);
-		start = max(start, 0);
-		int iter = (int)ceil(end / (double)step)-start;
-
-		api.blend(blendmode::off);
-		api.setIA(topology::lineList);
+		step = GetAdaptiveStepTime(ScreenToTime(8.f / width));
+		calcIterVars();
 
 		for (int i = 0; i < iter; i++)
 		{
-			int time = (i+start) * step;
+			int time = (int)((i+start) * step);
 			float x = TimeToScreen(time) - left + screenLeft;
 			float h = getHeight(time);
 
@@ -193,55 +182,14 @@ namespace TimeLine
 		ui::Line::Draw(iter);
 	}
 
-	void DrawCursor(float y)
-	{
-		api.blend(blendmode::alpha);
-		api.setIA(topology::lineList);
-
-		float cursor = TimeToScreen(timer::timeCursor-pos);
-
-		if (cursor<screenLeft || cursor > screenRight) return;
-		
-		StoreLine(0, cursor, y, cursor, y - ui::style::text::height * 1.25f);
-
-		if (isKeyDown(TIME_KEY)) StoreLine(0, cursor, 1, cursor, 0);
-
-		api.blend(blendmode::alpha);
-		ui::Line::Draw(1,1,1,1,.75f+.25f*sinf((float)timer::frameBeginTime*.01f));
-
-		ui::style::Base();
-		api.setIA(topology::triList);
-		TimeToStr(timer::timeCursor, true);
-		ui::text::Draw(timeStr, cursor, y - ui::style::text::height * 2.f);
-	}
-
 	void DrawTimeStamps(float y)
 	{
-		float left = screenLeft + TimeToScreen(pos);
-		float right = screenRight + TimeToScreen(pos);
-
-		int screenEnd = ScreenToTime(right);
-		int end = min(timelineLen, screenEnd);
-
-		ui::style::Base();
-
-		api.setIA(topology::triList);
-		api.blend(blendmode::alpha, blendop::add);
-
-		ps::letter_ps.samplers.s1Filter = filter::linear;
-		ps::letter_ps.samplers.s1AddressU = addr::clamp;
-		ps::letter_ps.samplers.s1AddressV = addr::clamp;
-		ps::letter_ps.textures.tex = ui::fontTextureIndex;
-
-		int minTimeStep = ScreenToTime(ui::style::text::height * 2.f);
-		int step = GetAdaptiveStepTime(minTimeStep);
-		int start = (int)(ceil(ScreenToTime(left) / (double)step));
-		start = max(start, 0);
-		int iter = (int)ceil(end / (double)step) - start;
+		step = GetAdaptiveStepTime(ScreenToTime(ui::style::text::height * 1.f));
+		calcIterVars();
 
 		for (int i = 0; i < iter; i++)
 		{
-			int time = (i + start) * step;
+			int time = (int)((i + start) * step);
 			float x = TimeToScreen(time) - left + screenLeft;
 
 			if ((time % (second) == 0) || (time % (minute) == 0))
@@ -254,27 +202,8 @@ namespace TimeLine
 
 	void DrawGridStamps(float y)
 	{
-		float left = screenLeft + TimeToScreen(pos);
-		float right = screenRight + TimeToScreen(pos);
-
-		int screenEnd = ScreenToTime(right);
-		int end = min(timelineLen, screenEnd);
-
-		ui::style::Base();
-
-		api.setIA(topology::triList);
-		api.blend(blendmode::alpha, blendop::add);
-
-		ps::letter_ps.samplers.s1Filter = filter::linear;
-		ps::letter_ps.samplers.s1AddressU = addr::clamp;
-		ps::letter_ps.samplers.s1AddressV = addr::clamp;
-		ps::letter_ps.textures.tex = ui::fontTextureIndex;
-
-		int minTimeStep = ScreenToTime(ui::style::text::height * 1.f);
-		double step = GetAdaptiveStepBPM(minTimeStep);
-		int start = (int)(floor(ScreenToTime(left) / step));
-		start = max(start, 0);
-		int iter = (int)ceil(end / step)- start;
+		step = GetAdaptiveStepBPM(ScreenToTime(ui::style::text::height * 1.f));
+		calcIterVars();
 
 		for (int i = 0; i < iter; i++)
 		{
@@ -283,6 +212,22 @@ namespace TimeLine
 			BPMToStr(time);
 			ui::text::Draw(timeStr, x, y);
 		}
+	}
+
+	void DrawCursor(float y)
+	{
+		api.blend(blendmode::alpha);
+		api.setIA(topology::lineList);
+
+		float cursor = TimeToScreen(timer::timeCursor - pos);
+		if (cursor<screenLeft || cursor > screenRight) return;
+		StoreLine(0, cursor, y, cursor, y - ui::style::text::height * 1.25f);
+		if (isKeyDown(TIME_KEY)) StoreLine(0, cursor, 1, cursor, 0);
+		ui::Line::Draw(1, 1, 1, 1, .75f + .25f * sinf((float)timer::frameBeginTime * .01f));
+
+		api.setIA(topology::triList);
+		TimeToStr(timer::timeCursor, true);
+		ui::text::Draw(timeStr, cursor, y - ui::style::text::height * 2.f);
 	}
 
 	int Quantize(int x, int q)
@@ -310,7 +255,6 @@ namespace TimeLine
 	void rbDown()
 	{
 		if (!isKeyDown(TIME_KEY)) return;
-
 		posLast = pos;
 	}
 
@@ -330,7 +274,6 @@ namespace TimeLine
 		zoomOut = (int)(zoomOut * (delta < 0 ? 1.05 : 1./1.05));
 		zoomOut = (int)clamp((float)zoomOut, 1000.f, timelineLen / (screenRight - screenLeft));
 		pos = ScreenToTime(c)+timer::timeCursor;
-
 		posLast = pos;
 		timeCursorLast = timer::timeCursor;
 		editor::ui::mouseLastPos.x = editor::ui::mousePos.x;
@@ -354,7 +297,7 @@ namespace TimeLine
 		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 	}
 
-	void Draw()
+	void ProcessInput()
 	{
 		editor::ui::lbDown = isKeyDown(VK_LBUTTON) ? true : false;
 		editor::ui::rbDown = isKeyDown(VK_RBUTTON) ? true : false;
@@ -365,9 +308,7 @@ namespace TimeLine
 		if (editor::ui::RightDown) Right();
 
 		editor::ui::mousePos = editor::ui::GetCusorPos();
-		
 		float delta = editor::ui::mousePos.x - editor::ui::mouseLastPos.x;
-
 		int rightM = ScreenToTime(screenRight - scrollMargin) + pos;
 		int leftM = ScreenToTime(screenLeft + scrollMargin) + pos;
 
@@ -378,16 +319,16 @@ namespace TimeLine
 				float scrollSpeed = .5;
 				timer::timeCursor = timeCursorLast + (int)(delta * ScreenToTime(1.f));
 
-				if (timer::timeCursor > rightM && pos < timelineLen - ScreenToTime(screenRight - scrollMargin) )
+				if (timer::timeCursor > rightM && pos < timelineLen - ScreenToTime(screenRight - scrollMargin))
 				{
-					pos += timer::timeCursor - rightM; 
+					pos += timer::timeCursor - rightM;
 					editor::ui::mouseLastPos.x -= scrollSpeed * (editor::ui::mousePos.x - (screenRight - scrollMargin));
 				}
 
-				if (timer::timeCursor < leftM && pos > -ScreenToTime(screenLeft + scrollMargin) )
+				if (timer::timeCursor < leftM && pos > -ScreenToTime(screenLeft + scrollMargin))
 				{
-					pos += timer::timeCursor - leftM; 
-					editor::ui::mouseLastPos.x += scrollSpeed * ((screenLeft + scrollMargin) - editor::ui::mousePos.x );
+					pos += timer::timeCursor - leftM;
+					editor::ui::mouseLastPos.x += scrollSpeed * ((screenLeft + scrollMargin) - editor::ui::mousePos.x);
 				}
 
 				reTime();
@@ -401,23 +342,46 @@ namespace TimeLine
 
 		if (play)
 		{
-			timer::timeCursor = (int) ((timer::frameBeginTime - timer::startTime) * second / 1000.f);
+			timer::timeCursor = (int)((timer::frameBeginTime - timer::startTime) * second / 1000.f);
 
-			if (timer::timeCursor > rightM) 
+			if (timer::timeCursor > rightM)
 			{
 				pos += timer::timeCursor - rightM;
 			}
 		}
+	}
+
+	void Draw()
+	{
+		ProcessInput();
 
 		api.setScissors(screenLeft, 0, screenRight, 1);
 
 		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 		timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
 
-		DrawMakers(1);
-		DrawTimeStamps(1 - ui::style::text::height * 1.25f);
+		left = screenLeft + TimeToScreen(pos);
+		right = screenRight + TimeToScreen(pos);
+		screenEnd = ScreenToTime(right);
+		end = min(timelineLen, screenEnd);
 
+		ui::style::Base();
+		editor::ui::style::box::outlineBrightness = 0;
+		editor::ui::style::box::edge = 100;
+		editor::ui::style::box::rounded = .001;
+		ps::letter_ps.samplers.s1Filter = filter::linear;
+		ps::letter_ps.samplers.s1AddressU = addr::clamp;
+		ps::letter_ps.samplers.s1AddressV = addr::clamp;
+		ps::letter_ps.textures.tex = ui::fontTextureIndex;
+
+		api.blend(blendmode::off);
+		api.setIA(topology::lineList);
+		DrawMakers(1);
+
+		api.blend(blendmode::alpha);
+		api.setIA(topology::triList);
 		DrawBPMGrid(0.025);
+		DrawTimeStamps(1 - ui::style::text::height * 1.25f);
 		DrawGridStamps(.025f - ui::style::text::height * .75f);
 
 		DrawCursor(1);

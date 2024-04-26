@@ -1,6 +1,9 @@
 namespace Loop
 {
 	
+	#include "uitils.h"
+	#include "camera.h"
+
 	bool isPrecalc = false;
 
 
@@ -113,10 +116,15 @@ namespace Loop
 		api.mips();
 	}
 
+
+
 	
+
 
 	void mainLoop()
 	{
+		regCam();
+
 		frameConst();
 
 		if (!isPrecalc) Precalc();
@@ -128,18 +136,18 @@ namespace Loop
 
 		api.blend(blendmode::off, blendop::add);
 		api.rt(tex::mainRT);
-		api.cam();
+
+		//setCam(0);
+		float t = (timer::timeCursor / (SAMPLES_IN_FRAME * 60.f));
+		slideCam(0, 1, t);
+
 		api.depth(depthmode::on);
 		api.clear(0.2f, 0.2f, 0.2f, 1.f);
 		api.clearDepth();
 
 		ShowCubemap(tex::env);
 		api.cull(cullmode::back);
-		//ShowObject(tex::obj1pos,tex::obj1nrml,0);
-
-
-
-
+		ShowObject(tex::obj1pos,tex::obj1nrml,4);
 
 	}
 
