@@ -140,11 +140,14 @@
     <ClInclude Include="editor\wndProc.h">
       <Filter>Source Files\editor</Filter>
     </ClInclude>
-    <ClInclude Include="projectFiles\uitils.h">
-      <Filter>Source Files\projectFiles</Filter>
-    </ClInclude>
     <ClInclude Include="projectFiles\camera.h">
       <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\viewCam.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +211,9 @@
       <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
     </None>
     <None Include="projectFiles\shaders\ps\letter_ps.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\lineDrawer3d.shader">
       <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
     </None>
   </ItemGroup>

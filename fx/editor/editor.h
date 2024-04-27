@@ -25,19 +25,35 @@ namespace editor
 	#include "hotReload.h"
 	#include "uiDraw.h"
 	#include "timeLine.h"
+	#include "viewCam.h"
 
 	void Init()
 	{
 		SelfLocate();
 		SetRenderWindowPosition();
+		ViewCam::Init();
 	}
 
 	void Process()
 	{
+		ui::mousePos = ui::GetCusorPos();
+		ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
+		ui::mouseDelta.y = ui::mousePos.y - ui::mouseLastPos.y;
+		ui::mouseAngle = -atan2(ui::mousePos.y-.5, ui::mousePos.x-.5);
+		ui::mouseAngleDelta = ui::mouseAngle - ui::mouseLastAngle;
+
+		ui::lbDown = isKeyDown(VK_LBUTTON) ? true : false;
+		ui::rbDown = isKeyDown(VK_RBUTTON) ? true : false;
+		ui::mbDown = isKeyDown(VK_MBUTTON) ? true : false;
+		ui::LeftDown = isKeyDown(VK_LEFT) ? true : false;
+		ui::RightDown = isKeyDown(VK_RIGHT) ? true : false;
+
 		api.rt(tex::mainRT);
 		api.cull(cullmode::off);
 		api.depth(depthmode::off);
 
 		TimeLine::Draw();
+		ViewCam::Draw();
+
 	}
 }

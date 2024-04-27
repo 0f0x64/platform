@@ -1,4 +1,4 @@
-namespace Camera 
+namespace Camera
 {
 	typedef struct {
 		float x;
@@ -13,15 +13,49 @@ namespace Camera
 		float angle;
 	} camData;
 
-	void Set(camData cam)
+	#if EditMode
+
+	struct {
+
+		XMMATRIX world;
+		XMMATRIX view;
+		XMMATRIX proj;
+
+		bool overRide = true;
+
+		void Init()
+		{
+			XMVECTOR Eye = XMVectorSet(0,0,3.f, 0.0f);
+			XMVECTOR At = XMVectorSet( 0,0,0, 0.0f);
+			XMVECTOR Up = XMVectorSet( 0,1,0, 0.0f);
+
+			world = XMMatrixIdentity();
+			view = XMMatrixLookAtLH(Eye, At, Up);
+			proj = XMMatrixPerspectiveFovLH(DegreesToRadians(120.f), width / (FLOAT)height, 0.01f, 100.0f);
+		}
+
+	} viewCam;
+
+	#endif
+
+	void Set(camData* cam)
 	{
-		XMVECTOR Eye = XMVectorSet(cam.eye.x, cam.eye.y, cam.eye.z, 0.0f);
-		XMVECTOR At = XMVectorSet(cam.at.x, cam.at.y, cam.at.z, 0.0f);
-		XMVECTOR Up = XMVectorSet(cam.up.x, cam.up.y, cam.up.z, 0.0f);
+		XMVECTOR Eye = XMVectorSet(cam->eye.x, cam->eye.y, cam->eye.z, 0.0f);
+		XMVECTOR At = XMVectorSet(cam->at.x, cam->at.y, cam->at.z, 0.0f);
+		XMVECTOR Up = XMVectorSet(cam->up.x, cam->up.y, cam->up.z, 0.0f);
 
 		ConstBuf::camera.world[0] = XMMatrixIdentity();
 		ConstBuf::camera.view[0] = XMMatrixTranspose(XMMatrixLookAtLH(Eye, At, Up));
-		ConstBuf::camera.proj[0] = XMMatrixTranspose(XMMatrixPerspectiveFovLH(cam.angle, width / (FLOAT)height, 0.01f, 100.0f));
+		ConstBuf::camera.proj[0] = XMMatrixTranspose(XMMatrixPerspectiveFovLH(cam->angle, width / (FLOAT)height, 0.01f, 100.0f));
+
+		#if EditMode
+		if (viewCam.overRide)
+		{
+			ConstBuf::camera.world[0] = viewCam.world;
+			ConstBuf::camera.view[0] = XMMatrixTranspose(viewCam.view);
+			ConstBuf::camera.proj[0] = XMMatrixTranspose(viewCam.proj);
+		}
+		#endif	
 
 		ConstBuf::UpdateCamera();
 		ConstBuf::SetToVertex(3);

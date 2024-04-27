@@ -1,26 +1,14 @@
 namespace Loop
 {
-	
-	#include "uitils.h"
+
 	#include "camera.h"
 
 	bool isPrecalc = false;
 
-
-
-	//----------
-
-	
-
 	void Precalc()
 	{
-
-
-		//---
-
 		api.setIA(topology::triList);
 		ConstBuf::Update(5, ConstBuf::global);
-
 		for (int i = 0; i < 6; i++) { ConstBuf::SetToVertex(i); ConstBuf::SetToPixel(i); }
 		isPrecalc = true;
 	}
@@ -81,7 +69,7 @@ namespace Loop
 		api.rt(targetTexture);
 		api.cull(cullmode::off);
 		api.depth(depthmode::off);
-		api.clear(sinf((float)timer::GetCounter()*.01f), 0, 0, 1);
+		api.clear(0, 0, 0, 1);
 
 		vs::quad.set();
 		ps::cubemapCreator.set();
@@ -116,25 +104,19 @@ namespace Loop
 		api.mips();
 	}
 
-
-
-	
-
-
 	void mainLoop()
 	{
-		regCam();
-
-		frameConst();
-
 		if (!isPrecalc) Precalc();
+
+		regCam();
+		frameConst();
 
 		api.setIA(topology::triList);
 
 		CalcCubemap(tex::env);
 		CalcObject(tex::obj1pos,tex::obj1nrml);
 
-		api.blend(blendmode::off, blendop::add);
+		api.blend(blendmode::off);
 		api.rt(tex::mainRT);
 
 		//setCam(0);

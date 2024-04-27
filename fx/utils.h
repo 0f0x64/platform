@@ -9,3 +9,8 @@ float DegreesToRadians(float degrees)
 {
 	return degrees * PI / 180.f;
 }
+
+float RadiansToDegrees(float radians)
+{
+	return radians*180.f/PI;
+}

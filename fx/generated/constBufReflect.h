@@ -33,20 +33,23 @@ namespace vs{
 
 struct { 
 
-struct 
-{
-float x1;
-float y1;
-float x2;
-float y2;
-} params;
-
 void set () {
 Shaders::SetVS(2);
-memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 }
 
 } lineDrawer;
+
+}
+
+namespace vs{
+
+struct { 
+
+void set () {
+Shaders::SetVS(3);
+}
+
+} lineDrawer3d;
 
 }
 
@@ -74,7 +77,7 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetVS(3);
+Shaders::SetVS(4);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 Textures::SetTexture(textures.positions, 0, Textures::tAssignType::vertex); 
 Textures::SetTexture(textures.normals, 1, Textures::tAssignType::vertex); 
@@ -90,7 +93,7 @@ namespace vs{
 struct { 
 
 void set () {
-Shaders::SetVS(4);
+Shaders::SetVS(5);
 }
 
 } quad;
@@ -108,7 +111,7 @@ float gY;
 } params;
 
 void set () {
-Shaders::SetVS(5);
+Shaders::SetVS(6);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 }
 

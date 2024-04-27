@@ -183,6 +183,7 @@
     <ClInclude Include="editor\style.h" />
     <ClInclude Include="editor\timeLine.h" />
     <ClInclude Include="editor\uiDraw.h" />
+    <ClInclude Include="editor\viewCam.h" />
     <ClInclude Include="editor\wndProc.h" />
     <ClInclude Include="generated\constBufReflect.h" />
     <ClInclude Include="generated\libList.h" />
@@ -193,9 +194,9 @@
     <ClInclude Include="projectFiles\camera.h" />
     <ClInclude Include="projectFiles\loop.h" />
     <ClInclude Include="projectFiles\texList.h" />
-    <ClInclude Include="projectFiles\uitils.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="timer.h" />
+    <ClInclude Include="utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="projectFiles\shaders\lib\constants.shader" />
@@ -219,6 +220,7 @@
     <None Include="projectFiles\shaders\vs\box.shader" />
     <None Include="projectFiles\shaders\vs\letter.shader" />
     <None Include="projectFiles\shaders\vs\lineDrawer.shader" />
+    <None Include="projectFiles\shaders\vs\lineDrawer3d.shader" />
     <None Include="projectFiles\shaders\vs\objViewer.shader" />
     <None Include="projectFiles\shaders\vs\quad.shader" />
     <None Include="projectFiles\shaders\vs\simpleCube.shader" />

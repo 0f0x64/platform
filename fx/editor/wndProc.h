@@ -34,6 +34,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		auto delta = GET_WHEEL_DELTA_WPARAM(wParam);
 		editor::TimeLine::Wheel(delta);
+		editor::ViewCam::Wheel(delta);
 		break;
 	}
 	case WM_CHAR:
@@ -45,11 +46,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case VK_SPACE:
 				editor::TimeLine::Space();
 				break;
-			case VK_LEFT:
-			//	editor::TimeLine::Left();
-				break;
-			case VK_RIGHT:
-			//	editor::TimeLine::Right();
+			case VK_ESCAPE:
+				editor::ViewCam::ToggleViewMode();
 				break;
 
 		}
@@ -63,6 +61,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		editor::ui::mouseLastPos = editor::ui::GetCusorPos();
 		editor::TimeLine::lbDown();
+		editor::ViewCam::lbDown();
 		break;
 	}
 
@@ -73,13 +72,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		editor::ui::mouseLastPos = editor::ui::GetCusorPos();
 		editor::TimeLine::rbDown();
+		editor::ViewCam::rbDown();
+		break;
+	}
+
+	case WM_MBUTTONDOWN:
+	{
+		editor::ui::mouseLastPos = editor::ui::GetCusorPos();
+		editor::ViewCam::mbDown();
 		break;
 	}
 
 
 	case WM_SYSKEYDOWN:
 	{
-
+		if (editor::isKeyDown(VK_LMENU))
+		{
+			if (editor::isKeyDown(VK_LEFT)) {
+				editor::TimeLine::Left();
+			}
+			if (editor::isKeyDown(VK_RIGHT)) {
+				editor::TimeLine::Right();
+			}
+		}
 		break;
 	}
 

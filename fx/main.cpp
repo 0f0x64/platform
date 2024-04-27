@@ -11,6 +11,7 @@ HWND hWnd;
 
 #include <math.h>
 #include "timer.h"
+#include "utils.h"
 
 #include "dx11\dx.h"
 #include <Xaudio2.h>

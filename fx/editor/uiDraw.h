@@ -4,6 +4,7 @@ namespace ui
 	int cursorID = 0;
 	bool lbDown = false;
 	bool rbDown = false;
+	bool mbDown = false;
 	bool LeftDown = false;
 	bool RightDown = false;
 	
@@ -12,8 +13,18 @@ namespace ui
 		float y;
 	} point2df;
 
+	typedef struct {
+		float x;
+		float y;
+		float z;
+	} point3df;
+
 	point2df mousePos;
 	point2df mouseLastPos;
+	point2df mouseDelta;
+	float mouseAngle;
+	float mouseLastAngle;
+	float mouseAngleDelta;
 
 	point2df GetCusorPos()
 	{
@@ -69,12 +80,12 @@ namespace ui
 
 		int pCounter = 0;
 
-		void SetFloat4Const(float x, float y, float w = 0, float h = 0)
+		void SetFloat4Const(float x, float y, float z = 0, float w = 1)
 		{
 			float4array[pCounter].x = x;
 			float4array[pCounter].y = y;
-			float4array[pCounter].z = w;
-			float4array[pCounter].w = h;
+			float4array[pCounter].z = z;
+			float4array[pCounter].w = w;
 			pCounter++;
 		}
 	}
@@ -104,11 +115,11 @@ namespace ui
 		typedef struct {
 			float x;
 			float y;
-			float x1;
-			float y1;
-		} line2;
+			float z;
+			float w;
+		} line4;
 
-		line2 buffer[2048];
+		line4 buffer[2048];
 
 		void Draw(int count, float r = 1, float g = 1, float b = 1, float a = 1)
 		{
@@ -122,12 +133,36 @@ namespace ui
 
 			for (int i = 0; i < count; i++)
 			{
-				ConstBuffer::SetFloat4Const(buffer[i].x, floorf(buffer[i].y * height) / height);
-				ConstBuffer::SetFloat4Const(buffer[i].x1, floorf(buffer[i].y1 * height) / height);
+				ConstBuffer::SetFloat4Const(buffer[i*2].x, buffer[i*2].y, buffer[i*2].z);
+				ConstBuffer::SetFloat4Const(buffer[i*2+1].x, buffer[i*2+1].y, buffer[i*2+1].z);
 
 				if (ConstBuffer::pCounter > float4ArraySize - 2 || i == count - 1)
 				{
 					vs::lineDrawer.set();
+					LineNullDrawer(ConstBuffer::pCounter, 1);
+					ConstBuffer::pCounter = 0;
+				}
+			}
+		}
+
+		void Draw3d(int count, float r = 1, float g = 1, float b = 1, float a = 1)
+		{
+			ps::lineDrawer_ps.params.r = r;
+			ps::lineDrawer_ps.params.g = g;
+			ps::lineDrawer_ps.params.b = b;
+			ps::lineDrawer_ps.params.a = a;
+			ps::lineDrawer_ps.set();
+
+			ConstBuffer::pCounter = 0;
+
+			for (int i = 0; i < count; i++)
+			{
+				ConstBuffer::SetFloat4Const(buffer[i * 2].x, buffer[i * 2].y, buffer[i * 2].z);
+				ConstBuffer::SetFloat4Const(buffer[i * 2 + 1].x, buffer[i * 2 + 1].y, buffer[i * 2 + 1].z);
+
+				if (ConstBuffer::pCounter > float4ArraySize - 2 || i == count - 1)
+				{
+					vs::lineDrawer3d.set();
 					LineNullDrawer(ConstBuffer::pCounter, 1);
 					ConstBuffer::pCounter = 0;
 				}
@@ -170,6 +205,7 @@ namespace ui
 			api.draw(1, 1);
 
 		}
+
 	}
 
 	namespace text

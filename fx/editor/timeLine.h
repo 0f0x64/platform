@@ -124,10 +124,10 @@ namespace TimeLine
 
 	void StoreLine(int counter, float x, float y, float x1, float y1)
 	{
-		ui::Line::buffer[counter].x = x;
-		ui::Line::buffer[counter].y = y;
-		ui::Line::buffer[counter].x1 = x1;
-		ui::Line::buffer[counter].y1 = y1;
+		ui::Line::buffer[counter*2].x = x;
+		ui::Line::buffer[counter*2].y = y;
+		ui::Line::buffer[counter*2 + 1].x = x1;
+		ui::Line::buffer[counter*2 + 1].y = y1;
 	}
 
 	float left;
@@ -299,16 +299,7 @@ namespace TimeLine
 
 	void ProcessInput()
 	{
-		editor::ui::lbDown = isKeyDown(VK_LBUTTON) ? true : false;
-		editor::ui::rbDown = isKeyDown(VK_RBUTTON) ? true : false;
-		editor::ui::LeftDown = isKeyDown(VK_LEFT) ? true : false;
-		editor::ui::RightDown = isKeyDown(VK_RIGHT) ? true : false;
 
-		if (editor::ui::LeftDown) Left();
-		if (editor::ui::RightDown) Right();
-
-		editor::ui::mousePos = editor::ui::GetCusorPos();
-		float delta = editor::ui::mousePos.x - editor::ui::mouseLastPos.x;
 		int rightM = ScreenToTime(screenRight - scrollMargin) + pos;
 		int leftM = ScreenToTime(screenLeft + scrollMargin) + pos;
 
@@ -317,7 +308,7 @@ namespace TimeLine
 			if (ui::lbDown)
 			{
 				float scrollSpeed = .5;
-				timer::timeCursor = timeCursorLast + (int)(delta * ScreenToTime(1.f));
+				timer::timeCursor = timeCursorLast + (int)(ui::mouseDelta.x * ScreenToTime(1.f));
 
 				if (timer::timeCursor > rightM && pos < timelineLen - ScreenToTime(screenRight - scrollMargin))
 				{
@@ -336,7 +327,7 @@ namespace TimeLine
 
 			if (ui::rbDown)
 			{
-				pos = posLast - (int)(delta * ScreenToTime(1.f));
+				pos = posLast - (int)(ui::mouseDelta.x * ScreenToTime(1.f));
 			}
 		}
 

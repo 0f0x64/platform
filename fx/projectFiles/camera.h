@@ -7,13 +7,13 @@ void regCam()
 {
 	int i = 0;
 
-	cam[i].angle = DegreesToRadians(120.);
+	cam[i].angle = DegreesToRadians(120.f);
 	cam[i].eye = { 0,0,3 };
 	cam[i].at = { 0,0,0 };
 	cam[i].up = { 0,1,0 };
 	i++;
 
-	cam[i].angle = DegreesToRadians(120.);
+	cam[i].angle = DegreesToRadians(120.f);
 	cam[i].eye = { 3,0,0 };
 	cam[i].at = { 0,0,0 };
 	cam[i].up = { 0,1,0 };
@@ -22,7 +22,7 @@ void regCam()
 
 void setCam(int i)
 {
-	api.cam(cam[i]);
+	api.cam(&cam[i]);
 }
 
 void slideCam(int i, int j, float a)
@@ -41,7 +41,7 @@ void slideCam(int i, int j, float a)
 	camTmp.up.y = lerp(cam[i].up.y, cam[j].up.y, a);
 	camTmp.up.z = lerp(cam[i].up.z, cam[j].up.z, a);
 
-	api.cam(camTmp);
+	api.cam(&camTmp);
 }
 
 typedef struct {
