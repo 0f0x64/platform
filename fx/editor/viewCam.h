@@ -16,10 +16,16 @@ namespace ViewCam
 
 	void Wheel(float delta)
 	{
-		if (!isKeyDown(CAM_KEY)) return;
+		if (isKeyDown(CAM_KEY)) {
+			XMMATRIX transM = XMMatrixTranslation(0, 0, delta / 2000.);
+			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, transM);
+		}
 
-		XMMATRIX transM = XMMatrixTranslation(0, 0, delta / 2000.);
-		Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, transM);
+		if (isKeyDown(VK_SHIFT)) {
+			Camera::viewCam.angle += delta / 50.;
+			Camera::viewCam.proj = XMMatrixPerspectiveFovLH(DegreesToRadians(Camera::viewCam.angle), width / (FLOAT)height, 0.01f, 100.0f);
+		}
+
 	}
 
 
@@ -42,22 +48,6 @@ namespace ViewCam
 
 	void ProcessInput()
 	{
-		editor::ui::point3df moveDelta = { 0,0,0 };
-
-		if (isKeyDown(VK_RIGHT)) {
-			moveDelta.x = .01;
-		}
-		if (isKeyDown(VK_LEFT)) {
-			moveDelta.x = .01;
-		}
-
-		if (isKeyDown(VK_UP)) {
-			moveDelta.z = .01;
-		}
-		if (isKeyDown(VK_DOWN)) {
-			moveDelta.z = -.01;
-		}
-
 
 		if (!isKeyDown(VK_CONTROL)) return;
 
@@ -95,8 +85,8 @@ namespace ViewCam
 			
 			XMMATRIX moveM = XMMatrixTranslation(t.x,t.y,t.z);
 			Camera::viewCam.view = XMMatrixMultiply(storedCam, transMInv);
-			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, XMMatrixRotationX(r.x));
 			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, XMMatrixRotationY(r.y));
+			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, XMMatrixRotationX(r.x));
 			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, XMMatrixRotationZ(r.z));
 			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, moveM);
 			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, transM);

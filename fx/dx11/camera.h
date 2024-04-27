@@ -22,6 +22,7 @@ namespace Camera
 		XMMATRIX proj;
 
 		bool overRide = true;
+		float angle = 120.f;
 
 		void Init()
 		{
@@ -31,7 +32,7 @@ namespace Camera
 
 			world = XMMatrixIdentity();
 			view = XMMatrixLookAtLH(Eye, At, Up);
-			proj = XMMatrixPerspectiveFovLH(DegreesToRadians(120.f), width / (FLOAT)height, 0.01f, 100.0f);
+			proj = XMMatrixPerspectiveFovLH(DegreesToRadians(angle), width / (FLOAT)height, 0.01f, 100.0f);
 		}
 
 	} viewCam;
