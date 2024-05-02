@@ -208,7 +208,7 @@ namespace ui
 
 	}
 
-	namespace text
+	namespace Text
 	{
 
 		float getLetterOffset(char a)
@@ -221,7 +221,7 @@ namespace ui
 			float offset = 0;
 			for (unsigned int i = 0; i < strlen(str); i++)
 			{
-				offset += getLetterOffset(str[i]);
+				offset += getLetterOffset(str[i]) / 2.f;
 			}
 			return offset;
 		}
@@ -253,7 +253,7 @@ namespace ui
 			for (unsigned int i = 0; i < strlen(str); i++)
 			{
 				ConstBuffer::SetFloat4Const(x + offset, y, (float)(str[i] - 32), 0);
-				offset += getLetterOffset(str[i]) / 2.f;
+				offset += getLetterOffset(str[i])/2.;
 			}
 
 			ConstBuffer::f4arrayUpdateAndSet();
@@ -276,19 +276,19 @@ namespace ui
 	{
 		style::Base();
 		float ofs = kerningTable[0] * 2.f;
-		float boxW = text::getTextLen(str) + ofs * 2.f;
+		float boxW = Text::getTextLen(str) + ofs * 2.f;
 		Box::Draw(x, y, boxW);
-		text::Draw(str, x + ofs, y);
+		Text::Draw(str, x + ofs, y);
 	}
 
 	void ShowButtonWithText(const char* str, float x, float y, float w, float h)
 	{
 		style::Base();
 		Box::Draw(x, y, w, h);
-		float textW = text::getTextLen(str);
+		float textW = Text::getTextLen(str);
 		float x1 = x + w / 2.f - textW / 2;
 		float y1 = y - h / 2.f + style::text::height / 2;
-		text::Draw(str, x1, y1);
+		Text::Draw(str, x1, y1);
 	}
 
 	void CreateFontTexture()

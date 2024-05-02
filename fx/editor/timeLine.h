@@ -189,7 +189,7 @@ namespace TimeLine
 			if ((time % (second) == 0) || (time % (minute) == 0))
 			{
 				TimeToStr(time);
-				ui::text::Draw(timeStr, x, y);
+				ui::Text::Draw(timeStr, x, y);
 			}
 		}
 	}
@@ -204,7 +204,7 @@ namespace TimeLine
 			int time = (int)((i + start) * step);
 			float x = TimeToScreen(time) - left + screenLeft;
 			BPMToStr(time);
-			ui::text::Draw(timeStr, x, y);
+			ui::Text::Draw(timeStr, x, y);
 		}
 	}
 
@@ -221,7 +221,7 @@ namespace TimeLine
 
 		gapi.setIA(topology::triList);
 		TimeToStr(timer::timeCursor, true);
-		ui::text::Draw(timeStr, cursor, y - ui::style::text::height * 2.f);
+		ui::Text::Draw(timeStr, cursor, y - ui::style::text::height * 2.f);
 	}
 
 	int Quantize(int x, int q)

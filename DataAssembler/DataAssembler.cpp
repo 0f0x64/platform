@@ -62,7 +62,7 @@ void Process(string shaderName, string inPath, string outPath, ofstream &ofile)
 	string _pathToExe = pathToExe;
 
 	string minifierCmdLine = _pathToExe + "\\shader_minifier.exe " +
-		" --hlsl --format text --no-remove-unused --preserve-all-globals --no-inlining --preserve-externals " +
+		" --hlsl --format Text --no-remove-unused --preserve-all-globals --no-inlining --preserve-externals " +
 		inPath + shaderName + shaderExtension +
 		" -o " + outPath + shaderName + shaderExtension;
 	

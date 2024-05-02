@@ -21,6 +21,9 @@ struct {
 
 void AddToUI(const char* funcName)
 {
-	strcpy(callList[cFunc].funcName, funcName);
+	int x = strlen(funcName)-1;;
+	for (x; x >= 0; x--) { if (funcName[x] == ':') { x++; break; } };
+
+	strcpy(callList[cFunc].funcName, funcName+x);
 	cFunc++;
 }

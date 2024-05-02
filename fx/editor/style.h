@@ -28,10 +28,10 @@ namespace style {
 		box::a = 1.f;
 		box::width = .25f;
 		box::height = .25f;
-		box::rounded = .1f;
-		box::soft = 11.1f;
-		box::edge = 11.f;
-		box::outlineBrightness = 1110.f;
+		box::rounded = .21f;
+		box::soft = 5.1f;
+		box::edge = 1.f;
+		box::outlineBrightness = 0.f;
 
 		text::r = .9f;
 		text::g = .9f;
