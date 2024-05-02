@@ -1,15 +1,20 @@
 namespace Loop
 {
 
-	#include "camera.h"
+#include "camera.h"
+#include "cubemap.h"
+#include "object.h"
+
+#include "..\\generated\apiReflection.h"
+
 
 	bool isPrecalc = false;
 
 	void Precalc()
 	{
-		api.setIA(topology::triList);
+		gapi.setIA(topology::triList);
 		ConstBuf::Update(5, ConstBuf::global);
-		for (int i = 0; i < 6; i++) { ConstBuf::SetToVertex(i); ConstBuf::SetToPixel(i); }
+		for (int i = 0; i < 6; i++) { ConstBuf::ConstToVertex(i); ConstBuf::ConstToPixel(i); }
 		isPrecalc = true;
 	}
 
@@ -18,119 +23,46 @@ namespace Loop
 		ConstBuf::frame.time = (float)(timer::frameBeginTime * .01);
 		ConstBuf::UpdateFrame();
 	}
-	
-	void ShowCubemap(int envTex)
-	{
-		api.blend(blendmode::off, blendop::add);
-		api.cull(cullmode::back);
 
-		ps::cubeMapViewer.textures.env = tex::env;
-		ps::cubeMapViewer.samplers.sam1Filter = filter::linear;
-		ps::cubeMapViewer.samplers.sam1AddressU = addr::wrap;
-		ps::cubeMapViewer.samplers.sam1AddressV = addr::wrap;
-		ps::cubeMapViewer.set();
-		int gX = 4;
-		int gY = 3;
-		vs::simpleCube.params.gX = (float)gX;
-		vs::simpleCube.params.gY = (float)gY;
-		vs::simpleCube.set();
-		api.draw(gX*gY);
+		
+//#define CalcCubemap(...) CalcCubemap(__FILE__, __LINE__,__VA_ARGS__)
 
-	}
-
-	void ShowObject(int geometry, int normals, int quality)
-	{
-		int denom = (int)pow(2, quality);
-
-		float gX = Textures::texture[tex::obj1pos].size.x/denom;
-		float gY = Textures::texture[tex::obj1pos].size.y/denom;
-
-		vs::objViewer.textures.positions = geometry;
-		vs::objViewer.samplers.sam1Filter = filter::linear;
-		vs::objViewer.samplers.sam1AddressU = addr::wrap;
-		vs::objViewer.samplers.sam1AddressV = addr::clamp;
-		vs::objViewer.params.gX = gX;
-		vs::objViewer.params.gY = gY;
-		vs::objViewer.set();
-
-		ps::basic.textures.env = tex::env;
-		ps::basic.textures.normals = normals;
-		ps::basic.samplers.sam1Filter = filter::linear;
-		ps::basic.samplers.sam1AddressU = addr::wrap;
-		ps::basic.samplers.sam1AddressV = addr::wrap;
-
-		ps::basic.set();
-		api.draw((int)gX * (int)gY);
-	}
-
-	void CalcCubemap(int targetTexture)
-	{
-		api.blend(blendmode::off, blendop::add);
-		api.rt(targetTexture);
-		api.cull(cullmode::off);
-		api.depth(depthmode::off);
-		api.clear(0, 0, 0, 1);
-
-		vs::quad.set();
-		ps::cubemapCreator.set();
-		api.draw(1, 1);
-		api.mips();
-	}
-
-	void CalcObject(int targetGeoTexture,int targetNrmlTexture)
-	{
-		api.blend(blendmode::off, blendop::add);
-		api.cull(cullmode::off);
-		api.rt(targetGeoTexture);
-		api.depth(depthmode::off);
-
-		//pos
-		vs::quad.set();
-		ps::obj1.set();
-		api.draw(1);
-		api.mips();
-
-		//normals
-		api.rt(targetNrmlTexture);
-		vs::quad.set();
-
-		ps::genNormals.samplers.sam1Filter = filter::linear;
-		ps::genNormals.samplers.sam1AddressU = addr::wrap;
-		ps::genNormals.samplers.sam1AddressV = addr::wrap;
-
-		ps::genNormals.textures.geo = targetGeoTexture;
-		ps::genNormals.set();
-		api.draw(1);
-		api.mips();
-	}
+#define ref __FILE__, __LINE__
 
 	void mainLoop()
 	{
+		cFunc = 0;
+		cmdCounter = 0;
+
+		//CalcCubemap(tex::env);
+
 		if (!isPrecalc) Precalc();
 
 		regCam();
 		frameConst();
 
-		api.setIA(topology::triList);
+		api.IA(ref,topology::triList);
 
-		CalcCubemap(tex::env);
-		CalcObject(tex::obj1pos,tex::obj1nrml);
+		api.CalcCubemap(ref, tex::env);
+		api.CalcObject(ref, tex::obj1pos,tex::obj1nrml);
 
-		api.blend(blendmode::off);
-		api.rt(tex::mainRT);
+		api.Blending(ref, blendmode::off);
+		api.RenderTarget(ref);
 
 		//setCam(0);
 		float t = (timer::timeCursor / (SAMPLES_IN_FRAME * 60.f));
 		slideCam(0, 1, t);
 
-		api.depth(depthmode::on);
-		api.clear(0.2f, 0.2f, 0.2f, 1.f);
-		api.clearDepth();
+		api.Depth(ref, depthmode::on);
+		api.Clear(ref, 0.2f, 0.2f, 0.2f, 1.f);
+		api.ClearDepth(ref);
 
-		ShowCubemap(tex::env);
-		api.cull(cullmode::back);
-		ShowObject(tex::obj1pos,tex::obj1nrml,4);
+		api.ShowCubemap(ref, tex::env);
+		api.Cull(ref, cullmode::back);
+		api.ShowObject(ref, tex::obj1pos,tex::obj1nrml,4,0,0,0);
+		api.ShowObject(ref, tex::obj1pos, tex::obj1nrml, 4, 0, 1, 0);
 
+		playTrack();
 	}
 
 }

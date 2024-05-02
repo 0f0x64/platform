@@ -1,3 +1,5 @@
+bool numpad5trigger = false;
+
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
@@ -49,6 +51,26 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case VK_ESCAPE:
 				editor::ViewCam::ToggleViewMode();
 				break;
+			case VK_NUMPAD4:
+				editor::ViewCam::AxisCam(0,90,0);
+				numpad5trigger = false;
+				break;
+			case VK_NUMPAD5:
+				editor::ViewCam::AxisCam(0, 180.f*(float)(!numpad5trigger), 0);
+				numpad5trigger = !numpad5trigger;
+				break;
+			case VK_NUMPAD6:
+				editor::ViewCam::AxisCam(0, -90, 0);
+				numpad5trigger = false;
+				break;
+			case VK_NUMPAD8:
+				editor::ViewCam::AxisCam(-90, 0, 0);
+				numpad5trigger = false;
+				break;
+			case VK_NUMPAD2:
+				editor::ViewCam::AxisCam(90, 0, 0);
+				numpad5trigger = false;
+				break;
 
 		}
 	}
@@ -75,14 +97,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		editor::ViewCam::rbDown();
 		break;
 	}
-
-	case WM_MBUTTONDOWN:
-	{
-		editor::ui::mouseLastPos = editor::ui::GetCusorPos();
-		editor::ViewCam::mbDown();
-		break;
-	}
-
 
 	case WM_SYSKEYDOWN:
 	{

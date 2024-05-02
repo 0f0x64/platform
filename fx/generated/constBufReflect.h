@@ -3,7 +3,7 @@ namespace vs{
 struct { 
 
 void set () {
-Shaders::SetVS(0);
+Shaders::vShader(0);
 }
 
 } box;
@@ -21,7 +21,7 @@ float height;
 } params;
 
 void set () {
-Shaders::SetVS(1);
+Shaders::vShader(1);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 }
 
@@ -34,7 +34,7 @@ namespace vs{
 struct { 
 
 void set () {
-Shaders::SetVS(2);
+Shaders::vShader(2);
 }
 
 } lineDrawer;
@@ -46,7 +46,7 @@ namespace vs{
 struct { 
 
 void set () {
-Shaders::SetVS(3);
+Shaders::vShader(3);
 }
 
 } lineDrawer3d;
@@ -77,11 +77,11 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetVS(4);
+Shaders::vShader(4);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
-Textures::SetTexture(textures.positions, 0, Textures::tAssignType::vertex); 
-Textures::SetTexture(textures.normals, 1, Textures::tAssignType::vertex); 
-Sampler::Set(Sampler::to::vertex, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+Textures::TextureToShader(textures.positions, 0, targetShader::vertex); 
+Textures::TextureToShader(textures.normals, 1, targetShader::vertex); 
+Sampler::Sampler(targetShader::vertex, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
 } objViewer;
@@ -93,7 +93,7 @@ namespace vs{
 struct { 
 
 void set () {
-Shaders::SetVS(5);
+Shaders::vShader(5);
 }
 
 } quad;
@@ -111,7 +111,7 @@ float gY;
 } params;
 
 void set () {
-Shaders::SetVS(6);
+Shaders::vShader(6);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
 }
 
@@ -146,12 +146,12 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetPS(0);
+Shaders::pShader(0);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
-Textures::SetTexture(textures.env, 0, Textures::tAssignType::pixel); 
-Textures::SetTexture(textures.normals, 1, Textures::tAssignType::pixel); 
-Textures::SetTexture(textures.albedo, 2, Textures::tAssignType::pixel); 
-Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+Textures::TextureToShader(textures.env, 0, targetShader::pixel); 
+Textures::TextureToShader(textures.normals, 1, targetShader::pixel); 
+Textures::TextureToShader(textures.albedo, 2, targetShader::pixel); 
+Sampler::Sampler(targetShader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
 } basic;
@@ -176,7 +176,7 @@ float outlineBrightness;
 } params;
 
 void set () {
-Shaders::SetPS(1);
+Shaders::pShader(1);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
@@ -194,7 +194,7 @@ float p;
 } params;
 
 void set () {
-Shaders::SetPS(2);
+Shaders::pShader(2);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
@@ -219,9 +219,9 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetPS(3);
-Textures::SetTexture(textures.env, 0, Textures::tAssignType::pixel); 
-Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+Shaders::pShader(3);
+Textures::TextureToShader(textures.env, 0, targetShader::pixel); 
+Sampler::Sampler(targetShader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
 } cubeMapViewer;
@@ -245,9 +245,9 @@ int sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetPS(4);
-Textures::SetTexture(textures.geo, 0, Textures::tAssignType::pixel); 
-Sampler::Set(Sampler::to::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+Shaders::pShader(4);
+Textures::TextureToShader(textures.geo, 0, targetShader::pixel); 
+Sampler::Sampler(targetShader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
 } genNormals;
@@ -280,10 +280,10 @@ int s1AddressV;
 } samplers;
 
 void set () {
-Shaders::SetPS(5);
+Shaders::pShader(5);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
-Textures::SetTexture(textures.tex, 0, Textures::tAssignType::pixel); 
-Sampler::Set(Sampler::to::pixel, 0, samplers.s1Filter, samplers.s1AddressU, samplers.s1AddressV); 
+Textures::TextureToShader(textures.tex, 0, targetShader::pixel); 
+Sampler::Sampler(targetShader::pixel, 0, samplers.s1Filter, samplers.s1AddressU, samplers.s1AddressV); 
 }
 
 } letter_ps;
@@ -303,7 +303,7 @@ float a;
 } params;
 
 void set () {
-Shaders::SetPS(6);
+Shaders::pShader(6);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
@@ -323,7 +323,7 @@ float sz;
 } params;
 
 void set () {
-Shaders::SetPS(7);
+Shaders::pShader(7);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
@@ -343,7 +343,7 @@ float b;
 } params;
 
 void set () {
-Shaders::SetPS(8);
+Shaders::pShader(8);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 

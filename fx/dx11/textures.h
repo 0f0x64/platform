@@ -211,38 +211,36 @@ namespace Textures
 		context->RSSetViewports(1, &vp);
 	}
 
-	void CopyColor(int dst, int src)
+	API CopyColor(int dst, int src)
 	{
 		context->CopyResource(texture[dst].pTexture, texture[src].pTexture);
 	}
 
-	void CopyDepth(int dst, int src)
+	API CopyDepth(int dst, int src)
 	{
 		context->CopyResource(texture[dst].pDepth, texture[src].pDepth);
 	}
 
-	enum tAssignType { vertex, pixel, both };
-
-	void SetTexture(int tex, int slot, tAssignType tA = tAssignType::both)
+	API TextureToShader(int tex, int slot, targetShader tA = targetShader::both)
 	{
-		if (tA == tAssignType::both || tA == tAssignType::vertex)
+		if (tA == targetShader::both || tA == targetShader::vertex)
 		{
 			context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
 		}
 
-		if (tA == tAssignType::both || tA == tAssignType::pixel)
+		if (tA == targetShader::both || tA == targetShader::pixel)
 		{
 			context->PSSetShaderResources(slot, 1, &texture[tex].TextureResView);
 		}
 	}
 
-	void CreateMipMap()
+	API CreateMipMap()
 	{
 		context->GenerateMips(texture[currentRT].TextureResView);
 	}
 
 
-	void SetRT(byte texId = mainRTIndex, byte level = 0)
+	API RenderTarget(byte texId = mainRTIndex, byte level = 0)
 	{
 		currentRT = texId;
 		
@@ -261,15 +259,15 @@ namespace Textures
 		SetViewport(texId, level);
 	}
 
-	#define Texture(name,type,format,width,height,mip,depth) name,
+	#define CreateTexture(name,type,format,width,height,mip,depth) name,
 	enum list {
 		#include "..\projectFiles\texList.h"
 	};
 
 	void Init()
 	{
-		#undef Texture
-		#define Texture(name,type,format,width,height,mip,depth) Textures::Create(list::name, Textures::tType::type,Textures::tFormat::format, XMFLOAT2((float)width,(float)height),mip,depth);
+		#undef CreateTexture
+		#define CreateTexture(name,type,format,width,height,mip,depth) Textures::Create(list::name, Textures::tType::type,Textures::tFormat::format, XMFLOAT2((float)width,(float)height),mip,depth);
 		#include "..\projectFiles\texList.h"
 	}
 

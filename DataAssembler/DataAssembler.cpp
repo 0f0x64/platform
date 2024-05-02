@@ -277,9 +277,9 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 					textures += "int " + name + ";\n";
 
-					texturesSet += "Textures::SetTexture(textures." + name + ", " + to_string(texturesCounter) + ", ";
-					if (type == sType::vertex) texturesSet += "Textures::tAssignType::vertex";
-					if (type == sType::pixel) texturesSet += "Textures::tAssignType::pixel";
+					texturesSet += "Textures::TextureToShader(textures." + name + ", " + to_string(texturesCounter) + ", ";
+					if (type == sType::vertex) texturesSet += "targetShader::vertex";
+					if (type == sType::pixel) texturesSet += "targetShader::pixel";
 					texturesSet += "); \n";
 					texturesCounter++;
 
@@ -302,8 +302,8 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 				samplers += "int " + name + "Filter;\n" + "int " + name + "AddressU;\n" + "int " + name + "AddressV;\n";
 
-				if (type == sType::vertex) samplersSet += "Sampler::Set(Sampler::to::vertex, ";
-				if (type == sType::pixel) samplersSet += "Sampler::Set(Sampler::to::pixel, ";
+				if (type == sType::vertex) samplersSet += "Sampler::Sampler(targetShader::vertex, ";
+				if (type == sType::pixel) samplersSet += "Sampler::Sampler(targetShader::pixel, ";
 				samplersSet += to_string(samplersCounter) + ", " + "samplers." + name + "Filter, " + "samplers." + name + "AddressU, " + "samplers." + name + "AddressV"+ "); \n";
 				samplersCounter++;
 			}
@@ -405,8 +405,8 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 	if (isSamplers) ofile << samplers << "} samplers;\n\n";
 
 	ofile << "void set () {\n";
-	if (type == sType::vertex) ofile << "Shaders::SetVS(";
-	if (type == sType::pixel) ofile << "Shaders::SetPS(";
+	if (type == sType::vertex) ofile << "Shaders::vShader(";
+	if (type == sType::pixel) ofile << "Shaders::pShader(";
 	ofile << sIndex << ");\n";
 	if (type == sType::vertex && isParams)
 	{
@@ -446,6 +446,195 @@ void catToFile(const std::filesystem::path& sandbox, ofstream& ofile, std::vecto
 		ofile << preStr << fName.c_str() << postStr;
 		outputName.push_back(fName);
 		counter++;
+	}
+}
+
+//TODO:: multiline declaration support
+//TODO:: proper namespace parsing
+void ScanFile(std::string fname, ofstream& ofile)
+{
+	//ofile << "// " << fname.c_str() << "\n";
+
+	ifstream in(fname);
+
+	if (in.is_open())
+	{
+		std::string nsName;
+		unsigned int res;
+		string s;
+		while (getline(in, s))
+		{
+
+			res = s.find("namespace ");
+			if (found)
+			{
+				for (int x = res + 10; x < s.length(); x++)
+				{
+					if (s.at(x) == '//') break;
+					if (s.at(x) == '{') break;
+					if (s.at(x) != ' ') nsName.push_back(s.at(x));
+				}
+				nsName.append("::");
+			}
+
+			res = s.find("API ");
+			if (found)
+			{
+				int pCount = 0;
+				std::string loader;
+				std::string overrider;
+				std::string caller;
+				std::string funcParams;
+				std::string funcName;
+
+				for (int x = res + 4; x < s.length(); x++)
+				{
+					if (s.at(x) == '(') break;
+					if (s.at(x) != ' ') funcName.push_back(s.at(x));
+				}
+
+				res = s.find("(",res+4);
+				if (found)
+				{
+					auto declEnd = s.find(")", res+1);
+					bool noParams = true;
+					for (int x = res+1 ; x < declEnd; x++)
+					{
+						if (s.at(x) != ' ') noParams = false;
+						funcParams.push_back(s.at(x));
+					}
+
+					string comma = noParams ? "" : ", ";
+					funcParams = "( const char* srcFileName, int srcLine" + comma + funcParams + ")";
+				
+					//decl
+					ofile << "void " << funcName.c_str() << funcParams << "\n{\n";
+
+					ofile << "if (currentCmd ==  cmdCounter) {\n";
+					ofile << "strcpy(cmdParamDesc.caller.fileName,srcFileName);\n";
+					ofile << "cmdParamDesc.caller.line = srcLine;\n";
+
+					caller.append(nsName + funcName.c_str() + "(");
+
+					std::string type;
+					std::string name;
+					int x = res+1;
+
+					auto end = s.find(')');
+
+					while (x < end)
+					{
+						if (s.at(x) == ' ') {
+							x++; continue;
+						}
+
+						while (x < end)
+						{
+							if (s.at(x) == ' ') break;
+							type.push_back(s.at(x));
+							x++;
+						}
+
+						if (type.compare("unsigned")==0|| type.compare("signed")==0)
+						{
+							type.push_back(' ');
+							while (x < end)
+							{
+								if (s.at(x) != ' ') break;
+								x++;
+							}
+
+							while (x < end)
+							{
+								if (s.at(x) == ' ') break;
+								type.push_back(s.at(x));
+								x++;
+							}
+
+						}
+
+						while (x < end)
+						{
+							if (s.at(x) == ' ') {
+								x++; continue;
+							}
+
+							if (s.at(x) == ',') break;
+							if (s.at(x) == '=')
+							{
+								while (x < end) {
+									if (s.at(x) == ',') break;
+									x++;
+								}
+								break;
+							}
+
+							name.push_back(s.at(x));
+							x++;
+						}
+
+						if (pCount > 0)
+						{
+							caller.append(",");
+						}
+
+						if (type.compare("int") == 0 || type.compare("float") == 0)
+						{
+							loader.append("cmdParamDesc.params[" + std::to_string(pCount) + "] = " + name + ";\n");
+							overrider.append(name + " = cmdParamDesc.params[" + std::to_string(pCount) + "];\n");
+						}
+
+						caller.append(name);
+
+						name.clear();
+						type.clear();
+						pCount++;
+						x++;
+					}
+
+				}
+
+				caller.append(");");
+				ofile << "cmdParamDesc.pCount = " << std::to_string(pCount) << ";\n";
+
+				if (pCount > 0)
+				{
+					ofile << "\nif (cmdParamDesc.loaded) {\n";
+					ofile << overrider;
+					ofile << "} else {\n";
+					ofile << loader;
+					ofile << "cmdParamDesc.loaded = true;\n";
+					ofile << "}\n";
+				}
+
+				ofile << "};\nAddToUI(__FUNCTION__);\n";
+				ofile << "cmdCounter++;\n\n";
+
+				ofile << caller;
+				ofile << "\n}\n\n";
+			}
+		}
+	}
+
+}
+
+void srcCat(const std::filesystem::path& sandbox, ofstream& ofile)
+{
+	for (auto const& cat : std::filesystem::recursive_directory_iterator{ sandbox })
+	{
+		std::string fName = cat.path().string();
+		auto o = fName.rfind(".", fName.length());
+		if (o != string::npos)
+		{
+			if (o == fName.length()-2)
+			{
+				if (fName.at(o + 1) = 'h')
+				{
+					ScanFile(fName,ofile);
+				}
+			}
+		}
+
 	}
 }
 
@@ -545,6 +734,27 @@ int main()
 
 	oSCfile.close();
 	oReflect.close();
+
+
+	//-- collect al API functions and create reflection structure
+	Log("\nReflected functions\n");
+
+	std::string apiFileName = "..\\fx\\generated\\apiReflection.h";
+	remove(apiFileName.c_str());
+	ofstream apiOfile(apiFileName);
+
+	apiOfile << "struct { \n\n";
+
+	const std::filesystem::path srcSandbox{ "..\\fx\\projectFiles\\" };
+	srcCat(srcSandbox, apiOfile);
+	const std::filesystem::path srcSandbox2{ "..\\fx\\dx11\\" };
+	srcCat(srcSandbox2, apiOfile);
+
+	apiOfile << "} api;\n";
+
+	apiOfile.close();
+	//--
+
 	Log("\n---competed!\n\n");
 
 }

@@ -3,11 +3,15 @@
 // windows environment
 
 #define _CRT_SECURE_NO_WARNINGS
-//#define WINDOWS_IGNORE_PACKING_MISMATCH
+#define WINDOWS_IGNORE_PACKING_MISMATCH
 #include <windows.h>
 HINSTANCE hInst;
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 HWND hWnd;
+
+//
+#define API void
+//
 
 #include <math.h>
 #include "timer.h"
@@ -15,12 +19,14 @@ HWND hWnd;
 
 #include "dx11\dx.h"
 #include <Xaudio2.h>
+#include "sound\tracker.h"
 
 using namespace dx11;
 
 #include "generated\constBufReflect.h"
 
 #if EditMode
+	#include "editor\cmdEditService.h"
 	#include "editor\editor.h"
 #endif
 
@@ -86,14 +92,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		if (time >= timer::nextFrameTime)
 		{
 			timer::frameBeginTime = timer::GetCounter();
-
 			Loop::mainLoop();
 
 			#if EditMode
 				editor::Process();
 			#endif	
 
-			api.present();
+			Draw::Present();
 
 			timer::frameEndTime = timer::GetCounter();
 			timer::frameRenderingDuration = timer::frameEndTime - timer::frameBeginTime;

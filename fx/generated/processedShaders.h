@@ -148,6 +148,7 @@ const char* objViewer =
 "    float2 uv = grid.xy;\n"
 "    \n"
 "    float4 pos = positions.SampleLevel(sam1, uv, 0);\n"
+"    pos = mul(pos, model);\n"
 "    //---\n"
 "    output.wpos = float4(pos.xyz, 0);\n"
 "    output.vpos = mul(float4(pos.xyz, 1), view[0]);\n"

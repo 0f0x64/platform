@@ -50,6 +50,22 @@ namespace dx11
 	float aspect;
 	float iaspect;
 
+	enum targetShader { vertex, pixel, both };
+
+	namespace blendmode { enum { off, on, alpha }; }
+	namespace blendop { enum { add, sub, revsub, min, max }; }
+	namespace depthmode { enum { off, on, readonly, writeonly }; }
+	namespace filter { enum { linear, point, minPoint_magLinear }; }
+	namespace addr { enum { clamp, wrap }; }
+	namespace cullmode { enum { off, front, back, wireframe }; }
+	namespace topology {
+		enum {
+			triList = D3D_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+			lineList = D3D_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST,
+			lineStrip = D3D_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINESTRIP
+		};
+	}
+
 	#include "constBuf.h"
 	#include "camera.h"
 	#include "blend.h"
@@ -74,39 +90,25 @@ namespace dx11
 		Textures::Init();
 	}
 
-	namespace blendmode { enum { off, on, alpha }; }
-	namespace blendop { enum { add, sub, revsub, min, max }; }
-	namespace depthmode { enum { off, on, readonly, writeonly }; }
-	namespace filter { enum { linear, point, minPoint_magLinear }; }
-	namespace addr { enum { clamp, wrap }; }
-	namespace cullmode { enum { off, front, back, wireframe }; }
-	namespace topology {
-		enum {
-			triList = D3D_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-			lineList = D3D_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST,
-			lineStrip = D3D_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINESTRIP
-		};
-	}
-
 	struct {
-		void setIA(int topology) { InputAssembler::Set(topology); }
-		void rt(int i) { Textures::SetRT(i); }
+		void setIA(int topology) { InputAssembler::IA(topology); }
+		void rt(int i) { Textures::RenderTarget(i); }
 		void mips() { Textures::CreateMipMap(); }
-		void depth(int i) { Depth::Set(i); }
+		void depth(int i) { Depth::Depth(i); }
 		void draw(int quadcount, int instances = 1) { Draw::NullDrawer(quadcount, instances); }
-		void cam(Camera::camData* cam) { Camera::Set(cam); }
+		void cam(camData* cam) { Camera::Camera(cam); }
 		void clear(float r, float g, float b, float a) { Draw::Clear(r, g, b, a); }
 		void clearDepth() { Draw::ClearDepth(); }
-		void blend(int mode, int op = blendop::add) { Blend::Set(mode, op); }
-		void cull(int i) { Rasterizer::SetCull(i); }
-		void setScissors(float left, float top, float right, float bottom) { Rasterizer::setScissors(left, top, right, bottom); }
+		void blend(int mode, int op = blendop::add) { Blend::Blending(mode, op); }
+		void cull(int i) { Rasterizer::Cull(i); }
+		void setScissors(float left, float top, float right, float bottom) { Rasterizer::Scissors(left, top, right, bottom); }
 		void copyColor(int dst, int src) { Textures::CopyColor(dst, src); }
 		void copyDepth(int dst, int src) { Textures::CopyDepth(dst, src); }
-		void present() { Draw::Present(); }
-	} api;
+
+	} gapi;
 	
-	#undef Texture
-	#define Texture(name,type,format,width,height,mip,depth) name,
+	#undef CreateTexture
+	#define CreateTexture(name,type,format,width,height,mip,depth) name,
 	namespace tex {
 		enum {
 			#include "..\projectFiles\texList.h"	

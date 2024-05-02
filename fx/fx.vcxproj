@@ -176,15 +176,18 @@
     <ClInclude Include="dx11\shaders.h" />
     <ClInclude Include="dx11\shadersReflection.h" />
     <ClInclude Include="dx11\textures.h" />
+    <ClInclude Include="editor\cmdEditService.h" />
     <ClInclude Include="editor\editor.h" />
     <ClInclude Include="editor\editorWindow.h" />
     <ClInclude Include="editor\font.h" />
     <ClInclude Include="editor\hotReload.h" />
+    <ClInclude Include="editor\paramEdit.h" />
     <ClInclude Include="editor\style.h" />
     <ClInclude Include="editor\timeLine.h" />
     <ClInclude Include="editor\uiDraw.h" />
     <ClInclude Include="editor\viewCam.h" />
     <ClInclude Include="editor\wndProc.h" />
+    <ClInclude Include="generated\apiReflection.h" />
     <ClInclude Include="generated\constBufReflect.h" />
     <ClInclude Include="generated\libList.h" />
     <ClInclude Include="generated\processedShaders.h" />
@@ -192,9 +195,12 @@
     <ClInclude Include="generated\psList.h" />
     <ClInclude Include="generated\vsList.h" />
     <ClInclude Include="projectFiles\camera.h" />
+    <ClInclude Include="projectFiles\cubemap.h" />
     <ClInclude Include="projectFiles\loop.h" />
+    <ClInclude Include="projectFiles\object.h" />
     <ClInclude Include="projectFiles\texList.h" />
     <ClInclude Include="settings.h" />
+    <ClInclude Include="sound\tracker.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="utils.h" />
   </ItemGroup>

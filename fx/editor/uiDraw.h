@@ -56,7 +56,7 @@ namespace ui
 	using namespace dx11;
 
 	const int fontTextureIndex = 254;
-	const int float4ArraySize = 32;
+	const int float4ArraySize = 255;
 
 	#include "font.h"
 	#include "style.h"
@@ -95,9 +95,9 @@ namespace ui
 		void LineNullDrawer(int vertexCount, int instances)
 		{
 			ConstBuf::Update(0, ConstBuf::drawerV);
-			ConstBuf::SetToVertex(0);
+			ConstBuf::ConstToVertex(0);
 			ConstBuf::Update(1, ConstBuf::drawerP);
-			ConstBuf::SetToPixel(1);
+			ConstBuf::ConstToPixel(1);
 
 			ConstBuffer::f4arrayUpdateAndSet();
 
@@ -106,10 +106,10 @@ namespace ui
 
 		void Setup()
 		{
-			api.setIA(topology::lineList);
-			api.blend(blendmode::off);
-			api.cull(cullmode::off);
-			api.depth(depthmode::off);
+			gapi.setIA(topology::lineList);
+			gapi.blend(blendmode::alpha);
+			gapi.cull(cullmode::off);
+			gapi.depth(depthmode::off);
 		}
 
 		typedef struct {
@@ -175,10 +175,10 @@ namespace ui
 
 		void Setup()
 		{
-			api.setIA(topology::triList);
-			api.blend(blendmode::alpha, blendop::add);
-			api.cull(cullmode::off);
-			api.depth(depthmode::off);
+			gapi.setIA(topology::triList);
+			gapi.blend(blendmode::alpha, blendop::add);
+			gapi.cull(cullmode::off);
+			gapi.depth(depthmode::off);
 		}
 
 		void Draw(float x, float y, float w = style::box::width, float h = style::box::height)
@@ -202,7 +202,7 @@ namespace ui
 			ps::box_ps.params.outlineBrightness = box::outlineBrightness;
 			ps::box_ps.set();
 
-			api.draw(1, 1);
+			gapi.draw(1, 1);
 
 		}
 
@@ -228,10 +228,10 @@ namespace ui
 
 		void Setup()
 		{
-			api.setIA(topology::triList);
-			api.blend(blendmode::alpha, blendop::add);
-			api.cull(cullmode::off);
-			api.depth(depthmode::off);
+			gapi.setIA(topology::triList);
+			gapi.blend(blendmode::alpha, blendop::add);
+			gapi.cull(cullmode::off);
+			gapi.depth(depthmode::off);
 
 			ps::letter_ps.samplers.s1Filter = filter::linear;
 			ps::letter_ps.samplers.s1AddressU = addr::clamp;
@@ -267,7 +267,7 @@ namespace ui
 
 			ps::letter_ps.set();
 
-			api.draw(1, strlen(str));
+			gapi.draw(1, strlen(str));
 
 		}
 	}

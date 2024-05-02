@@ -26,6 +26,7 @@ namespace editor
 	#include "uiDraw.h"
 	#include "timeLine.h"
 	#include "viewCam.h"
+	#include "paramEdit.h"
 
 	void Init()
 	{
@@ -39,7 +40,7 @@ namespace editor
 		ui::mousePos = ui::GetCusorPos();
 		ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
 		ui::mouseDelta.y = ui::mousePos.y - ui::mouseLastPos.y;
-		ui::mouseAngle = -atan2(ui::mousePos.y-.5, ui::mousePos.x-.5);
+		ui::mouseAngle = -atan2f(ui::mousePos.y-.5f, ui::mousePos.x-.5f);
 		ui::mouseAngleDelta = ui::mouseAngle - ui::mouseLastAngle;
 
 		ui::lbDown = isKeyDown(VK_LBUTTON) ? true : false;
@@ -48,12 +49,14 @@ namespace editor
 		ui::LeftDown = isKeyDown(VK_LEFT) ? true : false;
 		ui::RightDown = isKeyDown(VK_RIGHT) ? true : false;
 
-		api.rt(tex::mainRT);
-		api.cull(cullmode::off);
-		api.depth(depthmode::off);
+		gapi.rt(tex::mainRT);
+		gapi.cull(cullmode::off);
+		gapi.depth(depthmode::off);
 
 		TimeLine::Draw();
 		ViewCam::Draw();
+
+		paramEdit::ShowStack();
 
 	}
 }

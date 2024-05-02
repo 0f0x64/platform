@@ -21,12 +21,6 @@ namespace TimeLine
 
 	bool play = false;
 
-	template <typename T>
-	T clamp(T x, T left, T right)
-	{
-		return min(max(x, left), right);
-	}
-
 	float TimeToScreen(int time)
 	{
 		return time / (float)zoomOut;
@@ -216,8 +210,8 @@ namespace TimeLine
 
 	void DrawCursor(float y)
 	{
-		api.blend(blendmode::alpha);
-		api.setIA(topology::lineList);
+		gapi.blend(blendmode::alpha);
+		gapi.setIA(topology::lineList);
 
 		float cursor = TimeToScreen(timer::timeCursor - pos);
 		if (cursor<screenLeft || cursor > screenRight) return;
@@ -225,7 +219,7 @@ namespace TimeLine
 		if (isKeyDown(TIME_KEY)) StoreLine(0, cursor, 1, cursor, 0);
 		ui::Line::Draw(1, 1, 1, 1, .75f + .25f * sinf((float)timer::frameBeginTime * .01f));
 
-		api.setIA(topology::triList);
+		gapi.setIA(topology::triList);
 		TimeToStr(timer::timeCursor, true);
 		ui::text::Draw(timeStr, cursor, y - ui::style::text::height * 2.f);
 	}
@@ -346,7 +340,7 @@ namespace TimeLine
 	{
 		ProcessInput();
 
-		api.setScissors(screenLeft, 0, screenRight, 1);
+		gapi.setScissors(screenLeft, 0, screenRight, 1);
 
 		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 		timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
@@ -365,19 +359,19 @@ namespace TimeLine
 		ps::letter_ps.samplers.s1AddressV = addr::clamp;
 		ps::letter_ps.textures.tex = ui::fontTextureIndex;
 
-		api.blend(blendmode::off);
-		api.setIA(topology::lineList);
+		gapi.blend(blendmode::off);
+		gapi.setIA(topology::lineList);
 		DrawMakers(1);
 
-		api.blend(blendmode::alpha);
-		api.setIA(topology::triList);
+		gapi.blend(blendmode::alpha);
+		gapi.setIA(topology::triList);
 		DrawBPMGrid(0.025);
 		DrawTimeStamps(1 - ui::style::text::height * 1.25f);
 		DrawGridStamps(.025f - ui::style::text::height * .75f);
 
 		DrawCursor(1);
 
-		api.setScissors(0, 0, 1, 1);
+		gapi.setScissors(0, 0, 1, 1);
 
 	}
 

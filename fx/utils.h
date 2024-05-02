@@ -14,3 +14,9 @@ float RadiansToDegrees(float radians)
 {
 	return radians*180.f/PI;
 }
+
+template <typename T>
+T clamp(T x, T left, T right)
+{
+	return min(max(x, left), right);
+}

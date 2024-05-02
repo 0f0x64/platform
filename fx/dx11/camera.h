@@ -1,17 +1,19 @@
+typedef struct {
+	float x;
+	float y;
+	float z;
+} vec3;
+
+typedef struct {
+	vec3 eye;
+	vec3 at;
+	vec3 up;
+	float angle;
+} camData;
+
+
 namespace Camera
 {
-	typedef struct {
-		float x;
-		float y;
-		float z;
-	} vec3;
-
-	typedef struct {
-		vec3 eye;
-		vec3 at;
-		vec3 up;
-		float angle;
-	} camData;
 
 	#if EditMode
 
@@ -39,7 +41,7 @@ namespace Camera
 
 	#endif
 
-	void Set(camData* cam)
+	API Camera(camData* cam)
 	{
 		XMVECTOR Eye = XMVectorSet(cam->eye.x, cam->eye.y, cam->eye.z, 0.0f);
 		XMVECTOR At = XMVectorSet(cam->at.x, cam->at.y, cam->at.z, 0.0f);
@@ -59,7 +61,7 @@ namespace Camera
 		#endif	
 
 		ConstBuf::UpdateCamera();
-		ConstBuf::SetToVertex(3);
-		ConstBuf::SetToPixel(3);
+		ConstBuf::ConstToVertex(3);
+		ConstBuf::ConstToPixel(3);
 	}
 }

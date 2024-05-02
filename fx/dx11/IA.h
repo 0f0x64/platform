@@ -1,7 +1,7 @@
 namespace InputAssembler
 {
 
-	void Set(int topology)
+	API IA(int topology)
 	{
 		context->IASetPrimitiveTopology((D3D11_PRIMITIVE_TOPOLOGY)topology);
 		context->IASetInputLayout(NULL);

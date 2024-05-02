@@ -217,12 +217,12 @@ namespace Shaders {
 
 	#endif
 
-	void SetVS(int n)
+	API vShader(int n)
 	{
 		context->VSSetShader(VS[n].pShader, NULL, 0);
 	}
 
-	void SetPS(int n)
+	API pShader(int n)
 	{
 		context->PSSetShader(PS[n].pShader, NULL, 0);
 	}

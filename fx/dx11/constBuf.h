@@ -1,6 +1,5 @@
 namespace ConstBuf
 {
-
 	ID3D11Buffer* buffer[6];
 
 	#define constCount 32
@@ -71,21 +70,30 @@ namespace ConstBuf
 		context->UpdateSubresource(buffer[4], 0, NULL, &frame, 0, 0);
 	}
 
+	void UpdateDrawerMat()
+	{
+		context->UpdateSubresource(ConstBuf::buffer[2], 0, NULL, &drawerMat, 0, 0);
+	}
+
 	void UpdateCamera()
 	{
 		context->UpdateSubresource(ConstBuf::buffer[3], 0, NULL, &camera, 0, 0);
 	}
 
-	void SetToVertex(int i)
+	API ConstToVertex(int i)
 	{
 		context->VSSetConstantBuffers(i, 1, &buffer[i]);
 	}
 
-	void SetToPixel(int i)
+	API ConstToPixel(int i)
 	{
 		context->PSSetConstantBuffers(i, 1, &buffer[i]);
 	}
 
+
+	namespace getbyname {
+		enum { drawerV, drawerP, drawerMat, camera, frame, global };
+	}
 
 } 
 

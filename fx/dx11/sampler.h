@@ -52,15 +52,13 @@ namespace Sampler
 
 	}
 
-	enum to { vertex, pixel };
-
-	void Set(to shader, int slot, int filter, int addressU, int addressV)
+	API Sampler(targetShader shader, int slot, int filter, int addressU, int addressV)
 	{
 		if (shader == vertex) context->VSSetSamplers(slot, 1, &pSampler[filter][addressU][addressV]);
 		if (shader == pixel) context->PSSetSamplers(slot, 1, &pSampler[filter][addressU][addressV]);
 	}
 
-	void SetComp(int slot)
+	API SamplerComp(int slot)
 	{
 		context->PSSetSamplers(slot, 1, &pSamplerComp);
 	}

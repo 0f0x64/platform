@@ -1,7 +1,7 @@
 #define MAX_CAM 64
 #define MAX_CAM_KEY 64
-Camera::camData cam[MAX_CAM];
-Camera::camData camTmp;
+camData cam[MAX_CAM];
+camData camTmp;
 
 void regCam()
 {
@@ -22,7 +22,7 @@ void regCam()
 
 void setCam(int i)
 {
-	api.cam(&cam[i]);
+	gapi.cam(&cam[i]);
 }
 
 void slideCam(int i, int j, float a)
@@ -41,7 +41,7 @@ void slideCam(int i, int j, float a)
 	camTmp.up.y = lerp(cam[i].up.y, cam[j].up.y, a);
 	camTmp.up.z = lerp(cam[i].up.z, cam[j].up.z, a);
 
-	api.cam(&camTmp);
+	gapi.cam(&camTmp);
 }
 
 typedef struct {

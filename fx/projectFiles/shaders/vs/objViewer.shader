@@ -32,6 +32,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     float2 uv = grid.xy;
     
     float4 pos = positions.SampleLevel(sam1, uv, 0);
+    pos = mul(pos, model);
     //---
     output.wpos = float4(pos.xyz, 0);
     output.vpos = mul(float4(pos.xyz, 1), view[0]);
