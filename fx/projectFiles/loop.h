@@ -31,7 +31,6 @@ namespace Loop
 
 	void mainLoop()
 	{
-		cFunc = 0;
 		cmdCounter = 0;
 
 		//CalcCubemap(tex::env);
@@ -59,8 +58,8 @@ namespace Loop
 
 		api.ShowCubemap(ref, tex::env);
 		api.Cull(ref, cullmode::back);
-		api.ShowObject(ref, tex::obj1pos,tex::obj1nrml,4,0,0,0);
-		api.ShowObject(ref, tex::obj1pos, tex::obj1nrml, 4, 0, 1, 0);
+		api.ShowObject(ref, tex::obj1pos, tex::obj1nrml, 4, position{ 0,0,0 });
+		api.ShowObject(ref, tex::obj1pos, tex::obj1nrml, 4, position{ 0, 1, 0 });
 
 		playTrack();
 	}

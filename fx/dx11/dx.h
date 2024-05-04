@@ -50,6 +50,13 @@ namespace dx11
 	float aspect;
 	float iaspect;
 
+	typedef struct { float x; float y; float z; } position;
+	typedef struct { float x; float y; float z; } size;
+	typedef struct { float x; float y; float z; } rotation;
+	typedef struct { float r; float g; float b; } color;
+	typedef struct { float r; float g; float b; float a; } color4;
+
+
 	enum targetShader { vertex, pixel, both };
 
 	namespace blendmode { enum { off, on, alpha }; }

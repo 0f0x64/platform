@@ -75,7 +75,7 @@ namespace instrument
 
 	void bass()
 	{
-		envelope_ freq;
+		//envelope_ freq;
 
 		synth::oscillator(
 			0,

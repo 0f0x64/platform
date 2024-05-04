@@ -367,7 +367,7 @@ namespace TimeLine
 		gapi.setIA(topology::triList);
 		DrawBPMGrid(0.025);
 		DrawTimeStamps(1 - ui::style::text::height * 1.25f);
-		DrawGridStamps(.025f - ui::style::text::height * .75f);
+		DrawGridStamps(ui::style::text::height * .25f);
 
 		DrawCursor(1);
 

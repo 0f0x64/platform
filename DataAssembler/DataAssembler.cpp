@@ -468,7 +468,7 @@ void ScanFile(std::string fname, ofstream& ofile)
 			res = s.find("namespace ");
 			if (found)
 			{
-				for (int x = res + 10; x < s.length(); x++)
+				for (auto x = res + 10; x < s.length(); x++)
 				{
 					if (s.at(x) == '//') break;
 					if (s.at(x) == '{') break;
@@ -487,7 +487,7 @@ void ScanFile(std::string fname, ofstream& ofile)
 				std::string funcParams;
 				std::string funcName;
 
-				for (int x = res + 4; x < s.length(); x++)
+				for (auto x = res + 4; x < s.length(); x++)
 				{
 					if (s.at(x) == '(') break;
 					if (s.at(x) != ' ') funcName.push_back(s.at(x));
@@ -498,7 +498,7 @@ void ScanFile(std::string fname, ofstream& ofile)
 				{
 					auto declEnd = s.find(")", res+1);
 					bool noParams = true;
-					for (int x = res+1 ; x < declEnd; x++)
+					for (auto x = res+1 ; x < declEnd; x++)
 					{
 						if (s.at(x) != ' ') noParams = false;
 						funcParams.push_back(s.at(x));
@@ -510,15 +510,11 @@ void ScanFile(std::string fname, ofstream& ofile)
 					//decl
 					ofile << "void " << funcName.c_str() << funcParams << "\n{\n";
 
-					ofile << "if (currentCmd ==  cmdCounter) {\n";
-					ofile << "strcpy(cmdParamDesc.caller.fileName,srcFileName);\n";
-					ofile << "cmdParamDesc.caller.line = srcLine;\n";
-
 					caller.append(nsName + funcName.c_str() + "(");
 
 					std::string type;
 					std::string name;
-					int x = res+1;
+					unsigned int x = res+1;
 
 					auto end = s.find(')');
 
@@ -578,11 +574,28 @@ void ScanFile(std::string fname, ofstream& ofile)
 							caller.append(",");
 						}
 
+						auto pCountStr = std::to_string(pCount);
+
 						if (type.compare("int") == 0 || type.compare("float") == 0)
 						{
-							loader.append("cmdParamDesc.params[" + std::to_string(pCount) + "] = " + name + ";\n");
-							overrider.append(name + " = cmdParamDesc.params[" + std::to_string(pCount) + "];\n");
+							overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = (float)" + name + ";\n");
 						}
+
+						if (type.compare("position") == 0)
+						{
+							overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
+							overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].params[" + pCountStr + "][1];\n");
+							overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].params[" + pCountStr + "][2];\n");
+							
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = " + name + ".x;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][1] = " + name + ".y;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".z;\n");
+						}
+
+						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].paramType[" + pCountStr + "], \"" + type + "\"); \n");
+						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].paramName[" + pCountStr + "], \"" + name + "\"); \n");
+
 
 						caller.append(name);
 
@@ -595,19 +608,23 @@ void ScanFile(std::string fname, ofstream& ofile)
 				}
 
 				caller.append(");");
-				ofile << "cmdParamDesc.pCount = " << std::to_string(pCount) << ";\n";
 
 				if (pCount > 0)
 				{
-					ofile << "\nif (cmdParamDesc.loaded) {\n";
+					ofile << "\nif (cmdParamDesc[cmdCounter].loaded) {\n";
 					ofile << overrider;
 					ofile << "} else {\n";
+
+					ofile << "\tstrcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);\n";
+					ofile << "\tcmdParamDesc[cmdCounter].caller.line = srcLine;\n";
+					ofile << "\tcmdParamDesc[cmdCounter].pCount = " << std::to_string(pCount) << ";\n";
+
 					ofile << loader;
-					ofile << "cmdParamDesc.loaded = true;\n";
+					ofile << "\tcmdParamDesc[cmdCounter].loaded = true; \n";
 					ofile << "}\n";
 				}
 
-				ofile << "};\nAddToUI(__FUNCTION__);\n";
+				ofile << "\nAddToUI(__FUNCTION__);\n";
 				ofile << "cmdCounter++;\n\n";
 
 				ofile << caller;

@@ -1,10 +1,10 @@
 namespace Object {
 
-	API ShowObject(int geometry, int normals, int quality, float x, float y, float z)
+	API ShowObject(int geometry, int normals, int quality, position pos)
 	{
 		int denom = (int)pow(2, quality);
 		
-		ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixTranslation(x, y, z));
+		ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixTranslation(pos.x, pos.y, pos.z));
 		ConstBuf::UpdateDrawerMat();
 
 		float gX = Textures::texture[tex::obj1pos].size.x / denom;

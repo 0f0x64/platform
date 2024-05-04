@@ -15,9 +15,8 @@ cbuffer params : register(b1)
 
 float4 PS(VS_OUTPUT_POS_UV input) : SV_Target
 {
-    float4 color = tex.SampleLevel(s1, input.uv,0);
+    float4 color = tex.SampleLevel(s1, input.uv, 0);
     color.a = dot(color.rgb, 1);
-//    color.a = .5;
     color *= float4(r, g, b, a);
     return float4(color);
 }

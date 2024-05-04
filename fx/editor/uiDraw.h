@@ -211,17 +211,17 @@ namespace ui
 	namespace Text
 	{
 
-		float getLetterOffset(char a)
+		float getLetterOffset(char a, float w)
 		{
-			return vs::letter.params.width * kerningTable[a - 32] + style::text::tracking * kerningTable[0];
+			return w * ( kerningTable[a - 32] + style::text::tracking * kerningTable[0])/2.f;
 		}
 
-		float getTextLen(const char* str)
+		float getTextLen(const char* str, float w)
 		{
 			float offset = 0;
 			for (unsigned int i = 0; i < strlen(str); i++)
 			{
-				offset += getLetterOffset(str[i]) / 2.f;
+				offset += getLetterOffset(str[i], w * aspect);
 			}
 			return offset;
 		}
@@ -248,12 +248,12 @@ namespace ui
 
 			ConstBuffer::pCounter = 0;
 
-			float offset = 0;
+			float offset = 0.f;
 
 			for (unsigned int i = 0; i < strlen(str); i++)
 			{
 				ConstBuffer::SetFloat4Const(x + offset, y, (float)(str[i] - 32), 0);
-				offset += getLetterOffset(str[i])/2.;
+				offset += getLetterOffset(str[i], w * aspect);
 			}
 
 			ConstBuffer::f4arrayUpdateAndSet();
@@ -276,7 +276,7 @@ namespace ui
 	{
 		style::Base();
 		float ofs = kerningTable[0] * 2.f;
-		float boxW = Text::getTextLen(str) + ofs * 2.f;
+		float boxW = Text::getTextLen(str, ui::style::text::width) + ofs * 2.f;
 		Box::Draw(x, y, boxW);
 		Text::Draw(str, x + ofs, y);
 	}
@@ -285,7 +285,7 @@ namespace ui
 	{
 		style::Base();
 		Box::Draw(x, y, w, h);
-		float textW = Text::getTextLen(str);
+		float textW = Text::getTextLen(str,w);
 		float x1 = x + w / 2.f - textW / 2;
 		float y1 = y - h / 2.f + style::text::height / 2;
 		Text::Draw(str, x1, y1);

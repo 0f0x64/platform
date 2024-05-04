@@ -36,7 +36,7 @@ float4 PS(VS_OUTPUT_POS_UV input) : SV_Target
     float embossMask = sign(d) - saturate(d * edge * input.sz);
     float emboss = embossMask * dot(atan(uvs - .1), -.25);
     color.rgb += emboss;
-    float outline = sign(d) - saturate(d * 64 * input.sz); // * float3(r, g, b);
+    float outline = 1 - saturate(d * 64. * input.sz.y); // * float3(r, g, b);
     color.rgb += outline*outlineBrightness;
     return float4(color.rgb, saturate(d*soft)*color.a);
 }
