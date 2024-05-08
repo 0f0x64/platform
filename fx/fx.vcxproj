@@ -79,6 +79,7 @@
       <CreateHotpatchableImage>false</CreateHotpatchableImage>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -202,7 +203,9 @@
     <ClInclude Include="settings.h" />
     <ClInclude Include="sound\tracker.h" />
     <ClInclude Include="timer.h" />
+    <ClInclude Include="types.h" />
     <ClInclude Include="utils.h" />
+    <ClInclude Include="vMachine.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="projectFiles\shaders\lib\constants.shader" />

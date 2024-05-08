@@ -3,14 +3,14 @@ namespace Rasterizer
 
 	ID3D11RasterizerState* rasterState[4];
 
-	API Cull(int i)
+	API Cull(cullmode_ i)
 	{
 		context->RSSetState(rasterState[i]);
 	}
 
-	API Scissors(float left, float top, float right, float bottom)
+	API Scissors(rect_ r)
 	{
-		D3D11_RECT rect = { (int)(left * width), (int)(top * height), (int)(right * width), (int)(bottom * height) };
+		D3D11_RECT rect = { (int)(r.x * width), (int)(r.y * height), (int)(r.x1 * width), (int)(r.y1 * height) };
 		context->RSSetScissorRects(1, &rect);
 	}
 
@@ -40,7 +40,7 @@ namespace Rasterizer
 		device->CreateRasterizerState(&rasterizerState, &rasterState[3]);
 
 		context->RSSetState(rasterState[0]);
-		Scissors(0, 0, 1, 1);
+		Scissors(rect_{ 0, 0, 1, 1 });
 	}
 
 }

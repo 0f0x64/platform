@@ -278,8 +278,8 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 					textures += "int " + name + ";\n";
 
 					texturesSet += "Textures::TextureToShader(textures." + name + ", " + to_string(texturesCounter) + ", ";
-					if (type == sType::vertex) texturesSet += "targetShader::vertex";
-					if (type == sType::pixel) texturesSet += "targetShader::pixel";
+					if (type == sType::vertex) texturesSet += "targetshader::vertex";
+					if (type == sType::pixel) texturesSet += "targetshader::pixel";
 					texturesSet += "); \n";
 					texturesCounter++;
 
@@ -302,8 +302,8 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 				samplers += "int " + name + "Filter;\n" + "int " + name + "AddressU;\n" + "int " + name + "AddressV;\n";
 
-				if (type == sType::vertex) samplersSet += "Sampler::Sampler(targetShader::vertex, ";
-				if (type == sType::pixel) samplersSet += "Sampler::Sampler(targetShader::pixel, ";
+				if (type == sType::vertex) samplersSet += "Sampler::Sampler(targetshader::vertex, ";
+				if (type == sType::pixel) samplersSet += "Sampler::Sampler(targetshader::pixel, ";
 				samplersSet += to_string(samplersCounter) + ", " + "samplers." + name + "Filter, " + "samplers." + name + "AddressU, " + "samplers." + name + "AddressV"+ "); \n";
 				samplersCounter++;
 			}
@@ -486,6 +486,8 @@ void ScanFile(std::string fname, ofstream& ofile)
 				std::string caller;
 				std::string funcParams;
 				std::string funcName;
+				std::string pNameList;
+				std::string pNameListOut;
 
 				for (auto x = res + 4; x < s.length(); x++)
 				{
@@ -572,18 +574,42 @@ void ScanFile(std::string fname, ofstream& ofile)
 						if (pCount > 0)
 						{
 							caller.append(",");
+							pNameList.append(", ");
+							pNameListOut.append(", ");
 						}
 
 						auto pCountStr = std::to_string(pCount);
 
-						if (type.compare("int") == 0 || type.compare("float") == 0)
+						if (type.compare("int") == 0 || type.compare("float") == 0 )
 						{
+							pNameList.append(name);
+							pNameListOut.append(name);
 							overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
 							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = (float)" + name + ";\n");
 						}
 
-						if (type.compare("position") == 0)
+						if (type.compare("texture_") == 0 ||
+							type.compare("topology_") == 0 ||
+							type.compare("blendmode_") == 0 ||
+							type.compare("blendop_") == 0 ||
+							type.compare("depthmode_") == 0 ||
+							type.compare("filter_") == 0 ||
+							type.compare("addr_") == 0 ||
+							type.compare("cullmode_") == 0 ||
+							type.compare("targetshader_") == 0)
 						{
+							pNameList.append(name);
+							pNameListOut.append(name);
+							overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = (float)" + name + ";\n");
+						}
+
+						if (type.compare("position_") == 0 ||
+							type.compare("size_") == 0 ||
+							type.compare("rotation_") == 0 )
+						{
+							pNameList.append(name+"_x, "+ name + "_y, " + name + "_z");
+							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z }");
 							overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
 							overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].params[" + pCountStr + "][1];\n");
 							overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].params[" + pCountStr + "][2];\n");
@@ -591,6 +617,53 @@ void ScanFile(std::string fname, ofstream& ofile)
 							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = " + name + ".x;\n");
 							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][1] = " + name + ".y;\n");
 							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".z;\n");
+						}
+
+						if (type.compare("color_") == 0)
+						{
+							pNameList.append(name + "_r, " + name + "_g, " + name + "_b");
+							pNameListOut.append(type + " {" + name + "_r, " + name + "_g, " + name + "_b }");
+
+							overrider.append("\t" + name + ".r = cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
+							overrider.append("\t" + name + ".g = cmdParamDesc[cmdCounter].params[" + pCountStr + "][1];\n");
+							overrider.append("\t" + name + ".b = cmdParamDesc[cmdCounter].params[" + pCountStr + "][2];\n");
+
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = " + name + ".r;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][1] = " + name + ".g;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".b;\n");
+						}
+
+						if (type.compare("color4_") == 0 )
+						{
+							pNameList.append(name + "_r, " + name + "_g, " + name + "_b, " + name + "_a");
+							pNameListOut.append(type + " {" + name + "_r, " + name + "_g, " + name + "_b, " + name + "_a }");
+
+						overrider.append("\t" + name + ".r = cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
+						overrider.append("\t" + name + ".g = cmdParamDesc[cmdCounter].params[" + pCountStr + "][1];\n");
+						overrider.append("\t" + name + ".b = cmdParamDesc[cmdCounter].params[" + pCountStr + "][2];\n");
+						overrider.append("\t" + name + ".a = cmdParamDesc[cmdCounter].params[" + pCountStr + "][3];\n");
+
+						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = " + name + ".r;\n");
+						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][1] = " + name + ".g;\n");
+						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".b;\n");
+						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][3] = " + name + ".a;\n");
+						}
+
+						if (type.compare("rect_") == 0)
+						{
+							pNameList.append(name + "_x, " + name + "_y, " + name + "_x1" + name + "_y1");
+							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_x1, " + name + "_y1 }");
+
+
+							overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
+							overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].params[" + pCountStr + "][1];\n");
+							overrider.append("\t" + name + ".x1 = cmdParamDesc[cmdCounter].params[" + pCountStr + "][2];\n");
+							overrider.append("\t" + name + ".y1 = cmdParamDesc[cmdCounter].params[" + pCountStr + "][3];\n");
+
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = " + name + ".x;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][1] = " + name + ".y;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".x1;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][3] = " + name + ".y1;\n");
 						}
 
 						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].paramType[" + pCountStr + "], \"" + type + "\"); \n");
@@ -629,6 +702,13 @@ void ScanFile(std::string fname, ofstream& ofile)
 
 				ofile << caller;
 				ofile << "\n}\n\n";
+
+				ofile << "#define " << funcName << "(" << pNameList << ") ";
+				ofile << "api." << funcName << "( __FILE__, __LINE__ ";
+					if (pCount > 0) ofile << ", ";
+				ofile << pNameListOut << ")";
+				ofile << "\n\n";
+
 			}
 		}
 	}

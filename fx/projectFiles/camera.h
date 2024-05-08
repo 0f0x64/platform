@@ -22,26 +22,27 @@ void regCam()
 
 void setCam(int i)
 {
-	gapi.cam(&cam[i]);
+	//gapi.cam(&cam[i]);
 }
 
 void slideCam(int i, int j, float a)
 {
-	camTmp.angle = lerp(cam[i].angle, cam[j].angle, a);
+	position_ eye, at, up;
+	float angle = lerp(cam[i].angle, cam[j].angle, a);
 
-	camTmp.eye.x = lerp(cam[i].eye.x, cam[j].eye.x, a);
-	camTmp.eye.y = lerp(cam[i].eye.y, cam[j].eye.y, a);
-	camTmp.eye.z = lerp(cam[i].eye.z, cam[j].eye.z, a);
+	eye.x = lerp(cam[i].eye.x, cam[j].eye.x, a);
+	eye.y = lerp(cam[i].eye.y, cam[j].eye.y, a);
+	eye.z = lerp(cam[i].eye.z, cam[j].eye.z, a);
 
-	camTmp.at.x = lerp(cam[i].at.x, cam[j].at.x, a);
-	camTmp.at.y = lerp(cam[i].at.y, cam[j].at.y, a);
-	camTmp.at.z = lerp(cam[i].at.z, cam[j].at.z, a);
+	at.x = lerp(cam[i].at.x, cam[j].at.x, a);
+	at.y = lerp(cam[i].at.y, cam[j].at.y, a);
+	at.z = lerp(cam[i].at.z, cam[j].at.z, a);
 
-	camTmp.up.x = lerp(cam[i].up.x, cam[j].up.x, a);
-	camTmp.up.y = lerp(cam[i].up.y, cam[j].up.y, a);
-	camTmp.up.z = lerp(cam[i].up.z, cam[j].up.z, a);
+	up.x = lerp(cam[i].up.x, cam[j].up.x, a);
+	up.y = lerp(cam[i].up.y, cam[j].up.y, a);
+	up.z = lerp(cam[i].up.z, cam[j].up.z, a);
 
-	gapi.cam(&camTmp);
+	gapi.cam(eye, at, up, angle);
 }
 
 typedef struct {

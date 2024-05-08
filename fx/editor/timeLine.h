@@ -340,7 +340,7 @@ namespace TimeLine
 	{
 		ProcessInput();
 
-		gapi.setScissors(screenLeft, 0, screenRight, 1);
+		gapi.setScissors(rect_{ screenLeft, 0, screenRight, 1 });
 
 		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 		timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
@@ -371,7 +371,7 @@ namespace TimeLine
 
 		DrawCursor(1);
 
-		gapi.setScissors(0, 0, 1, 1);
+		gapi.setScissors(rect_{ 0, 0, 1, 1 });
 
 	}
 

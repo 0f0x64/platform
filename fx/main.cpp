@@ -16,10 +16,13 @@ HWND hWnd;
 #include <math.h>
 #include "timer.h"
 #include "utils.h"
+#include "types.h"
 
 #include "dx11\dx.h"
 #include <Xaudio2.h>
 #include "sound\tracker.h"
+
+#include "vMachine.h"
 
 using namespace dx11;
 

@@ -1,6 +1,6 @@
 namespace Object {
 
-	API ShowObject(int geometry, int normals, int quality, position pos)
+	API ShowObject(texture_ geometry, texture_ normals, int quality, position_ pos)
 	{
 		int denom = (int)pow(2, quality);
 		
@@ -28,7 +28,7 @@ namespace Object {
 		gapi.draw((int)gX * (int)gY);
 	}
 
-	API CalcObject(int targetGeoTexture, int targetNrmlTexture)
+	API CalcObject(texture_ targetGeoTexture, texture_ targetNrmlTexture)
 	{
 		gapi.blend(blendmode::off, blendop::add);
 		gapi.cull(cullmode::off);

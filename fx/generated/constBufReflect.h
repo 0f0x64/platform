@@ -79,9 +79,9 @@ int sam1AddressV;
 void set () {
 Shaders::vShader(4);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
-Textures::TextureToShader(textures.positions, 0, targetShader::vertex); 
-Textures::TextureToShader(textures.normals, 1, targetShader::vertex); 
-Sampler::Sampler(targetShader::vertex, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+Textures::TextureToShader(textures.positions, 0, targetshader::vertex); 
+Textures::TextureToShader(textures.normals, 1, targetshader::vertex); 
+Sampler::Sampler(targetshader::vertex, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
 } objViewer;
@@ -148,10 +148,10 @@ int sam1AddressV;
 void set () {
 Shaders::pShader(0);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
-Textures::TextureToShader(textures.env, 0, targetShader::pixel); 
-Textures::TextureToShader(textures.normals, 1, targetShader::pixel); 
-Textures::TextureToShader(textures.albedo, 2, targetShader::pixel); 
-Sampler::Sampler(targetShader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+Textures::TextureToShader(textures.env, 0, targetshader::pixel); 
+Textures::TextureToShader(textures.normals, 1, targetshader::pixel); 
+Textures::TextureToShader(textures.albedo, 2, targetshader::pixel); 
+Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
 } basic;
@@ -220,8 +220,8 @@ int sam1AddressV;
 
 void set () {
 Shaders::pShader(3);
-Textures::TextureToShader(textures.env, 0, targetShader::pixel); 
-Sampler::Sampler(targetShader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+Textures::TextureToShader(textures.env, 0, targetshader::pixel); 
+Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
 } cubeMapViewer;
@@ -246,8 +246,8 @@ int sam1AddressV;
 
 void set () {
 Shaders::pShader(4);
-Textures::TextureToShader(textures.geo, 0, targetShader::pixel); 
-Sampler::Sampler(targetShader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+Textures::TextureToShader(textures.geo, 0, targetshader::pixel); 
+Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
 } genNormals;
@@ -282,8 +282,8 @@ int s1AddressV;
 void set () {
 Shaders::pShader(5);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
-Textures::TextureToShader(textures.tex, 0, targetShader::pixel); 
-Sampler::Sampler(targetShader::pixel, 0, samplers.s1Filter, samplers.s1AddressU, samplers.s1AddressV); 
+Textures::TextureToShader(textures.tex, 0, targetshader::pixel); 
+Sampler::Sampler(targetshader::pixel, 0, samplers.s1Filter, samplers.s1AddressU, samplers.s1AddressV); 
 }
 
 } letter_ps;

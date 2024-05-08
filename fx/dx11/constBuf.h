@@ -80,12 +80,12 @@ namespace ConstBuf
 		context->UpdateSubresource(ConstBuf::buffer[3], 0, NULL, &camera, 0, 0);
 	}
 
-	API ConstToVertex(int i)
+	void ConstToVertex(int i)
 	{
 		context->VSSetConstantBuffers(i, 1, &buffer[i]);
 	}
 
-	API ConstToPixel(int i)
+	void ConstToPixel(int i)
 	{
 		context->PSSetConstantBuffers(i, 1, &buffer[i]);
 	}

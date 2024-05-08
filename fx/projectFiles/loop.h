@@ -25,9 +25,9 @@ namespace Loop
 	}
 
 		
-//#define CalcCubemap(...) CalcCubemap(__FILE__, __LINE__,__VA_ARGS__)
-
 #define ref __FILE__, __LINE__
+
+	//#define ShowObject(posTexture, nrmlTexture, quality, x,y,z) api.ShowObject(__FILE__, __LINE__, posTexture, nrmlTexture, quality, position_{x,y,z}) 
 
 	void mainLoop()
 	{
@@ -35,31 +35,36 @@ namespace Loop
 
 		//CalcCubemap(tex::env);
 
-		if (!isPrecalc) Precalc();
+		//if (!isPrecalc) 
+			Precalc();
+
+
 
 		regCam();
 		frameConst();
 
-		api.IA(ref,topology::triList);
+		IA(topology::triList);
 
-		api.CalcCubemap(ref, tex::env);
-		api.CalcObject(ref, tex::obj1pos,tex::obj1nrml);
+		CalcCubemap( tex::env);
+		CalcObject( tex::obj1pos,tex::obj1nrml);
 
-		api.Blending(ref, blendmode::off);
-		api.RenderTarget(ref);
+		Blending( blendmode::off, blendop::add);
+		RenderTarget(tex::mainRT, 0 );
 
 		//setCam(0);
 		float t = (timer::timeCursor / (SAMPLES_IN_FRAME * 60.f));
 		slideCam(0, 1, t);
 
-		api.Depth(ref, depthmode::on);
-		api.Clear(ref, 0.2f, 0.2f, 0.2f, 1.f);
-		api.ClearDepth(ref);
+		Depth( depthmode::on);
+		Clear( 0.2f, 0.2f, 0.2f, 1.f );
+		ClearDepth();
 
-		api.ShowCubemap(ref, tex::env);
-		api.Cull(ref, cullmode::back);
-		api.ShowObject(ref, tex::obj1pos, tex::obj1nrml, 4, position{ 0,0,0 });
-		api.ShowObject(ref, tex::obj1pos, tex::obj1nrml, 4, position{ 0, 1, 0 });
+		ShowCubemap( tex::env);
+		Cull( cullmode::back);
+		ShowObject( tex::obj1pos, tex::obj1nrml, 4, 0, 0, 0 );
+		ShowObject( tex::obj1pos, tex::obj1nrml, 4, 0, 1, 0 );
+		//ShowObject(tex::obj1pos, tex::obj1nrml, 4, 0, 1, 0);
+
 
 		playTrack();
 	}

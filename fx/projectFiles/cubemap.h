@@ -1,12 +1,12 @@
 namespace Cubemap {
 
-	API CalcCubemap(int texture)
+	API CalcCubemap(texture_ target)
 	{
 		gapi.blend(blendmode::off, blendop::add);
-		gapi.rt(texture);
+		gapi.rt(target);
 		gapi.cull(cullmode::off);
 		gapi.depth(depthmode::off);
-		gapi.clear(0, 0, 0, 1);
+		gapi.clear(color4_{ 0, 0, 0, 1 });
 
 		vs::quad.set();
 		ps::cubemapCreator.set();
@@ -14,7 +14,7 @@ namespace Cubemap {
 		gapi.mips();
 	}
 
-	API ShowCubemap(unsigned int envTex)
+	API ShowCubemap(texture_ envTex)
 	{
 		gapi.blend(blendmode::off, blendop::add);
 		gapi.cull(cullmode::back);

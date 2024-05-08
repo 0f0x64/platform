@@ -170,6 +170,12 @@
     <ClInclude Include="editor\paramEdit.h">
       <Filter>Source Files\editor</Filter>
     </ClInclude>
+    <ClInclude Include="types.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vMachine.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

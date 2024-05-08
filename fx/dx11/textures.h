@@ -194,7 +194,7 @@ namespace Textures
 		context->PSSetShaderResources(0, 128, null);
 	}
 
-	void SetViewport(byte texId, byte level = 0)
+	void SetViewport(texture_ texId, byte level = 0)
 	{
 		XMFLOAT2 size = Textures::texture[texId].size;
 		float denom = powf(2, level);
@@ -211,24 +211,24 @@ namespace Textures
 		context->RSSetViewports(1, &vp);
 	}
 
-	API CopyColor(int dst, int src)
+	API CopyColor(texture_ dst, texture_ src)
 	{
 		context->CopyResource(texture[dst].pTexture, texture[src].pTexture);
 	}
 
-	API CopyDepth(int dst, int src)
+	API CopyDepth(texture_ dst, texture_ src)
 	{
 		context->CopyResource(texture[dst].pDepth, texture[src].pDepth);
 	}
 
-	API TextureToShader(int tex, int slot, targetShader tA = targetShader::both)
+	API TextureToShader(texture_ tex, int slot, targetshader_ tA = targetshader::both)
 	{
-		if (tA == targetShader::both || tA == targetShader::vertex)
+		if (tA == targetshader::both || tA == targetshader::vertex)
 		{
 			context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
 		}
 
-		if (tA == targetShader::both || tA == targetShader::pixel)
+		if (tA == targetshader::both || tA == targetshader::pixel)
 		{
 			context->PSSetShaderResources(slot, 1, &texture[tex].TextureResView);
 		}
@@ -240,7 +240,7 @@ namespace Textures
 	}
 
 
-	API RenderTarget(byte texId = mainRTIndex, byte level = 0)
+	API RenderTarget(texture_ texId = mainRTIndex, int level = 0)
 	{
 		currentRT = texId;
 		
@@ -261,6 +261,13 @@ namespace Textures
 
 	#define CreateTexture(name,type,format,width,height,mip,depth) name,
 	enum list {
+		#include "..\projectFiles\texList.h"
+	};
+
+	#undef CreateTexture
+	#define CreateTexture(name,type,format,width,height,mip,depth) #name,
+
+	const char* nameList[] = {
 		#include "..\projectFiles\texList.h"
 	};
 

@@ -50,29 +50,6 @@ namespace dx11
 	float aspect;
 	float iaspect;
 
-	typedef struct { float x; float y; float z; } position;
-	typedef struct { float x; float y; float z; } size;
-	typedef struct { float x; float y; float z; } rotation;
-	typedef struct { float r; float g; float b; } color;
-	typedef struct { float r; float g; float b; float a; } color4;
-
-
-	enum targetShader { vertex, pixel, both };
-
-	namespace blendmode { enum { off, on, alpha }; }
-	namespace blendop { enum { add, sub, revsub, min, max }; }
-	namespace depthmode { enum { off, on, readonly, writeonly }; }
-	namespace filter { enum { linear, point, minPoint_magLinear }; }
-	namespace addr { enum { clamp, wrap }; }
-	namespace cullmode { enum { off, front, back, wireframe }; }
-	namespace topology {
-		enum {
-			triList = D3D_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-			lineList = D3D_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINELIST,
-			lineStrip = D3D_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_LINESTRIP
-		};
-	}
-
 	#include "constBuf.h"
 	#include "camera.h"
 	#include "blend.h"
@@ -103,15 +80,14 @@ namespace dx11
 		void mips() { Textures::CreateMipMap(); }
 		void depth(int i) { Depth::Depth(i); }
 		void draw(int quadcount, int instances = 1) { Draw::NullDrawer(quadcount, instances); }
-		void cam(camData* cam) { Camera::Camera(cam); }
-		void clear(float r, float g, float b, float a) { Draw::Clear(r, g, b, a); }
+		void cam(position_ eye, position_ at, position_ up, float angle) { Camera::Camera(eye, at, up, angle); }
+		void clear(color4_ c) { Draw::Clear(c); }
 		void clearDepth() { Draw::ClearDepth(); }
 		void blend(int mode, int op = blendop::add) { Blend::Blending(mode, op); }
 		void cull(int i) { Rasterizer::Cull(i); }
-		void setScissors(float left, float top, float right, float bottom) { Rasterizer::Scissors(left, top, right, bottom); }
+		void setScissors(rect_ r) { Rasterizer::Scissors(r); }
 		void copyColor(int dst, int src) { Textures::CopyColor(dst, src); }
 		void copyDepth(int dst, int src) { Textures::CopyDepth(dst, src); }
-
 	} gapi;
 	
 	#undef CreateTexture
