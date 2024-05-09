@@ -213,18 +213,18 @@ void Clear( const char* srcFileName, int srcLine, color4_ c)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	c.r = cmdParamDesc[cmdCounter].params[0][0];
-	c.g = cmdParamDesc[cmdCounter].params[0][1];
-	c.b = cmdParamDesc[cmdCounter].params[0][2];
-	c.a = cmdParamDesc[cmdCounter].params[0][3];
+	c.x = cmdParamDesc[cmdCounter].params[0][0];
+	c.y = cmdParamDesc[cmdCounter].params[0][1];
+	c.z = cmdParamDesc[cmdCounter].params[0][2];
+	c.w = cmdParamDesc[cmdCounter].params[0][3];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
-	cmdParamDesc[cmdCounter].params[0][0] = c.r;
-	cmdParamDesc[cmdCounter].params[0][1] = c.g;
-	cmdParamDesc[cmdCounter].params[0][2] = c.b;
-	cmdParamDesc[cmdCounter].params[0][3] = c.a;
+	cmdParamDesc[cmdCounter].params[0][0] = c.x;
+	cmdParamDesc[cmdCounter].params[0][1] = c.y;
+	cmdParamDesc[cmdCounter].params[0][2] = c.z;
+	cmdParamDesc[cmdCounter].params[0][3] = c.w;
 	strcpy(cmdParamDesc[cmdCounter].paramType[0], "color4_"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "c"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
@@ -236,7 +236,7 @@ cmdCounter++;
 Draw::Clear(c);
 }
 
-#define Clear(c_r, c_g, c_b, c_a) api.Clear( __FILE__, __LINE__ , color4_ {c_r, c_g, c_b, c_a })
+#define Clear(c_x, c_y, c_z, c_w) api.Clear( __FILE__, __LINE__ , color4_ {c_x, c_y, c_z, c_w })
 
 void ClearDepth( const char* srcFileName, int srcLine)
 {
@@ -326,18 +326,10 @@ void Scissors( const char* srcFileName, int srcLine, rect_ r)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	r.x = cmdParamDesc[cmdCounter].params[0][0];
-	r.y = cmdParamDesc[cmdCounter].params[0][1];
-	r.x1 = cmdParamDesc[cmdCounter].params[0][2];
-	r.y1 = cmdParamDesc[cmdCounter].params[0][3];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
-	cmdParamDesc[cmdCounter].params[0][0] = r.x;
-	cmdParamDesc[cmdCounter].params[0][1] = r.y;
-	cmdParamDesc[cmdCounter].params[0][2] = r.x1;
-	cmdParamDesc[cmdCounter].params[0][3] = r.y1;
 	strcpy(cmdParamDesc[cmdCounter].paramType[0], "rect_"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "r"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
@@ -349,7 +341,7 @@ cmdCounter++;
 Rasterizer::Scissors(r);
 }
 
-#define Scissors(r_x, r_y, r_x1r_y1) api.Scissors( __FILE__, __LINE__ , rect_ {r_x, r_y, r_x1, r_y1 })
+#define Scissors() api.Scissors( __FILE__, __LINE__ , )
 
 void Sampler( const char* srcFileName, int srcLine, targetshader_ shader, int slot, filter_ filter, addr_ addressU, addr_ addressV)
 {

@@ -606,7 +606,8 @@ void ScanFile(std::string fname, ofstream& ofile)
 
 						if (type.compare("position_") == 0 ||
 							type.compare("size_") == 0 ||
-							type.compare("rotation_") == 0 )
+							type.compare("rotation_") == 0 || 
+							type.compare("color_") == 0 )
 						{
 							pNameList.append(name+"_x, "+ name + "_y, " + name + "_z");
 							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z }");
@@ -619,51 +620,21 @@ void ScanFile(std::string fname, ofstream& ofile)
 							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".z;\n");
 						}
 
-						if (type.compare("color_") == 0)
+						if (type.compare("color4_") == 0 ||
+							type.compare("rect__") == 0 )
 						{
-							pNameList.append(name + "_r, " + name + "_g, " + name + "_b");
-							pNameListOut.append(type + " {" + name + "_r, " + name + "_g, " + name + "_b }");
+							pNameList.append(name + "_x, " + name + "_y, " + name + "_z, " + name + "_w");
+							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z, " + name + "_w }");
 
-							overrider.append("\t" + name + ".r = cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
-							overrider.append("\t" + name + ".g = cmdParamDesc[cmdCounter].params[" + pCountStr + "][1];\n");
-							overrider.append("\t" + name + ".b = cmdParamDesc[cmdCounter].params[" + pCountStr + "][2];\n");
+						overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
+						overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].params[" + pCountStr + "][1];\n");
+						overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].params[" + pCountStr + "][2];\n");
+						overrider.append("\t" + name + ".w = cmdParamDesc[cmdCounter].params[" + pCountStr + "][3];\n");
 
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = " + name + ".r;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][1] = " + name + ".g;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".b;\n");
-						}
-
-						if (type.compare("color4_") == 0 )
-						{
-							pNameList.append(name + "_r, " + name + "_g, " + name + "_b, " + name + "_a");
-							pNameListOut.append(type + " {" + name + "_r, " + name + "_g, " + name + "_b, " + name + "_a }");
-
-						overrider.append("\t" + name + ".r = cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
-						overrider.append("\t" + name + ".g = cmdParamDesc[cmdCounter].params[" + pCountStr + "][1];\n");
-						overrider.append("\t" + name + ".b = cmdParamDesc[cmdCounter].params[" + pCountStr + "][2];\n");
-						overrider.append("\t" + name + ".a = cmdParamDesc[cmdCounter].params[" + pCountStr + "][3];\n");
-
-						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = " + name + ".r;\n");
-						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][1] = " + name + ".g;\n");
-						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".b;\n");
-						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][3] = " + name + ".a;\n");
-						}
-
-						if (type.compare("rect_") == 0)
-						{
-							pNameList.append(name + "_x, " + name + "_y, " + name + "_x1" + name + "_y1");
-							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_x1, " + name + "_y1 }");
-
-
-							overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
-							overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].params[" + pCountStr + "][1];\n");
-							overrider.append("\t" + name + ".x1 = cmdParamDesc[cmdCounter].params[" + pCountStr + "][2];\n");
-							overrider.append("\t" + name + ".y1 = cmdParamDesc[cmdCounter].params[" + pCountStr + "][3];\n");
-
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = " + name + ".x;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][1] = " + name + ".y;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".x1;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][3] = " + name + ".y1;\n");
+						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = " + name + ".x;\n");
+						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][1] = " + name + ".y;\n");
+						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".z;\n");
+						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][3] = " + name + ".w;\n");
 						}
 
 						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].paramType[" + pCountStr + "], \"" + type + "\"); \n");

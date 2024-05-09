@@ -83,6 +83,32 @@ namespace paramEdit {
 		}
 	}
 
+	bool isType(const char* t1, const char* t2 )
+	{
+		return (strcmp(t1, t2) == 0);
+	}
+
+	bool isTypeEnum(const char* t1)
+	{
+		if (
+			isType(t1, "topology_") || 
+			isType(t1, "blendmode_") || 
+			isType(t1, "blendop_") || 
+			isType(t1, "depthmode_") ||
+			isType(t1, "filter_") || 
+			isType(t1, "addr_") ||
+			isType(t1, "cullmode_") ||
+			isType(t1, "targetshader_")
+			) 
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+
+	//create c++ call string and save it into source file
 	void Save()
 	{
 		char str[1024];
@@ -92,29 +118,23 @@ namespace paramEdit {
 
 		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
 		{
-			if (strcmp(cmdParamDesc[currentCmd].paramType[i], "int") == 0)
+			auto sType = cmdParamDesc[currentCmd].paramType[i];
+
+			if (isType(sType, "int"))
 			{
 				char pStr[32];
 				_itoa((int)cmdParamDesc[currentCmd].params[i][0], pStr, 10);
 				strcat(str, pStr);
 			}
 
-			if (strcmp(cmdParamDesc[currentCmd].paramType[i], "float") == 0)
+			if (isType(sType, "float"))
 			{
 				char pStr[32];
 				_gcvt(cmdParamDesc[currentCmd].params[i][0], 10, pStr);
 				strcat(str, pStr);
 			}
 
-			if (strcmp(cmdParamDesc[currentCmd].paramType[i], "texture_") == 0 ||
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "topology_") == 0 || 
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "blendmode_") == 0 || 
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "blendop_") == 0 || 
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "depthmode_") == 0 || 
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "filter_") == 0 || 
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "addr_") == 0 || 
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "cullmode_") == 0 || 
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "targetshader_") == 0 )
+			if (isType(sType, "texture_"))
 			{
 				auto a = Textures::nameList[(int)cmdParamDesc[currentCmd].params[i][0]];
 				strcat(str, cmdParamDesc[currentCmd].paramType[i]);
@@ -123,13 +143,20 @@ namespace paramEdit {
 				strcat(str, a);
 			}
 
-			if (strcmp(cmdParamDesc[currentCmd].paramType[i], "position_") == 0 ||
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "size_") == 0 ||
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "rotation_") == 0 || 
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "color_") == 0 )
+			if (isTypeEnum(sType))
 			{
-				//strcat(str, cmdParamDesc[currentCmd].paramType[i]);
-				//strcat(str, " {");
+				strcat(str, cmdParamDesc[currentCmd].paramType[i]);
+				str[strlen(str) - 1] = 0;
+				strcat(str, "::");
+				strcat(str, getEnumStr(sType, (int)cmdParamDesc[currentCmd].params[i][0]));
+			}
+
+
+			if (isType(sType, "position_") == 0 ||
+				isType(sType, "size_") == 0 ||
+				isType(sType, "rotation_") == 0 || 
+				isType(sType, "color_") == 0 )
+			{
 				char pStr[32];
 				for (int x = 0; x < 3; x++)
 				{
@@ -137,11 +164,10 @@ namespace paramEdit {
 					strcat(str, pStr);
 					if (x!=2) strcat(str, ", ");
 				}
-				//strcat(str, " } ");
 			}
 
-			if (strcmp(cmdParamDesc[currentCmd].paramType[i], "color4_") == 0 ||
-				strcmp(cmdParamDesc[currentCmd].paramType[i], "rect_") == 0 )
+			if (isType(sType, "color4_") == 0 ||
+				isType(sType, "rect_") == 0 )
 			{
 				char pStr[32];
 				for (int x = 0; x < 4; x++)
@@ -152,7 +178,6 @@ namespace paramEdit {
 				}
 			}
 
-
 			if (i!= cmdParamDesc[currentCmd].pCount -1) strcat(str, ", ");
 		}
 		strcat(str, ");");
@@ -160,8 +185,52 @@ namespace paramEdit {
 		//
 	}
 
+
 	void showParams()
 	{
+		float valueDrawOffset = .1f;
+
+		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
+		{
+			auto w = ui::Text::getTextLen(cmdParamDesc[currentCmd].paramName[i], ui::style::text::width);
+			float y = yPos + float(currentCmd + i) * lead;
+
+			float sel = currentParam == i ? 1.f : 0.f;
+			ui::style::text::r = lerp(.5, 1, sel);
+			ui::style::text::g = lerp(.5, 1, sel);
+			ui::style::text::b = lerp(.5, 1, sel);
+
+			ui::Text::Draw(cmdParamDesc[currentCmd].paramName[i], x, yPos + float(currentCmd + i) * lead);
+
+			auto sType = cmdParamDesc[currentCmd].paramType[i];
+
+			if (isType(sType, "int") || isType(sType, "float"))
+			{
+				char val[32];
+				_gcvt(cmdParamDesc[currentCmd].params[i][0], 5, val);
+				ui::Text::Draw(val, x + valueDrawOffset, yPos + float(currentCmd + i) * lead);
+			}
+
+			if (isType(sType, "position_") || isType(sType, "size"))
+			{
+				char val[32];
+				char vstr[132];
+				_gcvt(cmdParamDesc[currentCmd].params[i][0], 5, val);
+				strcpy(vstr, val);
+				_gcvt(cmdParamDesc[currentCmd].params[i][1], 5, val);
+				strcat(vstr, " : "); strcat(vstr, val);
+				_gcvt(cmdParamDesc[currentCmd].params[i][2], 5, val);
+				strcat(vstr, " : "); strcat(vstr, val);
+
+				ui::Text::Draw(vstr, x + valueDrawOffset, yPos + float(currentCmd + i) * lead);
+			}
+		}
+	}
+
+	/*
+	void showParams()
+	{
+
 		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
 		{
 			auto w = ui::Text::getTextLen(cmdParamDesc[currentCmd].paramName[i], ui::style::text::width);
@@ -229,7 +298,7 @@ namespace paramEdit {
 			}
 		}
 	}
-
+	*/
 	void ShowStack()
 	{
 		if (ui::rbDown)
@@ -255,7 +324,7 @@ namespace paramEdit {
 		ui::Text::Setup();
 		showLabels();
 		ui::style::Base();
-		x += .12;
+		x += .1;
 		showParams();
 
 		gapi.setScissors(rect_{ 0, 0, 1, 1 });

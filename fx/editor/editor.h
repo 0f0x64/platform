@@ -49,7 +49,7 @@ namespace editor
 		ui::LeftDown = isKeyDown(VK_LEFT) ? true : false;
 		ui::RightDown = isKeyDown(VK_RIGHT) ? true : false;
 
-		gapi.rt(tex::mainRT);
+		gapi.rt(texture::mainRT);
 		gapi.cull(cullmode::off);
 		gapi.depth(depthmode::off);
 

@@ -19,7 +19,7 @@ namespace Cubemap {
 		gapi.blend(blendmode::off, blendop::add);
 		gapi.cull(cullmode::back);
 
-		ps::cubeMapViewer.textures.env = tex::env;
+		ps::cubeMapViewer.textures.env = texture::env;
 		ps::cubeMapViewer.samplers.sam1Filter = filter::linear;
 		ps::cubeMapViewer.samplers.sam1AddressU = addr::wrap;
 		ps::cubeMapViewer.samplers.sam1AddressV = addr::wrap;

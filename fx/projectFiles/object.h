@@ -7,8 +7,8 @@ namespace Object {
 		ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixTranslation(pos.x, pos.y, pos.z));
 		ConstBuf::UpdateDrawerMat();
 
-		float gX = Textures::texture[tex::obj1pos].size.x / denom;
-		float gY = Textures::texture[tex::obj1pos].size.y / denom;
+		float gX = Textures::texture[texture::obj1pos].size.x / denom;
+		float gY = Textures::texture[texture::obj1pos].size.y / denom;
 
 		vs::objViewer.textures.positions = geometry;
 		vs::objViewer.samplers.sam1Filter = filter::linear;
@@ -18,7 +18,7 @@ namespace Object {
 		vs::objViewer.params.gY = gY;
 		vs::objViewer.set();
 
-		ps::basic.textures.env = tex::env;
+		ps::basic.textures.env = texture::env;
 		ps::basic.textures.normals = normals;
 		ps::basic.samplers.sam1Filter = filter::linear;
 		ps::basic.samplers.sam1AddressU = addr::wrap;

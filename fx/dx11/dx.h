@@ -92,7 +92,7 @@ namespace dx11
 	
 	#undef CreateTexture
 	#define CreateTexture(name,type,format,width,height,mip,depth) name,
-	namespace tex {
+	namespace texture {
 		enum {
 			#include "..\projectFiles\texList.h"	
 		};

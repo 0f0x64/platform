@@ -35,8 +35,7 @@ namespace Loop
 
 		//CalcCubemap(tex::env);
 
-		//if (!isPrecalc) 
-			Precalc();
+		if (!isPrecalc) Precalc();
 
 
 
@@ -45,11 +44,11 @@ namespace Loop
 
 		IA(topology::triList);
 
-		CalcCubemap( tex::env);
-		CalcObject( tex::obj1pos,tex::obj1nrml);
+		CalcCubemap( texture::env);
+		CalcObject( texture::obj1pos,texture::obj1nrml);
 
 		Blending( blendmode::off, blendop::add);
-		RenderTarget(tex::mainRT, 0 );
+		RenderTarget(texture::mainRT, 0 );
 
 		//setCam(0);
 		float t = (timer::timeCursor / (SAMPLES_IN_FRAME * 60.f));
@@ -59,10 +58,10 @@ namespace Loop
 		Clear( 0.2f, 0.2f, 0.2f, 1.f );
 		ClearDepth();
 
-		ShowCubemap( tex::env);
+		ShowCubemap( texture::env);
 		Cull( cullmode::back);
-		ShowObject( tex::obj1pos, tex::obj1nrml, 4, 0, 0, 0 );
-		ShowObject( tex::obj1pos, tex::obj1nrml, 4, 0, 1, 0 );
+		ShowObject( texture::obj1pos, texture::obj1nrml, 4, 0, 0, 0 );
+		ShowObject( texture::obj1pos, texture::obj1nrml, 4, 0, 1, 0 );
 		//ShowObject(tex::obj1pos, tex::obj1nrml, 4, 0, 1, 0);
 
 

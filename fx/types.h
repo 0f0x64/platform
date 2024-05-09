@@ -1,63 +1,68 @@
 //
+char enumStringTable[255][255][255];
 
-typedef struct { float x; float y; float z; } position_;
-typedef struct { float x; float y; float z; } size_;
-typedef struct { float x; float y; float z; } rotation_;
-typedef struct { float r; float g; float b; } color_;
-typedef struct { float r; float g; float b; float a; } color4_;
-typedef struct { float x; float y; float x1; float y1; } rect_;
+int enumCounter = 0;
 
-typedef int texture_;
-typedef int topology_;
-typedef int blendmode_;
-typedef int blendop_;
-typedef int depthmode_;
-typedef int filter_;
-typedef int addr_;
-typedef int cullmode_;
-typedef int targetshader_;
-
-#define vEnum(name, ...) namespace name { enum { __VA_ARGS__}; }; const char* name##_str = #__VA_ARGS__;
-
-vEnum(blendmode, off, on, alpha);
-vEnum(blendop, add, sub, revsub, min, max);
-vEnum(depthmode, off, on, readonly, writeonly);
-vEnum(filter, linear, point, minPoint_magLinear);
-vEnum(addr, clamp, wrap);
-vEnum(cullmode, off, front, back, wireframe);
-vEnum(topology, triList, lineList, lineStrip);
-vEnum(targetshader, vertex, pixel, both);
-
-
-
-void getStr(const char* mStr, char* result, int enumToGet)
+bool fillEnumTable(const char* name, const char* enumStr)
 {
-	char rStr[128];
+	int index = enumCounter;
+	strcpy(enumStringTable[index][0], name);
+	strcat(enumStringTable[index][0], "_");
 
-	int i = 0; int commaCounter = 0;
-	int offset = 0;
-
-	for (unsigned int i = 0; i <= strlen(mStr); i++)
+	int counter = 1;
+	int j = 0;
+	for (unsigned int i = 0; i <= strlen(enumStr); i++)
 	{
-		if (*(mStr + i) == ',' || i == strlen(mStr))
+		if (*(enumStr + i) == ' ') continue;
+
+		if (*(enumStr + i) == ',' || i == strlen(enumStr))
 		{
-			commaCounter++;
-
-			if (commaCounter == enumToGet + 1)
-			{
-				while (*(mStr + offset) == ' ') offset++;
-				int j = i - 1;
-				while (*(mStr + j) == ' ') j--;
-
-				//todo::check bounds
-				memcpy(rStr, (char*)(mStr + offset), j - offset + 1);
-				rStr[j - offset + 1] = 0;
-				strcpy(result, rStr);
-				break;
-			}
-			offset = i + 1;
+			enumStringTable[index][counter][j] = 0;
+			j = 0;
+			counter++;
+		}
+		else
+		{
+			enumStringTable[index][counter][j++] = *(enumStr + i);
 		}
 	}
+
+	enumCounter++;
+	return true;
 }
 
-#define getEnumStr(m, s, n) getStr(m##_str, s,n)
+typedef struct { float x; float y; float z; } vector3;
+typedef struct { float x; float y; float z; float w; } vector4;
+
+typedef vector3 position_;
+typedef vector3 size_;
+typedef vector3 rotation_;
+typedef vector3 color_;
+typedef vector4 color4_;
+typedef vector4 rect_;
+
+typedef int texture_;
+
+#define enumType(name, ...) namespace name { enum { __VA_ARGS__}; }; typedef int name##_; bool name##_b = fillEnumTable(#name, #__VA_ARGS__);
+
+enumType(blendmode, off, on, alpha);
+enumType(blendop, add, sub, revsub, min, max);
+enumType(depthmode, off, on, readonly, writeonly);
+enumType(filter, linear, point, minPoint_magLinear);
+enumType(addr, clamp, wrap);
+enumType(cullmode, off, front, back, wireframe);
+enumType(topology, triList, lineList, lineStrip);
+enumType(targetshader, vertex, pixel, both);
+
+
+char* getEnumStr(char* name, int value)
+{
+	for (int i = 0; i < enumCounter; i++)
+	{
+		if (strcmp(name, enumStringTable[i][0]) == 0)
+		{
+			return enumStringTable[i][value + 1];
+		}
+	}
+	return NULL;
+}
