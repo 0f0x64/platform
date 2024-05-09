@@ -1,7 +1,7 @@
 namespace InputAssembler
 {
 
-	API IA(topology_ t)
+	API IA(topology t)
 	{
 		D3D11_PRIMITIVE_TOPOLOGY ttype = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		switch (t)

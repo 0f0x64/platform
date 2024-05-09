@@ -275,9 +275,9 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 						i++;
 					}
 
-					textures += "int " + name + ";\n";
+					textures += "texture " + name + ";\n";
 
-					texturesSet += "Textures::TextureToShader(textures." + name + ", " + to_string(texturesCounter) + ", ";
+					texturesSet += "Textures::TextureToShader((texture)textures." + name + ", " + to_string(texturesCounter) + ", ";
 					if (type == sType::vertex) texturesSet += "targetshader::vertex";
 					if (type == sType::pixel) texturesSet += "targetshader::pixel";
 					texturesSet += "); \n";
@@ -300,7 +300,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 					i++;
 				}
 
-				samplers += "int " + name + "Filter;\n" + "int " + name + "AddressU;\n" + "int " + name + "AddressV;\n";
+				samplers += "filter " + name + "Filter;\n" + "addr " + name + "AddressU;\n" + "addr " + name + "AddressV;\n";
 
 				if (type == sType::vertex) samplersSet += "Sampler::Sampler(targetshader::vertex, ";
 				if (type == sType::pixel) samplersSet += "Sampler::Sampler(targetshader::pixel, ";
@@ -588,15 +588,15 @@ void ScanFile(std::string fname, ofstream& ofile)
 							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = (float)" + name + ";\n");
 						}
 
-						if (type.compare("texture_") == 0 ||
-							type.compare("topology_") == 0 ||
-							type.compare("blendmode_") == 0 ||
-							type.compare("blendop_") == 0 ||
-							type.compare("depthmode_") == 0 ||
-							type.compare("filter_") == 0 ||
-							type.compare("addr_") == 0 ||
-							type.compare("cullmode_") == 0 ||
-							type.compare("targetshader_") == 0)
+						if (type.compare("texture") == 0 ||
+							type.compare("topology") == 0 ||
+							type.compare("blendmode") == 0 ||
+							type.compare("blendop") == 0 ||
+							type.compare("depthmode") == 0 ||
+							type.compare("filter") == 0 ||
+							type.compare("addr") == 0 ||
+							type.compare("cullmode") == 0 ||
+							type.compare("targetshader") == 0)
 						{
 							pNameList.append(name);
 							pNameListOut.append(name);
@@ -604,10 +604,10 @@ void ScanFile(std::string fname, ofstream& ofile)
 							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = (float)" + name + ";\n");
 						}
 
-						if (type.compare("position_") == 0 ||
-							type.compare("size_") == 0 ||
-							type.compare("rotation_") == 0 || 
-							type.compare("color_") == 0 )
+						if (type.compare("position") == 0 ||
+							type.compare("size") == 0 ||
+							type.compare("rotation") == 0 || 
+							type.compare("color") == 0 )
 						{
 							pNameList.append(name+"_x, "+ name + "_y, " + name + "_z");
 							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z }");
@@ -620,8 +620,8 @@ void ScanFile(std::string fname, ofstream& ofile)
 							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".z;\n");
 						}
 
-						if (type.compare("color4_") == 0 ||
-							type.compare("rect__") == 0 )
+						if (type.compare("color4") == 0 ||
+							type.compare("rect") == 0 )
 						{
 							pNameList.append(name + "_x, " + name + "_y, " + name + "_z, " + name + "_w");
 							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z, " + name + "_w }");

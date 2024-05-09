@@ -41,7 +41,7 @@ namespace Camera
 
 	#endif
 
-	API Camera(position_ eye, position_ at, position_ up, float angle)
+	API Camera(position eye, position at, position up, float angle)
 	{
 		XMVECTOR Eye = XMVectorSet(eye.x,eye.y,eye.z, 0.0f);
 		XMVECTOR At =  XMVectorSet(at.x, at.y, at.z, 0.0f);

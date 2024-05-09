@@ -1,14 +1,14 @@
 namespace Draw
 { 
 
-	API Clear(color4_ c)
+	API Clear(color4 c)
 	{
-		context->ClearRenderTargetView(Textures::texture[Textures::currentRT].RenderTargetView[0][0], XMVECTORF32{ c.x,c.y,c.z,c.w });
+		context->ClearRenderTargetView(Textures::Texture[Textures::currentRT].RenderTargetView[0][0], XMVECTORF32{ c.x,c.y,c.z,c.w });
 	}
 
 	API ClearDepth()
 	{
-		context->ClearDepthStencilView(Textures::texture[Textures::currentRT].DepthStencilView[0], D3D11_CLEAR_DEPTH, 1.0f, 0);
+		context->ClearDepthStencilView(Textures::Texture[Textures::currentRT].DepthStencilView[0], D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
 	API NullDrawer(int quadCount, int instances = 1)

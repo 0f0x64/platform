@@ -33,13 +33,13 @@ namespace Textures
 
 	} textureDesc;
 
-	textureDesc texture[max_tex];
+	textureDesc Texture[max_tex];
 
 	byte currentRT = 0;
 
 	void CreateTex(int i)
 	{
-		auto cTex = texture[i];
+		auto cTex = Texture[i];
 
 		tdesc.Width = (UINT)cTex.size.x;
 		tdesc.Height = (UINT)cTex.size.y;
@@ -59,7 +59,7 @@ namespace Textures
 			tdesc.ArraySize = 6;
 		}
 
-		HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &texture[i].pTexture);
+		HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &Texture[i].pTexture);
 
 		LogIfError("CreateTexture2D error");
 	}
@@ -69,7 +69,7 @@ namespace Textures
 		svDesc.Format = tdesc.Format;
 		svDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 
-		if (texture[i].type == cube)
+		if (Texture[i].type == cube)
 		{
 			svDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 			svDesc.TextureCube.MostDetailedMip = 0;
@@ -82,7 +82,7 @@ namespace Textures
 			svDesc.Texture2D.MostDetailedMip = 0;
 		}
 
-		HRESULT hr = device->CreateShaderResourceView(texture[i].pTexture, &svDesc, &texture[i].TextureResView);
+		HRESULT hr = device->CreateShaderResourceView(Texture[i].pTexture, &svDesc, &Texture[i].TextureResView);
 		LogIfError("CreateShaderResourceView error\n");
 	}
 
@@ -92,7 +92,7 @@ namespace Textures
 		renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		renderTargetViewDesc.Texture2D.MipSlice = 0;
 
-		if (texture[i].type == cube)
+		if (Texture[i].type == cube)
 		{
 			renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
 			renderTargetViewDesc.Texture2DArray.ArraySize = 1;
@@ -101,7 +101,7 @@ namespace Textures
 			for (int j = 0; j < 6; j++)
 			{
 				renderTargetViewDesc.Texture2DArray.FirstArraySlice = j;
-				HRESULT hr = device->CreateRenderTargetView(texture[i].pTexture, &renderTargetViewDesc, &texture[i].RenderTargetView[0][j]);
+				HRESULT hr = device->CreateRenderTargetView(Texture[i].pTexture, &renderTargetViewDesc, &Texture[i].RenderTargetView[0][j]);
 				LogIfError("CreateRenderTargetView error\n");
 			}
 		}
@@ -110,7 +110,7 @@ namespace Textures
 			for (unsigned int m = 0; m < tdesc.MipLevels; m++)
 			{
 				renderTargetViewDesc.Texture2D.MipSlice = m;
-				HRESULT hr = device->CreateRenderTargetView(texture[i].pTexture, &renderTargetViewDesc, &texture[i].RenderTargetView[m][0]);
+				HRESULT hr = device->CreateRenderTargetView(Texture[i].pTexture, &renderTargetViewDesc, &Texture[i].RenderTargetView[m][0]);
 				LogIfError("CreateRenderTargetView error\n");
 			}
 		}
@@ -118,7 +118,7 @@ namespace Textures
 
 	void Depth(int i)
 	{
-		auto cTex = texture[i];
+		auto cTex = Texture[i];
 
 		tdesc.Width = (UINT)cTex.size.x;
 		tdesc.Height = (UINT)cTex.size.y;
@@ -132,7 +132,7 @@ namespace Textures
 		tdesc.Format = DXGI_FORMAT_R32_TYPELESS;
 		tdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 		tdesc.MiscFlags = 0;
-		HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &texture[i].pDepth);
+		HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &Texture[i].pDepth);
 		#if DebugMode
 				if (FAILED(hr)) { Log("CreateDepthStencilView error\n"); return; }
 		#endif	
@@ -144,7 +144,7 @@ namespace Textures
 		for (unsigned int m = 0; m < max(1,tdesc.MipLevels); m++)
 		{
 			descDSV.Texture2D.MipSlice = m;
-			HRESULT hr = device->CreateDepthStencilView(texture[i].pDepth, &descDSV, &texture[i].DepthStencilView[m]);
+			HRESULT hr = device->CreateDepthStencilView(Texture[i].pDepth, &descDSV, &Texture[i].DepthStencilView[m]);
 			LogIfError("CreateDepthStencilView error\n");
 		}
 	}
@@ -156,7 +156,7 @@ namespace Textures
 		svDesc.Texture2D.MostDetailedMip = 0;
 		svDesc.Texture2D.MipLevels = 1;
 
-		HRESULT hr = device->CreateShaderResourceView(texture[i].pDepth, &svDesc, &texture[i].DepthResView);
+		HRESULT hr = device->CreateShaderResourceView(Texture[i].pDepth, &svDesc, &Texture[i].DepthResView);
 		LogIfError("CreateShaderResourceView for Depth error\n");
 	}
 
@@ -167,11 +167,11 @@ namespace Textures
 		ZeroMemory(&renderTargetViewDesc, sizeof(renderTargetViewDesc));
 		ZeroMemory(&descDSV, sizeof(descDSV));
 
-		texture[i].type = type;
-		texture[i].format = format;
-		texture[i].size = size;
-		texture[i].mipMaps = mipMaps;
-		texture[i].depth = depth;
+		Texture[i].type = type;
+		Texture[i].format = format;
+		Texture[i].size = size;
+		Texture[i].mipMaps = mipMaps;
+		Texture[i].depth = depth;
 
 		if (i > 0)
 		{
@@ -194,9 +194,9 @@ namespace Textures
 		context->PSSetShaderResources(0, 128, null);
 	}
 
-	void SetViewport(texture_ texId, byte level = 0)
+	void SetViewport(texture texId, byte level = 0)
 	{
-		XMFLOAT2 size = Textures::texture[texId].size;
+		XMFLOAT2 size = Textures::Texture[(int)texId].size;
 		float denom = powf(2, level);
 
 		D3D11_VIEWPORT vp;
@@ -211,49 +211,49 @@ namespace Textures
 		context->RSSetViewports(1, &vp);
 	}
 
-	API CopyColor(texture_ dst, texture_ src)
+	API CopyColor(texture dst, texture src)
 	{
-		context->CopyResource(texture[dst].pTexture, texture[src].pTexture);
+		context->CopyResource(Texture[(int)dst].pTexture, Texture[(int)src].pTexture);
 	}
 
-	API CopyDepth(texture_ dst, texture_ src)
+	API CopyDepth(texture dst, texture src)
 	{
-		context->CopyResource(texture[dst].pDepth, texture[src].pDepth);
+		context->CopyResource(Texture[(int)dst].pDepth, Texture[(int)src].pDepth);
 	}
 
-	API TextureToShader(texture_ tex, int slot, targetshader_ tA = targetshader::both)
+	API TextureToShader(texture tex, int slot, targetshader tA = targetshader::both)
 	{
 		if (tA == targetshader::both || tA == targetshader::vertex)
 		{
-			context->VSSetShaderResources(slot, 1, &texture[tex].TextureResView);
+			context->VSSetShaderResources(slot, 1, &Texture[(int)tex].TextureResView);
 		}
 
 		if (tA == targetshader::both || tA == targetshader::pixel)
 		{
-			context->PSSetShaderResources(slot, 1, &texture[tex].TextureResView);
+			context->PSSetShaderResources(slot, 1, &Texture[(int)tex].TextureResView);
 		}
 	}
 
 	API CreateMipMap()
 	{
-		context->GenerateMips(texture[currentRT].TextureResView);
+		context->GenerateMips(Texture[currentRT].TextureResView);
 	}
 
 
-	API RenderTarget(texture_ texId = mainRTIndex, int level = 0)
+	API RenderTarget(texture texId, int level = 0)
 	{
-		currentRT = texId;
+		currentRT = (int)texId;
 		
-		auto depthStencil = texture[texId].depth ? texture[texId].DepthStencilView[0] : 0;
+		auto depthStencil = Texture[(int)texId].depth ? Texture[(int)texId].DepthStencilView[0] : 0;
 
-		if (texture[texId].type == tType::flat)
+		if (Texture[(int)texId].type == tType::flat)
 		{
-			context->OMSetRenderTargets(1, &texture[texId].RenderTargetView[0][0], depthStencil);
+			context->OMSetRenderTargets(1, &Texture[(int)texId].RenderTargetView[0][0], depthStencil);
 		}
 
-		if (texture[texId].type == tType::cube)
+		if (Texture[(int)texId].type == tType::cube)
 		{
-			context->OMSetRenderTargets(6, &texture[texId].RenderTargetView[0][0], 0);
+			context->OMSetRenderTargets(6, &Texture[(int)texId].RenderTargetView[0][0], 0);
 		}
 
 		SetViewport(texId, level);

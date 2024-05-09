@@ -340,7 +340,7 @@ namespace TimeLine
 	{
 		ProcessInput();
 
-		gapi.setScissors(rect_{ screenLeft, 0, screenRight, 1 });
+		gapi.setScissors(rect{ screenLeft, 0, screenRight, 1 });
 
 		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 		timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
@@ -357,7 +357,7 @@ namespace TimeLine
 		ps::letter_ps.samplers.s1Filter = filter::linear;
 		ps::letter_ps.samplers.s1AddressU = addr::clamp;
 		ps::letter_ps.samplers.s1AddressV = addr::clamp;
-		ps::letter_ps.textures.tex = ui::fontTextureIndex;
+		ps::letter_ps.textures.tex = (texture)ui::fontTextureIndex;
 
 		gapi.blend(blendmode::off);
 		gapi.setIA(topology::lineList);
@@ -371,7 +371,7 @@ namespace TimeLine
 
 		DrawCursor(1);
 
-		gapi.setScissors(rect_{ 0, 0, 1, 1 });
+		gapi.setScissors(rect{ 0, 0, 1, 1 });
 
 	}
 

@@ -91,14 +91,14 @@ namespace paramEdit {
 	bool isTypeEnum(const char* t1)
 	{
 		if (
-			isType(t1, "topology_") || 
-			isType(t1, "blendmode_") || 
-			isType(t1, "blendop_") || 
-			isType(t1, "depthmode_") ||
-			isType(t1, "filter_") || 
-			isType(t1, "addr_") ||
-			isType(t1, "cullmode_") ||
-			isType(t1, "targetshader_")
+			isType(t1, "topology") || 
+			isType(t1, "blendmode") || 
+			isType(t1, "blendop") || 
+			isType(t1, "depthmode") ||
+			isType(t1, "filter") || 
+			isType(t1, "addr") ||
+			isType(t1, "cullmode") ||
+			isType(t1, "targetshader")
 			) 
 		{
 			return true;
@@ -134,7 +134,7 @@ namespace paramEdit {
 				strcat(str, pStr);
 			}
 
-			if (isType(sType, "texture_"))
+			if (isType(sType, "texture"))
 			{
 				auto a = Textures::nameList[(int)cmdParamDesc[currentCmd].params[i][0]];
 				strcat(str, cmdParamDesc[currentCmd].paramType[i]);
@@ -152,10 +152,10 @@ namespace paramEdit {
 			}
 
 
-			if (isType(sType, "position_") == 0 ||
-				isType(sType, "size_") == 0 ||
-				isType(sType, "rotation_") == 0 || 
-				isType(sType, "color_") == 0 )
+			if (isType(sType, "position") ||
+				isType(sType, "size") ||
+				isType(sType, "rotation") || 
+				isType(sType, "color") )
 			{
 				char pStr[32];
 				for (int x = 0; x < 3; x++)
@@ -166,8 +166,8 @@ namespace paramEdit {
 				}
 			}
 
-			if (isType(sType, "color4_") == 0 ||
-				isType(sType, "rect_") == 0 )
+			if (isType(sType, "color4") ||
+				isType(sType, "rect") )
 			{
 				char pStr[32];
 				for (int x = 0; x < 4; x++)
@@ -192,6 +192,8 @@ namespace paramEdit {
 
 		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
 		{
+			char vstr[132];
+			vstr[0] = 0;
 			auto w = ui::Text::getTextLen(cmdParamDesc[currentCmd].paramName[i], ui::style::text::width);
 			float y = yPos + float(currentCmd + i) * lead;
 
@@ -204,26 +206,54 @@ namespace paramEdit {
 
 			auto sType = cmdParamDesc[currentCmd].paramType[i];
 
-			if (isType(sType, "int") || isType(sType, "float"))
+			if (isType(sType, "int"))
 			{
-				char val[32];
-				_gcvt(cmdParamDesc[currentCmd].params[i][0], 5, val);
-				ui::Text::Draw(val, x + valueDrawOffset, yPos + float(currentCmd + i) * lead);
+				_itoa(cmdParamDesc[currentCmd].params[i][0], vstr, 10);
+			}
+			
+			if (isType(sType, "float"))
+			{
+				_gcvt(cmdParamDesc[currentCmd].params[i][0], 5, vstr);
 			}
 
-			if (isType(sType, "position_") || isType(sType, "size"))
+			if (isType(sType, "position") ||
+				isType(sType, "size") ||
+				isType(sType, "rotation") ||
+				isType(sType, "color"))
 			{
 				char val[32];
-				char vstr[132];
-				_gcvt(cmdParamDesc[currentCmd].params[i][0], 5, val);
-				strcpy(vstr, val);
-				_gcvt(cmdParamDesc[currentCmd].params[i][1], 5, val);
-				strcat(vstr, " : "); strcat(vstr, val);
-				_gcvt(cmdParamDesc[currentCmd].params[i][2], 5, val);
-				strcat(vstr, " : "); strcat(vstr, val);
-
-				ui::Text::Draw(vstr, x + valueDrawOffset, yPos + float(currentCmd + i) * lead);
+				for (int k = 0; k < 3; k++)
+				{
+					_gcvt(cmdParamDesc[currentCmd].params[i][k], 5, val);
+					strcat(vstr, val);
+					strcat(vstr, " / ");
+				}
 			}
+
+			if (isType(sType, "color4") ||
+				isType(sType, "rect"))
+			{
+				char val[32];
+				for (int k = 0; k < 4; k++)
+				{
+					_gcvt(cmdParamDesc[currentCmd].params[i][k], 5, val);
+					strcat(vstr, val);
+					strcat(vstr, " / ");
+				}
+			}
+
+			if (isType(sType, "texture"))
+			{
+				auto a = Textures::nameList[(int)cmdParamDesc[currentCmd].params[i][0]];
+				strcpy(vstr, a);
+			}
+
+			if (isTypeEnum(sType))
+			{
+				strcpy(vstr, getEnumStr(sType, (int)cmdParamDesc[currentCmd].params[i][0]));
+			}
+
+			ui::Text::Draw(vstr, x + valueDrawOffset, yPos + float(currentCmd + i) * lead);
 		}
 	}
 
@@ -315,7 +345,7 @@ namespace paramEdit {
 		yPos = max(yPos, top - cmdCounter * lead + lead);
 		yPos = min(yPos, bottom - lead);
 
-		gapi.setScissors(rect_{ 0, top, 1, bottom });
+		gapi.setScissors(rect{ 0, top, 1, bottom });
 
 		x = ui::style::text::width / 2.f;
 		y = yPos;
@@ -327,7 +357,7 @@ namespace paramEdit {
 		x += .1;
 		showParams();
 
-		gapi.setScissors(rect_{ 0, 0, 1, 1 });
+		gapi.setScissors(rect{ 0, 0, 1, 1 });
 	}
 
 }

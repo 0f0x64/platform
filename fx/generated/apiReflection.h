@@ -1,16 +1,16 @@
 struct { 
 
-void CalcCubemap( const char* srcFileName, int srcLine, texture_ target)
+void CalcCubemap( const char* srcFileName, int srcLine, texture target)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	target = (texture_)cmdParamDesc[cmdCounter].params[0][0];
+	target = (texture)cmdParamDesc[cmdCounter].params[0][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)target;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "target"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -23,17 +23,17 @@ Cubemap::CalcCubemap(target);
 
 #define CalcCubemap(target) api.CalcCubemap( __FILE__, __LINE__ , target)
 
-void ShowCubemap( const char* srcFileName, int srcLine, texture_ envTex)
+void ShowCubemap( const char* srcFileName, int srcLine, texture envTex)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	envTex = (texture_)cmdParamDesc[cmdCounter].params[0][0];
+	envTex = (texture)cmdParamDesc[cmdCounter].params[0][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)envTex;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "envTex"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -46,12 +46,12 @@ Cubemap::ShowCubemap(envTex);
 
 #define ShowCubemap(envTex) api.ShowCubemap( __FILE__, __LINE__ , envTex)
 
-void ShowObject( const char* srcFileName, int srcLine, texture_ geometry, texture_ normals, int quality, position_ pos)
+void ShowObject( const char* srcFileName, int srcLine, texture geometry, texture normals, int quality, position pos)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	geometry = (texture_)cmdParamDesc[cmdCounter].params[0][0];
-	normals = (texture_)cmdParamDesc[cmdCounter].params[1][0];
+	geometry = (texture)cmdParamDesc[cmdCounter].params[0][0];
+	normals = (texture)cmdParamDesc[cmdCounter].params[1][0];
 	quality = (int)cmdParamDesc[cmdCounter].params[2][0];
 	pos.x = cmdParamDesc[cmdCounter].params[3][0];
 	pos.y = cmdParamDesc[cmdCounter].params[3][1];
@@ -61,10 +61,10 @@ if (cmdParamDesc[cmdCounter].loaded) {
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 4;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)geometry;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "geometry"); 
 	cmdParamDesc[cmdCounter].params[1][0] = (float)normals;
-	strcpy(cmdParamDesc[cmdCounter].paramType[1], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[1], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[1], "normals"); 
 	cmdParamDesc[cmdCounter].params[2][0] = (float)quality;
 	strcpy(cmdParamDesc[cmdCounter].paramType[2], "int"); 
@@ -72,7 +72,7 @@ if (cmdParamDesc[cmdCounter].loaded) {
 	cmdParamDesc[cmdCounter].params[3][0] = pos.x;
 	cmdParamDesc[cmdCounter].params[3][1] = pos.y;
 	cmdParamDesc[cmdCounter].params[3][2] = pos.z;
-	strcpy(cmdParamDesc[cmdCounter].paramType[3], "position_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[3], "position"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[3], "pos"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -83,23 +83,23 @@ cmdCounter++;
 Object::ShowObject(geometry,normals,quality,pos);
 }
 
-#define ShowObject(geometry, normals, quality, pos_x, pos_y, pos_z) api.ShowObject( __FILE__, __LINE__ , geometry, normals, quality, position_ {pos_x, pos_y, pos_z })
+#define ShowObject(geometry, normals, quality, pos_x, pos_y, pos_z) api.ShowObject( __FILE__, __LINE__ , geometry, normals, quality, position {pos_x, pos_y, pos_z })
 
-void CalcObject( const char* srcFileName, int srcLine, texture_ targetGeoTexture, texture_ targetNrmlTexture)
+void CalcObject( const char* srcFileName, int srcLine, texture targetGeoTexture, texture targetNrmlTexture)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	targetGeoTexture = (texture_)cmdParamDesc[cmdCounter].params[0][0];
-	targetNrmlTexture = (texture_)cmdParamDesc[cmdCounter].params[1][0];
+	targetGeoTexture = (texture)cmdParamDesc[cmdCounter].params[0][0];
+	targetNrmlTexture = (texture)cmdParamDesc[cmdCounter].params[1][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 2;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)targetGeoTexture;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "targetGeoTexture"); 
 	cmdParamDesc[cmdCounter].params[1][0] = (float)targetNrmlTexture;
-	strcpy(cmdParamDesc[cmdCounter].paramType[1], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[1], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[1], "targetNrmlTexture"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -112,21 +112,21 @@ Object::CalcObject(targetGeoTexture,targetNrmlTexture);
 
 #define CalcObject(targetGeoTexture, targetNrmlTexture) api.CalcObject( __FILE__, __LINE__ , targetGeoTexture, targetNrmlTexture)
 
-void Blending( const char* srcFileName, int srcLine, blendmode_ m = blendmode::off, blendop_ blend = blendop::add)
+void Blending( const char* srcFileName, int srcLine, blendmode m = blendmode::off, blendop blend = blendop::add)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	m = (blendmode_)cmdParamDesc[cmdCounter].params[0][0];
-	blend = (blendop_)cmdParamDesc[cmdCounter].params[1][0];
+	m = (blendmode)cmdParamDesc[cmdCounter].params[0][0];
+	blend = (blendop)cmdParamDesc[cmdCounter].params[1][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 2;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)m;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "blendmode_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "blendmode"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "m"); 
 	cmdParamDesc[cmdCounter].params[1][0] = (float)blend;
-	strcpy(cmdParamDesc[cmdCounter].paramType[1], "blendop_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[1], "blendop"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[1], "blend"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -139,7 +139,7 @@ Blend::Blending(m,blend);
 
 #define Blending(m, blend) api.Blending( __FILE__, __LINE__ , m, blend)
 
-void Camera( const char* srcFileName, int srcLine, position_ eye, position_ at, position_ up, float angle)
+void Camera( const char* srcFileName, int srcLine, position eye, position at, position up, float angle)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
@@ -160,17 +160,17 @@ if (cmdParamDesc[cmdCounter].loaded) {
 	cmdParamDesc[cmdCounter].params[0][0] = eye.x;
 	cmdParamDesc[cmdCounter].params[0][1] = eye.y;
 	cmdParamDesc[cmdCounter].params[0][2] = eye.z;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "position_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "position"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "eye"); 
 	cmdParamDesc[cmdCounter].params[1][0] = at.x;
 	cmdParamDesc[cmdCounter].params[1][1] = at.y;
 	cmdParamDesc[cmdCounter].params[1][2] = at.z;
-	strcpy(cmdParamDesc[cmdCounter].paramType[1], "position_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[1], "position"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[1], "at"); 
 	cmdParamDesc[cmdCounter].params[2][0] = up.x;
 	cmdParamDesc[cmdCounter].params[2][1] = up.y;
 	cmdParamDesc[cmdCounter].params[2][2] = up.z;
-	strcpy(cmdParamDesc[cmdCounter].paramType[2], "position_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[2], "position"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[2], "up"); 
 	cmdParamDesc[cmdCounter].params[3][0] = (float)angle;
 	strcpy(cmdParamDesc[cmdCounter].paramType[3], "float"); 
@@ -184,19 +184,19 @@ cmdCounter++;
 Camera::Camera(eye,at,up,angle);
 }
 
-#define Camera(eye_x, eye_y, eye_z, at_x, at_y, at_z, up_x, up_y, up_z, angle) api.Camera( __FILE__, __LINE__ , position_ {eye_x, eye_y, eye_z }, position_ {at_x, at_y, at_z }, position_ {up_x, up_y, up_z }, angle)
+#define Camera(eye_x, eye_y, eye_z, at_x, at_y, at_z, up_x, up_y, up_z, angle) api.Camera( __FILE__, __LINE__ , position {eye_x, eye_y, eye_z }, position {at_x, at_y, at_z }, position {up_x, up_y, up_z }, angle)
 
-void Depth( const char* srcFileName, int srcLine, depthmode_ m)
+void Depth( const char* srcFileName, int srcLine, depthmode m)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	m = (depthmode_)cmdParamDesc[cmdCounter].params[0][0];
+	m = (depthmode)cmdParamDesc[cmdCounter].params[0][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)m;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "depthmode_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "depthmode"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "m"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -209,7 +209,7 @@ Depth::Depth(m);
 
 #define Depth(m) api.Depth( __FILE__, __LINE__ , m)
 
-void Clear( const char* srcFileName, int srcLine, color4_ c)
+void Clear( const char* srcFileName, int srcLine, color4 c)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
@@ -225,7 +225,7 @@ if (cmdParamDesc[cmdCounter].loaded) {
 	cmdParamDesc[cmdCounter].params[0][1] = c.y;
 	cmdParamDesc[cmdCounter].params[0][2] = c.z;
 	cmdParamDesc[cmdCounter].params[0][3] = c.w;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "color4_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "color4"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "c"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -236,7 +236,7 @@ cmdCounter++;
 Draw::Clear(c);
 }
 
-#define Clear(c_x, c_y, c_z, c_w) api.Clear( __FILE__, __LINE__ , color4_ {c_x, c_y, c_z, c_w })
+#define Clear(c_x, c_y, c_z, c_w) api.Clear( __FILE__, __LINE__ , color4 {c_x, c_y, c_z, c_w })
 
 void ClearDepth( const char* srcFileName, int srcLine)
 {
@@ -276,17 +276,17 @@ Draw::NullDrawer(quadCount,instances);
 
 #define NullDrawer(quadCount, instances) api.NullDrawer( __FILE__, __LINE__ , quadCount, instances)
 
-void IA( const char* srcFileName, int srcLine, topology_ t)
+void IA( const char* srcFileName, int srcLine, topology t)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	t = (topology_)cmdParamDesc[cmdCounter].params[0][0];
+	t = (topology)cmdParamDesc[cmdCounter].params[0][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)t;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "topology_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "topology"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "t"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -299,17 +299,17 @@ InputAssembler::IA(t);
 
 #define IA(t) api.IA( __FILE__, __LINE__ , t)
 
-void Cull( const char* srcFileName, int srcLine, cullmode_ i)
+void Cull( const char* srcFileName, int srcLine, cullmode i)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	i = (cullmode_)cmdParamDesc[cmdCounter].params[0][0];
+	i = (cullmode)cmdParamDesc[cmdCounter].params[0][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)i;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "cullmode_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "cullmode"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "i"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -322,15 +322,23 @@ Rasterizer::Cull(i);
 
 #define Cull(i) api.Cull( __FILE__, __LINE__ , i)
 
-void Scissors( const char* srcFileName, int srcLine, rect_ r)
+void Scissors( const char* srcFileName, int srcLine, rect r)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
+	r.x = cmdParamDesc[cmdCounter].params[0][0];
+	r.y = cmdParamDesc[cmdCounter].params[0][1];
+	r.z = cmdParamDesc[cmdCounter].params[0][2];
+	r.w = cmdParamDesc[cmdCounter].params[0][3];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "rect_"); 
+	cmdParamDesc[cmdCounter].params[0][0] = r.x;
+	cmdParamDesc[cmdCounter].params[0][1] = r.y;
+	cmdParamDesc[cmdCounter].params[0][2] = r.z;
+	cmdParamDesc[cmdCounter].params[0][3] = r.w;
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "rect"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "r"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -341,35 +349,35 @@ cmdCounter++;
 Rasterizer::Scissors(r);
 }
 
-#define Scissors() api.Scissors( __FILE__, __LINE__ , )
+#define Scissors(r_x, r_y, r_z, r_w) api.Scissors( __FILE__, __LINE__ , rect {r_x, r_y, r_z, r_w })
 
-void Sampler( const char* srcFileName, int srcLine, targetshader_ shader, int slot, filter_ filter, addr_ addressU, addr_ addressV)
+void Sampler( const char* srcFileName, int srcLine, targetshader shader, int slot, filter f, addr addressU, addr addressV)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	shader = (targetshader_)cmdParamDesc[cmdCounter].params[0][0];
+	shader = (targetshader)cmdParamDesc[cmdCounter].params[0][0];
 	slot = (int)cmdParamDesc[cmdCounter].params[1][0];
-	filter = (filter_)cmdParamDesc[cmdCounter].params[2][0];
-	addressU = (addr_)cmdParamDesc[cmdCounter].params[3][0];
-	addressV = (addr_)cmdParamDesc[cmdCounter].params[4][0];
+	f = (filter)cmdParamDesc[cmdCounter].params[2][0];
+	addressU = (addr)cmdParamDesc[cmdCounter].params[3][0];
+	addressV = (addr)cmdParamDesc[cmdCounter].params[4][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 5;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)shader;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "targetshader_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "targetshader"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "shader"); 
 	cmdParamDesc[cmdCounter].params[1][0] = (float)slot;
 	strcpy(cmdParamDesc[cmdCounter].paramType[1], "int"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[1], "slot"); 
-	cmdParamDesc[cmdCounter].params[2][0] = (float)filter;
-	strcpy(cmdParamDesc[cmdCounter].paramType[2], "filter_"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[2], "filter"); 
+	cmdParamDesc[cmdCounter].params[2][0] = (float)f;
+	strcpy(cmdParamDesc[cmdCounter].paramType[2], "filter"); 
+	strcpy(cmdParamDesc[cmdCounter].paramName[2], "f"); 
 	cmdParamDesc[cmdCounter].params[3][0] = (float)addressU;
-	strcpy(cmdParamDesc[cmdCounter].paramType[3], "addr_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[3], "addr"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[3], "addressU"); 
 	cmdParamDesc[cmdCounter].params[4][0] = (float)addressV;
-	strcpy(cmdParamDesc[cmdCounter].paramType[4], "addr_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[4], "addr"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[4], "addressV"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -377,10 +385,10 @@ if (cmdParamDesc[cmdCounter].loaded) {
 AddToUI(__FUNCTION__);
 cmdCounter++;
 
-Sampler::Sampler(shader,slot,filter,addressU,addressV);
+Sampler::Sampler(shader,slot,f,addressU,addressV);
 }
 
-#define Sampler(shader, slot, filter, addressU, addressV) api.Sampler( __FILE__, __LINE__ , shader, slot, filter, addressU, addressV)
+#define Sampler(shader, slot, f, addressU, addressV) api.Sampler( __FILE__, __LINE__ , shader, slot, f, addressU, addressV)
 
 void SamplerComp( const char* srcFileName, int srcLine, int slot)
 {
@@ -451,21 +459,21 @@ Shaders::pShader(n);
 
 #define pShader(n) api.pShader( __FILE__, __LINE__ , n)
 
-void CopyColor( const char* srcFileName, int srcLine, texture_ dst, texture_ src)
+void CopyColor( const char* srcFileName, int srcLine, texture dst, texture src)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	dst = (texture_)cmdParamDesc[cmdCounter].params[0][0];
-	src = (texture_)cmdParamDesc[cmdCounter].params[1][0];
+	dst = (texture)cmdParamDesc[cmdCounter].params[0][0];
+	src = (texture)cmdParamDesc[cmdCounter].params[1][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 2;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)dst;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "dst"); 
 	cmdParamDesc[cmdCounter].params[1][0] = (float)src;
-	strcpy(cmdParamDesc[cmdCounter].paramType[1], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[1], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[1], "src"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -478,21 +486,21 @@ Textures::CopyColor(dst,src);
 
 #define CopyColor(dst, src) api.CopyColor( __FILE__, __LINE__ , dst, src)
 
-void CopyDepth( const char* srcFileName, int srcLine, texture_ dst, texture_ src)
+void CopyDepth( const char* srcFileName, int srcLine, texture dst, texture src)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	dst = (texture_)cmdParamDesc[cmdCounter].params[0][0];
-	src = (texture_)cmdParamDesc[cmdCounter].params[1][0];
+	dst = (texture)cmdParamDesc[cmdCounter].params[0][0];
+	src = (texture)cmdParamDesc[cmdCounter].params[1][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 2;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)dst;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "dst"); 
 	cmdParamDesc[cmdCounter].params[1][0] = (float)src;
-	strcpy(cmdParamDesc[cmdCounter].paramType[1], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[1], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[1], "src"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -505,25 +513,25 @@ Textures::CopyDepth(dst,src);
 
 #define CopyDepth(dst, src) api.CopyDepth( __FILE__, __LINE__ , dst, src)
 
-void TextureToShader( const char* srcFileName, int srcLine, texture_ tex, int slot, targetshader_ tA = targetshader::both)
+void TextureToShader( const char* srcFileName, int srcLine, texture tex, int slot, targetshader tA = targetshader::both)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	tex = (texture_)cmdParamDesc[cmdCounter].params[0][0];
+	tex = (texture)cmdParamDesc[cmdCounter].params[0][0];
 	slot = (int)cmdParamDesc[cmdCounter].params[1][0];
-	tA = (targetshader_)cmdParamDesc[cmdCounter].params[2][0];
+	tA = (targetshader)cmdParamDesc[cmdCounter].params[2][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 3;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)tex;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "tex"); 
 	cmdParamDesc[cmdCounter].params[1][0] = (float)slot;
 	strcpy(cmdParamDesc[cmdCounter].paramType[1], "int"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[1], "slot"); 
 	cmdParamDesc[cmdCounter].params[2][0] = (float)tA;
-	strcpy(cmdParamDesc[cmdCounter].paramType[2], "targetshader_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[2], "targetshader"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[2], "tA"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
@@ -547,18 +555,18 @@ Textures::CreateMipMap();
 
 #define CreateMipMap() api.CreateMipMap( __FILE__, __LINE__ )
 
-void RenderTarget( const char* srcFileName, int srcLine, texture_ texId = mainRTIndex, int level = 0)
+void RenderTarget( const char* srcFileName, int srcLine, texture texId, int level = 0)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	texId = (texture_)cmdParamDesc[cmdCounter].params[0][0];
+	texId = (texture)cmdParamDesc[cmdCounter].params[0][0];
 	level = (int)cmdParamDesc[cmdCounter].params[1][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 2;
 	cmdParamDesc[cmdCounter].params[0][0] = (float)texId;
-	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture_"); 
+	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[0], "texId"); 
 	cmdParamDesc[cmdCounter].params[1][0] = (float)level;
 	strcpy(cmdParamDesc[cmdCounter].paramType[1], "int"); 

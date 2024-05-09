@@ -236,7 +236,7 @@ namespace ui
 			ps::letter_ps.samplers.s1Filter = filter::linear;
 			ps::letter_ps.samplers.s1AddressU = addr::clamp;
 			ps::letter_ps.samplers.s1AddressV = addr::clamp;
-			ps::letter_ps.textures.tex = fontTextureIndex;
+			ps::letter_ps.textures.tex = (texture)fontTextureIndex;
 
 		}
 

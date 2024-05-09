@@ -65,22 +65,22 @@ float gY;
 
 struct 
 {
-int positions;
-int normals;
+texture positions;
+texture normals;
 } textures;
 
 struct 
 {
-int sam1Filter;
-int sam1AddressU;
-int sam1AddressV;
+filter sam1Filter;
+addr sam1AddressU;
+addr sam1AddressV;
 } samplers;
 
 void set () {
 Shaders::vShader(4);
 memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
-Textures::TextureToShader(textures.positions, 0, targetshader::vertex); 
-Textures::TextureToShader(textures.normals, 1, targetshader::vertex); 
+Textures::TextureToShader((texture)textures.positions, 0, targetshader::vertex); 
+Textures::TextureToShader((texture)textures.normals, 1, targetshader::vertex); 
 Sampler::Sampler(targetshader::vertex, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
@@ -133,24 +133,24 @@ float a;
 
 struct 
 {
-int env;
-int normals;
-int albedo;
+texture env;
+texture normals;
+texture albedo;
 } textures;
 
 struct 
 {
-int sam1Filter;
-int sam1AddressU;
-int sam1AddressV;
+filter sam1Filter;
+addr sam1AddressU;
+addr sam1AddressV;
 } samplers;
 
 void set () {
 Shaders::pShader(0);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
-Textures::TextureToShader(textures.env, 0, targetshader::pixel); 
-Textures::TextureToShader(textures.normals, 1, targetshader::pixel); 
-Textures::TextureToShader(textures.albedo, 2, targetshader::pixel); 
+Textures::TextureToShader((texture)textures.env, 0, targetshader::pixel); 
+Textures::TextureToShader((texture)textures.normals, 1, targetshader::pixel); 
+Textures::TextureToShader((texture)textures.albedo, 2, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
@@ -208,19 +208,19 @@ struct {
 
 struct 
 {
-int env;
+texture env;
 } textures;
 
 struct 
 {
-int sam1Filter;
-int sam1AddressU;
-int sam1AddressV;
+filter sam1Filter;
+addr sam1AddressU;
+addr sam1AddressV;
 } samplers;
 
 void set () {
 Shaders::pShader(3);
-Textures::TextureToShader(textures.env, 0, targetshader::pixel); 
+Textures::TextureToShader((texture)textures.env, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
@@ -234,19 +234,19 @@ struct {
 
 struct 
 {
-int geo;
+texture geo;
 } textures;
 
 struct 
 {
-int sam1Filter;
-int sam1AddressU;
-int sam1AddressV;
+filter sam1Filter;
+addr sam1AddressU;
+addr sam1AddressV;
 } samplers;
 
 void set () {
 Shaders::pShader(4);
-Textures::TextureToShader(textures.geo, 0, targetshader::pixel); 
+Textures::TextureToShader((texture)textures.geo, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
@@ -269,20 +269,20 @@ float bold;
 
 struct 
 {
-int tex;
+texture tex;
 } textures;
 
 struct 
 {
-int s1Filter;
-int s1AddressU;
-int s1AddressV;
+filter s1Filter;
+addr s1AddressU;
+addr s1AddressV;
 } samplers;
 
 void set () {
 Shaders::pShader(5);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
-Textures::TextureToShader(textures.tex, 0, targetshader::pixel); 
+Textures::TextureToShader((texture)textures.tex, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.s1Filter, samplers.s1AddressU, samplers.s1AddressV); 
 }
 

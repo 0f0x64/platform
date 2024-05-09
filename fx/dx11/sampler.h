@@ -4,9 +4,6 @@ namespace Sampler
 	ID3D11SamplerState* pSampler[3][2][2];//filter, addressU, addressV
 	ID3D11SamplerState* pSamplerComp;//for shadowmapping
 
-	enum type { linear, point, minPoint_magLinear };
-	enum addr { clamp, wrap };
-
 	void Init()
 	{
 		D3D11_SAMPLER_DESC sampDesc;
@@ -52,10 +49,10 @@ namespace Sampler
 
 	}
 
-	API Sampler(targetshader_ shader, int slot, filter_ filter, addr_ addressU, addr_ addressV)
+	API Sampler(targetshader shader, int slot, filter f, addr addressU, addr addressV)
 	{
-		if (shader == targetshader::vertex) context->VSSetSamplers(slot, 1, &pSampler[filter][addressU][addressV]);
-		if (shader == targetshader::pixel) context->PSSetSamplers(slot, 1, &pSampler[filter][addressU][addressV]);
+		if (shader == targetshader::vertex) context->VSSetSamplers(slot, 1, &pSampler[(int)f][(int)addressU][(int)addressV]);
+		if (shader == targetshader::pixel) context->PSSetSamplers(slot, 1, &pSampler[(int)f][(int)addressU][(int)addressV]);
 	}
 
 	API SamplerComp(int slot)

@@ -27,7 +27,7 @@ void setCam(int i)
 
 void slideCam(int i, int j, float a)
 {
-	position_ eye, at, up;
+	position eye, at, up;
 	float angle = lerp(cam[i].angle, cam[j].angle, a);
 
 	eye.x = lerp(cam[i].eye.x, cam[j].eye.x, a);

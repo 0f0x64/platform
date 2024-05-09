@@ -28,14 +28,14 @@ namespace Device
 		hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
 		LogIfError("device not created\n");
 
-		Textures::texture[0].pTexture = NULL;
-		hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&Textures::texture[0].pTexture);
+		Textures::Texture[0].pTexture = NULL;
+		hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&Textures::Texture[0].pTexture);
 		LogIfError("swapchain error\n");
 
-		hr = device->CreateRenderTargetView(Textures::texture[0].pTexture, NULL, &Textures::texture[0].RenderTargetView[0][0]);
+		hr = device->CreateRenderTargetView(Textures::Texture[0].pTexture, NULL, &Textures::Texture[0].RenderTargetView[0][0]);
 		LogIfError("rt not created\n");
 
-		Textures::texture[0].pTexture->Release();
+		Textures::Texture[0].pTexture->Release();
 
 	}
 

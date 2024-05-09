@@ -50,9 +50,9 @@ namespace Blend
 		context->OMSetBlendState(blendState[0][0], blendFactor, 0xffffffff);
 	}
 
-	API Blending(blendmode_ m = blendmode::off, blendop_ blend = blendop::add)
+	API Blending(blendmode m = blendmode::off, blendop blend = blendop::add)
 	{
 		float blendFactor[4] = { .0f,.0f,.0f,.0f };
-		context->OMSetBlendState(blendState[m][blend], blendFactor, 0xffffffff);
+		context->OMSetBlendState(blendState[(int)m][(int)blend], blendFactor, 0xffffffff);
 	}
 } 

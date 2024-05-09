@@ -75,27 +75,20 @@ namespace dx11
 	}
 
 	struct {
-		void setIA(int topology) { InputAssembler::IA(topology); }
-		void rt(int i) { Textures::RenderTarget(i); }
+		void setIA(topology t) { InputAssembler::IA(t); }
+		void rt(texture i) { Textures::RenderTarget(i); }
 		void mips() { Textures::CreateMipMap(); }
-		void depth(int i) { Depth::Depth(i); }
+		void depth(depthmode i) { Depth::Depth(i); }
 		void draw(int quadcount, int instances = 1) { Draw::NullDrawer(quadcount, instances); }
-		void cam(position_ eye, position_ at, position_ up, float angle) { Camera::Camera(eye, at, up, angle); }
-		void clear(color4_ c) { Draw::Clear(c); }
+		void cam(position eye, position at, position up, float angle) { Camera::Camera(eye, at, up, angle); }
+		void clear(color4 c) { Draw::Clear(c); }
 		void clearDepth() { Draw::ClearDepth(); }
-		void blend(int mode, int op = blendop::add) { Blend::Blending(mode, op); }
-		void cull(int i) { Rasterizer::Cull(i); }
-		void setScissors(rect_ r) { Rasterizer::Scissors(r); }
-		void copyColor(int dst, int src) { Textures::CopyColor(dst, src); }
-		void copyDepth(int dst, int src) { Textures::CopyDepth(dst, src); }
+		void blend(blendmode mode, blendop op = blendop::add) { Blend::Blending(mode, op); }
+		void cull(cullmode i) { Rasterizer::Cull(i); }
+		void setScissors(rect r) { Rasterizer::Scissors(r); }
+		void copyColor(texture dst, texture src) { Textures::CopyColor(dst, src); }
+		void copyDepth(texture dst, texture src) { Textures::CopyDepth(dst, src); }
 	} gapi;
 	
-	#undef CreateTexture
-	#define CreateTexture(name,type,format,width,height,mip,depth) name,
-	namespace texture {
-		enum {
-			#include "..\projectFiles\texList.h"	
-		};
-	};
 
 }

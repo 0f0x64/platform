@@ -1,14 +1,14 @@
 namespace Object {
 
-	API ShowObject(texture_ geometry, texture_ normals, int quality, position_ pos)
+	API ShowObject(texture geometry, texture normals, int quality, position pos)
 	{
 		int denom = (int)pow(2, quality);
 		
 		ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixTranslation(pos.x, pos.y, pos.z));
 		ConstBuf::UpdateDrawerMat();
 
-		float gX = Textures::texture[texture::obj1pos].size.x / denom;
-		float gY = Textures::texture[texture::obj1pos].size.y / denom;
+		float gX = Textures::Texture[(int)texture::obj1pos].size.x / denom;
+		float gY = Textures::Texture[(int)texture::obj1pos].size.y / denom;
 
 		vs::objViewer.textures.positions = geometry;
 		vs::objViewer.samplers.sam1Filter = filter::linear;
@@ -28,7 +28,7 @@ namespace Object {
 		gapi.draw((int)gX * (int)gY);
 	}
 
-	API CalcObject(texture_ targetGeoTexture, texture_ targetNrmlTexture)
+	API CalcObject(texture targetGeoTexture, texture targetNrmlTexture)
 	{
 		gapi.blend(blendmode::off, blendop::add);
 		gapi.cull(cullmode::off);

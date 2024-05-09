@@ -7,7 +7,6 @@ bool fillEnumTable(const char* name, const char* enumStr)
 {
 	int index = enumCounter;
 	strcpy(enumStringTable[index][0], name);
-	strcat(enumStringTable[index][0], "_");
 
 	int counter = 1;
 	int j = 0;
@@ -34,16 +33,21 @@ bool fillEnumTable(const char* name, const char* enumStr)
 typedef struct { float x; float y; float z; } vector3;
 typedef struct { float x; float y; float z; float w; } vector4;
 
-typedef vector3 position_;
-typedef vector3 size_;
-typedef vector3 rotation_;
-typedef vector3 color_;
-typedef vector4 color4_;
-typedef vector4 rect_;
+typedef vector3 position;
+typedef vector3 size;
+typedef vector3 rotation;
+typedef vector3 color;
+typedef vector4 color4;
+typedef vector4 rect;
 
-typedef int texture_;
+#undef CreateTexture
+#define CreateTexture(name,type,format,width,height,mip,depth) name,
+enum class texture:int {
+#include "projectFiles\texList.h"	
+};
 
-#define enumType(name, ...) namespace name { enum { __VA_ARGS__}; }; typedef int name##_; bool name##_b = fillEnumTable(#name, #__VA_ARGS__);
+
+#define enumType(name, ...) enum class name:int { __VA_ARGS__}; bool name##_b = fillEnumTable(#name, #__VA_ARGS__);
 
 enumType(blendmode, off, on, alpha);
 enumType(blendop, add, sub, revsub, min, max);
