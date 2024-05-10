@@ -1,9 +1,9 @@
 namespace Draw
 { 
 
-	API Clear(color4 c)
+	API Clear(color4 color)
 	{
-		context->ClearRenderTargetView(Textures::Texture[Textures::currentRT].RenderTargetView[0][0], XMVECTORF32{ c.x,c.y,c.z,c.w });
+		context->ClearRenderTargetView(Textures::Texture[Textures::currentRT].RenderTargetView[0][0], XMVECTORF32{ color.x,color.y,color.z,color.w });
 	}
 
 	API ClearDepth()

@@ -240,23 +240,23 @@ namespace Textures
 	}
 
 
-	API RenderTarget(texture texId, int level = 0)
+	API RenderTarget(texture target, int level = 0)
 	{
-		currentRT = (int)texId;
+		currentRT = (int)target;
 		
-		auto depthStencil = Texture[(int)texId].depth ? Texture[(int)texId].DepthStencilView[0] : 0;
+		auto depthStencil = Texture[(int)target].depth ? Texture[(int)target].DepthStencilView[0] : 0;
 
-		if (Texture[(int)texId].type == tType::flat)
+		if (Texture[(int)target].type == tType::flat)
 		{
-			context->OMSetRenderTargets(1, &Texture[(int)texId].RenderTargetView[0][0], depthStencil);
+			context->OMSetRenderTargets(1, &Texture[(int)target].RenderTargetView[0][0], depthStencil);
 		}
 
-		if (Texture[(int)texId].type == tType::cube)
+		if (Texture[(int)target].type == tType::cube)
 		{
-			context->OMSetRenderTargets(6, &Texture[(int)texId].RenderTargetView[0][0], 0);
+			context->OMSetRenderTargets(6, &Texture[(int)target].RenderTargetView[0][0], 0);
 		}
 
-		SetViewport(texId, level);
+		SetViewport(target, level);
 	}
 
 	#define CreateTexture(name,type,format,width,height,mip,depth) name,

@@ -28,11 +28,11 @@ namespace Object {
 		gapi.draw((int)gX * (int)gY);
 	}
 
-	API CalcObject(texture targetGeoTexture, texture targetNrmlTexture)
+	API CalcObject(texture targetGeo, texture targetNrml)
 	{
 		gapi.blend(blendmode::off, blendop::add);
 		gapi.cull(cullmode::off);
-		gapi.rt(targetGeoTexture);
+		gapi.rt(targetGeo);
 		gapi.depth(depthmode::off);
 
 		//pos
@@ -42,14 +42,14 @@ namespace Object {
 		gapi.mips();
 
 		//normals
-		gapi.rt(targetNrmlTexture);
+		gapi.rt(targetNrml);
 		vs::quad.set();
 
 		ps::genNormals.samplers.sam1Filter = filter::linear;
 		ps::genNormals.samplers.sam1AddressU = addr::wrap;
 		ps::genNormals.samplers.sam1AddressV = addr::wrap;
 
-		ps::genNormals.textures.geo = targetGeoTexture;
+		ps::genNormals.textures.geo = targetGeo;
 		ps::genNormals.set();
 		gapi.draw(1);
 		gapi.mips();

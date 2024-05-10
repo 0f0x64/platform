@@ -23,28 +23,28 @@ Cubemap::CalcCubemap(target);
 
 #define CalcCubemap(target) api.CalcCubemap( __FILE__, __LINE__ , target)
 
-void ShowCubemap( const char* srcFileName, int srcLine, texture envTex)
+void ShowCubemap( const char* srcFileName, int srcLine, texture envTexture)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	envTex = (texture)cmdParamDesc[cmdCounter].params[0][0];
+	envTexture = (texture)cmdParamDesc[cmdCounter].params[0][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
-	cmdParamDesc[cmdCounter].params[0][0] = (float)envTex;
+	cmdParamDesc[cmdCounter].params[0][0] = (float)envTexture;
 	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[0], "envTex"); 
+	strcpy(cmdParamDesc[cmdCounter].paramName[0], "envTexture"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
 
 AddToUI(__FUNCTION__);
 cmdCounter++;
 
-Cubemap::ShowCubemap(envTex);
+Cubemap::ShowCubemap(envTexture);
 }
 
-#define ShowCubemap(envTex) api.ShowCubemap( __FILE__, __LINE__ , envTex)
+#define ShowCubemap(envTexture) api.ShowCubemap( __FILE__, __LINE__ , envTexture)
 
 void ShowObject( const char* srcFileName, int srcLine, texture geometry, texture normals, int quality, position pos)
 {
@@ -85,59 +85,59 @@ Object::ShowObject(geometry,normals,quality,pos);
 
 #define ShowObject(geometry, normals, quality, pos_x, pos_y, pos_z) api.ShowObject( __FILE__, __LINE__ , geometry, normals, quality, position {pos_x, pos_y, pos_z })
 
-void CalcObject( const char* srcFileName, int srcLine, texture targetGeoTexture, texture targetNrmlTexture)
+void CalcObject( const char* srcFileName, int srcLine, texture targetGeo, texture targetNrml)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	targetGeoTexture = (texture)cmdParamDesc[cmdCounter].params[0][0];
-	targetNrmlTexture = (texture)cmdParamDesc[cmdCounter].params[1][0];
+	targetGeo = (texture)cmdParamDesc[cmdCounter].params[0][0];
+	targetNrml = (texture)cmdParamDesc[cmdCounter].params[1][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 2;
-	cmdParamDesc[cmdCounter].params[0][0] = (float)targetGeoTexture;
+	cmdParamDesc[cmdCounter].params[0][0] = (float)targetGeo;
 	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[0], "targetGeoTexture"); 
-	cmdParamDesc[cmdCounter].params[1][0] = (float)targetNrmlTexture;
+	strcpy(cmdParamDesc[cmdCounter].paramName[0], "targetGeo"); 
+	cmdParamDesc[cmdCounter].params[1][0] = (float)targetNrml;
 	strcpy(cmdParamDesc[cmdCounter].paramType[1], "texture"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[1], "targetNrmlTexture"); 
+	strcpy(cmdParamDesc[cmdCounter].paramName[1], "targetNrml"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
 
 AddToUI(__FUNCTION__);
 cmdCounter++;
 
-Object::CalcObject(targetGeoTexture,targetNrmlTexture);
+Object::CalcObject(targetGeo,targetNrml);
 }
 
-#define CalcObject(targetGeoTexture, targetNrmlTexture) api.CalcObject( __FILE__, __LINE__ , targetGeoTexture, targetNrmlTexture)
+#define CalcObject(targetGeo, targetNrml) api.CalcObject( __FILE__, __LINE__ , targetGeo, targetNrml)
 
-void Blending( const char* srcFileName, int srcLine, blendmode m = blendmode::off, blendop blend = blendop::add)
+void Blending( const char* srcFileName, int srcLine, blendmode mode = blendmode::off, blendop operation = blendop::add)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	m = (blendmode)cmdParamDesc[cmdCounter].params[0][0];
-	blend = (blendop)cmdParamDesc[cmdCounter].params[1][0];
+	mode = (blendmode)cmdParamDesc[cmdCounter].params[0][0];
+	operation = (blendop)cmdParamDesc[cmdCounter].params[1][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 2;
-	cmdParamDesc[cmdCounter].params[0][0] = (float)m;
+	cmdParamDesc[cmdCounter].params[0][0] = (float)mode;
 	strcpy(cmdParamDesc[cmdCounter].paramType[0], "blendmode"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[0], "m"); 
-	cmdParamDesc[cmdCounter].params[1][0] = (float)blend;
+	strcpy(cmdParamDesc[cmdCounter].paramName[0], "mode"); 
+	cmdParamDesc[cmdCounter].params[1][0] = (float)operation;
 	strcpy(cmdParamDesc[cmdCounter].paramType[1], "blendop"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[1], "blend"); 
+	strcpy(cmdParamDesc[cmdCounter].paramName[1], "operation"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
 
 AddToUI(__FUNCTION__);
 cmdCounter++;
 
-Blend::Blending(m,blend);
+Blend::Blending(mode,operation);
 }
 
-#define Blending(m, blend) api.Blending( __FILE__, __LINE__ , m, blend)
+#define Blending(mode, operation) api.Blending( __FILE__, __LINE__ , mode, operation)
 
 void Camera( const char* srcFileName, int srcLine, position eye, position at, position up, float angle)
 {
@@ -186,57 +186,57 @@ Camera::Camera(eye,at,up,angle);
 
 #define Camera(eye_x, eye_y, eye_z, at_x, at_y, at_z, up_x, up_y, up_z, angle) api.Camera( __FILE__, __LINE__ , position {eye_x, eye_y, eye_z }, position {at_x, at_y, at_z }, position {up_x, up_y, up_z }, angle)
 
-void Depth( const char* srcFileName, int srcLine, depthmode m)
+void Depth( const char* srcFileName, int srcLine, depthmode mode)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	m = (depthmode)cmdParamDesc[cmdCounter].params[0][0];
+	mode = (depthmode)cmdParamDesc[cmdCounter].params[0][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
-	cmdParamDesc[cmdCounter].params[0][0] = (float)m;
+	cmdParamDesc[cmdCounter].params[0][0] = (float)mode;
 	strcpy(cmdParamDesc[cmdCounter].paramType[0], "depthmode"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[0], "m"); 
+	strcpy(cmdParamDesc[cmdCounter].paramName[0], "mode"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
 
 AddToUI(__FUNCTION__);
 cmdCounter++;
 
-Depth::Depth(m);
+Depth::Depth(mode);
 }
 
-#define Depth(m) api.Depth( __FILE__, __LINE__ , m)
+#define Depth(mode) api.Depth( __FILE__, __LINE__ , mode)
 
-void Clear( const char* srcFileName, int srcLine, color4 c)
+void Clear( const char* srcFileName, int srcLine, color4 color)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	c.x = cmdParamDesc[cmdCounter].params[0][0];
-	c.y = cmdParamDesc[cmdCounter].params[0][1];
-	c.z = cmdParamDesc[cmdCounter].params[0][2];
-	c.w = cmdParamDesc[cmdCounter].params[0][3];
+	color.x = cmdParamDesc[cmdCounter].params[0][0];
+	color.y = cmdParamDesc[cmdCounter].params[0][1];
+	color.z = cmdParamDesc[cmdCounter].params[0][2];
+	color.w = cmdParamDesc[cmdCounter].params[0][3];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
-	cmdParamDesc[cmdCounter].params[0][0] = c.x;
-	cmdParamDesc[cmdCounter].params[0][1] = c.y;
-	cmdParamDesc[cmdCounter].params[0][2] = c.z;
-	cmdParamDesc[cmdCounter].params[0][3] = c.w;
+	cmdParamDesc[cmdCounter].params[0][0] = color.x;
+	cmdParamDesc[cmdCounter].params[0][1] = color.y;
+	cmdParamDesc[cmdCounter].params[0][2] = color.z;
+	cmdParamDesc[cmdCounter].params[0][3] = color.w;
 	strcpy(cmdParamDesc[cmdCounter].paramType[0], "color4"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[0], "c"); 
+	strcpy(cmdParamDesc[cmdCounter].paramName[0], "color"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
 
 AddToUI(__FUNCTION__);
 cmdCounter++;
 
-Draw::Clear(c);
+Draw::Clear(color);
 }
 
-#define Clear(c_x, c_y, c_z, c_w) api.Clear( __FILE__, __LINE__ , color4 {c_x, c_y, c_z, c_w })
+#define Clear(color_x, color_y, color_z, color_w) api.Clear( __FILE__, __LINE__ , color4 {color_x, color_y, color_z, color_w })
 
 void ClearDepth( const char* srcFileName, int srcLine)
 {
@@ -276,51 +276,51 @@ Draw::NullDrawer(quadCount,instances);
 
 #define NullDrawer(quadCount, instances) api.NullDrawer( __FILE__, __LINE__ , quadCount, instances)
 
-void IA( const char* srcFileName, int srcLine, topology t)
+void IA( const char* srcFileName, int srcLine, topology topoType)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	t = (topology)cmdParamDesc[cmdCounter].params[0][0];
+	topoType = (topology)cmdParamDesc[cmdCounter].params[0][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
-	cmdParamDesc[cmdCounter].params[0][0] = (float)t;
+	cmdParamDesc[cmdCounter].params[0][0] = (float)topoType;
 	strcpy(cmdParamDesc[cmdCounter].paramType[0], "topology"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[0], "t"); 
+	strcpy(cmdParamDesc[cmdCounter].paramName[0], "topoType"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
 
 AddToUI(__FUNCTION__);
 cmdCounter++;
 
-InputAssembler::IA(t);
+InputAssembler::IA(topoType);
 }
 
-#define IA(t) api.IA( __FILE__, __LINE__ , t)
+#define IA(topoType) api.IA( __FILE__, __LINE__ , topoType)
 
-void Cull( const char* srcFileName, int srcLine, cullmode i)
+void Cull( const char* srcFileName, int srcLine, cullmode mode)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	i = (cullmode)cmdParamDesc[cmdCounter].params[0][0];
+	mode = (cullmode)cmdParamDesc[cmdCounter].params[0][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 1;
-	cmdParamDesc[cmdCounter].params[0][0] = (float)i;
+	cmdParamDesc[cmdCounter].params[0][0] = (float)mode;
 	strcpy(cmdParamDesc[cmdCounter].paramType[0], "cullmode"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[0], "i"); 
+	strcpy(cmdParamDesc[cmdCounter].paramName[0], "mode"); 
 	cmdParamDesc[cmdCounter].loaded = true; 
 }
 
 AddToUI(__FUNCTION__);
 cmdCounter++;
 
-Rasterizer::Cull(i);
+Rasterizer::Cull(mode);
 }
 
-#define Cull(i) api.Cull( __FILE__, __LINE__ , i)
+#define Cull(mode) api.Cull( __FILE__, __LINE__ , mode)
 
 void Scissors( const char* srcFileName, int srcLine, rect r)
 {
@@ -351,13 +351,13 @@ Rasterizer::Scissors(r);
 
 #define Scissors(r_x, r_y, r_z, r_w) api.Scissors( __FILE__, __LINE__ , rect {r_x, r_y, r_z, r_w })
 
-void Sampler( const char* srcFileName, int srcLine, targetshader shader, int slot, filter f, addr addressU, addr addressV)
+void Sampler( const char* srcFileName, int srcLine, targetshader shader, int slot, filter filterType, addr addressU, addr addressV)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
 	shader = (targetshader)cmdParamDesc[cmdCounter].params[0][0];
 	slot = (int)cmdParamDesc[cmdCounter].params[1][0];
-	f = (filter)cmdParamDesc[cmdCounter].params[2][0];
+	filterType = (filter)cmdParamDesc[cmdCounter].params[2][0];
 	addressU = (addr)cmdParamDesc[cmdCounter].params[3][0];
 	addressV = (addr)cmdParamDesc[cmdCounter].params[4][0];
 } else {
@@ -370,9 +370,9 @@ if (cmdParamDesc[cmdCounter].loaded) {
 	cmdParamDesc[cmdCounter].params[1][0] = (float)slot;
 	strcpy(cmdParamDesc[cmdCounter].paramType[1], "int"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[1], "slot"); 
-	cmdParamDesc[cmdCounter].params[2][0] = (float)f;
+	cmdParamDesc[cmdCounter].params[2][0] = (float)filterType;
 	strcpy(cmdParamDesc[cmdCounter].paramType[2], "filter"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[2], "f"); 
+	strcpy(cmdParamDesc[cmdCounter].paramName[2], "filterType"); 
 	cmdParamDesc[cmdCounter].params[3][0] = (float)addressU;
 	strcpy(cmdParamDesc[cmdCounter].paramType[3], "addr"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[3], "addressU"); 
@@ -385,10 +385,10 @@ if (cmdParamDesc[cmdCounter].loaded) {
 AddToUI(__FUNCTION__);
 cmdCounter++;
 
-Sampler::Sampler(shader,slot,f,addressU,addressV);
+Sampler::Sampler(shader,slot,filterType,addressU,addressV);
 }
 
-#define Sampler(shader, slot, f, addressU, addressV) api.Sampler( __FILE__, __LINE__ , shader, slot, f, addressU, addressV)
+#define Sampler(shader, slot, filterType, addressU, addressV) api.Sampler( __FILE__, __LINE__ , shader, slot, filterType, addressU, addressV)
 
 void SamplerComp( const char* srcFileName, int srcLine, int slot)
 {
@@ -555,19 +555,19 @@ Textures::CreateMipMap();
 
 #define CreateMipMap() api.CreateMipMap( __FILE__, __LINE__ )
 
-void RenderTarget( const char* srcFileName, int srcLine, texture texId, int level = 0)
+void RenderTarget( const char* srcFileName, int srcLine, texture target, int level = 0)
 {
 
 if (cmdParamDesc[cmdCounter].loaded) {
-	texId = (texture)cmdParamDesc[cmdCounter].params[0][0];
+	target = (texture)cmdParamDesc[cmdCounter].params[0][0];
 	level = (int)cmdParamDesc[cmdCounter].params[1][0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
 	cmdParamDesc[cmdCounter].pCount = 2;
-	cmdParamDesc[cmdCounter].params[0][0] = (float)texId;
+	cmdParamDesc[cmdCounter].params[0][0] = (float)target;
 	strcpy(cmdParamDesc[cmdCounter].paramType[0], "texture"); 
-	strcpy(cmdParamDesc[cmdCounter].paramName[0], "texId"); 
+	strcpy(cmdParamDesc[cmdCounter].paramName[0], "target"); 
 	cmdParamDesc[cmdCounter].params[1][0] = (float)level;
 	strcpy(cmdParamDesc[cmdCounter].paramType[1], "int"); 
 	strcpy(cmdParamDesc[cmdCounter].paramName[1], "level"); 
@@ -577,9 +577,9 @@ if (cmdParamDesc[cmdCounter].loaded) {
 AddToUI(__FUNCTION__);
 cmdCounter++;
 
-Textures::RenderTarget(texId,level);
+Textures::RenderTarget(target,level);
 }
 
-#define RenderTarget(texId, level) api.RenderTarget( __FILE__, __LINE__ , texId, level)
+#define RenderTarget(target, level) api.RenderTarget( __FILE__, __LINE__ , target, level)
 
 } api;

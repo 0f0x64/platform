@@ -1,10 +1,10 @@
 namespace InputAssembler
 {
 
-	API IA(topology t)
+	API IA(topology topoType)
 	{
 		D3D11_PRIMITIVE_TOPOLOGY ttype = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		switch (t)
+		switch (topoType)
 		{
 			case topology::triList:
 				ttype = D3D_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;

@@ -3,9 +3,9 @@ namespace Rasterizer
 
 	ID3D11RasterizerState* rasterState[4];
 
-	API Cull(cullmode i)
+	API Cull(cullmode mode)
 	{
-		context->RSSetState(rasterState[(int)i]);
+		context->RSSetState(rasterState[(int)mode]);
 	}
 
 	API Scissors(rect r)

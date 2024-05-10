@@ -189,6 +189,14 @@ namespace paramEdit {
 	void showParams()
 	{
 		float valueDrawOffset = .1f;
+		float ySpacing = .15f * ui::style::box::height;
+
+		ui::Box::Setup();
+		ui::style::Base();
+		ui::style::box::rounded = .01;
+		ui::Box::Draw(x, yPos + float(currentCmd) * lead, .15, cmdParamDesc[currentCmd].pCount * lead);
+
+		ui::Text::Setup();
 
 		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
 		{
@@ -198,11 +206,11 @@ namespace paramEdit {
 			float y = yPos + float(currentCmd + i) * lead;
 
 			float sel = currentParam == i ? 1.f : 0.f;
-			ui::style::text::r = lerp(.5, 1, sel);
-			ui::style::text::g = lerp(.5, 1, sel);
-			ui::style::text::b = lerp(.5, 1, sel);
+			ui::style::text::r = lerp(.9, 1, sel);
+			ui::style::text::g = lerp(.9, 1, sel);
+			ui::style::text::b = lerp(.9, 1, sel);
 
-			ui::Text::Draw(cmdParamDesc[currentCmd].paramName[i], x, yPos + float(currentCmd + i) * lead);
+			ui::Text::Draw(cmdParamDesc[currentCmd].paramName[i], x+inside, yPos + float(currentCmd + i) * lead + ySpacing);
 
 			auto sType = cmdParamDesc[currentCmd].paramType[i];
 
@@ -253,7 +261,7 @@ namespace paramEdit {
 				strcpy(vstr, getEnumStr(sType, (int)cmdParamDesc[currentCmd].params[i][0]));
 			}
 
-			ui::Text::Draw(vstr, x + valueDrawOffset, yPos + float(currentCmd + i) * lead);
+			ui::Text::Draw(vstr, x + valueDrawOffset, yPos + float(currentCmd + i) * lead + ySpacing);
 		}
 	}
 

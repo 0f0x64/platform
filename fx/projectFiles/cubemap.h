@@ -14,12 +14,12 @@ namespace Cubemap {
 		gapi.mips();
 	}
 
-	API ShowCubemap(texture envTex)
+	API ShowCubemap(texture envTexture)
 	{
 		gapi.blend(blendmode::off, blendop::add);
 		gapi.cull(cullmode::back);
 
-		ps::cubeMapViewer.textures.env = texture::env;
+		ps::cubeMapViewer.textures.env = envTexture;
 		ps::cubeMapViewer.samplers.sam1Filter = filter::linear;
 		ps::cubeMapViewer.samplers.sam1AddressU = addr::wrap;
 		ps::cubeMapViewer.samplers.sam1AddressV = addr::wrap;
