@@ -80,7 +80,7 @@ namespace dx11
 		void mips() { Textures::CreateMipMap(); }
 		void depth(depthmode i) { Depth::Depth(i); }
 		void draw(int quadcount, int instances = 1) { Draw::NullDrawer(quadcount, instances); }
-		void cam(position eye, position at, position up, float angle) { Camera::Camera(eye, at, up, angle); }
+		void cam(position eye, position at, position up, unsigned int angle) { Camera::Camera(eye, at, up, angle); }
 		void clear(color4 c) { Draw::Clear(c); }
 		void clearDepth() { Draw::ClearDepth(); }
 		void blend(blendmode mode, blendop op = blendop::add) { Blend::Blending(mode, op); }

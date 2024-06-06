@@ -25,46 +25,35 @@ namespace Loop
 	}
 
 		
-#define ref __FILE__, __LINE__
-
-	//#define ShowObject(posTexture, nrmlTexture, quality, x,y,z) api.ShowObject(__FILE__, __LINE__, posTexture, nrmlTexture, quality, position_{x,y,z}) 
-
 	void mainLoop()
 	{
 		cmdCounter = 0;
 
-		//CalcCubemap(tex::env);
-
 		if (!isPrecalc) Precalc();
-
-
 
 		regCam();
 		frameConst();
 
-		IA(topology::triList);
+		api.IA(topology::triList);
+		api.CalcCubemap( texture::env);
+		api.CalcObject( texture::obj1pos,texture::obj1nrml);
 
-		CalcCubemap( texture::env);
-		CalcObject( texture::obj1pos,texture::obj1nrml);
-
-		Blending( blendmode::off, blendop::add);
-		RenderTarget(texture::mainRT, 0 );
+		api.Blending( blendmode::off, blendop::add);
+		api.RenderTarget(texture::mainRT, 0 );
 
 		//setCam(0);
 		float t = (timer::timeCursor / (SAMPLES_IN_FRAME * 60.f));
 		slideCam(0, 1, t);
 
-		Depth( depthmode::on);
-		Clear( 0.2f, 0.2f, 0.2f, 1.f );
-		ClearDepth();
+		api.Depth( depthmode::on);
+		api.Clear( 0, 0, 0, 1 );
+		api.ClearDepth();
 
-		ShowCubemap( texture::env);
-		Cull( cullmode::back);
-		ShowObject( texture::obj1pos, texture::obj1nrml, 4, 0, 0, 0 );
-		ShowObject( texture::obj1pos, texture::obj1nrml, 4, 0, 1, 0 );
-		//ShowObject(tex::obj1pos, tex::obj1nrml, 4, 0, 1, 0);
-
-
+		api.ShowCubemap( texture::env);
+		api.Cull( cullmode::back);
+		api.ShowObject( texture::obj1pos, texture::obj1nrml, 4, -500, 0, 0 );
+		api.ShowObject(texture::obj1pos, texture::obj1nrml, 4, 500, 0, 0);
+		
 		playTrack();
 	}
 

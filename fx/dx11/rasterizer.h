@@ -10,7 +10,7 @@ namespace Rasterizer
 
 	API Scissors(rect r)
 	{
-		D3D11_RECT rect = { (int)(r.x * width), (int)(r.y * height), (int)(r.z * width), (int)(r.w * height) };
+		D3D11_RECT rect = { r.x,r.y,r.z,r.w };
 		context->RSSetScissorRects(1, &rect);
 	}
 
@@ -40,7 +40,7 @@ namespace Rasterizer
 		device->CreateRasterizerState(&rasterizerState, &rasterState[3]);
 
 		context->RSSetState(rasterState[0]);
-		Scissors(rect{ 0, 0, 1, 1 });
+		Scissors(rect{ 0, 0, width, height });
 	}
 
 }

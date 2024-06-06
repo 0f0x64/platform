@@ -1,6 +1,6 @@
 namespace TimeLine
 {
-	const int TIME_KEY = VK_LMENU;
+	#define TIME_KEY VK_LMENU
 
 	const int frame = SAMPLES_IN_FRAME;
 	const int second = SAMPLING_FREQ;
@@ -116,13 +116,6 @@ namespace TimeLine
 		return h;
 	}
 
-	void StoreLine(int counter, float x, float y, float x1, float y1)
-	{
-		ui::Line::buffer[counter*2].x = x;
-		ui::Line::buffer[counter*2].y = y;
-		ui::Line::buffer[counter*2 + 1].x = x1;
-		ui::Line::buffer[counter*2 + 1].y = y1;
-	}
 
 	float left;
 	float right;
@@ -170,7 +163,7 @@ namespace TimeLine
 			float x = TimeToScreen(time) - left + screenLeft;
 			float h = getHeight(time);
 
-			StoreLine(i, x, y, x, y - h);
+			ui::Line::StoreLine(i, x, y, x, y - h);
 		}
 
 		ui::Line::Draw(iter);
@@ -215,8 +208,8 @@ namespace TimeLine
 
 		float cursor = TimeToScreen(timer::timeCursor - pos);
 		if (cursor<screenLeft || cursor > screenRight) return;
-		StoreLine(0, cursor, y, cursor, y - ui::style::text::height * 1.25f);
-		if (isKeyDown(TIME_KEY)) StoreLine(0, cursor, 1, cursor, 0);
+		ui::Line::StoreLine(0, cursor, y, cursor, y - ui::style::text::height * 1.25f);
+		if (isKeyDown(TIME_KEY)) ui::Line::StoreLine(0, cursor, 1, cursor, 0);
 		ui::Line::Draw(1, 1, 1, 1, .75f + .25f * sinf((float)timer::frameBeginTime * .01f));
 
 		gapi.setIA(topology::triList);
@@ -340,7 +333,7 @@ namespace TimeLine
 	{
 		ProcessInput();
 
-		gapi.setScissors(rect{ screenLeft, 0, screenRight, 1 });
+		gapi.setScissors(rect{ (int)(screenLeft*dx11::width), 0, (int)(screenRight*dx11::width), dx11::height });
 
 		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 		timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
@@ -371,7 +364,7 @@ namespace TimeLine
 
 		DrawCursor(1);
 
-		gapi.setScissors(rect{ 0, 0, 1, 1 });
+		gapi.setScissors(rect{ 0, 0, dx11::width, dx11::height });
 
 	}
 

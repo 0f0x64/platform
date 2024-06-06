@@ -1,10 +1,23 @@
 namespace paramEdit {
 
+	int floatConvertDigits = 5;
+
 	float yPos=0.05;
 	float yPosLast;
 
-	float  storedParam = 0;
-	int currentParam = 0;
+	int storedParam[4] = { 0,0,0,0 };
+	int currentParam = -1;
+	int subParam = -1;
+
+	bool action = false;
+	bool clickOnEmptyPlace;
+
+	bool editContext = false;
+
+	int cursorPos = 0;
+	float cursorX = 0;
+	float cursorY = 0;
+	bool showCursor = false;
 
 	void rbDown()
 	{
@@ -33,42 +46,11 @@ namespace paramEdit {
 	float top;
 	float bottom;
 	float lead;
-	float inside;
+	float insideX;
+	float insideY;
 	float x;
 	float y;
 
-	void showBoxes()
-	{
-		ui::Box::Setup();
-
-		for (int i = 0; i < cmdCounter; i++)
-		{
-			auto w = ui::Text::getTextLen(cmdParamDesc[i].funcName, ui::style::text::width) + inside * 2.f;
-
-			if (isMouseOver(x, y, w, ui::style::box::height))
-			{
-				ui::style::box::outlineBrightness = 1.f;
-
-				if (ui::lbDown && i != currentCmd) {
-					currentCmd = i;
-					currentParam = -1;
-				}
-			}
-			else
-			{
-				ui::style::box::outlineBrightness = 0.1f;
-			}
-
-			float sel = currentCmd == i ? 1.f : 0.f;
-			ui::style::box::r = lerp(0.2f, .8f, sel);
-			ui::style::box::g = lerp(0.2f, .8f, sel);
-			ui::style::box::b = lerp(0.2f, .8f, sel);
-
-			ui::Box::Draw(x, y, w, ui::style::text::height * .8f);
-			y += lead;
-		}
-	}
-	
 	void showLabels()
 	{
 		for (int i = 0; i < cmdCounter; i++)
@@ -78,7 +60,7 @@ namespace paramEdit {
 			ui::style::text::g = lerp(1.f, .0f, sel);
 			ui::style::text::b = lerp(1.f, .0f, sel);
 
-			ui::Text::Draw(cmdParamDesc[i].funcName, x + inside, y + .15f * ui::style::box::height);
+			ui::Text::Draw(cmdParamDesc[i].funcName, x + insideX, y + insideY);
 			y += lead;
 		}
 	}
@@ -91,6 +73,7 @@ namespace paramEdit {
 	bool isTypeEnum(const char* t1)
 	{
 		if (
+			isType(t1, "texture") ||
 			isType(t1, "topology") || 
 			isType(t1, "blendmode") || 
 			isType(t1, "blendop") || 
@@ -107,6 +90,167 @@ namespace paramEdit {
 		return false;
 	}
 
+	int getTypeDim(const char* t1)
+	{
+		if (
+			isType(t1, "position") ||
+			isType(t1, "size") ||
+			isType(t1, "rotation") ||
+			isType(t1, "color")
+			)
+		{
+			return 3;
+		} 
+
+		if (
+			isType(t1, "color4") ||
+			isType(t1, "rect") 
+			)
+		{
+			return 4;
+		}
+
+		return 1;
+	}
+
+	void showBoxes()
+	{
+		ui::Box::Setup();
+
+		for (int i = 0; i < cmdCounter; i++)
+		{
+			auto w = ui::Text::getTextLen(cmdParamDesc[i].funcName, ui::style::text::width) + insideX * 2.f;
+
+			if (isMouseOver(x, y, w, ui::style::box::height) && editContext)
+			{
+				ui::style::box::outlineBrightness = 1.f;
+
+				clickOnEmptyPlace = false;
+
+				if (ui::lbDown && i != currentCmd) {
+					currentCmd = i;
+					currentParam = -1;
+					subParam = -1;
+
+					if (ui::dblClk)
+					{
+						for (int j = 0; j < cmdParamDesc[currentCmd].pCount; j++)
+						{
+							if (isType(cmdParamDesc[currentCmd].param[j].type, "position"))
+							{
+								auto x = cmdParamDesc[currentCmd].param[j].value[0];
+								auto y = cmdParamDesc[currentCmd].param[j].value[1];
+								auto z = cmdParamDesc[currentCmd].param[j].value[2];
+								ViewCam::TransCam(-x/ intToFloatDenom, -y/intToFloatDenom, -z/ intToFloatDenom);
+							}
+						}
+						ui::dblClk = false;
+					}
+
+				}
+			}
+			else
+			{
+				ui::style::box::outlineBrightness = 0.1f;
+			}
+
+			float sel = currentCmd == i ? 1.f : 0.f;
+			ui::style::box::r = lerp(0.2f, .8f, sel);
+			ui::style::box::g = lerp(0.2f, .8f, sel);
+			ui::style::box::b = lerp(0.2f, .8f, sel);
+
+			ui::Box::Draw(x, y, w, ui::style::text::height * .8f);
+			y += lead;
+		}
+	}
+
+	void insertNumber(int p)
+	{
+		auto sType = cmdParamDesc[currentCmd].param[currentParam].type;
+		if (isTypeEnum(sType)) return;
+
+		if (p == '0' && cursorPos == 0) return;
+		if (p == VK_OEM_MINUS && cursorPos != 0) return;
+
+		char vstr[_CVTBUFSIZE];
+		vstr[0] = 0;
+		char vstr2[_CVTBUFSIZE];
+		vstr2[0] = 0;
+
+		_itoa(cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)], vstr, 10);
+
+		strcpy(vstr2, vstr);
+		vstr2[cursorPos] = p == VK_OEM_MINUS ? '-' : (unsigned char)p;
+		vstr2[cursorPos+1] = 0;
+		strncat(vstr2 + cursorPos + 1, vstr + cursorPos, strlen(vstr) - cursorPos);
+
+		cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)] = atoi(vstr2);
+
+		cursorPos++;
+
+	}
+
+	void Delete()
+	{
+		auto sType = cmdParamDesc[currentCmd].param[currentParam].type;
+		if (isTypeEnum(sType)) return;
+
+		char vstr[_CVTBUFSIZE];
+		vstr[0] = 0;
+		char vstr2[_CVTBUFSIZE];
+		vstr2[0] = 0;
+
+		_itoa(cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)], vstr, 10);
+
+		if (cursorPos == strlen(vstr))
+		{
+			return;
+		}
+
+		strcpy(vstr2, vstr);
+		strncpy(vstr2 + cursorPos, vstr + cursorPos + 1, strlen(vstr) - cursorPos);
+
+		cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)] = atoi(vstr2);
+
+	}
+
+	void BackSpace()
+	{
+		auto sType = cmdParamDesc[currentCmd].param[currentParam].type;
+		if (isTypeEnum(sType)) return;
+		if (cursorPos == 0) return;
+
+		char vstr[_CVTBUFSIZE];
+		vstr[0] = 0;
+		char vstr2[_CVTBUFSIZE];
+		vstr2[0] = 0;
+
+		_itoa(cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)], vstr, 10);
+
+		strcpy(vstr2, vstr);
+		strncpy(vstr2 + max(cursorPos - 1, 0), vstr + cursorPos, max(strlen(vstr) - cursorPos + 1,0));
+
+		cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)] = atoi(vstr2);
+
+		cursorPos--;
+
+	}
+
+	void Wheel(float delta)
+	{
+		if (!editContext) return;
+		if (currentCmd == -1) return;
+		if (currentParam == -1) return;
+
+		auto sType = cmdParamDesc[currentCmd].param[currentParam].type;
+
+		if (isTypeEnum(sType)) return;
+
+		float scale = ui::lbDown ? 10 : 1;
+
+		cmdParamDesc[currentCmd].param[currentParam].value[max(subParam,0)] += sign(delta) * scale;
+
+	}
 
 	//create c++ call string and save it into source file
 	void Save()
@@ -118,39 +262,22 @@ namespace paramEdit {
 
 		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
 		{
-			auto sType = cmdParamDesc[currentCmd].paramType[i];
+			auto sType = cmdParamDesc[currentCmd].param[i].type;
 
-			if (isType(sType, "int"))
+			if (isType(sType, "int") || isType(sType, "signed int") || isType(sType, "unsigned int"))
 			{
 				char pStr[32];
-				_itoa((int)cmdParamDesc[currentCmd].params[i][0], pStr, 10);
+				_itoa((int)cmdParamDesc[currentCmd].param[i].value[0], pStr, 10);
 				strcat(str, pStr);
-			}
-
-			if (isType(sType, "float"))
-			{
-				char pStr[32];
-				_gcvt(cmdParamDesc[currentCmd].params[i][0], 10, pStr);
-				strcat(str, pStr);
-			}
-
-			if (isType(sType, "texture"))
-			{
-				auto a = Textures::nameList[(int)cmdParamDesc[currentCmd].params[i][0]];
-				strcat(str, cmdParamDesc[currentCmd].paramType[i]);
-				str[strlen(str) - 1] = 0;
-				strcat(str, "::");
-				strcat(str, a);
 			}
 
 			if (isTypeEnum(sType))
 			{
-				strcat(str, cmdParamDesc[currentCmd].paramType[i]);
+				strcat(str, cmdParamDesc[currentCmd].param[i].type);
 				str[strlen(str) - 1] = 0;
 				strcat(str, "::");
-				strcat(str, getEnumStr(sType, (int)cmdParamDesc[currentCmd].params[i][0]));
+				strcat(str, getEnumStr(sType, (int)cmdParamDesc[currentCmd].param[i].value[0]));
 			}
-
 
 			if (isType(sType, "position") ||
 				isType(sType, "size") ||
@@ -160,7 +287,7 @@ namespace paramEdit {
 				char pStr[32];
 				for (int x = 0; x < 3; x++)
 				{
-					_gcvt(cmdParamDesc[currentCmd].params[i][x], 10, pStr);
+					_itoa(cmdParamDesc[currentCmd].param[i].value[x], pStr, 10);
 					strcat(str, pStr);
 					if (x!=2) strcat(str, ", ");
 				}
@@ -172,174 +299,283 @@ namespace paramEdit {
 				char pStr[32];
 				for (int x = 0; x < 4; x++)
 				{
-					_gcvt(cmdParamDesc[currentCmd].params[i][x], 10, pStr);
+					_itoa(cmdParamDesc[currentCmd].param[i].value[x], pStr, 10);
 					strcat(str, pStr);
-					if (x != 2) strcat(str, ", ");
+					if (x != 3) strcat(str, ", ");
 				}
 			}
 
 			if (i!= cmdParamDesc[currentCmd].pCount -1) strcat(str, ", ");
 		}
+
 		strcat(str, ");");
 
 		//
 	}
 
+	float valueDrawOffset = .1f;
+	float enumDrawOffset = .2f;
+
+	float enumPos = 0;
+
+	void showParamBoxes()
+	{
+		ui::Box::Setup();
+
+		float _x = x + valueDrawOffset - insideX;
+		float __x = x + enumDrawOffset - insideX;
+
+		float y = yPos + float(currentCmd) * lead;
+		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
+		{
+
+			if (cmdParamDesc[currentCmd].param[i].bypass) continue;
+
+			auto w = .05f;
+			auto sType = cmdParamDesc[currentCmd].param[i].type;
+			int count = getTypeDim(sType);
+
+			if (editContext)
+			{
+
+				if (count == 1)
+				{
+					ui::style::box::outlineBrightness = 0.1f;
+					if (isMouseOver(_x, y, w, ui::style::box::height))
+					{
+						ui::style::box::outlineBrightness = 1.f;
+						clickOnEmptyPlace = false;
+
+						if (ui::lbDown && !action)
+						{
+							action = true;
+							if (currentParam == i && isTypeEnum(sType))
+							{
+								currentParam = -1;
+							}
+							else
+							{
+								currentParam = i;
+								cursorPos = 0;
+								storedParam[0] = cmdParamDesc[currentCmd].param[currentParam].value[0];
+								subParam = -1;
+							}				
+						}
+					}
+				}
+				else
+				{
+					for (int p = 0; p < count; p++)
+					{
+						ui::style::box::outlineBrightness = 0.1f;
+
+						if (isMouseOver(_x , y+ float(p)*lead, w, ui::style::box::height))
+						{
+							ui::style::box::outlineBrightness = 1.f;
+							clickOnEmptyPlace = false;
+
+							if (ui::lbDown && !action)
+							{
+								action = true;
+								currentParam = i;
+								subParam = p;
+								cursorPos = 0;
+
+								storedParam[p] = cmdParamDesc[currentCmd].param[currentParam].value[p];
+							}
+						}
+					}
+
+				}
+			}
+
+			float sel = currentParam == i ? 1.f : 0.f;
+			ui::style::box::r = lerp(0.2f, .8f, sel);
+			ui::style::box::g = lerp(0.2f, .8f, sel);
+			ui::style::box::b = lerp(0.2f, .8f, sel);
+
+			for (int p = 0; p < count; p++)
+			{
+				float sel = currentParam == i ? 1.f : 0.f;
+				sel = sel * (float)(max(subParam,0) == p);
+				
+				bool mo = isMouseOver(_x , y+float(p)*lead, w, ui::style::box::height);
+				
+				ui::style::box::outlineBrightness = lerp(0.1f,1.f,mo);
+
+				ui::style::box::r = lerp(0.2f, .8f, sel);
+				ui::style::box::g = lerp(0.2f, .8f, sel);
+				ui::style::box::b = lerp(0.2f, .8f, sel);
+
+
+				ui::Box::Draw(_x, y+ float(p)*lead, w, ui::style::text::height * .8f);
+			}
+			
+			if (sel && isTypeEnum(sType))
+			{
+				auto val = cmdParamDesc[currentCmd].param[i].value[0];
+				
+				for (int e = 0; e < getEnumCount(sType); e++)
+				{
+					float sel = e == val ? 1.f : 0.f;
+					ui::style::box::r = .2f;
+					ui::style::box::g = .2f;
+					ui::style::box::b = .2f;
+
+					auto over = isMouseOver(__x, y+e*lead, w, ui::style::box::height);
+
+					ui::style::box::outlineBrightness = over ? 1.f : 0.1f;
+
+					ui::Box::Draw(__x, y + e*lead, w, ui::style::text::height * .8f);
+
+					if (over) { 
+						clickOnEmptyPlace = false; 
+					}
+
+					if (ui::lbDown && (!action) && editContext)
+					{
+						
+						if (over)
+						{
+							action = true;
+							currentParam = -1;
+
+							cmdParamDesc[currentCmd].param[i].value[0] = e;
+						}
+					}
+				}
+			}
+
+			y += lead* count;
+		}
+
+		if (!isTypeEnum(cmdParamDesc[currentCmd].param[currentParam].type))
+		{
+			if (editContext && currentParam >= 0)
+			{
+				if (ui::mbDown)
+				{
+					cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)] = storedParam[max(subParam, 0)] - ui::mouseDelta.y * height;
+				}
+				else
+				{
+					storedParam[max(subParam, 0)] = cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)];
+				}
+			}
+		}
+	}
 
 	void showParams()
 	{
-		float valueDrawOffset = .1f;
-		float ySpacing = .15f * ui::style::box::height;
+		float inCurPos = 0;
 
-		ui::Box::Setup();
-		ui::style::Base();
-		ui::style::box::rounded = .01;
-		ui::Box::Draw(x, yPos + float(currentCmd) * lead, .15, cmdParamDesc[currentCmd].pCount * lead);
+		showParamBoxes();
 
 		ui::Text::Setup();
 
+		showCursor = false;
+		auto bw = .05f;
+
+		float y = yPos + float(currentCmd) * lead;
+
 		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
 		{
-			char vstr[132];
+			if (cmdParamDesc[currentCmd].param[i].bypass) continue;
+
+			char vstr[_CVTBUFSIZE];
 			vstr[0] = 0;
-			auto w = ui::Text::getTextLen(cmdParamDesc[currentCmd].paramName[i], ui::style::text::width);
-			float y = yPos + float(currentCmd + i) * lead;
+			auto w = ui::Text::getTextLen(cmdParamDesc[currentCmd].param[i].name, ui::style::text::width);
+
 
 			float sel = currentParam == i ? 1.f : 0.f;
-			ui::style::text::r = lerp(.9, 1, sel);
-			ui::style::text::g = lerp(.9, 1, sel);
-			ui::style::text::b = lerp(.9, 1, sel);
+			ui::style::text::r = lerp(.8f, 1.f, sel);
+			ui::style::text::g = lerp(.8f, 1.f, sel);
+			ui::style::text::b = lerp(.8f, 1.f, sel);
 
-			ui::Text::Draw(cmdParamDesc[currentCmd].paramName[i], x+inside, yPos + float(currentCmd + i) * lead + ySpacing);
+			ui::Text::Draw(cmdParamDesc[currentCmd].param[i].name, x+insideX, y + insideY);
 
-			auto sType = cmdParamDesc[currentCmd].paramType[i];
+			auto sType = cmdParamDesc[currentCmd].param[i].type;
 
-			if (isType(sType, "int"))
+			if (isType(sType, "int") || isType(sType, "signed int") || isType(sType, "unsigned int"))
 			{
-				_itoa(cmdParamDesc[currentCmd].params[i][0], vstr, 10);
+				_itoa(cmdParamDesc[currentCmd].param[i].value[0], vstr, 10);
 			}
 			
-			if (isType(sType, "float"))
-			{
-				_gcvt(cmdParamDesc[currentCmd].params[i][0], 5, vstr);
-			}
+			int count = getTypeDim(sType);
 
-			if (isType(sType, "position") ||
-				isType(sType, "size") ||
-				isType(sType, "rotation") ||
-				isType(sType, "color"))
+			if (count > 1)
 			{
-				char val[32];
-				for (int k = 0; k < 3; k++)
+				char val[_CVTBUFSIZE];
+				for (int k = 0; k < count; k++)
 				{
-					_gcvt(cmdParamDesc[currentCmd].params[i][k], 5, val);
-					strcat(vstr, val);
-					strcat(vstr, " / ");
+					float sel = currentParam == i ? 1.f : 0.f;
+					sel = sel * (float)(subParam == k);
+					ui::style::text::r = lerp(.8, .2, sel);
+					ui::style::text::g = lerp(.8, .2, sel);
+					ui::style::text::b = lerp(.8, .2, sel);
+
+					_itoa(cmdParamDesc[currentCmd].param[i].value[k], val, 10);
+					strcpy(vstr, val);
+					ui::Text::Draw(vstr, x + valueDrawOffset, y + float(k) * lead + insideY);
+
+					if (sel) {
+						inCurPos = ui::Text::getTextLen(vstr, ui::style::text::width, cursorPos);
+						cursorPos = clamp(cursorPos, 0, (int)strlen(vstr));
+					}
 				}
 			}
 
-			if (isType(sType, "color4") ||
-				isType(sType, "rect"))
-			{
-				char val[32];
-				for (int k = 0; k < 4; k++)
-				{
-					_gcvt(cmdParamDesc[currentCmd].params[i][k], 5, val);
-					strcat(vstr, val);
-					strcat(vstr, " / ");
-				}
-			}
-
-			if (isType(sType, "texture"))
-			{
-				auto a = Textures::nameList[(int)cmdParamDesc[currentCmd].params[i][0]];
-				strcpy(vstr, a);
-			}
 
 			if (isTypeEnum(sType))
 			{
-				strcpy(vstr, getEnumStr(sType, (int)cmdParamDesc[currentCmd].params[i][0]));
+				strcpy(vstr, getEnumStr(sType, (int)cmdParamDesc[currentCmd].param[i].value[0]));
 			}
 
-			ui::Text::Draw(vstr, x + valueDrawOffset, yPos + float(currentCmd + i) * lead + ySpacing);
-		}
-	}
+			ui::style::text::r = lerp(.8, .2, sel);
+			ui::style::text::g = lerp(.8, .2, sel);
+			ui::style::text::b = lerp(.8, .2, sel);
 
-	/*
-	void showParams()
-	{
-
-		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
-		{
-			auto w = ui::Text::getTextLen(cmdParamDesc[currentCmd].paramName[i], ui::style::text::width);
-
-			float y = yPos + float(currentCmd + i) * lead;
-
-			if (i==currentParam && !ui::lbDown && saveMe)
+			if (count == 1)
 			{
-				Save();
-				saveMe = false;
-			}
-
-			if (isMouseOver(x, y, w, ui::style::box::height))
-			{
-				if (ui::lbDown && i != currentParam)
-				{
-					currentParam = i;
-					storedParam = cmdParamDesc[currentCmd].params[currentParam][0];
-				}
-			}
-
-			float sel = currentParam == i ? 1.f : 0.f;
-			ui::style::text::r = lerp(.5, 1, sel);
-			ui::style::text::g = lerp(.5, 1, sel);
-			ui::style::text::b = lerp(.5, 1, sel);
-
-			ui::Text::Draw(cmdParamDesc[currentCmd].paramName[i], x, yPos + float(currentCmd + i) * lead);
-
-
-			if ((strcmp(cmdParamDesc[currentCmd].paramType[i], "int") == 0) ||
-				(strcmp(cmdParamDesc[currentCmd].paramType[i], "float") == 0))
-			{
-				char val[32];
-				_gcvt(cmdParamDesc[currentCmd].params[i][0], 5, val);
-				ui::Text::Draw(val, x + .22f, yPos + float(currentCmd + i) * lead);
-			}
-
-			if ((strcmp(cmdParamDesc[currentCmd].paramType[i], "position_") == 0) ||
-				(strcmp(cmdParamDesc[currentCmd].paramType[i], "size") == 0))
-			{
-
+				ui::Text::Draw(vstr, x + valueDrawOffset, y + insideY);
 				if (i == currentParam)
 				{
-					if (ui::lbDown)
-					{
-						cmdParamDesc[currentCmd].params[i][0] = storedParam + ui::mouseDelta.x;
-						saveMe = true;
-					}
-					else
-					{
-						storedParam = cmdParamDesc[currentCmd].params[currentParam][0];
-					}
+					inCurPos = ui::Text::getTextLen(vstr, ui::style::text::width, cursorPos);
+					cursorPos = clamp(cursorPos, 0, (int)strlen(vstr));
 				}
-
-				char val[32];
-				char vstr[132];
-				_gcvt(cmdParamDesc[currentCmd].params[i][0], 5, val);
-				strcpy(vstr, val);
-				_gcvt(cmdParamDesc[currentCmd].params[i][1], 5, val);
-				strcat(vstr, " : "); strcat(vstr, val);
-				_gcvt(cmdParamDesc[currentCmd].params[i][2], 5, val);
-				strcat(vstr, " : "); strcat(vstr, val);
-
-				ui::Text::Draw(vstr, x + .22f, yPos + float(currentCmd + i) * lead);
 			}
+
+			if (sel && isTypeEnum(sType))
+			{
+				ui::style::text::r = .8f;
+				ui::style::text::g = .8f;
+				ui::style::text::b = .8f;
+
+				for (int e = 0; e < getEnumCount(sType); e++)
+				{
+					strcpy(vstr, getEnumStr(sType, e));
+					ui::Text::Draw(vstr, x + enumDrawOffset, yPos + float(currentCmd + i + e) * lead + insideY);
+				}
+			}
+
+
+			if (editContext && currentParam == i && !isTypeEnum(sType))
+			{
+				showCursor = true;
+				cursorX = x + valueDrawOffset + inCurPos;
+				cursorY = y + insideY + max(subParam,0)*lead;
+			}
+
+			y += lead*count;
 		}
 	}
-	*/
+
 	void ShowStack()
 	{
-		if (ui::rbDown)
+
+		clickOnEmptyPlace = true;
+
+		if (ui::rbDown && editContext)
 		{
 			yPos = yPosLast + editor::ui::mouseDelta.y;
 		}
@@ -349,11 +585,12 @@ namespace paramEdit {
 		top = ui::style::text::height;
 		bottom = 1.f - ui::style::text::height*2.5f;
 		lead = ui::style::text::height;
-		inside = ui::style::text::width * .5f * aspect / 2.f;
+		insideX = ui::style::text::width * .5f * aspect / 2.f;
+		insideY = .15f * ui::style::box::height;
 		yPos = max(yPos, top - cmdCounter * lead + lead);
 		yPos = min(yPos, bottom - lead);
 
-		gapi.setScissors(rect{ 0, top, 1, bottom });
+		gapi.setScissors(rect{ 0, (int)(top*dx11::height), dx11::width, (int)(bottom*dx11::height) });
 
 		x = ui::style::text::width / 2.f;
 		y = yPos;
@@ -365,7 +602,39 @@ namespace paramEdit {
 		x += .1;
 		showParams();
 
-		gapi.setScissors(rect{ 0, 0, 1, 1 });
+		if (showCursor)
+		{
+			ui::Box::Setup();
+			ui::style::box::width = 2. / width;
+			ui::style::box::height = ui::style::text::height * .5f;
+			ui::style::box::rounded = .0f;
+			ui::style::box::soft = 10.1f;
+			ui::style::box::edge = 0.f;
+			ui::style::box::outlineBrightness = 0.1f;
+			ui::style::box::r = 0;
+			ui::style::box::g = 0;
+			ui::style::box::b = 0;
+			ui::style::box::a = .5f + .5f * sinf((float)timer::frameBeginTime * .01f);
+
+			ui::Box::Draw(cursorX, cursorY);
+		}
+
+		gapi.setScissors(rect{ 0, 0, width, height });
+
+/*		if (!action && ui::lbDown && clickOnEmptyPlace) {
+
+			if (currentParam == -1) currentCmd = -1;
+			currentParam = -1;
+			
+		}*/
+
+		if (!action && ui::lbDown && clickOnEmptyPlace) {
+
+		//	if (currentParam == -1) currentCmd = -1;
+			currentParam = -1;
+
+		}
+
 	}
 
 }

@@ -1,5 +1,6 @@
 //
 char enumStringTable[255][255][255];
+int enumCount[255];
 
 int enumCounter = 0;
 
@@ -26,19 +27,27 @@ bool fillEnumTable(const char* name, const char* enumStr)
 		}
 	}
 
+	enumCount[enumCounter] = counter - 1;
+
 	enumCounter++;
 	return true;
 }
 
+const float intToFloatDenom = 255.f;
+
 typedef struct { float x; float y; float z; } vector3;
 typedef struct { float x; float y; float z; float w; } vector4;
 
-typedef vector3 position;
-typedef vector3 size;
-typedef vector3 rotation;
-typedef vector3 color;
-typedef vector4 color4;
-typedef vector4 rect;
+typedef struct { int x; int y; int z; } vector3i;
+typedef struct { int x; int y; int z; int w; } vector4i;
+
+
+typedef vector3i position;
+typedef vector3i size;
+typedef vector3i rotation;
+typedef vector3i color;
+typedef vector4i color4;
+typedef vector4i rect;
 
 #undef CreateTexture
 #define CreateTexture(name,type,format,width,height,mip,depth) name,
@@ -46,6 +55,22 @@ enum class texture:int {
 #include "projectFiles\texList.h"	
 };
 
+bool texturesToEnumType()
+{
+	strcpy(enumStringTable[enumCounter][0], "texture");
+
+	int tc = 1;
+	#undef CreateTexture
+	#define CreateTexture(name,type,format,width,height,mip,depth) strcpy(enumStringTable[enumCounter][tc++],#name);
+	#include "projectFiles\texList.h"
+
+	enumCount[enumCounter] = tc - 1;
+	enumCounter++;
+
+	return true;
+}
+
+bool ta = texturesToEnumType();
 
 #define enumType(name, ...) enum class name:int { __VA_ARGS__}; bool name##_b = fillEnumTable(#name, #__VA_ARGS__);
 
@@ -58,7 +83,6 @@ enumType(cullmode, off, front, back, wireframe);
 enumType(topology, triList, lineList, lineStrip);
 enumType(targetshader, vertex, pixel, both);
 
-
 char* getEnumStr(char* name, int value)
 {
 	for (int i = 0; i < enumCounter; i++)
@@ -69,4 +93,17 @@ char* getEnumStr(char* name, int value)
 		}
 	}
 	return NULL;
+}
+
+int getEnumCount(char* name)
+{
+	for (int i = 0; i < enumCounter; i++)
+	{
+		if (strcmp(name, enumStringTable[i][0]) == 0)
+		{
+			return enumCount[i];
+		}
+	}
+
+	return -1;
 }

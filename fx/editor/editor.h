@@ -37,10 +37,15 @@ namespace editor
 
 	void Process()
 	{
+		paramEdit::editContext = !(isKeyDown(CAM_KEY) | isKeyDown(CAM_KEY2) | isKeyDown(TIME_KEY));
+
 		ui::mousePos = ui::GetCusorPos();
+
+	//	if (ui::mousePos.x > 1 || ui::mousePos.x < 0 || ui::mousePos.y > 1 || ui::mousePos.x < 0) return;
+
 		ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
 		ui::mouseDelta.y = ui::mousePos.y - ui::mouseLastPos.y;
-		ui::mouseAngle = -atan2f(ui::mousePos.y-.5f, ui::mousePos.x-.5f);
+		ui::mouseAngle = - atan2f(ui::mousePos.y - .5f, ui::mousePos.x - .5f);
 		ui::mouseAngleDelta = ui::mouseAngle - ui::mouseLastAngle;
 
 		ui::lbDown = isKeyDown(VK_LBUTTON) ? true : false;
@@ -53,10 +58,17 @@ namespace editor
 		gapi.cull(cullmode::off);
 		gapi.depth(depthmode::off);
 
-		TimeLine::Draw();
+		if (!(isKeyDown(CAM_KEY) | isKeyDown(CAM_KEY2)))
+		{
+			TimeLine::Draw();
+		}
+
 		ViewCam::Draw();
 
-		paramEdit::ShowStack();
+		if (paramEdit::editContext)
+		{
+			paramEdit::ShowStack();
+		}
 
 	}
 }

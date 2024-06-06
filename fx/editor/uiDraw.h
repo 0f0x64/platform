@@ -168,6 +168,14 @@ namespace ui
 				}
 			}
 		}
+
+		void StoreLine(int counter, float x, float y, float x1, float y1)
+		{
+			ui::Line::buffer[counter * 2].x = x;
+			ui::Line::buffer[counter * 2].y = y;
+			ui::Line::buffer[counter * 2 + 1].x = x1;
+			ui::Line::buffer[counter * 2 + 1].y = y1;
+		}
 	}
 
 	namespace Box
@@ -216,13 +224,18 @@ namespace ui
 			return w * ( kerningTable[a - 32] + style::text::tracking * kerningTable[0])/2.f;
 		}
 
-		float getTextLen(const char* str, float w)
+		float getTextLen(const char* str, float w, int strEnd = -1)
 		{
 			float offset = 0;
-			for (unsigned int i = 0; i < strlen(str); i++)
+
+			if (strEnd < 0) strEnd = strlen(str);
+			strEnd = min((unsigned int)strEnd, strlen(str));
+
+			for (unsigned int i = 0; i < (unsigned int)strEnd; i++)
 			{
 				offset += getLetterOffset(str[i], w * aspect);
 			}
+
 			return offset;
 		}
 

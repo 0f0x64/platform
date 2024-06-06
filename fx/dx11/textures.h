@@ -221,7 +221,7 @@ namespace Textures
 		context->CopyResource(Texture[(int)dst].pDepth, Texture[(int)src].pDepth);
 	}
 
-	API TextureToShader(texture tex, int slot, targetshader tA = targetshader::both)
+	API TextureToShader(texture tex, unsigned int slot, targetshader tA = targetshader::both)
 	{
 		if (tA == targetshader::both || tA == targetshader::vertex)
 		{
@@ -240,7 +240,7 @@ namespace Textures
 	}
 
 
-	API RenderTarget(texture target, int level = 0)
+	API RenderTarget(texture target, unsigned int level = 0)
 	{
 		currentRT = (int)target;
 		
@@ -259,22 +259,19 @@ namespace Textures
 		SetViewport(target, level);
 	}
 
+	#undef CreateTexture
 	#define CreateTexture(name,type,format,width,height,mip,depth) name,
 	enum list {
 		#include "..\projectFiles\texList.h"
 	};
 
-	#undef CreateTexture
-	#define CreateTexture(name,type,format,width,height,mip,depth) #name,
-
-	const char* nameList[] = {
-		#include "..\projectFiles\texList.h"
-	};
+	int count;
 
 	void Init()
 	{
+		count = 0;
 		#undef CreateTexture
-		#define CreateTexture(name,type,format,width,height,mip,depth) Textures::Create(list::name, Textures::tType::type,Textures::tFormat::format, XMFLOAT2((float)width,(float)height),mip,depth);
+		#define CreateTexture(name,type,format,width,height,mip,depth) Textures::Create(list::name, Textures::tType::type,Textures::tFormat::format, XMFLOAT2((float)width,(float)height),mip,depth); count++;
 		#include "..\projectFiles\texList.h"
 	}
 

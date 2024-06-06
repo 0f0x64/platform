@@ -20,3 +20,7 @@ T clamp(T x, T left, T right)
 {
 	return min(max(x, left), right);
 }
+
+template <typename T> int sign(T val) {
+	return (T(0) < val) - (val < T(0));
+}

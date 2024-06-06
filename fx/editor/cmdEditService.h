@@ -8,16 +8,20 @@ struct {
 	} caller;
 
 	int pCount;
-	float params[256][4];
-	char paramType[255][255];
-	char paramName[255][255];
+
+	struct {
+		int value[4];
+		char type[255];
+		char name[255];
+		bool bypass;
+	} param[255];
 
 	bool loaded = false;
 
 } cmdParamDesc[1000];
 
 int cmdCounter = 0;//reset it in loop start point
-int currentCmd = 0;//comes from ui
+int currentCmd = -1;//comes from ui
 
 void AddToUI(const char* funcName)
 {

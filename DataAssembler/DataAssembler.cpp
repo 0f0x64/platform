@@ -580,13 +580,7 @@ void ScanFile(std::string fname, ofstream& ofile)
 
 						auto pCountStr = std::to_string(pCount);
 
-						if (type.compare("int") == 0 || type.compare("float") == 0 )
-						{
-							pNameList.append(name);
-							pNameListOut.append(name);
-							overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = (float)" + name + ";\n");
-						}
+						bool isTypeKnown = false;
 
 						if (type.compare("texture") == 0 ||
 							type.compare("topology") == 0 ||
@@ -600,8 +594,9 @@ void ScanFile(std::string fname, ofstream& ofile)
 						{
 							pNameList.append(name);
 							pNameListOut.append(name);
-							overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = (float)" + name + ";\n");
+							overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = (int)" + name + ";\n");
+							isTypeKnown = true;
 						}
 
 						if (type.compare("position") == 0 ||
@@ -611,13 +606,15 @@ void ScanFile(std::string fname, ofstream& ofile)
 						{
 							pNameList.append(name+"_x, "+ name + "_y, " + name + "_z");
 							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z }");
-							overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
-							overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].params[" + pCountStr + "][1];\n");
-							overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].params[" + pCountStr + "][2];\n");
+							overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+							overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
+							overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
 							
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = " + name + ".x;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][1] = " + name + ".y;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".z;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
+
+							isTypeKnown = true;
 						}
 
 						if (type.compare("color4") == 0 ||
@@ -626,19 +623,44 @@ void ScanFile(std::string fname, ofstream& ofile)
 							pNameList.append(name + "_x, " + name + "_y, " + name + "_z, " + name + "_w");
 							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z, " + name + "_w }");
 
-						overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].params[" + pCountStr + "][0];\n");
-						overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].params[" + pCountStr + "][1];\n");
-						overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].params[" + pCountStr + "][2];\n");
-						overrider.append("\t" + name + ".w = cmdParamDesc[cmdCounter].params[" + pCountStr + "][3];\n");
+							overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+							overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
+							overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
+							overrider.append("\t" + name + ".w = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3];\n");
 
-						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][0] = " + name + ".x;\n");
-						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][1] = " + name + ".y;\n");
-						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][2] = " + name + ".z;\n");
-						loader.append("\tcmdParamDesc[cmdCounter].params[" + pCountStr + "][3] = " + name + ".w;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3] = " + name + ".w;\n");
+
+							isTypeKnown = true;
 						}
 
-						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].paramType[" + pCountStr + "], \"" + type + "\"); \n");
-						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].paramName[" + pCountStr + "], \"" + name + "\"); \n");
+						if (type.compare("int") == 0 || 
+							type.compare("signed int") == 0 || 
+							type.compare("unsigned int") == 0 )
+						{
+							pNameList.append(name);
+							pNameListOut.append(name);
+							overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ";\n");
+							isTypeKnown = true;
+						}
+
+						if (!isTypeKnown)
+						{
+							pNameList.append(name);
+							pNameListOut.append(name);
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass = true;\n");
+
+						}
+						else
+						{
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass = false;\n");
+						}
+
+						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].type, \"" + type + "\"); \n");
+						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].name, \"" + name + "\"); \n");
 
 
 						caller.append(name);
@@ -675,7 +697,8 @@ void ScanFile(std::string fname, ofstream& ofile)
 				ofile << "\n}\n\n";
 
 				ofile << "#define " << funcName << "(" << pNameList << ") ";
-				ofile << "api." << funcName << "( __FILE__, __LINE__ ";
+				//ofile << "api." << funcName << "( __FILE__, __LINE__ ";
+				ofile << funcName << "( __FILE__, __LINE__ ";
 					if (pCount > 0) ofile << ", ";
 				ofile << pNameListOut << ")";
 				ofile << "\n\n";

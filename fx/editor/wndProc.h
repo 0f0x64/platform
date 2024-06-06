@@ -35,14 +35,30 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEWHEEL:
 	{
 		auto delta = GET_WHEEL_DELTA_WPARAM(wParam);
+
+		editor::paramEdit::Wheel(delta);
+
+		//if (editor::paramEdit::currentParam == -1)
+		if (!editor::paramEdit::editContext)
+		{
+			editor::ViewCam::Wheel(delta);
+		}
+
 		editor::TimeLine::Wheel(delta);
-		editor::ViewCam::Wheel(delta);
+
 		break;
 	}
 	case WM_CHAR:
 		break;
 	case WM_KEYDOWN:
 	{
+		if ((wParam >= '0' && wParam <= '9') || wParam == VK_OEM_MINUS)
+		{
+			editor::paramEdit::insertNumber(wParam);
+			break;
+		}
+
+
 		switch (wParam)
 		{
 			case VK_SPACE:
@@ -72,19 +88,54 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				numpad5trigger = false;
 				break;
 
+			case VK_LEFT:
+				editor::paramEdit::cursorPos--;
+				break;
+			case VK_RIGHT:
+				editor::paramEdit::cursorPos++;
+				break;
+			case VK_HOME:
+				editor::paramEdit::cursorPos = 0;;
+				break;
+			case VK_END:
+				editor::paramEdit::cursorPos = INT_MAX;
+				break;
+			case VK_BACK:
+				editor::paramEdit::BackSpace();
+				break;
+			case VK_DELETE:
+				editor::paramEdit::Delete();
+				break;
+
+
 		}
 	}
 	case WM_LBUTTONUP:
+		editor::paramEdit::action = false;
 		break;
 
 	case WM_LBUTTONDBLCLK:
 		editor::ui::dblClk = true;
+
 	case WM_LBUTTONDOWN:
 	{
 		editor::ui::mouseLastPos = editor::ui::GetCusorPos();
 		editor::TimeLine::lbDown();
 		editor::ViewCam::lbDown();
 		editor::paramEdit::lbDown();
+		break;
+	}
+
+	case WM_MBUTTONDOWN:
+	{
+		editor::ui::mouseLastPos = editor::ui::GetCusorPos();
+		editor::ViewCam::mbDown();
+		break;
+	}
+
+	case WM_MBUTTONUP:
+	{
+		editor::paramEdit::action = false;
 		break;
 	}
 
@@ -119,7 +170,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	default:
-		editor::ui::dblClk = false;
+	//	editor::ui::dblClk = false;
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 
