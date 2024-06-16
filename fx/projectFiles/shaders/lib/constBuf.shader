@@ -19,5 +19,6 @@ cbuffer camera : register(b3)
 cbuffer drawMat : register(b2)
 {
     float4x4 model;
+    float hilight;
 };
 //]

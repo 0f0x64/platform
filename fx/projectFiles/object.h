@@ -6,12 +6,14 @@ namespace Object {
 		float q = intToFloatDenom;
 		
 		ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixTranslation(pos.x/q, pos.y/q, pos.z/q));
+		ConstBuf::drawerMat.hilight = cmdCounter-1 == hilightedCmd ? 1 : 0;
 		ConstBuf::UpdateDrawerMat();
 
 		float gX = Textures::Texture[(int)texture::obj1pos].size.x / denom;
 		float gY = Textures::Texture[(int)texture::obj1pos].size.y / denom;
 
 		vs::objViewer.textures.positions = geometry;
+		vs::objViewer.textures.normals = normals;
 		vs::objViewer.samplers.sam1Filter = filter::linear;
 		vs::objViewer.samplers.sam1AddressU = addr::wrap;
 		vs::objViewer.samplers.sam1AddressV = addr::clamp;

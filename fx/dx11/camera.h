@@ -24,11 +24,11 @@ namespace Camera
 		XMMATRIX proj;
 
 		bool overRide = true;
-		float angle = 120.f;
+		float angle = 60.f;
 
 		void Init()
 		{
-			XMVECTOR Eye = XMVectorSet(0,0,3.f, 0.0f);
+			XMVECTOR Eye = XMVectorSet(0,111,113.f, 0.0f);
 			XMVECTOR At = XMVectorSet( 0,0,0, 0.0f);
 			XMVECTOR Up = XMVectorSet( 0,1,0, 0.0f);
 

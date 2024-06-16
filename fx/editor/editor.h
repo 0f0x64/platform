@@ -37,6 +37,7 @@ namespace editor
 
 	void Process()
 	{
+		hilightedCmd = -1;
 		paramEdit::editContext = !(isKeyDown(CAM_KEY) | isKeyDown(CAM_KEY2) | isKeyDown(TIME_KEY));
 
 		ui::mousePos = ui::GetCusorPos();
@@ -63,12 +64,14 @@ namespace editor
 			TimeLine::Draw();
 		}
 
-		ViewCam::Draw();
+		
 
-		if (paramEdit::editContext)
+		//if (paramEdit::editContext)
 		{
 			paramEdit::ShowStack();
 		}
+
+		ViewCam::Draw();
 
 	}
 }

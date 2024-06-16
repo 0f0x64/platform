@@ -67,26 +67,38 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case VK_ESCAPE:
 				editor::ViewCam::ToggleViewMode();
 				break;
-			case VK_NUMPAD4:
-				editor::ViewCam::AxisCam(0,90,0);
+
+			case 'A':
+			{
+				editor::ViewCam::AxisCam(-90,0);
 				numpad5trigger = false;
 				break;
-			case VK_NUMPAD5:
-				editor::ViewCam::AxisCam(0, 180.f*(float)(!numpad5trigger), 0);
+			}
+			/*case S:
+			{
+				float v = numpad5trigger ? 1 : -1;
+				editor::ViewCam::AxisCam(180,180);
 				numpad5trigger = !numpad5trigger;
 				break;
-			case VK_NUMPAD6:
-				editor::ViewCam::AxisCam(0, -90, 0);
+			}*/
+			case 'D':
+			{
+				editor::ViewCam::AxisCam(90,0);
 				numpad5trigger = false;
 				break;
-			case VK_NUMPAD8:
-				editor::ViewCam::AxisCam(-90, 0, 0);
+			}
+			case 'S':
+			{
+				editor::ViewCam::AxisCam(0,90);
 				numpad5trigger = false;
 				break;
-			case VK_NUMPAD2:
-				editor::ViewCam::AxisCam(90, 0, 0);
+			}
+			case 'W':
+			{
+				editor::ViewCam::AxisCam(0,-90);
 				numpad5trigger = false;
 				break;
+			}
 
 			case VK_LEFT:
 				editor::paramEdit::cursorPos--;

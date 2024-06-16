@@ -1,17 +1,61 @@
 namespace ViewCam
 {
-	#define CAM_KEY VK_CONTROL
-	#define CAM_KEY2 VK_SHIFT
+#define CAM_KEY VK_CONTROL
+#define CAM_KEY2 VK_SHIFT
 
-	XMMATRIX storedCam;
-	XMMATRIX targetCam;
-	float rotToCam = 1.f;
+	typedef struct  {
+		XMVECTOR Target;
+		XMVECTOR ViewVec;
+		XMVECTOR upVec;
+	} naviCam;
+
+	naviCam currentCamera;
+	naviCam storedCamera;
+	naviCam targetCamera;
+
 	float flyToCam = 1.f;
 
+	float camDistance = 13;
+
+	void ExtractCameraVectors(const XMMATRIX& viewMatrix, XMVECTOR& eye, XMVECTOR& at, XMVECTOR& up)
+	{
+		XMMATRIX cameraMatrix = XMMatrixInverse(nullptr, viewMatrix);
+		eye = cameraMatrix.r[3];
+		at = XMVectorSet(-cameraMatrix.r[2].m128_f32[0], -cameraMatrix.r[2].m128_f32[1], -cameraMatrix.r[2].m128_f32[2], 0.0f);
+		up = cameraMatrix.r[1];
+	}
+
+	float getCamDistance()
+	{
+		XMVECTOR eye, at, up;
+		ExtractCameraVectors(Camera::viewCam.view, eye, at, up);
+		XMVectorSetW(eye, 0);
+		XMVectorSetW(at, 0);
+		auto l = XMVector4Length(eye - at);
+		return XMVectorGetX(l);
+	}
 
 	void Init()
 	{
 		Camera::viewCam.Init();
+	}
+
+	float getFlatAngle()
+	{
+		auto right = XMVector3Cross(currentCamera.ViewVec, currentCamera.upVec);
+		XMVECTOR v2 = { XMVectorGetX(right), XMVectorGetZ(right) };
+		v2 = XMVector2Normalize(v2);
+		float angle = atan2(XMVectorGetX(v2), -XMVectorGetY(v2));
+		return RadiansToDegrees(angle) + 180.;
+	}
+
+	float getHAngle()
+	{
+		auto right = XMVector3Cross(currentCamera.ViewVec, currentCamera.upVec);
+		XMVECTOR v2 = { XMVectorGetZ(currentCamera.upVec), XMVectorGetY(currentCamera.upVec) };
+		//v2 = XMVector2Normalize(v2);
+		float angle = atan2(XMVectorGetX(v2), XMVectorGetY(v2));
+		return RadiansToDegrees(angle);
 	}
 
 	void ToggleViewMode()
@@ -19,38 +63,73 @@ namespace ViewCam
 		Camera::viewCam.overRide = !Camera::viewCam.overRide;
 	}
 
-	void AxisCam(float roll, float pitch,float yaw)
+	void AxisCam(float xz, float zy)
 	{
-		XMVECTOR scale, rot, trans;
-		XMMatrixDecompose(&scale, &rot, &trans, Camera::viewCam.view);
+		if (flyToCam < 1.f) return;
+		storedCamera = currentCamera;
 
-		XMMATRIX base = XMMatrixScalingFromVector(scale);
-		base = XMMatrixMultiply(base, XMMatrixRotationRollPitchYaw(DegreesToRadians(roll), DegreesToRadians(pitch), DegreesToRadians(yaw)));
-		base = XMMatrixMultiply(base, XMMatrixTranslationFromVector(trans));
+		float vl = XMVectorGetX(XMVector3Length(currentCamera.ViewVec));
+		float a = floor(getFlatAngle());
+		if (a >= 360.f) a = 0;
 
-		targetCam = base;
-		rotToCam = 0.f;
+		float b = floor(getHAngle());
+		if (b >= 360.f) b = 0;
+
+		auto view = XMVECTOR{ vl,0,0 };
+		auto up = XMVECTOR{ 0,1,0 };
+
+		if (xz != 0)
+		{
+			float ta;
+			if (xz > 0) ta = floor(a / 90.f) * 90.f + xz;
+			if (xz < 0) ta = ceil(a / 90.f) * 90.f + xz;
+			auto m = XMMatrixRotationY(DegreesToRadians(-ta));
+			view = XMVector3Transform(view, m);
+			up = XMVector3Transform(up, m);
+		}
+
+		if (zy != 0)
+		{
+			float ta;
+			if (zy > 0) ta = floor(b / 90.f) * 90.f + zy;
+			if (zy < 0) ta = ceil(b / 90.f) * 90.f + zy;
+
+			XMVECTOR right = XMVector3Cross(currentCamera.ViewVec, currentCamera.upVec);
+
+			//right = XMVector3Transform(right, ((XMMatrixLookToLH( XMVECTOR{ 0,0,0 }, currentCamera.ViewVec, currentCamera.upVec))));
+			//auto m = XMMatrixRotationAxis(right,DegreesToRadians(-zy));
+			auto m = XMMatrixRotationAxis(right, DegreesToRadians(-ta));
+
+			view = XMVector3Transform(currentCamera.ViewVec, m);
+			up = XMVector3Transform(currentCamera.upVec, m);
+
+			//view = XMVector3Transform(view, m);
+			//up = XMVector3Transform(up, m);
+		}
+
+
+		targetCamera = currentCamera;
+		targetCamera.ViewVec = view;
+		//targetCamera.upVec = XMVECTOR{ up.x,up.y,up.z };
+		targetCamera.upVec = up;
+
+		flyToCam = 0.f;
 	}
 
 	void TransCam(float x, float y, float z)
 	{
-		XMVECTOR scale, rot, trans;
-		XMMatrixDecompose(&scale, &rot, &trans, Camera::viewCam.view);
+		targetCamera = currentCamera;
+		targetCamera.Target = XMVECTOR{ x,y,z };
 
-		XMMATRIX base = XMMatrixScalingFromVector(scale);
-		base = XMMatrixMultiply(base, XMMatrixRotationQuaternion(rot));
-		base = XMMatrixMultiply(base, XMMatrixTranslation(x,y,z));
-		base = XMMatrixMultiply(base, XMMatrixTranslationFromVector(trans));
-
-		targetCam = base;
 		flyToCam = 0.f;
 	}
 
 	void Wheel(float delta)
 	{
-		if (isKeyDown(CAM_KEY)) {
-			XMMATRIX transM = XMMatrixTranslation(0, 0, -delta / 2000.f);
-			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, transM);
+		if (isKeyDown(CAM_KEY)) 
+		{
+			currentCamera.ViewVec = XMVectorScale(currentCamera.ViewVec, 1. - delta / 2000.f);
+			storedCamera = currentCamera;
 		}
 
 		if (isKeyDown(CAM_KEY2)) {
@@ -63,22 +142,22 @@ namespace ViewCam
 
 	void lbDown()
 	{
-		storedCam = Camera::viewCam.view;
+		storedCamera = currentCamera;
 	}
 
 	void mbDown()
 	{
-		storedCam = Camera::viewCam.view;
+		storedCamera = currentCamera;
 	}
-
 
 	void rbDown()
 	{
-		storedCam = Camera::viewCam.view;
+		storedCamera = currentCamera;
 		editor::ui::mouseLastAngle = editor::ui::mouseAngle;
 	}
 
 	float axisAlpha = 0;
+
 
 	void ProcessInput()
 	{
@@ -88,10 +167,10 @@ namespace ViewCam
 		editor::ui::point3df r = { 0,0,0 };
 		editor::ui::point3df t = { 0,0,0 };
 
-		if (ui::mbDown || (ui::lbDown&&isKeyDown(CAM_KEY2)))
+		if (ui::mbDown || (ui::lbDown && isKeyDown(CAM_KEY2)))
 		{
-			t.x = ui::mouseDelta.x * speed*4.f;
-			t.y = -ui::mouseDelta.y * speed*4.f;
+			t.x = ui::mouseDelta.x * speed * 4.f;
+			t.y = -ui::mouseDelta.y * speed * 4.f;
 			t.z = 0.f;
 		}
 		else
@@ -110,20 +189,21 @@ namespace ViewCam
 			}
 		}
 
-		if (ui::lbDown||ui::rbDown||ui::mbDown)
+		if (ui::lbDown || ui::rbDown || ui::mbDown)
 		{
-			XMVECTOR scale, rot, trans;
-			XMMatrixDecompose(&scale, &rot, &trans, Camera::viewCam.view);
-			XMMATRIX transMInv = XMMatrixTranslationFromVector(-trans);
-			XMMATRIX transM = XMMatrixTranslationFromVector(trans);
+			auto c = XMMatrixTranspose(XMMatrixLookAtLH(storedCamera.ViewVec, XMVECTOR{ 0,0,0 }, storedCamera.upVec));
+			XMVECTOR translation = XMVector3Transform(XMVECTOR{ t.x, t.y, t.z },c);
+			auto rm = XMMatrixRotationRollPitchYaw(-r.x, -r.y, -r.z);
 			
-			XMMATRIX moveM = XMMatrixTranslation(t.x,t.y,t.z);
-			Camera::viewCam.view = XMMatrixMultiply(storedCam, transMInv);
-			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, XMMatrixRotationY(r.y));
-			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, XMMatrixRotationX(r.x));
-			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, XMMatrixRotationZ(r.z));
-			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, moveM);
-			Camera::viewCam.view = XMMatrixMultiply(Camera::viewCam.view, transM);
+			currentCamera.ViewVec = XMVector3Transform(storedCamera.ViewVec, XMMatrixInverse(NULL, c));
+			currentCamera.ViewVec = XMVector3Transform(currentCamera.ViewVec, rm);
+			currentCamera.ViewVec = XMVector3Transform(currentCamera.ViewVec, c);
+			
+			currentCamera.upVec = XMVector3Transform(storedCamera.upVec, XMMatrixInverse(NULL, c));
+			currentCamera.upVec = XMVector3Transform(currentCamera.upVec, rm);
+			currentCamera.upVec = XMVector3Transform(currentCamera.upVec, c);
+			
+			currentCamera.Target = storedCamera.Target - translation;
 		}
 	}
 
@@ -146,92 +226,8 @@ namespace ViewCam
 		*flt_p_RollOut = (float)atan2(XMFLOAT4X4_Values._21, XMFLOAT4X4_Values._22);
 	}
 
-
-	void Draw()
+	void DrawAxis()
 	{
-		if (isKeyDown(CAM_KEY) || isKeyDown(CAM_KEY2) || rotToCam < 1.f)
-		{
-			axisAlpha += .4;
-			axisAlpha = clamp(axisAlpha, 0.f, 1.f);
-		}
-		else
-		{
-			axisAlpha -= .05;
-			axisAlpha = clamp(axisAlpha, 0.f, 1.f);
-
-		}
-
-		if (rotToCam<1.f)
-		{
-			rotToCam += .025;
-
-			XMVECTOR srcScale, srcRot, srcTrans;
-			XMMatrixDecompose(&srcScale, &srcRot, &srcTrans, Camera::viewCam.view);
-			XMVECTOR dstScale, dstRot, dstTrans;
-			XMMatrixDecompose(&dstScale, &dstRot, &dstTrans, targetCam);
-
-			float srcPitch, srcYaw, srcRoll;
-			ExtractPitchYawRollFromXMMatrix(&srcPitch, &srcYaw, &srcRoll, &Camera::viewCam.view);
-			float dstPitch, dstYaw, dstRoll;
-			ExtractPitchYawRollFromXMMatrix(&dstPitch, &dstYaw, &dstRoll, &targetCam);
-
-			srcPitch = lerp(srcPitch, dstPitch, rotToCam);
-			srcYaw = lerp(srcYaw, dstYaw, rotToCam);
-			srcRoll = lerp(srcRoll, dstRoll, rotToCam);
-
-			XMMATRIX RM = (XMMatrixRotationRollPitchYaw(srcPitch, srcYaw, srcRoll));
-
-			XMMATRIX base = XMMatrixScalingFromVector(srcScale);
-			base = XMMatrixMultiply(base, RM);
-			base = XMMatrixMultiply(base, XMMatrixTranslationFromVector(srcTrans));
-			
-			Camera::viewCam.view = base;
-			if (rotToCam > .975f)
-			{
-				Camera::viewCam.view = targetCam;
-				storedCam = targetCam;
-			}
-		}
-
-		if (flyToCam < 1.f)
-		{
-			flyToCam += .025;
-
-			XMVECTOR srcScale, srcRot, srcTrans;
-			XMMatrixDecompose(&srcScale, &srcRot, &srcTrans, Camera::viewCam.view);
-			XMVECTOR dstScale, dstRot, dstTrans;
-			XMMatrixDecompose(&dstScale, &dstRot, &dstTrans, targetCam);
-
-			float srcPitch, srcYaw, srcRoll;
-			ExtractPitchYawRollFromXMMatrix(&srcPitch, &srcYaw, &srcRoll, &Camera::viewCam.view);
-			float dstPitch, dstYaw, dstRoll;
-			ExtractPitchYawRollFromXMMatrix(&dstPitch, &dstYaw, &dstRoll, &targetCam);
-
-			srcPitch = lerp(srcPitch, dstPitch, rotToCam);
-			srcYaw = lerp(srcYaw, dstYaw, rotToCam);
-			srcRoll = lerp(srcRoll, dstRoll, rotToCam);
-
-			XMMATRIX RM = (XMMatrixRotationRollPitchYaw(srcPitch, srcYaw, srcRoll));
-
-			XMVectorSetX(srcTrans, lerp(XMVectorGetX(srcTrans), XMVectorGetX(dstTrans), flyToCam));
-			XMVectorSetY(srcTrans, lerp(XMVectorGetY(srcTrans), XMVectorGetY(dstTrans), flyToCam));
-			XMVectorSetZ(srcTrans, lerp(XMVectorGetZ(srcTrans), XMVectorGetZ(dstTrans), flyToCam));
-			
-
-			XMMATRIX base = XMMatrixScalingFromVector(srcScale);
-			base = XMMatrixMultiply(base, XMMatrixRotationQuaternion(srcRot));
-			base = XMMatrixMultiply(base, XMMatrixTranslationFromVector(srcTrans));
-
-			Camera::viewCam.view = base;
-			if (flyToCam > .975f)
-			{
-				Camera::viewCam.view = targetCam;
-				storedCam = targetCam;
-			}
-		}
-
-		ProcessInput();
-
 		float axisSize = 2.;
 		float arrowSize = .1;
 		counter = 0;
@@ -256,8 +252,68 @@ namespace ViewCam
 		}
 
 		ui::Line::Setup();
-		ui::Line::Draw3d(counter*3/2,1,1,1,axisAlpha);
-	
+
+		XMVECTOR Eye = currentCamera.ViewVec;
+		ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixLookAtLH(Eye, XMVECTOR{ 0,0,0 }, currentCamera.upVec));
+		ConstBuf::UpdateDrawerMat();
+
+		ui::Line::Draw3d(counter * 3 / 2, 1, 1, 1, axisAlpha);
+	}
+
+	bool isSetup = false;
+
+	void setup()
+	{
+		if (isSetup) return;
+
+		isSetup = true;
+
+		targetCamera.Target = XMVECTOR{ 0,0,0,1 };
+		targetCamera.ViewVec = XMVECTOR{ 0,0,13,1 };
+		targetCamera.upVec = XMVECTOR{ 0,1,0,1 };
+
+		currentCamera = targetCamera;
+		storedCamera = targetCamera;
+	}
+
+	void Draw()
+	{
+		setup();
+
+		bool fade = isKeyDown(CAM_KEY) || isKeyDown(CAM_KEY2) || flyToCam < 1.f;
+		axisAlpha = clamp(axisAlpha + (fade ? .4f : -.05f), 0.f, 1.f);
+
+		if (flyToCam < 1.f)
+		{
+			flyToCam = clamp(flyToCam + 1.f/9.f, 0.f, 1.f);//divde by even number prevent lerp vectors to zero for 180 degrees transformatrions
+			
+			auto vLen = XMVector3Length(targetCamera.ViewVec);
+
+			currentCamera.Target = XMVectorLerp (storedCamera.Target, targetCamera.Target, flyToCam);
+			currentCamera.ViewVec = XMVectorLerp(storedCamera.ViewVec, targetCamera.ViewVec, flyToCam);
+			currentCamera.upVec = XMVectorLerp  (storedCamera.upVec, targetCamera.upVec, flyToCam);
+
+			currentCamera.ViewVec = vLen * XMVector3Normalize(currentCamera.ViewVec);
+		}
+
+		ProcessInput();
+
+		XMVECTOR Eye = currentCamera.ViewVec + currentCamera.Target;
+		XMVECTOR At = currentCamera.Target;
+		Camera::viewCam.view = XMMatrixLookAtLH(Eye, At, currentCamera.upVec);
+
+		DrawAxis();
+
+
+		
+		ui::Text::Setup();
+		char str[132];
+		char str2[132];
+
+		auto aa = getHAngle();
+		_gcvt((aa), 10, str);
+		ui::Text::Draw(str, .5, .5);
+
 	}
 
 }

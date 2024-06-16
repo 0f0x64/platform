@@ -46,7 +46,15 @@ float4 PS(VS_OUTPUT input) : SV_Target
     diffK = albedo * diffK * diffR;
 
     float3 color = diffK + specK;
+    float3 screenN = mul(nrml, view[0]).xyz;
+    
 
-
+    //color *= saturate(1-2 * pow(dot(normalize(mul(eye, view[0])), normalize(mul(nrml, view[0]))), .5));// * saturate(sin(eye.x * 513 + eye.y * 521 + eye.z * 432 + time.x) * 4);
+    //float3 nt = mul(input.vnorm.xyz, view[0]);
+    float3 nt = mul(nrml, view[0]);
+    float d = dot(normalize(input.vpos.xyz), normalize(nt));
+    color += saturate(10 - 30 * d) * sin(d * 32 + time.x) * 4*hilight;
+    
+    
     return float4(color, 1);
 }

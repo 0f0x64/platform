@@ -34,7 +34,9 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
 
     //---
     output.wpos = float4(pos, 0);
-    output.pos = mul(float4(pos, 1), mul(view[0], proj[0]));
+
+    pos = mul(pos, (float3x3) view[0]);
+    output.pos = mul(float4(pos, 1), proj[0]);
     
     output.uv = grid.xy;
     return output;

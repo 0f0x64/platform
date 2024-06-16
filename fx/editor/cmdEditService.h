@@ -22,6 +22,7 @@ struct {
 
 int cmdCounter = 0;//reset it in loop start point
 int currentCmd = -1;//comes from ui
+int hilightedCmd = -1;
 
 void AddToUI(const char* funcName)
 {

@@ -45,14 +45,19 @@ namespace Loop
 		float t = (timer::timeCursor / (SAMPLES_IN_FRAME * 60.f));
 		slideCam(0, 1, t);
 
-		api.Depth( depthmode::on);
+		api.Depth( depthmode::off);
 		api.Clear( 0, 0, 0, 1 );
-		api.ClearDepth();
 
-		api.ShowCubemap( texture::env);
+		//api.ShowCubemap( texture::env);
+
+		api.Depth(depthmode::on);
+		api.ClearDepth();
 		api.Cull( cullmode::back);
-		api.ShowObject( texture::obj1pos, texture::obj1nrml, 4, -500, 0, 0 );
-		api.ShowObject(texture::obj1pos, texture::obj1nrml, 4, 500, 0, 0);
+		api.ShowObject( texture::obj1pos, texture::obj1nrml, 4, -500, 0, -500 );
+		api.ShowObject(texture::obj1pos, texture::obj1nrml, 4, -500, 0, 500);
+		api.ShowObject(texture::obj1pos, texture::obj1nrml, 4, 500, 0, -500);
+		api.ShowObject(texture::obj1pos, texture::obj1nrml, 4, 500, 0, 500);
+
 		
 		playTrack();
 	}

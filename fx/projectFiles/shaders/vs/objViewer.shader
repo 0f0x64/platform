@@ -4,7 +4,7 @@
 #include <../lib/utils.shader>
 
 Texture2D positions : register(t0);
-Texture2D normals : register(t0);
+Texture2D normals : register(t1);
 SamplerState sam1 : register(s0);
 
 //[
@@ -31,13 +31,19 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     float4 grid = getGrid(vID, 1, float2(gX,gY));
     float2 uv = grid.xy;
     
-    float4 pos = positions.SampleLevel(sam1, uv, 0);
+    float4 pos = float4(positions.SampleLevel(sam1, uv, 0).xyz,1);
     pos = mul(pos, model);
+    
+    float4 normal = float4(normals.SampleLevel(sam1, uv, 0).xyz, 1);
+    normal = mul(normal, transpose(model));
     //---
+    
+    output.vnorm = normal;
+    
     output.wpos = float4(pos.xyz, 0);
     output.vpos = mul(float4(pos.xyz, 1), view[0]);
     
-    output.pos = mul(float4(pos.xyz, 1), mul(view[0], proj[0]));
+    output.pos = mul(pos, mul(view[0], proj[0]));
     output.uv = grid.xy;
     return output;
 }

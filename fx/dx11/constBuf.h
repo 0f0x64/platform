@@ -13,6 +13,7 @@ namespace ConstBuf
 	//b2
 	struct {
 		XMMATRIX model;
+		float hilight;
 	} drawerMat;//update per draw call
 
 	//b3 

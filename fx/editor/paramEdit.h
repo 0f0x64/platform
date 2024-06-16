@@ -127,25 +127,25 @@ namespace paramEdit {
 
 				clickOnEmptyPlace = false;
 
+				if (ui::dblClk && ui::lbDown)
+				{
+					for (int j = 0; j < cmdParamDesc[currentCmd].pCount; j++)
+					{
+						if (isType(cmdParamDesc[currentCmd].param[j].type, "position"))
+						{
+							auto _x = cmdParamDesc[currentCmd].param[j].value[0];
+							auto _y = cmdParamDesc[currentCmd].param[j].value[1];
+							auto _z = cmdParamDesc[currentCmd].param[j].value[2];
+							ViewCam::TransCam(_x / intToFloatDenom, _y / intToFloatDenom, _z / intToFloatDenom);
+						}
+					}
+					ui::dblClk = false;
+				}
+
 				if (ui::lbDown && i != currentCmd) {
 					currentCmd = i;
 					currentParam = -1;
 					subParam = -1;
-
-					if (ui::dblClk)
-					{
-						for (int j = 0; j < cmdParamDesc[currentCmd].pCount; j++)
-						{
-							if (isType(cmdParamDesc[currentCmd].param[j].type, "position"))
-							{
-								auto x = cmdParamDesc[currentCmd].param[j].value[0];
-								auto y = cmdParamDesc[currentCmd].param[j].value[1];
-								auto z = cmdParamDesc[currentCmd].param[j].value[2];
-								ViewCam::TransCam(-x/ intToFloatDenom, -y/intToFloatDenom, -z/ intToFloatDenom);
-							}
-						}
-						ui::dblClk = false;
-					}
 
 				}
 			}
@@ -160,7 +160,66 @@ namespace paramEdit {
 			ui::style::box::b = lerp(0.2f, .8f, sel);
 
 			ui::Box::Draw(x, y, w, ui::style::text::height * .8f);
+
 			y += lead;
+		}
+
+		//second control
+		
+	}
+
+	void ObjHandlers()
+	{
+		hilightedCmd = currentCmd;
+
+		for (int i = 0; i < cmdCounter; i++)
+		{
+			for (int j = 0; j < cmdParamDesc[i].pCount; j++)
+			{
+				if (!isType(cmdParamDesc[i].param[j].type, "position")) continue;
+
+				float _x = cmdParamDesc[i].param[j].value[0];
+				float _y = cmdParamDesc[i].param[j].value[1];
+				float _z = cmdParamDesc[i].param[j].value[2];
+
+				XMVECTOR p = XMVECTOR{ _x / intToFloatDenom, _y / intToFloatDenom, _z / intToFloatDenom, 1. };
+				p = XMVector4Transform(p, Camera::viewCam.view * Camera::viewCam.proj);
+
+				if (XMVectorGetZ(p) < 0) continue;
+
+				float px = .5 * XMVectorGetX(p) / XMVectorGetW(p) + .5;
+				float py = -.5 * XMVectorGetY(p) / XMVectorGetW(p) + .5;
+
+				float h = ui::style::text::height * .48f;
+				px -= h * dx11::aspect / 2.;
+				py -= h / 2.;
+
+				ui::style::box::outlineBrightness = 2;
+
+				ui::style::box::rounded = .5;
+				ui::style::box::edge = .1;
+
+				bool over = isMouseOver(px, py, h * dx11::aspect, h);
+
+				ui::style::box::r = ui::style::box::g = ui::style::box::b = over ? .7 : 0;
+
+				if (over && isKeyDown(CAM_KEY))
+				{
+					hilightedCmd = i;
+				}
+
+				if (over && ui::lbDown && isKeyDown(CAM_KEY))
+				{
+					currentCmd = i;
+					currentParam = -1;
+					subParam = -1;
+
+					ViewCam::TransCam(_x / intToFloatDenom, _y / intToFloatDenom, _z / intToFloatDenom);
+				}
+
+				ui::Box::Draw(px, py, h * dx11::aspect, h);
+
+			}
 		}
 	}
 
@@ -595,6 +654,12 @@ namespace paramEdit {
 		x = ui::style::text::width / 2.f;
 		y = yPos;
 		showBoxes();
+
+		if (isKeyDown(CAM_KEY))
+		{
+			ObjHandlers();
+		}
+
 		y = yPos;
 		ui::Text::Setup();
 		showLabels();
