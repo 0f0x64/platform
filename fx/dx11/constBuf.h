@@ -25,7 +25,8 @@ namespace ConstBuf
 
 	//b4
 	struct {
-		float time;
+		XMFLOAT4 time;
+		XMFLOAT4 aspect;
 	} frame;//update per frame
 
 	//b5

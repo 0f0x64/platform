@@ -199,7 +199,7 @@ namespace ui
 
 			vs::box.set();
 
-			ps::box_ps.params.aspect = aspect;
+			ps::box_ps.params._aspect = aspect;
 			ps::box_ps.params.rad = box::rounded;
 			ps::box_ps.params.r = box::r;
 			ps::box_ps.params.g = box::g;

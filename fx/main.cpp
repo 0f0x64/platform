@@ -18,10 +18,10 @@ HWND hWnd;
 #include "utils.h"
 #include "types.h"
 
+
+
 #include "dx11\dx.h"
 #include <Xaudio2.h>
-#include "sound\tracker.h"
-
 #include "vMachine.h"
 
 using namespace dx11;
@@ -32,6 +32,7 @@ using namespace dx11;
 	#include "editor\cmdEditService.h"
 	#include "editor\editor.h"
 #endif
+
 
 #include "projectFiles\loop.h"
 
@@ -95,6 +96,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		if (time >= timer::nextFrameTime)
 		{
 			timer::frameBeginTime = timer::GetCounter();
+
+			//todo: use real rect in pixels without window header
+			#if EditMode
+				RECT rect;
+				GetWindowRect(hWnd, &rect);
+				int width = rect.right - rect.left;
+				int height = rect.bottom - rect.top;
+				dx11::aspect = float(height) / float(width);
+				dx11::iaspect = float(width) / float(height);
+			#endif
+
 			Loop::mainLoop();
 
 			#if EditMode

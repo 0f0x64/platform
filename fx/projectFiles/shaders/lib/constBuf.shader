@@ -7,6 +7,7 @@ cbuffer global : register(b5)
 cbuffer frame : register(b4)
 {
     float4 time;
+    float4 aspect;
 };
 
 cbuffer camera : register(b3)

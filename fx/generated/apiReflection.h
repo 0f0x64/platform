@@ -1,4 +1,4 @@
-struct { 
+namespace api { 
 
 void CalcCubemap( const char* srcFileName, int srcLine, texture target)
 {
@@ -22,8 +22,6 @@ cmdCounter++;
 Cubemap::CalcCubemap(target);
 }
 
-#define CalcCubemap(target) CalcCubemap( __FILE__, __LINE__ , target)
-
 void ShowCubemap( const char* srcFileName, int srcLine, texture envTexture)
 {
 
@@ -45,8 +43,6 @@ cmdCounter++;
 
 Cubemap::ShowCubemap(envTexture);
 }
-
-#define ShowCubemap(envTexture) ShowCubemap( __FILE__, __LINE__ , envTexture)
 
 void ShowObject( const char* srcFileName, int srcLine, texture geometry, texture normals, unsigned int quality, position pos)
 {
@@ -89,8 +85,6 @@ cmdCounter++;
 Object::ShowObject(geometry,normals,quality,pos);
 }
 
-#define ShowObject(geometry, normals, quality, pos_x, pos_y, pos_z) ShowObject( __FILE__, __LINE__ , geometry, normals, quality, position {pos_x, pos_y, pos_z })
-
 void CalcObject( const char* srcFileName, int srcLine, texture targetGeo, texture targetNrml)
 {
 
@@ -118,8 +112,6 @@ cmdCounter++;
 Object::CalcObject(targetGeo,targetNrml);
 }
 
-#define CalcObject(targetGeo, targetNrml) CalcObject( __FILE__, __LINE__ , targetGeo, targetNrml)
-
 void Blending( const char* srcFileName, int srcLine, blendmode mode = blendmode::off, blendop operation = blendop::add)
 {
 
@@ -146,8 +138,6 @@ cmdCounter++;
 
 Blend::Blending(mode,operation);
 }
-
-#define Blending(mode, operation) Blending( __FILE__, __LINE__ , mode, operation)
 
 void Camera( const char* srcFileName, int srcLine, position eye, position at, position up, unsigned int angle)
 {
@@ -198,8 +188,6 @@ cmdCounter++;
 Camera::Camera(eye,at,up,angle);
 }
 
-#define Camera(eye_x, eye_y, eye_z, at_x, at_y, at_z, up_x, up_y, up_z, angle) Camera( __FILE__, __LINE__ , position {eye_x, eye_y, eye_z }, position {at_x, at_y, at_z }, position {up_x, up_y, up_z }, angle)
-
 void Depth( const char* srcFileName, int srcLine, depthmode mode)
 {
 
@@ -221,8 +209,6 @@ cmdCounter++;
 
 Depth::Depth(mode);
 }
-
-#define Depth(mode) Depth( __FILE__, __LINE__ , mode)
 
 void Clear( const char* srcFileName, int srcLine, color4 color)
 {
@@ -252,8 +238,6 @@ cmdCounter++;
 Draw::Clear(color);
 }
 
-#define Clear(color_x, color_y, color_z, color_w) Clear( __FILE__, __LINE__ , color4 {color_x, color_y, color_z, color_w })
-
 void ClearDepth( const char* srcFileName, int srcLine)
 {
 
@@ -262,8 +246,6 @@ cmdCounter++;
 
 Draw::ClearDepth();
 }
-
-#define ClearDepth() ClearDepth( __FILE__, __LINE__ )
 
 void NullDrawer( const char* srcFileName, int srcLine, int quadCount, unsigned int instances = 1)
 {
@@ -292,8 +274,6 @@ cmdCounter++;
 Draw::NullDrawer(quadCount,instances);
 }
 
-#define NullDrawer(quadCount, instances) NullDrawer( __FILE__, __LINE__ , quadCount, instances)
-
 void IA( const char* srcFileName, int srcLine, topology topoType)
 {
 
@@ -316,8 +296,6 @@ cmdCounter++;
 InputAssembler::IA(topoType);
 }
 
-#define IA(topoType) IA( __FILE__, __LINE__ , topoType)
-
 void Cull( const char* srcFileName, int srcLine, cullmode mode)
 {
 
@@ -339,8 +317,6 @@ cmdCounter++;
 
 Rasterizer::Cull(mode);
 }
-
-#define Cull(mode) Cull( __FILE__, __LINE__ , mode)
 
 void Scissors( const char* srcFileName, int srcLine, rect r)
 {
@@ -369,8 +345,6 @@ cmdCounter++;
 
 Rasterizer::Scissors(r);
 }
-
-#define Scissors(r_x, r_y, r_z, r_w) Scissors( __FILE__, __LINE__ , rect {r_x, r_y, r_z, r_w })
 
 void Sampler( const char* srcFileName, int srcLine, targetshader shader, unsigned int slot, filter filterType, addr addressU, addr addressV)
 {
@@ -414,8 +388,6 @@ cmdCounter++;
 Sampler::Sampler(shader,slot,filterType,addressU,addressV);
 }
 
-#define Sampler(shader, slot, filterType, addressU, addressV) Sampler( __FILE__, __LINE__ , shader, slot, filterType, addressU, addressV)
-
 void SamplerComp( const char* srcFileName, int srcLine, unsigned int slot)
 {
 
@@ -437,8 +409,6 @@ cmdCounter++;
 
 Sampler::SamplerComp(slot);
 }
-
-#define SamplerComp(slot) SamplerComp( __FILE__, __LINE__ , slot)
 
 void vShader( const char* srcFileName, int srcLine, unsigned int n)
 {
@@ -462,8 +432,6 @@ cmdCounter++;
 Shaders::vShader(n);
 }
 
-#define vShader(n) vShader( __FILE__, __LINE__ , n)
-
 void pShader( const char* srcFileName, int srcLine, unsigned int n)
 {
 
@@ -485,8 +453,6 @@ cmdCounter++;
 
 Shaders::pShader(n);
 }
-
-#define pShader(n) pShader( __FILE__, __LINE__ , n)
 
 void CopyColor( const char* srcFileName, int srcLine, texture dst, texture src)
 {
@@ -515,8 +481,6 @@ cmdCounter++;
 Textures::CopyColor(dst,src);
 }
 
-#define CopyColor(dst, src) CopyColor( __FILE__, __LINE__ , dst, src)
-
 void CopyDepth( const char* srcFileName, int srcLine, texture dst, texture src)
 {
 
@@ -543,8 +507,6 @@ cmdCounter++;
 
 Textures::CopyDepth(dst,src);
 }
-
-#define CopyDepth(dst, src) CopyDepth( __FILE__, __LINE__ , dst, src)
 
 void TextureToShader( const char* srcFileName, int srcLine, texture tex, unsigned int slot, targetshader tA = targetshader::both)
 {
@@ -578,8 +540,6 @@ cmdCounter++;
 Textures::TextureToShader(tex,slot,tA);
 }
 
-#define TextureToShader(tex, slot, tA) TextureToShader( __FILE__, __LINE__ , tex, slot, tA)
-
 void CreateMipMap( const char* srcFileName, int srcLine)
 {
 
@@ -588,8 +548,6 @@ cmdCounter++;
 
 Textures::CreateMipMap();
 }
-
-#define CreateMipMap() CreateMipMap( __FILE__, __LINE__ )
 
 void RenderTarget( const char* srcFileName, int srcLine, texture target, unsigned int level = 0)
 {
@@ -618,6 +576,144 @@ cmdCounter++;
 Textures::RenderTarget(target,level);
 }
 
-#define RenderTarget(target, level) RenderTarget( __FILE__, __LINE__ , target, level)
+void oscillator( const char* srcFileName, int srcLine, int a, int b)
+{
 
-} api;
+if (cmdParamDesc[cmdCounter].loaded) {
+	a = (int)cmdParamDesc[cmdCounter].param[0].value[0];
+	b = (int)cmdParamDesc[cmdCounter].param[1].value[0];
+} else {
+	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
+	cmdParamDesc[cmdCounter].caller.line = srcLine;
+	cmdParamDesc[cmdCounter].pCount = 2;
+	cmdParamDesc[cmdCounter].param[0].value[0] = a;
+	cmdParamDesc[cmdCounter].param[0].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[0].type, "int"); 
+	strcpy(cmdParamDesc[cmdCounter].param[0].name, "a"); 
+	cmdParamDesc[cmdCounter].param[1].value[0] = b;
+	cmdParamDesc[cmdCounter].param[1].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[1].type, "int"); 
+	strcpy(cmdParamDesc[cmdCounter].param[1].name, "b"); 
+	cmdParamDesc[cmdCounter].loaded = true; 
+}
+
+AddToUI(__FUNCTION__);
+cmdCounter++;
+
+tracker::oscillator(a,b);
+}
+
+void eq( const char* srcFileName, int srcLine, int a)
+{
+
+if (cmdParamDesc[cmdCounter].loaded) {
+	a = (int)cmdParamDesc[cmdCounter].param[0].value[0];
+} else {
+	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
+	cmdParamDesc[cmdCounter].caller.line = srcLine;
+	cmdParamDesc[cmdCounter].pCount = 1;
+	cmdParamDesc[cmdCounter].param[0].value[0] = a;
+	cmdParamDesc[cmdCounter].param[0].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[0].type, "int"); 
+	strcpy(cmdParamDesc[cmdCounter].param[0].name, "a"); 
+	cmdParamDesc[cmdCounter].loaded = true; 
+}
+
+AddToUI(__FUNCTION__);
+cmdCounter++;
+
+tracker::eq(a);
+}
+
+void channel_01_bass( const char* srcFileName, int srcLine, int volume, int pan, visibility ms)
+{
+
+if (cmdParamDesc[cmdCounter].loaded) {
+	volume = (int)cmdParamDesc[cmdCounter].param[0].value[0];
+	pan = (int)cmdParamDesc[cmdCounter].param[1].value[0];
+} else {
+	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
+	cmdParamDesc[cmdCounter].caller.line = srcLine;
+	cmdParamDesc[cmdCounter].pCount = 3;
+	cmdParamDesc[cmdCounter].param[0].value[0] = volume;
+	cmdParamDesc[cmdCounter].param[0].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[0].type, "int"); 
+	strcpy(cmdParamDesc[cmdCounter].param[0].name, "volume"); 
+	cmdParamDesc[cmdCounter].param[1].value[0] = pan;
+	cmdParamDesc[cmdCounter].param[1].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[1].type, "int"); 
+	strcpy(cmdParamDesc[cmdCounter].param[1].name, "pan"); 
+	cmdParamDesc[cmdCounter].param[2].bypass = true;
+	strcpy(cmdParamDesc[cmdCounter].param[2].type, "visibility"); 
+	strcpy(cmdParamDesc[cmdCounter].param[2].name, "ms"); 
+	cmdParamDesc[cmdCounter].loaded = true; 
+}
+
+AddToUI(__FUNCTION__);
+cmdCounter++;
+
+tracker::channel_01_bass(volume,pan,ms);
+}
+
+void channel_02_solo( const char* srcFileName, int srcLine, int volume,int pan,visibility ms)
+{
+
+if (cmdParamDesc[cmdCounter].loaded) {
+	volume = (int)cmdParamDesc[cmdCounter].param[0].value[0];
+	pan = (int)cmdParamDesc[cmdCounter].param[1].value[0];
+} else {
+	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
+	cmdParamDesc[cmdCounter].caller.line = srcLine;
+	cmdParamDesc[cmdCounter].pCount = 3;
+	cmdParamDesc[cmdCounter].param[0].value[0] = volume;
+	cmdParamDesc[cmdCounter].param[0].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[0].type, "int"); 
+	strcpy(cmdParamDesc[cmdCounter].param[0].name, "volume"); 
+	cmdParamDesc[cmdCounter].param[1].value[0] = pan;
+	cmdParamDesc[cmdCounter].param[1].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[1].type, "int"); 
+	strcpy(cmdParamDesc[cmdCounter].param[1].name, "pan"); 
+	cmdParamDesc[cmdCounter].param[2].bypass = true;
+	strcpy(cmdParamDesc[cmdCounter].param[2].type, "visibility"); 
+	strcpy(cmdParamDesc[cmdCounter].param[2].name, "ms"); 
+	cmdParamDesc[cmdCounter].loaded = true; 
+}
+
+AddToUI(__FUNCTION__);
+cmdCounter++;
+
+tracker::channel_02_solo(volume,pan,ms);
+}
+
+void mix( const char* srcFileName, int srcLine, int level)
+{
+
+if (cmdParamDesc[cmdCounter].loaded) {
+	level = (int)cmdParamDesc[cmdCounter].param[0].value[0];
+} else {
+	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
+	cmdParamDesc[cmdCounter].caller.line = srcLine;
+	cmdParamDesc[cmdCounter].pCount = 1;
+	cmdParamDesc[cmdCounter].param[0].value[0] = level;
+	cmdParamDesc[cmdCounter].param[0].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[0].type, "int"); 
+	strcpy(cmdParamDesc[cmdCounter].param[0].name, "level"); 
+	cmdParamDesc[cmdCounter].loaded = true; 
+}
+
+AddToUI(__FUNCTION__);
+cmdCounter++;
+
+tracker::mix(level);
+}
+
+void playTrack( const char* srcFileName, int srcLine)
+{
+
+AddToUI(__FUNCTION__);
+cmdCounter++;
+
+tracker::playTrack();
+}
+
+};

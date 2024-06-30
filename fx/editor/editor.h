@@ -59,19 +59,28 @@ namespace editor
 		gapi.cull(cullmode::off);
 		gapi.depth(depthmode::off);
 
-		if (!(isKeyDown(CAM_KEY) | isKeyDown(CAM_KEY2)))
+		if (isKeyDown(TIME_KEY))
 		{
 			TimeLine::Draw();
 		}
 
-		
-
-		//if (paramEdit::editContext)
+		if (paramEdit::editContext)
 		{
 			paramEdit::ShowStack();
 		}
 
-		ViewCam::Draw();
+		ViewCam::setup();
+
+		if (Camera::viewCam.overRide)
+		{
+			if (isKeyDown(CAM_KEY)|| isKeyDown(CAM_KEY2) || ViewCam::flyToCam < 1.f)
+			{
+				paramEdit::ObjHandlers();
+				ViewCam::Draw();
+			} 
+		}
+
+		ViewCam::setCamMat();
 
 	}
 }

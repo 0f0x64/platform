@@ -6,7 +6,7 @@ namespace Object {
 		float q = intToFloatDenom;
 		
 		ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixTranslation(pos.x/q, pos.y/q, pos.z/q));
-		ConstBuf::drawerMat.hilight = cmdCounter-1 == hilightedCmd ? 1 : 0;
+		ConstBuf::drawerMat.hilight = cmdCounter-1 == hilightedCmd ? 1.f : 0.f;
 		ConstBuf::UpdateDrawerMat();
 
 		float gX = Textures::Texture[(int)texture::obj1pos].size.x / denom;
@@ -29,6 +29,7 @@ namespace Object {
 
 		ps::basic.set();
 		gapi.draw((int)gX * (int)gY);
+		
 	}
 
 	API CalcObject(texture targetGeo, texture targetNrml)

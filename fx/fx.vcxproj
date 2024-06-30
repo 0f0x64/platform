@@ -109,6 +109,7 @@
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <DebugInformationFormat>None</DebugInformationFormat>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -188,6 +189,7 @@
     <ClInclude Include="editor\uiDraw.h" />
     <ClInclude Include="editor\viewCam.h" />
     <ClInclude Include="editor\wndProc.h" />
+    <ClInclude Include="generated\accel.h" />
     <ClInclude Include="generated\apiReflection.h" />
     <ClInclude Include="generated\constBufReflect.h" />
     <ClInclude Include="generated\libList.h" />

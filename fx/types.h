@@ -83,6 +83,8 @@ enumType(cullmode, off, front, back, wireframe);
 enumType(topology, triList, lineList, lineStrip);
 enumType(targetshader, vertex, pixel, both);
 
+enumType(visibility, on, off, solo);
+
 char* getEnumStr(char* name, int value)
 {
 	for (int i = 0; i < enumCounter; i++)

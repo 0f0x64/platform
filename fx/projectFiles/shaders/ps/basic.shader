@@ -53,8 +53,7 @@ float4 PS(VS_OUTPUT input) : SV_Target
     //float3 nt = mul(input.vnorm.xyz, view[0]);
     float3 nt = mul(nrml, view[0]);
     float d = dot(normalize(input.vpos.xyz), normalize(nt));
-    color += saturate(10 - 30 * d) * sin(d * 32 + time.x) * 4*hilight;
-    
+    color += saturate(10 - 35 * d)* sin(d * 127 + time.x) * 4 * hilight;
     
     return float4(color, 1);
 }

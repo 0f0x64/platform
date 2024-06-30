@@ -4,7 +4,7 @@
 //[
 cbuffer params : register(b1)
 {
-    float aspect;
+    float _aspect;
     float rad;
     float r, g, b, a;
     float soft;
@@ -20,7 +20,7 @@ float roundedBoxSDF(float2 CenterPosition, float2 Size, float Radius)
 
 float calcRA(float2 uv, float2 sz, float radius)
 {
-    float2 ca = float2(1, aspect);
+    float2 ca = float2(1, aspect.x);
     float2 s = sz*ca;
     float r1 = min(s.x, s.y) * (0.001 + radius);
     float r2 = roundedBoxSDF(uv*ca*sz, s*.5, r1)  / r1;

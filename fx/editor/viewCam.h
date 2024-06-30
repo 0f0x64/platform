@@ -45,17 +45,8 @@ namespace ViewCam
 		auto right = XMVector3Cross(currentCamera.ViewVec, currentCamera.upVec);
 		XMVECTOR v2 = { XMVectorGetX(right), XMVectorGetZ(right) };
 		v2 = XMVector2Normalize(v2);
-		float angle = atan2(XMVectorGetX(v2), -XMVectorGetY(v2));
-		return RadiansToDegrees(angle) + 180.;
-	}
-
-	float getHAngle()
-	{
-		auto right = XMVector3Cross(currentCamera.ViewVec, currentCamera.upVec);
-		XMVECTOR v2 = { XMVectorGetZ(currentCamera.upVec), XMVectorGetY(currentCamera.upVec) };
-		//v2 = XMVector2Normalize(v2);
-		float angle = atan2(XMVectorGetX(v2), XMVectorGetY(v2));
-		return RadiansToDegrees(angle);
+		float angle = (float)atan2(XMVectorGetX(v2), -XMVectorGetY(v2));
+		return RadiansToDegrees(angle) + 180.f;
 	}
 
 	void ToggleViewMode()
@@ -63,58 +54,56 @@ namespace ViewCam
 		Camera::viewCam.overRide = !Camera::viewCam.overRide;
 	}
 
-	void AxisCam(float xz, float zy)
+	void AxisCamPitch(float zy)
 	{
 		if (flyToCam < 1.f) return;
 		storedCamera = currentCamera;
 
 		float vl = XMVectorGetX(XMVector3Length(currentCamera.ViewVec));
-		float a = floor(getFlatAngle());
-		if (a >= 360.f) a = 0;
+		float a = (float)((int)(floor(getFlatAngle())) % 360);
 
-		float b = floor(getHAngle());
-		if (b >= 360.f) b = 0;
+		auto m2 = XMMatrixRotationAxis(XMVECTOR{ 0,1,0 }, DegreesToRadians(-a - 90));
+
+		auto view = XMVECTOR{ 0,0,-vl };
+		auto up = XMVECTOR{ 0,1,0 };
+		auto m = XMMatrixRotationX(DegreesToRadians(-zy));
+		view = XMVector3Transform(view, m);
+		up = XMVector3Transform(up, m);
+
+		view = XMVector3Transform(view, m2);
+		up = XMVector3Transform(up, m2);
+
+		targetCamera = currentCamera;
+		targetCamera.ViewVec = view;
+		targetCamera.upVec = up;
+
+		flyToCam = 0.f;
+
+	}
+
+	void AxisCamYaw(float xz)
+	{
+		if (flyToCam < 1.f) return;
+		storedCamera = currentCamera;
+
+		float vl = XMVectorGetX(XMVector3Length(currentCamera.ViewVec));
+		float a = (float)((int)(floor(getFlatAngle())) % 360);
 
 		auto view = XMVECTOR{ vl,0,0 };
 		auto up = XMVECTOR{ 0,1,0 };
 
-		if (xz != 0)
-		{
-			float ta;
-			if (xz > 0) ta = floor(a / 90.f) * 90.f + xz;
-			if (xz < 0) ta = ceil(a / 90.f) * 90.f + xz;
-			auto m = XMMatrixRotationY(DegreesToRadians(-ta));
-			view = XMVector3Transform(view, m);
-			up = XMVector3Transform(up, m);
-		}
-
-		if (zy != 0)
-		{
-			float ta;
-			if (zy > 0) ta = floor(b / 90.f) * 90.f + zy;
-			if (zy < 0) ta = ceil(b / 90.f) * 90.f + zy;
-
-			XMVECTOR right = XMVector3Cross(currentCamera.ViewVec, currentCamera.upVec);
-
-			//right = XMVector3Transform(right, ((XMMatrixLookToLH( XMVECTOR{ 0,0,0 }, currentCamera.ViewVec, currentCamera.upVec))));
-			//auto m = XMMatrixRotationAxis(right,DegreesToRadians(-zy));
-			auto m = XMMatrixRotationAxis(right, DegreesToRadians(-ta));
-
-			view = XMVector3Transform(currentCamera.ViewVec, m);
-			up = XMVector3Transform(currentCamera.upVec, m);
-
-			//view = XMVector3Transform(view, m);
-			//up = XMVector3Transform(up, m);
-		}
-
+		float ta = ((xz > 0.f) ? floorf(a / 90.f) : ceilf(a / 90.f)) * 90.f + xz;
+		auto m = XMMatrixRotationY(DegreesToRadians(-ta));
+		view = XMVector3Transform(view, m);
+		up = XMVector3Transform(up, m);
 
 		targetCamera = currentCamera;
 		targetCamera.ViewVec = view;
-		//targetCamera.upVec = XMVECTOR{ up.x,up.y,up.z };
 		targetCamera.upVec = up;
 
 		flyToCam = 0.f;
 	}
+
 
 	void TransCam(float x, float y, float z)
 	{
@@ -128,13 +117,12 @@ namespace ViewCam
 	{
 		if (isKeyDown(CAM_KEY)) 
 		{
-			currentCamera.ViewVec = XMVectorScale(currentCamera.ViewVec, 1. - delta / 2000.f);
+			currentCamera.ViewVec = XMVectorScale(currentCamera.ViewVec, 1.f - delta / 2000.f);
 			storedCamera = currentCamera;
 		}
 
 		if (isKeyDown(CAM_KEY2)) {
 			Camera::viewCam.angle += delta / 50.f;
-			Camera::viewCam.proj = XMMatrixPerspectiveFovLH(DegreesToRadians(Camera::viewCam.angle), width / (FLOAT)height, 0.01f, 100.0f);
 		}
 
 	}
@@ -276,10 +264,16 @@ namespace ViewCam
 		storedCamera = targetCamera;
 	}
 
+	void setCamMat()
+	{
+		XMVECTOR Eye = currentCamera.ViewVec + currentCamera.Target;
+		XMVECTOR At = currentCamera.Target;
+		Camera::viewCam.view = XMMatrixLookAtLH(Eye, At, currentCamera.upVec);
+		Camera::viewCam.proj = XMMatrixPerspectiveFovLH(DegreesToRadians(Camera::viewCam.angle), dx11::iaspect, 0.01f, 100.0f);
+	}
+
 	void Draw()
 	{
-		setup();
-
 		bool fade = isKeyDown(CAM_KEY) || isKeyDown(CAM_KEY2) || flyToCam < 1.f;
 		axisAlpha = clamp(axisAlpha + (fade ? .4f : -.05f), 0.f, 1.f);
 
@@ -298,22 +292,19 @@ namespace ViewCam
 
 		ProcessInput();
 
-		XMVECTOR Eye = currentCamera.ViewVec + currentCamera.Target;
-		XMVECTOR At = currentCamera.Target;
-		Camera::viewCam.view = XMMatrixLookAtLH(Eye, At, currentCamera.upVec);
+		setCamMat();
 
 		DrawAxis();
-
-
 		
 		ui::Text::Setup();
-		char str[132];
-		char str2[132];
+		char str[32];
+		char str2[123] = "angle:";
+		_itoa((int)Camera::viewCam.angle, str,10);
+		strcat(str2, str);
+		ui::Text::Draw(str2, .5, .9);
 
-		auto aa = getHAngle();
-		_gcvt((aa), 10, str);
-		ui::Text::Draw(str, .5, .5);
 
 	}
 
 }
+

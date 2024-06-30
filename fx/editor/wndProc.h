@@ -1,4 +1,3 @@
-bool numpad5trigger = false;
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -44,7 +43,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			editor::ViewCam::Wheel(delta);
 		}
 
-		editor::TimeLine::Wheel(delta);
+		if (editor::isKeyDown(TIME_KEY))
+		{
+			editor::TimeLine::Wheel(delta);
+		}
 
 		break;
 	}
@@ -61,70 +63,78 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		switch (wParam)
 		{
-			case VK_SPACE:
-				editor::TimeLine::Space();
-				break;
-			case VK_ESCAPE:
-				editor::ViewCam::ToggleViewMode();
-				break;
+		case VK_SPACE:
+			editor::TimeLine::Space();
+			break;
+		case VK_ESCAPE:
+			editor::ViewCam::ToggleViewMode();
+			break;
 
-			case 'A':
-			{
-				editor::ViewCam::AxisCam(-90,0);
-				numpad5trigger = false;
-				break;
-			}
-			/*case S:
-			{
-				float v = numpad5trigger ? 1 : -1;
-				editor::ViewCam::AxisCam(180,180);
-				numpad5trigger = !numpad5trigger;
-				break;
-			}*/
-			case 'D':
-			{
-				editor::ViewCam::AxisCam(90,0);
-				numpad5trigger = false;
-				break;
-			}
-			case 'S':
-			{
-				editor::ViewCam::AxisCam(0,90);
-				numpad5trigger = false;
-				break;
-			}
-			case 'W':
-			{
-				editor::ViewCam::AxisCam(0,-90);
-				numpad5trigger = false;
-				break;
-			}
+		case 'A':
+		{
+			editor::ViewCam::AxisCamYaw(-90);
+			break;
+		}
+		case 'D':
+		{
+			editor::ViewCam::AxisCamYaw(90);
+			break;
+		}
+		case 'S':
+		{
+			editor::ViewCam::AxisCamPitch(0);
+			break;
+		}
+		case 'X':
+		{
+			editor::ViewCam::AxisCamPitch(90);
+			break;
+		}
 
-			case VK_LEFT:
-				editor::paramEdit::cursorPos--;
-				break;
-			case VK_RIGHT:
-				editor::paramEdit::cursorPos++;
-				break;
-			case VK_HOME:
-				editor::paramEdit::cursorPos = 0;;
-				break;
-			case VK_END:
-				editor::paramEdit::cursorPos = INT_MAX;
-				break;
-			case VK_BACK:
-				editor::paramEdit::BackSpace();
-				break;
-			case VK_DELETE:
-				editor::paramEdit::Delete();
-				break;
+		case 'W':
+		{
+			editor::ViewCam::AxisCamPitch(-90);
+			break;
+		}
+
+		case VK_LEFT:
+			editor::paramEdit::cursorPos--;
+			break;
+		case VK_RIGHT:
+			editor::paramEdit::cursorPos++;
+			break;
+
+		case VK_HOME:
+			editor::paramEdit::cursorPos = 0;;
+			break;
+		case VK_END:
+			editor::paramEdit::cursorPos = INT_MAX;
+			break;
+		case VK_BACK:
+			editor::paramEdit::BackSpace();
+			break;
+		case VK_DELETE:
+			editor::paramEdit::Delete();
+			break;
 
 
 		}
 	}
 	case WM_LBUTTONUP:
+	{
 		editor::paramEdit::action = false;
 		break;
+	}
+	case WM_MBUTTONUP:
+	{
+		editor::paramEdit::action = false;
+		break;
+	}
+	case WM_RBUTTONUP:
+	{
+		editor::paramEdit::action = false;
+		break;
+	}
 
 	case WM_LBUTTONDBLCLK:
 		editor::ui::dblClk = true;
@@ -144,15 +154,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		editor::ViewCam::mbDown();
 		break;
 	}
-
-	case WM_MBUTTONUP:
-	{
-		editor::paramEdit::action = false;
-		break;
-	}
-
-	case WM_RBUTTONUP:
-		break;
 
 	case WM_RBUTTONDOWN:
 	{

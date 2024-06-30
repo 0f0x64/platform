@@ -19,6 +19,9 @@ namespace paramEdit {
 	float cursorY = 0;
 	bool showCursor = false;
 
+	int pCountV = 0;
+	float tabLen = 0.f;
+
 	void rbDown()
 	{
 		yPosLast = yPos;
@@ -113,6 +116,8 @@ namespace paramEdit {
 		return 1;
 	}
 
+	float selYpos = 0.5;
+
 	void showBoxes()
 	{
 		ui::Box::Setup();
@@ -142,7 +147,8 @@ namespace paramEdit {
 					ui::dblClk = false;
 				}
 
-				if (ui::lbDown && i != currentCmd) {
+				if (ui::lbDown && i != currentCmd &&!action) {
+					action = true;
 					currentCmd = i;
 					currentParam = -1;
 					subParam = -1;
@@ -155,6 +161,9 @@ namespace paramEdit {
 			}
 
 			float sel = currentCmd == i ? 1.f : 0.f;
+
+			if (sel) selYpos = y;
+
 			ui::style::box::r = lerp(0.2f, .8f, sel);
 			ui::style::box::g = lerp(0.2f, .8f, sel);
 			ui::style::box::b = lerp(0.2f, .8f, sel);
@@ -168,8 +177,12 @@ namespace paramEdit {
 		
 	}
 
+	float vScroll = false;
+
 	void ObjHandlers()
 	{
+		ui::Box::Setup();
+
 		hilightedCmd = currentCmd;
 
 		for (int i = 0; i < cmdCounter; i++)
@@ -178,43 +191,47 @@ namespace paramEdit {
 			{
 				if (!isType(cmdParamDesc[i].param[j].type, "position")) continue;
 
-				float _x = cmdParamDesc[i].param[j].value[0];
-				float _y = cmdParamDesc[i].param[j].value[1];
-				float _z = cmdParamDesc[i].param[j].value[2];
+				float _x = (float)cmdParamDesc[i].param[j].value[0];
+				float _y = (float)cmdParamDesc[i].param[j].value[1];
+				float _z = (float)cmdParamDesc[i].param[j].value[2];
 
 				XMVECTOR p = XMVECTOR{ _x / intToFloatDenom, _y / intToFloatDenom, _z / intToFloatDenom, 1. };
 				p = XMVector4Transform(p, Camera::viewCam.view * Camera::viewCam.proj);
 
 				if (XMVectorGetZ(p) < 0) continue;
 
-				float px = .5 * XMVectorGetX(p) / XMVectorGetW(p) + .5;
-				float py = -.5 * XMVectorGetY(p) / XMVectorGetW(p) + .5;
+				float px = .5f * XMVectorGetX(p) / XMVectorGetW(p) + .5f;
+				float py = -.5f * XMVectorGetY(p) / XMVectorGetW(p) + .5f;
 
 				float h = ui::style::text::height * .48f;
-				px -= h * dx11::aspect / 2.;
-				py -= h / 2.;
+				px -= h * dx11::aspect / 2.f;
+				py -= h / 2.f;
 
-				ui::style::box::outlineBrightness = 2;
+				ui::style::box::outlineBrightness = 1.5;
 
 				ui::style::box::rounded = .5;
-				ui::style::box::edge = .1;
+				ui::style::box::edge = 1.;
+				ui::style::box::soft = 11.;
 
 				bool over = isMouseOver(px, py, h * dx11::aspect, h);
 
-				ui::style::box::r = ui::style::box::g = ui::style::box::b = over ? .7 : 0;
+				ui::style::box::r = ui::style::box::g = ui::style::box::b = over ? .7f : 0.f;
 
 				if (over && isKeyDown(CAM_KEY))
 				{
 					hilightedCmd = i;
 				}
 
-				if (over && ui::lbDown && isKeyDown(CAM_KEY))
+				if (over && ui::lbDown && isKeyDown(CAM_KEY) )
 				{
+					
 					currentCmd = i;
 					currentParam = -1;
 					subParam = -1;
 
 					ViewCam::TransCam(_x / intToFloatDenom, _y / intToFloatDenom, _z / intToFloatDenom);
+
+					vScroll = true;
 				}
 
 				ui::Box::Draw(px, py, h * dx11::aspect, h);
@@ -305,9 +322,9 @@ namespace paramEdit {
 
 		if (isTypeEnum(sType)) return;
 
-		float scale = ui::lbDown ? 10 : 1;
+		float scale = ui::lbDown ? 10.f : 1.f;
 
-		cmdParamDesc[currentCmd].param[currentParam].value[max(subParam,0)] += sign(delta) * scale;
+		cmdParamDesc[currentCmd].param[currentParam].value[max(subParam,0)] += (int)(sign(delta) * scale);
 
 	}
 
@@ -379,6 +396,8 @@ namespace paramEdit {
 
 	void showParamBoxes()
 	{
+		pCountV = 0;
+
 		ui::Box::Setup();
 
 		float _x = x + valueDrawOffset - insideX;
@@ -390,7 +409,7 @@ namespace paramEdit {
 
 			if (cmdParamDesc[currentCmd].param[i].bypass) continue;
 
-			auto w = .05f;
+			auto w = tabLen*.9f;
 			auto sType = cmdParamDesc[currentCmd].param[i].type;
 			int count = getTypeDim(sType);
 
@@ -505,6 +524,7 @@ namespace paramEdit {
 				}
 			}
 
+			pCountV += count;
 			y += lead* count;
 		}
 
@@ -514,7 +534,7 @@ namespace paramEdit {
 			{
 				if (ui::mbDown)
 				{
-					cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)] = storedParam[max(subParam, 0)] - ui::mouseDelta.y * height;
+					cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)] = storedParam[max(subParam, 0)] - (int)(ui::mouseDelta.y * height);
 				}
 				else
 				{
@@ -524,8 +544,12 @@ namespace paramEdit {
 		}
 	}
 
+	float paramAreaHeight = 0.f;
+
 	void showParams()
 	{
+		paramAreaHeight = 0.f;
+
 		float inCurPos = 0;
 
 		showParamBoxes();
@@ -629,8 +653,19 @@ namespace paramEdit {
 		}
 	}
 
+	float isOutside(float x, float top, float bottom)
+	{
+		if (x < top) return x - top;
+		if (x > bottom) return x - bottom;
+		return 0.f;
+	}
+
+
 	void ShowStack()
 	{
+		tabLen = ui::Text::getTextLen("000000000000000", ui::style::text::width);
+		valueDrawOffset = tabLen *1.f;
+		enumDrawOffset = tabLen *2.f;
 
 		clickOnEmptyPlace = true;
 
@@ -641,8 +676,12 @@ namespace paramEdit {
 
 		ui::style::Base();
 
-		top = ui::style::text::height;
-		bottom = 1.f - ui::style::text::height*2.5f;
+		//top = ui::style::text::height;
+		//bottom = 1.f - ui::style::text::height*2.5f;
+		top = 0.f;
+		bottom = 1.f;
+
+
 		lead = ui::style::text::height;
 		insideX = ui::style::text::width * .5f * aspect / 2.f;
 		insideY = .15f * ui::style::box::height;
@@ -655,22 +694,17 @@ namespace paramEdit {
 		y = yPos;
 		showBoxes();
 
-		if (isKeyDown(CAM_KEY))
-		{
-			ObjHandlers();
-		}
-
 		y = yPos;
 		ui::Text::Setup();
 		showLabels();
 		ui::style::Base();
-		x += .1;
+		x += tabLen;
 		showParams();
 
 		if (showCursor)
 		{
 			ui::Box::Setup();
-			ui::style::box::width = 2. / width;
+			ui::style::box::width = 2.f / width;
 			ui::style::box::height = ui::style::text::height * .5f;
 			ui::style::box::rounded = .0f;
 			ui::style::box::soft = 10.1f;
@@ -699,6 +733,10 @@ namespace paramEdit {
 			currentParam = -1;
 
 		}
+
+		float scroll = isOutside(selYpos, top+lead*1.f, bottom - lead * (pCountV+1)) / 4.f;
+		yPos -= vScroll ? scroll : 0.f;
+		if (fabs(scroll) < 0.00125f) vScroll = false;
 
 	}
 

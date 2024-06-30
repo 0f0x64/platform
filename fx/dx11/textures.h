@@ -209,6 +209,9 @@ namespace Textures
 		vp.TopLeftY = 0;
 
 		context->RSSetViewports(1, &vp);
+
+		rect r = rect{ 0,0,(int)vp.Width ,(int)vp.Height };
+		Rasterizer::Scissors(r);
 	}
 
 	API CopyColor(texture dst, texture src)

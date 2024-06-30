@@ -451,7 +451,7 @@ void catToFile(const std::filesystem::path& sandbox, ofstream& ofile, std::vecto
 
 //TODO:: multiline declaration support
 //TODO:: proper namespace parsing
-void ScanFile(std::string fname, ofstream& ofile)
+void ScanFile(std::string fname, ofstream& ofile, ofstream& ofileAccel)
 {
 	//ofile << "// " << fname.c_str() << "\n";
 
@@ -508,7 +508,8 @@ void ScanFile(std::string fname, ofstream& ofile)
 
 					string comma = noParams ? "" : ", ";
 					funcParams = "( const char* srcFileName, int srcLine" + comma + funcParams + ")";
-				
+
+
 					//decl
 					ofile << "void " << funcName.c_str() << funcParams << "\n{\n";
 
@@ -696,12 +697,11 @@ void ScanFile(std::string fname, ofstream& ofile)
 				ofile << caller;
 				ofile << "\n}\n\n";
 
-				ofile << "#define " << funcName << "(" << pNameList << ") ";
-				//ofile << "api." << funcName << "( __FILE__, __LINE__ ";
-				ofile << funcName << "( __FILE__, __LINE__ ";
-					if (pCount > 0) ofile << ", ";
-				ofile << pNameListOut << ")";
-				ofile << "\n\n";
+				ofileAccel << "#define " << funcName << "(" << pNameList << ") ";
+				ofileAccel << funcName << "( __FILE__, __LINE__ ";
+					if (pCount > 0) ofileAccel << ", ";
+					ofileAccel << pNameListOut << ")";
+					ofileAccel << "\n\n";
 
 			}
 		}
@@ -709,7 +709,7 @@ void ScanFile(std::string fname, ofstream& ofile)
 
 }
 
-void srcCat(const std::filesystem::path& sandbox, ofstream& ofile)
+void srcCat(const std::filesystem::path& sandbox, ofstream& ofile, ofstream& ofileAccel)
 {
 	for (auto const& cat : std::filesystem::recursive_directory_iterator{ sandbox })
 	{
@@ -721,7 +721,7 @@ void srcCat(const std::filesystem::path& sandbox, ofstream& ofile)
 			{
 				if (fName.at(o + 1) = 'h')
 				{
-					ScanFile(fName,ofile);
+					ScanFile(fName, ofile, ofileAccel);
 				}
 			}
 		}
@@ -834,16 +834,25 @@ int main()
 	remove(apiFileName.c_str());
 	ofstream apiOfile(apiFileName);
 
-	apiOfile << "struct { \n\n";
+	std::string apiAccel = "..\\fx\\generated\\accel.h";
+	remove(apiAccel.c_str());
+	ofstream accelOfile(apiAccel);
+
+	apiOfile << "namespace api { \n\n";
 
 	const std::filesystem::path srcSandbox{ "..\\fx\\projectFiles\\" };
-	srcCat(srcSandbox, apiOfile);
+	srcCat(srcSandbox, apiOfile, accelOfile);
 	const std::filesystem::path srcSandbox2{ "..\\fx\\dx11\\" };
-	srcCat(srcSandbox2, apiOfile);
+	srcCat(srcSandbox2, apiOfile, accelOfile);
+	const std::filesystem::path srcSandbox3{ "..\\fx\\sound\\" };
+	srcCat(srcSandbox3, apiOfile, accelOfile);
 
-	apiOfile << "} api;\n";
+
+	apiOfile << "};\n";
 
 	apiOfile.close();
+	accelOfile.close();
+
 	//--
 
 	Log("\n---competed!\n\n");

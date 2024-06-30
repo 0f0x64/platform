@@ -43,6 +43,9 @@
     <Filter Include="Source Files\sound">
       <UniqueIdentifier>{821ad417-7f85-4c8d-ba21-f6215f748da3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\generated\reflectrion">
+      <UniqueIdentifier>{c3dc61e8-5b78-4d7f-93e9-1d9f1684f99f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -175,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="vMachine.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\accel.h">
+      <Filter>Source Files\generated</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

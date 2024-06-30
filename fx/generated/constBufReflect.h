@@ -164,7 +164,7 @@ struct {
 
 struct 
 {
-float aspect;
+float _aspect;
 float rad;
 float r;
 float g;

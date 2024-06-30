@@ -18,7 +18,7 @@
 	#define EditMode true
 	#define DebugMode true
 	#define DirectXDebugMode false
-	#define SECONDARY_DISPLAY_IF_AVAILABLE true
+	#define SECONDARY_DISPLAY_IF_AVAILABLE false
 	#define USE_SHADER_MINIFIER false
 #endif
 
@@ -35,4 +35,4 @@
 #define vShadersPath "../fx/projectFiles/shaders/vs/"
 #define pShadersPath "../fx/projectFiles/shaders/ps/"
 
-#define MAIN_DISPLAY_DENOMINATOR 1
+#define MAIN_DISPLAY_DENOMINATOR 2

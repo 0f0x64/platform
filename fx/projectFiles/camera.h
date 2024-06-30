@@ -28,19 +28,19 @@ void setCam(int i)
 void slideCam(int i, int j, float a)
 {
 	position eye, at, up;
-	unsigned int angle = lerp(cam[i].angle, cam[j].angle, a);
+	unsigned int angle = (unsigned int)lerp(cam[i].angle, cam[j].angle, a);
 
-	eye.x = lerp(cam[i].eye.x, cam[j].eye.x, a);
-	eye.y = lerp(cam[i].eye.y, cam[j].eye.y, a);
-	eye.z = lerp(cam[i].eye.z, cam[j].eye.z, a);
+	eye.x = (int)lerp(cam[i].eye.x, cam[j].eye.x, a);
+	eye.y = (int)lerp(cam[i].eye.y, cam[j].eye.y, a);
+	eye.z = (int)lerp(cam[i].eye.z, cam[j].eye.z, a);
 
-	at.x = lerp(cam[i].at.x, cam[j].at.x, a);
-	at.y = lerp(cam[i].at.y, cam[j].at.y, a);
-	at.z = lerp(cam[i].at.z, cam[j].at.z, a);
+	at.x = (int)lerp(cam[i].at.x, cam[j].at.x, a);
+	at.y = (int)lerp(cam[i].at.y, cam[j].at.y, a);
+	at.z = (int)lerp(cam[i].at.z, cam[j].at.z, a);
 
-	up.x = lerp(cam[i].up.x, cam[j].up.x, a);
-	up.y = lerp(cam[i].up.y, cam[j].up.y, a);
-	up.z = lerp(cam[i].up.z, cam[j].up.z, a);
+	up.x = (int)lerp(cam[i].up.x, cam[j].up.x, a);
+	up.y = (int)lerp(cam[i].up.y, cam[j].up.y, a);
+	up.z = (int)lerp(cam[i].up.z, cam[j].up.z, a);
 
 	gapi.cam(eye, at, up, angle);
 }

@@ -26,7 +26,7 @@ namespace Rasterizer
 		rasterizerState.DepthClipEnable = false;
 		rasterizerState.ScissorEnable = true;
 		rasterizerState.MultisampleEnable = false;
-		rasterizerState.AntialiasedLineEnable = false;
+		rasterizerState.AntialiasedLineEnable = true;
 		device->CreateRasterizerState(&rasterizerState, &rasterState[0]);
 
 		rasterizerState.CullMode = D3D11_CULL_FRONT;
