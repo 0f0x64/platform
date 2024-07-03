@@ -451,7 +451,7 @@ void catToFile(const std::filesystem::path& sandbox, ofstream& ofile, std::vecto
 
 //TODO:: multiline declaration support
 //TODO:: proper namespace parsing
-void ScanFile(std::string fname, ofstream& ofile, ofstream& ofileAccel)
+void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 {
 	//ofile << "// " << fname.c_str() << "\n";
 
@@ -459,13 +459,13 @@ void ScanFile(std::string fname, ofstream& ofile, ofstream& ofileAccel)
 
 	if (in.is_open())
 	{
-		std::string nsName;
+		//std::string nsName;
 		unsigned int res;
 		string s;
 		while (getline(in, s))
 		{
 
-			res = s.find("namespace ");
+			/*res = s.find("namespace ");
 			if (found)
 			{
 				for (auto x = res + 10; x < s.length(); x++)
@@ -475,49 +475,60 @@ void ScanFile(std::string fname, ofstream& ofile, ofstream& ofileAccel)
 					if (s.at(x) != ' ') nsName.push_back(s.at(x));
 				}
 				nsName.append("::");
-			}
+			}*/
 
-			res = s.find("API ");
+			res = s.find("COMMAND");
 			if (found)
 			{
 				int pCount = 0;
 				std::string loader;
 				std::string overrider;
-				std::string caller;
+				//std::string caller;
 				std::string funcParams;
 				std::string funcName;
 				std::string pNameList;
 				std::string pNameListOut;
 
-				for (auto x = res + 4; x < s.length(); x++)
+				/*for (auto x = res + 4; x < s.length(); x++)
 				{
 					if (s.at(x) == '(') break;
 					if (s.at(x) != ' ') funcName.push_back(s.at(x));
-				}
+				}*/
 
-				res = s.find("(",res+4);
+				res = s.find("(",res+7);
 				if (found)
 				{
-					auto declEnd = s.find(")", res+1);
+					auto declEnd = s.find(")", res + 1);
 					bool noParams = true;
-					for (auto x = res+1 ; x < declEnd; x++)
+					for (auto x = res + 1; x <= declEnd; x++)
+					{
+						if (s.at(x) == ',' || s.at(x) == ')') { res = x;  break; }
+						if (s.at(x) != ' ') funcName.push_back(s.at(x));
+					}
+
+					std::string fReflection = "..\\fx\\generated\\reflection\\" + funcName + "_ref.h";
+					ofstream ofile(fReflection);
+
+					ofile << "#if REFLECTION\n\n";
+
+					for (auto x = res + 1; x < declEnd; x++)
 					{
 						if (s.at(x) != ' ') noParams = false;
 						funcParams.push_back(s.at(x));
 					}
 
 					string comma = noParams ? "" : ", ";
-					funcParams = "( const char* srcFileName, int srcLine" + comma + funcParams + ")";
+					funcParams = "( CALLER_INFO" + comma + funcParams + ")";
 
 
 					//decl
-					ofile << "void " << funcName.c_str() << funcParams << "\n{\n";
+					//ofile << "void " << funcName.c_str() << funcParams << "\n{\n";
 
-					caller.append(nsName + funcName.c_str() + "(");
+					//caller.append(nsName + funcName.c_str() + "(");
 
 					std::string type;
 					std::string name;
-					unsigned int x = res+1;
+					unsigned int x = res + 1;
 
 					auto end = s.find(')');
 
@@ -534,7 +545,7 @@ void ScanFile(std::string fname, ofstream& ofile, ofstream& ofileAccel)
 							x++;
 						}
 
-						if (type.compare("unsigned")==0|| type.compare("signed")==0)
+						if (type.compare("unsigned") == 0 || type.compare("signed") == 0)
 						{
 							type.push_back(' ');
 							while (x < end)
@@ -574,7 +585,7 @@ void ScanFile(std::string fname, ofstream& ofile, ofstream& ofileAccel)
 
 						if (pCount > 0)
 						{
-							caller.append(",");
+							//caller.append(",");
 							pNameList.append(", ");
 							pNameListOut.append(", ");
 						}
@@ -602,15 +613,15 @@ void ScanFile(std::string fname, ofstream& ofile, ofstream& ofileAccel)
 
 						if (type.compare("position") == 0 ||
 							type.compare("size") == 0 ||
-							type.compare("rotation") == 0 || 
-							type.compare("color") == 0 )
+							type.compare("rotation") == 0 ||
+							type.compare("color") == 0)
 						{
-							pNameList.append(name+"_x, "+ name + "_y, " + name + "_z");
+							pNameList.append(name + "_x, " + name + "_y, " + name + "_z");
 							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z }");
 							overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
 							overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
 							overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
-							
+
 							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
 							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
 							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
@@ -619,7 +630,7 @@ void ScanFile(std::string fname, ofstream& ofile, ofstream& ofileAccel)
 						}
 
 						if (type.compare("color4") == 0 ||
-							type.compare("rect") == 0 )
+							type.compare("rect") == 0)
 						{
 							pNameList.append(name + "_x, " + name + "_y, " + name + "_z, " + name + "_w");
 							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z, " + name + "_w }");
@@ -637,9 +648,9 @@ void ScanFile(std::string fname, ofstream& ofile, ofstream& ofileAccel)
 							isTypeKnown = true;
 						}
 
-						if (type.compare("int") == 0 || 
-							type.compare("signed int") == 0 || 
-							type.compare("unsigned int") == 0 )
+						if (type.compare("int") == 0 ||
+							type.compare("signed int") == 0 ||
+							type.compare("unsigned int") == 0)
 						{
 							pNameList.append(name);
 							pNameListOut.append(name);
@@ -664,7 +675,7 @@ void ScanFile(std::string fname, ofstream& ofile, ofstream& ofileAccel)
 						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].name, \"" + name + "\"); \n");
 
 
-						caller.append(name);
+						//caller.append(name);
 
 						name.clear();
 						type.clear();
@@ -672,36 +683,43 @@ void ScanFile(std::string fname, ofstream& ofile, ofstream& ofileAccel)
 						x++;
 					}
 
+
+
+					//caller.append(");");
+
+					if (pCount > 0)
+					{
+						ofile << "if (paramsAreLoaded) {\n";
+						ofile << overrider;
+						ofile << "} else {\n";
+
+						ofile << "\tstrcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);\n";
+						ofile << "\tcmdParamDesc[cmdCounter].caller.line = srcLine;\n";
+						ofile << "\tcmdParamDesc[cmdCounter].pCount = " << std::to_string(pCount) << ";\n";
+
+						ofile << loader;
+						ofile << "}\n";
+					}
+
+					ofile << "\nAddToUI(__FUNCTION__);\n";
+					ofile << "cmdCounter++;\n\n";
+					ofile << "cmdLevel++;\n\n";
+
+					//ofile << caller;
+					//ofile << "\n\n";
+
+					ofile << "#define " << funcName << "(" << pNameList << ") ";
+					ofile << funcName << "( __FILE__, __LINE__ ";
+					if (pCount > 0) ofile << ", ";
+					ofile << pNameListOut << ")";
+					ofile << "\n\n";
+					ofile << "#endif";
+
+					//#define playTrack_REF "./generated/reflection/playTrack_ref.h"
+					ofileAccel << "#define " << funcName << "_REF " << "\".\\generated\\reflection\\" << funcName << "_ref.h\"\n\n";
+
+					ofile.close();
 				}
-
-				caller.append(");");
-
-				if (pCount > 0)
-				{
-					ofile << "\nif (cmdParamDesc[cmdCounter].loaded) {\n";
-					ofile << overrider;
-					ofile << "} else {\n";
-
-					ofile << "\tstrcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);\n";
-					ofile << "\tcmdParamDesc[cmdCounter].caller.line = srcLine;\n";
-					ofile << "\tcmdParamDesc[cmdCounter].pCount = " << std::to_string(pCount) << ";\n";
-
-					ofile << loader;
-					ofile << "\tcmdParamDesc[cmdCounter].loaded = true; \n";
-					ofile << "}\n";
-				}
-
-				ofile << "\nAddToUI(__FUNCTION__);\n";
-				ofile << "cmdCounter++;\n\n";
-
-				ofile << caller;
-				ofile << "\n}\n\n";
-
-				ofileAccel << "#define " << funcName << "(" << pNameList << ") ";
-				ofileAccel << funcName << "( __FILE__, __LINE__ ";
-					if (pCount > 0) ofileAccel << ", ";
-					ofileAccel << pNameListOut << ")";
-					ofileAccel << "\n\n";
 
 			}
 		}
@@ -727,6 +745,12 @@ void srcCat(const std::filesystem::path& sandbox, ofstream& ofile, ofstream& ofi
 		}
 
 	}
+}
+
+void deleteDirectoryContents(const std::filesystem::path& dir)
+{
+	for (const auto& entry : std::filesystem::directory_iterator(dir))
+		std::filesystem::remove_all(entry.path());
 }
 
 int main()
@@ -838,7 +862,11 @@ int main()
 	remove(apiAccel.c_str());
 	ofstream accelOfile(apiAccel);
 
-	apiOfile << "namespace api { \n\n";
+	
+	std::filesystem::path fref{ "..\\fx\\generated\\reflection\\" };
+	deleteDirectoryContents(fref);
+
+	//apiOfile << "namespace api { \n\n";
 
 	const std::filesystem::path srcSandbox{ "..\\fx\\projectFiles\\" };
 	srcCat(srcSandbox, apiOfile, accelOfile);
@@ -848,7 +876,7 @@ int main()
 	srcCat(srcSandbox3, apiOfile, accelOfile);
 
 
-	apiOfile << "};\n";
+	//apiOfile << "};\n";
 
 	apiOfile.close();
 	accelOfile.close();

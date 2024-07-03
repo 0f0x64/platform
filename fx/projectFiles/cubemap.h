@@ -1,21 +1,25 @@
 namespace Cubemap {
 
-	API CalcCubemap(texture target)
+	COMMAND (CalcCubemap, texture target)
 	{
+		#include REFLINK(CalcCubemap)
+
 		gapi.blend(blendmode::off, blendop::add);
-		gapi.rt(target);
+		gapi.rt(target,0);
 		gapi.cull(cullmode::off);
 		gapi.depth(depthmode::off);
 		gapi.clear(color4{ 0, 0, 0, 1 });
 
 		vs::quad.set();
 		ps::cubemapCreator.set();
-		gapi.draw(1, 1);
+		gapi.draw(1);
 		gapi.mips();
 	}
 
-	API ShowCubemap(texture envTexture)
+	COMMAND(ShowCubemap,texture envTexture)
 	{
+		#include REFLINK(ShowCubemap)
+
 		gapi.blend(blendmode::off, blendop::add);
 		gapi.cull(cullmode::back);
 

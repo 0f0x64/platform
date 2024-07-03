@@ -182,6 +182,111 @@
     <ClInclude Include="generated\accel.h">
       <Filter>Source Files\generated</Filter>
     </ClInclude>
+    <ClInclude Include="generated\reflection\playTrack_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\channel_01_bass_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\channel_02_solo_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\eq_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\mix_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\oscillator_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\blend_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\CalcCubemap_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\CalcObject_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\cam_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\clear_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\clearDepth_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\copyColor_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\copyDepth_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\cull_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\depth_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\draw_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\mips_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\rt_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\setIA_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\setScissors_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\ShowCubemap_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\ShowObject_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\ClearRT_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\ClearRTDepth_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\CopyRTColor_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\CopyRTDepth_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\CreateMips_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\SetBlendMode_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\SetCamera_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\SetCull_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\SetDepthMode_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\SetRT_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="tools.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\graphicsAPI.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

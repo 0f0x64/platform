@@ -1,56 +1,46 @@
-#define CalcCubemap(target) CalcCubemap( __FILE__, __LINE__ , target)
+#define CalcCubemap_REF ".\generated\reflection\CalcCubemap_ref.h"
 
-#define ShowCubemap(envTexture) ShowCubemap( __FILE__, __LINE__ , envTexture)
+#define ShowCubemap_REF ".\generated\reflection\ShowCubemap_ref.h"
 
-#define ShowObject(geometry, normals, quality, pos_x, pos_y, pos_z) ShowObject( __FILE__, __LINE__ , geometry, normals, quality, position {pos_x, pos_y, pos_z })
+#define SetInputAsm_REF ".\generated\reflection\SetInputAsm_ref.h"
 
-#define CalcObject(targetGeo, targetNrml) CalcObject( __FILE__, __LINE__ , targetGeo, targetNrml)
+#define SetRT_REF ".\generated\reflection\SetRT_ref.h"
 
-#define Blending(mode, operation) Blending( __FILE__, __LINE__ , mode, operation)
+#define CreateMips_REF ".\generated\reflection\CreateMips_ref.h"
 
-#define Camera(eye_x, eye_y, eye_z, at_x, at_y, at_z, up_x, up_y, up_z, angle) Camera( __FILE__, __LINE__ , position {eye_x, eye_y, eye_z }, position {at_x, at_y, at_z }, position {up_x, up_y, up_z }, angle)
+#define SetDepthMode_REF ".\generated\reflection\SetDepthMode_ref.h"
 
-#define Depth(mode) Depth( __FILE__, __LINE__ , mode)
+#define Draw_REF ".\generated\reflection\Draw_ref.h"
 
-#define Clear(color_x, color_y, color_z, color_w) Clear( __FILE__, __LINE__ , color4 {color_x, color_y, color_z, color_w })
+#define SetCamera_REF ".\generated\reflection\SetCamera_ref.h"
 
-#define ClearDepth() ClearDepth( __FILE__, __LINE__ )
+#define ClearRT_REF ".\generated\reflection\ClearRT_ref.h"
 
-#define NullDrawer(quadCount, instances) NullDrawer( __FILE__, __LINE__ , quadCount, instances)
+#define ClearRTDepth_REF ".\generated\reflection\ClearRTDepth_ref.h"
 
-#define IA(topoType) IA( __FILE__, __LINE__ , topoType)
+#define SetBlendMode_REF ".\generated\reflection\SetBlendMode_ref.h"
 
-#define Cull(mode) Cull( __FILE__, __LINE__ , mode)
+#define SetCull_REF ".\generated\reflection\SetCull_ref.h"
 
-#define Scissors(r_x, r_y, r_z, r_w) Scissors( __FILE__, __LINE__ , rect {r_x, r_y, r_z, r_w })
+#define SetScissors_REF ".\generated\reflection\SetScissors_ref.h"
 
-#define Sampler(shader, slot, filterType, addressU, addressV) Sampler( __FILE__, __LINE__ , shader, slot, filterType, addressU, addressV)
+#define CopyRTColor_REF ".\generated\reflection\CopyRTColor_ref.h"
 
-#define SamplerComp(slot) SamplerComp( __FILE__, __LINE__ , slot)
+#define CopyRTDepth_REF ".\generated\reflection\CopyRTDepth_ref.h"
 
-#define vShader(n) vShader( __FILE__, __LINE__ , n)
+#define ShowObject_REF ".\generated\reflection\ShowObject_ref.h"
 
-#define pShader(n) pShader( __FILE__, __LINE__ , n)
+#define CalcObject_REF ".\generated\reflection\CalcObject_ref.h"
 
-#define CopyColor(dst, src) CopyColor( __FILE__, __LINE__ , dst, src)
+#define oscillator_REF ".\generated\reflection\oscillator_ref.h"
 
-#define CopyDepth(dst, src) CopyDepth( __FILE__, __LINE__ , dst, src)
+#define eq_REF ".\generated\reflection\eq_ref.h"
 
-#define TextureToShader(tex, slot, tA) TextureToShader( __FILE__, __LINE__ , tex, slot, tA)
+#define channel_01_bass_REF ".\generated\reflection\channel_01_bass_ref.h"
 
-#define CreateMipMap() CreateMipMap( __FILE__, __LINE__ )
+#define channel_02_solo_REF ".\generated\reflection\channel_02_solo_ref.h"
 
-#define RenderTarget(target, level) RenderTarget( __FILE__, __LINE__ , target, level)
+#define mix_REF ".\generated\reflection\mix_ref.h"
 
-#define oscillator(a, b) oscillator( __FILE__, __LINE__ , a, b)
-
-#define eq(a) eq( __FILE__, __LINE__ , a)
-
-#define channel_01_bass(volume, pan, ms) channel_01_bass( __FILE__, __LINE__ , volume, pan, ms)
-
-#define channel_02_solo(volume, pan, ms) channel_02_solo( __FILE__, __LINE__ , volume, pan, ms)
-
-#define mix(level) mix( __FILE__, __LINE__ , level)
-
-#define playTrack() playTrack( __FILE__, __LINE__ )
+#define playTrack_REF ".\generated\reflection\playTrack_ref.h"
 

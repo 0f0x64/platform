@@ -1,7 +1,9 @@
 namespace Object {
 
-	API ShowObject(texture geometry, texture normals, unsigned int quality, position pos)
+	COMMAND(ShowObject,texture geometry, texture normals, unsigned int quality, position pos)
 	{
+		#include REFLINK(ShowObject)
+
 		int denom = (int)pow(2, quality);
 		float q = intToFloatDenom;
 		
@@ -32,21 +34,23 @@ namespace Object {
 		
 	}
 
-	API CalcObject(texture targetGeo, texture targetNrml)
+	COMMAND(CalcObject,texture targetGeo, texture targetNrml)
 	{
-		gapi.blend(blendmode::off, blendop::add);
-		gapi.cull(cullmode::off);
-		gapi.rt(targetGeo);
-		gapi.depth(depthmode::off);
+		#include REFLINK(CalcObject)
+
+		gApi.SetBlendMode(blendmode::off, blendop::add);
+		gApi.SetCull(cullmode::off);
+		gApi.SetRT(targetGeo,0);
+		gApi.SetDepthMode(depthmode::off);
 
 		//pos
 		vs::quad.set();
 		ps::obj1.set();
-		gapi.draw(1);
-		gapi.mips();
+		gApi.Draw(1,1);
+		gApi.CreateMips();
 
 		//normals
-		gapi.rt(targetNrml);
+		gApi.SetRT(targetNrml,0);
 		vs::quad.set();
 
 		ps::genNormals.samplers.sam1Filter = filter::linear;
@@ -55,8 +59,9 @@ namespace Object {
 
 		ps::genNormals.textures.geo = targetGeo;
 		ps::genNormals.set();
-		gapi.draw(1);
-		gapi.mips();
+
+		gApi.Draw(1,1);
+		gApi.CreateMips();
 	}
 
 }

@@ -1,4 +1,5 @@
 #include "settings.h"
+#include "tools.h"
 
 // windows environment
 
@@ -18,8 +19,6 @@ HWND hWnd;
 #include "utils.h"
 #include "types.h"
 
-
-
 #include "dx11\dx.h"
 #include <Xaudio2.h>
 #include "vMachine.h"
@@ -33,6 +32,25 @@ using namespace dx11;
 	#include "editor\editor.h"
 #endif
 
+#define REFLECTION true
+
+#define refPath ./generated/reflection/
+#define refTail _ref.h
+#define REFLINK(FOO) STRINGIFY( CAT_3(refPath,FOO,refTail) )
+
+
+#if REFLECTION
+	#define CALLER_INFO const char* srcFileName, int srcLine 
+	#define EDITABLE __FILE__, __LINE__
+#define COMMAND(fname, ...) void fname(CALLER_INFO, __VA_ARGS__)
+#else
+	#define CALLER_INFO
+	#define EDITABLE
+	#define COMMAND(fname, ...) void fname(__VA_ARGS__)
+#endif
+
+
+#include "generated\accel.h"
 
 #include "projectFiles\loop.h"
 

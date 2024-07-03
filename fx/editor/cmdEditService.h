@@ -16,9 +16,10 @@ struct {
 		bool bypass;
 	} param[255];
 
-	bool loaded = false;
-
 } cmdParamDesc[1000];
+
+bool paramsAreLoaded = false;
+int cmdLevel = 0;
 
 int cmdCounter = 0;//reset it in loop start point
 int currentCmd = -1;//comes from ui

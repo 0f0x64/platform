@@ -76,7 +76,7 @@ namespace dx11
 
 	struct {
 		void setIA(topology t) { InputAssembler::IA(t); }
-		void rt(texture i) { Textures::RenderTarget(i); }
+		void rt(texture i, int level =0) { Textures::RenderTarget(i,level); }
 		void mips() { Textures::CreateMipMap(); }
 		void depth(depthmode i) { Depth::Depth(i); }
 		void draw(int quadcount, int instances = 1) { Draw::NullDrawer(quadcount, instances); }
