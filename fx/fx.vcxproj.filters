@@ -287,6 +287,9 @@
     <ClInclude Include="projectFiles\graphicsAPI.h">
       <Filter>Source Files\projectFiles</Filter>
     </ClInclude>
+    <ClInclude Include="generated\reflection\SetInputAsm_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

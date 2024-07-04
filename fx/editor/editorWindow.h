@@ -40,7 +40,7 @@ void SetRenderWindowPosition()
 				const auto rc = monitorInfo.rcMonitor;
 
 				int w = (rc.right - rc.left) / MAIN_DISPLAY_DENOMINATOR;
-				int h = (rc.bottom - rc.top) / MAIN_DISPLAY_DENOMINATOR;
+				int h = (rc.bottom - rc.top);// / MAIN_DISPLAY_DENOMINATOR;
 				SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, w, h, SWP_NOMOVE);//window on top
 
 				width = (rc.right - rc.left);

@@ -84,12 +84,14 @@ namespace tracker
 	{
 		#include REFLINK(oscillator)
 		int d = 011;
+		refStackBack;
 	}
 
 	COMMAND (eq, int a)
 	{
 		#include REFLINK(eq)
 		int b = 1;
+		refStackBack;
 	}
 
 	COMMAND (channel_01_bass, int volume, int pan, visibility ms)
@@ -97,6 +99,7 @@ namespace tracker
 		#include REFLINK(channel_01_bass)
 		int c = 2;
 		oscillator(1, 2);
+		refStackBack;
 	}
 
 	COMMAND (channel_02_solo, int volume,int pan,visibility ms)
@@ -104,6 +107,7 @@ namespace tracker
 		#include REFLINK(channel_02_solo)
 
 		int a = 4;
+		refStackBack;
 	}
 
 
@@ -112,6 +116,7 @@ namespace tracker
 	{
 		#include REFLINK(mix)
 		int a = 5;
+		refStackBack;
 	}
 
 
@@ -124,7 +129,7 @@ namespace tracker
 		channel_02_solo(100, 0, visibility::on);
 		mix( 123);
 		
-
+		refStackBack;
 		
 	
 		

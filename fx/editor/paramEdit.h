@@ -22,6 +22,8 @@ namespace paramEdit {
 	int pCountV = 0;
 	float tabLen = 0.f;
 
+	float vScroll = false;
+
 	void rbDown()
 	{
 		yPosLast = yPos;
@@ -31,6 +33,12 @@ namespace paramEdit {
 
 	void lbDown()
 	{
+/*		if (ui::dblClk)
+		{
+			//cmdLevel
+			ui::dblClk = false;
+		}*/
+
 	//	storedParam = cmdParamDesc[currentCmd].params[currentParam][0];
 	}
 
@@ -56,8 +64,12 @@ namespace paramEdit {
 
 	void showLabels()
 	{
-		for (int i = 0; i < cmdCounter; i++)
+		for (int i = startCmd; i < cmdCounter; i++)
 		{
+			if (i > startCmd && curCmdLevel > cmdParamDesc[i].stackLevel) break;
+			if (i > startCmd && curCmdLevel != cmdParamDesc[i].stackLevel) continue;
+
+
 			float sel = currentCmd == i ? 1.f : 0.f;
 			ui::style::text::r = lerp(1.f, .0f, sel);
 			ui::style::text::g = lerp(1.f, .0f, sel);
@@ -84,7 +96,8 @@ namespace paramEdit {
 			isType(t1, "filter") || 
 			isType(t1, "addr") ||
 			isType(t1, "cullmode") ||
-			isType(t1, "targetshader")
+			isType(t1, "targetshader") ||
+			isType(t1, "visibility")
 			) 
 		{
 			return true;
@@ -121,10 +134,14 @@ namespace paramEdit {
 	void showBoxes()
 	{
 		ui::Box::Setup();
-
-		for (int i = 0; i < cmdCounter; i++)
+		auto c = curCmdLevel;
+		for (int i = startCmd; i < cmdCounter; i++)
 		{
 			auto w = ui::Text::getTextLen(cmdParamDesc[i].funcName, ui::style::text::width) + insideX * 2.f;
+
+			auto cl = cmdParamDesc[i].stackLevel;
+			if (i > startCmd && curCmdLevel > cmdParamDesc[i].stackLevel) break;
+			if (i > startCmd && curCmdLevel !=cmdParamDesc[i].stackLevel) continue;
 
 			if (isMouseOver(x, y, w, ui::style::box::height) && editContext)
 			{
@@ -134,17 +151,55 @@ namespace paramEdit {
 
 				if (ui::dblClk && ui::lbDown)
 				{
-					for (int j = 0; j < cmdParamDesc[currentCmd].pCount; j++)
+					if (i == startCmd) //close
 					{
-						if (isType(cmdParamDesc[currentCmd].param[j].type, "position"))
+						curCmdLevel = max(cl , 0);
+
+						for (int j = startCmd; j >= 0; j--)
 						{
-							auto _x = cmdParamDesc[currentCmd].param[j].value[0];
-							auto _y = cmdParamDesc[currentCmd].param[j].value[1];
-							auto _z = cmdParamDesc[currentCmd].param[j].value[2];
-							ViewCam::TransCam(_x / intToFloatDenom, _y / intToFloatDenom, _z / intToFloatDenom);
+							if (cmdParamDesc[j].stackLevel < curCmdLevel  || j == 0) {
+								startCmd = j; break;
+							}
+						}
+
+						int cnt = 0;
+						for (int j = startCmd; j < i; j++)
+						{
+							if (j == startCmd || curCmdLevel == cmdParamDesc[j].stackLevel) cnt++;
+						}
+						
+						yPos -= float(cnt)* lead;
+						//y = float(i - startCmd) * lead
+
+					}
+					else //open
+					{
+						bool haveContent = false;
+						for (int j = i+1; j < cmdCounter; j++)
+						{
+							if (cl < cmdParamDesc[j].stackLevel)
+							{
+								haveContent = true;
+								break;
+							}
+
+							if (cl >= cmdParamDesc[j].stackLevel)
+							{
+								break;
+							}
+						}
+
+						if (haveContent)
+						{
+							startCmd = i;
+							curCmdLevel = cl + 1;
+							yPos = y;
 						}
 					}
+
 					ui::dblClk = false;
+					//vScroll = true;
+					break;
 				}
 
 				if (ui::lbDown && i != currentCmd &&!action) {
@@ -177,7 +232,7 @@ namespace paramEdit {
 		
 	}
 
-	float vScroll = false;
+
 
 	void ObjHandlers()
 	{
@@ -185,7 +240,7 @@ namespace paramEdit {
 
 		hilightedCmd = currentCmd;
 
-		for (int i = 0; i < cmdCounter; i++)
+		for (int i = startCmd; i < cmdCounter; i++)
 		{
 			for (int j = 0; j < cmdParamDesc[i].pCount; j++)
 			{
@@ -328,6 +383,83 @@ namespace paramEdit {
 
 	}
 
+
+
+	//detect expressions and variables in caller and set bypass
+
+	std::vector<std::string> regex_split(const std::string& str, const std::regex& reg) {
+		const std::sregex_token_iterator beg{ str.cbegin(), str.cend(), reg, -1 };
+		const std::sregex_token_iterator end{};
+
+		return { beg, end };
+	}
+
+	bool isNumber(const std::string& token)
+	{
+		return std::regex_match(token, std::regex("(\\+|-)?[0-9]*(\\.?([0-9]+))$"));
+	}
+
+	void setBypass()
+	{
+		const char* filename = cmdParamDesc[cmdCounter].caller.fileName; 
+		const int lineNum = cmdParamDesc[cmdCounter].caller.line;
+
+		using namespace std;
+		string inFilePath = filename;
+
+		string s;
+		ifstream ifile(inFilePath);
+
+		int lc = 1;
+		if (ifile.is_open())
+		{
+			while (getline(ifile, s) && lc != lineNum) lc++;
+
+			unsigned int pos = 0;
+			pos = s.find(cmdParamDesc[cmdCounter].funcName);
+			if (pos != string::npos)
+			{
+				pos = s.find("(")+1;
+				unsigned int posEnd = 0;
+				posEnd = s.find(";",pos);
+				posEnd = s.rfind(")", posEnd);
+				string s2;
+				s2.append(s.substr(pos, posEnd - pos));
+				s2.erase(remove(s2.begin(), s2.end(), ' '), s2.end());
+				s2.erase(remove(s2.begin(), s2.end(), '\t'), s2.end());
+
+				constexpr auto regex_str = R"(,)";
+				const std::regex reg{ regex_str };
+				const auto tokens = regex_split(s2, reg);
+
+				int j = 0;
+				for (auto& i : tokens)
+				{
+					bool enumValue = false;
+
+					if (i.find("::") != string::npos)
+					{//check for known types
+						const auto t = i.substr(0, i.find("::"));
+						enumValue = isTypeEnum(t.c_str());
+					}
+
+					bool intValue = isNumber(i);
+
+					bool bypass = !(intValue || enumValue);
+
+					cmdParamDesc[cmdCounter].param[j].bypass = bypass;
+					j++;
+				}
+
+
+			}
+
+		}
+
+		ifile.close();
+		
+	}
+
 	//create c++ call string and save it into source file
 	void Save()
 	{
@@ -385,7 +517,7 @@ namespace paramEdit {
 		}
 
 		strcat(str, ");");
-
+		int ttt = 0;
 		//
 	}
 
@@ -396,6 +528,7 @@ namespace paramEdit {
 
 	void showParamBoxes()
 	{
+		bool needToSave = false;
 		pCountV = 0;
 
 		ui::Box::Setup();
@@ -403,7 +536,8 @@ namespace paramEdit {
 		float _x = x + valueDrawOffset - insideX;
 		float __x = x + enumDrawOffset - insideX;
 
-		float y = yPos + float(currentCmd) * lead;
+		float y = selYpos;
+
 		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
 		{
 
@@ -519,6 +653,7 @@ namespace paramEdit {
 							currentParam = -1;
 
 							cmdParamDesc[currentCmd].param[i].value[0] = e;
+							needToSave = true;
 						}
 					}
 				}
@@ -540,7 +675,13 @@ namespace paramEdit {
 				{
 					storedParam[max(subParam, 0)] = cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)];
 				}
+				needToSave = true;
 			}
+		}
+
+		if (needToSave)
+		{
+			Save();
 		}
 	}
 
@@ -559,7 +700,7 @@ namespace paramEdit {
 		showCursor = false;
 		auto bw = .05f;
 
-		float y = yPos + float(currentCmd) * lead;
+		float y = selYpos;
 
 		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
 		{
@@ -637,7 +778,7 @@ namespace paramEdit {
 				for (int e = 0; e < getEnumCount(sType); e++)
 				{
 					strcpy(vstr, getEnumStr(sType, e));
-					ui::Text::Draw(vstr, x + enumDrawOffset, yPos + float(currentCmd + i + e) * lead + insideY);
+					ui::Text::Draw(vstr, x + enumDrawOffset, selYpos + float(i + e) * lead + insideY);
 				}
 			}
 

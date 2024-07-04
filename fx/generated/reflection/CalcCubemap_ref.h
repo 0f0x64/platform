@@ -1,7 +1,7 @@
 #if REFLECTION
 
 if (paramsAreLoaded) {
-	target = (texture)cmdParamDesc[cmdCounter].param[0].value[0];
+	if (!cmdParamDesc[cmdCounter].param[0].bypass)  target = (texture)cmdParamDesc[cmdCounter].param[0].value[0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
@@ -10,6 +10,9 @@ if (paramsAreLoaded) {
 	cmdParamDesc[cmdCounter].param[0].bypass = false;
 	strcpy(cmdParamDesc[cmdCounter].param[0].type, "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].param[0].name, "target"); 
+
+		editor::paramEdit::setBypass();
+
 }
 
 AddToUI(__FUNCTION__);

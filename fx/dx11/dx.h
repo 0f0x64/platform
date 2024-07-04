@@ -1,6 +1,7 @@
 typedef unsigned long uint32;
 typedef long int32;
-static inline int32 log2(float x)
+
+static inline int32 _log2(float x)
 {
 	uint32 ix = (uint32&)x;
 	uint32 exp = (ix >> 23) & 0xFF;

@@ -1,7 +1,7 @@
 #if REFLECTION
 
 if (paramsAreLoaded) {
-	r.x = cmdParamDesc[cmdCounter].param[0].value[0];
+	if (!cmdParamDesc[cmdCounter].param[0].bypass) 	r.x = cmdParamDesc[cmdCounter].param[0].value[0];
 	r.y = cmdParamDesc[cmdCounter].param[0].value[1];
 	r.z = cmdParamDesc[cmdCounter].param[0].value[2];
 	r.w = cmdParamDesc[cmdCounter].param[0].value[3];
@@ -16,6 +16,9 @@ if (paramsAreLoaded) {
 	cmdParamDesc[cmdCounter].param[0].bypass = false;
 	strcpy(cmdParamDesc[cmdCounter].param[0].type, "rect"); 
 	strcpy(cmdParamDesc[cmdCounter].param[0].name, "r"); 
+
+		editor::paramEdit::setBypass();
+
 }
 
 AddToUI(__FUNCTION__);

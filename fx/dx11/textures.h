@@ -43,7 +43,7 @@ namespace Textures
 
 		tdesc.Width = (UINT)cTex.size.x;
 		tdesc.Height = (UINT)cTex.size.y;
-		tdesc.MipLevels = cTex.mipMaps ? (UINT)(log2(max(cTex.size.x, cTex.size.y))) : 0;
+		tdesc.MipLevels = cTex.mipMaps ? (UINT)(_log2(max(cTex.size.x, cTex.size.y))) : 0;
 		tdesc.ArraySize = 1;
 		tdesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
 		tdesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
@@ -122,7 +122,7 @@ namespace Textures
 
 		tdesc.Width = (UINT)cTex.size.x;
 		tdesc.Height = (UINT)cTex.size.y;
-		tdesc.MipLevels = cTex.mipMaps ? (UINT)(log2(max(cTex.size.x, cTex.size.y))) : 0;
+		tdesc.MipLevels = cTex.mipMaps ? (UINT)(_log2(max(cTex.size.x, cTex.size.y))) : 0;
 		tdesc.CPUAccessFlags = 0;
 		tdesc.SampleDesc.Count = 1;
 		tdesc.SampleDesc.Quality = 0;

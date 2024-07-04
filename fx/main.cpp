@@ -34,6 +34,7 @@ using namespace dx11;
 
 #define REFLECTION true
 
+#define refStackBack cmdLevel--
 #define refPath ./generated/reflection/
 #define refTail _ref.h
 #define REFLINK(FOO) STRINGIFY( CAT_3(refPath,FOO,refTail) )
@@ -42,7 +43,7 @@ using namespace dx11;
 #if REFLECTION
 	#define CALLER_INFO const char* srcFileName, int srcLine 
 	#define EDITABLE __FILE__, __LINE__
-#define COMMAND(fname, ...) void fname(CALLER_INFO, __VA_ARGS__)
+	#define COMMAND(fname, ...) void fname(CALLER_INFO, __VA_ARGS__)
 #else
 	#define CALLER_INFO
 	#define EDITABLE

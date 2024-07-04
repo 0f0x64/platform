@@ -225,6 +225,7 @@
     <ClInclude Include="generated\reflection\SetCull_ref.h" />
     <ClInclude Include="generated\reflection\SetDepthMode_ref.h" />
     <ClInclude Include="generated\reflection\setIA_ref.h" />
+    <ClInclude Include="generated\reflection\SetInputAsm_ref.h" />
     <ClInclude Include="generated\reflection\SetRT_ref.h" />
     <ClInclude Include="generated\reflection\setScissors_ref.h" />
     <ClInclude Include="generated\reflection\ShowCubemap_ref.h" />

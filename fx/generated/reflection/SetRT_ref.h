@@ -1,8 +1,8 @@
 #if REFLECTION
 
 if (paramsAreLoaded) {
-	i = (texture)cmdParamDesc[cmdCounter].param[0].value[0];
-	level = (int)cmdParamDesc[cmdCounter].param[1].value[0];
+	if (!cmdParamDesc[cmdCounter].param[0].bypass)  i = (texture)cmdParamDesc[cmdCounter].param[0].value[0];
+	if (!cmdParamDesc[cmdCounter].param[1].bypass) 	level = (int)cmdParamDesc[cmdCounter].param[1].value[0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
@@ -15,6 +15,9 @@ if (paramsAreLoaded) {
 	cmdParamDesc[cmdCounter].param[1].bypass = false;
 	strcpy(cmdParamDesc[cmdCounter].param[1].type, "int"); 
 	strcpy(cmdParamDesc[cmdCounter].param[1].name, "level"); 
+
+		editor::paramEdit::setBypass();
+
 }
 
 AddToUI(__FUNCTION__);

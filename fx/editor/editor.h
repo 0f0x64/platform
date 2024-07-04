@@ -1,3 +1,12 @@
+
+
+#include <iostream>
+#include <string>
+#include <filesystem>
+#include <fstream>
+#include <regex>
+#include <vector>
+
 using namespace dx11;
 
 namespace editor

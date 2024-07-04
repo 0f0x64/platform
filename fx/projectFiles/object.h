@@ -4,15 +4,15 @@ namespace Object {
 	{
 		#include REFLINK(ShowObject)
 
-		int denom = (int)pow(2, quality);
+		int denom = (int)pow(2, (float)quality);
 		float q = intToFloatDenom;
 		
 		ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixTranslation(pos.x/q, pos.y/q, pos.z/q));
 		ConstBuf::drawerMat.hilight = cmdCounter-1 == hilightedCmd ? 1.f : 0.f;
 		ConstBuf::UpdateDrawerMat();
 
-		float gX = Textures::Texture[(int)texture::obj1pos].size.x / denom;
-		float gY = Textures::Texture[(int)texture::obj1pos].size.y / denom;
+		float gX = Textures::Texture[(int)geometry].size.x / denom;
+		float gY = Textures::Texture[(int)geometry].size.y / denom;
 
 		vs::objViewer.textures.positions = geometry;
 		vs::objViewer.textures.normals = normals;
@@ -30,7 +30,9 @@ namespace Object {
 		ps::basic.samplers.sam1AddressV = addr::wrap;
 
 		ps::basic.set();
-		gapi.draw((int)gX * (int)gY);
+		gApi.Draw((int)gX * (int)gY,1);
+
+		refStackBack;
 		
 	}
 
@@ -62,6 +64,8 @@ namespace Object {
 
 		gApi.Draw(1,1);
 		gApi.CreateMips();
+
+		refStackBack;
 	}
 
 }

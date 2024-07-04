@@ -594,6 +594,8 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 
 						bool isTypeKnown = false;
 
+						overrider.append("\tif (!cmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass) ");
+
 						if (type.compare("texture") == 0 ||
 							type.compare("topology") == 0 ||
 							type.compare("blendmode") == 0 ||
@@ -602,11 +604,12 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 							type.compare("filter") == 0 ||
 							type.compare("addr") == 0 ||
 							type.compare("cullmode") == 0 ||
-							type.compare("targetshader") == 0)
+							type.compare("targetshader") == 0 ||
+							type.compare("visibility") == 0)
 						{
 							pNameList.append(name);
 							pNameListOut.append(name);
-							overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+							overrider.append(" " + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
 							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = (int)" + name + ";\n");
 							isTypeKnown = true;
 						}
@@ -618,9 +621,10 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 						{
 							pNameList.append(name + "_x, " + name + "_y, " + name + "_z");
 							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z }");
-							overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-							overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
-							overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
+							overrider.append("\n\t\t{\n\t\t\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+							overrider.append("\t\t\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
+							overrider.append("\t\t\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
+							overrider.append("\t\t}\n");
 
 							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
 							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
@@ -674,7 +678,6 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].type, \"" + type + "\"); \n");
 						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].name, \"" + name + "\"); \n");
 
-
 						//caller.append(name);
 
 						name.clear();
@@ -697,6 +700,8 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 						ofile << "\tcmdParamDesc[cmdCounter].caller.line = srcLine;\n";
 						ofile << "\tcmdParamDesc[cmdCounter].pCount = " << std::to_string(pCount) << ";\n";
 
+						loader.append("\n\t\teditor::paramEdit::setBypass();\n\n");
+
 						ofile << loader;
 						ofile << "}\n";
 					}
@@ -713,6 +718,7 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 					if (pCount > 0) ofile << ", ";
 					ofile << pNameListOut << ")";
 					ofile << "\n\n";
+
 					ofile << "#endif";
 
 					//#define playTrack_REF "./generated/reflection/playTrack_ref.h"

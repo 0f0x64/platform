@@ -16,10 +16,14 @@ struct {
 		bool bypass;
 	} param[255];
 
+	int stackLevel = 0;
+
 } cmdParamDesc[1000];
 
 bool paramsAreLoaded = false;
 int cmdLevel = 0;
+int startCmd = 0;
+int curCmdLevel = 0;
 
 int cmdCounter = 0;//reset it in loop start point
 int currentCmd = -1;//comes from ui
@@ -27,6 +31,8 @@ int hilightedCmd = -1;
 
 void AddToUI(const char* funcName)
 {
+	cmdParamDesc[cmdCounter].stackLevel = cmdLevel;
+
 	int x = strlen(funcName)-1;;
 	for (x; x >= 0; x--) { if (funcName[x] == ':') { x++; break; } };
 
