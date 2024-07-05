@@ -71,11 +71,11 @@ namespace paramEdit {
 
 
 			float sel = currentCmd == i ? 1.f : 0.f;
-			ui::style::text::r = lerp(1.f, .0f, sel);
-			ui::style::text::g = lerp(1.f, .0f, sel);
-			ui::style::text::b = lerp(1.f, .0f, sel);
+			editor::ui::style::text::r = lerp(1.f, .0f, sel);
+			editor::ui::style::text::g = lerp(1.f, .0f, sel);
+			editor::ui::style::text::b = lerp(1.f, .0f, sel);
 
-			ui::Text::Draw(cmdParamDesc[i].funcName, x + insideX, y + insideY);
+			editor::ui::Text::Draw(cmdParamDesc[i].funcName, x + insideX, y + insideY);
 			y += lead;
 		}
 	}
@@ -297,6 +297,7 @@ namespace paramEdit {
 
 	void insertNumber(int p)
 	{
+		if (cmdParamDesc[currentCmd].param[currentParam].bypass) return;
 		auto sType = cmdParamDesc[currentCmd].param[currentParam].type;
 		if (isTypeEnum(sType)) return;
 
@@ -373,6 +374,7 @@ namespace paramEdit {
 		if (currentCmd == -1) return;
 		if (currentParam == -1) return;
 
+		if (cmdParamDesc[currentCmd].param[currentParam].bypass) return;
 		auto sType = cmdParamDesc[currentCmd].param[currentParam].type;
 
 		if (isTypeEnum(sType)) return;
@@ -463,62 +465,108 @@ namespace paramEdit {
 	//create c++ call string and save it into source file
 	void Save()
 	{
-		char str[1024];
-		
-		strcpy(str, cmdParamDesc[currentCmd].funcName);
-		strcat(str, "(");
+		std::vector<std::string> genParams;
 
 		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
 		{
 			auto sType = cmdParamDesc[currentCmd].param[i].type;
 
-			if (isType(sType, "int") || isType(sType, "signed int") || isType(sType, "unsigned int"))
-			{
-				char pStr[32];
-				_itoa((int)cmdParamDesc[currentCmd].param[i].value[0], pStr, 10);
-				strcat(str, pStr);
-			}
-
 			if (isTypeEnum(sType))
 			{
-				strcat(str, cmdParamDesc[currentCmd].param[i].type);
-				str[strlen(str) - 1] = 0;
-				strcat(str, "::");
-				strcat(str, getEnumStr(sType, (int)cmdParamDesc[currentCmd].param[i].value[0]));
+				genParams.push_back(std::string(cmdParamDesc[currentCmd].param[i].type) +
+					"::" + std::string(getEnumStr(sType, (int)cmdParamDesc[currentCmd].param[i].value[0])));
 			}
-
-			if (isType(sType, "position") ||
-				isType(sType, "size") ||
-				isType(sType, "rotation") || 
-				isType(sType, "color") )
+			else
 			{
 				char pStr[32];
-				for (int x = 0; x < 3; x++)
+				for (int x = 0; x < getTypeDim(sType); x++)
 				{
 					_itoa(cmdParamDesc[currentCmd].param[i].value[x], pStr, 10);
-					strcat(str, pStr);
-					if (x!=2) strcat(str, ", ");
+					genParams.push_back(std::string(pStr));
 				}
 			}
 
-			if (isType(sType, "color4") ||
-				isType(sType, "rect") )
-			{
-				char pStr[32];
-				for (int x = 0; x < 4; x++)
-				{
-					_itoa(cmdParamDesc[currentCmd].param[i].value[x], pStr, 10);
-					strcat(str, pStr);
-					if (x != 3) strcat(str, ", ");
-				}
-			}
-
-			if (i!= cmdParamDesc[currentCmd].pCount -1) strcat(str, ", ");
 		}
 
-		strcat(str, ");");
-		int ttt = 0;
-		//
+		const char* filename = cmdParamDesc[currentCmd].caller.fileName;
+		const int lineNum = cmdParamDesc[currentCmd].caller.line;
+
+		using namespace std;
+		string inFilePath = filename;
+		string outFilePath = inFilePath + "_";
+
+		string s;
+		ifstream ifile(inFilePath);
+		ofstream ofile(outFilePath);
+
+		std::string caller;
+
+		int lc = 1;
+		if (ifile.is_open())
+		{
+			while (getline(ifile, s) && lc < lineNum)
+			{
+				ofile << s;
+				lc++;
+			}
+
+			getline(ifile, s);
+
+			unsigned int pos = 0;
+			pos = s.find(cmdParamDesc[currentCmd].funcName);
+			if (pos != string::npos)
+			{
+				pos = s.find("(") + 1;
+				unsigned int posEnd = 0;
+				posEnd = s.find(";", pos);
+				posEnd = s.rfind(")", posEnd);
+				string s2;
+				s2.append(s.substr(pos, posEnd - pos));
+				s2.erase(remove(s2.begin(), s2.end(), ' '), s2.end());
+				s2.erase(remove(s2.begin(), s2.end(), '\t'), s2.end());
+
+				constexpr auto regex_str = R"(,)";
+				const std::regex reg{ regex_str };
+				const auto tokens = regex_split(s2, reg);
+
+				caller.append(cmdParamDesc[currentCmd].funcName);
+				caller.append("(");
+
+				int j = 0;
+				for (auto& i : tokens)
+				{
+					if (cmdParamDesc[currentCmd].param[j].bypass)
+					{
+						caller.append(i);
+					}
+					else
+					{
+						caller.append(genParams[j]);
+					}
+
+					caller.append(", ");
+
+					j++;
+				}
+
+				caller.erase(caller.size() - 2);
+				caller.append(");");
+
+				ofile << caller << "\n";
+			}
+
+			while (getline(ifile, s))
+			{
+				ofile << s;
+			}
+
+
+		}
+
+		ifile.close();
+		ofile.close();
+
+		int t = 11;
 	}
 
 	float valueDrawOffset = .1f;
@@ -541,7 +589,7 @@ namespace paramEdit {
 		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
 		{
 
-			if (cmdParamDesc[currentCmd].param[i].bypass) continue;
+			//if (cmdParamDesc[currentCmd].param[i].bypass) continue;
 
 			auto w = tabLen*.9f;
 			auto sType = cmdParamDesc[currentCmd].param[i].type;
@@ -553,7 +601,8 @@ namespace paramEdit {
 				if (count == 1)
 				{
 					ui::style::box::outlineBrightness = 0.1f;
-					if (isMouseOver(_x, y, w, ui::style::box::height))
+					if (isMouseOver(_x, y, w, ui::style::box::height)&&
+						!cmdParamDesc[currentCmd].param[i].bypass)
 					{
 						ui::style::box::outlineBrightness = 1.f;
 						clickOnEmptyPlace = false;
@@ -581,7 +630,8 @@ namespace paramEdit {
 					{
 						ui::style::box::outlineBrightness = 0.1f;
 
-						if (isMouseOver(_x , y+ float(p)*lead, w, ui::style::box::height))
+						if (isMouseOver(_x , y+ float(p)*lead, w, ui::style::box::height)&&
+							!cmdParamDesc[currentCmd].param[i].bypass)
 						{
 							ui::style::box::outlineBrightness = 1.f;
 							clickOnEmptyPlace = false;
@@ -619,6 +669,7 @@ namespace paramEdit {
 				ui::style::box::g = lerp(0.2f, .8f, sel);
 				ui::style::box::b = lerp(0.2f, .8f, sel);
 
+				ui::style::box::a = cmdParamDesc[currentCmd].param[i].bypass ? .25 : 1;
 
 				ui::Box::Draw(_x, y+ float(p)*lead, w, ui::style::text::height * .8f);
 			}
@@ -704,7 +755,7 @@ namespace paramEdit {
 
 		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
 		{
-			if (cmdParamDesc[currentCmd].param[i].bypass) continue;
+			ui::style::text::a = cmdParamDesc[currentCmd].param[i].bypass ? .75 : 1;
 
 			char vstr[_CVTBUFSIZE];
 			vstr[0] = 0;
@@ -761,6 +812,7 @@ namespace paramEdit {
 
 			if (count == 1)
 			{
+				
 				ui::Text::Draw(vstr, x + valueDrawOffset, y + insideY);
 				if (i == currentParam)
 				{
@@ -783,7 +835,7 @@ namespace paramEdit {
 			}
 
 
-			if (editContext && currentParam == i && !isTypeEnum(sType))
+			if (editContext && currentParam == i && !isTypeEnum(sType) && !cmdParamDesc[currentCmd].param[i].bypass)
 			{
 				showCursor = true;
 				cursorX = x + valueDrawOffset + inCurPos;
