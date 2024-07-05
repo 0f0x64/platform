@@ -246,6 +246,7 @@
     <ClInclude Include="vMachine.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="projectFiles\loop.h_" />
     <None Include="projectFiles\shaders\lib\constants.shader" />
     <None Include="projectFiles\shaders\lib\constBuf.shader" />
     <None Include="projectFiles\shaders\lib\io.shader" />

@@ -504,9 +504,9 @@ namespace paramEdit {
 		int lc = 1;
 		if (ifile.is_open())
 		{
-			while (getline(ifile, s) && lc < lineNum)
+			while (lc < lineNum && getline(ifile, s))
 			{
-				ofile << s;
+				ofile << s << "\n";
 				lc++;
 			}
 
@@ -516,6 +516,7 @@ namespace paramEdit {
 			pos = s.find(cmdParamDesc[currentCmd].funcName);
 			if (pos != string::npos)
 			{
+				unsigned int startFuncPos = pos;
 				pos = s.find("(") + 1;
 				unsigned int posEnd = 0;
 				posEnd = s.find(";", pos);
@@ -550,14 +551,18 @@ namespace paramEdit {
 				}
 
 				caller.erase(caller.size() - 2);
-				caller.append(");");
+				caller.append(")");
 
-				ofile << caller << "\n";
+				string pre = s.substr(0, startFuncPos);
+				posEnd = s.find(";", startFuncPos);
+				string post = s.substr(posEnd,s.length()-posEnd);
+				
+				ofile << pre << caller << post << "\n";
 			}
 
 			while (getline(ifile, s))
 			{
-				ofile << s;
+				ofile << s << "\n";
 			}
 
 
