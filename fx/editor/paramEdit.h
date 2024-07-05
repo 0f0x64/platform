@@ -571,6 +571,9 @@ namespace paramEdit {
 		ifile.close();
 		ofile.close();
 
+		remove(inFilePath.c_str());
+		rename(outFilePath.c_str(), inFilePath.c_str());
+
 		int t = 11;
 	}
 
