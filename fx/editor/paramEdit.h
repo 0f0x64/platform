@@ -80,54 +80,7 @@ namespace paramEdit {
 		}
 	}
 
-	bool isType(const char* t1, const char* t2 )
-	{
-		return (strcmp(t1, t2) == 0);
-	}
-
-	bool isTypeEnum(const char* t1)
-	{
-		if (
-			isType(t1, "texture") ||
-			isType(t1, "topology") || 
-			isType(t1, "blendmode") || 
-			isType(t1, "blendop") || 
-			isType(t1, "depthmode") ||
-			isType(t1, "filter") || 
-			isType(t1, "addr") ||
-			isType(t1, "cullmode") ||
-			isType(t1, "targetshader") ||
-			isType(t1, "visibility")
-			) 
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	int getTypeDim(const char* t1)
-	{
-		if (
-			isType(t1, "position") ||
-			isType(t1, "size") ||
-			isType(t1, "rotation") ||
-			isType(t1, "color")
-			)
-		{
-			return 3;
-		} 
-
-		if (
-			isType(t1, "color4") ||
-			isType(t1, "rect") 
-			)
-		{
-			return 4;
-		}
-
-		return 1;
-	}
+	
 
 	float selYpos = 0.5;
 
@@ -391,10 +344,7 @@ namespace paramEdit {
 
 
 
-	bool isNumber(const std::string& token)
-	{
-		return std::regex_match(token, std::regex("(\\+|-)?[0-9]*(\\.?([0-9]+))$"));
-	}
+	
 
 	void setBypass()
 	{
@@ -458,33 +408,35 @@ namespace paramEdit {
 	}
 
 	//create c++ call string and save it into source file
-	void Save()
+	void Save(int cmdIndex)
 	{
+		if (cmdIndex < 0) return;
+
 		std::vector<std::string> genParams;
 
-		for (int i = 0; i < cmdParamDesc[currentCmd].pCount; i++)
+		for (int i = 0; i < cmdParamDesc[cmdIndex].pCount; i++)
 		{
-			auto sType = cmdParamDesc[currentCmd].param[i].type;
+			auto sType = cmdParamDesc[cmdIndex].param[i].type;
 
 			if (isTypeEnum(sType))
 			{
-				genParams.push_back(std::string(cmdParamDesc[currentCmd].param[i].type) +
-					"::" + std::string(getEnumStr(sType, (int)cmdParamDesc[currentCmd].param[i].value[0])));
+				genParams.push_back(std::string(cmdParamDesc[cmdIndex].param[i].type) +
+					"::" + std::string(getEnumStr(sType, (int)cmdParamDesc[cmdIndex].param[i].value[0])));
 			}
 			else
 			{
 				char pStr[32];
 				for (int x = 0; x < getTypeDim(sType); x++)
 				{
-					_itoa(cmdParamDesc[currentCmd].param[i].value[x], pStr, 10);
+					_itoa(cmdParamDesc[cmdIndex].param[i].value[x], pStr, 10);
 					genParams.push_back(std::string(pStr));
 				}
 			}
 
 		}
 
-		const char* filename = cmdParamDesc[currentCmd].caller.fileName;
-		const int lineNum = cmdParamDesc[currentCmd].caller.line;
+		const char* filename = cmdParamDesc[cmdIndex].caller.fileName;
+		const int lineNum = cmdParamDesc[cmdIndex].caller.line;
 
 		using namespace std;
 		string inFilePath = filename;
@@ -508,7 +460,7 @@ namespace paramEdit {
 			getline(ifile, s);
 
 			unsigned int pos = 0;
-			pos = s.find(cmdParamDesc[currentCmd].funcName);
+			pos = s.find(cmdParamDesc[cmdIndex].funcName);
 			if (pos != string::npos)
 			{
 				unsigned int startFuncPos = pos;
@@ -525,13 +477,13 @@ namespace paramEdit {
 				const std::regex reg{ regex_str };
 				const auto tokens = regex_split(s2, reg);
 
-				caller.append(cmdParamDesc[currentCmd].funcName);
+				caller.append(cmdParamDesc[cmdIndex].funcName);
 				caller.append("(");
 
 				int j = 0;
 				for (auto& i : tokens)
 				{
-					if (cmdParamDesc[currentCmd].param[j].bypass)
+					if (cmdParamDesc[cmdIndex].param[j].bypass)
 					{
 						caller.append(i);
 					}
@@ -577,7 +529,6 @@ namespace paramEdit {
 
 	void showParamBoxes()
 	{
-		bool needToSave = false;
 		pCountV = 0;
 
 		ui::Box::Setup();
@@ -705,7 +656,6 @@ namespace paramEdit {
 							currentParam = -1;
 
 							cmdParamDesc[currentCmd].param[i].value[0] = e;
-							needToSave = true;
 						}
 					}
 				}
@@ -727,13 +677,7 @@ namespace paramEdit {
 				{
 					storedParam[max(subParam, 0)] = cmdParamDesc[currentCmd].param[currentParam].value[max(subParam, 0)];
 				}
-				needToSave = true;
 			}
-		}
-
-		if (needToSave)
-		{
-			Save();
 		}
 	}
 
@@ -857,6 +801,8 @@ namespace paramEdit {
 
 	void ShowStack()
 	{
+		int currentCmd_backup = currentCmd;
+
 		tabLen = ui::Text::getTextLen("000000000000000", ui::style::text::width);
 		valueDrawOffset = tabLen *1.f;
 		enumDrawOffset = tabLen *2.f;
@@ -931,6 +877,8 @@ namespace paramEdit {
 		float scroll = isOutside(selYpos, top+lead*1.f, bottom - lead * (pCountV+1)) / 4.f;
 		yPos -= vScroll ? scroll : 0.f;
 		if (fabs(scroll) < 0.00125f) vScroll = false;
+
+		if (currentCmd_backup != currentCmd) Save(currentCmd_backup);
 
 	}
 

@@ -76,7 +76,40 @@ void reflectSourceChanges(std::filesystem::path fileName)
 					const std::regex reg{ regex_str };
 					const auto tokens = regex_split(s2, reg);
 
-					int tt = 0;
+					int pC = 0;
+					for (int j=0;j<cmdParamDesc[cCmd].pCount;j++)
+					{
+						auto ts = getTypeDim(cmdParamDesc[cCmd].param[j].type);
+
+						if (cmdParamDesc[cCmd].param[j].bypass) {
+							pC+= ts; continue;
+						}
+
+						if (isTypeEnum(cmdParamDesc[cCmd].param[j].type))
+						{
+							auto evP = tokens[j].find("::") + 2;
+							std::string eV = tokens[j].substr(evP,tokens[j].length()-evP);
+						 	auto v = GetEnumValue(cmdParamDesc[cCmd].param[j].type, eV.c_str());
+							if (v != INT_MAX)
+							{
+								cmdParamDesc[cCmd].param[j].value[0] = v;
+							}
+						}
+						else
+						{
+							for (int k = 0; k < ts; k++)
+							{
+								auto t = tokens[pC + k];
+								if (isNumber(t))
+								{
+									auto v = atoi(t.c_str());
+									cmdParamDesc[cCmd].param[j].value[k] = v;
+								}
+							}
+						}
+
+						pC += ts;
+					}
 				}
 				//
 
@@ -265,7 +298,7 @@ void WatchFiles()
 						//strcpy(pureName, s2 + 3);// 3= len vs/ps with backslash
 						pureName[strlen(pureName) - shaderExtensionLen] = 0;
 
-						char s3[255];
+						//char s3[255];
 						//strcpy(s3, "/");
 						//strcat(s3, s2);
 

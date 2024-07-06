@@ -53,18 +53,18 @@ namespace Loop
 		gApi.SetRT(texture::mainRT,0);
 		gApi.SetCamera(0, 0, 1, 0, 0, 0, 0, 1,0, 45);
 		gApi.SetDepthMode(depthmode::off);
-		gApi.ClearRT(0, 0, 235, 233);
+		gApi.ClearRT(0, 111, 235, 233);
 
 		Cubemap::ShowCubemap(texture::env);
 
 		gApi.SetDepthMode(depthmode::on);
 		gApi.ClearRTDepth();
 		gApi.SetCull(cullmode::back);
-		//asdasdasda    sda 
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 7, 513, 0, -500);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 6, -500, 0, 500);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -620, 0, -500);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 4, 498, 0, 500);
+
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 500, 0, -500);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -500, 0, 500);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -500, 0, -500);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 500, 498, 500);
 
 		tracker::playTrack();
 

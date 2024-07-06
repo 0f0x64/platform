@@ -14,6 +14,15 @@ HWND hWnd;
 #define API void
 //
 
+#if EditMode
+#include <iostream>
+#include <string>
+#include <filesystem>
+#include <fstream>
+#include <regex>
+#include <vector>
+#endif
+
 #include <math.h>
 #include "timer.h"
 #include "utils.h"

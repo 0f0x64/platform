@@ -97,6 +97,28 @@ char* getEnumStr(char* name, int value)
 	return NULL;
 }
 
+int GetEnumValue(const char* type, const char* id)
+{
+	for (int i = 0; i < enumCounter; i++)
+	{
+		if (strcmp(type, enumStringTable[i][0]) == 0)
+		{
+			int j = 1; 
+			while (enumStringTable[i][j][0] != 0)
+			{
+				if (strcmp(id, enumStringTable[i][j]) == 0)
+				{
+					return j - 1;
+				}
+				j++;
+			}
+			return INT_MAX;
+		}
+	}
+
+	return INT_MAX;
+}
+
 int getEnumCount(char* name)
 {
 	for (int i = 0; i < enumCounter; i++)
@@ -108,4 +130,58 @@ int getEnumCount(char* name)
 	}
 
 	return -1;
+}
+
+bool isType(const char* t1, const char* t2)
+{
+	return (strcmp(t1, t2) == 0);
+}
+
+bool isTypeEnum(const char* t1)
+{
+	if (
+		isType(t1, "texture") ||
+		isType(t1, "topology") ||
+		isType(t1, "blendmode") ||
+		isType(t1, "blendop") ||
+		isType(t1, "depthmode") ||
+		isType(t1, "filter") ||
+		isType(t1, "addr") ||
+		isType(t1, "cullmode") ||
+		isType(t1, "targetshader") ||
+		isType(t1, "visibility")
+		)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+int getTypeDim(const char* t1)
+{
+	if (
+		isType(t1, "position") ||
+		isType(t1, "size") ||
+		isType(t1, "rotation") ||
+		isType(t1, "color")
+		)
+	{
+		return 3;
+	}
+
+	if (
+		isType(t1, "color4") ||
+		isType(t1, "rect")
+		)
+	{
+		return 4;
+	}
+
+	return 1;
+}
+
+bool isNumber(const std::string& token)
+{
+	return std::regex_match(token, std::regex("(\\+|-)?[0-9]*(\\.?([0-9]+))$"));
 }
