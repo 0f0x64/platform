@@ -389,12 +389,7 @@ namespace paramEdit {
 
 	//detect expressions and variables in caller and set bypass
 
-	std::vector<std::string> regex_split(const std::string& str, const std::regex& reg) {
-		const std::sregex_token_iterator beg{ str.cbegin(), str.cend(), reg, -1 };
-		const std::sregex_token_iterator end{};
 
-		return { beg, end };
-	}
 
 	bool isNumber(const std::string& token)
 	{
@@ -573,8 +568,6 @@ namespace paramEdit {
 
 		remove(inFilePath.c_str());
 		rename(outFilePath.c_str(), inFilePath.c_str());
-
-		int t = 11;
 	}
 
 	float valueDrawOffset = .1f;

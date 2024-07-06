@@ -45,30 +45,26 @@ namespace Loop
 		regCam();
 		frameConst();
 
-		gApi.SetInputAsm(	topology::triList);
+		gApi.SetInputAsm(topology::triList);
 		Cubemap::CalcCubemap(texture::env);
 		Object::CalcObject(texture::obj1pos,texture::obj1nrml);
 
 		gApi.SetBlendMode(blendmode::off,blendop::add);
 		gApi.SetRT(texture::mainRT,0);
-
-		//setCam(0);
-		float t = (timer::timeCursor / (SAMPLES_IN_FRAME * 60.f));
-		slideCam(0, 1, t);
-
+		gApi.SetCamera(0, 0, 1, 0, 0, 0, 0, 1,0, 45);
 		gApi.SetDepthMode(depthmode::off);
-		gApi.ClearRT( 0, 0, 255, 255 );
+		gApi.ClearRT(0, 0, 235, 233);
 
 		Cubemap::ShowCubemap(texture::env);
 
 		gApi.SetDepthMode(depthmode::on);
 		gApi.ClearRTDepth();
-		gApi.SetCull( cullmode::back);
-
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 8,  -500, 0, -500 );
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 7,  -500, 0, 500 );
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 6,  -500, 0, -500 );
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5,  500, 0, 500 );
+		gApi.SetCull(cullmode::back);
+		//asdasdasda    sda 
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 7, 513, 0, -500);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 6, -500, 0, 500);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -620, 0, -500);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 4, 498, 0, 500);
 
 		tracker::playTrack();
 

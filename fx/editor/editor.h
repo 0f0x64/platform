@@ -9,6 +9,13 @@
 
 using namespace dx11;
 
+std::vector<std::string> regex_split(const std::string& str, const std::regex& reg) {
+	const std::sregex_token_iterator beg{ str.cbegin(), str.cend(), reg, -1 };
+	const std::sregex_token_iterator end{};
+
+	return { beg, end };
+}
+
 namespace editor
 {
 	#include <libloaderapi.h>

@@ -30,7 +30,7 @@ namespace Object {
 		ps::basic.samplers.sam1AddressV = addr::wrap;
 
 		ps::basic.set();
-		gApi.Draw((int)gX * (int)gY,1);
+		gApi.Draw((int)gX*(int)gY, 1);
 
 		refStackBack;
 		

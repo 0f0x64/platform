@@ -32,7 +32,6 @@
 //----------------------------------editor settings-----------------------------------------
 
 #define shadersPath "../fx/projectFiles/shaders"
-#define vShadersPath "../fx/projectFiles/shaders/vs/"
-#define pShadersPath "../fx/projectFiles/shaders/ps/"
+#define userSpacePath "../fx/projectFiles"
 
 #define MAIN_DISPLAY_DENOMINATOR 2
