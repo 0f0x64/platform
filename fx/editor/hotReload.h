@@ -127,62 +127,9 @@ void reflectSourceChanges(std::filesystem::path fileName)
 
 			lc++;
 		}
-
-/*		getline(ifile, s);
-
-		unsigned int pos = 0;
-		pos = s.find(cmdParamDesc[currentCmd].funcName);
-		if (pos != string::npos)
-		{
-			unsigned int startFuncPos = pos;
-			pos = s.find("(") + 1;
-			unsigned int posEnd = 0;
-			posEnd = s.find(";", pos);
-			posEnd = s.rfind(")", posEnd);
-			string s2;
-			s2.append(s.substr(pos, posEnd - pos));
-			s2.erase(remove(s2.begin(), s2.end(), ' '), s2.end());
-			s2.erase(remove(s2.begin(), s2.end(), '\t'), s2.end());
-
-			constexpr auto regex_str = R"(,)";
-			const std::regex reg{ regex_str };
-			const auto tokens = regex_split(s2, reg);
-
-			caller.append(cmdParamDesc[currentCmd].funcName);
-			caller.append("(");
-
-			int j = 0;
-			for (auto& i : tokens)
-			{
-				if (cmdParamDesc[currentCmd].param[j].bypass)
-				{
-					caller.append(i);
-				}
-				else
-				{
-					caller.append(genParams[j]);
-				}
-
-				caller.append(", ");
-
-				j++;
-			}
-
-			caller.erase(caller.size() - 2);
-			caller.append(")");
-
-			string pre = s.substr(0, startFuncPos);
-			posEnd = s.find(";", startFuncPos);
-			string post = s.substr(posEnd, s.length() - posEnd);
-
-			ofile << pre << caller << post << "\n";
-		}
-		*/
 	}
 
 	ifile.close();
-
-	auto a = lines;
 }
 
 void WatchFiles()
@@ -252,7 +199,7 @@ void WatchFiles()
 					strcpy(modifedExt, Shaders::shaderExtension);
 					strcat(modifedExt, "~RF");//visual studio only hack!
 
-					
+					#if SRC_WATCH
 					char* h = strstr(fileName, headerExtension);
 					if (h)
 					{
@@ -277,6 +224,7 @@ void WatchFiles()
 						reflectSourceChanges(ap);
 
 					}
+					#endif	
 
 					char* s = strstr(fileName, modifedExt);
 					if (s)
