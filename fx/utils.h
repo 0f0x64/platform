@@ -1,6 +1,7 @@
 #define PI 3.1415926535897932384626433832795f
 
-float lerp(float x1, float x2, float a)
+template <typename T>
+T lerp(T x1, T x2, T a)
 {
 	return x1 * (1 - a) + x2 * a;
 }

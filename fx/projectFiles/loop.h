@@ -5,7 +5,7 @@
 #include "cubemap.h"
 #include "object.h"
 
-#include "..\sound\tracker.h"
+#include "sound\tracker.h"
 
 int precalcOfs = 0;
 
@@ -34,6 +34,7 @@ namespace Loop
 
 	void mainLoop()
 	{
+		BasicCam::camPass = false;
 		cmdCounter = 0;
 		cmdLevel = 0;
 
@@ -42,7 +43,7 @@ namespace Loop
 
 		cmdCounter = precalcOfs;
 
-		regCam();
+		//BasicCam::setCam(0,keyType::set,)
 		frameConst();
 
 		gApi.SetInputAsm(topology::triList);
@@ -51,7 +52,13 @@ namespace Loop
 
 		gApi.SetBlendMode(blendmode::off,blendop::add);
 		gApi.SetRT(texture::mainRT,0);
-		gApi.SetCamera(0, 0, 1, 0, 0, 0, 0, 1,0, 45);
+
+		BasicCam::setCamKey(0, keyType::slide, 788, 2085, -1732, -500, 0, 500, -101, 197, 125, 60);
+		BasicCam::setCamKey(600, keyType::slide, 1788, 2085, -2732, 500, 0, -500, -101, 197, 125, 60);
+		BasicCam::setCamKey(1200, keyType::set, -157, 3304, -215, 0, 0, 0, -86, 11, 239, 60);
+		BasicCam::processCam();
+		
+		
 		gApi.SetDepthMode(depthmode::off);
 		gApi.ClearRT(0, 111, 235, 233);
 
@@ -66,7 +73,7 @@ namespace Loop
 
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 500, 0, -500);
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -500, 0, 500);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -500, 0, -500);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -500, 250, -500);
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 500, 349, 500);
 
 		tracker::playTrack();

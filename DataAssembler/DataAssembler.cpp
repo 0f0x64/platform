@@ -605,6 +605,7 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 							type.compare("addr") == 0 ||
 							type.compare("cullmode") == 0 ||
 							type.compare("targetshader") == 0 ||
+							type.compare("keyType") == 0 ||
 							type.compare("visibility") == 0)
 						{
 							pNameList.append(name);
@@ -652,7 +653,8 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 							isTypeKnown = true;
 						}
 
-						if (type.compare("int") == 0 ||
+						if (type.compare("timestamp") == 0 ||
+							type.compare("int") == 0 ||
 							type.compare("signed int") == 0 ||
 							type.compare("unsigned int") == 0)
 						{
@@ -878,8 +880,8 @@ int main()
 	srcCat(srcSandbox, apiOfile, accelOfile);
 	const std::filesystem::path srcSandbox2{ "..\\fx\\dx11\\" };
 	srcCat(srcSandbox2, apiOfile, accelOfile);
-	const std::filesystem::path srcSandbox3{ "..\\fx\\sound\\" };
-	srcCat(srcSandbox3, apiOfile, accelOfile);
+	//const std::filesystem::path srcSandbox3{ "..\\fx\\sound\\" };
+	//srcCat(srcSandbox3, apiOfile, accelOfile);
 
 
 	//apiOfile << "};\n";

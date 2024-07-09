@@ -201,6 +201,8 @@
     <ClInclude Include="generated\reflection\CalcObject_ref.h" />
     <ClInclude Include="generated\reflection\cam_ref.h" />
     <ClInclude Include="generated\reflection\channel_01_bass_ref.h" />
+    <ClInclude Include="generated\reflection\channel_01_ref.h" />
+    <ClInclude Include="generated\reflection\channel_02_ref.h" />
     <ClInclude Include="generated\reflection\channel_02_solo_ref.h" />
     <ClInclude Include="generated\reflection\clearDepth_ref.h" />
     <ClInclude Include="generated\reflection\ClearRTDepth_ref.h" />
@@ -215,6 +217,7 @@
     <ClInclude Include="generated\reflection\depth_ref.h" />
     <ClInclude Include="generated\reflection\draw_ref.h" />
     <ClInclude Include="generated\reflection\eq_ref.h" />
+    <ClInclude Include="generated\reflection\mainbeat_ref.h" />
     <ClInclude Include="generated\reflection\mips_ref.h" />
     <ClInclude Include="generated\reflection\mix_ref.h" />
     <ClInclude Include="generated\reflection\oscillator_ref.h" />
@@ -222,6 +225,7 @@
     <ClInclude Include="generated\reflection\rt_ref.h" />
     <ClInclude Include="generated\reflection\SetBlendMode_ref.h" />
     <ClInclude Include="generated\reflection\SetCamera_ref.h" />
+    <ClInclude Include="generated\reflection\setCamKey_ref.h" />
     <ClInclude Include="generated\reflection\SetCull_ref.h" />
     <ClInclude Include="generated\reflection\SetDepthMode_ref.h" />
     <ClInclude Include="generated\reflection\setIA_ref.h" />
@@ -236,9 +240,9 @@
     <ClInclude Include="projectFiles\graphicsAPI.h" />
     <ClInclude Include="projectFiles\loop.h" />
     <ClInclude Include="projectFiles\object.h" />
+    <ClInclude Include="projectFiles\sound\tracker.h" />
     <ClInclude Include="projectFiles\texList.h" />
     <ClInclude Include="settings.h" />
-    <ClInclude Include="sound\tracker.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="tools.h" />
     <ClInclude Include="types.h" />

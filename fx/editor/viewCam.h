@@ -1,7 +1,6 @@
 namespace ViewCam
 {
-#define CAM_KEY VK_CONTROL
-#define CAM_KEY2 VK_SHIFT
+
 
 	typedef struct  {
 		XMVECTOR Target;
@@ -272,6 +271,8 @@ namespace ViewCam
 		Camera::viewCam.proj = XMMatrixPerspectiveFovLH(DegreesToRadians(Camera::viewCam.angle), dx11::iaspect, 0.01f, 100.0f);
 	}
 
+	float switcherTimer = 0;
+
 	void Draw()
 	{
 		bool fade = isKeyDown(CAM_KEY) || isKeyDown(CAM_KEY2) || flyToCam < 1.f;
@@ -295,13 +296,83 @@ namespace ViewCam
 		setCamMat();
 
 		DrawAxis();
-		
+
+		char cbutton[] = "capture  viewCam";
+		ui::Box::Setup();
+		float w = ui::Text::getTextLen(cbutton, ui::style::text::width) + ui::style::text::width * 2;
+		float x = .5 - w / 2.; float y = .9 + ui::style::text::height;
+
+			ui::style::Base();
+			ui::style::box::r += switcherTimer;
+
+			if (isMouseOver(x, y, w, ui::style::box::height))
+			{
+				ui::style::box::outlineBrightness = 1.f;
+				if (isKeyDown(VK_LBUTTON))
+				{
+					if (!strcmp(cmdParamDesc[currentCmd].funcName, "setCamKey"))
+					{
+						float q = intToFloatDenom;
+						auto eye = currentCamera.ViewVec*q + currentCamera.Target*q;
+						cmdParamDesc[currentCmd].param[2].value[0] = XMVectorGetX(eye);
+						cmdParamDesc[currentCmd].param[2].value[1] = XMVectorGetY(eye);
+						cmdParamDesc[currentCmd].param[2].value[2] = XMVectorGetZ(eye);
+						auto at = currentCamera.Target*q;
+						cmdParamDesc[currentCmd].param[3].value[0] = XMVectorGetX(at);
+						cmdParamDesc[currentCmd].param[3].value[1] = XMVectorGetY(at);
+						cmdParamDesc[currentCmd].param[3].value[2] = XMVectorGetZ(at);
+						auto up = currentCamera.upVec*q;
+						cmdParamDesc[currentCmd].param[4].value[0] = XMVectorGetX(up);
+						cmdParamDesc[currentCmd].param[4].value[1] = XMVectorGetY(up);
+						cmdParamDesc[currentCmd].param[4].value[2] = XMVectorGetZ(up);
+
+						cmdParamDesc[currentCmd].param[5].value[0] = Camera::viewCam.angle;
+
+					}
+
+
+					switcherTimer = 1;
+				}
+			}
+			ui::Box::Draw(x, y, w);
+
+			char cbutton2[100];
+			strcpy (cbutton2, !Camera::viewCam.overRide ? "switch  to  free  camera" : "switch  to  keyed  camera");
+			float w2 = ui::Text::getTextLen(cbutton2, ui::style::text::width) + ui::style::text::width * 2;
+			float x2 = .5 - w2 / 2.; float y2 = .025;
+
+			ui::style::Base();
+			ui::style::box::r += switcherTimer;
+			ui::style::box::g += switcherTimer;
+			ui::style::box::b += switcherTimer;
+
+			if (isMouseOver(x2, y2, w2, ui::style::box::height))
+			{
+				ui::style::box::outlineBrightness = 1.f;
+				if (isKeyDown(VK_LBUTTON) && switcherTimer == 0.)
+				{
+					editor::ViewCam::ToggleViewMode();
+					switcherTimer = 1;
+				}
+			}
+			ui::Box::Draw(x2, y2, w2);
+
+			switcherTimer = clamp(switcherTimer - .1,0.,1.);
+
+
 		ui::Text::Setup();
+		ui::Text::Draw(cbutton, x+ ui::style::text::width, y+ ui::style::text::height/8.);
+		ui::Text::Draw(cbutton2, x2 + ui::style::text::width, y2 + ui::style::text::height / 8.);
+
+
 		char str[32];
 		char str2[123] = "angle:";
 		_itoa((int)Camera::viewCam.angle, str,10);
 		strcat(str2, str);
-		ui::Text::Draw(str2, .5, .9);
+		w = ui::Text::getTextLen(str2, ui::style::text::width);
+		ui::Text::Draw(str2, .5-w/2., .9);
+
+
 
 
 	}

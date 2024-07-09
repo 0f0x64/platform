@@ -94,17 +94,36 @@ namespace tracker
 		refStackBack;
 	}
 
-	COMMAND (channel_01_bass, int volume, int pan, visibility ms)
+
+	COMMAND(mainbeat, int pos, int len, int repeat)
 	{
-		#include REFLINK(channel_01_bass)
-		int c = 2;
-		oscillator(1, 2);
+		#include REFLINK(mainbeat)
+
+		//notes = "DdddDded";
+		//vol = "1123";
+		//send = "00001";
+
+
 		refStackBack;
 	}
 
-	COMMAND (channel_02_solo, int volume,int pan,visibility ms)
+	COMMAND (channel_01, int volume, int pan)
 	{
-		#include REFLINK(channel_02_solo)
+		#include REFLINK(channel_01)
+
+		mainbeat(0, 19, 10);
+
+
+		oscillator(1, 2);
+
+
+
+		refStackBack;
+	}
+
+	COMMAND (channel_02, int volume,int pan)
+	{
+		#include REFLINK(channel_02)
 
 		int a = 4;
 		refStackBack;
@@ -115,7 +134,10 @@ namespace tracker
 	COMMAND (mix, int level)
 	{
 		#include REFLINK(mix)
-		int a = 5;
+
+
+
+
 		refStackBack;
 	}
 
@@ -125,13 +147,11 @@ namespace tracker
 	{
 		#include REFLINK(playTrack)
 
-		channel_01_bass(100, 0, visibility::on);
-		channel_02_solo(100, 0, visibility::on);
-		mix( 123);
+		channel_01(100, 0);
+		channel_02(100, 0);
+		mix( 100);
 		
 		refStackBack;
-		
-	
 		
 	}
 

@@ -1,59 +1,91 @@
-#define MAX_CAM 64
-#define MAX_CAM_KEY 64
-camData cam[MAX_CAM];
-camData camTmp;
-
-void regCam()
+namespace BasicCam
 {
-	int i = 0;
 
-	cam[i].angle = DegreesToRadians(120.f);
-	cam[i].eye = { 0,0,3 };
-	cam[i].at = { 0,0,0 };
-	cam[i].up = { 0,1,0 };
-	i++;
+	camData Prev;
+	camData Next;
 
-	cam[i].angle = DegreesToRadians(120.f);
-	cam[i].eye = { 3,0,0 };
-	cam[i].at = { 0,0,0 };
-	cam[i].up = { 0,1,0 };
-	i++;
-}
+	bool camPass = false;
+	int prevTime = 0;
+	int nextTime = 0;
+	keyType currentCamType = keyType::set;
 
-void setCam(int i)
-{
-	//gapi.cam(&cam[i]);
-}
+	COMMAND (setCamKey, timestamp camTime, keyType camType, position eye, position at, position up, int angle)
+	{
+		#include REFLINK(setCamKey)
 
-void slideCam(int i, int j, float a)
-{
-	position eye, at, up;
-	unsigned int angle = (unsigned int)lerp(cam[i].angle, cam[j].angle, a);
+		if (!camPass) {
 
-	eye.x = (int)lerp(cam[i].eye.x, cam[j].eye.x, a);
-	eye.y = (int)lerp(cam[i].eye.y, cam[j].eye.y, a);
-	eye.z = (int)lerp(cam[i].eye.z, cam[j].eye.z, a);
+			int t = timer::timeCursor/ SAMPLES_IN_FRAME;
 
-	at.x = (int)lerp(cam[i].at.x, cam[j].at.x, a);
-	at.y = (int)lerp(cam[i].at.y, cam[j].at.y, a);
-	at.z = (int)lerp(cam[i].at.z, cam[j].at.z, a);
+			if (camTime <= t)
+			{
+				Prev.eye.x = eye.x;
+				Prev.eye.y = eye.y;
+				Prev.eye.z = eye.z;
 
-	up.x = (int)lerp(cam[i].up.x, cam[j].up.x, a);
-	up.y = (int)lerp(cam[i].up.y, cam[j].up.y, a);
-	up.z = (int)lerp(cam[i].up.z, cam[j].up.z, a);
+				Prev.at.x = at.x;
+				Prev.at.y = at.y;
+				Prev.at.z = at.z;
 
-	gapi.cam(eye, at, up, angle);
-}
+				Prev.up.x = up.x;
+				Prev.up.y = up.y;
+				Prev.up.z = up.z;
 
-typedef struct {
-	int pos;
-	int type;
-} camKey_;
+				Prev.angle = angle;
 
-camKey_ camKey[MAX_CAM_KEY];
+				prevTime = camTime;
 
-void regCamKeys()
-{
-	int i = 0;
+				currentCamType = camType;
+
+			}
+			else
+			{
+				Next.eye.x = eye.x;
+				Next.eye.y = eye.y;
+				Next.eye.z = eye.z;
+
+				Next.at.x = at.x;
+				Next.at.y = at.y;
+				Next.at.z = at.z;
+
+				Next.up.x = up.x;
+				Next.up.y = up.y;
+				Next.up.z = up.z;
+
+				Next.angle = angle;
+
+				camPass = true;
+
+				nextTime = camTime;
+			}
+		}
+
+		refStackBack;
+	}
+
+	void processCam()
+	{
+		float q = intToFloatDenom;
+		float a = 0;
+		if (currentCamType == keyType::slide) a = (timer::timeCursor -prevTime*SAMPLES_IN_FRAME)/(float)((nextTime-prevTime)* SAMPLES_IN_FRAME);
+		
+		positionF eye, at, up;
+		float angle = lerp((float)Prev.angle, (float)Next.angle, a);
+
+		eye.x = lerp(Prev.eye.x, Next.eye.x, a)/q;
+		eye.y = lerp(Prev.eye.y, Next.eye.y, a) / q;
+		eye.z = lerp(Prev.eye.z, Next.eye.z, a) / q;
+
+		at.x = lerp(Prev.at.x, Next.at.x, a) / q;
+		at.y = lerp(Prev.at.y, Next.at.y, a) / q;
+		at.z = lerp(Prev.at.z, Next.at.z, a) / q;
+
+		up.x = lerp(Prev.up.x, Next.up.x, a) / q;
+		up.y = lerp(Prev.up.y, Next.up.y, a) / q;
+		up.z = lerp(Prev.up.z, Next.up.z, a) / q;
+
+		gapi.cam(eye, at, up, angle);
+	}
+
 
 }

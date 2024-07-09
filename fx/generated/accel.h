@@ -1,3 +1,5 @@
+#define setCamKey_REF ".\generated\reflection\setCamKey_ref.h"
+
 #define CalcCubemap_REF ".\generated\reflection\CalcCubemap_ref.h"
 
 #define ShowCubemap_REF ".\generated\reflection\ShowCubemap_ref.h"
@@ -36,9 +38,11 @@
 
 #define eq_REF ".\generated\reflection\eq_ref.h"
 
-#define channel_01_bass_REF ".\generated\reflection\channel_01_bass_ref.h"
+#define mainbeat_REF ".\generated\reflection\mainbeat_ref.h"
 
-#define channel_02_solo_REF ".\generated\reflection\channel_02_solo_ref.h"
+#define channel_01_REF ".\generated\reflection\channel_01_ref.h"
+
+#define channel_02_REF ".\generated\reflection\channel_02_ref.h"
 
 #define mix_REF ".\generated\reflection\mix_ref.h"
 

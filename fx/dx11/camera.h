@@ -41,17 +41,16 @@ namespace Camera
 
 	#endif
 
-	API Camera(position eye, position at, position up, unsigned int angle)
+	API Camera(positionF eye, positionF at, positionF up, float angle)
 	{
-		float q = intToFloatDenom;
 
-		XMVECTOR Eye = XMVectorSet(eye.x/q,eye.y/q,eye.z/q, 0.0f);
-		XMVECTOR At =  XMVectorSet(at.x/q, at.y/q, at.z/q, 0.0f);
-		XMVECTOR Up =  XMVectorSet(up.x/q, up.y/q, up.z/q, 0.0f);
+		XMVECTOR Eye = XMVectorSet(eye.x,eye.y,eye.z, 0.0f);
+		XMVECTOR At =  XMVectorSet(at.x, at.y, at.z, 0.0f);
+		XMVECTOR Up =  XMVectorSet(up.x, up.y, up.z, 0.0f);
 
 		ConstBuf::camera.world[0] = XMMatrixIdentity();
 		ConstBuf::camera.view[0] = XMMatrixTranspose(XMMatrixLookAtLH(Eye, At, Up));
-		ConstBuf::camera.proj[0] = XMMatrixTranspose(XMMatrixPerspectiveFovLH((float)angle, width / (FLOAT)height, 0.01f, 100.0f));
+		ConstBuf::camera.proj[0] = XMMatrixTranspose(XMMatrixPerspectiveFovLH(DegreesToRadians(angle), dx11::iaspect, 0.01f, 100.0f));
 
 		#if EditMode
 		if (viewCam.overRide)

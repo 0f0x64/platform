@@ -29,11 +29,12 @@ struct {
 		Draw::NullDrawer(quadcount, instances);
 		refStackBack;
 	}
-	COMMAND(SetCamera, position eye, position at, position up, unsigned int angle) {
+/*	COMMAND(SetCamera, position eye, position at, position up, unsigned int angle) {
 #include REFLINK(SetCamera)
 		Camera::Camera(eye, at, up, angle);
 		refStackBack;
-	}
+	}*/
+
 	COMMAND(ClearRT, color4 c) {
 #include REFLINK(ClearRT)
 		Draw::Clear(c);

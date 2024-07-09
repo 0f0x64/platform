@@ -32,9 +32,28 @@ namespace editor
 		return GetKeyState(key) & 0x8000;
 	}
 
+
+
+#define CAM_KEY VK_CONTROL
+#define CAM_KEY2 VK_SHIFT
+
 	#include "editorWindow.h"
 	#include "hotReload.h"
 	#include "uiDraw.h"
+
+	bool isMouseOver(float x, float y, float w, float h)
+	{
+		if (ui::mousePos.x > x && ui::mousePos.x < x + w &&
+			ui::mousePos.y > y &&
+			ui::mousePos.y < y + h)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+
 	#include "timeLine.h"
 	#include "viewCam.h"
 	#include "paramEdit.h"
@@ -70,7 +89,7 @@ namespace editor
 		gapi.cull(cullmode::off);
 		gapi.depth(depthmode::off);
 
-		if (isKeyDown(TIME_KEY))
+		if (isKeyDown(TIME_KEY) || editor::TimeLine::play)
 		{
 			TimeLine::Draw();
 		}
@@ -82,16 +101,21 @@ namespace editor
 
 		ViewCam::setup();
 
-		if (Camera::viewCam.overRide)
+		ViewCam::setCamMat();
+
+		//if (Camera::viewCam.overRide)
 		{
 			if (isKeyDown(CAM_KEY)|| isKeyDown(CAM_KEY2) || ViewCam::flyToCam < 1.f)
 			{
+				
 				paramEdit::ObjHandlers();
 				ViewCam::Draw();
+				ViewCam::setCamMat();
+				
 			} 
 		}
 
-		ViewCam::setCamMat();
+		//ViewCam::setCamMat();
 
 	}
 }

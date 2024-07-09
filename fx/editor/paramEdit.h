@@ -42,17 +42,6 @@ namespace paramEdit {
 	//	storedParam = cmdParamDesc[currentCmd].params[currentParam][0];
 	}
 
-	bool isMouseOver(float x,float y, float w, float h)
-	{
-		if (editor::ui::mousePos.x > x && editor::ui::mousePos.x < x + w &&
-			editor::ui::mousePos.y > y &&
-			editor::ui::mousePos.y < y + h)
-		{
-			return true;
-		}
-
-		return false;
-	}
 
 	float top;
 	float bottom;
@@ -615,7 +604,7 @@ namespace paramEdit {
 				
 				bool mo = isMouseOver(_x , y+float(p)*lead, w, ui::style::box::height);
 				
-				ui::style::box::outlineBrightness = lerp(0.1f,1.f,mo);
+				ui::style::box::outlineBrightness = lerp(0.1f,1.f,(float)mo);
 
 				ui::style::box::r = lerp(0.2f, .8f, sel);
 				ui::style::box::g = lerp(0.2f, .8f, sel);
@@ -716,7 +705,10 @@ namespace paramEdit {
 
 			auto sType = cmdParamDesc[currentCmd].param[i].type;
 
-			if (isType(sType, "int") || isType(sType, "signed int") || isType(sType, "unsigned int"))
+			if (isType(sType, "timestamp") ||
+				isType(sType, "int") || 
+				isType(sType, "signed int") || 
+				isType(sType, "unsigned int"))
 			{
 				_itoa(cmdParamDesc[currentCmd].param[i].value[0], vstr, 10);
 			}
@@ -730,9 +722,9 @@ namespace paramEdit {
 				{
 					float sel = currentParam == i ? 1.f : 0.f;
 					sel = sel * (float)(subParam == k);
-					ui::style::text::r = lerp(.8, .2, sel);
-					ui::style::text::g = lerp(.8, .2, sel);
-					ui::style::text::b = lerp(.8, .2, sel);
+					ui::style::text::r = lerp(.8f, .2f, (float)sel);
+					ui::style::text::g = lerp(.8f, .2f, (float)sel);
+					ui::style::text::b = lerp(.8f, .2f, (float)sel);
 
 					_itoa(cmdParamDesc[currentCmd].param[i].value[k], val, 10);
 					strcpy(vstr, val);
@@ -751,9 +743,9 @@ namespace paramEdit {
 				strcpy(vstr, getEnumStr(sType, (int)cmdParamDesc[currentCmd].param[i].value[0]));
 			}
 
-			ui::style::text::r = lerp(.8, .2, sel);
-			ui::style::text::g = lerp(.8, .2, sel);
-			ui::style::text::b = lerp(.8, .2, sel);
+			ui::style::text::r = lerp(.8f, .2f, (float)sel);
+			ui::style::text::g = lerp(.8f, .2f, (float)sel);
+			ui::style::text::b = lerp(.8f, .2f, (float)sel);
 
 			if (count == 1)
 			{

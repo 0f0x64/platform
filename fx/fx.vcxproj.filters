@@ -155,9 +155,6 @@
     <ClInclude Include="utils.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="sound\tracker.h">
-      <Filter>Source Files\sound</Filter>
-    </ClInclude>
     <ClInclude Include="generated\apiReflection.h">
       <Filter>Source Files\generated</Filter>
     </ClInclude>
@@ -288,6 +285,21 @@
       <Filter>Source Files\projectFiles</Filter>
     </ClInclude>
     <ClInclude Include="generated\reflection\SetInputAsm_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\sound\tracker.h">
+      <Filter>Source Files\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\channel_01_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\channel_02_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\mainbeat_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\setCamKey_ref.h">
       <Filter>Source Files\generated\reflectrion</Filter>
     </ClInclude>
   </ItemGroup>
