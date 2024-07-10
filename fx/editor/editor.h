@@ -110,10 +110,11 @@ namespace editor
 				
 				paramEdit::ObjHandlers();
 				ViewCam::Draw();
-				ViewCam::setCamMat();
 				
 			} 
 		}
+
+		paramEdit::CamKeys();
 
 		//ViewCam::setCamMat();
 

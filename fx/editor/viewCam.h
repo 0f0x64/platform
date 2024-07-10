@@ -178,19 +178,35 @@ namespace ViewCam
 
 		if (ui::lbDown || ui::rbDown || ui::mbDown)
 		{
-			auto c = XMMatrixTranspose(XMMatrixLookAtLH(storedCamera.ViewVec, XMVECTOR{ 0,0,0 }, storedCamera.upVec));
-			XMVECTOR translation = XMVector3Transform(XMVECTOR{ t.x, t.y, t.z },c);
-			auto rm = XMMatrixRotationRollPitchYaw(-r.x, -r.y, -r.z);
-			
-			currentCamera.ViewVec = XMVector3Transform(storedCamera.ViewVec, XMMatrixInverse(NULL, c));
-			currentCamera.ViewVec = XMVector3Transform(currentCamera.ViewVec, rm);
-			currentCamera.ViewVec = XMVector3Transform(currentCamera.ViewVec, c);
-			
-			currentCamera.upVec = XMVector3Transform(storedCamera.upVec, XMMatrixInverse(NULL, c));
-			currentCamera.upVec = XMVector3Transform(currentCamera.upVec, rm);
-			currentCamera.upVec = XMVector3Transform(currentCamera.upVec, c);
-			
-			currentCamera.Target = storedCamera.Target - translation;
+			bool rollMode = true;
+
+			if (rollMode)
+			{
+				auto c = XMMatrixTranspose(XMMatrixLookAtLH(storedCamera.ViewVec, XMVECTOR{ 0,0,0 }, storedCamera.upVec));
+				XMVECTOR translation = XMVector3Transform(XMVECTOR{ t.x, t.y, t.z }, c);
+				auto rm = XMMatrixRotationY(-r.y);
+				rm = XMMatrixMultiply(XMMatrixRotationAxis(XMVector3Cross(storedCamera.ViewVec , storedCamera.upVec), -r.x),rm);
+				rm = XMMatrixMultiply(XMMatrixRotationAxis(storedCamera.ViewVec, r.z), rm);
+				currentCamera.ViewVec = XMVector3Transform(storedCamera.ViewVec, rm);
+				currentCamera.upVec = XMVector3Transform(storedCamera.upVec, rm);
+				currentCamera.Target = storedCamera.Target - translation;
+			}
+			else
+			{
+				auto c = XMMatrixTranspose(XMMatrixLookAtLH(storedCamera.ViewVec, XMVECTOR{ 0,0,0 }, storedCamera.upVec));
+				XMVECTOR translation = XMVector3Transform(XMVECTOR{ t.x, t.y, t.z }, c);
+				auto rm = XMMatrixRotationRollPitchYaw(-r.x, -r.y, -r.z);
+
+				currentCamera.ViewVec = XMVector3Transform(storedCamera.ViewVec, XMMatrixInverse(NULL, c));
+				currentCamera.ViewVec = XMVector3Transform(currentCamera.ViewVec, rm);
+				currentCamera.ViewVec = XMVector3Transform(currentCamera.ViewVec, c);
+
+				currentCamera.upVec = XMVector3Transform(storedCamera.upVec, XMMatrixInverse(NULL, c));
+				currentCamera.upVec = XMVector3Transform(currentCamera.upVec, rm);
+				currentCamera.upVec = XMVector3Transform(currentCamera.upVec, c);
+
+				currentCamera.Target = storedCamera.Target - translation;
+			}
 		}
 	}
 
@@ -241,7 +257,9 @@ namespace ViewCam
 		ui::Line::Setup();
 
 		XMVECTOR Eye = currentCamera.ViewVec;
-		ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixLookAtLH(Eye, XMVECTOR{ 0,0,0 }, currentCamera.upVec));
+		//ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixLookAtLH(Eye, XMVECTOR{ 0,0,0 }, currentCamera.upVec));
+		auto m = ConstBuf::camera.view[0];
+		ConstBuf::drawerMat.model = ConstBuf::camera.view[0];
 		ConstBuf::UpdateDrawerMat();
 
 		ui::Line::Draw3d(counter * 3 / 2, 1, 1, 1, axisAlpha);
@@ -277,7 +295,7 @@ namespace ViewCam
 	{
 		bool fade = isKeyDown(CAM_KEY) || isKeyDown(CAM_KEY2) || flyToCam < 1.f;
 		axisAlpha = clamp(axisAlpha + (fade ? .4f : -.05f), 0.f, 1.f);
-
+		axisAlpha = 1;
 		if (flyToCam < 1.f)
 		{
 			flyToCam = clamp(flyToCam + 1.f/9.f, 0.f, 1.f);//divde by even number prevent lerp vectors to zero for 180 degrees transformatrions

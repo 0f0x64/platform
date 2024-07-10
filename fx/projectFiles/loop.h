@@ -51,11 +51,11 @@ namespace Loop
 		Object::CalcObject(texture::obj1pos,texture::obj1nrml);
 
 		gApi.SetBlendMode(blendmode::off,blendop::add);
-		gApi.SetRT(texture::mainRT,0);
+		gApi.SetRT(texture::mainRT, 0);
 
 		BasicCam::setCamKey(0, keyType::slide, 788, 2085, -1732, -500, 0, 500, -101, 197, 125, 60);
-		BasicCam::setCamKey(600, keyType::slide, 1788, 2085, -2732, 500, 0, -500, -101, 197, 125, 60);
-		BasicCam::setCamKey(1200, keyType::set, -157, 3304, -215, 0, 0, 0, -86, 11, 239, 60);
+		BasicCam::setCamKey(1077, keyType::slide, 1788, 2085, -2732, 500, 0, -500, -101, 197, 125, 60);
+		BasicCam::setCamKey(2124, keyType::set, -157, 3304, -215, 0, 0, 0, -86, 11, 239, 60);
 		BasicCam::processCam();
 		
 		
@@ -74,7 +74,7 @@ namespace Loop
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 500, 0, -500);
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -500, 0, 500);
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -500, 250, -500);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 500, 349, 500);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 4, 500, 349, 500);
 
 		tracker::playTrack();
 

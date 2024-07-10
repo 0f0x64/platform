@@ -169,6 +169,11 @@ namespace TimeLine
 		ui::Line::Draw(iter);
 	}
 
+	float getScreenPos(int time)
+	{
+		return TimeToScreen(time) - left + screenLeft;
+	}
+
 	void DrawTimeStamps(float y)
 	{
 		step = GetAdaptiveStepTime(ScreenToTime(ui::style::text::height * 1.f));

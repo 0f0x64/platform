@@ -193,7 +193,8 @@ namespace paramEdit {
 				float _z = (float)cmdParamDesc[i].param[j].value[2];
 
 				XMVECTOR p = XMVECTOR{ _x / intToFloatDenom, _y / intToFloatDenom, _z / intToFloatDenom, 1. };
-				p = XMVector4Transform(p, Camera::viewCam.view * Camera::viewCam.proj);
+				
+				p = XMVector4Transform(p, XMMatrixTranspose(ConstBuf::camera.view[0]) * XMMatrixTranspose(ConstBuf::camera.proj[0]));
 
 				if (XMVectorGetZ(p) < 0) continue;
 
@@ -230,6 +231,76 @@ namespace paramEdit {
 
 					vScroll = true;
 				}
+
+				ui::Box::Draw(px, py, h * dx11::aspect, h);
+
+			}
+		}
+	}
+
+	void CamKeys()
+	{
+		ui::Box::Setup();
+
+		hilightedCmd = currentCmd;
+
+		for (int i = startCmd; i < cmdCounter; i++)
+		{
+			if (strcmp(cmdParamDesc[i].funcName, "setCamKey")) continue;
+
+			for (int j = 0; j < cmdParamDesc[i].pCount; j++)
+			{
+				if (!isType(cmdParamDesc[i].param[j].type, "timestamp")) continue;
+
+				float _x = (float)cmdParamDesc[i].param[j].value[0];
+
+				float px = TimeLine::getScreenPos(_x*SAMPLES_IN_FRAME);
+				float py = .94;
+
+				float h = ui::style::text::height * .48f;
+				px -= h * dx11::aspect / 2.f;
+				py -= h / 2.f;
+
+				ui::style::box::outlineBrightness = .05;
+
+				ui::style::box::rounded = 1.;
+				ui::style::box::edge = .1;
+				ui::style::box::soft = 15.;
+
+				bool over = isMouseOver(px, py, h * dx11::aspect, h);
+
+				ui::style::box::r = ui::style::box::g = ui::style::box::b = over ? .7f : 0.f;
+				ui::style::box::a = 1;
+
+				if (over )
+				{
+					hilightedCmd = i;
+				}
+
+				if (over && ui::lbDown && currentCmd != i)
+				{
+
+					currentCmd = i;
+					currentParam = -1;
+					subParam = -1;
+
+					storedParam[j] = cmdParamDesc[i].param[j].value[0];
+
+					vScroll = true;
+				}
+
+				if (currentCmd == i)
+				{
+					if (ui::lbDo wn)
+					{
+						cmdParamDesc[i].param[j].value[0] = storedParam[j] + TimeLine::ScreenToTime( ui::mouseDelta.x)/SAMPLES_IN_FRAME;
+					}
+					else
+					{
+						storedParam[j] = cmdParamDesc[i].param[j].value[0];
+					}
+				}
+
 
 				ui::Box::Draw(px, py, h * dx11::aspect, h);
 
@@ -328,13 +399,7 @@ namespace paramEdit {
 	}
 
 
-
 	//detect expressions and variables in caller and set bypass
-
-
-
-	
-
 	void setBypass()
 	{
 		const char* filename = cmdParamDesc[cmdCounter].caller.fileName; 
