@@ -232,24 +232,6 @@ namespace TimeLine
 		timer::startTime = timer::frameBeginTime - timer::timeCursor / (double)second * 1000.;
 	}
 
-	void lbDown()
-	{
-		if (!isKeyDown(TIME_KEY)) return;
-
-		editor::ui::mousePos = editor::ui::GetCusorPos();
-		timer::timeCursor = ScreenToTime(editor::ui::mousePos.x) + pos;
-		timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
-
-		timeCursorLast = timer::timeCursor;
-		editor::ui::mouseLastPos = editor::ui::mousePos;
-	}
-
-	void rbDown()
-	{
-		if (!isKeyDown(TIME_KEY)) return;
-		posLast = pos;
-	}
-
 	void Space()
 	{
 		play = !play;
@@ -289,15 +271,49 @@ namespace TimeLine
 		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 	}
 
+	bool clickLb = false;
+	bool clickRb = false;
+
 	void ProcessInput()
 	{
+		if (isKeyDown(VK_LBUTTON))
+		{
+			if (isKeyDown(TIME_KEY) && !stillDragCamKey && !clickLb) {
+
+				clickLb = true;
+
+				editor::ui::mousePos = editor::ui::GetCusorPos();
+				timer::timeCursor = ScreenToTime(editor::ui::mousePos.x) + pos;
+				timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
+
+				timeCursorLast = timer::timeCursor;
+				editor::ui::mouseLastPos = editor::ui::mousePos;
+			}
+		}
+		else
+		{
+			clickLb = false;
+		}
+
+		if (isKeyDown(VK_RBUTTON)) 
+		{
+			if (isKeyDown(TIME_KEY) && !stillDragCamKey && !clickRb) {
+				clickRb = true;
+				posLast = pos;
+			}
+		}
+		else
+		{
+			clickRb = false;
+		}
+
 
 		int rightM = ScreenToTime(screenRight - scrollMargin) + pos;
 		int leftM = ScreenToTime(screenLeft + scrollMargin) + pos;
 
 		if (isKeyDown(TIME_KEY))
 		{
-			if (ui::lbDown)
+			if (ui::lbDown && !stillDragCamKey)
 			{
 				float scrollSpeed = .5;
 				timer::timeCursor = timeCursorLast + (int)(ui::mouseDelta.x * ScreenToTime(1.f));
@@ -332,13 +348,6 @@ namespace TimeLine
 				pos += timer::timeCursor - rightM;
 			}
 		}
-	}
-
-	void Draw()
-	{
-		ProcessInput();
-
-		gapi.setScissors(rect{ (int)(screenLeft*dx11::width), 0, (int)(screenRight*dx11::width), dx11::height });
 
 		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 		timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
@@ -347,6 +356,13 @@ namespace TimeLine
 		right = screenRight + TimeToScreen(pos);
 		screenEnd = ScreenToTime(right);
 		end = min(timelineLen, screenEnd);
+	}
+
+	void Draw()
+	{
+		//ProcessInput();
+
+		gapi.setScissors(rect{ (int)(screenLeft*dx11::width), 0, (int)(screenRight*dx11::width), dx11::height });
 
 		ui::style::Base();
 		editor::ui::style::box::outlineBrightness = 0;
@@ -357,7 +373,7 @@ namespace TimeLine
 		ps::letter_ps.samplers.s1AddressV = addr::clamp;
 		ps::letter_ps.textures.tex = (texture)ui::fontTextureIndex;
 
-		gapi.blend(blendmode::off);
+		gapi.blend(blendmode::alpha);
 		gapi.setIA(topology::lineList);
 		DrawMakers(1);
 

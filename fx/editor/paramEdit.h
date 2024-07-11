@@ -238,11 +238,13 @@ namespace paramEdit {
 		}
 	}
 
+	
+
 	void CamKeys()
 	{
-		ui::Box::Setup();
+		if (!isKeyDown(VK_LBUTTON)) stillDragCamKey = false;
 
-		hilightedCmd = currentCmd;
+		ui::Box::Setup();
 
 		for (int i = startCmd; i < cmdCounter; i++)
 		{
@@ -257,29 +259,32 @@ namespace paramEdit {
 				float px = TimeLine::getScreenPos(_x*SAMPLES_IN_FRAME);
 				float py = .94;
 
-				float h = ui::style::text::height * .48f;
+				float h = ui::style::text::height * .58f;
 				px -= h * dx11::aspect / 2.f;
 				py -= h / 2.f;
 
-				ui::style::box::outlineBrightness = .05;
+				
 
-				ui::style::box::rounded = 1.;
-				ui::style::box::edge = .1;
-				ui::style::box::soft = 15.;
+				ui::style::box::rounded = .990;
+				ui::style::box::edge = 100.1;
+				ui::style::box::soft = 1000.;
 
-				bool over = isMouseOver(px, py, h * dx11::aspect, h);
 
-				ui::style::box::r = ui::style::box::g = ui::style::box::b = over ? .7f : 0.f;
-				ui::style::box::a = 1;
+				bool over = isMouseOver(px, py, h * dx11::aspect, h) ;
 
-				if (over )
+				if (stillDragCamKey)
 				{
-					hilightedCmd = i;
+					over = currentCmd == i;
 				}
 
-				if (over && ui::lbDown && currentCmd != i)
-				{
+				ui::style::box::outlineBrightness = over ? .7 : 0.2;
 
+				ui::style::box::r = ui::style::box::g = ui::style::box::b = (currentCmd == i) ? .7f : 0.2f;
+				ui::style::box::a = 1;
+
+				if (over && ui::lbDown && !stillDragCamKey)
+				{
+					stillDragCamKey = true;
 					currentCmd = i;
 					currentParam = -1;
 					subParam = -1;
@@ -289,9 +294,9 @@ namespace paramEdit {
 					vScroll = true;
 				}
 
-				if (currentCmd == i)
+				if (currentCmd == i && stillDragCamKey)
 				{
-					if (ui::lbDo wn)
+					if (ui::lbDown)
 					{
 						cmdParamDesc[i].param[j].value[0] = storedParam[j] + TimeLine::ScreenToTime( ui::mouseDelta.x)/SAMPLES_IN_FRAME;
 					}
@@ -881,7 +886,7 @@ namespace paramEdit {
 
 		lead = ui::style::text::height;
 		insideX = ui::style::text::width * .5f * aspect / 2.f;
-		insideY = .15f * ui::style::box::height;
+		insideY = .19f * ui::style::box::height;
 		yPos = max(yPos, top - cmdCounter * lead + lead);
 		yPos = min(yPos, bottom - lead);
 

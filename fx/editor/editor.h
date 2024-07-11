@@ -53,6 +53,7 @@ namespace editor
 		return false;
 	}
 
+	bool stillDragCamKey = false;
 
 	#include "timeLine.h"
 	#include "viewCam.h"
@@ -79,11 +80,11 @@ namespace editor
 		ui::mouseAngle = - atan2f(ui::mousePos.y - .5f, ui::mousePos.x - .5f);
 		ui::mouseAngleDelta = ui::mouseAngle - ui::mouseLastAngle;
 
-		ui::lbDown = isKeyDown(VK_LBUTTON) ? true : false;
-		ui::rbDown = isKeyDown(VK_RBUTTON) ? true : false;
-		ui::mbDown = isKeyDown(VK_MBUTTON) ? true : false;
-		ui::LeftDown = isKeyDown(VK_LEFT) ? true : false;
-		ui::RightDown = isKeyDown(VK_RIGHT) ? true : false;
+		ui::lbDown = isKeyDown(VK_LBUTTON);
+		ui::rbDown = isKeyDown(VK_RBUTTON);
+		ui::mbDown = isKeyDown(VK_MBUTTON);
+		ui::LeftDown = isKeyDown(VK_LEFT);
+		ui::RightDown = isKeyDown(VK_RIGHT);
 
 		gapi.rt(texture::mainRT);
 		gapi.cull(cullmode::off);
@@ -91,7 +92,11 @@ namespace editor
 
 		if (isKeyDown(TIME_KEY) || editor::TimeLine::play)
 		{
+		
+			paramEdit::CamKeys();
 			TimeLine::Draw();
+			TimeLine::ProcessInput();
+			
 		}
 
 		if (paramEdit::editContext)
@@ -114,7 +119,7 @@ namespace editor
 			} 
 		}
 
-		paramEdit::CamKeys();
+		
 
 		//ViewCam::setCamMat();
 

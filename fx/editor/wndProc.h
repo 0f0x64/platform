@@ -142,7 +142,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 	{
 		editor::ui::mouseLastPos = editor::ui::GetCusorPos();
-		editor::TimeLine::lbDown();
 		editor::ViewCam::lbDown();
 		editor::paramEdit::lbDown();
 		break;
@@ -158,7 +157,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONDOWN:
 	{
 		editor::ui::mouseLastPos = editor::ui::GetCusorPos();
-		editor::TimeLine::rbDown();
 		editor::ViewCam::rbDown();
 		editor::paramEdit::rbDown();
 		break;
