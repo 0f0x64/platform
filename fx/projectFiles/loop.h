@@ -53,8 +53,8 @@ namespace Loop
 		gApi.SetBlendMode(blendmode::off,blendop::add);
 		gApi.SetRT(texture::mainRT, 0);
 
-		BasicCam::setCamKey(0, keyType::slide, 788, 2085, -1732, -500, 0, 500, -101, 197, 125, 60);
-		BasicCam::setCamKey(1077, keyType::slide, 1788, 2085, -2732, 500, 0, -500, -101, 197, 125, 60);
+		BasicCam::setCamKey(0, keyType::slide, -577, 1660, 2057, 0, 267, -265, 30, 220, -124, 60);
+		BasicCam::setCamKey(967, keyType::slide, -2514, 1346, 157, 0, 267, -265, 98, 234, -16, 60);
 		BasicCam::setCamKey(2124, keyType::set, -157, 3304, -215, 0, 0, 0, -86, 11, 239, 60);
 		BasicCam::processCam();
 		

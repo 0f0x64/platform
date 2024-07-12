@@ -149,7 +149,7 @@ namespace tracker
 
 		channel_01(100, 0);
 		channel_02(100, 0);
-		mix( 100);
+		mix(100);
 		
 		refStackBack;
 		
