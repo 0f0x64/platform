@@ -3,12 +3,12 @@ namespace Rasterizer
 
 	ID3D11RasterizerState* rasterState[4];
 
-	API Cull(cullmode mode)
+	void Cull(cullmode mode)
 	{
 		context->RSSetState(rasterState[(int)mode]);
 	}
 
-	API Scissors(rect r)
+	void Scissors(rect r)
 	{
 		D3D11_RECT rect = { r.x,r.y,r.z,r.w };
 		context->RSSetScissorRects(1, &rect);

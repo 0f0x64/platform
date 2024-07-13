@@ -49,13 +49,13 @@ namespace Sampler
 
 	}
 
-	API Sampler(targetshader shader, unsigned int slot, filter filterType, addr addressU, addr addressV)
+	void Sampler(targetshader shader, unsigned int slot, filter filterType, addr addressU, addr addressV)
 	{
 		if (shader == targetshader::vertex) context->VSSetSamplers(slot, 1, &pSampler[(int)filterType][(int)addressU][(int)addressV]);
 		if (shader == targetshader::pixel) context->PSSetSamplers(slot, 1, &pSampler[(int)filterType][(int)addressU][(int)addressV]);
 	}
 
-	API SamplerComp(unsigned int slot)
+	void SamplerComp(unsigned int slot)
 	{
 		context->PSSetSamplers(slot, 1, &pSamplerComp);
 	}

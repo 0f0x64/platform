@@ -57,6 +57,17 @@ namespace paramEdit {
 
 	float selYpos = 0.5;
 
+	void setParamsAttr()
+	{
+		for (int i = 0; i < cmdParamDesc[cmdCounter].pCount; i++)
+		{
+			auto pid = getTypeIndex(cmdParamDesc[cmdCounter].param[i].type);
+			cmdParamDesc[cmdCounter].param[i].typeIndex = pid;
+			cmdParamDesc[cmdCounter].param[i]._min = typeDesc[pid]._min;
+			cmdParamDesc[cmdCounter].param[i]._max = typeDesc[pid]._max;
+		}
+	}
+
 	//detect expressions and variables in caller and set bypass
 	void setBypass()
 	{
@@ -99,7 +110,7 @@ namespace paramEdit {
 					if (i.find("::") != string::npos)
 					{//check for known types
 						const auto t = i.substr(0, i.find("::"));
-						enumValue = isTypeEnum(t.c_str());
+						enumValue = isTypeEnum(getTypeIndex(t.c_str()));
 					}
 
 					bool intValue = isNumber(i);
@@ -125,7 +136,7 @@ namespace paramEdit {
 
 		for (int i = 0; i < cmdParamDesc[cmdIndex].pCount; i++)
 		{
-			auto sType = cmdParamDesc[cmdIndex].param[i].type;
+			auto sType = getTypeIndex(cmdParamDesc[cmdIndex].param[i].type);
 
 			if (isTypeEnum(sType))
 			{
@@ -233,7 +244,7 @@ namespace paramEdit {
 	void insertNumber(int p)
 	{
 		if (cmdParamDesc[currentCmd].param[currentParam].bypass) return;
-		auto sType = cmdParamDesc[currentCmd].param[currentParam].type;
+		auto sType = getTypeIndex(cmdParamDesc[currentCmd].param[currentParam].type);
 		if (isTypeEnum(sType)) return;
 
 		if (p == '0' && cursorPos == 0) return;
@@ -257,7 +268,7 @@ namespace paramEdit {
 
 	void Delete()
 	{
-		auto sType = cmdParamDesc[currentCmd].param[currentParam].type;
+		auto sType = getTypeIndex(cmdParamDesc[currentCmd].param[currentParam].type);
 		if (isTypeEnum(sType)) return;
 
 		char vstr[_CVTBUFSIZE];
@@ -279,7 +290,7 @@ namespace paramEdit {
 
 	void BackSpace()
 	{
-		auto sType = cmdParamDesc[currentCmd].param[currentParam].type;
+		auto sType = getTypeIndex(cmdParamDesc[currentCmd].param[currentParam].type);
 		if (isTypeEnum(sType)) return;
 		if (cursorPos == 0) return;
 
@@ -301,7 +312,7 @@ namespace paramEdit {
 		if (currentParam == -1) return;
 
 		if (cmdParamDesc[currentCmd].param[currentParam].bypass) return;
-		auto sType = cmdParamDesc[currentCmd].param[currentParam].type;
+		auto sType = getTypeIndex(cmdParamDesc[currentCmd].param[currentParam].type);
 
 		if (isTypeEnum(sType)) return;
 
@@ -551,7 +562,8 @@ namespace paramEdit {
 			char vstr[_CVTBUFSIZE];
 
 			auto w = tabLen * .9f;
-			auto sType = cmdParamDesc[currentCmd].param[i].type;
+			auto tt = cmdParamDesc[currentCmd].param[i].type;
+			auto sType = getTypeIndex(tt);
 			int subCount = getTypeDim(sType);
 			
 			if (!cmdParamDesc[currentCmd].param[i].bypass)
@@ -682,13 +694,14 @@ namespace paramEdit {
 		}
 
 		//drag by mouse
-		if (!isTypeEnum(cmdParamDesc[currentCmd].param[currentParam].type))
+		auto ti = getTypeIndex(cmdParamDesc[currentCmd].param[currentParam].type);
+		if (!isTypeEnum(ti))
 		{
 			if (currentParam >= 0)
 			{
-				if (ui::mbDown)
+				if (ui::lbDown)
 				{
-					cmdParamDesc[currentCmd].param[currentParam].value[subParam] = storedParam[subParam] - (int)(ui::mouseDelta.y * height);
+					cmdParamDesc[currentCmd].param[currentParam].value[subParam] = storedParam[subParam] + (int)(ui::mouseDelta.x * width);
 				}
 				else
 				{
@@ -710,6 +723,7 @@ namespace paramEdit {
 
 	void ShowStack()
 	{
+
 		int currentCmd_backup = currentCmd;
 
 		tabLen = ui::Text::getTextLen("000000000000000", ui::style::text::width);

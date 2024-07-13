@@ -13,6 +13,7 @@
 #pragma comment(lib, "Shlwapi.lib")
 
 #include <fstream>
+#include <regex>
 
 using namespace std;
 
@@ -449,6 +450,9 @@ void catToFile(const std::filesystem::path& sandbox, ofstream& ofile, std::vecto
 	}
 }
 
+
+#include "..\fx\types.h"
+
 //TODO:: multiline declaration support
 //TODO:: proper namespace parsing
 void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
@@ -596,17 +600,9 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 
 						overrider.append("\tif (!cmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass) ");
 
-						if (type.compare("texture") == 0 ||
-							type.compare("topology") == 0 ||
-							type.compare("blendmode") == 0 ||
-							type.compare("blendop") == 0 ||
-							type.compare("depthmode") == 0 ||
-							type.compare("filter") == 0 ||
-							type.compare("addr") == 0 ||
-							type.compare("cullmode") == 0 ||
-							type.compare("targetshader") == 0 ||
-							type.compare("keyType") == 0 ||
-							type.compare("visibility") == 0)
+						auto typeIndex = getTypeIndex(type.c_str());
+
+						if (isTypeEnum(typeIndex))
 						{
 							pNameList.append(name);
 							pNameListOut.append(name);
@@ -614,62 +610,63 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = (int)" + name + ";\n");
 							isTypeKnown = true;
 						}
-
-						if (type.compare("position") == 0 ||
-							type.compare("size") == 0 ||
-							type.compare("rotation") == 0 ||
-							type.compare("color") == 0)
+						else
 						{
-							pNameList.append(name + "_x, " + name + "_y, " + name + "_z");
-							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z }");
-							overrider.append("\n\t\t{\n\t\t\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-							overrider.append("\t\t\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
-							overrider.append("\t\t\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
-							overrider.append("\t\t}\n");
+							if (getTypeDim(typeIndex) == 3)
+							{
+								pNameList.append(name + "_x, " + name + "_y, " + name + "_z");
+								pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z }");
+								overrider.append("\n\t\t{\n\t\t\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+								overrider.append("\t\t\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
+								overrider.append("\t\t\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
+								overrider.append("\t\t}\n");
 
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
+								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
+								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
+								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
 
-							isTypeKnown = true;
-						}
+								isTypeKnown = true;
+							}
 
-						if (type.compare("color4") == 0 ||
-							type.compare("rect") == 0)
-						{
-							pNameList.append(name + "_x, " + name + "_y, " + name + "_z, " + name + "_w");
-							pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z, " + name + "_w }");
+							if (getTypeDim(typeIndex) == 4)
+							{
+								pNameList.append(name + "_x, " + name + "_y, " + name + "_z, " + name + "_w");
+								pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z, " + name + "_w }");
 
-							overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-							overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
-							overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
-							overrider.append("\t" + name + ".w = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3];\n");
+								overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+								overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
+								overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
+								overrider.append("\t" + name + ".w = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3];\n");
 
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3] = " + name + ".w;\n");
+								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
+								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
+								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
+								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3] = " + name + ".w;\n");
 
-							isTypeKnown = true;
-						}
+								isTypeKnown = true;
+							}
 
-						if (type.compare("timestamp") == 0 ||
-							type.compare("int") == 0 ||
-							type.compare("signed int") == 0 ||
-							type.compare("unsigned int") == 0)
-						{
-							pNameList.append(name);
-							pNameListOut.append(name);
-							overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ";\n");
-							isTypeKnown = true;
+							if (getTypeDim(typeIndex) == 1)
+							{
+								pNameList.append(name);
+								pNameListOut.append(name);
+								overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ";\n");
+								isTypeKnown = true;
+							}
 						}
 
 						if (!isTypeKnown)
 						{
 							pNameList.append(name);
 							pNameListOut.append(name);
+							overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ";\n");
+
+/*							pNameList.append(name);
+							pNameListOut.append(name);
 							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass = true;\n");
+							*/
 
 						}
 						else
@@ -702,7 +699,8 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 						ofile << "\tcmdParamDesc[cmdCounter].caller.line = srcLine;\n";
 						ofile << "\tcmdParamDesc[cmdCounter].pCount = " << std::to_string(pCount) << ";\n";
 
-						loader.append("\n\t\teditor::paramEdit::setBypass();\n\n");
+						loader.append("\n\t\teditor::paramEdit::setBypass();\n");
+						loader.append("\n\t\teditor::paramEdit::setParamsAttr();\n\n");
 
 						ofile << loader;
 						ofile << "}\n";
@@ -859,7 +857,7 @@ int main()
 	oReflect.close();
 
 
-	//-- collect al API functions and create reflection structure
+	//-- collect al marked functions and create reflection structure
 	Log("\nReflected functions\n");
 
 	std::string apiFileName = "..\\fx\\generated\\apiReflection.h";

@@ -1,5 +1,5 @@
 //
-char enumStringTable[255][255][255];
+/*char enumStringTable[255][255][255];
 int enumCount[255];
 int enumCounter = 0;
 
@@ -31,23 +31,52 @@ bool fillEnumTable(const char* name, const char* enumStr)
 	enumCounter++;
 	return true;
 }
+*/
 
 struct {
 	char name[255];
 	int _min;
 	int _max;
 	int _dim;
+
+	char enumString[255][255];
+	int enumCount = 0;
+
 } typeDesc[255];
 
 int typeCount = 0;
 
-bool fillTypeTable(const char* name, int _min_value, int _max_value, int _dim)
+bool fillTypeTable(const char* name, int _min_value, int _max_value, int _dim, const char* enumStr = NULL)
 {
 	strcpy(typeDesc[typeCount].name, name);
 	typeDesc[typeCount]._dim = _dim;
 	typeDesc[typeCount]._min = _min_value;
 	typeDesc[typeCount]._max = _max_value;
+
+	if (enumStr)
+	{
+		int counter = 0;
+		int j = 0;
+		for (unsigned int i = 0; i <= strlen(enumStr); i++)
+		{
+			if (*(enumStr + i) == ' ') continue;
+
+			if (*(enumStr + i) == ',' || i == strlen(enumStr))
+			{
+				j = 0;
+				counter++;
+			}
+			else
+			{
+				typeDesc[typeCount].enumString[counter][j++] = *(enumStr + i);
+			}
+		}
+
+		typeDesc[typeCount].enumCount = counter;
+	}
+
 	typeCount++;
+
 	return true;
 }
 
@@ -85,23 +114,28 @@ enum class texture:int {
 
 bool texturesToEnumType()
 {
-	
-	strcpy(enumStringTable[enumCounter][0], "texture");
+	strcpy(typeDesc[typeCount].name, "texture");
+	typeDesc[typeCount]._dim = 1;
+	typeDesc[typeCount]._min = 0;
+	typeDesc[typeCount]._max = 0;
+	typeDesc[typeCount].enumCount = 0;
 
 	int tc = 1;
 	#undef CreateTexture
-	#define CreateTexture(name,type,format,width,height,mip,depth) strcpy(enumStringTable[enumCounter][tc++],#name);
+#define CreateTexture(name,type,format,width,height,mip,depth) { \
+	typeDesc[typeCount]._max++; \
+	strcpy(typeDesc[typeCount].enumString[typeDesc[typeCount].enumCount++],#name); }
+
 	#include "projectFiles\texList.h"
 
-	enumCount[enumCounter] = tc - 1;
-	enumCounter++;
+	typeCount++;
 
 	return true;
 }
 
 bool ta = texturesToEnumType();
 
-#define enumType(name, ...) enum class name:int { __VA_ARGS__}; bool name##_b = fillEnumTable(#name, #__VA_ARGS__);
+#define enumType(name, ...) enum class name:int { __VA_ARGS__}; bool name##_t = fillTypeTable(#name, 0, INT_MAX, 1, #__VA_ARGS__);
 
 enumType(blendmode, off, on, alpha);
 enumType(blendop, add, sub, revsub, min, max);
@@ -116,69 +150,45 @@ enumType(visibility, on, off, solo);
 
 char tmpConv[255];
 
-int getEnumTableIndex(char* name)
+char* getStrValue(int index, int value)
 {
-	for (int i = 0; i < enumCounter; i++)
+	if (index < 0)//type is unknown
 	{
-		if (strcmp(name, enumStringTable[i][0]) == 0)
+		_itoa(value, tmpConv, 10);
+		return tmpConv;
+	}
+
+	auto ec = typeDesc[index].enumCount;
+
+	if (value >= 0 && value < ec)
+	{
+		return typeDesc[index].enumString[value];
+	}
+
+	_itoa(value, tmpConv, 10);
+	return tmpConv;
+
+}
+
+int GetEnumValue(int typeIndex, const char* id)
+{
+	if (typeIndex < 0) return NULL;
+
+	for (int i = 0; i < typeDesc[typeIndex].enumCount; i++)
+	{
+		if (strcmp(id, typeDesc[typeIndex].enumString[i]) == 0)
 		{
 			return i;
 		}
 	}
-
 	return -1;
-
 }
 
-char* getStrValue(char* name, int value)
+int getEnumCount(int typeIndex)
 {
-	for (int i = 0; i < enumCounter; i++)
-	{
-		if (strcmp(name, enumStringTable[i][0]) == 0)
-		{
-			return enumStringTable[i][value + 1];
-		}
-	}
+	if (typeIndex < 0) return -1;
 
-	_itoa(value, tmpConv, 10);
-
-	return tmpConv;
-	
-}
-
-int GetEnumValue(const char* type, const char* id)
-{
-	for (int i = 0; i < enumCounter; i++)
-	{
-		if (strcmp(type, enumStringTable[i][0]) == 0)
-		{
-			int j = 1; 
-			while (enumStringTable[i][j][0] != 0)
-			{
-				if (strcmp(id, enumStringTable[i][j]) == 0)
-				{
-					return j - 1;
-				}
-				j++;
-			}
-			return INT_MAX;
-		}
-	}
-
-	return INT_MAX;
-}
-
-int getEnumCount(char* name)
-{
-	for (int i = 0; i < enumCounter; i++)
-	{
-		if (strcmp(name, enumStringTable[i][0]) == 0)
-		{
-			return enumCount[i];
-		}
-	}
-
-	return -1;
+	return typeDesc[typeIndex].enumCount;
 }
 
 bool isType(const char* t1, const char* t2)
@@ -186,30 +196,42 @@ bool isType(const char* t1, const char* t2)
 	return (strcmp(t1, t2) == 0);
 }
 
-bool isTypeEnum(const char* name)
+bool isTypeEnum(int typeIndex)
 {
-	for (int i = 0; i < enumCounter; i++)
-	{
-		if (strcmp(name, enumStringTable[i][0]) == 0)
-		{
-			return true;
-		}
-	}
+	if (typeIndex < 0) return false;
 
-	return false;
+	return typeDesc[typeIndex].enumCount != 0 ? true : false;
 }
 
-int getTypeDim(const char* t1)
+int getTypeIndex(const char* t1)
 {
 	for (int i = 0; i < typeCount; i++)
 	{
-	if (strcmp(typeDesc[i].name,t1) == 0)
+		if (strcmp(typeDesc[i].name, t1) == 0)
 		{
-		return typeDesc[i]._dim;
+			return i;
 		}
 	}
 
-	return 1;
+	return -1;
+}
+
+int getTypeDim(int typeIndex)
+{
+	if (typeIndex < 0) return 1;
+	return typeDesc[typeIndex]._dim;
+}
+
+int getTypeMin(int typeIndex)
+{
+	if (typeIndex < 0) return INT_MIN;
+	return typeDesc[typeIndex]._min;
+}
+
+int getTypeMax(int typeIndex)
+{
+	if (typeIndex < 0) return INT_MAX;
+	return typeDesc[typeIndex]._max;
 }
 
 bool isNumber(const std::string& token)

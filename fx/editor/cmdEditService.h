@@ -12,8 +12,11 @@ struct {
 	struct {
 		int value[4];
 		char type[255];
+		int typeIndex;
 		char name[255];
 		bool bypass;
+		int _min;
+		int _max;
 	} param[255];
 
 	int stackLevel = 0;

@@ -214,17 +214,17 @@ namespace Textures
 		Rasterizer::Scissors(r);
 	}
 
-	API CopyColor(texture dst, texture src)
+	void CopyColor(texture dst, texture src)
 	{
 		context->CopyResource(Texture[(int)dst].pTexture, Texture[(int)src].pTexture);
 	}
 
-	API CopyDepth(texture dst, texture src)
+	void CopyDepth(texture dst, texture src)
 	{
 		context->CopyResource(Texture[(int)dst].pDepth, Texture[(int)src].pDepth);
 	}
 
-	API TextureToShader(texture tex, unsigned int slot, targetshader tA = targetshader::both)
+	void TextureToShader(texture tex, unsigned int slot, targetshader tA = targetshader::both)
 	{
 		if (tA == targetshader::both || tA == targetshader::vertex)
 		{
@@ -237,13 +237,13 @@ namespace Textures
 		}
 	}
 
-	API CreateMipMap()
+	void CreateMipMap()
 	{
 		context->GenerateMips(Texture[currentRT].TextureResView);
 	}
 
 
-	API RenderTarget(texture target, unsigned int level = 0)
+	void RenderTarget(texture target, unsigned int level = 0)
 	{
 		currentRT = (int)target;
 		

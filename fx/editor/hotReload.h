@@ -79,17 +79,18 @@ void reflectSourceChanges(std::filesystem::path fileName)
 					int pC = 0;
 					for (int j=0;j<cmdParamDesc[cCmd].pCount;j++)
 					{
-						auto ts = getTypeDim(cmdParamDesc[cCmd].param[j].type);
+						auto typeIndex = getTypeIndex(cmdParamDesc[cCmd].param[j].type);
+						auto ts = getTypeDim(typeIndex);
 
 						if (cmdParamDesc[cCmd].param[j].bypass) {
 							pC+= ts; continue;
 						}
 
-						if (isTypeEnum(cmdParamDesc[cCmd].param[j].type))
+						if (isTypeEnum(typeIndex))
 						{
 							auto evP = tokens[j].find("::") + 2;
 							std::string eV = tokens[j].substr(evP,tokens[j].length()-evP);
-						 	auto v = GetEnumValue(cmdParamDesc[cCmd].param[j].type, eV.c_str());
+						 	auto v = GetEnumValue(typeIndex, eV.c_str());
 							if (v != INT_MAX)
 							{
 								cmdParamDesc[cCmd].param[j].value[0] = v;

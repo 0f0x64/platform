@@ -47,7 +47,7 @@ namespace Depth
 		device->CreateDepthStencilState(&dsDesc, &pDSState[3]);//write
 	}
 
-	API Depth(depthmode mode)
+	void Depth(depthmode mode)
 	{
 		context->OMSetDepthStencilState(pDSState[(int)mode], 1);
 	}

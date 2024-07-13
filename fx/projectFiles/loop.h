@@ -69,13 +69,10 @@ namespace Loop
 		gApi.ClearRTDepth();
 		gApi.SetCull(cullmode::back);
 
-
-
-
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 504, 0, -500);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -496, 2, 500);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -492, 360, -495);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 4, 511, 365, 542);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -323, 0, 682);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -492, 0, -495);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 511, 0, 542);
 
 		tracker::playTrack();
 

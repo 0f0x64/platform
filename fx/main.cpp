@@ -10,18 +10,14 @@ HINSTANCE hInst;
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 HWND hWnd;
 
-//
-#define API void
-//
-
 #if EditMode
-#include <iostream>
-#include <string>
-#include <filesystem>
-#include <fstream>
-#include <regex>
-#include <vector>
-#include <typeinfo>
+	#include <iostream>
+	#include <string>
+	#include <filesystem>
+	#include <fstream>
+	#include <regex>
+	#include <vector>
+	#include <typeinfo>
 #endif
 
 #include <math.h>

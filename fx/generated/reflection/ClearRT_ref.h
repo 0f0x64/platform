@@ -19,6 +19,8 @@ if (paramsAreLoaded) {
 
 		editor::paramEdit::setBypass();
 
+		editor::paramEdit::setParamsAttr();
+
 }
 
 AddToUI(__FUNCTION__);
