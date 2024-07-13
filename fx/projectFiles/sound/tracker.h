@@ -82,34 +82,34 @@ namespace tracker
 
 	COMMAND (oscillator, int a, int b)
 	{
-		#include REFLINK(oscillator)
+		#include REFLECT(oscillator)
 		int d = 011;
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 	COMMAND (eq, int a)
 	{
-		#include REFLINK(eq)
+		#include REFLECT(eq)
 		int b = 1;
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 
 	COMMAND(mainbeat, int pos, int len, int repeat)
 	{
-		#include REFLINK(mainbeat)
+		#include REFLECT(mainbeat)
 
 		//notes = "DdddDded";
 		//vol = "1123";
 		//send = "00001";
 
 
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 	COMMAND (channel_01, int volume, int pan)
 	{
-		#include REFLINK(channel_01)
+		#include REFLECT(channel_01)
 
 		mainbeat(0, 19, 10);
 
@@ -118,40 +118,40 @@ namespace tracker
 
 
 
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 	COMMAND (channel_02, int volume,int pan)
 	{
-		#include REFLINK(channel_02)
+		#include REFLECT(channel_02)
 
 		int a = 4;
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 
 
 	COMMAND (mix, int level)
 	{
-		#include REFLINK(mix)
+		#include REFLECT(mix)
 
 
 
 
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 
 
 	COMMAND (playTrack)
 	{
-		#include REFLINK(playTrack)
+		#include REFLECT(playTrack)
 
 		channel_01(100, 0);
 		channel_02(100, 0);
 		mix(100);
 		
-		refStackBack;
+		REFLECT_CLOSE;
 		
 	}
 

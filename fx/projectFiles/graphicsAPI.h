@@ -1,33 +1,33 @@
 struct {
 
 	COMMAND(SetInputAsm, topology t) {
-#include REFLINK(SetInputAsm)
+#include REFLECT(SetInputAsm)
 		InputAssembler::IA(t);
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 	COMMAND(SetRT, texture i, int level) {
-#include REFLINK(SetRT)
+#include REFLECT(SetRT)
 		Textures::RenderTarget(i, level);
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 	COMMAND(CreateMips) {
-#include REFLINK(CreateMips)
+#include REFLECT(CreateMips)
 		Textures::CreateMipMap();
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 
 	COMMAND(SetDepthMode, depthmode i) {
-#include REFLINK(SetDepthMode)
+#include REFLECT(SetDepthMode)
 		Depth::Depth(i);
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 	COMMAND(Draw, int quadcount, int instances = 1) {
-#include REFLINK(Draw)
+#include REFLECT(Draw)
 		Draw::NullDrawer(quadcount, instances);
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 /*	COMMAND(SetCamera, position eye, position at, position up, unsigned int angle) {
 #include REFLINK(SetCamera)
@@ -36,38 +36,38 @@ struct {
 	}*/
 
 	COMMAND(ClearRT, color4 c) {
-#include REFLINK(ClearRT)
+#include REFLECT(ClearRT)
 		Draw::Clear(c);
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 	COMMAND(ClearRTDepth) {
-#include REFLINK(ClearRTDepth)
+#include REFLECT(ClearRTDepth)
 		Draw::ClearDepth();
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 	COMMAND(SetBlendMode, blendmode mode, blendop op = blendop::add) {
-#include REFLINK(SetBlendMode)
+#include REFLECT(SetBlendMode)
 		Blend::Blending(mode, op);
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 	COMMAND(SetCull, cullmode i) {
-#include REFLINK(SetCull)
+#include REFLECT(SetCull)
 		Rasterizer::Cull(i);
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 	COMMAND(SetScissors, rect r) {
-#include REFLINK(SetScissors)
+#include REFLECT(SetScissors)
 		Rasterizer::Scissors(r);
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 	COMMAND(CopyRTColor, texture dst, texture src) {
-#include REFLINK(CopyRTColor)
+#include REFLECT(CopyRTColor)
 		Textures::CopyColor(dst, src);
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 	COMMAND(CopyRTDepth, texture dst, texture src) {
-#include REFLINK(CopyRTDepth)
+#include REFLECT(CopyRTDepth)
 		Textures::CopyDepth(dst, src);
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 } gApi;

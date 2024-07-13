@@ -21,6 +21,7 @@ HWND hWnd;
 #include <fstream>
 #include <regex>
 #include <vector>
+#include <typeinfo>
 #endif
 
 #include <math.h>
@@ -43,10 +44,10 @@ using namespace dx11;
 
 #define REFLECTION true
 
-#define refStackBack cmdLevel--
+#define REFLECT_CLOSE cmdLevel--
 #define refPath ./generated/reflection/
 #define refTail _ref.h
-#define REFLINK(FOO) STRINGIFY( CAT_3(refPath,FOO,refTail) )
+#define REFLECT(FOO) STRINGIFY( CAT_3(refPath,FOO,refTail) )
 
 
 #if REFLECTION

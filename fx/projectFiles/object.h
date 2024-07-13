@@ -2,7 +2,7 @@ namespace Object {
 
 	COMMAND(ShowObject,texture geometry, texture normals, unsigned int quality, position pos)
 	{
-		#include REFLINK(ShowObject)
+		#include REFLECT(ShowObject)
 
 		int denom = (int)pow(2, (float)quality);
 		float q = intToFloatDenom;
@@ -32,13 +32,13 @@ namespace Object {
 		ps::basic.set();
 		gApi.Draw((int)gX*(int)gY, 1);
 
-		refStackBack;
+		REFLECT_CLOSE;
 		
 	}
 
 	COMMAND(CalcObject,texture targetGeo, texture targetNrml)
 	{
-		#include REFLINK(CalcObject)
+		#include REFLECT(CalcObject)
 
 		gApi.SetBlendMode(blendmode::off, blendop::add);
 		gApi.SetCull(cullmode::off);
@@ -65,7 +65,7 @@ namespace Object {
 		gApi.Draw(1,1);
 		gApi.CreateMips();
 
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 }

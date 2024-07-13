@@ -2,7 +2,7 @@ namespace Cubemap {
 
 	COMMAND (CalcCubemap, texture target)
 	{
-		#include REFLINK(CalcCubemap)
+		#include REFLECT(CalcCubemap)
 
 		gApi.SetBlendMode(blendmode::off, blendop::add);
 		gApi.SetRT(target,0);
@@ -15,12 +15,12 @@ namespace Cubemap {
 		gApi.Draw(1,1);
 		gApi.CreateMips();
 
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 	COMMAND(ShowCubemap,texture envTexture)
 	{
-		#include REFLINK(ShowCubemap)
+		#include REFLECT(ShowCubemap)
 
 		gApi.SetBlendMode(blendmode::off, blendop::add);
 		gApi.SetCull(cullmode::back);
@@ -37,7 +37,7 @@ namespace Cubemap {
 		vs::simpleCube.set();
 		gApi.Draw(gX * gY,1);
 
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 }

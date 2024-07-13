@@ -5,7 +5,7 @@ namespace TimeLine
 	const int frame = SAMPLES_IN_FRAME;
 	const int second = SAMPLING_FREQ;
 	const int minute = SAMPLING_FREQ * FRAMES_PER_SECOND;
-	const int timelineLen = minute * 5;
+	const int timelineLen = second * DEMO_DURATION;
 
 	float bpm = 120;
 	float bpmMaj = 4;
@@ -360,8 +360,6 @@ namespace TimeLine
 
 	void Draw()
 	{
-		//ProcessInput();
-
 		gapi.setScissors(rect{ (int)(screenLeft*dx11::width), 0, (int)(screenRight*dx11::width), dx11::height });
 
 		ui::style::Base();

@@ -143,7 +143,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		editor::ui::mouseLastPos = editor::ui::GetCusorPos();
 		editor::ViewCam::lbDown();
-		editor::paramEdit::lbDown();
 		break;
 	}
 

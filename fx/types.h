@@ -1,7 +1,6 @@
 //
 char enumStringTable[255][255][255];
 int enumCount[255];
-
 int enumCounter = 0;
 
 bool fillEnumTable(const char* name, const char* enumStr)
@@ -33,29 +32,49 @@ bool fillEnumTable(const char* name, const char* enumStr)
 	return true;
 }
 
+struct {
+	char name[255];
+	int _min;
+	int _max;
+	int _dim;
+} typeDesc[255];
+
+int typeCount = 0;
+
+bool fillTypeTable(const char* name, int _min_value, int _max_value, int _dim)
+{
+	strcpy(typeDesc[typeCount].name, name);
+	typeDesc[typeCount]._dim = _dim;
+	typeDesc[typeCount]._min = _min_value;
+	typeDesc[typeCount]._max = _max_value;
+	typeCount++;
+	return true;
+}
+
+#define createType(name, _min, _max, _dim, ...) typedef struct {  __VA_ARGS__ } name; bool name##_r = fillTypeTable(#name, _min,_max,_dim);
+#define createSimpleType(name, _min, _max) typedef int name; bool name##_r = fillTypeTable(#name, _min,_max,1);
+
 const float intToFloatDenom = 255.f;
 
-typedef struct { float x; float y; float z; } vector3;
-typedef struct { float x; float y; float z; float w; } vector4;
+createType(vector3, 0, 0, 3, float x; float y; float z;);
+createType(vector4, 0, 0, 4, float x; float y; float z; float w;);
+createType(vector3i, 0, 0, 3, int x; int y; int z;);
+createType(vector4i, 0, 0, 4, int x; int y; int z; int w;);
 
-typedef struct { int x; int y; int z; } vector3i;
-typedef struct { int x; int y; int z; int w; } vector4i;
-
+//internal 
 typedef vector3 positionF;
 typedef vector3 sizeF;
 typedef vector3 rotationF;
+//----
 
-
-typedef vector3i position;
-typedef vector3i size;
-typedef vector3i rotation;
-typedef vector3i color;
-typedef vector4i color4;
-typedef vector4i rect;
-
-typedef int timestamp;
-typedef int duration_time;
-typedef int duration_ticks;
+createType(position, INT_MIN, INT_MAX, 3, int x; int y; int z;);
+createType(size, INT_MIN, INT_MAX, 3, int x; int y; int z;);
+createType(rotation, INT_MIN, INT_MAX, 3, int x; int y; int z;);
+createType(color, 0, 255, 3, int x; int y; int z;);
+createType(color4, 0, 255, 4, int x; int y; int z; int w;);
+createType(rect, INT_MIN, INT_MAX, 4, int x; int y; int z; int w;);
+createSimpleType(timestamp, 0, DEMO_DURATION* SAMPLING_FREQ);
+createSimpleType(duration_time, 0, DEMO_DURATION* SAMPLING_FREQ);
 
 
 #undef CreateTexture
@@ -66,6 +85,7 @@ enum class texture:int {
 
 bool texturesToEnumType()
 {
+	
 	strcpy(enumStringTable[enumCounter][0], "texture");
 
 	int tc = 1;
@@ -94,7 +114,23 @@ enumType(targetshader, vertex, pixel, both);
 enumType(keyType, set, slide);
 enumType(visibility, on, off, solo);
 
-char* getEnumStr(char* name, int value)
+char tmpConv[255];
+
+int getEnumTableIndex(char* name)
+{
+	for (int i = 0; i < enumCounter; i++)
+	{
+		if (strcmp(name, enumStringTable[i][0]) == 0)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+
+}
+
+char* getStrValue(char* name, int value)
 {
 	for (int i = 0; i < enumCounter; i++)
 	{
@@ -103,7 +139,11 @@ char* getEnumStr(char* name, int value)
 			return enumStringTable[i][value + 1];
 		}
 	}
-	return NULL;
+
+	_itoa(value, tmpConv, 10);
+
+	return tmpConv;
+	
 }
 
 int GetEnumValue(const char* type, const char* id)
@@ -146,23 +186,14 @@ bool isType(const char* t1, const char* t2)
 	return (strcmp(t1, t2) == 0);
 }
 
-bool isTypeEnum(const char* t1)
+bool isTypeEnum(const char* name)
 {
-	if (
-		isType(t1, "texture") ||
-		isType(t1, "topology") ||
-		isType(t1, "blendmode") ||
-		isType(t1, "blendop") ||
-		isType(t1, "depthmode") ||
-		isType(t1, "filter") ||
-		isType(t1, "addr") ||
-		isType(t1, "cullmode") ||
-		isType(t1, "targetshader") ||
-		isType(t1, "keyType") ||
-		isType(t1, "visibility")
-		)
+	for (int i = 0; i < enumCounter; i++)
 	{
-		return true;
+		if (strcmp(name, enumStringTable[i][0]) == 0)
+		{
+			return true;
+		}
 	}
 
 	return false;
@@ -170,22 +201,12 @@ bool isTypeEnum(const char* t1)
 
 int getTypeDim(const char* t1)
 {
-	if (
-		isType(t1, "position") ||
-		isType(t1, "size") ||
-		isType(t1, "rotation") ||
-		isType(t1, "color")
-		)
+	for (int i = 0; i < typeCount; i++)
 	{
-		return 3;
-	}
-
-	if (
-		isType(t1, "color4") ||
-		isType(t1, "rect")
-		)
-	{
-		return 4;
+	if (strcmp(typeDesc[i].name,t1) == 0)
+		{
+		return typeDesc[i]._dim;
+		}
 	}
 
 	return 1;

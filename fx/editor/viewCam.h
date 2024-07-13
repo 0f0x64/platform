@@ -318,7 +318,7 @@ namespace ViewCam
 		char cbutton[] = "capture  viewCam";
 		ui::Box::Setup();
 		float w = ui::Text::getTextLen(cbutton, ui::style::text::width) + ui::style::text::width * 2;
-		float x = .5 - w / 2.; float y = .9 + ui::style::text::height;
+		float x = .5f - w / 2.f; float y = .9f + ui::style::text::height;
 
 			ui::style::Base();
 			ui::style::box::r += switcherTimer;
@@ -332,19 +332,19 @@ namespace ViewCam
 					{
 						float q = intToFloatDenom;
 						auto eye = currentCamera.ViewVec*q + currentCamera.Target*q;
-						cmdParamDesc[currentCmd].param[2].value[0] = XMVectorGetX(eye);
-						cmdParamDesc[currentCmd].param[2].value[1] = XMVectorGetY(eye);
-						cmdParamDesc[currentCmd].param[2].value[2] = XMVectorGetZ(eye);
-						auto at = currentCamera.Target*q;
-						cmdParamDesc[currentCmd].param[3].value[0] = XMVectorGetX(at);
-						cmdParamDesc[currentCmd].param[3].value[1] = XMVectorGetY(at);
-						cmdParamDesc[currentCmd].param[3].value[2] = XMVectorGetZ(at);
-						auto up = currentCamera.upVec*q;
-						cmdParamDesc[currentCmd].param[4].value[0] = XMVectorGetX(up);
-						cmdParamDesc[currentCmd].param[4].value[1] = XMVectorGetY(up);
-						cmdParamDesc[currentCmd].param[4].value[2] = XMVectorGetZ(up);
+						cmdParamDesc[currentCmd].param[2].value[0] = (int)XMVectorGetX(eye);
+						cmdParamDesc[currentCmd].param[2].value[1] = (int)XMVectorGetY(eye);
+						cmdParamDesc[currentCmd].param[2].value[2] = (int)XMVectorGetZ(eye);
+						auto at = currentCamera.Target*q;			 
+						cmdParamDesc[currentCmd].param[3].value[0] = (int)XMVectorGetX(at);
+						cmdParamDesc[currentCmd].param[3].value[1] = (int)XMVectorGetY(at);
+						cmdParamDesc[currentCmd].param[3].value[2] = (int)XMVectorGetZ(at);
+						auto up = currentCamera.upVec*q;			 
+						cmdParamDesc[currentCmd].param[4].value[0] = (int)XMVectorGetX(up);
+						cmdParamDesc[currentCmd].param[4].value[1] = (int)XMVectorGetY(up);
+						cmdParamDesc[currentCmd].param[4].value[2] = (int)XMVectorGetZ(up);
 
-						cmdParamDesc[currentCmd].param[5].value[0] = Camera::viewCam.angle;
+						cmdParamDesc[currentCmd].param[5].value[0] = (int)Camera::viewCam.angle;
 
 					}
 
@@ -357,7 +357,7 @@ namespace ViewCam
 			char cbutton2[100];
 			strcpy (cbutton2, !Camera::viewCam.overRide ? "switch  to  free  camera" : "switch  to  keyed  camera");
 			float w2 = ui::Text::getTextLen(cbutton2, ui::style::text::width) + ui::style::text::width * 2;
-			float x2 = .5 - w2 / 2.; float y2 = .025;
+			float x2 = .5f - w2 / 2.f; float y2 = .025f;
 
 			ui::style::Base();
 			ui::style::box::r += switcherTimer;
@@ -375,12 +375,12 @@ namespace ViewCam
 			}
 			ui::Box::Draw(x2, y2, w2);
 
-			switcherTimer = clamp(switcherTimer - .1,0.,1.);
+			switcherTimer = clamp(switcherTimer - .1f,0.f,1.f);
 
 
 		ui::Text::Setup();
-		ui::Text::Draw(cbutton, x+ ui::style::text::width, y+ ui::style::text::height/8.);
-		ui::Text::Draw(cbutton2, x2 + ui::style::text::width, y2 + ui::style::text::height / 8.);
+		ui::Text::Draw(cbutton, x+ ui::style::text::width, y+ ui::style::text::height/8.f);
+		ui::Text::Draw(cbutton2, x2 + ui::style::text::width, y2 + ui::style::text::height / 8.f);
 
 
 		char str[32];
@@ -388,7 +388,7 @@ namespace ViewCam
 		_itoa((int)Camera::viewCam.angle, str,10);
 		strcat(str2, str);
 		w = ui::Text::getTextLen(str2, ui::style::text::width);
-		ui::Text::Draw(str2, .5-w/2., .9);
+		ui::Text::Draw(str2, .5f-w/2.f, .9f);
 
 
 

@@ -11,56 +11,41 @@ namespace BasicCam
 
 	COMMAND (setCamKey, timestamp camTime, keyType camType, position eye, position at, position up, int angle)
 	{
-		#include REFLINK(setCamKey)
+		#include REFLECT(setCamKey)
 
 		if (!camPass) {
 
-			int t = timer::timeCursor/ SAMPLES_IN_FRAME;
+			int t = timer::timeCursor / SAMPLES_IN_FRAME;
+
+			camData* sCam;
 
 			if (camTime <= t)
 			{
-				Prev.eye.x = eye.x;
-				Prev.eye.y = eye.y;
-				Prev.eye.z = eye.z;
-
-				Prev.at.x = at.x;
-				Prev.at.y = at.y;
-				Prev.at.z = at.z;
-
-				Prev.up.x = up.x;
-				Prev.up.y = up.y;
-				Prev.up.z = up.z;
-
-				Prev.angle = angle;
-
+				sCam = &Prev;
 				prevTime = camTime;
-
 				currentCamType = camType;
-
 			}
 			else
 			{
-				Next.eye.x = eye.x;
-				Next.eye.y = eye.y;
-				Next.eye.z = eye.z;
-
-				Next.at.x = at.x;
-				Next.at.y = at.y;
-				Next.at.z = at.z;
-
-				Next.up.x = up.x;
-				Next.up.y = up.y;
-				Next.up.z = up.z;
-
-				Next.angle = angle;
-
+				sCam = &Next;
 				camPass = true;
-
 				nextTime = camTime;
 			}
+
+			sCam->eye.x = (float)eye.x;
+			sCam->eye.y = (float)eye.y;
+			sCam->eye.z = (float)eye.z;
+			sCam->at.x = (float)at.x;
+			sCam->at.y = (float)at.y;
+			sCam->at.z = (float)at.z;
+			sCam->up.x = (float)up.x;
+			sCam->up.y = (float)up.y;
+			sCam->up.z = (float)up.z;
+			sCam->angle = (float)angle;
+
 		}
 
-		refStackBack;
+		REFLECT_CLOSE;
 	}
 
 	void processCam()
@@ -71,15 +56,12 @@ namespace BasicCam
 		
 		positionF eye, at, up;
 		float angle = lerp((float)Prev.angle, (float)Next.angle, a);
-
-		eye.x = lerp(Prev.eye.x, Next.eye.x, a)/q;
+		eye.x = lerp(Prev.eye.x, Next.eye.x, a) / q;
 		eye.y = lerp(Prev.eye.y, Next.eye.y, a) / q;
 		eye.z = lerp(Prev.eye.z, Next.eye.z, a) / q;
-
 		at.x = lerp(Prev.at.x, Next.at.x, a) / q;
 		at.y = lerp(Prev.at.y, Next.at.y, a) / q;
 		at.z = lerp(Prev.at.z, Next.at.z, a) / q;
-
 		up.x = lerp(Prev.up.x, Next.up.x, a) / q;
 		up.y = lerp(Prev.up.y, Next.up.y, a) / q;
 		up.z = lerp(Prev.up.z, Next.up.z, a) / q;
