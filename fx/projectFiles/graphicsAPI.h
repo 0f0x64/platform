@@ -1,14 +1,14 @@
 struct {
 
-	COMMAND(SetInputAsm, topology t) {
+	COMMAND(SetInputAsm, topology topo) {
 #include REFLECT(SetInputAsm)
-		InputAssembler::IA(t);
+		InputAssembler::IA(topo);
 		REFLECT_CLOSE;
 	}
 
-	COMMAND(SetRT, texture i, int level) {
+	COMMAND(SetRT, texture targetRT, int level) {
 #include REFLECT(SetRT)
-		Textures::RenderTarget(i, level);
+		Textures::RenderTarget(targetRT, level);
 		REFLECT_CLOSE;
 	}
 
@@ -18,10 +18,9 @@ struct {
 		REFLECT_CLOSE;
 	}
 
-
-	COMMAND(SetDepthMode, depthmode i) {
+	COMMAND(SetDepthMode, depthmode mode) {
 #include REFLECT(SetDepthMode)
-		Depth::Depth(i);
+		Depth::Depth(mode);
 		REFLECT_CLOSE;
 	}
 	COMMAND(Draw, int quadcount, int instances = 1) {
@@ -35,9 +34,9 @@ struct {
 		refStackBack;
 	}*/
 
-	COMMAND(ClearRT, color4 c) {
+	COMMAND(ClearRT, color4 color) {
 #include REFLECT(ClearRT)
-		Draw::Clear(c);
+		Draw::Clear(color);
 		REFLECT_CLOSE;
 	}
 	COMMAND(ClearRTDepth) {
@@ -50,14 +49,14 @@ struct {
 		Blend::Blending(mode, op);
 		REFLECT_CLOSE;
 	}
-	COMMAND(SetCull, cullmode i) {
+	COMMAND(SetCull, cullmode mode) {
 #include REFLECT(SetCull)
-		Rasterizer::Cull(i);
+		Rasterizer::Cull(mode);
 		REFLECT_CLOSE;
 	}
-	COMMAND(SetScissors, rect r) {
+	COMMAND(SetScissors, rect bbox) {
 #include REFLECT(SetScissors)
-		Rasterizer::Scissors(r);
+		Rasterizer::Scissors(bbox);
 		REFLECT_CLOSE;
 	}
 	COMMAND(CopyRTColor, texture dst, texture src) {

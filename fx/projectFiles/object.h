@@ -4,6 +4,13 @@ namespace Object {
 	{
 		#include REFLECT(ShowObject)
 
+		#if EditMode //dynamic limits
+			auto r = max(Textures::Texture[(int)geometry].size.x, Textures::Texture[(int)geometry].size.y);
+			auto mipMaps = Textures::Texture[(int)geometry].mipMaps;
+			cmdParamDesc[cmdCounter - 1].param[2]._min = 0;
+			cmdParamDesc[cmdCounter - 1].param[2]._max = max((mipMaps ? (UINT)(_log2(r)) : 0)-2,0);
+		#endif
+
 		int denom = (int)pow(2, (float)quality);
 		float q = intToFloatDenom;
 		

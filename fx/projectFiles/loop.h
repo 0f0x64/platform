@@ -32,6 +32,17 @@ namespace Loop
 		ConstBuf::UpdateFrame();
 	}
 
+	COMMAND(cameraMan)
+	{
+		#include REFLECT(cameraMan)
+
+		BasicCam::setCamKey(0, keyType::slide, -537, 1660, 2057, 0, 267, -265, 30, 220, -124, 60);
+		BasicCam::setCamKey(884, keyType::slide, -2451, 1346, 157, 0, 267, -265, 98, 234, -16, 80);
+		BasicCam::setCamKey(1965, keyType::slide, -157, 3304, -215, 0, 0, 0, -86, 11, 239, 60);
+		BasicCam::processCam();
+
+		REFLECT_CLOSE;
+	}
 
 	void mainLoop()
 	{
@@ -48,20 +59,17 @@ namespace Loop
 		frameConst();
 
 		gApi.SetInputAsm(topology::triList);
+		gApi.SetBlendMode(blendmode::off, blendop::add);
+
 		Cubemap::CalcCubemap(texture::env);
 		Object::CalcObject(texture::obj1pos, texture::obj1nrml);
 
-		gApi.SetBlendMode(blendmode::off, blendop::add);
 		gApi.SetRT(texture::mainRT, 0);
 
-		BasicCam::setCamKey(0, keyType::slide, -577, 1660, 2057, 0, 267, -265, 30, 220, -124, 60);
-		BasicCam::setCamKey(892, keyType::slide, -2514, 1346, 157, 0, 267, -265, 98, 234, -16, 60);
-		BasicCam::setCamKey(1965, keyType::slide, -157, 3304, -215, 0, 0, 0, -86, 11, 239, 60);
-		BasicCam::processCam();
-		
+		cameraMan();
 		
 		gApi.SetDepthMode(depthmode::off);
-		gApi.ClearRT(0, 111, 235, 233);
+		gApi.ClearRT(255, 255, 255, 255);
 
 		Cubemap::ShowCubemap(texture::env);
 
@@ -69,10 +77,12 @@ namespace Loop
 		gApi.ClearRTDepth();
 		gApi.SetCull(cullmode::back);
 
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 504, 0, -500);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -323, 0, 682);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -492, 0, -495);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 511, 0, 542);
+		gApi.SetBlendMode(blendmode::off, blendop::add);
+
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 1, 504, 264, -500);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -323, 219, 682);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 8, -492, 229, -495);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 513, 282, 534);
 
 		tracker::playTrack();
 

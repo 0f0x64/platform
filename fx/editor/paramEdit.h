@@ -63,8 +63,19 @@ namespace paramEdit {
 		{
 			auto pid = getTypeIndex(cmdParamDesc[cmdCounter].param[i].type);
 			cmdParamDesc[cmdCounter].param[i].typeIndex = pid;
-			cmdParamDesc[cmdCounter].param[i]._min = typeDesc[pid]._min;
-			cmdParamDesc[cmdCounter].param[i]._max = typeDesc[pid]._max;
+
+			if (pid < 0)
+			{
+				cmdParamDesc[cmdCounter].param[i]._min = INT_MIN;
+				cmdParamDesc[cmdCounter].param[i]._max = INT_MAX;
+				cmdParamDesc[cmdCounter].param[i]._dim = 1;
+			}
+			else
+			{
+				cmdParamDesc[cmdCounter].param[i]._min = typeDesc[pid]._min;
+				cmdParamDesc[cmdCounter].param[i]._max = typeDesc[pid]._max;
+				cmdParamDesc[cmdCounter].param[i]._dim = typeDesc[pid]._dim;
+			}
 		}
 	}
 
@@ -136,8 +147,8 @@ namespace paramEdit {
 
 		for (int i = 0; i < cmdParamDesc[cmdIndex].pCount; i++)
 		{
-			auto sType = getTypeIndex(cmdParamDesc[cmdIndex].param[i].type);
-
+			auto sType = cmdParamDesc[cmdIndex].param[i].typeIndex;
+			
 			if (isTypeEnum(sType))
 			{
 				genParams.push_back(std::string(cmdParamDesc[cmdIndex].param[i].type) +
@@ -240,11 +251,17 @@ namespace paramEdit {
 		rename(outFilePath.c_str(), inFilePath.c_str());
 	}
 
+	void pLimits()
+	{
+		cmdParamDesc[currentCmd].param[currentParam].value[subParam] = clamp(cmdParamDesc[currentCmd].param[currentParam].value[subParam], cmdParamDesc[currentCmd].param[currentParam]._min, cmdParamDesc[currentCmd].param[currentParam]._max);
+	}
+
 	//TEXT EDITOR
 	void insertNumber(int p)
 	{
 		if (cmdParamDesc[currentCmd].param[currentParam].bypass) return;
-		auto sType = getTypeIndex(cmdParamDesc[currentCmd].param[currentParam].type);
+		auto sType = cmdParamDesc[currentCmd].param[currentParam].typeIndex;
+		
 		if (isTypeEnum(sType)) return;
 
 		if (p == '0' && cursorPos == 0) return;
@@ -261,14 +278,14 @@ namespace paramEdit {
 		strncat(vstr2 + cursorPos + 1, vstr + cursorPos, strlen(vstr) - cursorPos);
 
 		cmdParamDesc[currentCmd].param[currentParam].value[subParam] = atoi(vstr2);
-
+		pLimits();
 		cursorPos++;
 
 	}
 
 	void Delete()
 	{
-		auto sType = getTypeIndex(cmdParamDesc[currentCmd].param[currentParam].type);
+		auto sType = cmdParamDesc[currentCmd].param[currentParam].typeIndex;
 		if (isTypeEnum(sType)) return;
 
 		char vstr[_CVTBUFSIZE];
@@ -285,12 +302,13 @@ namespace paramEdit {
 		strncpy(vstr2 + cursorPos, vstr + cursorPos + 1, strlen(vstr) - cursorPos);
 
 		cmdParamDesc[currentCmd].param[currentParam].value[subParam] = atoi(vstr2);
+		pLimits();
 
 	}
 
 	void BackSpace()
 	{
-		auto sType = getTypeIndex(cmdParamDesc[currentCmd].param[currentParam].type);
+		auto sType = cmdParamDesc[currentCmd].param[currentParam].typeIndex;
 		if (isTypeEnum(sType)) return;
 		if (cursorPos == 0) return;
 
@@ -302,6 +320,8 @@ namespace paramEdit {
 		strncpy(vstr2 + max(cursorPos - 1, 0), vstr + cursorPos, max(strlen(vstr) - cursorPos + 1, 0));
 
 		cmdParamDesc[currentCmd].param[currentParam].value[subParam] = atoi(vstr2);
+		pLimits();
+
 		cursorPos--;
 	}
 
@@ -312,13 +332,14 @@ namespace paramEdit {
 		if (currentParam == -1) return;
 
 		if (cmdParamDesc[currentCmd].param[currentParam].bypass) return;
-		auto sType = getTypeIndex(cmdParamDesc[currentCmd].param[currentParam].type);
+		auto sType = cmdParamDesc[currentCmd].param[currentParam].typeIndex;
 
 		if (isTypeEnum(sType)) return;
 
 		float scale = ui::lbDown ? 10.f : 1.f;
 
 		cmdParamDesc[currentCmd].param[currentParam].value[subParam] += (int)(sign(delta) * scale);
+		pLimits();
 
 	}
 
@@ -562,10 +583,9 @@ namespace paramEdit {
 			char vstr[_CVTBUFSIZE];
 
 			auto w = tabLen * .9f;
-			auto tt = cmdParamDesc[currentCmd].param[i].type;
-			auto sType = getTypeIndex(tt);
-			int subCount = getTypeDim(sType);
-			
+			auto sType = cmdParamDesc[currentCmd].param[i].typeIndex;
+			int subCount = cmdParamDesc[currentCmd].param[i]._dim;
+
 			if (!cmdParamDesc[currentCmd].param[i].bypass)
 			{
 				for (int p = 0; p < subCount; p++) //process clicks
@@ -702,6 +722,7 @@ namespace paramEdit {
 				if (ui::lbDown)
 				{
 					cmdParamDesc[currentCmd].param[currentParam].value[subParam] = storedParam[subParam] + (int)(ui::mouseDelta.x * width);
+					pLimits();
 				}
 				else
 				{

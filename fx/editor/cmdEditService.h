@@ -17,6 +17,7 @@ struct {
 		bool bypass;
 		int _min;
 		int _max;
+		int _dim;
 	} param[255];
 
 	int stackLevel = 0;

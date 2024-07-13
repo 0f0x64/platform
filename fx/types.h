@@ -1,38 +1,3 @@
-//
-/*char enumStringTable[255][255][255];
-int enumCount[255];
-int enumCounter = 0;
-
-bool fillEnumTable(const char* name, const char* enumStr)
-{
-	int index = enumCounter;
-	strcpy(enumStringTable[index][0], name);
-
-	int counter = 1;
-	int j = 0;
-	for (unsigned int i = 0; i <= strlen(enumStr); i++)
-	{
-		if (*(enumStr + i) == ' ') continue;
-
-		if (*(enumStr + i) == ',' || i == strlen(enumStr))
-		{
-			enumStringTable[index][counter][j] = 0;
-			j = 0;
-			counter++;
-		}
-		else
-		{
-			enumStringTable[index][counter][j++] = *(enumStr + i);
-		}
-	}
-
-	enumCount[enumCounter] = counter - 1;
-
-	enumCounter++;
-	return true;
-}
-*/
-
 struct {
 	char name[255];
 	int _min;
@@ -122,7 +87,7 @@ bool texturesToEnumType()
 
 	int tc = 1;
 	#undef CreateTexture
-#define CreateTexture(name,type,format,width,height,mip,depth) { \
+	#define CreateTexture(name,type,format,width,height,mip,depth) { \
 	typeDesc[typeCount]._max++; \
 	strcpy(typeDesc[typeCount].enumString[typeDesc[typeCount].enumCount++],#name); }
 

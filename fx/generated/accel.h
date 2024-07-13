@@ -30,6 +30,8 @@
 
 #define CopyRTDepth_REF ".\generated\reflection\CopyRTDepth_ref.h"
 
+#define cameraMan_REF ".\generated\reflection\cameraMan_ref.h"
+
 #define ShowObject_REF ".\generated\reflection\ShowObject_ref.h"
 
 #define CalcObject_REF ".\generated\reflection\CalcObject_ref.h"
