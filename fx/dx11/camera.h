@@ -5,12 +5,10 @@ typedef struct {
 } vec3;
 
 typedef struct {
-	vec3 eye;
-	vec3 at;
-	vec3 up;
+	XMVECTOR eye;
+	XMVECTOR at;
+	XMVECTOR up;
 	float angle;
-	vec3 slide;
-	vec3 fly;
 } camData;
 
 

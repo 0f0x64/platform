@@ -1,5 +1,5 @@
 
-
+bool watchOn = true;
 
 
 using namespace dx11;

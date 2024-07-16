@@ -34,11 +34,7 @@ namespace Loop
 	{
 		#include REFLECT(cameraMan)
 
-		auto a = typeDesc;
-
-		BasicCam::setCamKey(0, keyType::set, 1984, 2301, 3145, -24, 671, -88, -6, 252, -33, 60, sliderType::slide, 0, 0, 0, camAxis::local, 0, 0, 0, 312);
-		//BasicCam::setCamKey(884, keyType::slide, -2451, 1346, 157, 0, 267, -265, 98, 234, -16, 80,0, 0, 0, 0, 0, 0, 0);
-		//BasicCam::setCamKey(1965, keyType::slide, -157, 3304, -215, 0, 0, 0, -86, 11, 239, 60, 0, 0, 0, 0, 0, 0, 0);
+		BasicCam::setCamKey(0, keyType::set, 2617, 3254, 626, 10, 0, 0, -28, 48, -248, 60, sliderType::follow, 203, 0, 0, camAxis::global, 0, 88, 0, 409);
 		BasicCam::processCam();
 
 		REFLECT_CLOSE;
@@ -46,6 +42,8 @@ namespace Loop
 
 	void mainLoop()
 	{
+
+
 
 		BasicCam::camPass = false;
 		cmdCounter = 0;
@@ -75,11 +73,13 @@ namespace Loop
 		gApi.ClearRTDepth();
 		gApi.SetCull(cullmode::back);
 		gApi.SetBlendMode(blendmode::off, blendop::add);
-
+		
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 1, 504, 264, -500);
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -323, 219, 682);
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 8, -492, 229, -495);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 513, 282, 534);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 567, 282, 534);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 0, 0, 0);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 0, 1, 0);
 
 		tracker::playTrack();
 

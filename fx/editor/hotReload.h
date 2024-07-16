@@ -135,6 +135,9 @@ void reflectSourceChanges(std::filesystem::path fileName)
 
 void WatchFiles()
 {
+
+	if (!watchOn) return;
+
 	const char* headerExtension = ".h";
 	int shaderExtensionLen = strlen(Shaders::shaderExtension);
 	int headerExtensionLen = strlen(headerExtension);

@@ -446,6 +446,11 @@ namespace paramEdit {
 
 		for (int i = startCmd; i < cmdCounter; i++)
 		{
+			auto cl = cmdParamDesc[i].stackLevel;
+			if (i > startCmd && curCmdLevel > cl) break;
+			if (i > startCmd && curCmdLevel != cl) continue;
+			//if (!isType(cmdParamDesc[i].funcName, "ShowObject")) continue;
+
 			for (int j = 0; j < cmdParamDesc[i].pCount; j++)
 			{
 				if (!isType(cmdParamDesc[i].param[j].type, "position")) continue;
