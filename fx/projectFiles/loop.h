@@ -9,10 +9,8 @@
 
 int precalcOfs = 0;
 
-
 namespace Loop
 {
-
 
 	bool isPrecalc = false;
 
@@ -36,9 +34,11 @@ namespace Loop
 	{
 		#include REFLECT(cameraMan)
 
-		BasicCam::setCamKey(0, keyType::slide, -537, 1660, 2057, 0, 267, -265, 30, 220, -124, 60);
-		BasicCam::setCamKey(884, keyType::slide, -2451, 1346, 157, 0, 267, -265, 98, 234, -16, 80);
-		BasicCam::setCamKey(1965, keyType::slide, -157, 3304, -215, 0, 0, 0, -86, 11, 239, 60);
+		auto a = typeDesc;
+
+		BasicCam::setCamKey(0, keyType::set, 1984, 2301, 3145, -24, 671, -88, -6, 252, -33, 60, sliderType::slide, 0, 0, 0, camAxis::local, 0, 0, 0, 312);
+		//BasicCam::setCamKey(884, keyType::slide, -2451, 1346, 157, 0, 267, -265, 98, 234, -16, 80,0, 0, 0, 0, 0, 0, 0);
+		//BasicCam::setCamKey(1965, keyType::slide, -157, 3304, -215, 0, 0, 0, -86, 11, 239, 60, 0, 0, 0, 0, 0, 0, 0);
 		BasicCam::processCam();
 
 		REFLECT_CLOSE;
@@ -65,18 +65,15 @@ namespace Loop
 		Object::CalcObject(texture::obj1pos, texture::obj1nrml);
 
 		gApi.SetRT(texture::mainRT, 0);
+		gApi.ClearRT(255, 255, 255, 255);
 
 		cameraMan();
-		
-		gApi.SetDepthMode(depthmode::off);
-		gApi.ClearRT(255, 255, 255, 255);
 
 		Cubemap::ShowCubemap(texture::env);
 
 		gApi.SetDepthMode(depthmode::on);
 		gApi.ClearRTDepth();
 		gApi.SetCull(cullmode::back);
-
 		gApi.SetBlendMode(blendmode::off, blendop::add);
 
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 1, 504, 264, -500);

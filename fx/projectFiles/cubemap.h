@@ -22,6 +22,7 @@ namespace Cubemap {
 	{
 		#include REFLECT(ShowCubemap)
 
+		gApi.SetDepthMode(depthmode::off);
 		gApi.SetBlendMode(blendmode::off, blendop::add);
 		gApi.SetCull(cullmode::back);
 

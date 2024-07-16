@@ -88,8 +88,8 @@ void reflectSourceChanges(std::filesystem::path fileName)
 
 						if (isTypeEnum(typeIndex))
 						{
-							auto evP = tokens[j].find("::") + 2;
-							std::string eV = tokens[j].substr(evP,tokens[j].length()-evP);
+							auto evP = tokens[pC].find("::") + 2;
+							std::string eV = tokens[pC].substr(evP,tokens[pC].length()-evP);
 						 	auto v = GetEnumValue(typeIndex, eV.c_str());
 							if (v != INT_MAX)
 							{

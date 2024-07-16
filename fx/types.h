@@ -112,6 +112,8 @@ enumType(topology, triList, lineList, lineStrip);
 enumType(targetshader, vertex, pixel, both);
 enumType(keyType, set, slide);
 enumType(visibility, on, off, solo);
+enumType(camAxis, local, global);
+enumType(sliderType, follow, pan, slide);
 
 char tmpConv[255];
 

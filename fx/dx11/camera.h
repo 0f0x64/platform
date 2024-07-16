@@ -9,6 +9,8 @@ typedef struct {
 	vec3 at;
 	vec3 up;
 	float angle;
+	vec3 slide;
+	vec3 fly;
 } camData;
 
 

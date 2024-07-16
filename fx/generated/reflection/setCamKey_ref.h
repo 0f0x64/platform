@@ -22,10 +22,25 @@ if (paramsAreLoaded) {
 			up.z = cmdParamDesc[cmdCounter].param[4].value[2];
 		}
 	if (!cmdParamDesc[cmdCounter].param[5].bypass) 	angle = (int)cmdParamDesc[cmdCounter].param[5].value[0];
+	if (!cmdParamDesc[cmdCounter].param[6].bypass)  sType = (sliderType)cmdParamDesc[cmdCounter].param[6].value[0];
+	if (!cmdParamDesc[cmdCounter].param[7].bypass) 
+		{
+			slide.x = cmdParamDesc[cmdCounter].param[7].value[0];
+			slide.y = cmdParamDesc[cmdCounter].param[7].value[1];
+			slide.z = cmdParamDesc[cmdCounter].param[7].value[2];
+		}
+	if (!cmdParamDesc[cmdCounter].param[8].bypass)  axisType = (camAxis)cmdParamDesc[cmdCounter].param[8].value[0];
+	if (!cmdParamDesc[cmdCounter].param[9].bypass) 
+		{
+			fly.x = cmdParamDesc[cmdCounter].param[9].value[0];
+			fly.y = cmdParamDesc[cmdCounter].param[9].value[1];
+			fly.z = cmdParamDesc[cmdCounter].param[9].value[2];
+		}
+	if (!cmdParamDesc[cmdCounter].param[10].bypass) 	jitter = (int)cmdParamDesc[cmdCounter].param[10].value[0];
 } else {
 	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
 	cmdParamDesc[cmdCounter].caller.line = srcLine;
-	cmdParamDesc[cmdCounter].pCount = 6;
+	cmdParamDesc[cmdCounter].pCount = 11;
 	cmdParamDesc[cmdCounter].param[0].value[0] = camTime;
 	cmdParamDesc[cmdCounter].param[0].bypass = false;
 	strcpy(cmdParamDesc[cmdCounter].param[0].type, "timestamp"); 
@@ -56,6 +71,30 @@ if (paramsAreLoaded) {
 	cmdParamDesc[cmdCounter].param[5].bypass = false;
 	strcpy(cmdParamDesc[cmdCounter].param[5].type, "int"); 
 	strcpy(cmdParamDesc[cmdCounter].param[5].name, "angle"); 
+	cmdParamDesc[cmdCounter].param[6].value[0] = (int)sType;
+	cmdParamDesc[cmdCounter].param[6].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[6].type, "sliderType"); 
+	strcpy(cmdParamDesc[cmdCounter].param[6].name, "sType"); 
+	cmdParamDesc[cmdCounter].param[7].value[0] = slide.x;
+	cmdParamDesc[cmdCounter].param[7].value[1] = slide.y;
+	cmdParamDesc[cmdCounter].param[7].value[2] = slide.z;
+	cmdParamDesc[cmdCounter].param[7].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[7].type, "position"); 
+	strcpy(cmdParamDesc[cmdCounter].param[7].name, "slide"); 
+	cmdParamDesc[cmdCounter].param[8].value[0] = (int)axisType;
+	cmdParamDesc[cmdCounter].param[8].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[8].type, "camAxis"); 
+	strcpy(cmdParamDesc[cmdCounter].param[8].name, "axisType"); 
+	cmdParamDesc[cmdCounter].param[9].value[0] = fly.x;
+	cmdParamDesc[cmdCounter].param[9].value[1] = fly.y;
+	cmdParamDesc[cmdCounter].param[9].value[2] = fly.z;
+	cmdParamDesc[cmdCounter].param[9].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[9].type, "rotation"); 
+	strcpy(cmdParamDesc[cmdCounter].param[9].name, "fly"); 
+	cmdParamDesc[cmdCounter].param[10].value[0] = jitter;
+	cmdParamDesc[cmdCounter].param[10].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[10].type, "int"); 
+	strcpy(cmdParamDesc[cmdCounter].param[10].name, "jitter"); 
 
 		editor::paramEdit::setBypass();
 
@@ -68,6 +107,6 @@ cmdCounter++;
 
 cmdLevel++;
 
-#define setCamKey(camTime, camType, eye_x, eye_y, eye_z, at_x, at_y, at_z, up_x, up_y, up_z, angle) setCamKey( __FILE__, __LINE__ , camTime, camType, position {eye_x, eye_y, eye_z }, position {at_x, at_y, at_z }, position {up_x, up_y, up_z }, angle)
+#define setCamKey(camTime, camType, eye_x, eye_y, eye_z, at_x, at_y, at_z, up_x, up_y, up_z, angle, sType, slide_x, slide_y, slide_z, axisType, fly_x, fly_y, fly_z, jitter) setCamKey( __FILE__, __LINE__ , camTime, camType, position {eye_x, eye_y, eye_z }, position {at_x, at_y, at_z }, position {up_x, up_y, up_z }, angle, sType, position {slide_x, slide_y, slide_z }, axisType, rotation {fly_x, fly_y, fly_z }, jitter)
 
 #endif

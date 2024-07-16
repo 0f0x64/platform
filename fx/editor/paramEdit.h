@@ -698,7 +698,7 @@ namespace paramEdit {
 
 					for (int e = 0; e < getEnumCount(sType); e++)
 					{
-						ui::Text::Draw(getStrValue(sType, e), x + enumDrawOffset, selYpos + float(i + e) * lead + insideY);
+						ui::Text::Draw(getStrValue(sType, e), x + enumDrawOffset, y + e * lead + insideY);
 					}
 				} 
 				else//show cursor on textfield
