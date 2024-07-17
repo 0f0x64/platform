@@ -251,10 +251,12 @@ namespace paramEdit {
 		rename(outFilePath.c_str(), inFilePath.c_str());
 	}
 
-	void pLimits()
+	void pLimits(int cCmd = currentCmd, int cParam = currentParam, int cSubParam = subParam)
 	{
-		cmdParamDesc[currentCmd].param[currentParam].value[subParam] = clamp(cmdParamDesc[currentCmd].param[currentParam].value[subParam], cmdParamDesc[currentCmd].param[currentParam]._min, cmdParamDesc[currentCmd].param[currentParam]._max);
+		auto cp = cmdParamDesc[cCmd].param[cParam];
+		cmdParamDesc[cCmd].param[cParam].value[cSubParam] = clamp(cp.value[cSubParam], cp._min, cp._max);
 	}
+
 
 	//TEXT EDITOR
 	void insertNumber(int p)
@@ -482,12 +484,12 @@ namespace paramEdit {
 
 				ui::style::box::r = ui::style::box::g = ui::style::box::b = over ? .7f : 0.f;
 
-				if (over && isKeyDown(CAM_KEY))
+				if (over)
 				{
 					hilightedCmd = i;
 				}
 
-				if (over && ui::lbDown && isKeyDown(CAM_KEY) )
+				if (over && ui::lbDown && lbDragContext == DragContext::free )
 				{
 					currentCmd = i;
 					currentParam = -1;
@@ -505,8 +507,6 @@ namespace paramEdit {
 
 	void CamKeys()
 	{
-		if (!isKeyDown(VK_LBUTTON)) stillDragCamKey = false;
-
 		ui::Box::Setup();
 
 		for (int i = startCmd; i < cmdCounter; i++)
@@ -528,7 +528,7 @@ namespace paramEdit {
 
 				bool over = isMouseOver(px, py, h * dx11::aspect, h) ;
 
-				if (stillDragCamKey)
+				if (lbDragContext == DragContext::timeKey)
 				{
 					over = currentCmd == i;
 				}
@@ -540,21 +540,32 @@ namespace paramEdit {
 				ui::style::box::r = ui::style::box::g = ui::style::box::b = (currentCmd == i) ? .7f : 0.2f;
 				ui::style::box::a = 1;
 
-				if (over && ui::lbDown && !stillDragCamKey)
+				if (over && ui::lbDown && lbDragContext == DragContext::free)
 				{
-					stillDragCamKey = true;
+					lbDragContext = DragContext::timeKey;
 					currentCmd = i;
 					currentParam = -1;
 					subParam = 0;
 					storedParam[j] = cmdParamDesc[i].param[j].value[0];
 					vScroll = true;
+
+					curCmdLevel = cmdParamDesc[currentCmd].stackLevel;
+
+					for (int j = currentCmd; j >= 0; j--)//search for prev level
+					{
+						if (cmdParamDesc[j].stackLevel < curCmdLevel || j == 0) {
+							startCmd = j; break;
+						}
+					}
+					 
 				}
 
-				if (currentCmd == i && stillDragCamKey)
+				if (currentCmd == i && lbDragContext == DragContext::timeKey)
 				{
 					if (ui::lbDown)
 					{
 						cmdParamDesc[i].param[j].value[0] = storedParam[j] + TimeLine::ScreenToTime( ui::mouseDelta.x)/SAMPLES_IN_FRAME;
+						pLimits(currentCmd,j);
 					}
 					else
 					{

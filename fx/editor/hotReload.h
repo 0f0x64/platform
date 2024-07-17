@@ -6,6 +6,8 @@ const int changeBufLen = 1024 * 4;
 const int nameBufLen = 1024;
 uint8_t change_buf[changeBufLen];
 
+bool codeRecompiled = false;
+
 typedef struct {
 	int srcFlieLine;
 	int indexInStack;
@@ -133,10 +135,11 @@ void reflectSourceChanges(std::filesystem::path fileName)
 	ifile.close();
 }
 
+//#define SUBSCRIBE FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME
+#define SUBSCRIBE FILE_NOTIFY_CHANGE_FILE_NAME
+
 void WatchFiles()
 {
-
-	if (!watchOn) return;
 
 	const char* headerExtension = ".h";
 	int shaderExtensionLen = strlen(Shaders::shaderExtension);
@@ -163,7 +166,7 @@ void WatchFiles()
 
 		success = ReadDirectoryChangesW(
 			file, change_buf, changeBufLen, TRUE,
-			FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME,
+			SUBSCRIBE,
 			NULL, &overlapped, NULL);
 
 		isWatching = true;
@@ -183,20 +186,26 @@ void WatchFiles()
 		for (;;)
 		{
 			DWORD name_len = event->FileNameLength / sizeof(wchar_t);
+			auto a = event;
 
 			switch (event->Action)
 			{
-			case FILE_NOTIFY_CHANGE_FILE_NAME:
-			case FILE_ACTION_MODIFIED:
-			case FILE_ACTION_RENAMED_NEW_NAME:
+			case FILE_ACTION_ADDED:
+			//case FILE_NOTIFY_CHANGE_FILE_NAME:
+			//case FILE_ACTION_MODIFIED:
+			//case FILE_ACTION_RENAMED_NEW_NAME:
+			//case FILE_ACTION_RENAMED_OLD_NAME:
 			{
 				char fileName[nameBufLen];
 				DWORD offset = 0;
 
-				do
-				{
-					memset(fileName, NULL, nameBufLen);
+				while (event->NextEntryOffset != 0) {
 					event = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(&change_buf[offset]);
+					offset += event->NextEntryOffset;
+				};
+
+					memset(fileName, NULL, nameBufLen);
+					//event = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(&change_buf[offset]);
 					WideCharToMultiByte(CP_ACP, NULL, event->FileName, event->FileNameLength / sizeof(WCHAR), fileName, sizeof(fileName), NULL, NULL);
 
 					char modifedExt[nameBufLen];
@@ -293,8 +302,7 @@ void WatchFiles()
 
 					}
 
-					offset += event->NextEntryOffset;
-				} while (event->NextEntryOffset != 0);
+
 
 
 			}
@@ -309,8 +317,101 @@ void WatchFiles()
 
 		BOOL success = ReadDirectoryChangesW(
 			file, change_buf, changeBufLen, TRUE,
-			FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME,
+			SUBSCRIBE,
 			NULL, &overlapped, NULL);
+
+	}
+}
+
+//------------
+bool isWatchingRecompilation = false;
+HANDLE fileRec = NULL;
+OVERLAPPED overlappedRec;
+BOOL successRec = false;
+const int changeBufLen_rec = 1024 * 4;
+uint8_t change_buf_rec[changeBufLen_rec];
+
+void WatchForRecompilation()
+{
+	const char* objExtension = ".obj";
+	int objExtensionLen = strlen(objExtension);
+
+	if (!isWatchingRecompilation)//init
+	{
+		Log("watching for recompilation ");
+		Log(objPath);
+		Log("\n");
+
+		fileRec = CreateFile(objPath,
+			FILE_LIST_DIRECTORY,
+			FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+			NULL,
+			OPEN_EXISTING,
+			FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
+			NULL);
+
+		assert(fileRec != INVALID_HANDLE_VALUE);
+
+		overlappedRec.hEvent = CreateEvent(NULL, FALSE, 0, NULL);
+
+		successRec = ReadDirectoryChangesW(
+			fileRec, change_buf_rec, changeBufLen_rec, TRUE,
+			FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME,
+			NULL, &overlappedRec, NULL);
+
+		isWatchingRecompilation = true;
+	}
+
+	//--
+
+	DWORD result = WaitForSingleObject(overlappedRec.hEvent, 0);
+
+	if (result == WAIT_OBJECT_0)
+	{
+		DWORD bytes_transferred;
+		GetOverlappedResult(fileRec, &overlappedRec, &bytes_transferred, FALSE);
+
+		FILE_NOTIFY_INFORMATION* event = (FILE_NOTIFY_INFORMATION*)change_buf_rec;
+
+		for (;;)
+		{
+			DWORD name_len = event->FileNameLength / sizeof(wchar_t);
+
+			switch (event->Action)
+			{
+			case FILE_ACTION_RENAMED_OLD_NAME:
+			{
+				char fileName[nameBufLen];
+				DWORD offset = 0;
+
+				while (event->NextEntryOffset != 0)
+				{
+					event = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(&change_buf_rec[offset]);
+					offset += event->NextEntryOffset;
+				};
+
+				memset(fileName, NULL, nameBufLen);
+				WideCharToMultiByte(CP_ACP, NULL, event->FileName, event->FileNameLength / sizeof(WCHAR), fileName, sizeof(fileName), NULL, NULL);
+
+				if (strstr(fileName, objExtension))
+				{
+					codeRecompiled = true;
+					Log("recompilation\n");
+				}
+
+			}
+			break;
+			}
+
+			break;
+		}
+
+		// Queue the next event
+
+		BOOL success = ReadDirectoryChangesW(
+			fileRec, change_buf_rec, changeBufLen_rec, TRUE,
+			FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME,
+			NULL, &overlappedRec, NULL);
 
 	}
 }

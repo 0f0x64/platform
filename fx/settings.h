@@ -33,6 +33,7 @@
 
 #define shadersPath "../fx/projectFiles/shaders"
 #define userSpacePath "../fx/projectFiles"
+#define objPath "../fx/Debug"
 
 #define MAIN_DISPLAY_DENOMINATOR 2
 

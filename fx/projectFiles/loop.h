@@ -25,7 +25,7 @@ namespace Loop
 
 	void frameConst()
 	{
-		ConstBuf::frame.time = XMFLOAT4{ (float)(timer::frameBeginTime * .01) ,0,0,0};
+		ConstBuf::frame.time = XMFLOAT4{ (float)(timer::frameBeginTime * .01) ,(float)timer::timeCursor/SAMPLES_IN_FRAME,0,0};
 		ConstBuf::frame.aspect = XMFLOAT4{dx11::aspect,dx11::iaspect, 0, 0};
 		ConstBuf::UpdateFrame();
 	}
@@ -34,7 +34,7 @@ namespace Loop
 	{
 		#include REFLECT(cameraMan)
 
-		BasicCam::setCamKey(0, keyType::set, 2617, 3254, 626, 10, 0, 0, -28, 48, -248, 60, sliderType::follow, 203, 0, 0, camAxis::global, 0, 88, 0, 409);
+		BasicCam::setCamKey(0, keyType::set, -1212, -685, -1676, 4, 56, 0, -2, 233, -102, 60, sliderType::follow, 2, 3, 8, camAxis::local, 0, 50, 0, 0);
 		BasicCam::processCam();
 
 		REFLECT_CLOSE;
@@ -42,12 +42,16 @@ namespace Loop
 
 	void mainLoop()
 	{
-
-
+		if (editor::codeRecompiled) {
+			editor::codeRecompiled = false;
+			isPrecalc = false;
+			paramsAreLoaded = false;
+		}
 
 		BasicCam::camPass = false;
 		cmdCounter = 0;
 		cmdLevel = 0;
+		BasicCam::camCounter = 0;
 
 		if (!isPrecalc)
 			Precalc();
@@ -71,15 +75,10 @@ namespace Loop
 
 		gApi.SetDepthMode(depthmode::on);
 		gApi.ClearRTDepth();
-		gApi.SetCull(cullmode::back);
+		gApi.SetCull(cullmode::off);
 		gApi.SetBlendMode(blendmode::off, blendop::add);
 		
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 1, 504, 264, -500);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, -323, 219, 682);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 8, -492, 229, -495);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 567, 282, 534);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 0, 0, 0);
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 5, 0, 1, 0);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 0, 0, 0);
 
 		tracker::playTrack();
 

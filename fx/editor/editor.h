@@ -1,7 +1,3 @@
-
-bool watchOn = true;
-
-
 using namespace dx11;
 
 std::vector<std::string> regex_split(const std::string& str, const std::regex& reg) {
@@ -10,6 +6,9 @@ std::vector<std::string> regex_split(const std::string& str, const std::regex& r
 
 	return { beg, end };
 }
+
+enum class DragContext : int { free, timeCursor, timeKey, cameraView, cameraButtons };
+DragContext lbDragContext = DragContext::free;
 
 namespace editor
 {
@@ -53,8 +52,6 @@ namespace editor
 		return false;
 	}
 
-	bool stillDragCamKey = false;
-
 	#include "timeLine.h"
 	#include "viewCam.h"
 	#include "paramEdit.h"
@@ -73,8 +70,6 @@ namespace editor
 
 		ui::mousePos = ui::GetCusorPos();
 
-	//	if (ui::mousePos.x > 1 || ui::mousePos.x < 0 || ui::mousePos.y > 1 || ui::mousePos.x < 0) return;
-
 		ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
 		ui::mouseDelta.y = ui::mousePos.y - ui::mouseLastPos.y;
 		ui::mouseAngle = - atan2f(ui::mousePos.y - .5f, ui::mousePos.x - .5f);
@@ -85,6 +80,11 @@ namespace editor
 		ui::mbDown = isKeyDown(VK_MBUTTON);
 		ui::LeftDown = isKeyDown(VK_LEFT);
 		ui::RightDown = isKeyDown(VK_RIGHT);
+
+		if (!ui::lbDown)
+		{
+			lbDragContext = DragContext::free;
+		}
 
 		gapi.rt(texture::mainRT);
 		gapi.cull(cullmode::off);

@@ -290,6 +290,7 @@ namespace ViewCam
 	}
 
 	float switcherTimer = 0;
+	float captureTimer = 0;
 
 	void Draw()
 	{
@@ -315,18 +316,26 @@ namespace ViewCam
 
 		DrawAxis();
 
+		bool boxSelected = false;
 		char cbutton[] = "capture  viewCam";
 		ui::Box::Setup();
 		float w = ui::Text::getTextLen(cbutton, ui::style::text::width) + ui::style::text::width * 2;
 		float x = .5f - w / 2.f; float y = .9f + ui::style::text::height;
 
 			ui::style::Base();
-			ui::style::box::r += switcherTimer;
+			if (!strcmp(cmdParamDesc[currentCmd].funcName, "setCamKey"))
+			{
+				ui::style::box::g += captureTimer;
+			}
+			else
+			{
+				ui::style::box::r += captureTimer;
+			}
 
-			if (isMouseOver(x, y, w, ui::style::box::height))
+			if (isMouseOver(x, y, w, ui::style::box::height) && lbDragContext == DragContext::free)
 			{
 				ui::style::box::outlineBrightness = 1.f;
-				if (isKeyDown(VK_LBUTTON))
+				if (ui::lbDown)
 				{
 					if (!strcmp(cmdParamDesc[currentCmd].funcName, "setCamKey"))
 					{
@@ -348,14 +357,14 @@ namespace ViewCam
 
 					}
 
-
-					switcherTimer = 1;
+					boxSelected = true;
+					captureTimer = 1;
 				}
 			}
 			ui::Box::Draw(x, y, w);
 
 			char cbutton2[100];
-			strcpy (cbutton2, !Camera::viewCam.overRide ? "switch  to  free  camera" : "switch  to  keyed  camera");
+			strcpy (cbutton2, !Camera::viewCam.overRide ? "switch  to  free  camera  [esc]" : "switch  to  keyed  camera  [esc]");
 			float w2 = ui::Text::getTextLen(cbutton2, ui::style::text::width) + ui::style::text::width * 2;
 			float x2 = .5f - w2 / 2.f; float y2 = .025f;
 
@@ -364,18 +373,20 @@ namespace ViewCam
 			ui::style::box::g += switcherTimer;
 			ui::style::box::b += switcherTimer;
 
-			if (isMouseOver(x2, y2, w2, ui::style::box::height))
+			if (isMouseOver(x2, y2, w2, ui::style::box::height) && lbDragContext == DragContext::free)
 			{
 				ui::style::box::outlineBrightness = 1.f;
-				if (isKeyDown(VK_LBUTTON) && switcherTimer == 0.)
+				if (ui::lbDown && switcherTimer == 0.)
 				{
 					editor::ViewCam::ToggleViewMode();
 					switcherTimer = 1;
+					boxSelected = true;
 				}
 			}
 			ui::Box::Draw(x2, y2, w2);
 
 			switcherTimer = clamp(switcherTimer - .1f,0.f,1.f);
+			captureTimer = clamp(captureTimer - .1f, 0.f, 1.f);
 
 
 		ui::Text::Setup();
@@ -391,7 +402,10 @@ namespace ViewCam
 		ui::Text::Draw(str2, .5f-w/2.f, .9f);
 
 
-
+		if (!boxSelected&& ui::lbDown)
+		{
+			lbDragContext = DragContext::cameraView;
+		}
 
 	}
 

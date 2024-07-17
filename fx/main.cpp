@@ -100,13 +100,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		
 		#if EditMode
 			
-			editor::WatchFiles();
+		if (msg.message == WM_QUIT)	break;
 
 			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
+
+			editor::WatchFiles();
+			editor::WatchForRecompilation();
 
 		#else
 
@@ -116,7 +119,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		#endif
 
-		if (msg.message == WM_QUIT)	break;
+		
 
 		if (time >= timer::nextFrameTime)
 		{

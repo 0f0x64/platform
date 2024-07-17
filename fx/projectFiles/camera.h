@@ -1,6 +1,6 @@
 namespace BasicCam
 {
-
+	int camCounter = 0;
 	camData Prev;
 	camData Next;
 
@@ -24,10 +24,12 @@ namespace BasicCam
 
 			camData* sCam;
 
-			if (camTime <= t)
+			if (camTime <= t || camCounter == 0)
 			{
 				sCam = &Prev;
 				prevTime = camTime;
+				if (camCounter == 0) prevTime = 0;
+
 				currentCamType = camType;
 				slider = sType;
 				camAxisType = axisType;
@@ -49,6 +51,7 @@ namespace BasicCam
 			sCam->up = XMVectorSet(up.x,up.y,up.z,0);
 			sCam->angle = (float)angle;
 
+			camCounter++;
 		}
 
 		REFLECT_CLOSE;

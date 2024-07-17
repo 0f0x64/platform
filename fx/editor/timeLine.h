@@ -238,6 +238,9 @@ namespace TimeLine
 		posLast = pos;
 		timeCursorLast = timer::timeCursor;
 		reTime();
+
+		Camera::viewCam.overRide = !play;
+
 	}
 
 	void Wheel(int delta)
@@ -271,16 +274,15 @@ namespace TimeLine
 		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 	}
 
-	bool clickLb = false;
 	bool clickRb = false;
 
 	void ProcessInput()
 	{
-		if (isKeyDown(VK_LBUTTON))
-		{
-			if (isKeyDown(TIME_KEY) && !stillDragCamKey && !clickLb) {
+		bool bounds = !(ui::mousePos.x > 1 || ui::mousePos.x < 0 || ui::mousePos.y > 1 || ui::mousePos.x < 0);
 
-				clickLb = true;
+		if (ui::lbDown & bounds)
+		{
+			if (lbDragContext == DragContext::free) {
 
 				editor::ui::mousePos = editor::ui::GetCusorPos();
 				timer::timeCursor = ScreenToTime(editor::ui::mousePos.x) + pos;
@@ -288,16 +290,15 @@ namespace TimeLine
 
 				timeCursorLast = timer::timeCursor;
 				editor::ui::mouseLastPos = editor::ui::mousePos;
+
+				lbDragContext = DragContext::timeCursor;
+
 			}
 		}
-		else
-		{
-			clickLb = false;
-		}
 
-		if (isKeyDown(VK_RBUTTON)) 
+		if (ui::rbDown & bounds)
 		{
-			if (isKeyDown(TIME_KEY) && !stillDragCamKey && !clickRb) {
+			if (!clickRb) {
 				clickRb = true;
 				posLast = pos;
 			}
@@ -307,50 +308,53 @@ namespace TimeLine
 			clickRb = false;
 		}
 
-
 		int rightM = ScreenToTime(screenRight - scrollMargin) + pos;
 		int leftM = ScreenToTime(screenLeft + scrollMargin) + pos;
 
-		if (isKeyDown(TIME_KEY))
+		if (ui::lbDown && lbDragContext == DragContext::timeCursor & bounds)
 		{
-			if (ui::lbDown && !stillDragCamKey)
+			float scrollSpeed = .5;
+			timer::timeCursor = timeCursorLast + (int)(ui::mouseDelta.x * ScreenToTime(1.f));
+
+			if (timer::timeCursor > rightM && pos < timelineLen - ScreenToTime(screenRight - scrollMargin))
 			{
-				float scrollSpeed = .5;
-				timer::timeCursor = timeCursorLast + (int)(ui::mouseDelta.x * ScreenToTime(1.f));
-
-				if (timer::timeCursor > rightM && pos < timelineLen - ScreenToTime(screenRight - scrollMargin))
-				{
-					pos += timer::timeCursor - rightM;
-					editor::ui::mouseLastPos.x -= scrollSpeed * (editor::ui::mousePos.x - (screenRight - scrollMargin));
-				}
-
-				if (timer::timeCursor < leftM && pos > -ScreenToTime(screenLeft + scrollMargin))
-				{
-					pos += timer::timeCursor - leftM;
-					editor::ui::mouseLastPos.x += scrollSpeed * ((screenLeft + scrollMargin) - editor::ui::mousePos.x);
-				}
-
-				reTime();
+				pos += timer::timeCursor - rightM;
+				editor::ui::mouseLastPos.x -= scrollSpeed * (editor::ui::mousePos.x - (screenRight - scrollMargin));
 			}
 
-			if (ui::rbDown)
+			if (timer::timeCursor < leftM && pos > -ScreenToTime(screenLeft + scrollMargin))
 			{
-				pos = posLast - (int)(ui::mouseDelta.x * ScreenToTime(1.f));
+				pos += timer::timeCursor - leftM;
+				editor::ui::mouseLastPos.x += scrollSpeed * ((screenLeft + scrollMargin) - editor::ui::mousePos.x);
 			}
+
+			reTime();
 		}
+
+		if (ui::rbDown & bounds)
+		{
+			pos = posLast - (int)(ui::mouseDelta.x * ScreenToTime(1.f));
+		}
+		
 
 		if (play)
 		{
+
 			timer::timeCursor = (int)((timer::frameBeginTime - timer::startTime) * second / 1000.f);
 
 			if (timer::timeCursor > rightM)
 			{
 				pos += timer::timeCursor - rightM;
 			}
-		}
+			timer::timeCursor = timer::timeCursor % timelineLen;
+			if (pos > 0) pos = 0;
 
-		pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
-		timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
+		}
+		else
+		{
+			pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
+			timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
+		}
 
 		left = screenLeft + TimeToScreen(pos);
 		right = screenRight + TimeToScreen(pos);
