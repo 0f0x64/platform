@@ -24,10 +24,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define SetScissors(bbox_x, bbox_y, bbox_z, bbox_w) SetScissors( __FILE__, __LINE__ , rect {bbox_x, bbox_y, bbox_z, bbox_w })
 
+#else
+
+#define SetScissors(bbox_x, bbox_y, bbox_z, bbox_w) SetScissors( rect {bbox_x, bbox_y, bbox_z, bbox_w })
+
 #endif
+
+cmdCounter++;
+

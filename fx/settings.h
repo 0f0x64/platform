@@ -11,7 +11,8 @@
 	#define DebugMode true
 	#define DirectXDebugMode false
 	#define SECONDARY_DISPLAY_IF_AVAILABLE true
-#define USE_SHADER_MINIFIER false
+	#define USE_SHADER_MINIFIER false
+	#define objPath "../fx/Release"
 #endif
 
 #ifdef EDITOR_DEBUG
@@ -20,6 +21,7 @@
 	#define DirectXDebugMode false
 	#define SECONDARY_DISPLAY_IF_AVAILABLE false
 	#define USE_SHADER_MINIFIER false
+	#define objPath "../fx/Debug"
 #endif
 
 #define FRAMES_PER_SECOND 60
@@ -33,7 +35,9 @@
 
 #define shadersPath "../fx/projectFiles/shaders"
 #define userSpacePath "../fx/projectFiles"
-#define objPath "../fx/Debug"
+
+ 
+
 
 #define MAIN_DISPLAY_DENOMINATOR 2
 

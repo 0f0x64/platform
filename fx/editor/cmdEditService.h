@@ -29,7 +29,7 @@ int cmdLevel = 0;
 int startCmd = 0;
 int curCmdLevel = 0;
 
-int cmdCounter = 0;//reset it in loop start point
+
 int currentCmd = -1;//comes from ui
 int hilightedCmd = -1;
 

@@ -18,10 +18,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define SetInputAsm(topo) SetInputAsm( __FILE__, __LINE__ , topo)
 
+#else
+
+#define SetInputAsm(topo) SetInputAsm( topo)
+
 #endif
+
+cmdCounter++;
+

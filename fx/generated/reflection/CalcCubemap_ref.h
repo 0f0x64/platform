@@ -18,10 +18,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define CalcCubemap(target) CalcCubemap( __FILE__, __LINE__ , target)
 
+#else
+
+#define CalcCubemap(target) CalcCubemap( target)
+
 #endif
+
+cmdCounter++;
+

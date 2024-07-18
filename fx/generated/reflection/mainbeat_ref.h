@@ -28,10 +28,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define mainbeat(pos, len, repeat) mainbeat( __FILE__, __LINE__ , pos, len, repeat)
 
+#else
+
+#define mainbeat(pos, len, repeat) mainbeat( pos, len, repeat)
+
 #endif
+
+cmdCounter++;
+

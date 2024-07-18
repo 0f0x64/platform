@@ -23,10 +23,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define oscillator(a, b) oscillator( __FILE__, __LINE__ , a, b)
 
+#else
+
+#define oscillator(a, b) oscillator( a, b)
+
 #endif
+
+cmdCounter++;
+

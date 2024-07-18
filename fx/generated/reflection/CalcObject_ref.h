@@ -23,10 +23,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define CalcObject(targetGeo, targetNrml) CalcObject( __FILE__, __LINE__ , targetGeo, targetNrml)
 
+#else
+
+#define CalcObject(targetGeo, targetNrml) CalcObject( targetGeo, targetNrml)
+
 #endif
+
+cmdCounter++;
+

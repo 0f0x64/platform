@@ -15,7 +15,13 @@ namespace Object {
 		float q = intToFloatDenom;
 		
 		ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixTranslation(pos.x/q, pos.y/q, pos.z/q));
-		ConstBuf::drawerMat.hilight = cmdCounter-1 == hilightedCmd ? 1.f : 0.f;
+
+		#if EditMode
+			ConstBuf::drawerMat.hilight = cmdCounter - 1 == hilightedCmd ? 1.f : 0.f;
+		#else 
+			ConstBuf::drawerMat.hilight = 0.f;
+		#endif
+
 		ConstBuf::UpdateDrawerMat();
 
 		float gX = Textures::Texture[(int)geometry].size.x / denom;

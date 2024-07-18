@@ -23,10 +23,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define CopyRTColor(dst, src) CopyRTColor( __FILE__, __LINE__ , dst, src)
 
+#else
+
+#define CopyRTColor(dst, src) CopyRTColor( dst, src)
+
 #endif
+
+cmdCounter++;
+

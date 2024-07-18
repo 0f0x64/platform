@@ -23,10 +23,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define channel_01(volume, pan) channel_01( __FILE__, __LINE__ , volume, pan)
 
+#else
+
+#define channel_01(volume, pan) channel_01( volume, pan)
+
 #endif
+
+cmdCounter++;
+

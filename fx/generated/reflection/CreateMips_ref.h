@@ -2,10 +2,15 @@
 
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define CreateMips() CreateMips( __FILE__, __LINE__ )
 
+#else
+
+#define CreateMips() CreateMips( )
+
 #endif
+
+cmdCounter++;
+

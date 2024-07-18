@@ -2,10 +2,15 @@
 
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define playTrack() playTrack( __FILE__, __LINE__ )
 
+#else
+
+#define playTrack() playTrack( )
+
 #endif
+
+cmdCounter++;
+

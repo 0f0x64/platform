@@ -23,10 +23,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define SetBlendMode(mode, op) SetBlendMode( __FILE__, __LINE__ , mode, op)
 
+#else
+
+#define SetBlendMode(mode, op) SetBlendMode( mode, op)
+
 #endif
+
+cmdCounter++;
+

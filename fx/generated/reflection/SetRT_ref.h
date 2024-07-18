@@ -23,10 +23,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define SetRT(targetRT, level) SetRT( __FILE__, __LINE__ , targetRT, level)
 
+#else
+
+#define SetRT(targetRT, level) SetRT( targetRT, level)
+
 #endif
+
+cmdCounter++;
+

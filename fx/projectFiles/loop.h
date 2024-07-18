@@ -42,15 +42,22 @@ namespace Loop
 
 	void mainLoop()
 	{
+		#if EditMode
 		if (editor::codeRecompiled) {
 			editor::codeRecompiled = false;
 			isPrecalc = false;
 			paramsAreLoaded = false;
 		}
 
-		BasicCam::camPass = false;
-		cmdCounter = 0;
 		cmdLevel = 0;
+
+		#endif	
+
+
+		cmdCounter = 0;
+
+
+		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
 
 		if (!isPrecalc)
@@ -82,7 +89,9 @@ namespace Loop
 
 		tracker::playTrack();
 
+		#if EditMode
 		paramsAreLoaded = true;
+		#endif
 	}
 
 }

@@ -18,10 +18,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define eq(a) eq( __FILE__, __LINE__ , a)
 
+#else
+
+#define eq(a) eq( a)
+
 #endif
+
+cmdCounter++;
+

@@ -18,10 +18,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define SetDepthMode(mode) SetDepthMode( __FILE__, __LINE__ , mode)
 
+#else
+
+#define SetDepthMode(mode) SetDepthMode( mode)
+
 #endif
+
+cmdCounter++;
+

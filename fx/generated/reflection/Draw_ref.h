@@ -23,10 +23,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define Draw(quadcount, instances) Draw( __FILE__, __LINE__ , quadcount, instances)
 
+#else
+
+#define Draw(quadcount, instances) Draw( quadcount, instances)
+
 #endif
+
+cmdCounter++;
+

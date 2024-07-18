@@ -24,10 +24,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define ClearRT(color_x, color_y, color_z, color_w) ClearRT( __FILE__, __LINE__ , color4 {color_x, color_y, color_z, color_w })
 
+#else
+
+#define ClearRT(color_x, color_y, color_z, color_w) ClearRT( color4 {color_x, color_y, color_z, color_w })
+
 #endif
+
+cmdCounter++;
+

@@ -23,10 +23,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define CopyRTDepth(dst, src) CopyRTDepth( __FILE__, __LINE__ , dst, src)
 
+#else
+
+#define CopyRTDepth(dst, src) CopyRTDepth( dst, src)
+
 #endif
+
+cmdCounter++;
+

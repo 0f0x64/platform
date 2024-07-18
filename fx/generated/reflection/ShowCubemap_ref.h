@@ -18,10 +18,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define ShowCubemap(envTexture) ShowCubemap( __FILE__, __LINE__ , envTexture)
 
+#else
+
+#define ShowCubemap(envTexture) ShowCubemap( envTexture)
+
 #endif
+
+cmdCounter++;
+

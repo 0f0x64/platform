@@ -40,6 +40,8 @@
 
 #define eq_REF ".\generated\reflection\eq_ref.h"
 
+#define Notes_REF ".\generated\reflection\Notes_ref.h"
+
 #define mainbeat_REF ".\generated\reflection\mainbeat_ref.h"
 
 #define channel_01_REF ".\generated\reflection\channel_01_ref.h"

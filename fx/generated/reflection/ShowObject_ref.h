@@ -40,10 +40,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define ShowObject(geometry, normals, quality, pos_x, pos_y, pos_z) ShowObject( __FILE__, __LINE__ , geometry, normals, quality, position {pos_x, pos_y, pos_z })
 
+#else
+
+#define ShowObject(geometry, normals, quality, pos_x, pos_y, pos_z) ShowObject( geometry, normals, quality, position {pos_x, pos_y, pos_z })
+
 #endif
+
+cmdCounter++;
+

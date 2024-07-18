@@ -1,3 +1,5 @@
+#define EditMode true
+
 #include "..\fx\settings.h"
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -484,6 +486,7 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 			res = s.find("COMMAND");
 			if (found)
 			{
+				bool variadic = false;
 				int pCount = 0;
 				std::string loader;
 				std::string overrider;
@@ -535,7 +538,7 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 					unsigned int x = res + 1;
 
 					auto end = s.find(')');
-
+					std::string pCountStr = "";
 					while (x < end)
 					{
 						if (s.at(x) == ' ') {
@@ -587,6 +590,11 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 							x++;
 						}
 
+						if (name.compare("...") == 0)
+						{
+							variadic = true;
+						}
+
 						if (pCount > 0)
 						{
 							//caller.append(",");
@@ -598,91 +606,119 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 
 						bool isTypeKnown = false;
 
-						overrider.append("\tif (!cmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass) ");
-
-						auto typeIndex = getTypeIndex(type.c_str());
-
-						if (isTypeEnum(typeIndex))
+						if (variadic)
 						{
-							pNameList.append(name);
-							pNameListOut.append(name);
-							overrider.append(" " + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = (int)" + name + ";\n");
-							isTypeKnown = true;
+							pNameList = "...";
+							pNameListOut.clear();
+							overrider.clear();
+							loader.clear();
+
+							overrider.append("\tcount = cmdParamDesc[cmdCounter].param[0].value[0];\n");
+							overrider.append("\tcmdParamDesc[cmdCounter].pCount = count+1;\n");
+							overrider.append("\tfor (int i = 1; i <= count; i++)\n\t{\n");
+							overrider.append("\t\tparams [i]= (unsigned char) cmdParamDesc[cmdCounter].param[i].value[0];\n\t}\n");
+							loader.append("\tfor (int i = 0; i < 256; i++)\n\t{\n");
+							loader.append("\t\tcmdParamDesc[cmdCounter].param[i].bypass = false;\n");
+							loader.append("\t\tstrcpy(cmdParamDesc[cmdCounter].param[i].type , \"int\");\n ");
+							loader.append("\t\tcmdParamDesc[cmdCounter].param[i].typeIndex = -1;\n ");
+							loader.append("\t\tcmdParamDesc[cmdCounter].param[i]._min = 0;\n");
+							loader.append("\t\tcmdParamDesc[cmdCounter].param[i]._max = 255;\n");
+							loader.append("\t\tcmdParamDesc[cmdCounter].param[i]._dim = 1;\n");
+							loader.append("\t}\n");
+							
+
+							loader.append("\tfor (int i = 1; i <= count; i++)\n\t{\n");
+							loader.append("\t\tcmdParamDesc[cmdCounter].param[i].value[0]= (int)params[i];\n\t}\n");
+
 						}
 						else
 						{
-							if (getTypeDim(typeIndex) == 3)
+							overrider.append("\tif (!cmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass) ");
+
+							auto typeIndex = getTypeIndex(type.c_str());
+
+							if (isTypeEnum(typeIndex))
 							{
-								pNameList.append(name + "_x, " + name + "_y, " + name + "_z");
-								pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z }");
-								overrider.append("\n\t\t{\n\t\t\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-								overrider.append("\t\t\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
-								overrider.append("\t\t\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
-								overrider.append("\t\t}\n");
-
-								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
-								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
-								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
-
+								pNameList.append(name);
+								pNameListOut.append(name);
+								overrider.append(" " + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = (int)" + name + ";\n");
 								isTypeKnown = true;
 							}
-
-							if (getTypeDim(typeIndex) == 4)
+							else
 							{
-								pNameList.append(name + "_x, " + name + "_y, " + name + "_z, " + name + "_w");
-								pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z, " + name + "_w }");
+								if (getTypeDim(typeIndex) == 3)
+								{
+									pNameList.append(name + "_x, " + name + "_y, " + name + "_z");
+									pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z }");
+									overrider.append("\n\t\t{\n\t\t\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+									overrider.append("\t\t\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
+									overrider.append("\t\t\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
+									overrider.append("\t\t}\n");
 
-								overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-								overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
-								overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
-								overrider.append("\t" + name + ".w = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3];\n");
+									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
+									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
+									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
 
-								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
-								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
-								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
-								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3] = " + name + ".w;\n");
+									isTypeKnown = true;
+								}
 
-								isTypeKnown = true;
+								if (getTypeDim(typeIndex) == 4)
+								{
+									pNameList.append(name + "_x, " + name + "_y, " + name + "_z, " + name + "_w");
+									pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z, " + name + "_w }");
+
+									overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+									overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
+									overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
+									overrider.append("\t" + name + ".w = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3];\n");
+
+									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
+									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
+									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
+									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3] = " + name + ".w;\n");
+
+									isTypeKnown = true;
+								}
+
+								if (getTypeDim(typeIndex) == 1)
+								{
+									pNameList.append(name);
+									pNameListOut.append(name);
+									overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ";\n");
+									isTypeKnown = true;
+								}
 							}
 
-							if (getTypeDim(typeIndex) == 1)
+							if (!isTypeKnown)
 							{
 								pNameList.append(name);
 								pNameListOut.append(name);
 								overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
 								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ";\n");
-								isTypeKnown = true;
+
+								/*							pNameList.append(name);
+															pNameListOut.append(name);
+															loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass = true;\n");
+															*/
+
 							}
+							else
+							{
+								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass = false;\n");
+							}
+
+							loader.append("\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].type, \"" + type + "\"); \n");
+							loader.append("\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].name, \"" + name + "\"); \n");
 						}
-
-						if (!isTypeKnown)
-						{
-							pNameList.append(name);
-							pNameListOut.append(name);
-							overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ";\n");
-
-/*							pNameList.append(name);
-							pNameListOut.append(name);
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass = true;\n");
-							*/
-
-						}
-						else
-						{
-							loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass = false;\n");
-						}
-
-						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].type, \"" + type + "\"); \n");
-						loader.append("\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].name, \"" + name + "\"); \n");
-
 						//caller.append(name);
 
 						name.clear();
 						type.clear();
 						pCount++;
 						x++;
+
 					}
 
 
@@ -697,17 +733,24 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 
 						ofile << "\tstrcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);\n";
 						ofile << "\tcmdParamDesc[cmdCounter].caller.line = srcLine;\n";
-						ofile << "\tcmdParamDesc[cmdCounter].pCount = " << std::to_string(pCount) << ";\n";
+						auto st = variadic ? "count+1" : std::to_string(pCount);
+						if (variadic)
+						{
+							ofile << "\tcmdParamDesc[cmdCounter].param[0].value[0] = count ;\n";
+						}
+						ofile << "\tcmdParamDesc[cmdCounter].pCount = " << st << ";\n";
 
-						loader.append("\n\t\teditor::paramEdit::setBypass();\n");
-						loader.append("\n\t\teditor::paramEdit::setParamsAttr();\n\n");
+						if (!variadic)
+						{
+							loader.append("\n\t\teditor::paramEdit::setBypass();\n");
+							loader.append("\n\t\teditor::paramEdit::setParamsAttr();\n\n");
+						}
 
 						ofile << loader;
 						ofile << "}\n";
 					}
 
 					ofile << "\nAddToUI(__FUNCTION__);\n";
-					ofile << "cmdCounter++;\n\n";
 					ofile << "cmdLevel++;\n\n";
 
 					//ofile << caller;
@@ -716,10 +759,25 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 					ofile << "#define " << funcName << "(" << pNameList << ") ";
 					ofile << funcName << "( __FILE__, __LINE__ ";
 					if (pCount > 0) ofile << ", ";
-					ofile << pNameListOut << ")";
+					ofile << pNameListOut;
+					if (variadic) ofile << "__VA_ARGS__";
+					ofile << ")";
+
 					ofile << "\n\n";
 
-					ofile << "#endif";
+					ofile << "#else\n\n";
+
+					ofile << "#define " << funcName << "(" << pNameList << ") ";
+					ofile << funcName << "( ";
+					ofile << pNameListOut;
+					if (variadic) ofile << "__VA_ARGS__";
+					ofile << ")";
+					ofile << "\n\n";
+
+
+					ofile << "#endif\n\n";
+
+					ofile << "cmdCounter++;\n\n";
 
 					//#define playTrack_REF "./generated/reflection/playTrack_ref.h"
 					ofileAccel << "#define " << funcName << "_REF " << "\".\\generated\\reflection\\" << funcName << "_ref.h\"\n\n";

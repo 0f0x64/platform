@@ -20,6 +20,8 @@ HWND hWnd;
 	#include <typeinfo>
 #endif
 
+int cmdCounter = 0;//reset it in loop start point
+
 #include <math.h>
 #include "timer.h"
 #include "utils.h"
@@ -36,31 +38,28 @@ using namespace dx11;
 #if EditMode
 	#include "editor\cmdEditService.h"
 	#include "editor\editor.h"
+	#define REFLECTION true
 #endif
 
-#define REFLECTION true
-
-#define REFLECT_CLOSE cmdLevel--
 #define refPath ./generated/reflection/
 #define refTail _ref.h
 #define REFLECT(FOO) STRINGIFY( CAT_3(refPath,FOO,refTail) )
 
-
 #if REFLECTION
+	#define REFLECT_CLOSE cmdLevel--
 	#define CALLER_INFO const char* srcFileName, int srcLine 
 	#define EDITABLE __FILE__, __LINE__
 	#define COMMAND(fname, ...) void fname(CALLER_INFO, __VA_ARGS__)
 #else
+	#define REFLECT_CLOSE 
+
 	#define CALLER_INFO
 	#define EDITABLE
 	#define COMMAND(fname, ...) void fname(__VA_ARGS__)
 #endif
 
-
 #include "generated\accel.h"
-
 #include "projectFiles\loop.h"
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -135,6 +134,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				dx11::iaspect = float(width) / float(height);
 			#endif
 
+			timer::timeCursor = (int)((timer::frameBeginTime - timer::startTime) * SAMPLING_FREQ / 1000.f);
 			Loop::mainLoop();
 
 			#if EditMode

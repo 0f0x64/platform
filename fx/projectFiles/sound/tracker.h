@@ -94,15 +94,27 @@ namespace tracker
 		REFLECT_CLOSE;
 	}
 
+	COMMAND(Notes, int count, unsigned char ...)
+	{
+		unsigned char params[255];
+		va_list args;
+		va_start(args, count);
+		params[0] = count;
+		for (int i = 1; i <= count; i++)
+		{
+			params[i] = va_arg(args, unsigned char);
+		}
+
+		#include REFLECT(Notes)
+
+		REFLECT_CLOSE;
+	}
 
 	COMMAND(mainbeat, int pos, int len, int repeat)
 	{
 		#include REFLECT(mainbeat)
 
-		//notes = "DdddDded";
-		//vol = "1123";
-		//send = "00001";
-
+		Notes(3, 255, 0, 255);
 
 		REFLECT_CLOSE;
 	}

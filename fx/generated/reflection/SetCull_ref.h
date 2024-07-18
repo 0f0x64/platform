@@ -18,10 +18,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define SetCull(mode) SetCull( __FILE__, __LINE__ , mode)
 
+#else
+
+#define SetCull(mode) SetCull( mode)
+
 #endif
+
+cmdCounter++;
+

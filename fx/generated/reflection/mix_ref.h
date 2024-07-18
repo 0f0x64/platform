@@ -18,10 +18,15 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
-cmdCounter++;
-
 cmdLevel++;
 
 #define mix(level) mix( __FILE__, __LINE__ , level)
 
+#else
+
+#define mix(level) mix( level)
+
 #endif
+
+cmdCounter++;
+

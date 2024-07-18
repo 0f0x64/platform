@@ -77,6 +77,7 @@ void reflectSourceChanges(std::filesystem::path fileName)
 					constexpr auto regex_str = R"(,)";
 					const std::regex reg{ regex_str };
 					const auto tokens = regex_split(s2, reg);
+					const auto tCount = tokens.size();
 
 					int pC = 0;
 					for (int j=0;j<cmdParamDesc[cCmd].pCount;j++)
@@ -102,11 +103,18 @@ void reflectSourceChanges(std::filesystem::path fileName)
 						{
 							for (int k = 0; k < ts; k++)
 							{
-								auto t = tokens[pC + k];
-								if (isNumber(t))
+								if (pC + k>= tCount)
 								{
-									auto v = atoi(t.c_str());
-									cmdParamDesc[cCmd].param[j].value[k] = v;
+									cmdParamDesc[cCmd].param[j].value[k] = 0;
+								}
+								else
+								{
+									auto t = tokens[pC + k];
+									if (isNumber(t))
+									{
+										auto v = atoi(t.c_str());
+										cmdParamDesc[cCmd].param[j].value[k] = v;
+									}
 								}
 							}
 						}

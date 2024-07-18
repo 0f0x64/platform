@@ -302,6 +302,12 @@
     <ClInclude Include="generated\reflection\setCamKey_ref.h">
       <Filter>Source Files\generated\reflectrion</Filter>
     </ClInclude>
+    <ClInclude Include="emptyFile.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\reflection\Notes_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">
