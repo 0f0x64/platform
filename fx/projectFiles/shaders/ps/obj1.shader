@@ -58,9 +58,10 @@ float calcWalls(float2 uv)
         uv5 += uv4;
         
     }
-    //walls += pow(saturate(1 - 2 * (abs(sin(uv5.x)) * abs(sin(uv5.y / 13)))), 5) * 2;
-    walls = pow((1 - 2 * (abs(sin(uv5.x)) * abs(sin(uv5.y / 13)))), 9) * 2;
-    //walls = walls /  length(uv - .5);
+  
+//  walls = pow((1 - 2 * (abs(sin(uv5.x)) * abs(sin(uv5.y / 13)))), 9) * 2;
+    walls = pow((1 - 1 *(abs(sin(uv5.x)) * abs(sin(uv5.y / 13)))), 9) * 2;
+
     return walls;
 }
 

@@ -276,11 +276,24 @@ namespace TimeLine
 
 	bool clickRb = false;
 
+	void playMode()
+	{
+		int rightM = ScreenToTime(screenRight - scrollMargin) + pos;
+		int leftM = ScreenToTime(screenLeft + scrollMargin) + pos;
+
+		timer::timeCursor = (int)((timer::frameBeginTime - timer::startTime) * second / 1000.f);
+		if (timer::timeCursor > rightM)
+		{
+			pos += timer::timeCursor - rightM;
+		}
+		timer::timeCursor = timer::timeCursor % timelineLen;
+		if (pos > 0) pos = 0;
+	}
+
 	void ProcessInput()
 	{
-		bool bounds = !(ui::mousePos.x > 1 || ui::mousePos.x < 0 || ui::mousePos.y > 1 || ui::mousePos.x < 0);
 
-		if (ui::lbDown & bounds)
+		if (ui::lbDown)
 		{
 			if (lbDragContext == DragContext::free) {
 
@@ -296,7 +309,7 @@ namespace TimeLine
 			}
 		}
 
-		if (ui::rbDown & bounds)
+		if (ui::rbDown) 
 		{
 			if (!clickRb) {
 				clickRb = true;
@@ -311,7 +324,7 @@ namespace TimeLine
 		int rightM = ScreenToTime(screenRight - scrollMargin) + pos;
 		int leftM = ScreenToTime(screenLeft + scrollMargin) + pos;
 
-		if (ui::lbDown && lbDragContext == DragContext::timeCursor & bounds)
+		if (ui::lbDown && lbDragContext == DragContext::timeCursor)
 		{
 			float scrollSpeed = .5;
 			timer::timeCursor = timeCursorLast + (int)(ui::mouseDelta.x * ScreenToTime(1.f));
@@ -331,26 +344,13 @@ namespace TimeLine
 			reTime();
 		}
 
-		if (ui::rbDown & bounds)
+		if (ui::rbDown)
 		{
 			pos = posLast - (int)(ui::mouseDelta.x * ScreenToTime(1.f));
 		}
 		
 
-		if (play)
-		{
-
-			timer::timeCursor = (int)((timer::frameBeginTime - timer::startTime) * second / 1000.f);
-
-			if (timer::timeCursor > rightM)
-			{
-				pos += timer::timeCursor - rightM;
-			}
-			timer::timeCursor = timer::timeCursor % timelineLen;
-			if (pos > 0) pos = 0;
-
-		}
-		else
+		if (!play)
 		{
 			pos = clamp(pos, -ScreenToTime(.5), timelineLen - ScreenToTime(.5));
 			timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);

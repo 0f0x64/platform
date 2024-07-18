@@ -70,6 +70,10 @@ namespace editor
 
 		ui::mousePos = ui::GetCusorPos();
 
+		if (TimeLine::play) TimeLine::playMode();
+
+		if (ui::mousePos.x > 1 || ui::mousePos.x < 0 || ui::mousePos.y > 1 || ui::mousePos.x < 0) return;
+
 		ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
 		ui::mouseDelta.y = ui::mousePos.y - ui::mouseLastPos.y;
 		ui::mouseAngle = - atan2f(ui::mousePos.y - .5f, ui::mousePos.x - .5f);
@@ -90,7 +94,7 @@ namespace editor
 		gapi.cull(cullmode::off);
 		gapi.depth(depthmode::off);
 
-		if (isKeyDown(TIME_KEY) || editor::TimeLine::play)
+		if (isKeyDown(TIME_KEY))
 		{
 		
 			paramEdit::CamKeys();

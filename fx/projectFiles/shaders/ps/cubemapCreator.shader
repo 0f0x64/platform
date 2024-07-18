@@ -48,7 +48,7 @@ PS_OUTPUT PS(VS_OUTPUT input)
     PS_OUTPUT cube;
     float a = PI*4;
     float walls = saturate(1 - 2 * length(uv - .5));
-    //color.xyz = saturate(-sign(max(sin(uv.x * a), sin(uv.y * a))));
+
     float top = 0;
     for (int i = 0; i < 5;i++)
     {
@@ -59,19 +59,12 @@ PS_OUTPUT PS(VS_OUTPUT input)
     
     float2 uv3 = float2(atan2(uv.y-.5, uv.x-.5) * PI*.06, length(uv - .5)-time.x*.01);
     
-    float floor_ = 0.0;//    (max(sin(uv3.x * 112), sin(uv3.y * 112)) - .7) * saturate(1 - length(uv - .5) * 4);
+    float floor_ = 0.0;
     
     cube.c3 = float4(1, 1, 1, 1) * saturate(floor_);
     
     walls =calcWalls(uv);
     walls -= calcWalls(uv + float2(0.0035,.0035))*1.2;
-    //walls += .2;
-    //walls *= 1 - uv.y;
-    
-    //walls = max(walls, 0);
-    
-    //cube.c2 = walls * float4(1, 1, 1, 1)*2;
-    //cube.c3 = walls * float4(.2, .6, 1, 1)/4;
     
     cube.c4 = walls*float4(1,1,1.3,1);
     cube.c5 = walls*float4(1,1,1.3,1);
