@@ -159,10 +159,10 @@ namespace paramEdit {
 				char pStr[32];
 				for (int x = 0; x < getTypeDim(sType); x++)
 				{
-					if (!cmdParamDesc[cmdIndex].param[i].value[x])
-					{
-						cmdParamDesc[cmdIndex].param[i].value[x] = 0;
-					}
+					//if (!cmdParamDesc[cmdIndex].param[i].value[x])
+					//{
+						//cmdParamDesc[cmdIndex].param[i].value[x] = 0;
+					//}
 
 					_itoa(cmdParamDesc[cmdIndex].param[i].value[x], pStr, 10);
 					genParams.push_back(std::string(pStr));
@@ -220,21 +220,25 @@ namespace paramEdit {
 				for (int i = 0; i < cmdParamDesc[cmdIndex].pCount; i++)
 				//for (auto& i : tokens)
 				{
-					if (cmdParamDesc[cmdIndex].param[j].bypass)
+					auto sType = cmdParamDesc[cmdIndex].param[i].typeIndex;
+					for (int x = 0; x < getTypeDim(sType); x++)
 					{
-						//caller.append(i);
-						//if (!tokens[i]) tokens[i].c_str() = "0";
-						caller.append(tokens[i]);
-					}
-					else
-					{
-						//if (!tokens[i])
-						caller.append(genParams[j]);
-					}
+						if (cmdParamDesc[cmdIndex].param[j].bypass)
+						{
+							//caller.append(i);
+							//if (!tokens[i]) tokens[i].c_str() = "0";
+							caller.append(tokens[i]);
+						}
+						else
+						{
+							//if (!tokens[i])
+							caller.append(genParams[j]);
+						}
 
-					caller.append(", ");
+						caller.append(", ");
 
-					j++;
+						j++;
+					}
 				}
 
 				caller.erase(caller.size() - 2);

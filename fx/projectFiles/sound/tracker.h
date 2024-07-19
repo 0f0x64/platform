@@ -32,7 +32,6 @@ namespace tracker
 	typedef struct
 	{
 		byte note[NOTES_IN_CLIP];
-		byte volume[NOTES_IN_CLIP];
 		byte variation[NOTES_IN_CLIP];
 		byte retrigger[NOTES_IN_CLIP];
 		byte slide[NOTES_IN_CLIP];
