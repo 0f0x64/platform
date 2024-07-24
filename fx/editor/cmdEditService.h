@@ -1,3 +1,5 @@
+typedef bool (*PVFN)(int i, float &x, float &y, float lead, float sel);
+
 struct {
 
 	char funcName[255];
@@ -6,6 +8,9 @@ struct {
 		char fileName[MAX_PATH];
 		int line;
 	} caller;
+
+	PVFN uiDraw = NULL;
+	PVFN uiClick = NULL;
 
 	int pCount;
 
@@ -42,3 +47,10 @@ void AddToUI(const char* funcName)
 
 	strcpy(cmdParamDesc[cmdCounter].funcName, funcName+x);
 }
+
+
+#if EditMode 
+	#define regDrawer(name) cmdParamDesc[cmdCounter].uiDraw = &name 
+#else 
+	#define regDrawer(name)
+#endif

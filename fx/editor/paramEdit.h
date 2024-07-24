@@ -159,11 +159,6 @@ namespace paramEdit {
 				char pStr[32];
 				for (int x = 0; x < getTypeDim(sType); x++)
 				{
-					//if (!cmdParamDesc[cmdIndex].param[i].value[x])
-					//{
-						//cmdParamDesc[cmdIndex].param[i].value[x] = 0;
-					//}
-
 					_itoa(cmdParamDesc[cmdIndex].param[i].value[x], pStr, 10);
 					genParams.push_back(std::string(pStr));
 				}
@@ -211,27 +206,26 @@ namespace paramEdit {
 
 				constexpr auto regex_str = R"(,)";
 				const std::regex reg{ regex_str };
-				const auto tokens = regex_split(s2, reg);
+				auto tokens = regex_split(s2, reg);
 
 				caller.append(cmdParamDesc[cmdIndex].funcName);
 				caller.append("(");
 
 				int j = 0;
 				for (int i = 0; i < cmdParamDesc[cmdIndex].pCount; i++)
-				//for (auto& i : tokens)
 				{
 					auto sType = cmdParamDesc[cmdIndex].param[i].typeIndex;
 					for (int x = 0; x < getTypeDim(sType); x++)
 					{
-						if (cmdParamDesc[cmdIndex].param[j].bypass)
+						if (j >= tokens.size()) tokens.push_back("0");
+
+						//if (cmdParamDesc[cmdIndex].param[j].bypass || 
+						if (!isNumber(tokens[i].c_str()))
 						{
-							//caller.append(i);
-							//if (!tokens[i]) tokens[i].c_str() = "0";
 							caller.append(tokens[i]);
 						}
 						else
 						{
-							//if (!tokens[i])
 							caller.append(genParams[j]);
 						}
 
@@ -359,15 +353,23 @@ namespace paramEdit {
 	}
 
 	//SHOW STACK
+	bool expandTree = false;
+
 	void showCommands()
 	{
+		expandTree = false;
+
 		for (int i = startCmd; i < cmdCounter; i++)
 		{
 			auto w = ui::Text::getTextLen(cmdParamDesc[i].funcName, ui::style::text::width) + insideX * 2.f;
 
 			auto cl = cmdParamDesc[i].stackLevel;
 			if (i > startCmd && curCmdLevel > cl) break;
-			if (i > startCmd && curCmdLevel != cl) continue;
+
+			if (!expandTree)
+			{
+				if (i > startCmd && curCmdLevel != cl) continue;
+			}
 
 			auto mo = isMouseOver(x, y, w, ui::style::box::height);
 
@@ -379,11 +381,11 @@ namespace paramEdit {
 				{
 					if (i == startCmd) //close
 					{
-						curCmdLevel = max(cl , 0);
+						curCmdLevel = max(cl, 0);
 
 						for (int j = startCmd; j >= 0; j--)//search for prev level
 						{
-							if (cmdParamDesc[j].stackLevel < curCmdLevel  || j == 0) {
+							if (cmdParamDesc[j].stackLevel < curCmdLevel || j == 0) {
 								startCmd = j; break;
 							}
 						}
@@ -393,14 +395,14 @@ namespace paramEdit {
 						{
 							if (j == startCmd || curCmdLevel == cmdParamDesc[j].stackLevel) cnt++;
 						}
-						
-						yPos -= float(cnt)* lead;
+
+						yPos -= float(cnt) * lead;
 
 					}
 					else //open
 					{
 						bool haveContent = false;
-						for (int j = i+1; j < cmdCounter; j++)
+						for (int j = i + 1; j < cmdCounter; j++)
 						{
 							if (cl < cmdParamDesc[j].stackLevel)
 							{
@@ -426,7 +428,7 @@ namespace paramEdit {
 					break;
 				}
 
-				if (ui::lbDown && i != currentCmd &&!action) {
+				if (ui::lbDown && i != currentCmd && !action) {
 					action = true;
 					currentCmd = i;
 					currentParam = -1;
@@ -441,15 +443,24 @@ namespace paramEdit {
 			float sel = currentCmd == i ? 1.f : 0.f;
 			if (sel) selYpos = y;
 
-			ui::Box::Setup();
-			setBStyle(sel);
-			ui::Box::Draw(x, y, w, ui::style::text::height * .8f);
+			bool exclusiveMode = false;
+			if (cmdParamDesc[i].uiDraw)
+			{
+				exclusiveMode = cmdParamDesc[i].uiDraw(i,x,y,lead,sel);
+			}
 
-			ui::Text::Setup();
-			setTStyle(sel);
-			ui::Text::Draw(cmdParamDesc[i].funcName, x + insideX, y + insideY);
+			if (!exclusiveMode)
+			{
+				ui::Box::Setup();
+				setBStyle(sel);
+				ui::Box::Draw(x, y, w, ui::style::text::height * .8f);
 
-			y += lead;
+				ui::Text::Setup();
+				setTStyle(sel);
+				ui::Text::Draw(cmdParamDesc[i].funcName, x + insideX, y + insideY);
+
+				y += lead;
+			}
 		}
 	}
 

@@ -516,8 +516,6 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 					std::string fReflection = "..\\fx\\generated\\reflection\\" + funcName + "_ref.h";
 					ofstream ofile(fReflection);
 
-					ofile << "#if REFLECTION\n\n";
-
 					for (auto x = res + 1; x < declEnd; x++)
 					{
 						if (s.at(x) != ' ') noParams = false;
@@ -721,8 +719,12 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 
 					}
 
+					if (variadic)
+					{
+						ofile << "VA_READ\n\n";
+					}
 
-
+					ofile << "#if REFLECTION\n\n";
 					//caller.append(");");
 
 					if (pCount > 0)

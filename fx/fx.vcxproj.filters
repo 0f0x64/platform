@@ -308,6 +308,9 @@
     <ClInclude Include="generated\reflection\Notes_ref.h">
       <Filter>Source Files\generated\reflectrion</Filter>
     </ClInclude>
+    <ClInclude Include="generated\reflection\Pitch_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

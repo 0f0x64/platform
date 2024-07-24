@@ -40,15 +40,11 @@
 
 #define eq_REF ".\generated\reflection\eq_ref.h"
 
-#define Notes_REF ".\generated\reflection\Notes_ref.h"
+#define Pitch_REF ".\generated\reflection\Pitch_ref.h"
 
-#define mainbeat_REF ".\generated\reflection\mainbeat_ref.h"
+#define Clip_REF ".\generated\reflection\Clip_ref.h"
 
 #define channel_01_REF ".\generated\reflection\channel_01_ref.h"
-
-#define channel_02_REF ".\generated\reflection\channel_02_ref.h"
-
-#define mix_REF ".\generated\reflection\mix_ref.h"
 
 #define playTrack_REF ".\generated\reflection\playTrack_ref.h"
 

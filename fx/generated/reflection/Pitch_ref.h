@@ -1,3 +1,5 @@
+VA_READ
+
 #if REFLECTION
 
 if (paramsAreLoaded) {
@@ -30,11 +32,11 @@ if (paramsAreLoaded) {
 AddToUI(__FUNCTION__);
 cmdLevel++;
 
-#define Notes(...) Notes( __FILE__, __LINE__ , __VA_ARGS__)
+#define Pitch(...) Pitch( __FILE__, __LINE__ , __VA_ARGS__)
 
 #else
 
-#define Notes(...) Notes( __VA_ARGS__)
+#define Pitch(...) Pitch( __VA_ARGS__)
 
 #endif
 
