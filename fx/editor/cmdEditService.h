@@ -1,4 +1,4 @@
-typedef bool (*PVFN)(int i, float &x, float &y, float lead, float sel);
+typedef void (*PVFN)(int i, float &x, float &y, float w, float lead, float sel);
 
 struct {
 
@@ -47,10 +47,3 @@ void AddToUI(const char* funcName)
 
 	strcpy(cmdParamDesc[cmdCounter].funcName, funcName+x);
 }
-
-
-#if EditMode 
-	#define regDrawer(name) cmdParamDesc[cmdCounter].uiDraw = &name 
-#else 
-	#define regDrawer(name)
-#endif

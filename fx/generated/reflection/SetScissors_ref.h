@@ -24,6 +24,7 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
+cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 cmdLevel++;
 
 #define SetScissors(bbox_x, bbox_y, bbox_z, bbox_w) SetScissors( __FILE__, __LINE__ , rect {bbox_x, bbox_y, bbox_z, bbox_w })

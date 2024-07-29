@@ -43,6 +43,7 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
+cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 cmdLevel++;
 
 #define Clip(pos, len, repeat, bpmScale, mode, swing) Clip( __FILE__, __LINE__ , pos, len, repeat, bpmScale, mode, swing)

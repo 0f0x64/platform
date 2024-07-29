@@ -18,6 +18,7 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
+cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 cmdLevel++;
 
 #define SetDepthMode(mode) SetDepthMode( __FILE__, __LINE__ , mode)

@@ -30,6 +30,7 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
+cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 cmdLevel++;
 
 #define Pitch(...) Pitch( __FILE__, __LINE__ , __VA_ARGS__)

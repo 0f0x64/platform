@@ -23,6 +23,7 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
+cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 cmdLevel++;
 
 #define SetRT(targetRT, level) SetRT( __FILE__, __LINE__ , targetRT, level)

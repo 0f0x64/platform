@@ -23,6 +23,7 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
+cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 cmdLevel++;
 
 #define Draw(quadcount, instances) Draw( __FILE__, __LINE__ , quadcount, instances)

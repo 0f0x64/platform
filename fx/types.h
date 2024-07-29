@@ -194,6 +194,8 @@ createType(color4, 0, 255, 4, int x; int y; int z; int w;);
 createType(rect, INT_MIN, INT_MAX, 4, int x; int y; int z; int w;);
 createSimpleType(timestamp, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
 createSimpleType(duration_time, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
+createSimpleType(volume, 0, 100);
+createSimpleType(panorama, -90, 90);
 
 enumType(blendmode, off, on, alpha);
 enumType(blendop, add, sub, revsub, min, max);
@@ -207,6 +209,7 @@ enumType(keyType, set, slide);
 enumType(visibility, on, off, solo);
 enumType(camAxis, local, global);
 enumType(sliderType, follow, pan, slide);
+enumType(switcher, off, on);
 
 #undef CreateTexture
 #define CreateTexture(name,type,format,width,height,mip,depth) name,

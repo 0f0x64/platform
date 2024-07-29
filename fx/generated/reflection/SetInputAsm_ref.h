@@ -18,6 +18,7 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
+cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 cmdLevel++;
 
 #define SetInputAsm(topo) SetInputAsm( __FILE__, __LINE__ , topo)

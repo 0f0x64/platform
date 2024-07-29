@@ -36,9 +36,12 @@ using namespace dx11;
 #include "generated\constBufReflect.h"
 
 #if EditMode
+	#define regDrawer(name) cmdParamDesc[cmdCounter-1].uiDraw = &name 
 	#include "editor\cmdEditService.h"
 	#include "editor\editor.h"
 	#define REFLECTION true
+#else
+	#define regDrawer(name)
 #endif
 
 #define refPath ./generated/reflection/
@@ -132,9 +135,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				int height = rect.bottom - rect.top;
 				dx11::aspect = float(height) / float(width);
 				dx11::iaspect = float(width) / float(height);
+			#else
+				timer::timeCursor = (int)((timer::frameBeginTime - timer::startTime) * SAMPLING_FREQ / 1000.f);
 			#endif
 
-			timer::timeCursor = (int)((timer::frameBeginTime - timer::startTime) * SAMPLING_FREQ / 1000.f);
 			Loop::mainLoop();
 
 			#if EditMode

@@ -24,6 +24,7 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
+cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 cmdLevel++;
 
 #define ClearRT(color_x, color_y, color_z, color_w) ClearRT( __FILE__, __LINE__ , color4 {color_x, color_y, color_z, color_w })

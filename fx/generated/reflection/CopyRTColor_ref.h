@@ -23,6 +23,7 @@ if (paramsAreLoaded) {
 }
 
 AddToUI(__FUNCTION__);
+cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 cmdLevel++;
 
 #define CopyRTColor(dst, src) CopyRTColor( __FILE__, __LINE__ , dst, src)

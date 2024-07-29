@@ -33,7 +33,7 @@ namespace editor
 		return GetKeyState(key) & 0x8000;
 	}
 
-
+	bool showTimeFlag = false;
 
 #define CAM_KEY VK_CONTROL
 #define CAM_KEY2 VK_SHIFT
@@ -67,6 +67,7 @@ namespace editor
 
 	void Process()
 	{
+		showTimeFlag = false;
 		hilightedCmd = -1;
 		paramEdit::editContext = !(isKeyDown(CAM_KEY) | isKeyDown(CAM_KEY2) | isKeyDown(TIME_KEY));
 
@@ -96,7 +97,12 @@ namespace editor
 		gapi.cull(cullmode::off);
 		gapi.depth(depthmode::off);
 
-		if (isKeyDown(TIME_KEY))
+		if (paramEdit::editContext)
+		{
+			paramEdit::ShowStack();
+		}
+
+		//if (isKeyDown(TIME_KEY) || showTimeFlag)
 		{
 		
 			paramEdit::CamKeys();
@@ -105,10 +111,7 @@ namespace editor
 			
 		}
 
-		if (paramEdit::editContext)
-		{
-			paramEdit::ShowStack();
-		}
+
 
 		ViewCam::setup();
 

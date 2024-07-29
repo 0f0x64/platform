@@ -355,12 +355,40 @@ namespace paramEdit {
 	//SHOW STACK
 	bool expandTree = false;
 
+	bool mouseOverItem = false;
+	float prevY;
+
+	bool showButton(float x, float y, float w, float h, float sel, int i)
+	{
+		bool mo = isMouseOver(x, y, w, h);
+
+		ui::style::box::outlineBrightness = mo ? 1.f : 0.1f;
+
+		ui::Box::Setup();
+		setBStyle(sel);
+		ui::Box::Draw(x, y, w, h);
+
+		ui::Text::Setup();
+		setTStyle(sel);
+		ui::Text::Draw(cmdParamDesc[i].funcName, x + insideX, y + insideY);
+
+		return mo;
+	}
+
+	void showStackItem(int i, float& x, float& y, float w, float lead, float sel)
+	{
+		mouseOverItem = showButton(x, y, w, ui::style::text::height * .8f, sel, i);
+		y += lead;
+	}
+
 	void showCommands()
 	{
 		expandTree = false;
 
 		for (int i = startCmd; i < cmdCounter; i++)
 		{
+			prevY = y;
+
 			auto w = ui::Text::getTextLen(cmdParamDesc[i].funcName, ui::style::text::width) + insideX * 2.f;
 
 			auto cl = cmdParamDesc[i].stackLevel;
@@ -371,9 +399,15 @@ namespace paramEdit {
 				if (i > startCmd && curCmdLevel != cl) continue;
 			}
 
-			auto mo = isMouseOver(x, y, w, ui::style::box::height);
+			//draw
 
-			if (mo)//process click
+			float sel = currentCmd == i ? 1.f : 0.f;
+			if (sel) selYpos = y;
+
+			cmdParamDesc[i].uiDraw(i, x, y, w, lead, sel);
+			
+
+			if (mouseOverItem)//process click
 			{
 				clickOnEmptyPlace = false;
 
@@ -420,7 +454,7 @@ namespace paramEdit {
 						{
 							startCmd = i;
 							curCmdLevel = cl + 1;
-							yPos = y;
+							yPos = prevY;
 						}
 					}
 
@@ -436,31 +470,7 @@ namespace paramEdit {
 				}
 			}
 
-			//draw
-
-			ui::style::box::outlineBrightness = mo ? 1.f : 0.1f;
-
-			float sel = currentCmd == i ? 1.f : 0.f;
-			if (sel) selYpos = y;
-
-			bool exclusiveMode = false;
-			if (cmdParamDesc[i].uiDraw)
-			{
-				exclusiveMode = cmdParamDesc[i].uiDraw(i,x,y,lead,sel);
-			}
-
-			if (!exclusiveMode)
-			{
-				ui::Box::Setup();
-				setBStyle(sel);
-				ui::Box::Draw(x, y, w, ui::style::text::height * .8f);
-
-				ui::Text::Setup();
-				setTStyle(sel);
-				ui::Text::Draw(cmdParamDesc[i].funcName, x + insideX, y + insideY);
-
-				y += lead;
-			}
+			
 		}
 	}
 
@@ -659,6 +669,7 @@ namespace paramEdit {
 			set2Style(sel);
 
 			ui::Box::Setup();
+
 			for (int p = 0; p < subCount; p++)
 			{
 				float sel_ = currentParam == i ? 1.f : 0.f;
@@ -670,36 +681,62 @@ namespace paramEdit {
 				ui::style::box::outlineBrightness = lerp(0.1f, 1.f, (float)mo);
 				ui::style::box::a = cmdParamDesc[currentCmd].param[i].bypass ? .25f : 1.f;
 
+				ui::Box::Setup();
 				ui::Box::Draw(_x, y + float(p) * lead, w, ui::style::text::height * .8f);
+
+				auto val =  getStrValue(sType, (int)cmdParamDesc[currentCmd].param[i].value[p]);
+
+				setTStyle(sel_);
+				ui::Text::Draw(val, x + valueDrawOffset, y + float(p) * lead + insideY);
+
+				if (sel_) {
+					inCurPos = ui::Text::getTextLen(vstr, ui::style::text::width, cursorPos);
+					cursorPos = clamp(cursorPos, 0, (int)strlen(vstr));
+				}
 			}
 
 			if (sel && isTypeEnum(sType))
 			{
 				auto val = cmdParamDesc[currentCmd].param[i].value[0];
 
-				for (int e = 0; e < getEnumCount(sType); e++)
+				auto ec = getEnumCount(sType);
+				if (ec == 2)
 				{
-					float sel = e == val ? 1.f : 0.f;
-					auto over = isMouseOver(__x, y + e * lead, w, ui::style::box::height);
+					cmdParamDesc[currentCmd].param[i].value[0] = 1 - val;
+					action = false;
 
-					ui::style::box::r = ui::style::box::g = ui::style::box::b = .2f;
-					ui::style::box::outlineBrightness = over ? 1.f : 0.1f;
+				}
+				else
+				{
 
-					ui::Box::Draw(__x, y + e * lead, w, ui::style::text::height * .8f);
 
-					if (over)
+					for (int e = 0; e < getEnumCount(sType); e++)
 					{
-						clickOnEmptyPlace = false;
+						float sel = e == val ? 1.f : 0.f;
+						auto over = isMouseOver(__x, y + e * lead, w, ui::style::box::height);
 
-						if (ui::lbDown && !action)
+						ui::style::box::r = ui::style::box::g = ui::style::box::b = .2f;
+						ui::style::box::outlineBrightness = over ? 1.f : 0.1f;
+						ui::Box::Setup();
+						ui::Box::Draw(__x, y + e * lead, w, ui::style::text::height * .8f);
+						
+						ui::style::text::r = ui::style::text::g = ui::style::text::b = .8f;
+						ui::Text::Draw(getStrValue(sType, e), x + enumDrawOffset, y + e * lead + insideY);
+
+						if (over)
 						{
-							action = true;
-							currentParam = -1;
-							cmdParamDesc[currentCmd].param[i].value[0] = e;
+							clickOnEmptyPlace = false;
+
+							if (ui::lbDown && !action)
+							{
+								action = true;
+								currentParam = -1;
+								cmdParamDesc[currentCmd].param[i].value[0] = e;
+							}
+
 						}
 
 					}
-
 				}
 			}
 
@@ -710,7 +747,7 @@ namespace paramEdit {
 
 			setTStyle(sel);
 
-			char val[_CVTBUFSIZE];
+			/*char val[_CVTBUFSIZE];
 			for (int k = 0; k < subCount; k++)
 			{
 				float sel_ = currentParam == i ? 1.f : 0.f;
@@ -728,25 +765,13 @@ namespace paramEdit {
 					inCurPos = ui::Text::getTextLen(vstr, ui::style::text::width, cursorPos);
 					cursorPos = clamp(cursorPos, 0, (int)strlen(vstr));
 				}
-			}
+			}*/
 
-			if (sel)
+			if (sel && !isTypeEnum(sType))
 			{
-				if (isTypeEnum(sType))//enum dropdown menu
-				{
-					ui::style::text::r = ui::style::text::g = ui::style::text::b = .8f;
-
-					for (int e = 0; e < getEnumCount(sType); e++)
-					{
-						ui::Text::Draw(getStrValue(sType, e), x + enumDrawOffset, y + e * lead + insideY);
-					}
-				} 
-				else//show cursor on textfield
-				{
-					showCursor = true;
-					cursorX = x + valueDrawOffset + inCurPos;
-					cursorY = y + insideY + subParam * lead;
-				}
+				showCursor = true;
+				cursorX = x + valueDrawOffset + inCurPos;
+				cursorY = y + insideY + subParam * lead;
 			}
 
 			pCountV += subCount;
@@ -784,7 +809,6 @@ namespace paramEdit {
 
 	void ShowStack()
 	{
-
 		int currentCmd_backup = currentCmd;
 
 		tabLen = ui::Text::getTextLen("000000000000000", ui::style::text::width);

@@ -753,6 +753,8 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 					}
 
 					ofile << "\nAddToUI(__FUNCTION__);\n";
+					ofile << "cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;\n";
+
 					ofile << "cmdLevel++;\n\n";
 
 					//ofile << caller;

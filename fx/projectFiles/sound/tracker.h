@@ -123,36 +123,46 @@ namespace tracker
 		REFLECT_CLOSE;
 	}
 
-	#if EditMode
-	bool channelDraw(int i, float& x, float& y, float lead, float sel)
+#if EditMode
+	#pragma push_macro("Draw")
+	#undef Draw
+
+	void channelDraw(int i, float &x, float &y, float w, float lead, float sel)
 	{
+		w = editor::paramEdit::tabLen;
+		editor::paramEdit::mouseOverItem = editor::paramEdit::showButton(x, y, w, editor::ui::style::text::height * 2.f - editor::ui::style::text::height * .2f , sel, i);
+
+		/*
+		editor::paramEdit::mouseOverItem = editor::isMouseOver(x, y, w, editor::ui::style::box::height*2);
+		editor::ui::style::box::outlineBrightness = editor::paramEdit::mouseOverItem ? 1.f : 0.1f;
+
 		editor::ui::Box::Setup();
 		editor::paramEdit::setBStyle(sel);
-		editor::ui::Box::Draw(x, y, w, ui::style::text::height * .8f);
+		editor::ui::Box::Draw(x, y, w, editor::ui::style::text::height * .8f*2.);
 
 		editor::ui::Text::Setup();
 		editor::paramEdit::setTStyle(sel);
-		editor::ui::Text::Draw(cmdParamDesc[i].funcName, x + insideX, y + insideY);
+		editor::ui::Text::Draw(cmdParamDesc[i].funcName, x + editor::paramEdit::insideX, y + editor::paramEdit::insideY);*/
 
 		y += lead*2;
 
 		editor::paramEdit::expandTree = true;
-		return true;
 	}
-	#endif
+
+	#pragma pop_macro("Draw")
+#endif
 
 
 
-	COMMAND(channel_01, int volume, int pan)
+	COMMAND(channel_01, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
-		regDrawer(channelDraw);
-
 		#include REFLECT(channel_01)
+		regDrawer(channelDraw);
 
 		clipCounter = -1;
 
 		Clip(0, 16, 4, 1, false, 0);
-		Pitch(10, 255, 204, 192, 0, 0, 0, 0, 0, 0, 0);
+		Pitch(10, 255, 204, 192, 1, 0, 0, 0, 0, 0, 0);
 
 		Clip(0, 16, 4, 1, false, 0);
 		Pitch(10, 255, 204, 192, 0, 0, 0, 0, 0, 0, 0);
@@ -166,7 +176,7 @@ namespace tracker
 	{
 		#include REFLECT(playTrack)
 		
-		channel_01(66, 0);
+		channel_01(0, 90, 14, switcher::off, switcher::off);
 	
 		REFLECT_CLOSE;
 		

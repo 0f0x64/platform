@@ -2,6 +2,7 @@
 
 
 AddToUI(__FUNCTION__);
+cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 cmdLevel++;
 
 #define playTrack() playTrack( __FILE__, __LINE__ )
