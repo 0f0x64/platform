@@ -116,14 +116,16 @@ namespace ViewCam
 	{
 		if (isKeyDown(CAM_KEY)) 
 		{
-			currentCamera.ViewVec = XMVectorScale(currentCamera.ViewVec, 1.f - delta / 2000.f);
-			storedCamera = currentCamera;
+			if (isKeyDown(VK_LBUTTON))
+			{//adjust cam angle
+				Camera::viewCam.angle += delta / 50.f;
+			}
+			else
+			{//adjust distance from target
+				currentCamera.ViewVec = XMVectorScale(currentCamera.ViewVec, 1.f - delta / 2000.f);
+				storedCamera = currentCamera;
+			}
 		}
-
-		if (isKeyDown(CAM_KEY2)) {
-			Camera::viewCam.angle += delta / 50.f;
-		}
-
 	}
 
 
@@ -135,12 +137,13 @@ namespace ViewCam
 	void mbDown()
 	{
 		storedCamera = currentCamera;
+		editor::ui::mouseLastAngle = editor::ui::mouseAngle;
 	}
 
 	void rbDown()
 	{
 		storedCamera = currentCamera;
-		editor::ui::mouseLastAngle = editor::ui::mouseAngle;
+		
 	}
 
 	float axisAlpha = 0;
@@ -148,13 +151,13 @@ namespace ViewCam
 
 	void ProcessInput()
 	{
-		if (!(isKeyDown(CAM_KEY) || isKeyDown(CAM_KEY2))) return;
+		if (!isKeyDown(CAM_KEY)) return;
 
 		float speed = 4.f;
 		editor::ui::point3df r = { 0,0,0 };
 		editor::ui::point3df t = { 0,0,0 };
 
-		if (ui::mbDown || (ui::lbDown && isKeyDown(CAM_KEY2)))
+		if (ui::rbDown)
 		{
 			t.x = ui::mouseDelta.x * speed * 4.f;
 			t.y = -ui::mouseDelta.y * speed * 4.f;
@@ -162,7 +165,7 @@ namespace ViewCam
 		}
 		else
 		{
-			if (ui::rbDown)
+			if (ui::mbDown)
 			{
 				r.x = 0.f;
 				r.y = 0.f;
@@ -212,11 +215,12 @@ namespace ViewCam
 
 	int counter;
 
-	void StorePoint3d(float x, float y, float z)
+	void StorePoint3d(float x, float y, float z, float w=1)
 	{
 		ui::Line::buffer[counter].x = x;
 		ui::Line::buffer[counter].y = y;
 		ui::Line::buffer[counter].z = z;
+		ui::Line::buffer[counter].w = w;
 		counter++;
 	}
 
@@ -234,12 +238,14 @@ namespace ViewCam
 		float axisSize = 2.;
 		float arrowSize = .1;
 		counter = 0;
-		StorePoint3d(0, 0, 0);
-		StorePoint3d(-axisSize, 0, 0);
-		StorePoint3d(-axisSize, 0, 0);
-		StorePoint3d(-axisSize + arrowSize, arrowSize / 2, 0);
-		StorePoint3d(-axisSize, 0, 0);
-		StorePoint3d(-axisSize + arrowSize, -arrowSize / 2, 0);
+		StorePoint3d(0, 0, 0, 0);
+		StorePoint3d(-axisSize, 0, 0, 1);
+
+		StorePoint3d(-axisSize, 0, 0, 0);
+		StorePoint3d(-axisSize + arrowSize, arrowSize / 2, 0, 1);
+
+		StorePoint3d(-axisSize, 0, 0, 0);
+		StorePoint3d(-axisSize + arrowSize, -arrowSize / 2, 0, 1);
 
 		int yA = counter;
 		int zA = yA * 2;
@@ -248,10 +254,12 @@ namespace ViewCam
 			ui::Line::buffer[yA + x].x = ui::Line::buffer[x].y;
 			ui::Line::buffer[yA + x].y = -ui::Line::buffer[x].x;
 			ui::Line::buffer[yA + x].z = -ui::Line::buffer[x].z;
+			ui::Line::buffer[yA + x].w = ui::Line::buffer[x].w;
 
 			ui::Line::buffer[zA + x].x = ui::Line::buffer[x].z;
 			ui::Line::buffer[zA + x].y = ui::Line::buffer[x].y;
 			ui::Line::buffer[zA + x].z = ui::Line::buffer[x].x;
+			ui::Line::buffer[zA + x].w = ui::Line::buffer[x].w;
 		}
 
 		ui::Line::Setup();
@@ -294,7 +302,7 @@ namespace ViewCam
 
 	void Draw()
 	{
-		bool fade = isKeyDown(CAM_KEY) || isKeyDown(CAM_KEY2) || flyToCam < 1.f;
+		bool fade = isKeyDown(CAM_KEY) || flyToCam < 1.f;
 		axisAlpha = clamp(axisAlpha + (fade ? .4f : -.05f), 0.f, 1.f);
 		axisAlpha = 1;
 		if (flyToCam < 1.f)

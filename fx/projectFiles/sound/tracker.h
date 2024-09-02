@@ -145,8 +145,6 @@ namespace tracker
 		editor::ui::Text::Draw(cmdParamDesc[i].funcName, x + editor::paramEdit::insideX, y + editor::paramEdit::insideY);*/
 
 		y += lead*2;
-
-		editor::paramEdit::expandTree = true;
 	}
 
 	#pragma pop_macro("Draw")

@@ -12,7 +12,7 @@ namespace paramEdit {
 	bool action = false;
 	bool clickOnEmptyPlace;
 
-	bool editContext = false;
+
 
 	int cursorPos = 0;
 	float cursorX = 0;
@@ -336,7 +336,7 @@ namespace paramEdit {
 
 	void Wheel(float delta)
 	{
-		if (!editContext) return;
+		if (uiContext != uiContext_::stack) return;
 		if (currentCmd == -1) return;
 		if (currentParam == -1) return;
 
@@ -353,7 +353,6 @@ namespace paramEdit {
 	}
 
 	//SHOW STACK
-	bool expandTree = false;
 
 	bool mouseOverItem = false;
 	float prevY;
@@ -381,81 +380,87 @@ namespace paramEdit {
 		y += lead;
 	}
 
+	int searchParent(int start)
+	{
+		auto ccl = max(0,cmdParamDesc[start].stackLevel);
+
+		for (int j = start; j >= 0; j--)//search for prev level
+		{
+			if (cmdParamDesc[j].stackLevel < ccl || j == 0) {
+				return j;
+			}
+		}
+
+		return 0;
+	}
+
+	bool isContentInside(int pos)
+	{
+
+		auto ccl = max(0, cmdParamDesc[pos].stackLevel);
+
+		for (int j = pos + 1; j < cmdCounter; j++)
+		{
+			if (ccl < cmdParamDesc[j].stackLevel)
+			{
+				return true;
+			}
+
+			if (ccl >= cmdParamDesc[j].stackLevel)
+			{
+				return false;
+			}
+		}
+
+		return false;
+	}
+
+	void stepOut(int i)
+	{
+		curCmdLevel = max(cmdParamDesc[i].stackLevel, 0);
+		startCmd = searchParent(i);
+
+		for (int j = startCmd; j < i; j++)//displayed level cmd count for adjust pos
+		{
+			if (j == startCmd || curCmdLevel == cmdParamDesc[j].stackLevel) yPos -= lead;
+		}
+
+	}
+
+	void stepIn(int i)
+	{
+		if (!isContentInside(i)) return;
+
+		startCmd = i;
+		curCmdLevel = cmdParamDesc[i].stackLevel + 1;
+		yPos = prevY;
+	}
+
 	void showCommands()
 	{
-		expandTree = false;
 
 		for (int i = startCmd; i < cmdCounter; i++)
 		{
 			prevY = y;
-
-			auto w = ui::Text::getTextLen(cmdParamDesc[i].funcName, ui::style::text::width) + insideX * 2.f;
-
-			auto cl = cmdParamDesc[i].stackLevel;
-			if (i > startCmd && curCmdLevel > cl) break;
-
-			if (!expandTree)
-			{
-				if (i > startCmd && curCmdLevel != cl) continue;
-			}
+			if (i > startCmd && curCmdLevel > cmdParamDesc[i].stackLevel) break;
+			if (i > startCmd && curCmdLevel != cmdParamDesc[i].stackLevel) continue;
 
 			//draw
-
 			float sel = currentCmd == i ? 1.f : 0.f;
 			if (sel) selYpos = y;
+			cmdParamDesc[i].uiDraw(i, x, y, ui::Text::getTextLen(cmdParamDesc[i].funcName, ui::style::text::width) + insideX * 2.f, lead, sel);
 
-			cmdParamDesc[i].uiDraw(i, x, y, w, lead, sel);
-			
-
-			if (mouseOverItem)//process click
+			//process clicks
+			if (mouseOverItem)
 			{
-				clickOnEmptyPlace = false;
+				clickOnEmptyPlace = false; 
 
 				if (ui::dblClk && ui::lbDown)
 				{
-					if (i == startCmd) //close
-					{
-						curCmdLevel = max(cl, 0);
-
-						for (int j = startCmd; j >= 0; j--)//search for prev level
-						{
-							if (cmdParamDesc[j].stackLevel < curCmdLevel || j == 0) {
-								startCmd = j; break;
-							}
-						}
-
-						int cnt = 0;
-						for (int j = startCmd; j < i; j++)//displayed level cmd count for adjust pos
-						{
-							if (j == startCmd || curCmdLevel == cmdParamDesc[j].stackLevel) cnt++;
-						}
-
-						yPos -= float(cnt) * lead;
-
-					}
-					else //open
-					{
-						bool haveContent = false;
-						for (int j = i + 1; j < cmdCounter; j++)
-						{
-							if (cl < cmdParamDesc[j].stackLevel)
-							{
-								haveContent = true;
-								break;
-							}
-
-							if (cl >= cmdParamDesc[j].stackLevel)
-							{
-								break;
-							}
-						}
-
-						if (haveContent)
-						{
-							startCmd = i;
-							curCmdLevel = cl + 1;
-							yPos = prevY;
-						}
+					if (i != startCmd) {
+						stepIn(i);
+					} else {
+						stepOut(i);
 					}
 
 					ui::dblClk = false;
@@ -469,8 +474,6 @@ namespace paramEdit {
 					subParam = 0;
 				}
 			}
-
-			
 		}
 	}
 
@@ -668,7 +671,8 @@ namespace paramEdit {
 			float sel = currentParam == i ? 1.f : 0.f;
 			set2Style(sel);
 
-			ui::Box::Setup();
+			ui::Text::Setup();
+			ui::Text::Draw(cmdParamDesc[currentCmd].param[i].name, x + insideX, y + insideY);
 
 			for (int p = 0; p < subCount; p++)
 			{
@@ -695,77 +699,43 @@ namespace paramEdit {
 				}
 			}
 
-			if (sel && isTypeEnum(sType))
+			if (sel && isTypeEnum(sType) && getEnumCount(sType) == 2)
+			{
+				cmdParamDesc[currentCmd].param[i].value[0] = 1 - cmdParamDesc[currentCmd].param[i].value[0];
+				action = false;
+			}
+
+			if (sel && isTypeEnum(sType) && getEnumCount(sType) != 2)
 			{
 				auto val = cmdParamDesc[currentCmd].param[i].value[0];
 
-				auto ec = getEnumCount(sType);
-				if (ec == 2)
+				for (int e = 0; e < getEnumCount(sType); e++)
 				{
-					cmdParamDesc[currentCmd].param[i].value[0] = 1 - val;
-					action = false;
+					float sel = e == val ? 1.f : 0.f;
+					auto over = isMouseOver(__x, y + e * lead, w, ui::style::box::height);
 
-				}
-				else
-				{
+					ui::style::box::r = ui::style::box::g = ui::style::box::b = .2f;
+					ui::style::box::outlineBrightness = over ? 1.f : 0.1f;
+					ui::Box::Setup();
+					ui::Box::Draw(__x, y + e * lead, w, ui::style::text::height * .8f);
+					
+					ui::style::text::r = ui::style::text::g = ui::style::text::b = .8f;
+					ui::Text::Draw(getStrValue(sType, e), x + enumDrawOffset, y + e * lead + insideY);
 
-
-					for (int e = 0; e < getEnumCount(sType); e++)
+					if (over)
 					{
-						float sel = e == val ? 1.f : 0.f;
-						auto over = isMouseOver(__x, y + e * lead, w, ui::style::box::height);
+						clickOnEmptyPlace = false;
 
-						ui::style::box::r = ui::style::box::g = ui::style::box::b = .2f;
-						ui::style::box::outlineBrightness = over ? 1.f : 0.1f;
-						ui::Box::Setup();
-						ui::Box::Draw(__x, y + e * lead, w, ui::style::text::height * .8f);
-						
-						ui::style::text::r = ui::style::text::g = ui::style::text::b = .8f;
-						ui::Text::Draw(getStrValue(sType, e), x + enumDrawOffset, y + e * lead + insideY);
-
-						if (over)
+						if (ui::lbDown && !action)
 						{
-							clickOnEmptyPlace = false;
-
-							if (ui::lbDown && !action)
-							{
-								action = true;
-								currentParam = -1;
-								cmdParamDesc[currentCmd].param[i].value[0] = e;
-							}
-
+							action = true;
+							currentParam = -1;
+							cmdParamDesc[currentCmd].param[i].value[0] = e;
 						}
-
 					}
 				}
 			}
 
-			ui::Text::Setup();
-			ui::Text::Draw(cmdParamDesc[currentCmd].param[i].name, x + insideX, y + insideY);
-
-			strcpy(vstr, getStrValue(sType, (int)cmdParamDesc[currentCmd].param[i].value[0]));
-
-			setTStyle(sel);
-
-			/*char val[_CVTBUFSIZE];
-			for (int k = 0; k < subCount; k++)
-			{
-				float sel_ = currentParam == i ? 1.f : 0.f;
-
-				if (subCount > 1) {
-					sel_ *= (float)(subParam == k);
-					_itoa(cmdParamDesc[currentCmd].param[i].value[k], val, 10);
-					strcpy(vstr, val);
-				}
-
-				setTStyle(sel_);
-				ui::Text::Draw(vstr, x + valueDrawOffset, y + float(k) * lead + insideY);
-
-				if (sel_) {
-					inCurPos = ui::Text::getTextLen(vstr, ui::style::text::width, cursorPos);
-					cursorPos = clamp(cursorPos, 0, (int)strlen(vstr));
-				}
-			}*/
 
 			if (sel && !isTypeEnum(sType))
 			{
@@ -779,25 +749,19 @@ namespace paramEdit {
 		}
 
 		//drag by mouse
-		auto ti = getTypeIndex(cmdParamDesc[currentCmd].param[currentParam].type);
-		if (!isTypeEnum(ti))
+		if (!isTypeEnum(getTypeIndex(cmdParamDesc[currentCmd].param[currentParam].type)) && currentParam >= 0)
 		{
-			if (currentParam >= 0)
+			if (ui::lbDown)
 			{
-				if (ui::lbDown)
-				{
-					cmdParamDesc[currentCmd].param[currentParam].value[subParam] = storedParam[subParam] + (int)(ui::mouseDelta.x * width);
-					pLimits();
-				}
-				else
-				{
-					storedParam[subParam] = cmdParamDesc[currentCmd].param[currentParam].value[subParam];
-				}
+				cmdParamDesc[currentCmd].param[currentParam].value[subParam] = storedParam[subParam] + (int)(ui::mouseDelta.x * width);
+				pLimits();
+			}
+			else
+			{
+				storedParam[subParam] = cmdParamDesc[currentCmd].param[currentParam].value[subParam];
 			}
 		}
 	}
-
-	
 
 	float isOutside(float x, float top, float bottom)
 	{
@@ -817,7 +781,7 @@ namespace paramEdit {
 
 		clickOnEmptyPlace = true;
 
-		if (ui::rbDown)
+		if (ui::rbDown && !isKeyDown(CAM_KEY) && !isKeyDown(TIME_KEY))
 		{
 			yPos = yPosLast + editor::ui::mouseDelta.y;
 		}

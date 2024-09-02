@@ -259,6 +259,7 @@
     <None Include="projectFiles\shaders\lib\utils.shader" />
     <None Include="projectFiles\shaders\ps\basic.shader" />
     <None Include="projectFiles\shaders\ps\box_ps.shader" />
+    <None Include="projectFiles\shaders\ps\lineDrawerUV_ps.shader" />
     <None Include="projectFiles\shaders\ps\lineDrawer_ps.shader" />
     <None Include="projectFiles\shaders\ps\cubemapCreator.shader" />
     <None Include="projectFiles\shaders\ps\genNormals.shader" />

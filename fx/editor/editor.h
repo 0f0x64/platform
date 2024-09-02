@@ -12,6 +12,9 @@ std::vector<std::string> regex_split(const std::string& str, const std::regex& r
 enum class DragContext : int { free, timeCursor, timeKey, cameraView, cameraButtons };
 DragContext lbDragContext = DragContext::free;
 
+enum class uiContext_ : int { stack, camera, timeline };
+uiContext_ uiContext = uiContext_::stack;
+
 namespace editor
 {
 	#include <libloaderapi.h>
@@ -36,7 +39,6 @@ namespace editor
 	bool showTimeFlag = false;
 
 #define CAM_KEY VK_CONTROL
-#define CAM_KEY2 VK_SHIFT
 
 	#include "editorWindow.h"
 	#include "hotReload.h"
@@ -65,28 +67,68 @@ namespace editor
 		ViewCam::Init();
 	}
 
+	void ProcessContext()
+	{
+		if (isKeyDown(CAM_KEY) && isKeyDown(TIME_KEY)) return;
+
+		if (isKeyDown(CAM_KEY) && uiContext != uiContext_::camera)
+		{
+			ViewCam::storedCamera = ViewCam::currentCamera;
+			ui::mouseLastPos = ui::mousePos;
+			uiContext = uiContext_::camera;
+			return;
+		}
+
+		if (!isKeyDown(CAM_KEY) && uiContext == uiContext_::camera)
+		{
+			ui::mouseLastPos = ui::mousePos;
+			paramEdit::yPosLast = paramEdit::yPos;
+			uiContext = uiContext_::stack;
+			return;
+		}
+
+		if (isKeyDown(TIME_KEY) && uiContext != uiContext_::timeline)
+		{
+			ui::mouseLastPos = ui::mousePos;
+			uiContext = uiContext_::timeline;
+			return;
+		}
+		
+		if (!isKeyDown(TIME_KEY) && uiContext == uiContext_::timeline)
+		{
+			ui::mouseLastPos = ui::mousePos;
+			paramEdit::yPosLast = paramEdit::yPos;
+			uiContext = uiContext_::stack;
+			return;
+		}
+	}
+
 	void Process()
 	{
 		showTimeFlag = false;
 		hilightedCmd = -1;
-		paramEdit::editContext = !(isKeyDown(CAM_KEY) | isKeyDown(CAM_KEY2) | isKeyDown(TIME_KEY));
 
 		ui::mousePos = ui::GetCusorPos();
 
 		if (TimeLine::play) TimeLine::playMode();
 
-		if (ui::mousePos.x > 1 || ui::mousePos.x < 0 || ui::mousePos.y > 1 || ui::mousePos.x < 0) return;
+		ProcessContext();
 
-		ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
-		ui::mouseDelta.y = ui::mousePos.y - ui::mouseLastPos.y;
-		ui::mouseAngle = - atan2f(ui::mousePos.y - .5f, ui::mousePos.x - .5f);
-		ui::mouseAngleDelta = ui::mouseAngle - ui::mouseLastAngle;
+		//if (ui::mousePos.x > 1 || ui::mousePos.x < 0 || ui::mousePos.y > 1 || ui::mousePos.x < 0) return;
+		if (ui::mousePos.x < 1 || ui::mousePos.x >= 0 || ui::mousePos.y < 1 || ui::mousePos.x >= 0) {
 
-		ui::lbDown = isKeyDown(VK_LBUTTON);
-		ui::rbDown = isKeyDown(VK_RBUTTON);
-		ui::mbDown = isKeyDown(VK_MBUTTON);
-		ui::LeftDown = isKeyDown(VK_LEFT);
-		ui::RightDown = isKeyDown(VK_RIGHT);
+			ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
+			ui::mouseDelta.y = ui::mousePos.y - ui::mouseLastPos.y;
+			ui::mouseAngle = -atan2f(ui::mousePos.y - .5f, ui::mousePos.x - .5f);
+			ui::mouseAngleDelta = ui::mouseAngle - ui::mouseLastAngle;
+
+			ui::lbDown = isKeyDown(VK_LBUTTON);
+			ui::rbDown = isKeyDown(VK_RBUTTON);
+			ui::mbDown = isKeyDown(VK_MBUTTON);
+			ui::LeftDown = isKeyDown(VK_LEFT);
+			ui::RightDown = isKeyDown(VK_RIGHT);
+		}
+
 
 		if (!ui::lbDown)
 		{
@@ -97,7 +139,7 @@ namespace editor
 		gapi.cull(cullmode::off);
 		gapi.depth(depthmode::off);
 
-		if (paramEdit::editContext)
+		//if (paramEdit::editContext)
 		{
 			paramEdit::ShowStack();
 		}
@@ -107,7 +149,7 @@ namespace editor
 		
 			paramEdit::CamKeys();
 			TimeLine::Draw();
-			TimeLine::ProcessInput();
+			if (isKeyDown(TIME_KEY)) TimeLine::ProcessInput();
 			
 		}
 
@@ -119,7 +161,7 @@ namespace editor
 
 		//if (Camera::viewCam.overRide)
 		{
-			if (isKeyDown(CAM_KEY)|| isKeyDown(CAM_KEY2) || ViewCam::flyToCam < 1.f)
+			if (isKeyDown(CAM_KEY)|| ViewCam::flyToCam < 1.f)
 			{
 				
 				paramEdit::ObjHandlers();

@@ -378,5 +378,8 @@
     <None Include="projectFiles\shaders\vs\lineDrawer3d.shader">
       <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
     </None>
+    <None Include="projectFiles\shaders\ps\lineDrawerUV_ps.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
   </ItemGroup>
 </Project>

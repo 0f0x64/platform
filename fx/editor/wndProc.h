@@ -38,18 +38,29 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		editor::paramEdit::Wheel(delta);
 
 		//if (editor::paramEdit::currentParam == -1)
-		if (!editor::paramEdit::editContext)
+		if (uiContext == uiContext_::camera)
 		{
 			editor::ViewCam::Wheel(delta);
 		}
 
-		if (editor::isKeyDown(TIME_KEY))
+		if (uiContext == uiContext_::timeline)
 		{
 			editor::TimeLine::Wheel(delta);
 		}
 
 		break;
 	}
+
+	case WM_KEYUP:
+	{
+		break;
+	}
+	case WM_SYSKEYUP:
+	{
+		break;
+	}
+
+
 	case WM_CHAR:
 		break;
 	case WM_KEYDOWN:
@@ -163,7 +174,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_SYSKEYDOWN:
 	{
-		if (editor::isKeyDown(VK_LMENU))
+		if (editor::isKeyDown(CAM_KEY))
 		{
 			if (editor::isKeyDown(VK_LEFT)) {
 				editor::TimeLine::Left();

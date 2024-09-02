@@ -307,6 +307,27 @@ Shaders::pShader(6);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
+} lineDrawerUV_ps;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+float r;
+float g;
+float b;
+float a;
+} params;
+
+void set () {
+Shaders::pShader(7);
+memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+}
+
 } lineDrawer_ps;
 
 }
@@ -323,7 +344,7 @@ float sz;
 } params;
 
 void set () {
-Shaders::pShader(7);
+Shaders::pShader(8);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 
@@ -343,7 +364,7 @@ float b;
 } params;
 
 void set () {
-Shaders::pShader(8);
+Shaders::pShader(9);
 memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
 }
 

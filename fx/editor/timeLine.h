@@ -356,14 +356,16 @@ namespace TimeLine
 			timer::timeCursor = clamp(timer::timeCursor, 0, timelineLen);
 		}
 
-		left = screenLeft + TimeToScreen(pos);
-		right = screenRight + TimeToScreen(pos);
-		screenEnd = ScreenToTime(right);
-		end = min(timelineLen, screenEnd);
+
 	}
 
 	void Draw()
 	{
+		left = screenLeft + TimeToScreen(pos);
+		right = screenRight + TimeToScreen(pos);
+		screenEnd = ScreenToTime(right);
+		end = min(timelineLen, screenEnd);
+
 		gapi.setScissors(rect{ (int)(screenLeft*dx11::width), 0, (int)(screenRight*dx11::width), dx11::height });
 
 		ui::style::Base();

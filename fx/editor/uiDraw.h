@@ -133,8 +133,8 @@ namespace ui
 
 			for (int i = 0; i < count; i++)
 			{
-				ConstBuffer::SetFloat4Const(buffer[i*2].x, buffer[i*2].y, buffer[i*2].z);
-				ConstBuffer::SetFloat4Const(buffer[i*2+1].x, buffer[i*2+1].y, buffer[i*2+1].z);
+				ConstBuffer::SetFloat4Const(buffer[i*2].x, buffer[i*2].y, buffer[i*2].z, buffer[i * 2].w);
+				ConstBuffer::SetFloat4Const(buffer[i*2+1].x, buffer[i*2+1].y, buffer[i*2+1].z, buffer[i * 2 + 1].w);
 
 				if (ConstBuffer::pCounter > float4ArraySize - 2 || i == count - 1)
 				{
@@ -147,18 +147,18 @@ namespace ui
 
 		void Draw3d(int count, float r = 1, float g = 1, float b = 1, float a = 1)
 		{
-			ps::lineDrawer_ps.params.r = r;
-			ps::lineDrawer_ps.params.g = g;
-			ps::lineDrawer_ps.params.b = b;
-			ps::lineDrawer_ps.params.a = a;
-			ps::lineDrawer_ps.set();
+			ps::lineDrawerUV_ps.params.r = r;
+			ps::lineDrawerUV_ps.params.g = g;
+			ps::lineDrawerUV_ps.params.b = b;
+			ps::lineDrawerUV_ps.params.a = a;
+			ps::lineDrawerUV_ps.set();
 
 			ConstBuffer::pCounter = 0;
 
 			for (int i = 0; i < count; i++)
 			{
-				ConstBuffer::SetFloat4Const(buffer[i * 2].x, buffer[i * 2].y, buffer[i * 2].z);
-				ConstBuffer::SetFloat4Const(buffer[i * 2 + 1].x, buffer[i * 2 + 1].y, buffer[i * 2 + 1].z);
+				ConstBuffer::SetFloat4Const(buffer[i * 2].x, buffer[i * 2].y, buffer[i * 2].z, buffer[i * 2].w);
+				ConstBuffer::SetFloat4Const(buffer[i * 2 + 1].x, buffer[i * 2 + 1].y, buffer[i * 2 + 1].z,  buffer[i * 2 + 1].w);
 
 				if (ConstBuffer::pCounter > float4ArraySize - 2 || i == count - 1)
 				{
@@ -173,8 +173,10 @@ namespace ui
 		{
 			ui::Line::buffer[counter * 2].x = x;
 			ui::Line::buffer[counter * 2].y = y;
+			ui::Line::buffer[counter * 2].w = 0;
 			ui::Line::buffer[counter * 2 + 1].x = x1;
 			ui::Line::buffer[counter * 2 + 1].y = y1;
+			ui::Line::buffer[counter * 2 + 1].w = 1;
 		}
 	}
 

@@ -85,7 +85,7 @@ namespace Loop
 		gApi.SetCull(cullmode::off);
 		gApi.SetBlendMode(blendmode::off, blendop::add);
 		
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 0, 0, 0);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 0, 0, 4);
 
 		tracker::playTrack();
 
