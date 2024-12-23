@@ -16,10 +16,8 @@ if (paramsAreLoaded) {
 	strcpy(cmdParamDesc[cmdCounter].param[1].type, "int"); 
 	strcpy(cmdParamDesc[cmdCounter].param[1].name, "instances"); 
 
-		editor::paramEdit::setBypass();
-
 		editor::paramEdit::setParamsAttr();
-
+		editor::paramEdit::setBypass();
 }
 
 AddToUI(__FUNCTION__);

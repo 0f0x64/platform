@@ -9,7 +9,7 @@ std::vector<std::string> regex_split(const std::string& str, const std::regex& r
 	return { beg, end };
 }
 
-enum class DragContext : int { free, timeCursor, timeKey, cameraView, cameraButtons };
+enum class DragContext : int { free, timeCursor, timeKey, cameraView, cameraButtons, clipMove };
 DragContext lbDragContext = DragContext::free;
 
 enum class uiContext_ : int { stack, camera, timeline };
@@ -114,7 +114,6 @@ namespace editor
 
 		ProcessContext();
 
-		//if (ui::mousePos.x > 1 || ui::mousePos.x < 0 || ui::mousePos.y > 1 || ui::mousePos.x < 0) return;
 		if (ui::mousePos.x < 1 || ui::mousePos.x >= 0 || ui::mousePos.y < 1 || ui::mousePos.x >= 0) {
 
 			ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
@@ -128,7 +127,6 @@ namespace editor
 			ui::LeftDown = isKeyDown(VK_LEFT);
 			ui::RightDown = isKeyDown(VK_RIGHT);
 		}
-
 
 		if (!ui::lbDown)
 		{
@@ -146,27 +144,21 @@ namespace editor
 
 		//if (isKeyDown(TIME_KEY) || showTimeFlag)
 		{
-		
-			paramEdit::CamKeys();
+			TimeLine::ProcessInput();
 			TimeLine::Draw();
-			if (isKeyDown(TIME_KEY)) TimeLine::ProcessInput();
-			
+			paramEdit::CamKeys();
+			paramEdit::showTrack();
 		}
 
-
-
 		ViewCam::setup();
-
 		ViewCam::setCamMat();
 
 		//if (Camera::viewCam.overRide)
 		{
 			if (isKeyDown(CAM_KEY)|| ViewCam::flyToCam < 1.f)
 			{
-				
 				paramEdit::ObjHandlers();
 				ViewCam::Draw();
-				
 			} 
 		}
 

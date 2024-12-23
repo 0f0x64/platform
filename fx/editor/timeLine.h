@@ -31,7 +31,7 @@ namespace TimeLine
 		return (int)(x * zoomOut);
 	}
 
-	int pos = (-ScreenToTime(screenLeft));	
+	int pos = -ScreenToTime(screenLeft);	
 	
 	double GetAdaptiveStepTime(int minTimeStep)
 	{
@@ -292,6 +292,7 @@ namespace TimeLine
 
 	void ProcessInput()
 	{
+		if (uiContext != uiContext_::timeline) return;
 
 		if (ui::lbDown)
 		{

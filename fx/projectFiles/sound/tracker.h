@@ -1,79 +1,6 @@
 namespace tracker
 {
 
-#define NOTES_IN_CLIP 128
-#define MAX_CLIPS 128
-#define CHANNELS 16
-#define ENV_POINTS 32
-
-	int clipCounter;
-
-	typedef struct
-	{
-		int position;
-
-		struct {
-			int x;
-			int y;
-		} points[ENV_POINTS];
-
-		byte pCount;
-
-		byte variation;
-		byte mixOp;
-		byte assignTo;
-		byte assignOp;
-		byte link;
-		byte loop;
-		byte loopStart;
-		byte loopEnd;
-
-	} envelope_;
-
-
-	typedef struct
-	{
-		unsigned char pitch;
-		unsigned char variation;
-		unsigned char retrigger;
-		unsigned char slide;
-		unsigned char send[4];
-	} note_;
-
-	typedef struct
-	{
-		note_ note[NOTES_IN_CLIP];
-
-		int position;
-		int length;
-		int repeat;
-		int bpmScale;
-		float swing;
-		bool mode;//overwrite or mix
-
-	} clip_;
-
-
-	struct {
-
-		clip_ clip[MAX_CLIPS];
-
-		struct
-		{
-			byte volume;
-			byte pan;
-
-			envelope_ volumeEnv;
-			envelope_ panEnv;
-			envelope_ sendEnv[4];
-
-
-		} channel[CHANNELS];
-
-		float masterBPM;
-
-	} track_desc;
-
 	COMMAND(oscillator, int a, int b)
 	{
 		#include REFLECT(oscillator)
@@ -92,33 +19,41 @@ namespace tracker
 		REFLECT_CLOSE;
 	}
 
+	byte curChannel;
+
 	COMMAND(Pitch, int count, unsigned char ...)
 	{
 		#include REFLECT(Pitch)
 
-		auto c = track_desc.clip[clipCounter];
+		auto& c = track_desc.channel[curChannel].clip[track_desc.channel[curChannel].clipCounter];
+
 		for (int i = 0; i < count; i++)
 		{
-			c.note[i].pitch = params[i];
+			c.note[(int)layers::pitch].note_pitch[i] = params[i];
 		}
+
+		c.note[(int)layers::pitch].cmdIndex = cmdCounter - 1;
 
 		REFLECT_CLOSE;
 	}
 
-	COMMAND(Clip, int pos, int len, int repeat, int bpmScale, bool mode, int swing)
+	COMMAND(Clip, timestamp pos, int len, int repeat, int bpmScale, overdub overDub, int swing)
 	{
 		#include REFLECT(Clip)
 
 		//check range
+		track_desc.channel[curChannel].clipCounter++;
+		clip_& c = track_desc.channel[curChannel].clip[track_desc.channel[curChannel].clipCounter];
 
-		clip_* c = &track_desc.clip[++clipCounter];
+		c.position = pos;
+		c.length = len;
+		c.repeat = repeat;
+		c.bpmScale = bpmScale;
+		c.swing = swing;
+		c.overDub = overDub;
 
-		c->position = pos;
-		c->length = len;
-		c->repeat = repeat;
-		c->bpmScale = bpmScale;
-		c->mode = mode;
-		c->swing = swing;
+		c.cmdIndex = cmdCounter - 1;
+	
 
 		REFLECT_CLOSE;
 	}
@@ -152,30 +87,66 @@ namespace tracker
 
 
 
-	COMMAND(channel_01, volume vol, panorama pan, volume send, switcher solo, switcher mute)
+	COMMAND(kick, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
-		#include REFLECT(channel_01)
+		#include REFLECT(kick)
+		regfuncGroup(channel);
 		regDrawer(channelDraw);
 
-		clipCounter = -1;
+		track_desc.channel[curChannel].clipCounter = -1;
+		
+		Clip(0, 11, 6, 1, overdub::off, 0);
+		Pitch(11, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-		Clip(0, 16, 4, 1, false, 0);
-		Pitch(10, 255, 204, 192, 1, 0, 0, 0, 0, 0, 0);
-
-		Clip(0, 16, 4, 1, false, 0);
-		Pitch(10, 255, 204, 192, 0, 0, 0, 0, 0, 0, 0);
+		Clip(12, 4, 1, 1, overdub::off, 0);
+		Pitch(4, 255, 204, 192, 0);
 
 		oscillator(1, 2);
+
+		curChannel++;
 
 		REFLECT_CLOSE;
 	}
 
-	COMMAND (playTrack)
+	COMMAND(snare, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
-		#include REFLECT(playTrack)
-		
-		channel_01(0, 90, 14, switcher::off, switcher::off);
+		#include REFLECT(snare)
+		regfuncGroup(channel);
+		regDrawer(channelDraw);
+
+		track_desc.channel[curChannel].clipCounter = -1;
+
+		Clip(0, 11, 6, 1, overdub::off, 0);
+		Pitch(8, 0, 0, 1, 0, 0, 0, 1, 0);
+
+		Clip(11, 8, 1, 1, overdub::off, 0);
+		Pitch(8, 0, 0, 1, 1, 0, 0, 0, 6);
+
+		oscillator(1, 2);
+
+		curChannel++;
+
+		REFLECT_CLOSE;
+	}
+
+	void playTrack_dc(int i, float& x, float& y, float w, float lead, float sel)
+	{
+
+	}
+
+	COMMAND (Track, int masterBPM)
+	{
+		#include REFLECT(Track)
+		//regDrawer(playTrack_dc);
+
+		editor::TimeLine::bpm = track_desc.masterBPM = masterBPM;
+		curChannel = 0;
+
+		kick(100, 0, 14, switcher::off, switcher::off);
+		snare(100, 0, 14, switcher::off, switcher::off);
 	
+		track_desc.channelsCount = curChannel;
+
 		REFLECT_CLOSE;
 		
 	}

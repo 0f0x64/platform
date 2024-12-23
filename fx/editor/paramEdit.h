@@ -12,7 +12,9 @@ namespace paramEdit {
 	bool action = false;
 	bool clickOnEmptyPlace;
 
-
+	float valueDrawOffset = .1f;
+	float enumDrawOffset = .2f;
+	float enumPos = 0;
 
 	int cursorPos = 0;
 	float cursorX = 0;
@@ -114,22 +116,24 @@ namespace paramEdit {
 				const auto tokens = regex_split(s2, reg);
 
 				int j = 0;
-				for (auto& i : tokens)
+				//for (auto& i : tokens)
+				for (int n=0; n< cmdParamDesc[cmdCounter].pCount;n++)
 				{
 					bool enumValue = false;
 
-					if (i.find("::") != string::npos)
+					if (tokens[j].find("::") != string::npos)
 					{//check for known types
-						const auto t = i.substr(0, i.find("::"));
+						const auto t = tokens[j].substr(0, tokens[j].find("::"));
 						enumValue = isTypeEnum(getTypeIndex(t.c_str()));
 					}
 
-					bool intValue = isNumber(i);
+					bool intValue = isNumber(tokens[j]);
 
 					bool bypass = !(intValue || enumValue);
 
-					cmdParamDesc[cmdCounter].param[j].bypass = bypass;
-					j++;
+					cmdParamDesc[cmdCounter].param[n].bypass = bypass;
+					
+					j+= cmdParamDesc[cmdCounter].param[n]._dim;
 				}
 			}
 		}
@@ -219,8 +223,12 @@ namespace paramEdit {
 					{
 						if (j >= tokens.size()) tokens.push_back("0");
 
-						//if (cmdParamDesc[cmdIndex].param[j].bypass || 
-						if (!isNumber(tokens[i].c_str()))
+						/*if (!isNumber(tokens[i].c_str()))
+						{
+							caller.append(tokens[i]);
+						}*/
+
+						if (cmdParamDesc[cmdIndex].param[i].bypass)
 						{
 							caller.append(tokens[i]);
 						}
@@ -448,7 +456,11 @@ namespace paramEdit {
 			//draw
 			float sel = currentCmd == i ? 1.f : 0.f;
 			if (sel) selYpos = y;
-			cmdParamDesc[i].uiDraw(i, x, y, ui::Text::getTextLen(cmdParamDesc[i].funcName, ui::style::text::width) + insideX * 2.f, lead, sel);
+
+			if (cmdParamDesc[i].uiDraw)
+			{
+				cmdParamDesc[i].uiDraw(i, x, y, ui::Text::getTextLen(cmdParamDesc[i].funcName, ui::style::text::width) + insideX * 2.f, lead, sel);
+			}
 
 			//process clicks
 			if (mouseOverItem)
@@ -616,9 +628,491 @@ namespace paramEdit {
 		}
 	}
 
-	float valueDrawOffset = .1f;
-	float enumDrawOffset = .2f;
-	float enumPos = 0;
+	void clipStyleApply(int i, bool over)
+	{
+		ui::style::box::rounded = .145;
+		ui::style::box::edge = 100;
+		ui::style::box::soft = 30;
+		ui::style::box::outlineBrightness = over ? .8f : 0.5f;
+		ui::style::box::r = ui::style::box::g = ui::style::box::b = (currentCmd == i) ? .5f : 0.2f;
+		ui::style::box::a = 1;
+	}
+
+	void noteStyleApply(int i, bool over)
+	{
+		ui::style::box::rounded = .145 * 2.;
+		ui::style::box::edge = 150;
+		ui::style::box::soft = 1135;
+		ui::style::box::outlineBrightness = over ? .5f : 0.3f;
+		ui::style::box::r = ui::style::box::g = ui::style::box::b = (currentCmd == i) ? .3f : 0.1f;
+		ui::style::box::a = 1;
+
+		ui::style::box::rounded = .145;
+		//ui::style::box::outlineBrightness = over ? .5f : 0.1f;
+
+	}
+
+
+	int getParamByStr(int i, const char* str, int index = 0)
+	{
+		for (int j = 0; j < cmdParamDesc[i].pCount; j++)
+		{
+			if (!strcmp(cmdParamDesc[i].param[j].name, str))
+			{
+				return cmdParamDesc[i].param[j].value[index];
+			}
+		}
+
+		return MAXINT;
+	}
+
+	float clipYpos;
+
+	//float clip_x = 0;
+	//float clip_y = 0;
+	//float clip_l = 0;
+	//float note_step = 0;
+	//int clip_r = 0;
+	//int clip_nc;
+	//float clip_counter = 0;
+
+	char noteText[7] = "      ";
+
+	void CreateNoteText(BYTE p)
+	{
+		const char* table = "C-0C#0D-0D#0E-0F-0F#0G-0G#0A-0A#0B-0";
+		//const char* table = "C 0C#0D 0D#0E 0F 0F#0G 0G#0A 0A#0B 0";
+		const char* vtable = "0123456789";
+		strcpy(noteText, " - ");
+
+		if (p == 0) return;
+
+		if (p == 255)
+		{
+			strcpy(noteText, "off");
+			return;
+		}
+
+		if (p < 12 * 8 + 1) //in range
+		{
+			p--;//skip nonote
+			int octave = p / 12;
+			char _octave[10];
+			_itoa(octave, _octave, 10);
+			int note = p - octave * 12;
+
+			noteText[0] = table[note * 3];
+			noteText[1] = table[note * 3 + 1];
+			noteText[2] = _octave[0];
+			noteText[3] = 0;
+		}
+
+	}
+	/*
+	void showTrack()
+	{
+		ui::Box::Setup();
+
+		int topUIElementIndex = -1;
+
+		int channelIndex = -1;
+
+		for (int iter = 0; iter < 2; iter++)
+		{
+			clip_counter = 0;
+			clipYpos = ui::style::box::height;
+			TimeLine::screenLeft = x + enumDrawOffset - insideX;
+			int trackStartLvl = -1;
+
+			for (int i = 0; i < cmdCounter; i++)
+			{
+				if (cmdParamDesc[i].stackLevel == trackStartLvl) break;
+				if (!strcmp(cmdParamDesc[i].funcName, "Track")) trackStartLvl = cmdParamDesc[i].stackLevel;
+				if (trackStartLvl == -1) continue;
+
+				if (!strcmp(cmdParamDesc[i].funcGroup, "channel"))
+				{
+					channelIndex = i;
+					clipYpos += ui::style::box::height*2;
+				}
+
+				if (!strcmp(cmdParamDesc[i].funcName, "Clip"))
+				{
+					clip_counter++;
+					float bpm = editor::TimeLine::bpm;
+					int _x = getParamByStr(i, "pos");
+					int clipRepeat = getParamByStr(i, "repeat");
+					int clipBpmScale = getParamByStr(i, "bpmScale");
+					int len = getParamByStr(i, "len");
+					float frame = SAMPLING_FREQ / FRAMES_PER_SECOND;
+					float sWidth = TimeLine::TimeToScreen(frame * 60 * 60 * len * clipRepeat / (bpm * clipBpmScale));
+
+					float px = TimeLine::getScreenPos(frame * 60 * 60 * _x / bpm);
+					float py = clipYpos;
+
+					float h = ui::style::text::height * .58f / 1.5f;
+					py -= h / 2.f;
+
+					clip_x = px;
+					clip_y = py;
+					clip_l = sWidth;
+					clip_nc = len;
+					note_step = sWidth / len/ clipRepeat;
+					clip_r = clipRepeat;
+
+					bool over = isMouseOver(px, py, sWidth, h);
+
+					if (iter == 0)
+					{
+						if (over) topUIElementIndex = i;
+						continue;
+					}
+					else
+					{
+						//over = (i == topUIElementIndex) & over;
+						if (over && i == topUIElementIndex) over = true; else over = false;
+					}
+
+					if (lbDragContext == DragContext::clipMove)
+					{
+						over = currentCmd == i;
+					}
+
+					clipStyleApply(i, over);
+
+					int j = 0;//adjust "pos"
+
+					if (over && ui::lbDown && lbDragContext == DragContext::free)
+					{
+						lbDragContext = DragContext::clipMove;
+						currentCmd = i;
+						currentParam = -1;
+						subParam = 0;
+						storedParam[j] = cmdParamDesc[i].param[j].value[0];
+						vScroll = true;
+
+						curCmdLevel = cmdParamDesc[currentCmd].stackLevel;
+
+						for (int j = currentCmd; j >= 0; j--)//search for prev level
+						{
+							if (cmdParamDesc[j].stackLevel < curCmdLevel || j == 0) {
+								startCmd = j; break;
+							}
+						}
+
+					}
+
+					if (currentCmd == i && lbDragContext == DragContext::clipMove)
+					{
+						if (ui::lbDown)
+						{
+							cmdParamDesc[i].param[j].value[0] = storedParam[j] + TimeLine::ScreenToTime(ui::mouseDelta.x) / (frame * 60 * 60 / bpm);
+							pLimits(currentCmd, j);
+						}
+						else
+						{
+							storedParam[j] = cmdParamDesc[i].param[j].value[0];
+						}
+					}
+
+					ui::Box::Draw(px, py, sWidth, h/1.125);
+					for (int r = 0; r < clip_r; r++)
+					{
+						ui::style::box::r = .4 + .2 * sin(clip_counter * 12.123);
+						ui::style::box::g = .4 + .2 * sin(clip_counter * 23.123);
+						ui::style::box::b = .4 + .2 * sin(clip_counter * 44.123);
+						ui::Box::Draw(px + r * len * note_step, py+h/1.5, note_step * len, h/1.5);
+					}
+
+					if (channelIndex >= 0)
+					{
+						ui::Text::Draw(cmdParamDesc[channelIndex].funcName, TimeLine::screenLeft, clipYpos - ui::style::box::height * .25);
+					}
+				}
+
+				// show all layers
+
+				if (iter == 0) continue;
+				
+				if (!strcmp(cmdParamDesc[i].funcName, "Pitch"))
+				{
+					for (int r = 0; r < clip_r; r++)
+					{
+						for (int n = 1; n < cmdParamDesc[i].pCount; n++)
+						{
+							float h = ui::style::text::height * .58f / 1.f;
+							float x = clip_x + (n - 1)* note_step+ (r * clip_nc*note_step);
+							float y = clip_y + h;
+
+							bool over = isMouseOver(x, y, note_step, h);
+							noteStyleApply(i, over);
+
+							ui::style::box::r = .2;
+							ui::style::box::g = .2;
+							ui::style::box::b = .2;
+
+							if (cmdParamDesc[i].param[n].value[0] == 0)
+							{
+								ui::style::box::r = 0.1;
+								ui::style::box::g = 0.1;
+								ui::style::box::b = 0.1;
+							}
+
+							ui::Box::Draw(x, y, note_step, h);
+							CreateNoteText(cmdParamDesc[i].param[n].value[0]);
+							
+							int lp = 2;
+							while (note_step < ui::Text::getTextLen("A#0", ui::style::text::width, lp+1) && lp >= 0)
+							{
+								noteText[lp--]=0;
+							}
+							ui::Text::Draw(noteText, x, y);
+
+							if (over && ui::lbDown)
+							{
+								currentParam = n;
+								cursorPos = 0;
+								storedParam[0] = cmdParamDesc[i].param[currentParam].value[0];
+								subParam = 0;
+							}
+
+						}
+					}
+				}
+			}
+		}
+	}
+	*/
+
+	enum class bAlign {left,right,center};
+
+bool DrawButton(const char* str,float x, float y, float w,float h, bAlign align = bAlign::center)
+{
+	float ic = .1;
+	bool over = isMouseOver(x, y, w,h);
+	ui::style::box::outlineBrightness = over ? .25f : 0.1f;
+	ui::Box::Draw(x, y, w, h);
+
+	if (align == bAlign::left)
+	{
+		ui::Text::Draw(str, x + ic * h, y + ic * h, h * 1.5, h * 1.5);
+	}
+
+	if (align == bAlign::center)
+	{
+		float tw = ui::Text::getTextLen(str, h * 1.5);
+		ui::Text::Draw(str, x + w / 2. - tw / 2., y + ic * h, h * 1.5, h * 1.5);
+	}
+
+	return over;
+}
+
+	void showTrack()
+	{
+		x = ui::style::text::width / 2.f;
+		ui::Box::Setup();
+
+		int topUIElementIndex = -1;
+
+		int channelIndex = -1;
+
+		for (int iter = 0; iter < 2; iter++)
+		{
+			clipYpos = ui::style::box::height;
+			TimeLine::screenLeft = x + enumDrawOffset - insideX;
+
+			for (int ch = 0; ch < tracker::track_desc.channelsCount; ch++)
+			{
+				gapi.setScissors(rect{ 0, (int)(top * dx11::height), dx11::width, (int)(bottom * dx11::height) });
+				
+				channelIndex = tracker::track_desc.channel[ch].cmdIndex;
+				clipYpos += ui::style::box::height * 2;
+				
+				int i = tracker::track_desc.channel[ch].cmdIndex;
+				float ch_y = clipYpos - ui::style::box::height * .25;
+				float ch_h = ui::style::box::height * 1.5;
+				bool over = isMouseOver(x, ch_y, TimeLine::screenLeft - x, ch_h);
+
+				if (iter == 1)
+				{
+					if (channelIndex >= 0)
+					{
+						ui::style::box::rounded = .145;
+						ui::style::box::edge = 100;
+						ui::style::box::soft = 3000;
+						ui::style::box::outlineBrightness = over ? .0f : 0.0f;
+						ui::style::box::r = ui::style::box::g = ui::style::box::b = (currentCmd == i) ? .5f : 0.2f;
+						ui::style::box::a = 1;
+
+						DrawButton(cmdParamDesc[channelIndex].funcName, 0, ch_y, TimeLine::screenLeft - x, ch_h,bAlign::left);
+
+						ui::style::box::rounded = .5;
+						float bw = aspect*ch_h / 2.;
+						float bx = TimeLine::screenLeft - x - bw;
+
+						DrawButton("S", bx, ch_y,			bw, ch_h / 2.);
+						DrawButton("M", bx, ch_y + ch_h/2., bw, ch_h / 2.);
+
+					}
+				}
+
+				for (int clp = 0; clp <= tracker::track_desc.channel[ch].clipCounter; clp++)
+				{
+					gapi.setScissors(rect{ (int)(TimeLine::screenLeft* dx11::width), (int)(top * dx11::height), dx11::width, (int)(bottom * dx11::height) });
+
+					int i = tracker::track_desc.channel[ch].clip[clp].cmdIndex;
+					auto  clp_desc = tracker::track_desc.channel[ch].clip[clp];
+
+					float frame = SAMPLING_FREQ / FRAMES_PER_SECOND;
+					float sWidth = TimeLine::TimeToScreen(frame * 60 * 60 * clp_desc.length * clp_desc.repeat / (editor::TimeLine::bpm * clp_desc.bpmScale));
+
+					float h = ui::style::text::height * .58f / 1.5f;
+
+					float clip_x = TimeLine::getScreenPos(frame * 60 * 60 * clp_desc.position / editor::TimeLine::bpm);
+					float clip_y = clipYpos - h / 2.f;
+
+					float note_step = sWidth / clp_desc.length / clp_desc.repeat;
+
+					bool over = isMouseOver(clip_x, clip_y, sWidth, h);
+
+					if (ui::mousePos.x < TimeLine::screenLeft) over = false;
+
+					if (iter == 0)
+					{
+						if (over) topUIElementIndex = i;
+					}
+					else
+					{
+						if (over && i == topUIElementIndex) over = true; else over = false;
+
+						if (lbDragContext == DragContext::clipMove)
+						{
+							over = currentCmd == i;
+						}
+
+						clipStyleApply(i, over);
+
+						int j = 0;//adjust "pos"
+
+						if (over && ui::lbDown && lbDragContext == DragContext::free)
+						{
+							lbDragContext = DragContext::clipMove;
+							currentCmd = i;
+							currentParam = -1;
+							subParam = 0;
+							storedParam[j] = cmdParamDesc[i].param[j].value[0];
+							vScroll = true;
+
+							curCmdLevel = cmdParamDesc[currentCmd].stackLevel;
+
+							for (int j = currentCmd; j >= 0; j--)//search for prev level
+							{
+								if (cmdParamDesc[j].stackLevel < curCmdLevel || j == 0) {
+									startCmd = j; break;
+								}
+							}
+
+						}
+
+						if (currentCmd == i && lbDragContext == DragContext::clipMove)
+						{
+							if (ui::lbDown)
+							{
+								cmdParamDesc[i].param[j].value[0] = storedParam[j] + TimeLine::ScreenToTime(ui::mouseDelta.x) / (frame * 60 * 60 / editor::TimeLine::bpm);
+								pLimits(currentCmd, j);
+							}
+							else
+							{
+								storedParam[j] = cmdParamDesc[i].param[j].value[0];
+							}
+						}
+
+						ui::Box::Draw(clip_x, clip_y, sWidth, h / 1.125);
+						for (int r = 0; r < clp_desc.repeat; r++)
+						{
+							float c = clp + 222;
+							ui::style::box::r = .4 + .2 * sin(c * 12.123);
+							ui::style::box::g = .4 + .2 * sin(c * 23.123);
+							ui::style::box::b = .4 + .2 * sin(c * 44.123);
+							ui::Box::Draw(clip_x + r * clp_desc.length * note_step, clip_y + h / 1.5, note_step * clp_desc.length, h / 1.5);
+						}
+
+					}
+
+					// show all layers
+
+					for (int r = 0; r < clp_desc.repeat; r++)
+					{
+						for (int n = 1; n <= clp_desc.length; n++)
+						{
+							i = tracker::track_desc.channel[ch].clip[clp].note[(int)layers::pitch].cmdIndex;
+
+							float h = ui::style::text::height * .58f / 1.f;
+							float x = clip_x + (n - 1) * note_step + (r * clp_desc.length * note_step);
+							float y = clip_y + h;
+
+							bool over = isMouseOver(x, y, note_step, h);
+							if (ui::mousePos.x < TimeLine::screenLeft) over = false;
+
+							if (iter == 0)
+							{
+								if (over) topUIElementIndex = i;
+							}
+							else
+							{
+								if (over && i == topUIElementIndex) over = true; else over = false;
+							
+								noteStyleApply(i, over);
+
+								ui::style::box::r = .2;
+								ui::style::box::g = .2;
+								ui::style::box::b = .2;
+
+								if (cmdParamDesc[i].param[n].value[0] == 0)
+								{
+									ui::style::box::r = 0.1;
+									ui::style::box::g = 0.1;
+									ui::style::box::b = 0.1;
+								}
+
+								ui::Box::Draw(x, y, note_step, h);
+								CreateNoteText(cmdParamDesc[i].param[n].value[0]);
+
+								int lp = 2;
+								while (note_step < ui::Text::getTextLen("A#0", ui::style::text::width, lp + 1) && lp >= 0)
+								{
+									noteText[lp--] = 0;
+								}
+								ui::Text::Draw(noteText, x, y);
+
+								if (over && ui::lbDown)
+								{
+									currentCmd = i;
+									currentParam = n;
+									cursorPos = 0;
+									storedParam[0] = cmdParamDesc[i].param[currentParam].value[0];
+									subParam = 0;
+
+									vScroll = true;
+
+									curCmdLevel = cmdParamDesc[currentCmd].stackLevel;
+
+									for (int j = currentCmd; j >= 0; j--)//search for prev level
+									{
+										if (cmdParamDesc[j].stackLevel < curCmdLevel || j == 0) {
+											startCmd = j; break;
+										}
+									}
+								}
+							}
+
+						}
+					}
+					
+				}
+			}
+		}
+	}
 
 	void showParams()
 	{

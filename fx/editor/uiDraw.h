@@ -257,6 +257,10 @@ namespace ui
 
 		void Draw(const char* str, float x, float y, float w = style::text::width, float h = style::text::height)
 		{
+			if (strlen(str) == 0)
+			{
+				return;
+			}
 
 			vs::letter.params.width = w * aspect;
 			vs::letter.params.height = h;

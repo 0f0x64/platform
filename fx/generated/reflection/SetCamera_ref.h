@@ -47,10 +47,8 @@ if (paramsAreLoaded) {
 	strcpy(cmdParamDesc[cmdCounter].param[3].type, "unsigned int"); 
 	strcpy(cmdParamDesc[cmdCounter].param[3].name, "angle"); 
 
-		editor::paramEdit::setBypass();
-
 		editor::paramEdit::setParamsAttr();
-
+		editor::paramEdit::setBypass();
 }
 
 AddToUI(__FUNCTION__);

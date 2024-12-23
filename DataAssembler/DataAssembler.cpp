@@ -744,8 +744,8 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 
 						if (!variadic)
 						{
-							loader.append("\n\t\teditor::paramEdit::setBypass();\n");
-							loader.append("\n\t\teditor::paramEdit::setParamsAttr();\n\n");
+							loader.append("\n\t\teditor::paramEdit::setParamsAttr();\n");
+							loader.append("\t\teditor::paramEdit::setBypass();\n");
 						}
 
 						ofile << loader;

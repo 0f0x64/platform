@@ -61,7 +61,7 @@ namespace Object {
 		//pos
 		vs::quad.set();
 		ps::obj1.set();
-		gApi.Draw(1,1);
+		gApi.Draw(1, 1);
 		gApi.CreateMips();
 
 		//normals

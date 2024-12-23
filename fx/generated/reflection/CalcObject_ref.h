@@ -16,10 +16,8 @@ if (paramsAreLoaded) {
 	strcpy(cmdParamDesc[cmdCounter].param[1].type, "texture"); 
 	strcpy(cmdParamDesc[cmdCounter].param[1].name, "targetNrml"); 
 
-		editor::paramEdit::setBypass();
-
 		editor::paramEdit::setParamsAttr();
-
+		editor::paramEdit::setBypass();
 }
 
 AddToUI(__FUNCTION__);

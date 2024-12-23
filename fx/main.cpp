@@ -31,12 +31,15 @@ int cmdCounter = 0;//reset it in loop start point
 #include <Xaudio2.h>
 #include "vMachine.h"
 
+#include "projectFiles\sound\track_struct.h"
+
 using namespace dx11;
 
 #include "generated\constBufReflect.h"
 
 #if EditMode
-	#define regDrawer(name) cmdParamDesc[cmdCounter-1].uiDraw = &name 
+	#define regDrawer(name) cmdParamDesc[cmdCounter-1].uiDraw = &name; track_desc.channel[curChannel].cmdIndex = cmdCounter - 1
+#define regfuncGroup(name) strcpy(cmdParamDesc[cmdCounter-1].funcGroup, #name); 
 	#include "editor\cmdEditService.h"
 	#include "editor\editor.h"
 	#define REFLECTION true

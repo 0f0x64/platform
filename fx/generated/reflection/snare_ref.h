@@ -31,21 +31,19 @@ if (paramsAreLoaded) {
 	strcpy(cmdParamDesc[cmdCounter].param[4].type, "switcher"); 
 	strcpy(cmdParamDesc[cmdCounter].param[4].name, "mute"); 
 
-		editor::paramEdit::setBypass();
-
 		editor::paramEdit::setParamsAttr();
-
+		editor::paramEdit::setBypass();
 }
 
 AddToUI(__FUNCTION__);
 cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 cmdLevel++;
 
-#define channel_01(vol, pan, send, solo, mute) channel_01( __FILE__, __LINE__ , vol, pan, send, solo, mute)
+#define snare(vol, pan, send, solo, mute) snare( __FILE__, __LINE__ , vol, pan, send, solo, mute)
 
 #else
 
-#define channel_01(vol, pan, send, solo, mute) channel_01( vol, pan, send, solo, mute)
+#define snare(vol, pan, send, solo, mute) snare( vol, pan, send, solo, mute)
 
 #endif
 

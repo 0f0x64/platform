@@ -82,12 +82,14 @@ namespace Loop
 
 		gApi.SetDepthMode(depthmode::on);
 		gApi.ClearRTDepth();
-		gApi.SetCull(cullmode::off);
+		gApi.SetCull(cullmode::back);
 		gApi.SetBlendMode(blendmode::off, blendop::add);
 		
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 0, 0, 4);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 40, 42, 6);
 
-		tracker::playTrack();
+		tracker::Track(120);
+
+		gApi.ClearRT(0, 0, 0, 0);
 
 		#if EditMode
 		paramsAreLoaded = true;

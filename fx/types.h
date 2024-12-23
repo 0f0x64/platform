@@ -210,6 +210,8 @@ enumType(visibility, on, off, solo);
 enumType(camAxis, local, global);
 enumType(sliderType, follow, pan, slide);
 enumType(switcher, off, on);
+enumType(overdub, off, on);
+enumType(layers, pitch, variation, retrigger, slide, send0, send1, send2, send3);
 
 #undef CreateTexture
 #define CreateTexture(name,type,format,width,height,mip,depth) name,

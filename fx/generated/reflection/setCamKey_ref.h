@@ -96,10 +96,8 @@ if (paramsAreLoaded) {
 	strcpy(cmdParamDesc[cmdCounter].param[10].type, "int"); 
 	strcpy(cmdParamDesc[cmdCounter].param[10].name, "jitter"); 
 
-		editor::paramEdit::setBypass();
-
 		editor::paramEdit::setParamsAttr();
-
+		editor::paramEdit::setBypass();
 }
 
 AddToUI(__FUNCTION__);

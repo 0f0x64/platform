@@ -311,6 +311,12 @@
     <ClInclude Include="generated\reflection\Pitch_ref.h">
       <Filter>Source Files\generated\reflectrion</Filter>
     </ClInclude>
+    <ClInclude Include="generated\reflection\AddLayer_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\sound\track_struct.h">
+      <Filter>Source Files\sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

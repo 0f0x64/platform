@@ -3,6 +3,7 @@ typedef void (*PVFN)(int i, float &x, float &y, float w, float lead, float sel);
 struct {
 
 	char funcName[255];
+	char funcGroup[255];
 
 	struct {
 		char fileName[MAX_PATH];

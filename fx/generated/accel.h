@@ -44,7 +44,9 @@
 
 #define Clip_REF ".\generated\reflection\Clip_ref.h"
 
-#define channel_01_REF ".\generated\reflection\channel_01_ref.h"
+#define kick_REF ".\generated\reflection\kick_ref.h"
 
-#define playTrack_REF ".\generated\reflection\playTrack_ref.h"
+#define snare_REF ".\generated\reflection\snare_ref.h"
+
+#define Track_REF ".\generated\reflection\Track_ref.h"
 

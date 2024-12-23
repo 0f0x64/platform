@@ -34,6 +34,11 @@ struct {
 		refStackBack;
 	}*/
 
+	void eld(int i, float& x, float& y, float w, float lead, float sel)
+	{
+
+	}
+
 	COMMAND(ClearRT, color4 color) {
 #include REFLECT(ClearRT)
 		Draw::Clear(color);
@@ -46,6 +51,7 @@ struct {
 	}
 	COMMAND(SetBlendMode, blendmode mode, blendop op = blendop::add) {
 #include REFLECT(SetBlendMode)
+		//regDrawer(eld);
 		Blend::Blending(mode, op);
 		REFLECT_CLOSE;
 	}
