@@ -12,7 +12,7 @@ std::vector<std::string> regex_split(const std::string& str, const std::regex& r
 enum class DragContext : int { free, timeCursor, timeKey, cameraView, cameraButtons, clipMove };
 DragContext lbDragContext = DragContext::free;
 
-enum class uiContext_ : int { stack, camera, timeline };
+enum class uiContext_ : int { stack, camera, timeline, undefined };
 uiContext_ uiContext = uiContext_::stack;
 
 namespace editor
@@ -46,9 +46,15 @@ namespace editor
 
 	bool isMouseOver(float x, float y, float w, float h)
 	{
+		if (ui::mousePos.x < 0 || ui::mousePos.x >= 1 ||
+			ui::mousePos.y < 0 || ui::mousePos.y >= 1)
+		{
+			return false;
+		}
+
+
 		if (ui::mousePos.x > x && ui::mousePos.x < x + w &&
-			ui::mousePos.y > y &&
-			ui::mousePos.y < y + h)
+			ui::mousePos.y > y && ui::mousePos.y < y + h)
 		{
 			return true;
 		}
@@ -69,7 +75,31 @@ namespace editor
 
 	void ProcessContext()
 	{
-		if (isKeyDown(CAM_KEY) && isKeyDown(TIME_KEY)) return;
+		if (ui::mousePos.x > 1 || ui::mousePos.x < 0 || ui::mousePos.y > 1 || ui::mousePos.x < 0)
+		{
+			if (uiContext == uiContext_::camera)
+			{
+				if (!isKeyDown(CAM_KEY) || !(ui::lbDown|| ui::rbDown))
+				{
+					uiContext = uiContext_::undefined;
+				}
+			}
+
+			if (uiContext == uiContext_::timeline)
+			{
+				if (!isKeyDown(TIME_KEY) || !(ui::lbDown || ui::rbDown))
+				{
+					uiContext = uiContext_::undefined;
+				}
+			}
+
+			return;
+		}
+
+		if (isKeyDown(CAM_KEY) && isKeyDown(TIME_KEY))
+		{
+			return;
+		}
 
 		if (isKeyDown(CAM_KEY) && uiContext != uiContext_::camera)
 		{
@@ -114,8 +144,6 @@ namespace editor
 
 		ProcessContext();
 
-		if (ui::mousePos.x < 1 || ui::mousePos.x >= 0 || ui::mousePos.y < 1 || ui::mousePos.x >= 0) {
-
 			ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
 			ui::mouseDelta.y = ui::mousePos.y - ui::mouseLastPos.y;
 			ui::mouseAngle = -atan2f(ui::mousePos.y - .5f, ui::mousePos.x - .5f);
@@ -126,7 +154,7 @@ namespace editor
 			ui::mbDown = isKeyDown(VK_MBUTTON);
 			ui::LeftDown = isKeyDown(VK_LEFT);
 			ui::RightDown = isKeyDown(VK_RIGHT);
-		}
+		
 
 		if (!ui::lbDown)
 		{

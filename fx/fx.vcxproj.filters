@@ -317,6 +317,9 @@
     <ClInclude Include="projectFiles\sound\track_struct.h">
       <Filter>Source Files\sound</Filter>
     </ClInclude>
+    <ClInclude Include="generated\reflection\snare_ref.h">
+      <Filter>Source Files\generated\reflectrion</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

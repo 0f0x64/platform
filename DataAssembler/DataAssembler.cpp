@@ -492,6 +492,7 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 				std::string overrider;
 				//std::string caller;
 				std::string funcParams;
+				std::string funcParams_clean;
 				std::string funcName;
 				std::string pNameList;
 				std::string pNameListOut;
@@ -523,6 +524,7 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 					}
 
 					string comma = noParams ? "" : ", ";
+					funcParams_clean = "( " + funcParams + ")";
 					funcParams = "( CALLER_INFO" + comma + funcParams + ")";
 
 
@@ -787,6 +789,22 @@ void ScanFile(std::string fname, ofstream& _ofile, ofstream& ofileAccel)
 					ofileAccel << "#define " << funcName << "_REF " << "\".\\generated\\reflection\\" << funcName << "_ref.h\"\n\n";
 
 					ofile.close();
+
+					//REF MODEL V2
+					//if (false)
+					{
+						_ofile << "#define " << funcName << "( " << pNameListOut << ") " << funcName << "_ref (__FILE__, __LINE__ ," << pNameListOut << ")\n";
+						_ofile << "void " << funcName << "_impl" << funcParams_clean << ";\n";
+						_ofile << "void " << funcName << "_ref " << funcParams << "\n";
+						_ofile << "{\n";
+						//reflection code
+
+						//caller
+						_ofile << funcName << "_impl (" << pNameListOut << ");\n";
+						//post-call - adjust cmd level;
+						_ofile << "cmdLevel--;\n";
+						_ofile << "}\n\n";
+					}
 				}
 
 			}

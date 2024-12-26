@@ -491,6 +491,8 @@ namespace paramEdit {
 
 	void ObjHandlers()
 	{
+		if (uiContext != uiContext_::camera) return;
+
 		ui::Box::Setup();
 
 		hilightedCmd = currentCmd;
@@ -634,7 +636,12 @@ namespace paramEdit {
 		ui::style::box::edge = 100;
 		ui::style::box::soft = 30;
 		ui::style::box::outlineBrightness = over ? .8f : 0.5f;
-		ui::style::box::r = ui::style::box::g = ui::style::box::b = (currentCmd == i) ? .5f : 0.2f;
+
+		if (currentCmd == i)
+		{
+			ui::style::box::r = ui::style::box::g = ui::style::box::b = .6f;
+		}
+
 		ui::style::box::a = 1;
 	}
 
@@ -884,32 +891,68 @@ namespace paramEdit {
 	}
 	*/
 
-	enum class bAlign {left,right,center};
-
-bool DrawButton(const char* str,float x, float y, float w,float h, bAlign align = bAlign::center)
+bool Button(const char* str,float x, float y, float w,float h)
 {
-	float ic = .1;
 	bool over = isMouseOver(x, y, w,h);
+	ui::style::BaseColor(ui::style::button::inverted);
 	ui::style::box::outlineBrightness = over ? .25f : 0.1f;
 	ui::Box::Draw(x, y, w, h);
+	float th = ui::style::button::zoom ? (h*1.25 - h*ui::style::button::inner*2.) : ui::style::text::height;
+	float tw = ui::Text::getTextLen(str, th);
 
-	if (align == bAlign::left)
+	float tx = 0;
+	float ty = 0;
+
+	switch (ui::style::button::hAlign)
 	{
-		ui::Text::Draw(str, x + ic * h, y + ic * h, h * 1.5, h * 1.5);
+	case ui::style::align_h::left:
+		tx = x + ui::style::button::inner*h;
+		break;
+	case ui::style::align_h::center:
+		tx = x + (w  - tw) / 2.;
+		break;
+	case ui::style::align_h::right:
+		//todo
+		break;
 	}
 
-	if (align == bAlign::center)
+	switch (ui::style::button::vAlign)
 	{
-		float tw = ui::Text::getTextLen(str, h * 1.5);
-		ui::Text::Draw(str, x + w / 2. - tw / 2., y + ic * h, h * 1.5, h * 1.5);
+	case ui::style::align_v::top:
+		ty = y + ui::style::button::inner * h;
+		break;
+	case ui::style::align_v::center:
+		ty = y + h/2.-th/4.;
+		break;
+	case ui::style::align_v::bottom:
+		//todo
+		break;
+
 	}
+
+	ui::Text::Draw(str, tx, ty, th, th);
 
 	return over;
 }
 
+bool ButtonPressed(const char* str, float x, float y, float w, float h)
+{
+	return ui::lbDown & Button(str, x, y, w, h);
+}
+
+
+float tempPValue = 0;
+
 	void showTrack()
 	{
-		x = ui::style::text::width / 2.f;
+		
+
+		//auto a=  eCmdList::func1::p3;
+		float b = 0;
+
+		if (!ui::lbDown) action = false;
+
+		x = ui::style::text::height / 6.f*aspect;
 		ui::Box::Setup();
 
 		int topUIElementIndex = -1;
@@ -926,32 +969,68 @@ bool DrawButton(const char* str,float x, float y, float w,float h, bAlign align 
 				gapi.setScissors(rect{ 0, (int)(top * dx11::height), dx11::width, (int)(bottom * dx11::height) });
 				
 				channelIndex = tracker::track_desc.channel[ch].cmdIndex;
-				clipYpos += ui::style::box::height * 2;
+				float  ch_lead = ui::style::box::height*2.2;
+				clipYpos +=ch_lead;
 				
 				int i = tracker::track_desc.channel[ch].cmdIndex;
-				float ch_y = clipYpos - ui::style::box::height * .25;
-				float ch_h = ui::style::box::height * 1.5;
+				float ch_y = clipYpos ;
+				float ch_h = ch_lead*.8;
 				bool over = isMouseOver(x, ch_y, TimeLine::screenLeft - x, ch_h);
 
 				if (iter == 1)
 				{
 					if (channelIndex >= 0)
 					{
-						ui::style::box::rounded = .145;
-						ui::style::box::edge = 100;
-						ui::style::box::soft = 3000;
-						ui::style::box::outlineBrightness = over ? .0f : 0.0f;
-						ui::style::box::r = ui::style::box::g = ui::style::box::b = (currentCmd == i) ? .5f : 0.2f;
-						ui::style::box::a = 1;
 
-						DrawButton(cmdParamDesc[channelIndex].funcName, 0, ch_y, TimeLine::screenLeft - x, ch_h,bAlign::left);
+						ui::style::Base();
+						ui::style::BaseButton();
+						ui::style::button::zoom = false;
+						ui::style::button::vAlign = ui::style::align_v::top;
+						Button(cmdParamDesc[channelIndex].funcName, 0, ch_y-x/2., TimeLine::screenLeft - x, ch_h+x);
 
 						ui::style::box::rounded = .5;
-						float bw = aspect*ch_h / 2.;
-						float bx = TimeLine::screenLeft - x - bw;
+						float bw = aspect*ch_h / 2.2;
+						float bx = TimeLine::screenLeft - x*2 - bw;
 
-						DrawButton("S", bx, ch_y,			bw, ch_h / 2.);
-						DrawButton("M", bx, ch_y + ch_h/2., bw, ch_h / 2.);
+						ui::style::button::zoom = true;
+						ui::style::button::hAlign = ui::style::align_h::center;
+						ui::style::button::vAlign = ui::style::align_v::center;
+						ui::style::box::rounded = .5;
+						float sm_h = ch_h / 2.2;
+						float slot_h = ch_h / 2.;
+						float low = ch_y + ch_h / 2. + (slot_h - sm_h) / 2.;
+						
+						int sI = 3;
+						ui::style::button::inverted = cmdParamDesc[channelIndex].param[sI].value[0] == 0 ? false : true;
+						
+						bool s = ButtonPressed("S", bx, ch_y + (slot_h - sm_h) / 2., bw, sm_h);
+						if (!action && s)
+						{
+							action = true;
+							cmdParamDesc[channelIndex].param[sI].value[0] = 1- cmdParamDesc[channelIndex].param[sI].value[0];
+						}
+
+						int mI = 4;
+						ui::style::button::inverted = cmdParamDesc[channelIndex].param[mI].value[0] == 0 ? false : true;
+						bool m = ButtonPressed("M", bx, low, bw, sm_h);
+						if (!action && m)
+						{
+							action = true;
+							cmdParamDesc[channelIndex].param[mI].value[0] = 1 - cmdParamDesc[channelIndex].param[mI].value[0];
+						}
+
+						ui::style::button::inverted = false;
+						ui::style::box::rounded = .15;
+						
+						if (Button("vol::50", x, low, bw * 4, sm_h))
+						{
+							int vI = 0;
+							if (!action) tempPValue = cmdParamDesc[channelIndex].param[vI].value[vI];
+							
+							action = true;
+							cmdParamDesc[channelIndex].param[vI].value[0] = tempPValue + ui::mouseDelta.x;
+						}
+						Button("pan::50", x+bw*4.5, low, bw*2 , sm_h);
 
 					}
 				}
@@ -966,16 +1045,16 @@ bool DrawButton(const char* str,float x, float y, float w,float h, bAlign align 
 					float frame = SAMPLING_FREQ / FRAMES_PER_SECOND;
 					float sWidth = TimeLine::TimeToScreen(frame * 60 * 60 * clp_desc.length * clp_desc.repeat / (editor::TimeLine::bpm * clp_desc.bpmScale));
 
-					float h = ui::style::text::height * .58f / 1.5f;
+					float h = ch_h ;
 
 					float clip_x = TimeLine::getScreenPos(frame * 60 * 60 * clp_desc.position / editor::TimeLine::bpm);
-					float clip_y = clipYpos - h / 2.f;
+					float clip_y = clipYpos ;
 
 					float note_step = sWidth / clp_desc.length / clp_desc.repeat;
 
-					bool over = isMouseOver(clip_x, clip_y, sWidth, h);
+					bool over = !action && isMouseOver(clip_x, clip_y, sWidth, h);
 
-					if (ui::mousePos.x < TimeLine::screenLeft) over = false;
+					if (ui::mousePos.x < TimeLine::screenLeft|| ui::mousePos.x >= TimeLine::screenRight) over = false;
 
 					if (iter == 0)
 					{
@@ -990,7 +1069,7 @@ bool DrawButton(const char* str,float x, float y, float w,float h, bAlign align 
 							over = currentCmd == i;
 						}
 
-						clipStyleApply(i, over);
+						
 
 						int j = 0;//adjust "pos"
 
@@ -1027,14 +1106,15 @@ bool DrawButton(const char* str,float x, float y, float w,float h, bAlign align 
 							}
 						}
 
-						ui::Box::Draw(clip_x, clip_y, sWidth, h / 1.125);
+						float c = clp + 222;
+						ui::style::box::r = .4 + .3 * sin(c * 12.123);
+						ui::style::box::g = .4 + .3 * sin(c * 23.123);
+						ui::style::box::b = .4 + .3 * sin(c * 44.123);
+						clipStyleApply(i, over);
+						ui::Box::Draw(clip_x, clip_y, sWidth, h / 3);
 						for (int r = 0; r < clp_desc.repeat; r++)
 						{
-							float c = clp + 222;
-							ui::style::box::r = .4 + .2 * sin(c * 12.123);
-							ui::style::box::g = .4 + .2 * sin(c * 23.123);
-							ui::style::box::b = .4 + .2 * sin(c * 44.123);
-							ui::Box::Draw(clip_x + r * clp_desc.length * note_step, clip_y + h / 1.5, note_step * clp_desc.length, h / 1.5);
+							ui::Box::Draw(clip_x + r * clp_desc.length * note_step, clip_y + h / 1.5, note_step * clp_desc.length, h / 3);
 						}
 
 					}
@@ -1051,8 +1131,8 @@ bool DrawButton(const char* str,float x, float y, float w,float h, bAlign align 
 							float x = clip_x + (n - 1) * note_step + (r * clp_desc.length * note_step);
 							float y = clip_y + h;
 
-							bool over = isMouseOver(x, y, note_step, h);
-							if (ui::mousePos.x < TimeLine::screenLeft) over = false;
+							bool over = !action && isMouseOver(x, y, note_step, h);
+							if (ui::mousePos.x < TimeLine::screenLeft || ui::mousePos.x >= TimeLine::screenRight) over = false;
 
 							if (iter == 0)
 							{

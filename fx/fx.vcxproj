@@ -238,6 +238,7 @@
     <ClInclude Include="generated\reflection\setScissors_ref.h" />
     <ClInclude Include="generated\reflection\ShowCubemap_ref.h" />
     <ClInclude Include="generated\reflection\ShowObject_ref.h" />
+    <ClInclude Include="generated\reflection\snare_ref.h" />
     <ClInclude Include="generated\vsList.h" />
     <ClInclude Include="projectFiles\camera.h" />
     <ClInclude Include="projectFiles\cubemap.h" />

@@ -151,7 +151,12 @@ namespace ViewCam
 
 	void ProcessInput()
 	{
-		if (!isKeyDown(CAM_KEY)) return;
+		if (lbDragContext != DragContext::cameraView) return;
+
+		if (!isKeyDown(CAM_KEY))
+		{
+			return;
+		}
 
 		float speed = 4.f;
 		editor::ui::point3df r = { 0,0,0 };
@@ -302,6 +307,8 @@ namespace ViewCam
 
 	void Draw()
 	{
+		if (uiContext != uiContext_::camera) return;
+
 		bool fade = isKeyDown(CAM_KEY) || flyToCam < 1.f;
 		axisAlpha = clamp(axisAlpha + (fade ? .4f : -.05f), 0.f, 1.f);
 		axisAlpha = 1;

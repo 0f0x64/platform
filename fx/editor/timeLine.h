@@ -214,7 +214,12 @@ namespace TimeLine
 		float cursor = TimeToScreen(timer::timeCursor - pos);
 		if (cursor<screenLeft || cursor > screenRight) return;
 		ui::Line::StoreLine(0, cursor, y, cursor, y - ui::style::text::height * 1.25f);
-		if (isKeyDown(TIME_KEY)) ui::Line::StoreLine(0, cursor, 1, cursor, 0);
+
+		if (uiContext == uiContext_::timeline)
+		{
+			ui::Line::StoreLine(0, cursor, 1, cursor, 0);
+		}
+
 		ui::Line::Draw(1, 1, 1, 1, .75f + .25f * sinf((float)timer::frameBeginTime * .01f));
 
 		gapi.setIA(topology::triList);

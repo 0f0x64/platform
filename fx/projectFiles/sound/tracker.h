@@ -95,8 +95,8 @@ namespace tracker
 
 		track_desc.channel[curChannel].clipCounter = -1;
 		
-		Clip(0, 11, 6, 1, overdub::off, 0);
-		Pitch(11, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+		Clip(28, 11, 6, 1, overdub::off, 0);
+		Pitch(11, 2, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0);
 
 		Clip(12, 4, 1, 1, overdub::off, 0);
 		Pitch(4, 255, 204, 192, 0);
@@ -108,6 +108,30 @@ namespace tracker
 		REFLECT_CLOSE;
 	}
 
+#define API(fname, ...) void fname##_impl(__VA_ARGS__)
+
+	//---
+	#define func1(a) func1_ref(__FILE__, __LINE__ , a)
+
+	void func1_impl(float a);
+	void func1_ref(CALLER_INFO, float a)
+	{
+		func1_impl(a);
+		cmdLevel--;
+	}
+
+	API (func1, float a)
+	{
+	}
+
+	
+	void dodd()
+	{
+		func1(4);
+	}
+
+
+
 	COMMAND(snare, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
 		#include REFLECT(snare)
@@ -116,11 +140,11 @@ namespace tracker
 
 		track_desc.channel[curChannel].clipCounter = -1;
 
-		Clip(0, 11, 6, 1, overdub::off, 0);
-		Pitch(8, 0, 0, 1, 0, 0, 0, 1, 0);
+		Clip(29, 11, 6, 1, overdub::off, 0);
+		Pitch(8, 255, 0, 255, 255, 255, 247, 255, 255);
 
-		Clip(11, 8, 1, 1, overdub::off, 0);
-		Pitch(8, 0, 0, 1, 1, 0, 0, 0, 6);
+		Clip(22, 8, 1, 1, overdub::off, 0);
+		Pitch(8, 255, 255, 1, 1, 255, 0, 255, 255);
 
 		oscillator(1, 2);
 
@@ -143,7 +167,7 @@ namespace tracker
 		curChannel = 0;
 
 		kick(100, 0, 14, switcher::off, switcher::off);
-		snare(100, 0, 14, switcher::off, switcher::off);
+		snare(55, 0, 14, switcher::off, switcher::off);
 	
 		track_desc.channelsCount = curChannel;
 
