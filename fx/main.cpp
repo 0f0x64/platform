@@ -47,24 +47,15 @@ using namespace dx11;
 	#define regDrawer(name)
 #endif
 
-#define refPath ./generated/reflection/
-#define refTail _ref.h
-#define REFLECT(FOO) STRINGIFY( CAT_3(refPath,FOO,refTail) )
-
 #if REFLECTION
-	#define REFLECT_CLOSE cmdLevel--
 	#define CALLER_INFO const char* srcFileName, int srcLine 
-	#define EDITABLE __FILE__, __LINE__
-	#define COMMAND(fname, ...) void fname(CALLER_INFO, __VA_ARGS__)
+	#define API(fname, ...) void fname##_impl(__VA_ARGS__)
 #else
-	#define REFLECT_CLOSE 
-
+	#define API(fname, ...) void fname(__VA_ARGS__)
 	#define CALLER_INFO
-	#define EDITABLE
-	#define COMMAND(fname, ...) void fname(__VA_ARGS__)
 #endif
 
-#include "generated\accel.h"
+#include "generated\apiReflection.h"
 #include "projectFiles\loop.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -99,16 +90,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	timer::StartCounter();
 
-	while (true)
+	while (msg.message != WM_QUIT)
 	{
 		double time = timer::GetCounter();
 		
 		#if EditMode
 			
-		if (msg.message == WM_QUIT)	break;
-
 			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
+				if (msg.message == WM_QUIT) break;
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
@@ -159,8 +149,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		
 	}
 
-	ExitProcess(0);
-
+	return (0);
 }
 
 #if EditMode

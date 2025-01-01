@@ -1,78 +1,56 @@
-struct {
+namespace gfx {
 
-	COMMAND(SetInputAsm, topology topo) {
-#include REFLECT(SetInputAsm)
+	API(SetInputAsm, topology topo) {
 		InputAssembler::IA(topo);
-		REFLECT_CLOSE;
 	}
 
-	COMMAND(SetRT, texture targetRT, int level) {
-#include REFLECT(SetRT)
+	API(SetRT, texture targetRT, int level) {
 		Textures::RenderTarget(targetRT, level);
-		REFLECT_CLOSE;
 	}
 
-	COMMAND(CreateMips) {
-#include REFLECT(CreateMips)
+	API(CreateMips) {
 		Textures::CreateMipMap();
-		REFLECT_CLOSE;
 	}
 
-	COMMAND(SetDepthMode, depthmode mode) {
-#include REFLECT(SetDepthMode)
+	API(SetDepthMode, depthmode mode) {
 		Depth::Depth(mode);
-		REFLECT_CLOSE;
 	}
-	COMMAND(Draw, int quadcount, int instances = 1) {
-#include REFLECT(Draw)
+
+	API(Draw, int quadcount, int instances) {
 		Draw::NullDrawer(quadcount, instances);
-		REFLECT_CLOSE;
 	}
-/*	COMMAND(SetCamera, position eye, position at, position up, unsigned int angle) {
-#include REFLINK(SetCamera)
-		Camera::Camera(eye, at, up, angle);
-		refStackBack;
-	}*/
-
-	void eld(int i, float& x, float& y, float w, float lead, float sel)
-	{
-
+	API(SetCamera, position eye, position at, position up, unsigned int angle) {
+	//		Camera::Camera(eye, at, up, angle);
 	}
 
-	COMMAND(ClearRT, color4 color) {
-#include REFLECT(ClearRT)
+//	void eld(int i, float& x, float& y, float w, float lead, float sel)
+	//{
+
+	//}
+
+	API(ClearRT, color4 color) {
 		Draw::Clear(color);
-		REFLECT_CLOSE;
 	}
-	COMMAND(ClearRTDepth) {
-#include REFLECT(ClearRTDepth)
+
+	API(ClearRTDepth) {
 		Draw::ClearDepth();
-		REFLECT_CLOSE;
 	}
-	COMMAND(SetBlendMode, blendmode mode, blendop op = blendop::add) {
-#include REFLECT(SetBlendMode)
+	API(SetBlendMode, blendmode mode, blendop op) {
 		//regDrawer(eld);
 		Blend::Blending(mode, op);
-		REFLECT_CLOSE;
 	}
-	COMMAND(SetCull, cullmode mode) {
-#include REFLECT(SetCull)
+
+	API(SetCull, cullmode mode) {
 		Rasterizer::Cull(mode);
-		REFLECT_CLOSE;
 	}
-	COMMAND(SetScissors, rect bbox) {
-#include REFLECT(SetScissors)
+	API(SetScissors, rect bbox) {
 		Rasterizer::Scissors(bbox);
-		REFLECT_CLOSE;
 	}
-	COMMAND(CopyRTColor, texture dst, texture src) {
-#include REFLECT(CopyRTColor)
+	API(CopyRTColor, texture dst, texture src) {
 		Textures::CopyColor(dst, src);
-		REFLECT_CLOSE;
 	}
-	COMMAND(CopyRTDepth, texture dst, texture src) {
-#include REFLECT(CopyRTDepth)
+	API(CopyRTDepth, texture dst, texture src) {
 		Textures::CopyDepth(dst, src);
-		REFLECT_CLOSE;
 	}
-} gApi;
+}
+

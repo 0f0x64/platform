@@ -14,10 +14,8 @@ namespace BasicCam
 	XMVECTOR camSlide;
 	XMVECTOR camFly;
 
-	COMMAND (setCamKey, timestamp camTime, keyType camType, position eye, position at, position up, int angle, sliderType sType, position slide, camAxis axisType, rotation fly, int jitter)
+	API (setCamKey, timestamp camTime, keyType camType, position eye, position at, position up, int angle, sliderType sType, position slide, camAxis axisType, rotation fly, int jitter)
 	{
-		#include REFLECT(setCamKey)
-
 		if (!camPass) {
 
 			int t = timer::timeCursor / SAMPLES_IN_FRAME;
@@ -53,8 +51,6 @@ namespace BasicCam
 
 			camCounter++;
 		}
-
-		REFLECT_CLOSE;
 	}
 
 	void processCam()

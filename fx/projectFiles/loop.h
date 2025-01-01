@@ -16,7 +16,7 @@ namespace Loop
 
 	void Precalc()
 	{
-		gApi.SetInputAsm(topology::lineList);
+		gfx::SetInputAsm(topology::lineList);
 		ConstBuf::Update(5, ConstBuf::global);
 		for (int i = 0; i < 6; i++) { ConstBuf::ConstToVertex(i); ConstBuf::ConstToPixel(i); }
 		isPrecalc = true;
@@ -30,32 +30,27 @@ namespace Loop
 		ConstBuf::UpdateFrame();
 	}
 
-	COMMAND(cameraMan)
+	API(cameraMan)
 	{
-		#include REFLECT(cameraMan)
-
 		BasicCam::setCamKey(0, keyType::set, -1212, -685, -1676, 4, 56, 0, -2, 233, -102, 60, sliderType::follow, 2, 3, 8, camAxis::local, 0, 50, 0, 0);
 		BasicCam::processCam();
-
-		REFLECT_CLOSE;
 	}
 
 	void mainLoop()
 	{
+		
+
 		#if EditMode
-		if (editor::codeRecompiled) {
-			editor::codeRecompiled = false;
-			isPrecalc = false;
-			paramsAreLoaded = false;
-		}
+			if (editor::codeRecompiled) {
+				editor::codeRecompiled = false;
+				isPrecalc = false;
+				paramsAreLoaded = false;
+			}
 
-		cmdLevel = 0;
-
+			cmdLevel = 0;
 		#endif	
 
-
 		cmdCounter = 0;
-
 
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
@@ -67,29 +62,29 @@ namespace Loop
 
 		frameConst();
 
-		gApi.SetInputAsm(topology::triList);
-		gApi.SetBlendMode(blendmode::off, blendop::add);
+		gfx::SetInputAsm(topology::triList);
+		gfx::SetBlendMode(blendmode::off, blendop::add);
 
 		Cubemap::CalcCubemap(texture::env);
 		Object::CalcObject(texture::obj1pos, texture::obj1nrml);
 
-		gApi.SetRT(texture::mainRT, 0);
-		gApi.ClearRT(255, 255, 255, 255);
+		gfx::SetRT(texture::mainRT, 0);
+		gfx::ClearRT(255, 255, 255, 255);
 
 		cameraMan();
 
 		Cubemap::ShowCubemap(texture::env);
 
-		gApi.SetDepthMode(depthmode::on);
-		gApi.ClearRTDepth();
-		gApi.SetCull(cullmode::back);
-		gApi.SetBlendMode(blendmode::off, blendop::add);
+		gfx::SetDepthMode(depthmode::on);
+		gfx::ClearRTDepth();
+		gfx::SetCull(cullmode::back);
+		gfx::SetBlendMode(blendmode::off, blendop::add);
 		
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 40, 42, 6);
 
 		tracker::Track(120);
 
-		gApi.ClearRT(0, 0, 0, 0);
+		//gApi.ClearRT(0, 0, 0, 0);
 
 		#if EditMode
 		paramsAreLoaded = true;

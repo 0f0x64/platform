@@ -1,30 +1,24 @@
 namespace Cubemap {
 
-	COMMAND (CalcCubemap, texture target)
+	API(CalcCubemap, texture target)
 	{
-		#include REFLECT(CalcCubemap)
-
-		gApi.SetBlendMode(blendmode::off, blendop::add);
-		gApi.SetRT(target,0);
-		gApi.SetCull(cullmode::off);
-		gApi.SetDepthMode(depthmode::off);
-		gApi.ClearRT( 0, 0, 0, 1 );
+		gfx::SetBlendMode(blendmode::off, blendop::add);
+		gfx::SetRT(target,0);
+		gfx::SetCull(cullmode::off);
+		gfx::SetDepthMode(depthmode::off);
+		gfx::ClearRT( 0, 0, 0, 1 );
 
 		vs::quad.set();
 		ps::cubemapCreator.set();
-		gApi.Draw(1,1);
-		gApi.CreateMips();
-
-		REFLECT_CLOSE;
+		gfx::Draw(1,1);
+		gfx::CreateMips();
 	}
 
-	COMMAND(ShowCubemap,texture envTexture)
+	API(ShowCubemap,texture envTexture)
 	{
-		#include REFLECT(ShowCubemap)
-
-		gApi.SetDepthMode(depthmode::off);
-		gApi.SetBlendMode(blendmode::off, blendop::add);
-		gApi.SetCull(cullmode::back);
+		gfx::SetDepthMode(depthmode::off);
+		gfx::SetBlendMode(blendmode::off, blendop::add);
+		gfx::SetCull(cullmode::back);
 
 		ps::cubeMapViewer.textures.env = envTexture;
 		ps::cubeMapViewer.samplers.sam1Filter = filter::linear;
@@ -36,9 +30,7 @@ namespace Cubemap {
 		vs::simpleCube.params.gX = (float)gX;
 		vs::simpleCube.params.gY = (float)gY;
 		vs::simpleCube.set();
-		gApi.Draw(gX * gY,1);
-
-		REFLECT_CLOSE;
+		gfx::Draw(gX * gY,1);
 	}
 
 }

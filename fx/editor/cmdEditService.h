@@ -44,7 +44,7 @@ void AddToUI(const char* funcName)
 	cmdParamDesc[cmdCounter].stackLevel = cmdLevel;
 
 	int x = strlen(funcName)-1;;
-	for (x; x >= 0; x--) { if (funcName[x] == ':') { x++; break; } };
+	for (x; x > 0; x--) { if (funcName[x] == ':') { x++; break; } };
 
 	strcpy(cmdParamDesc[cmdCounter].funcName, funcName+x);
 }

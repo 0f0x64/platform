@@ -1,9 +1,7 @@
 namespace Object {
 
-	COMMAND(ShowObject,texture geometry, texture normals, unsigned int quality, position pos)
+	API(ShowObject,texture geometry, texture normals, unsigned int quality, position pos)
 	{
-		#include REFLECT(ShowObject)
-
 		#if EditMode //dynamic limits
 			auto r = max(Textures::Texture[(int)geometry].size.x, Textures::Texture[(int)geometry].size.y);
 			auto mipMaps = Textures::Texture[(int)geometry].mipMaps;
@@ -43,29 +41,24 @@ namespace Object {
 		ps::basic.samplers.sam1AddressV = addr::wrap;
 
 		ps::basic.set();
-		gApi.Draw((int)gX*(int)gY, 1);
-
-		REFLECT_CLOSE;
-		
+		gfx::Draw((int)gX*(int)gY, 1);
 	}
 
-	COMMAND(CalcObject,texture targetGeo, texture targetNrml)
+	API(CalcObject,texture targetGeo, texture targetNrml)
 	{
-		#include REFLECT(CalcObject)
-
-		gApi.SetBlendMode(blendmode::off, blendop::add);
-		gApi.SetCull(cullmode::off);
-		gApi.SetRT(targetGeo,0);
-		gApi.SetDepthMode(depthmode::off);
+		gfx::SetBlendMode(blendmode::off, blendop::add);
+		gfx::SetCull(cullmode::off);
+		gfx::SetRT(targetGeo,0);
+		gfx::SetDepthMode(depthmode::off);
 
 		//pos
 		vs::quad.set();
 		ps::obj1.set();
-		gApi.Draw(1, 1);
-		gApi.CreateMips();
+		gfx::Draw(1, 1);
+		gfx::CreateMips();
 
 		//normals
-		gApi.SetRT(targetNrml,0);
+		gfx::SetRT(targetNrml,0);
 		vs::quad.set();
 
 		ps::genNormals.samplers.sam1Filter = filter::linear;
@@ -75,10 +68,8 @@ namespace Object {
 		ps::genNormals.textures.geo = targetGeo;
 		ps::genNormals.set();
 
-		gApi.Draw(1,1);
-		gApi.CreateMips();
-
-		REFLECT_CLOSE;
+		gfx::Draw(1,1);
+		gfx::CreateMips();
 	}
 
 }

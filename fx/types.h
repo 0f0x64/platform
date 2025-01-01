@@ -219,15 +219,19 @@ enum class texture:int {
 #include "projectFiles\texList.h"	
 };
 
+unsigned char va_params[255];
+
 #define VA_READ \
-unsigned char params[255]; \
 va_list args;\
 va_start(args, count);\
-params[0] = count;\
+va_params[0] = count;\
 for (int i = 1; i <= count; i++)\
 {\
-	params[i] = va_arg(args, unsigned char);\
+	va_params[i] = va_arg(args, unsigned char);\
 };
+
+
+
 
 
 

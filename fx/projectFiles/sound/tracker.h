@@ -1,46 +1,37 @@
 namespace tracker
 {
 
-	COMMAND(oscillator, int a, int b)
+	API(oscillator, int a, int b)
 	{
-		#include REFLECT(oscillator)
-		
 		int d = 011;
-		
-		REFLECT_CLOSE;
 	}
 
-	COMMAND(eq, int a)
+	API(eq, int a)
 	{
-		#include REFLECT(eq)
-
 		int b = 1;
-
-		REFLECT_CLOSE;
 	}
 
 	byte curChannel;
 
-	COMMAND(Pitch, int count, unsigned char ...)
+	API(Pitch, int count, unsigned char ...)
 	{
-		#include REFLECT(Pitch)
+
+	#if !EditMode
+		VA_READ
+	#endif 
 
 		auto& c = track_desc.channel[curChannel].clip[track_desc.channel[curChannel].clipCounter];
 
 		for (int i = 0; i < count; i++)
 		{
-			c.note[(int)layers::pitch].note_pitch[i] = params[i];
+			c.note[(int)layers::pitch].note_pitch[i] = va_params[i];
 		}
 
 		c.note[(int)layers::pitch].cmdIndex = cmdCounter - 1;
-
-		REFLECT_CLOSE;
 	}
 
-	COMMAND(Clip, timestamp pos, int len, int repeat, int bpmScale, overdub overDub, int swing)
+	API(Clip, timestamp pos, int len, int repeat, int bpmScale, overdub overDub, int swing)
 	{
-		#include REFLECT(Clip)
-
 		//check range
 		track_desc.channel[curChannel].clipCounter++;
 		clip_& c = track_desc.channel[curChannel].clip[track_desc.channel[curChannel].clipCounter];
@@ -53,9 +44,6 @@ namespace tracker
 		c.overDub = overDub;
 
 		c.cmdIndex = cmdCounter - 1;
-	
-
-		REFLECT_CLOSE;
 	}
 
 #if EditMode
@@ -87,70 +75,42 @@ namespace tracker
 
 
 
-	COMMAND(kick, volume vol, panorama pan, volume send, switcher solo, switcher mute)
+	API(kick, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
-		#include REFLECT(kick)
 		regfuncGroup(channel);
 		regDrawer(channelDraw);
 
 		track_desc.channel[curChannel].clipCounter = -1;
 		
-		Clip(28, 11, 6, 1, overdub::off, 0);
-		Pitch(11, 2, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0);
+		Clip(33, 11, 6, 1, overdub::off, 0);
+		Pitch(11, 249, 253, 252, 253, 253, 255, 255, 255, 255, 255, 255);
 
-		Clip(12, 4, 1, 1, overdub::off, 0);
+		Clip(21, 4, 1, 1, overdub::off, 0);
 		Pitch(4, 255, 204, 192, 0);
 
 		oscillator(1, 2);
 
 		curChannel++;
-
-		REFLECT_CLOSE;
-	}
-
-#define API(fname, ...) void fname##_impl(__VA_ARGS__)
-
-	//---
-	#define func1(a) func1_ref(__FILE__, __LINE__ , a)
-
-	void func1_impl(float a);
-	void func1_ref(CALLER_INFO, float a)
-	{
-		func1_impl(a);
-		cmdLevel--;
-	}
-
-	API (func1, float a)
-	{
-	}
-
-	
-	void dodd()
-	{
-		func1(4);
 	}
 
 
 
-	COMMAND(snare, volume vol, panorama pan, volume send, switcher solo, switcher mute)
+	API(snare, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
-		#include REFLECT(snare)
 		regfuncGroup(channel);
 		regDrawer(channelDraw);
 
 		track_desc.channel[curChannel].clipCounter = -1;
 
-		Clip(29, 11, 6, 1, overdub::off, 0);
-		Pitch(8, 255, 0, 255, 255, 255, 247, 255, 255);
+		Clip(23, 10, 6, 1, overdub::off, 0);
+		Pitch(8, 0, 0, 0, 255, 255, 255, 255, 255);
 
-		Clip(22, 8, 1, 1, overdub::off, 0);
-		Pitch(8, 255, 255, 1, 1, 255, 0, 255, 255);
+		Clip(42, 8, 1, 1, overdub::off, 0);
+		Pitch(3, 0, 90, 255);
 
 		oscillator(1, 2);
 
 		curChannel++;
-
-		REFLECT_CLOSE;
 	}
 
 	void playTrack_dc(int i, float& x, float& y, float w, float lead, float sel)
@@ -158,21 +118,18 @@ namespace tracker
 
 	}
 
-	COMMAND (Track, int masterBPM)
+	API (Track, int masterBPM)
 	{
-		#include REFLECT(Track)
 		//regDrawer(playTrack_dc);
 
 		editor::TimeLine::bpm = track_desc.masterBPM = masterBPM;
 		curChannel = 0;
 
-		kick(100, 0, 14, switcher::off, switcher::off);
-		snare(55, 0, 14, switcher::off, switcher::off);
-	
-		track_desc.channelsCount = curChannel;
+		kick(74, 0, 14, switcher::on, switcher::on);
+		snare(54, 0, 14, switcher::on, switcher::on);
 
-		REFLECT_CLOSE;
-		
+		track_desc.channelsCount = curChannel;
+	
 	}
 
 }

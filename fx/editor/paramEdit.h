@@ -264,6 +264,10 @@ namespace paramEdit {
 
 		remove(inFilePath.c_str());
 		rename(outFilePath.c_str(), inFilePath.c_str());
+
+		Log("Modified:  ");
+		Log(inFilePath.c_str());
+		Log("\n");
 	}
 
 	void pLimits(int cCmd = currentCmd, int cParam = currentParam, int cSubParam = subParam)
@@ -673,6 +677,19 @@ namespace paramEdit {
 		return MAXINT;
 	}
 
+	int getParamIndexByStr(int i, const char* str)
+	{
+		for (int j = 0; j < cmdParamDesc[i].pCount; j++)
+		{
+			if (!strcmp(cmdParamDesc[i].param[j].name, str))
+			{
+				return j;
+			}
+		}
+
+		return MAXINT;
+	}
+
 	float clipYpos;
 
 	//float clip_x = 0;
@@ -946,6 +963,7 @@ float tempPValue = 0;
 	void showTrack()
 	{
 		
+		int currentCmd_backup = currentCmd;
 
 		//auto a=  eCmdList::func1::p3;
 		float b = 0;
@@ -977,6 +995,8 @@ float tempPValue = 0;
 				float ch_h = ch_lead*.8;
 				bool over = isMouseOver(x, ch_y, TimeLine::screenLeft - x, ch_h);
 
+				if (over&& ui::lbDown) currentCmd = channelIndex;
+
 				if (iter == 1)
 				{
 					if (channelIndex >= 0)
@@ -1000,7 +1020,8 @@ float tempPValue = 0;
 						float slot_h = ch_h / 2.;
 						float low = ch_y + ch_h / 2. + (slot_h - sm_h) / 2.;
 						
-						int sI = 3;
+						
+						int sI = getParamIndexByStr(channelIndex,"solo");
 						ui::style::button::inverted = cmdParamDesc[channelIndex].param[sI].value[0] == 0 ? false : true;
 						
 						bool s = ButtonPressed("S", bx, ch_y + (slot_h - sm_h) / 2., bw, sm_h);
@@ -1010,7 +1031,7 @@ float tempPValue = 0;
 							cmdParamDesc[channelIndex].param[sI].value[0] = 1- cmdParamDesc[channelIndex].param[sI].value[0];
 						}
 
-						int mI = 4;
+						int mI = getParamIndexByStr(channelIndex,"mute");
 						ui::style::button::inverted = cmdParamDesc[channelIndex].param[mI].value[0] == 0 ? false : true;
 						bool m = ButtonPressed("M", bx, low, bw, sm_h);
 						if (!action && m)
@@ -1120,7 +1141,7 @@ float tempPValue = 0;
 					}
 
 					// show all layers
-
+				
 					for (int r = 0; r < clp_desc.repeat; r++)
 					{
 						for (int n = 1; n <= clp_desc.length; n++)
@@ -1131,7 +1152,8 @@ float tempPValue = 0;
 							float x = clip_x + (n - 1) * note_step + (r * clp_desc.length * note_step);
 							float y = clip_y + h;
 
-							bool over = !action && isMouseOver(x, y, note_step, h);
+							bool over = (!action) && isMouseOver(x, y, note_step, h);
+							over = over && lbDragContext == DragContext::free;
 							if (ui::mousePos.x < TimeLine::screenLeft || ui::mousePos.x >= TimeLine::screenRight) over = false;
 
 							if (iter == 0)
@@ -1192,6 +1214,8 @@ float tempPValue = 0;
 				}
 			}
 		}
+
+		if (currentCmd_backup != currentCmd) Save(currentCmd_backup);
 	}
 
 	void showParams()
@@ -1347,6 +1371,7 @@ float tempPValue = 0;
 
 	void ShowStack()
 	{
+
 		int currentCmd_backup = currentCmd;
 
 		tabLen = ui::Text::getTextLen("000000000000000", ui::style::text::width);
@@ -1378,6 +1403,7 @@ float tempPValue = 0;
 
 		x = ui::style::text::width / 2.f;
 		y = yPos;
+
 		showCommands();
 
 		ui::style::Base();
