@@ -726,6 +726,13 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 						if (pCount > 0) _ofile << ", ";
 						if (variadic) _ofile << "__VA_ARGS__";
 						_ofile << pNameListOut << ")\n";
+
+						if (pCount > 0 && !variadic)
+						{
+							_ofile << "enum class " << funcName << "_param {" << pNameListComplexType << "};\n";
+							
+						}
+
 						_ofile << "void " << funcName << "_impl" << funcParams_clean << ";\n";
 						_ofile << "void " << funcName << "_ref " << funcParams << "\n";
 						_ofile << "{\n";

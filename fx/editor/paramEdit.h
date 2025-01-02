@@ -544,7 +544,7 @@ namespace paramEdit {
 					hilightedCmd = i;
 				}
 
-				if (over && ui::lbDown && lbDragContext == DragContext::free )
+				if (over && ui::lbDown && drag.isFree())
 				{
 					currentCmd = i;
 					currentParam = -1;
@@ -583,7 +583,7 @@ namespace paramEdit {
 
 				bool over = isMouseOver(px, py, h * dx11::aspect, h) ;
 
-				if (lbDragContext == DragContext::timeKey)
+				if (drag.check(drag.context::timeKey))
 				{
 					over = currentCmd == i;
 				}
@@ -595,9 +595,9 @@ namespace paramEdit {
 				ui::style::box::r = ui::style::box::g = ui::style::box::b = (currentCmd == i) ? .7f : 0.2f;
 				ui::style::box::a = 1;
 
-				if (over && ui::lbDown && lbDragContext == DragContext::free)
+				if (over && ui::lbDown && drag.isFree())
 				{
-					lbDragContext = DragContext::timeKey;
+					drag.set(drag.context::timeKey);
 					currentCmd = i;
 					currentParam = -1;
 					subParam = 0;
@@ -615,7 +615,7 @@ namespace paramEdit {
 					 
 				}
 
-				if (currentCmd == i && lbDragContext == DragContext::timeKey)
+				if (currentCmd == i && drag.check(drag.context::timeKey))
 				{
 					if (ui::lbDown)
 					{
@@ -965,9 +965,6 @@ float tempPValue = 0;
 		
 		int currentCmd_backup = currentCmd;
 
-		//auto a=  eCmdList::func1::p3;
-		float b = 0;
-
 		if (!ui::lbDown) action = false;
 
 		x = ui::style::text::height / 6.f*aspect;
@@ -990,12 +987,9 @@ float tempPValue = 0;
 				float  ch_lead = ui::style::box::height*2.2;
 				clipYpos +=ch_lead;
 				
-				int i = tracker::track_desc.channel[ch].cmdIndex;
 				float ch_y = clipYpos ;
 				float ch_h = ch_lead*.8;
-				bool over = isMouseOver(x, ch_y, TimeLine::screenLeft - x, ch_h);
-
-				if (over&& ui::lbDown) currentCmd = channelIndex;
+				bool over = isMouseOver(0, ch_y - x / 2., TimeLine::screenLeft - x, ch_lead * .9);
 
 				if (iter == 1)
 				{
@@ -1006,7 +1000,7 @@ float tempPValue = 0;
 						ui::style::BaseButton();
 						ui::style::button::zoom = false;
 						ui::style::button::vAlign = ui::style::align_v::top;
-						Button(cmdParamDesc[channelIndex].funcName, 0, ch_y-x/2., TimeLine::screenLeft - x, ch_h+x);
+						Button(cmdParamDesc[channelIndex].funcName, 0, ch_y-x/2., TimeLine::screenLeft - x, ch_lead*.9);
 
 						ui::style::box::rounded = .5;
 						float bw = aspect*ch_h / 2.2;
@@ -1043,14 +1037,16 @@ float tempPValue = 0;
 						ui::style::button::inverted = false;
 						ui::style::box::rounded = .15;
 						
-						if (Button("vol::50", x, low, bw * 4, sm_h))
+						int vI = getParamIndexByStr(channelIndex, "vol");
+						std::string vtx = "vol::" + std::to_string(cmdParamDesc[channelIndex].param[vI].value[0]);
+						if (ButtonPressed(vtx.c_str(), x, low, bw * 4, sm_h))
 						{
-							int vI = 0;
-							if (!action) tempPValue = cmdParamDesc[channelIndex].param[vI].value[vI];
+							if (!action) tempPValue = cmdParamDesc[channelIndex].param[vI].value[0];
 							
 							action = true;
-							cmdParamDesc[channelIndex].param[vI].value[0] = tempPValue + ui::mouseDelta.x;
+							cmdParamDesc[channelIndex].param[vI].value[0] = tempPValue + ui::mouseDelta.x*dx11::width;
 						}
+
 						Button("pan::50", x+bw*4.5, low, bw*2 , sm_h);
 
 					}
@@ -1085,27 +1081,27 @@ float tempPValue = 0;
 					{
 						if (over && i == topUIElementIndex) over = true; else over = false;
 
-						if (lbDragContext == DragContext::clipMove)
+						if (drag.check(i, getParamIndexByStr(i, "pos"), 0))
 						{
 							over = currentCmd == i;
 						}
 
 						
 
-						int j = 0;//adjust "pos"
+						int podIndex = getParamIndexByStr(i, "pos");
 
-						if (over && ui::lbDown && lbDragContext == DragContext::free)
+						if (over && ui::lbDown && drag.isFree())
 						{
-							lbDragContext = DragContext::clipMove;
+							drag.set(i,podIndex,0 );
 							currentCmd = i;
 							currentParam = -1;
 							subParam = 0;
-							storedParam[j] = cmdParamDesc[i].param[j].value[0];
+							storedParam[podIndex] = cmdParamDesc[i].param[podIndex].value[0];
 							vScroll = true;
 
-							curCmdLevel = cmdParamDesc[currentCmd].stackLevel;
+							curCmdLevel = cmdParamDesc[i].stackLevel;
 
-							for (int j = currentCmd; j >= 0; j--)//search for prev level
+							for (int j = i; j >= 0; j--)//search for prev level
 							{
 								if (cmdParamDesc[j].stackLevel < curCmdLevel || j == 0) {
 									startCmd = j; break;
@@ -1114,16 +1110,16 @@ float tempPValue = 0;
 
 						}
 
-						if (currentCmd == i && lbDragContext == DragContext::clipMove)
+						if (currentCmd == i && drag.check(i, podIndex ,0))
 						{
 							if (ui::lbDown)
 							{
-								cmdParamDesc[i].param[j].value[0] = storedParam[j] + TimeLine::ScreenToTime(ui::mouseDelta.x) / (frame * 60 * 60 / editor::TimeLine::bpm);
-								pLimits(currentCmd, j);
+								cmdParamDesc[i].param[podIndex].value[0] = storedParam[podIndex] + TimeLine::ScreenToTime(ui::mouseDelta.x) / (frame * 60 * 60 / editor::TimeLine::bpm);
+								pLimits(i, podIndex);
 							}
 							else
 							{
-								storedParam[j] = cmdParamDesc[i].param[j].value[0];
+								storedParam[podIndex] = cmdParamDesc[i].param[podIndex].value[0];
 							}
 						}
 
@@ -1153,7 +1149,7 @@ float tempPValue = 0;
 							float y = clip_y + h;
 
 							bool over = (!action) && isMouseOver(x, y, note_step, h);
-							over = over && lbDragContext == DragContext::free;
+							over = over && drag.isFree();
 							if (ui::mousePos.x < TimeLine::screenLeft || ui::mousePos.x >= TimeLine::screenRight) over = false;
 
 							if (iter == 0)
@@ -1403,7 +1399,7 @@ float tempPValue = 0;
 
 		x = ui::style::text::width / 2.f;
 		y = yPos;
-
+		
 		showCommands();
 
 		ui::style::Base();
