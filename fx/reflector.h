@@ -39,6 +39,7 @@ const char* shaderExtension = ".shader";
 void Log(const char* message)
 {
 	printf("%s", message);
+
 }
 
 char pathToExe[MAX_PATH];
@@ -795,6 +796,9 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 							_ofile << "}\n";
 						}
 
+
+						Log(funcName.c_str());
+						Log("\n");
 					}
 				}
 
@@ -949,5 +953,7 @@ int main()
 	//--
 
 	Log("\n---competed!\n\n");
+
+	//getchar();
 
 }
