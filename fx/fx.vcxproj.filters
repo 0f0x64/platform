@@ -182,9 +182,6 @@
     <ClInclude Include="projectFiles\sound\tracker.h">
       <Filter>Source Files\sound</Filter>
     </ClInclude>
-    <ClInclude Include="emptyFile.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="projectFiles\sound\track_struct.h">
       <Filter>Source Files\sound</Filter>
     </ClInclude>

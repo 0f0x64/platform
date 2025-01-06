@@ -14,7 +14,7 @@ namespace BasicCam
 	XMVECTOR camSlide;
 	XMVECTOR camFly;
 
-	API (setCamKey, timestamp camTime, keyType camType, position eye, position at, position up, int angle, sliderType sType, position slide, camAxis axisType, rotation fly, int jitter)
+	API(setCamKey, timestamp camTime, keyType camType, position eye, position at, position up, int angle, sliderType sType, position slide, camAxis axisType, rotation fly, int jitter)
 	{
 		if (!camPass) {
 

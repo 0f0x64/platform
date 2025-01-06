@@ -1,4 +1,6 @@
 namespace BasicCam {
+#ifdef REFLECTION
+
 #define setCamKey(camTime, camType, eye_x, eye_y, eye_z, at_x, at_y, at_z, up_x, up_y, up_z, angle, sType, slide_x, slide_y, slide_z, axisType, fly_x, fly_y, fly_z, jitter) setCamKey_ref (__FILE__, __LINE__, camTime, camType, position {eye_x, eye_y, eye_z }, position {at_x, at_y, at_z }, position {up_x, up_y, up_z }, angle, sType, position {slide_x, slide_y, slide_z }, axisType, rotation {fly_x, fly_y, fly_z }, jitter)
 enum class setCamKey_param {camTime, camType, eye, at, up, angle, sType, slide, axisType, fly, jitter};
 void setCamKey_impl(  timestamp camTime, keyType camType, position eye, position at, position up, int angle, sliderType sType, position slide, camAxis axisType, rotation fly, int jitter);
@@ -114,8 +116,14 @@ setCamKey_impl (camTime, camType, eye, at, up, angle, sType, slide, axisType, fl
 cmdLevel--;
 }
 
+#else
+#undef setCamKey
+#define setCamKey(camTime, camType, eye_x, eye_y, eye_z, at_x, at_y, at_z, up_x, up_y, up_z, angle, sType, slide_x, slide_y, slide_z, axisType, fly_x, fly_y, fly_z, jitter) setCamKey_( camTime, camType, position {eye_x, eye_y, eye_z }, position {at_x, at_y, at_z }, position {up_x, up_y, up_z }, angle, sType, position {slide_x, slide_y, slide_z }, axisType, rotation {fly_x, fly_y, fly_z }, jitter)
+#endif
 }
 namespace Cubemap {
+#ifdef REFLECTION
+
 #define CalcCubemap(target) CalcCubemap_ref (__FILE__, __LINE__, target)
 enum class CalcCubemap_param {target};
 void CalcCubemap_impl(  texture target);
@@ -146,8 +154,14 @@ CalcCubemap_impl (target);
 cmdLevel--;
 }
 
+#else
+#undef CalcCubemap
+#define CalcCubemap(target) CalcCubemap_( target)
+#endif
 }
 namespace Cubemap {
+#ifdef REFLECTION
+
 #define ShowCubemap(envTexture) ShowCubemap_ref (__FILE__, __LINE__, envTexture)
 enum class ShowCubemap_param {envTexture};
 void ShowCubemap_impl( texture envTexture);
@@ -178,8 +192,14 @@ ShowCubemap_impl (envTexture);
 cmdLevel--;
 }
 
+#else
+#undef ShowCubemap
+#define ShowCubemap(envTexture) ShowCubemap_( envTexture)
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define SetInputAsm(topo) SetInputAsm_ref (__FILE__, __LINE__, topo)
 enum class SetInputAsm_param {topo};
 void SetInputAsm_impl(  topology topo);
@@ -210,8 +230,14 @@ SetInputAsm_impl (topo);
 cmdLevel--;
 }
 
+#else
+#undef SetInputAsm
+#define SetInputAsm(topo) SetInputAsm_( topo)
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define SetRT(targetRT, level) SetRT_ref (__FILE__, __LINE__, targetRT, level)
 enum class SetRT_param {targetRT, level};
 void SetRT_impl(  texture targetRT, int level);
@@ -247,8 +273,14 @@ SetRT_impl (targetRT, level);
 cmdLevel--;
 }
 
+#else
+#undef SetRT
+#define SetRT(targetRT, level) SetRT_( targetRT, level)
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define CreateMips() CreateMips_ref (__FILE__, __LINE__)
 void CreateMips_impl( );
 void CreateMips_ref ( CALLER_INFO)
@@ -264,8 +296,14 @@ CreateMips_impl ();
 cmdLevel--;
 }
 
+#else
+#undef CreateMips
+#define CreateMips() CreateMips_( )
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define SetDepthMode(mode) SetDepthMode_ref (__FILE__, __LINE__, mode)
 enum class SetDepthMode_param {mode};
 void SetDepthMode_impl(  depthmode mode);
@@ -296,8 +334,14 @@ SetDepthMode_impl (mode);
 cmdLevel--;
 }
 
+#else
+#undef SetDepthMode
+#define SetDepthMode(mode) SetDepthMode_( mode)
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define Draw(quadcount, instances) Draw_ref (__FILE__, __LINE__, quadcount, instances)
 enum class Draw_param {quadcount, instances};
 void Draw_impl(  int quadcount, int instances);
@@ -333,8 +377,14 @@ Draw_impl (quadcount, instances);
 cmdLevel--;
 }
 
+#else
+#undef Draw
+#define Draw(quadcount, instances) Draw_( quadcount, instances)
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define SetCamera(eye_x, eye_y, eye_z, at_x, at_y, at_z, up_x, up_y, up_z, angle) SetCamera_ref (__FILE__, __LINE__, position {eye_x, eye_y, eye_z }, position {at_x, at_y, at_z }, position {up_x, up_y, up_z }, angle)
 enum class SetCamera_param {eye, at, up, angle};
 void SetCamera_impl(  position eye, position at, position up, unsigned int angle);
@@ -401,8 +451,14 @@ SetCamera_impl (eye, at, up, angle);
 cmdLevel--;
 }
 
+#else
+#undef SetCamera
+#define SetCamera(eye_x, eye_y, eye_z, at_x, at_y, at_z, up_x, up_y, up_z, angle) SetCamera_( position {eye_x, eye_y, eye_z }, position {at_x, at_y, at_z }, position {up_x, up_y, up_z }, angle)
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define ClearRT(color_x, color_y, color_z, color_w) ClearRT_ref (__FILE__, __LINE__, color4 {color_x, color_y, color_z, color_w })
 enum class ClearRT_param {color};
 void ClearRT_impl(  color4 color);
@@ -439,8 +495,14 @@ ClearRT_impl (color);
 cmdLevel--;
 }
 
+#else
+#undef ClearRT
+#define ClearRT(color_x, color_y, color_z, color_w) ClearRT_( color4 {color_x, color_y, color_z, color_w })
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define ClearRTDepth() ClearRTDepth_ref (__FILE__, __LINE__)
 void ClearRTDepth_impl( );
 void ClearRTDepth_ref ( CALLER_INFO)
@@ -456,8 +518,14 @@ ClearRTDepth_impl ();
 cmdLevel--;
 }
 
+#else
+#undef ClearRTDepth
+#define ClearRTDepth() ClearRTDepth_( )
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define SetBlendMode(mode, op) SetBlendMode_ref (__FILE__, __LINE__, mode, op)
 enum class SetBlendMode_param {mode, op};
 void SetBlendMode_impl(  blendmode mode, blendop op);
@@ -493,8 +561,14 @@ SetBlendMode_impl (mode, op);
 cmdLevel--;
 }
 
+#else
+#undef SetBlendMode
+#define SetBlendMode(mode, op) SetBlendMode_( mode, op)
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define SetCull(mode) SetCull_ref (__FILE__, __LINE__, mode)
 enum class SetCull_param {mode};
 void SetCull_impl(  cullmode mode);
@@ -525,8 +599,14 @@ SetCull_impl (mode);
 cmdLevel--;
 }
 
+#else
+#undef SetCull
+#define SetCull(mode) SetCull_( mode)
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define SetScissors(bbox_x, bbox_y, bbox_z, bbox_w) SetScissors_ref (__FILE__, __LINE__, rect {bbox_x, bbox_y, bbox_z, bbox_w })
 enum class SetScissors_param {bbox};
 void SetScissors_impl(  rect bbox);
@@ -563,8 +643,14 @@ SetScissors_impl (bbox);
 cmdLevel--;
 }
 
+#else
+#undef SetScissors
+#define SetScissors(bbox_x, bbox_y, bbox_z, bbox_w) SetScissors_( rect {bbox_x, bbox_y, bbox_z, bbox_w })
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define CopyRTColor(dst, src) CopyRTColor_ref (__FILE__, __LINE__, dst, src)
 enum class CopyRTColor_param {dst, src};
 void CopyRTColor_impl(  texture dst, texture src);
@@ -600,8 +686,14 @@ CopyRTColor_impl (dst, src);
 cmdLevel--;
 }
 
+#else
+#undef CopyRTColor
+#define CopyRTColor(dst, src) CopyRTColor_( dst, src)
+#endif
 }
 namespace gfx {
+#ifdef REFLECTION
+
 #define CopyRTDepth(dst, src) CopyRTDepth_ref (__FILE__, __LINE__, dst, src)
 enum class CopyRTDepth_param {dst, src};
 void CopyRTDepth_impl(  texture dst, texture src);
@@ -637,8 +729,14 @@ CopyRTDepth_impl (dst, src);
 cmdLevel--;
 }
 
+#else
+#undef CopyRTDepth
+#define CopyRTDepth(dst, src) CopyRTDepth_( dst, src)
+#endif
 }
 namespace Loop {
+#ifdef REFLECTION
+
 #define cameraMan() cameraMan_ref (__FILE__, __LINE__)
 void cameraMan_impl( );
 void cameraMan_ref ( CALLER_INFO)
@@ -654,8 +752,14 @@ cameraMan_impl ();
 cmdLevel--;
 }
 
+#else
+#undef cameraMan
+#define cameraMan() cameraMan_( )
+#endif
 }
 namespace Object {
+#ifdef REFLECTION
+
 #define ShowObject(geometry, normals, quality, pos_x, pos_y, pos_z) ShowObject_ref (__FILE__, __LINE__, geometry, normals, quality, position {pos_x, pos_y, pos_z })
 enum class ShowObject_param {geometry, normals, quality, pos};
 void ShowObject_impl( texture geometry, texture normals, unsigned int quality, position pos);
@@ -708,8 +812,14 @@ ShowObject_impl (geometry, normals, quality, pos);
 cmdLevel--;
 }
 
+#else
+#undef ShowObject
+#define ShowObject(geometry, normals, quality, pos_x, pos_y, pos_z) ShowObject_( geometry, normals, quality, position {pos_x, pos_y, pos_z })
+#endif
 }
 namespace Object {
+#ifdef REFLECTION
+
 #define CalcObject(targetGeo, targetNrml) CalcObject_ref (__FILE__, __LINE__, targetGeo, targetNrml)
 enum class CalcObject_param {targetGeo, targetNrml};
 void CalcObject_impl( texture targetGeo, texture targetNrml);
@@ -745,8 +855,14 @@ CalcObject_impl (targetGeo, targetNrml);
 cmdLevel--;
 }
 
+#else
+#undef CalcObject
+#define CalcObject(targetGeo, targetNrml) CalcObject_( targetGeo, targetNrml)
+#endif
 }
 namespace tracker {
+#ifdef REFLECTION
+
 #define oscillator(a, b) oscillator_ref (__FILE__, __LINE__, a, b)
 enum class oscillator_param {a, b};
 void oscillator_impl(  int a, int b);
@@ -782,8 +898,14 @@ oscillator_impl (a, b);
 cmdLevel--;
 }
 
+#else
+#undef oscillator
+#define oscillator(a, b) oscillator_( a, b)
+#endif
 }
 namespace tracker {
+#ifdef REFLECTION
+
 #define eq(a) eq_ref (__FILE__, __LINE__, a)
 enum class eq_param {a};
 void eq_impl(  int a);
@@ -814,8 +936,14 @@ eq_impl (a);
 cmdLevel--;
 }
 
+#else
+#undef eq
+#define eq(a) eq_( a)
+#endif
 }
 namespace tracker {
+#ifdef REFLECTION
+
 #define Pitch(...) Pitch_ref (__FILE__, __LINE__, __VA_ARGS__)
 void Pitch_impl(  int count, unsigned char ...);
 void Pitch_ref ( CALLER_INFO,  int count, unsigned char ...)
@@ -859,8 +987,14 @@ Pitch_impl (count, 0 );
 cmdLevel--;
 }
 
+#else
+#undef Pitch
+#define Pitch(...) Pitch_( __VA_ARGS__)
+#endif
 }
 namespace tracker {
+#ifdef REFLECTION
+
 #define Clip(pos, len, repeat, bpmScale, overDub, swing) Clip_ref (__FILE__, __LINE__, pos, len, repeat, bpmScale, overDub, swing)
 enum class Clip_param {pos, len, repeat, bpmScale, overDub, swing};
 void Clip_impl(  timestamp pos, int len, int repeat, int bpmScale, overdub overDub, int swing);
@@ -916,8 +1050,14 @@ Clip_impl (pos, len, repeat, bpmScale, overDub, swing);
 cmdLevel--;
 }
 
+#else
+#undef Clip
+#define Clip(pos, len, repeat, bpmScale, overDub, swing) Clip_( pos, len, repeat, bpmScale, overDub, swing)
+#endif
 }
 namespace tracker {
+#ifdef REFLECTION
+
 #define kick(vol, pan, send, solo, mute) kick_ref (__FILE__, __LINE__, vol, pan, send, solo, mute)
 enum class kick_param {vol, pan, send, solo, mute};
 void kick_impl(  volume vol, panorama pan, volume send, switcher solo, switcher mute);
@@ -968,8 +1108,14 @@ kick_impl (vol, pan, send, solo, mute);
 cmdLevel--;
 }
 
+#else
+#undef kick
+#define kick(vol, pan, send, solo, mute) kick_( vol, pan, send, solo, mute)
+#endif
 }
 namespace tracker {
+#ifdef REFLECTION
+
 #define snare(vol, pan, send, solo, mute) snare_ref (__FILE__, __LINE__, vol, pan, send, solo, mute)
 enum class snare_param {vol, pan, send, solo, mute};
 void snare_impl(  volume vol, panorama pan, volume send, switcher solo, switcher mute);
@@ -1020,8 +1166,14 @@ snare_impl (vol, pan, send, solo, mute);
 cmdLevel--;
 }
 
+#else
+#undef snare
+#define snare(vol, pan, send, solo, mute) snare_( vol, pan, send, solo, mute)
+#endif
 }
 namespace tracker {
+#ifdef REFLECTION
+
 #define Track(masterBPM) Track_ref (__FILE__, __LINE__, masterBPM)
 enum class Track_param {masterBPM};
 void Track_impl(  int masterBPM);
@@ -1052,4 +1204,8 @@ Track_impl (masterBPM);
 cmdLevel--;
 }
 
+#else
+#undef Track
+#define Track(masterBPM) Track_( masterBPM)
+#endif
 }

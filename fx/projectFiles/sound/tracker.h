@@ -77,8 +77,12 @@ namespace tracker
 
 	API(kick, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
-		regfuncGroup(channel);
-		regDrawer(channelDraw);
+	#ifdef Editor
+			regfuncGroup(channel);
+			regDrawer(channelDraw);
+
+	#endif // Editor
+
 
 		track_desc.channel[curChannel].clipCounter = -1;
 		
@@ -97,8 +101,10 @@ namespace tracker
 
 	API(snare, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
+	#ifdef Editor
 		regfuncGroup(channel);
 		regDrawer(channelDraw);
+	#endif	
 
 		track_desc.channel[curChannel].clipCounter = -1;
 
@@ -121,8 +127,9 @@ namespace tracker
 	API (Track, int masterBPM)
 	{
 		//regDrawer(playTrack_dc);
-
+#ifdef Editor
 		editor::TimeLine::bpm = track_desc.masterBPM = masterBPM;
+#endif
 		curChannel = 0;
 
 		kick(0, 0, 14, switcher::on, switcher::on);

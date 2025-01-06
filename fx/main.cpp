@@ -45,7 +45,7 @@ using namespace dx11;
 
 #if EditMode
 	#define regDrawer(name) cmdParamDesc[cmdCounter-1].uiDraw = &name; track_desc.channel[curChannel].cmdIndex = cmdCounter - 1
-#define regfuncGroup(name) strcpy(cmdParamDesc[cmdCounter-1].funcGroup, #name); 
+	#define regfuncGroup(name) strcpy(cmdParamDesc[cmdCounter-1].funcGroup, #name); 
 	#include "editor\cmdEditService.h"
 	#include "editor\editor.h"
 	#define REFLECTION true
@@ -57,16 +57,20 @@ using namespace dx11;
 	#define CALLER_INFO const char* srcFileName, int srcLine 
 	#define API(fname, ...) void fname##_impl(__VA_ARGS__)
 #else
-	#define API(fname, ...) void fname(__VA_ARGS__)
+#define API(fname, ...) void fname##_(__VA_ARGS__)
 	#define CALLER_INFO
 #endif
 
 #include "generated\apiReflection.h"
+
 #include "projectFiles\loop.h"
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	SetProcessDPIAware();
+	#if EditMode
+		SetProcessDPIAware();
+	#endif
+
 	hInst = (HINSTANCE)GetModuleHandle(0);
 
 	width = GetSystemMetrics(SM_CXSCREEN);
@@ -77,9 +81,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	RegisterClassEx(&wcex);
 	hWnd = CreateWindow("fx", "fx", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
 
-	ShowWindow(hWnd, EditMode ? SW_SHOW: SW_MAXIMIZE);
-	UpdateWindow(hWnd);
-	SetFocus(hWnd);
+	#if EditMode
+		ShowWindow(hWnd, EditMode ? SW_SHOW: SW_MAXIMIZE);
+		UpdateWindow(hWnd);
+		SetFocus(hWnd);
+	#endif
+
 	ShowCursor(EditMode);
 
 	#if EditMode
@@ -155,7 +162,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		
 	}
 
-	return (0);
+	ExitProcess(0);
 }
 
 #if EditMode

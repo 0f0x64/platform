@@ -721,7 +721,8 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 						{
 							_ofile << "namespace " + nsName[nsi] + " {\n";
 						}
-
+						_ofile << "#ifdef REFLECTION\n\n";
+						
 						_ofile << "#define " << funcName << "(";
 						_ofile << pNameList << ") " << funcName << "_ref (__FILE__, __LINE__";
 						if (pCount > 0) _ofile << ", ";
@@ -790,7 +791,15 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 
 						_ofile << "cmdLevel--;\n";
 						_ofile << "}\n\n";
+						_ofile << "#else\n";
 
+						_ofile << "#undef " << funcName << "\n";
+						_ofile << "#define " << funcName << "(";
+						_ofile << pNameList << ") " << funcName << "_( ";
+						if (variadic) _ofile << "__VA_ARGS__";
+						_ofile << pNameListOut << ")\n";
+
+						_ofile << "#endif\n";
 						for (int nsi = 0; nsi < nsDepth; nsi++)
 						{
 							_ofile << "}\n";
