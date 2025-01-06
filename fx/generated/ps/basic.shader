@@ -1,0 +1,3 @@
+#include<../lib/constBuf.shader>
+#include<../lib/io.shader>
+TextureCube env:register(t0);Texture2D normals:register(t1);TextureCube albedo:register(t2);SamplerState sam1:register(s0);float3 FresnelSchlick(float3 s,float3 f,float3 P){float t=dot(-P,f);return saturate(s+(1.-s)*pow(1.-saturate(t),5.));}float4 PS(VS_OUTPUT f):SV_Target{float2 s=f.uv;float3 t=float3(1,.5,.3);float P=0,C=1;float3 T=.04,v=normals.SampleLevel(sam1,f.uv,1).xyz,r=f.vpos.xyz;r=normalize(mul(view[0],float4(r,1)));r=normalize(r);float3 F=reflect(r,v),l=env.SampleLevel(sam1,F,P*10)*2,p=env.SampleLevel(sam1,-v,8.5)*2,B=lerp(t,0,C);T=lerp(T,T*t,C);float3 S=FresnelSchlick(T,r,-v);S*=lerp(saturate(1-P),1,C);float3 a=l*S,n=saturate(1.-S);n=t*n*p;float3 V=n+a;return float4(V,1);}

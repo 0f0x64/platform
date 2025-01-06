@@ -1,0 +1,1 @@
+float hash(float h){return frac(sin(h)*43758.5453);}float noise(float3 h){float3 f=floor(h),x=frac(h);x=x*x*(3.-2.*x);float l=f.x+f.y*57.+113.*f.z;return lerp(lerp(lerp(hash(l),hash(l+1.),x.x),lerp(hash(l+57.),hash(l+58.),x.x),x.y),lerp(lerp(hash(l+113.),hash(l+114.),x.x),lerp(hash(l+170.),hash(l+171.),x.x),x.y),x.z);}

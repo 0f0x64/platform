@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Crinkler|Win32">
+      <Configuration>Crinkler</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Reflector|Win32">
+      <Configuration>Reflector</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{6f404b08-b1db-4eaf-b14c-941c4c032963}</ProjectGuid>
+    <RootNamespace>fx</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>platform</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Reflector|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Crinkler|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Reflector|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Crinkler|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Reflector|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Crinkler|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <GenerateManifest>false</GenerateManifest>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <ExecutablePath>$(SolutionDir);$(VC_ExecutablePath_x86);$(CommonExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;EDITOR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d10.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;xaudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(TargetDir)DataAssembler.exe</Command>
+    </PreBuildEvent>
+    <FxCompile>
+      <ObjectFileOutput />
+    </FxCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Reflector|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;REFLECTOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d10.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;xaudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(TargetDir)DataAssembler.exe</Command>
+    </PreBuildEvent>
+    <FxCompile>
+      <ObjectFileOutput>
+      </ObjectFileOutput>
+    </FxCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <ExceptionHandling>false</ExceptionHandling>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <Optimization>MaxSpeed</Optimization>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d10.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;xaudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>$(TargetDir)DataAssembler.exe</Command>
+    </PreBuildEvent>
+    <FxCompile>
+      <ObjectFileOutput />
+    </FxCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Crinkler|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;FINAL_RELEASE_CRINKLER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <ExceptionHandling>false</ExceptionHandling>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <AdditionalOptions>/d2noftol3 %(AdditionalOptions)</AdditionalOptions>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+      <Optimization>MaxSpeed</Optimization>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>d3d10.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;xaudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/CRINKLER /ENTRY:WinMain %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <Manifest>
+      <EnableDpiAwareness>false</EnableDpiAwareness>
+    </Manifest>
+    <PreBuildEvent>
+      <Command>$(TargetDir)DataAssembler.exe</Command>
+    </PreBuildEvent>
+    <FxCompile>
+      <ObjectFileOutput />
+    </FxCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dx11\blend.h" />
+    <ClInclude Include="dx11\camera.h" />
+    <ClInclude Include="dx11\constBuf.h" />
+    <ClInclude Include="dx11\depth.h" />
+    <ClInclude Include="dx11\device.h" />
+    <ClInclude Include="dx11\draw.h" />
+    <ClInclude Include="dx11\dx.h" />
+    <ClInclude Include="dx11\IA.h" />
+    <ClInclude Include="dx11\rasterizer.h" />
+    <ClInclude Include="dx11\sampler.h" />
+    <ClInclude Include="dx11\shaders.h" />
+    <ClInclude Include="dx11\shadersReflection.h" />
+    <ClInclude Include="dx11\textures.h" />
+    <ClInclude Include="editor\cmdEditService.h" />
+    <ClInclude Include="editor\editor.h" />
+    <ClInclude Include="editor\editorWindow.h" />
+    <ClInclude Include="editor\font.h" />
+    <ClInclude Include="editor\hotReload.h" />
+    <ClInclude Include="editor\paramEdit.h" />
+    <ClInclude Include="editor\style.h" />
+    <ClInclude Include="editor\textEditor.h" />
+    <ClInclude Include="editor\timeLine.h" />
+    <ClInclude Include="editor\trackerUI.h" />
+    <ClInclude Include="editor\uiDraw.h" />
+    <ClInclude Include="editor\viewCam.h" />
+    <ClInclude Include="editor\wndProc.h" />
+    <ClInclude Include="emptyFile.h" />
+    <ClInclude Include="generated\apiReflection.h" />
+    <ClInclude Include="generated\constBufReflect.h" />
+    <ClInclude Include="generated\libList.h" />
+    <ClInclude Include="generated\processedShaders.h" />
+    <ClInclude Include="generated\processedShadersCompile.h" />
+    <ClInclude Include="generated\psList.h" />
+    <ClInclude Include="generated\vsList.h" />
+    <ClInclude Include="projectFiles\camera.h" />
+    <ClInclude Include="projectFiles\cubemap.h" />
+    <ClInclude Include="projectFiles\graphicsAPI.h" />
+    <ClInclude Include="projectFiles\loop.h" />
+    <ClInclude Include="projectFiles\object.h" />
+    <ClInclude Include="projectFiles\sound\tracker.h" />
+    <ClInclude Include="projectFiles\sound\track_struct.h" />
+    <ClInclude Include="projectFiles\texList.h" />
+    <ClInclude Include="reflector.h" />
+    <ClInclude Include="settings.h" />
+    <ClInclude Include="timer.h" />
+    <ClInclude Include="tools.h" />
+    <ClInclude Include="types.h" />
+    <ClInclude Include="utils.h" />
+    <ClInclude Include="vMachine.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="projectFiles\shaders\lib\constants.shader" />
+    <None Include="projectFiles\shaders\lib\constBuf.shader" />
+    <None Include="projectFiles\shaders\lib\io.shader" />
+    <None Include="projectFiles\shaders\lib\utils.shader" />
+    <None Include="projectFiles\shaders\ps\basic.shader" />
+    <None Include="projectFiles\shaders\ps\box_ps.shader" />
+    <None Include="projectFiles\shaders\ps\lineDrawerUV_ps.shader" />
+    <None Include="projectFiles\shaders\ps\lineDrawer_ps.shader" />
+    <None Include="projectFiles\shaders\ps\cubemapCreator.shader" />
+    <None Include="projectFiles\shaders\ps\genNormals.shader" />
+    <None Include="projectFiles\shaders\ps\letter_ps.shader" />
+    <None Include="projectFiles\shaders\ps\obj1.shader" />
+    <None Include="projectFiles\shaders\ps\simpleFx.shader">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </DeploymentContent>
+    </None>
+    <None Include="projectFiles\shaders\ps\cubeMapViewer.shader" />
+    <None Include="projectFiles\shaders\vs\box.shader" />
+    <None Include="projectFiles\shaders\vs\letter.shader" />
+    <None Include="projectFiles\shaders\vs\lineDrawer.shader" />
+    <None Include="projectFiles\shaders\vs\lineDrawer3d.shader" />
+    <None Include="projectFiles\shaders\vs\objViewer.shader" />
+    <None Include="projectFiles\shaders\vs\quad.shader" />
+    <None Include="projectFiles\shaders\vs\simpleCube.shader" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,1 @@
+Texture2D tex1:register(t0);SamplerState sam1:register(s0);cbuffer ConstantBuffer:register(b0){float4 time;};struct VS_OUTPUT{float4 pos:SV_POSITION;float2 uv:TEXCOORD0;};float4 PS(VS_OUTPUT t):SV_Target{float4 f=float4(t.uv,sin(t.uv.x*12),1);float2 s=t.uv;s.y-=2;f=tex1.Sample(sam1,s);return f;}

@@ -1,0 +1,271 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\projectFiles">
+      <UniqueIdentifier>{48d34976-4b74-47cc-95fa-1381348bf0e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\generated">
+      <UniqueIdentifier>{5d051027-66fd-480c-ba4d-8a03f468ba02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\projectFiles\shadersSource">
+      <UniqueIdentifier>{03958e32-959e-42e5-b59b-263cdacc9678}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\projectFiles\shadersSource\vs">
+      <UniqueIdentifier>{1d05ceaa-bb05-4a0d-89a6-7dc50c820dd4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\projectFiles\shadersSource\ps">
+      <UniqueIdentifier>{a5c9fc64-11cc-4e2e-ae8d-d51df701188e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\projectFiles\shadersSource\lib">
+      <UniqueIdentifier>{7b41ce91-85a6-4bd9-938c-a7484811232a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dx11">
+      <UniqueIdentifier>{0f21f16a-86d3-4e2f-be72-eb8c8b1c31a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\editor">
+      <UniqueIdentifier>{f48baced-bedb-4d0b-864d-cc9f8c0d8038}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\projectFiles\shadersSource\ui">
+      <UniqueIdentifier>{9a898832-04c4-4db4-9929-0b27abf85e4d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\sound">
+      <UniqueIdentifier>{821ad417-7f85-4c8d-ba21-f6215f748da3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="timer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\loop.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="settings.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\processedShaders.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\texList.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\psList.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\vsList.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\constBufReflect.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\libList.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\processedShadersCompile.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\blend.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\camera.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\constBuf.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\depth.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\device.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\draw.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\dx.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\IA.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\rasterizer.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\sampler.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\shaders.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\textures.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\shadersReflection.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\editor.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\hotReload.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\editorWindow.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\uiDraw.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\timeLine.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\font.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\style.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\wndProc.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\camera.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\viewCam.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\apiReflection.h">
+      <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\cubemap.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\object.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\cmdEditService.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\paramEdit.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="types.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vMachine.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tools.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\graphicsAPI.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\sound\tracker.h">
+      <Filter>Source Files\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="emptyFile.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\sound\track_struct.h">
+      <Filter>Source Files\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\trackerUI.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="editor\textEditor.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
+    <ClInclude Include="reflector.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="projectFiles\shaders\ps\simpleFx.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\quad.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\simpleCube.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\cubeMapViewer.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\constBuf.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\io.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\cubemapCreator.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\obj1.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\constants.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\objViewer.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\utils.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\basic.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\genNormals.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\box.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\letter.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\lineDrawer.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\box_ps.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\lineDrawer_ps.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\letter_ps.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\lineDrawer3d.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\lineDrawerUV_ps.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ui</Filter>
+    </None>
+  </ItemGroup>
+</Project>

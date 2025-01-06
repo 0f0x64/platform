@@ -1,0 +1,51 @@
+check unused shaders & includes
+
+refactor api for working with external resources - use pouinters instead indicies
+
+timeline drawer batching (text, bpm boxes)
+
+mrt set
+compare sampler support
+
+
+select proper videocard (force nvidia if #define)
+
+
+
+
+//--
+
+float pitch = DirectX::XMScalarASin(-m_transform._32);
+
+DirectX::XMVECTOR from(DirectX::XMVectorSet(m_transform._12, m_transform._31, 0.0f, 0.0f));
+DirectX::XMVECTOR to(DirectX::XMVectorSet(m_transform._22, m_transform._33, 0.0f, 0.0f));
+DirectX::XMVECTOR res(DirectX::XMVectorATan2(from, to));
+
+float roll = DirectX::XMVectorGetX(res);
+float yaw = DirectX::XMVectorGetY(res);
+
+return DirectX::XMFLOAT3(yaw, pitch, roll);
+
+//--
+
+
+win errors handling
+
+static void LogWin32Error(DWORD err, const char* msg)
+{
+    OutputDebugStringA(msg);
+    OutputDebugStringA("!\n");
+
+    LPWSTR str;
+    if (FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
+        err, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), (LPWSTR)&str, 0, NULL))
+    {
+        OutputDebugStringW(str);
+        LocalFree(str);
+    }
+}
+static void LogWin32LastError(const char* msg)
+{
+    LogWin32Error(GetLastError(), msg);
+}
+
