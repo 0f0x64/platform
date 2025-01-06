@@ -948,8 +948,6 @@ int main()
 	remove(apiFileName.c_str());
 	ofstream apiOfile(apiFileName);
 
-	std::filesystem::path fref{ "..\\fx\\generated\\reflection\\" };
-	deleteDirectoryContents(fref);
 
 	const std::filesystem::path srcSandbox{ "..\\fx\\projectFiles\\" };
 	srcCat(srcSandbox, apiOfile);
