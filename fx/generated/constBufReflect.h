@@ -173,6 +173,10 @@ float a;
 float soft;
 float edge;
 float outlineBrightness;
+float progress_x;
+float progress_y;
+float progress_radial;
+float signed_progress;
 } params;
 
 void set () {

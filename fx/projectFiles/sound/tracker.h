@@ -46,8 +46,8 @@ namespace tracker
 		c.cmdIndex = cmdCounter - 1;
 	}
 
-#if EditMode
-	#pragma push_macro("Draw")
+	#if EditMode
+		#pragma push_macro("Draw")
 	#undef Draw
 
 	void channelDraw(int i, float &x, float &y, float w, float lead, float sel)
@@ -77,7 +77,7 @@ namespace tracker
 
 	API(kick, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
-	#ifdef Editor
+	#if EditMode
 			regfuncGroup(channel);
 			regDrawer(channelDraw);
 
@@ -101,7 +101,7 @@ namespace tracker
 
 	API(snare, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
-	#ifdef Editor
+	#if EditMode
 		regfuncGroup(channel);
 		regDrawer(channelDraw);
 	#endif	
@@ -127,13 +127,13 @@ namespace tracker
 	API (Track, int masterBPM)
 	{
 		//regDrawer(playTrack_dc);
-#ifdef Editor
+#if EditMode
 		editor::TimeLine::bpm = track_desc.masterBPM = masterBPM;
 #endif
 		curChannel = 0;
 
-		kick(0, 0, 14, switcher::on, switcher::on);
-		snare(48, 0, 14, switcher::on, switcher::off);
+		kick(0, -90, 14, switcher::off, switcher::off);
+		snare(0, -90, 14, switcher::off, switcher::off);
 
 		track_desc.channelsCount = curChannel;
 	

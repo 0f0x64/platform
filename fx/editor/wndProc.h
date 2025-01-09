@@ -187,7 +187,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 
 	case WM_CLOSE:
-		editor::paramEdit::Save(currentCmd);
 		PostQuitMessage(0);
 		break;
 

@@ -61,6 +61,8 @@ namespace paramEdit
 
 					processSlider(channelIndex, "vol", x, low, bw * 4, sm_h);
 					processSlider(channelIndex, "pan", x + bw * 4.5, low, bw * 2, sm_h);
+
+					ui::style::Base();
 				}
 
 				gapi.setScissors(rect{ (int)(TimeLine::screenLeft * dx11::width), (int)(top * dx11::height), dx11::width, (int)(bottom * dx11::height) });

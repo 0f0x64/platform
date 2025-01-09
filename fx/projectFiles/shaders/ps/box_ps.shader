@@ -10,6 +10,10 @@ cbuffer params : register(b1)
     float soft;
     float edge;
     float outlineBrightness;
+    float progress_x;
+    float progress_y;
+    float progress_radial;
+    float signed_progress;
 }
 //]
 
@@ -31,7 +35,14 @@ float calcRA(float2 uv, float2 sz, float radius)
 float4 PS(VS_OUTPUT_POS_UV input) : SV_Target
 {
     float4 color = float4(r, g, b, a);
+    
     float2 uvs = (input.uv - .5);
+    float progressX = progress_x < input.uv.x ? 0. : .125;
+    progressX+=progress_x>0 ? abs(uvs.y)*saturate(pow(saturate(1-2*abs(input.uv.x-progress_x)),28)) :0;
+    float signedProgressX = saturate(pow(saturate(1-2*abs(uvs.x-progress_x)),8));
+    signedProgressX*=abs(uvs.y);
+    progressX=lerp(progressX,signedProgressX,signed_progress);
+    color += progressX;
     float d = calcRA(uvs, input.sz, rad);
     float embossMask = sign(d) - saturate(d * edge * input.sz);
     float emboss = embossMask * dot(atan(uvs - .1), -.25);

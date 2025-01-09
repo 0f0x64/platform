@@ -793,9 +793,18 @@ bool Button(const char* str,float x, float y, float w,float h)
 	return over;
 }
 
+
+
 bool ButtonPressed(const char* str, float x, float y, float w, float h)
 {
-	return ui::lbDown & Button(str, x, y, w, h);
+	return ui::lbDown & drag.isFree() & Button(str, x, y, w, h);
+}
+
+bool ButtonPressed(int cmdIndex, const char* str, float x, float y, float w, float h)
+{
+	if (ui::lbDown && drag.isFree()) currentCmd = cmdIndex;
+
+	return ui::lbDown & drag.isFree() & Button(str, x, y, w, h);
 }
 
 
@@ -803,11 +812,20 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 {
 
 	int paramIndex = getParamIndexByStr(cmdIndex, pName.c_str());
+	float range = cmdParamDesc[cmdIndex].param[paramIndex]._max - cmdParamDesc[cmdIndex].param[paramIndex]._min;
+	ui::style::box::signed_progress = cmdParamDesc[cmdIndex].param[paramIndex]._min < 0 ? 1 :0;
+	ui::style::box::progress_x = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range;
 	std::string buttonText = pName + "::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value[0]);
-	if (ButtonPressed(buttonText.c_str(), x, y, w, h) && drag.isFree())
+	if (ButtonPressed(cmdIndex,buttonText.c_str(), x, y, w, h))
 	{
 		storedParam[0] = cmdParamDesc[cmdIndex].param[paramIndex].value[0];
 		drag.set(cmdIndex, paramIndex, 0);
+
+		if (ui::dblClk && ui::style::box::signed_progress)
+		{
+			storedParam[0] = cmdParamDesc[cmdIndex].param[paramIndex].value[0] = 0;
+			ui::dblClk = false;
+		}
 	}
 
 	if (drag.check(cmdIndex, paramIndex, 0))
@@ -815,6 +833,7 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 		cmdParamDesc[cmdIndex].param[paramIndex].value[0] = storedParam[0] + ui::mouseDelta.x * dx11::width;
 		pLimits(cmdIndex, paramIndex, 0);
 	}
+	ui::style::box::progress_x = 0;
 }
 
 void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w, float h, const char* shortName = "")
@@ -822,7 +841,7 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 	int paramIndex = getParamIndexByStr(cmdIndex, pName.c_str());
 	ui::style::button::inverted = cmdParamDesc[cmdIndex].param[paramIndex].value[0] == 0 ? false : true;
 
-	if (ButtonPressed(shortName ? shortName : pName.c_str(), x, y, w, h) && drag.isFree())
+	if (ButtonPressed(cmdIndex,shortName ? shortName : pName.c_str(), x, y, w, h))
 	{
 		drag.set(cmdIndex, paramIndex, 0);
 		cmdParamDesc[cmdIndex].param[paramIndex].value[0] = 1 - cmdParamDesc[cmdIndex].param[paramIndex].value[0];

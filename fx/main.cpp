@@ -162,6 +162,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		
 	}
 
+	#if EditMode
+			editor::paramEdit::Save(currentCmd);
+	#endif
+
 	ExitProcess(0);
 }
 
