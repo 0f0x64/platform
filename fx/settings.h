@@ -19,7 +19,7 @@
 	#define EditMode true
 	#define DebugMode true
 	#define DirectXDebugMode false
-	#define SECONDARY_DISPLAY_IF_AVAILABLE false
+	#define SECONDARY_DISPLAY_IF_AVAILABLE true
 	#define USE_SHADER_MINIFIER false
 	#define objPath "../fx/Editor_Debug"
 #endif

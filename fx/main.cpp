@@ -72,28 +72,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	#endif
 
 	hInst = (HINSTANCE)GetModuleHandle(0);
-
 	width = GetSystemMetrics(SM_CXSCREEN);
 	height = GetSystemMetrics(SM_CYSCREEN);
-
 	HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
 	RegisterClassEx(&wcex);
-	hWnd = CreateWindow("fx", "fx", WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
+	hWnd = CreateWindow("fx", "fx", WS_OVERLAPPEDWINDOW, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
+	ShowCursor(EditMode);
 
-	#if EditMode
-		ShowWindow(hWnd, EditMode ? SW_SHOW: SW_MAXIMIZE);
-		UpdateWindow(hWnd);
-		SetFocus(hWnd);
+	#if !EditMode
+		ShowWindow(hWnd, SW_MAXIMIZE);
 	#endif
 
-	ShowCursor(EditMode);
 
 	#if EditMode
 		editor::Init();
 	#endif	
 
-	Init();
+	dx11::Init();
 
 	#if EditMode
 		editor::ui::Init();
@@ -133,10 +129,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		{
 			timer::frameBeginTime = timer::GetCounter();
 
-			//todo: use real rect in pixels without window header
 			#if EditMode
 				RECT rect;
-				GetWindowRect(hWnd, &rect);
+				GetClientRect(hWnd, &rect);
 				int width = rect.right - rect.left;
 				int height = rect.bottom - rect.top;
 				dx11::aspect = float(height) / float(width);

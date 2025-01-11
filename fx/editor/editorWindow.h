@@ -1,5 +1,37 @@
+#pragma comment(lib, "Dwmapi.lib")
+#include <dwmapi.h>
+
+
+static bool isWin11()
+{
+	auto sharedUserData = (BYTE*)0x7FFE0000;
+
+	LONG vmaj = *(ULONG*)(sharedUserData + 0x26c); // major version offset
+	if (vmaj >= 10)
+	{
+		LONG vmin = *(ULONG*)(sharedUserData + 0x270);  // minor version offset
+		LONG vbm = *(ULONG*)(sharedUserData + 0x260); // build number offset
+
+		if (vbm >= 22000)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void SetRenderWindowPosition()
 {
+	RECT rect = { 0,0,0,0 };
+
+	if (isWin11())
+	{
+		COLORREF DARK_COLOR = 0x00202020;
+		DwmSetWindowAttribute(hWnd, DWMWINDOWATTRIBUTE::DWMWA_CAPTION_COLOR, &DARK_COLOR, sizeof(DARK_COLOR));
+		DwmGetWindowAttribute(hWnd, DWMWA_EXTENDED_FRAME_BOUNDS, &rect, sizeof(RECT));
+	}
+
 	//search for first non-primary display and show window on it
 	DWORD i = 0;
 	DISPLAY_DEVICE dc = { sizeof(dc) };
@@ -37,22 +69,20 @@ void SetRenderWindowPosition()
 			{
 				MONITORINFO monitorInfo = { sizeof(MONITORINFO) };
 				GetMonitorInfo(MonitorFromWindow(hWnd, 0), &monitorInfo);
-				const auto rc = monitorInfo.rcMonitor;
+				auto rc = monitorInfo.rcWork;
+				rc.right /= 2.;
+				SetWindowPos(hWnd, HWND_TOPMOST, -rect.left, 0, rc.right - rc.left+ rect.left*2, rc.bottom+rect.left, SWP_SHOWWINDOW);//window on top
 
-				int w = (rc.right - rc.left) / MAIN_DISPLAY_DENOMINATOR;
-				int h = (rc.bottom - rc.top);// / MAIN_DISPLAY_DENOMINATOR;
-				SetWindowPos(hWnd, HWND_TOPMOST, 0, 0, w, h, SWP_NOMOVE);//window on top
+				
+				UpdateWindow(hWnd);
+				SetFocus(hWnd);
 
-				width = (rc.right - rc.left);
-				height = (rc.bottom - rc.top);
-				//width = w;
-				//height = h;
-
+				GetClientRect(hWnd, &rc);
+				width = rc.right - rc.left;
+				height = rc.bottom - rc.top;
 
 				return;
 			}
-
-
 		}
 		++i;
 	}

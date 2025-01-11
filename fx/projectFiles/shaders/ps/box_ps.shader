@@ -40,7 +40,7 @@ float4 PS(VS_OUTPUT_POS_UV input) : SV_Target
     float progressX = progress_x < input.uv.x ? 0. : .125;
     progressX+=progress_x>0 ? abs(uvs.y)*saturate(pow(saturate(1-2*abs(input.uv.x-progress_x)),28)) :0;
     float signedProgressX = saturate(pow(saturate(1-2*abs(uvs.x-progress_x)),8));
-    signedProgressX*=abs(uvs.y);
+    signedProgressX*=4*pow(abs(uvs.y),2);
     progressX=lerp(progressX,signedProgressX,signed_progress);
     color += progressX;
     float d = calcRA(uvs, input.sz, rad);
