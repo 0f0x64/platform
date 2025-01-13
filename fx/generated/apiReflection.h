@@ -285,6 +285,10 @@ namespace gfx {
 void CreateMips_impl( );
 void CreateMips_ref ( CALLER_INFO)
 {
+if (!paramsAreLoaded) {
+	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
+	cmdParamDesc[cmdCounter].caller.line = srcLine;
+}
 
 AddToUI("CreateMips"); 
 cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
@@ -507,6 +511,10 @@ namespace gfx {
 void ClearRTDepth_impl( );
 void ClearRTDepth_ref ( CALLER_INFO)
 {
+if (!paramsAreLoaded) {
+	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
+	cmdParamDesc[cmdCounter].caller.line = srcLine;
+}
 
 AddToUI("ClearRTDepth"); 
 cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
@@ -741,6 +749,10 @@ namespace Loop {
 void cameraMan_impl( );
 void cameraMan_ref ( CALLER_INFO)
 {
+if (!paramsAreLoaded) {
+	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
+	cmdParamDesc[cmdCounter].caller.line = srcLine;
+}
 
 AddToUI("cameraMan"); 
 cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;

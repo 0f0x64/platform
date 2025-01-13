@@ -80,7 +80,7 @@ namespace Loop
 		gfx::SetCull(cullmode::back);
 		gfx::SetBlendMode(blendmode::off, blendop::add);
 		
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 501, 52, 32);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 0, 0, 0);
 
 		tracker::Track(120);
 

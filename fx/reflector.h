@@ -122,103 +122,6 @@ void Process(string shaderName, string inPath, string outPath, ofstream& ofile)
 
 enum sType { vertex, pixel };
 
-/*
-#include <d3dcompiler.h>
-#include <d3d11shader.h>
-#pragma comment(lib, "d3d10.lib")
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "d3dcompiler.lib")
-#pragma comment(lib, "dxguid.lib")
-
-ID3DBlob* pBlob;
-ID3DBlob* pErrorBlob;
-
-wchar_t shaderPathW[MAX_PATH];
-
-LPCWSTR nameToPatchLPCWSTR(const char* name)
-{
-	char path[MAX_PATH];
-	strcpy(path, name);
-
-
-	int len = MultiByteToWideChar(CP_ACP, 0, path, -1, NULL, 0);
-	MultiByteToWideChar(CP_ACP, 0, path, -1, shaderPathW, len);
-	return shaderPathW;
-}
-
-
-void reflect(ofstream& ofile, string &shaderName)
-{
-	ID3D11ShaderReflection* pReflector = NULL;
-	D3DReflect(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&pReflector);
-	D3D11_SHADER_DESC shaderDesc;
-	pReflector->GetDesc(&shaderDesc);
-
-	for (UINT i = 0; i < shaderDesc.ConstantBuffers; i++)
-	{
-		ID3D11ShaderReflectionConstantBuffer* constBuffReflection = pReflector->GetConstantBufferByIndex(i);
-		D3D11_SHADER_BUFFER_DESC shaderBuffDesc;
-		constBuffReflection->GetDesc(&shaderBuffDesc);
-
-		if (!strcmp(shaderBuffDesc.Name, "params"))
-		{
-			if (shaderBuffDesc.Variables > 0)
-			{
-				ofile << "enum " << shaderName << " { ";
-
-				for (UINT j = 0; j < shaderBuffDesc.Variables; j++)
-				{
-					ID3D11ShaderReflectionVariable* variableRefl = constBuffReflection->GetVariableByIndex(j);
-					D3D11_SHADER_VARIABLE_DESC shaderVarDesc;
-					variableRefl->GetDesc(&shaderVarDesc);
-
-					ofile << shaderVarDesc.Name;
-					ofile << ", ";
-				}
-
-				ofile << " };\n";
-			}
-		}
-
-	}
-}
-
-void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType type)
-{
-	string inFilePath = inPath + shaderName + shaderExtension;
-	LPCWSTR source = nameToPatchLPCWSTR(inFilePath.c_str());
-
-	HRESULT hr;
-	if (type == sType::vertex)
-	{
-		pBlob = NULL;
-		hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", "vs_4_1", D3DCOMPILE_SKIP_OPTIMIZATION , NULL, &pBlob, &pErrorBlob);
-		if (FAILED(hr))
-		{
-			char* m = (char*)pErrorBlob->GetBufferPointer();
-			Log(m);
-		}
-	}
-	if (type == sType::pixel)
-	{
-		pBlob = NULL;
-		hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS", "ps_4_1", D3DCOMPILE_SKIP_OPTIMIZATION, NULL, &pBlob, &pErrorBlob);
-		if (FAILED(hr))
-		{
-			char* m = (char*)pErrorBlob->GetBufferPointer();
-			Log(m);
-		}
-	}
-
-
-
-	reflect(ofile,shaderName);
-
-
-
-}*/
-
-
 void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType type, int sIndex)
 {
 	ofile << "namespace ";
@@ -766,6 +669,13 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 							}
 
 							_ofile << loader;
+							_ofile << "}\n";
+						}
+						else
+						{
+							_ofile << "if (!paramsAreLoaded) {\n";
+							_ofile << "\tstrcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);\n";
+							_ofile << "\tcmdParamDesc[cmdCounter].caller.line = srcLine;\n";
 							_ofile << "}\n";
 						}
 

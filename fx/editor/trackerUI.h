@@ -1,13 +1,12 @@
 namespace paramEdit 
 {
 
+	int currentClip = -1;
 	int currentNote = -1;
 	int currentPitchLayer = -1;
 
 	void showTrack()
 	{
-
-		int currentCmd_backup = currentCmd;
 
 		x = ui::style::text::height / 6.f * aspect;
 		ui::Box::Setup();
@@ -15,7 +14,7 @@ namespace paramEdit
 		int topUIElementIndex = -1;
 		int channelIndex = 0;
 
-		bool clippingTest = ui::mousePos.x < TimeLine::screenLeft || ui::mousePos.x >= TimeLine::screenRight;
+		bool clippingTest = ui::mousePos.x >= TimeLine::screenLeft && ui::mousePos.x < TimeLine::screenRight;
 
 		for (int iter = 0; iter < 2; iter++)
 		{
@@ -39,7 +38,7 @@ namespace paramEdit
 					ui::style::BaseButton();
 					ui::style::button::zoom = false;
 					ui::style::button::vAlign = ui::style::align_v::top;
-					Button(cmdParamDesc[channelIndex].funcName, 0, ch_y - x / 2., TimeLine::screenLeft - x, ch_lead * .9);
+					Button(channelIndex, cmdParamDesc[channelIndex].funcName, 0, ch_y - x / 2., TimeLine::screenLeft - x, ch_lead * .9);
 
 					ui::style::box::rounded = .5;
 					float bw = aspect * ch_h / 2.2;
@@ -95,6 +94,8 @@ namespace paramEdit
 						{
 							drag.set(clipIndex, posIndex, 0);
 							storedParam[0] = cmdParamDesc[clipIndex].param[posIndex].value[0];
+							currentCmd = clipIndex;
+							currentClip = clipIndex;
 						}
 
 						if (ui::lbDown && drag.check(clipIndex, posIndex, 0))
@@ -142,22 +143,24 @@ namespace paramEdit
 							if (ui::lbDown && over)
 							{
 								currentNote = n - 1;
+								currentClip = clipIndex;
 							}
 
 							noteStyleApply(pitchLayerIndex, over);
 
-							ui::style::BaseColor((pitchLayerIndex == topUIElementIndex) && (n - 1 == currentNote));
+							ui::style::BaseColor( (n - 1 == currentNote) && currentClip == clipIndex );
 							//ui::style::BaseColor();
-
-							if (cmdParamDesc[pitchLayerIndex].param[n].value[0] == 0)
+							auto pitchValue = tracker::track_desc.channel[ch].clip[clp].note[(int)layers::pitch].note_pitch[n - 1];
+							if (pitchValue == 0)
 							{
-								//	ui::style::box::r *= 0.5;
-								//	ui::style::box::g *= 0.5;
-								//	ui::style::box::b *= 0.5;
+								ui::style::box::r *= 0.75;
+								ui::style::box::g *= 0.75;
+								ui::style::box::b *= 0.75;
 							}
 
+
 							ui::Box::Draw(x, y, note_step, h);
-							CreateNoteText(cmdParamDesc[clipIndex].param[n].value[0]);
+							CreateNoteText(pitchValue);
 
 							int lp = 2;
 							while (note_step < ui::Text::getTextLen("A#0", ui::style::text::width, lp + 1) && lp >= 0)
@@ -168,7 +171,9 @@ namespace paramEdit
 
 							if (over && ui::lbDown)
 							{
-								storedParam[0] = cmdParamDesc[pitchLayerIndex].param[currentParam].value[0];
+								storedParam[0] = pitchValue;
+								currentCmd = pitchLayerIndex;
+								currentParam = n;
 							}
 
 						}
@@ -178,6 +183,5 @@ namespace paramEdit
 			}
 		}
 
-		if (currentCmd_backup != currentCmd) Save(currentCmd_backup);
 	}
 }

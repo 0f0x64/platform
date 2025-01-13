@@ -24,7 +24,7 @@ namespace tracker
 
 		for (int i = 0; i < count; i++)
 		{
-			c.note[(int)layers::pitch].note_pitch[i] = va_params[i];
+			c.note[(int)layers::pitch].note_pitch[i] = va_params[i+1];
 		}
 
 		c.note[(int)layers::pitch].cmdIndex = cmdCounter - 1;
@@ -86,10 +86,10 @@ namespace tracker
 
 		track_desc.channel[curChannel].clipCounter = -1;
 		
-		Clip(33, 11, 6, 1, overdub::off, 0);
-		Pitch(11, 249, 253, 252, 253, 253, 255, 255, 255, 255, 255, 255);
+		Clip(27, 11, 6, 1, overdub::off, 0);
+		Pitch(11, 4, 12, 252, 253, 253, 255, 255, 255, 255, 255, 255);
 
-		Clip(23, 4, 1, 1, overdub::off, 0);
+		Clip(22, 4, 1, 1, overdub::off, 0);
 		Pitch(4, 255, 204, 192, 0);
 
 		oscillator(1, 2);
@@ -108,11 +108,11 @@ namespace tracker
 
 		track_desc.channel[curChannel].clipCounter = -1;
 
-		Clip(22, 10, 6, 1, overdub::off, 0);
-		Pitch(8, 0, 0, 0, 255, 255, 255, 255, 255);
+		Clip(30, 10, 6, 1, overdub::off, 0);
+		Pitch(8, 10, 0, 0, 255, 255, 255, 255, 255);
 
-		Clip(38, 8, 1, 1, overdub::off, 0);
-		Pitch(3, 0, 90, 255);
+		Clip(44, 4, 1, 1, overdub::off, 0);
+		Pitch(3, 3, 3, 255);
 
 		oscillator(1, 2);
 
@@ -132,8 +132,8 @@ namespace tracker
 #endif
 		curChannel = 0;
 
-		kick(69, -29, 14, switcher::off, switcher::off);
-		snare(78, -1, 14, switcher::off, switcher::off);
+		kick(99, 19, 14, switcher::off, switcher::off);
+		snare(34, 55, 14, switcher::off, switcher::off);
 
 		track_desc.channelsCount = curChannel;
 	

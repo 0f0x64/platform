@@ -35,7 +35,7 @@ int cmdLevel = 0;
 int startCmd = 0;
 int curCmdLevel = 0;
 
-
+int currentCmd_backup = -1;
 int currentCmd = -1;//comes from ui
 int hilightedCmd = -1;
 

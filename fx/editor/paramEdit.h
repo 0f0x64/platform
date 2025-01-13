@@ -103,6 +103,8 @@ namespace paramEdit {
 	void Save(int cmdIndex)
 	{
 		if (cmdIndex < 0) return;
+		
+		justSaved = true;
 
 		std::vector<std::string> genParams;
 
@@ -126,6 +128,7 @@ namespace paramEdit {
 			}
 
 		}
+
 
 		const char* filename = cmdParamDesc[cmdIndex].caller.fileName;
 		const int lineNum = cmdParamDesc[cmdIndex].caller.line;
@@ -200,7 +203,10 @@ namespace paramEdit {
 					}
 				}
 
-				caller.erase(caller.size() - 2);
+				if (cmdParamDesc[cmdIndex].pCount > 0)
+				{
+					caller.erase(caller.size() - 2);
+				}
 				caller.append(")");
 
 				string pre = s.substr(0, startFuncPos);
@@ -214,17 +220,23 @@ namespace paramEdit {
 			{
 				ofile << s << "\n";
 			}
+
+			ifile.close();
+			ofile.close();
+
+			remove(inFilePath.c_str());
+			rename(outFilePath.c_str(), inFilePath.c_str());
+
+			Log("Modified:  ");
+			Log(inFilePath.c_str());
+			Log("\n");
+
+
+
+			return;
 		}
 
-		ifile.close();
-		ofile.close();
-
-		remove(inFilePath.c_str());
-		rename(outFilePath.c_str(), inFilePath.c_str());
-
-		Log("Modified:  ");
-		Log(inFilePath.c_str());
-		Log("\n");
+		Log("unable to open source file\n");
 	}
 
 
@@ -350,7 +362,7 @@ namespace paramEdit {
 					break;
 				}
 
-				if (ui::lbDown && i != currentCmd && !action) {
+				if (ui::lbDown && i != currentCmd && drag.isFree()) {
 					action = true;
 					currentCmd = i;
 					currentParam = -1;
@@ -749,9 +761,12 @@ namespace paramEdit {
 	}
 	*/
 
-bool Button(const char* str,float x, float y, float w,float h)
+bool Button(int cmdIndex, const char* str,float x, float y, float w,float h)
 {
 	bool over = isMouseOver(x, y, w,h);
+
+	if (over && ui::lbDown && drag.isFree()) currentCmd = cmdIndex;
+
 	ui::style::BaseColor(ui::style::button::inverted);
 	ui::style::box::outlineBrightness = over ? .25f : 0.1f;
 	ui::Box::Draw(x, y, w, h);
@@ -795,16 +810,15 @@ bool Button(const char* str,float x, float y, float w,float h)
 
 
 
-bool ButtonPressed(const char* str, float x, float y, float w, float h)
+/*bool ButtonPressed(const char* str, float x, float y, float w, float h)
 {
 	return ui::lbDown & drag.isFree() & Button(str, x, y, w, h);
-}
+}*/
 
 bool ButtonPressed(int cmdIndex, const char* str, float x, float y, float w, float h)
 {
-	if (ui::lbDown && drag.isFree()) currentCmd = cmdIndex;
 
-	return ui::lbDown & drag.isFree() & Button(str, x, y, w, h);
+	return ui::lbDown & drag.isFree() & Button(cmdIndex, str, x, y, w, h);
 }
 
 
@@ -852,6 +866,7 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 
 	void showParams()
 	{
+		if (currentCmd < 0) return;
 		float inCurPos = 0;
 		pCountV = 0;
 		showCursor = false;
@@ -1003,9 +1018,6 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 
 	void ShowStack()
 	{
-
-		int currentCmd_backup = currentCmd;
-
 		tabLen = ui::Text::getTextLen("000000000000000", ui::style::text::width);
 		valueDrawOffset = tabLen *1.f;
 		enumDrawOffset = tabLen *2.f;
@@ -1078,8 +1090,6 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 		float scroll = isOutside(selYpos, top+lead*1.f, bottom - lead * (pCountV+1)) / 4.f;
 		yPos -= vScroll ? scroll : 0.f;
 		if (fabs(scroll) < 0.00125f) vScroll = false;
-
-		if (currentCmd_backup != currentCmd) Save(currentCmd_backup);
 
 	}
 

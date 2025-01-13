@@ -7,6 +7,7 @@ const int nameBufLen = 1024;
 uint8_t change_buf[changeBufLen];
 
 bool codeRecompiled = false;
+bool justSaved = false;
 
 typedef struct {
 	int srcFlieLine;
@@ -230,10 +231,6 @@ void WatchFiles()
 						memcpy(s2, fileName, bytes);
 						s2[bytes + 1] = 0;
 
-						Log("Modified:  ");
-						Log(s2);
-						Log("\n");
-
 						char fn[1024];
 						strcpy(fn, userSpacePath);
 						strcat(fn, "\\");
@@ -242,7 +239,18 @@ void WatchFiles()
 						std::filesystem::path p = fn;
 						auto ap = std::filesystem::absolute(p);
 
-						reflectSourceChanges(ap);
+						if (justSaved)
+						{
+							justSaved = false;
+						}
+						else {
+							reflectSourceChanges(ap);
+
+							Log("Modified: ");
+							Log(s2);
+							Log(" - data updated from source file");
+							Log("\n");
+						}
 
 					}
 					#endif	

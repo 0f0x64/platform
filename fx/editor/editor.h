@@ -266,6 +266,8 @@ namespace editor
 
 	void Process()
 	{
+		currentCmd_backup = currentCmd;
+
 		showTimeFlag = false;
 		hilightedCmd = -1;
 
@@ -322,7 +324,10 @@ namespace editor
 		}
 
 		
-
+		if (currentCmd_backup != currentCmd)
+		{
+			paramEdit::Save(currentCmd_backup);
+		}
 		//ViewCam::setCamMat();
 
 	}
