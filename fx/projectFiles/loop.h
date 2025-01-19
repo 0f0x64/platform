@@ -82,7 +82,7 @@ namespace Loop
 		
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 0, 0, 0);
 
-		tracker::Track(120);
+		//tracker::Track(120);
 
 		//gApi.ClearRT(0, 0, 0, 0);
 
