@@ -38,20 +38,7 @@ namespace Loop
 
 	void mainLoop()
 	{
-		
-
-		#if EditMode
-			if (editor::codeRecompiled) {
-				editor::codeRecompiled = false;
-				isPrecalc = false;
-				paramsAreLoaded = false;
-			}
-
-			cmdLevel = 0;
-		#endif	
-
-		cmdCounter = 0;
-
+	
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
 
@@ -80,15 +67,12 @@ namespace Loop
 		gfx::SetCull(cullmode::back);
 		gfx::SetBlendMode(blendmode::off, blendop::add);
 		
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 0, 0, 0);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, -16, 0);
 
-		//tracker::Track(120);
+		tracker::Track(120);
 
 		//gApi.ClearRT(0, 0, 0, 0);
 
-		#if EditMode
-		paramsAreLoaded = true;
-		#endif
 	}
 
 }

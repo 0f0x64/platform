@@ -47,7 +47,7 @@ private:
 
 public:
 
-	enum class context { free = -1, timeCursor = -2, timeKey = -3, cameraView = -4, cameraButtons = -5 };
+	enum class context { free = -1, timeCursor = -2, timeKey = -3, cameraView = -4, cameraButtons = -5, commonUIButtons = -6 };
 
 	bool isFree()
 	{
@@ -204,6 +204,14 @@ namespace editor
 		ViewCam::Init();
 	}
 
+	enum class editorMode_ {
+		graphics, music
+	};
+
+	int editorMode_count = 2;
+
+	editorMode_ editorMode = editorMode_::music;
+
 	void ProcessContext()
 	{
 		if (ui::mousePos.x > 1 || ui::mousePos.x < 0 || ui::mousePos.y > 1 || ui::mousePos.x < 0)
@@ -231,6 +239,7 @@ namespace editor
 		{
 			return;
 		}
+
 
 		if (isKeyDown(CAM_KEY) && uiContext != uiContext_::camera)
 		{
@@ -264,8 +273,13 @@ namespace editor
 		}
 	}
 
+
+	
 	void Process()
 	{
+		paramEdit::top = 0;
+		paramEdit::bottom = 1;
+
 		currentCmd_backup = currentCmd;
 
 		showTimeFlag = false;
@@ -277,17 +291,17 @@ namespace editor
 
 		ProcessContext();
 
-			ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
-			ui::mouseDelta.y = ui::mousePos.y - ui::mouseLastPos.y;
-			ui::mouseAngle = -atan2f(ui::mousePos.y - .5f, ui::mousePos.x - .5f);
-			ui::mouseAngleDelta = ui::mouseAngle - ui::mouseLastAngle;
+		ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
+		ui::mouseDelta.y = ui::mousePos.y - ui::mouseLastPos.y;
+		ui::mouseAngle = -atan2f(ui::mousePos.y - .5f, ui::mousePos.x - .5f);
+		ui::mouseAngleDelta = ui::mouseAngle - ui::mouseLastAngle;
 
-			ui::lbDown = isKeyDown(VK_LBUTTON);
-			ui::rbDown = isKeyDown(VK_RBUTTON);
-			ui::mbDown = isKeyDown(VK_MBUTTON);
-			ui::LeftDown = isKeyDown(VK_LEFT);
-			ui::RightDown = isKeyDown(VK_RIGHT);
-		
+		ui::lbDown = isKeyDown(VK_LBUTTON);
+		ui::rbDown = isKeyDown(VK_RBUTTON);
+		ui::mbDown = isKeyDown(VK_MBUTTON);
+		ui::LeftDown = isKeyDown(VK_LEFT);
+		ui::RightDown = isKeyDown(VK_RIGHT);
+
 
 		if (!ui::lbDown)
 		{
@@ -298,16 +312,27 @@ namespace editor
 		gapi.cull(cullmode::off);
 		gapi.depth(depthmode::off);
 
+
 		//if (paramEdit::editContext)
+		if (editorMode == editorMode_::graphics)
 		{
 			paramEdit::ShowStack();
 		}
 
 		//if (isKeyDown(TIME_KEY) || showTimeFlag)
+
 		{
 			TimeLine::ProcessInput();
 			TimeLine::Draw();
+		}
+
+		if (editorMode == editorMode_::graphics)
+		{
 			paramEdit::CamKeys();
+		}
+
+		if (editorMode == editorMode_::music)
+		{
 			paramEdit::showTrack();
 		}
 
@@ -315,6 +340,7 @@ namespace editor
 		ViewCam::setCamMat();
 
 		//if (Camera::viewCam.overRide)
+		if (editorMode == editorMode_::graphics)
 		{
 			if (isKeyDown(CAM_KEY)|| ViewCam::flyToCam < 1.f)
 			{
@@ -329,6 +355,36 @@ namespace editor
 			paramEdit::Save(currentCmd_backup);
 		}
 		//ViewCam::setCamMat();
+		//ui::Text::Draw(str, tx, ty, th, th);
+
+		//common ui
+		char modeText[22];
+		switch (editorMode)
+		{
+		case editorMode_::graphics:
+			strcpy(modeText,"graphics");
+			break;
+		case editorMode_::music:
+			strcpy(modeText, "music");
+			break;
+
+		}
+
+		gapi.setScissors({ 0,0,dx11::width,dx11::height });
+		ui::Box::Setup();
+		ui::style::Base();
+		ui::style::button::hAlign = ui::style::align_h::center;
+		ui::style::button::zoom = true;
+
+		if (paramEdit::ButtonPressed(modeText, 0, 0, ui::style::box::width/1.5, ui::style::box::height/1.2) && drag.isFree())
+		{
+			editorMode = (editorMode_)((int)editorMode+1);
+			editorMode = (editorMode_)((int)editorMode%editorMode_count);
+			
+			drag.set(drag.context::commonUIButtons);
+
+		}
+		
 
 	}
 }

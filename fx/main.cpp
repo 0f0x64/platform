@@ -140,7 +140,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				timer::timeCursor = (int)((timer::frameBeginTime - timer::startTime) * SAMPLING_FREQ / 1000.f);
 			#endif
 
+			//pre-loop
+			#if EditMode
+				if (editor::codeRecompiled) {
+					editor::codeRecompiled = false;
+					Loop::isPrecalc = false;
+					paramsAreLoaded = false;
+				}
+				cmdLevel = 0;
+			#endif	
+			cmdCounter = 0;
+			//-------
 			Loop::mainLoop();
+			//post-loop
+			#if EditMode
+				paramsAreLoaded = true;
+			#endif
+			//-------
 
 			#if EditMode
 				editor::Process();

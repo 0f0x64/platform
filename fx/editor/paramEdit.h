@@ -761,11 +761,8 @@ namespace paramEdit {
 	}
 	*/
 
-bool Button(int cmdIndex, const char* str,float x, float y, float w,float h)
+bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 {
-	bool over = isMouseOver(x, y, w,h);
-
-	if (over && ui::lbDown && drag.isFree()) currentCmd = cmdIndex;
 
 	ui::style::BaseColor(ui::style::button::inverted);
 	ui::style::box::outlineBrightness = over ? .25f : 0.1f;
@@ -800,7 +797,6 @@ bool Button(int cmdIndex, const char* str,float x, float y, float w,float h)
 	case ui::style::align_v::bottom:
 		//todo
 		break;
-
 	}
 
 	ui::Text::Draw(str, tx, ty, th, th);
@@ -809,18 +805,28 @@ bool Button(int cmdIndex, const char* str,float x, float y, float w,float h)
 }
 
 
-
-/*bool ButtonPressed(const char* str, float x, float y, float w, float h)
+bool Button(int cmdIndex, const char* str, float x, float y, float w, float h)
 {
-	return ui::lbDown & drag.isFree() & Button(str, x, y, w, h);
-}*/
+	bool over = isMouseOver(x, y, w, h);
+	if (over && ui::lbDown && drag.isFree()) currentCmd = cmdIndex;
+	return ShowButton(str, x, y, w, h, over);
+}
+
+bool Button(const char* str, float x, float y, float w, float h)
+{
+	bool over = isMouseOver(x, y, w, h);
+	return ShowButton(str, x, y, w, h, over);
+}
 
 bool ButtonPressed(int cmdIndex, const char* str, float x, float y, float w, float h)
 {
-
 	return ui::lbDown & drag.isFree() & Button(cmdIndex, str, x, y, w, h);
 }
 
+bool ButtonPressed(const char* str, float x, float y, float w, float h)
+{
+	return ui::lbDown & drag.isFree() & Button(str, x, y, w, h);
+}
 
 void processSlider(int cmdIndex, std::string pName,float x, float y,float w,float h)
 {
