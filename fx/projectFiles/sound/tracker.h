@@ -87,7 +87,7 @@ namespace tracker
 		track_desc.channel[curChannel].clipCounter = -1;
 		
 		Clip(10, 11, 6, 1, overdub::off, 0);
-		Pitch(11, 4, 12, 252, 253, 253, 255, 255, 255, 255, 255, 255);
+		Pitch(11, 34, 12, 252, 25, 253, 25, 255, 255, 255, 255, 255);
 
 		Clip(3, 4, 1, 1, overdub::off, 0);
 		Pitch(4, 255, 204, 192, 0);
@@ -108,10 +108,10 @@ namespace tracker
 
 		track_desc.channel[curChannel].clipCounter = -1;
 
-		Clip(5, 10, 6, 1, overdub::off, 0);
-		Pitch(8, 10, 0, 0, 255, 255, 255, 255, 255);
+		Clip(6, 10, 6, 1, overdub::off, 0);
+		Pitch(8, 24, 0, 104, 109, 7, 196, 120, 255);
 
-		Clip(22, 4, 1, 1, overdub::off, 0);
+		Clip(23, 4, 1, 1, overdub::off, 0);
 		Pitch(3, 3, 3, 255);
 
 		oscillator(1, 2);
@@ -132,8 +132,8 @@ namespace tracker
 #endif
 		curChannel = 0;
 
-		kick(70, -20, 14, switcher::off, switcher::on);
-		snare(40, 55, 14, switcher::off, switcher::on);
+		kick(76, -20, 14, switcher::off, switcher::on);
+		snare(76, 58, 14, switcher::off, switcher::on);
 
 		track_desc.channelsCount = curChannel;
 	

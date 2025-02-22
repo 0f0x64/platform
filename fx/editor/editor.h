@@ -367,7 +367,6 @@ namespace editor
 		case editorMode_::music:
 			strcpy(modeText, "music");
 			break;
-
 		}
 
 		gapi.setScissors({ 0,0,dx11::width,dx11::height });
@@ -382,7 +381,9 @@ namespace editor
 			editorMode = (editorMode_)((int)editorMode%editorMode_count);
 			
 			drag.set(drag.context::commonUIButtons);
-
+			
+			currentCmd = -1;
+			paramEdit::currentParam = -1;
 		}
 		
 

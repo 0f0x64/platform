@@ -67,69 +67,63 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_KEYDOWN:
 	{
-		if ((wParam >= '0' && wParam <= '9') || wParam == VK_OEM_MINUS)
+
+		if (editor::editorMode == editor::editorMode_::music)
 		{
-			editor::paramEdit::insertNumber(wParam);
-			break;
+			editor::paramEdit::trackerKeys(wParam);
 		}
 
-
-		switch (wParam)
+		if (editor::editorMode == editor::editorMode_::graphics)
 		{
-		case VK_SPACE:
-			editor::TimeLine::Space();
-			break;
-		case VK_ESCAPE:
-			editor::ViewCam::ToggleViewMode();
-			break;
 
-		case 'A':
-		{
-			editor::ViewCam::AxisCamYaw(-90);
-			break;
-		}
-		case 'D':
-		{
-			editor::ViewCam::AxisCamYaw(90);
-			break;
-		}
-		case 'S':
-		{
-			editor::ViewCam::AxisCamPitch(0);
-			break;
-		}
-		case 'X':
-		{
-			editor::ViewCam::AxisCamPitch(90);
-			break;
-		}
+			if ((wParam >= '0' && wParam <= '9') || wParam == VK_OEM_MINUS)
+			{
+				editor::paramEdit::insertNumber(wParam);
+				break;
+			}
 
-		case 'W':
-		{
-			editor::ViewCam::AxisCamPitch(-90);
-			break;
-		}
-
-		case VK_LEFT:
-			editor::paramEdit::cursorPos--;
-			break;
-		case VK_RIGHT:
-			editor::paramEdit::cursorPos++;
-			break;
-
-		case VK_HOME:
-			editor::paramEdit::cursorPos = 0;;
-			break;
-		case VK_END:
-			editor::paramEdit::cursorPos = INT_MAX;
-			break;
-		case VK_BACK:
-			editor::paramEdit::BackSpace();
-			break;
-		case VK_DELETE:
-			editor::paramEdit::Delete();
-			break;
-
+			switch (wParam)
+			{
+				case VK_SPACE:
+					editor::TimeLine::Space();
+					break;
+				case VK_ESCAPE:
+					editor::ViewCam::ToggleViewMode();
+					break;
+				case 'A':
+					editor::ViewCam::AxisCamYaw(-90);
+					break;
+				case 'D':
+					editor::ViewCam::AxisCamYaw(90);
+					break;
+				case 'S':
+					editor::ViewCam::AxisCamPitch(0);
+					break;
+				case 'X':
+					editor::ViewCam::AxisCamPitch(90);
+					break;
+				case 'W':
+					editor::ViewCam::AxisCamPitch(-90);
+					break;
+				case VK_LEFT:
+					editor::paramEdit::cursorPos--;
+					break;
+				case VK_RIGHT:
+					editor::paramEdit::cursorPos++;
+					break;
+				case VK_HOME:
+					editor::paramEdit::cursorPos = 0;;
+					break;
+				case VK_END:
+					editor::paramEdit::cursorPos = INT_MAX;
+					break;
+				case VK_BACK:
+					editor::paramEdit::BackSpace();
+					break;
+				case VK_DELETE:
+					editor::paramEdit::Delete();
+					break;
+			}
 
 		}
 	}
