@@ -71,6 +71,58 @@ namespace paramEdit
 
 	}
 
+	int currentOctave = 2;
+	int currentStep = 1;
+
+	void showTrackControls()
+	{
+		gapi.setScissors({ 0,0,dx11::width,dx11::height });
+		ui::Box::Setup();
+		ui::style::Base();
+		ui::style::button::hAlign = ui::style::align_h::center;
+		ui::style::button::zoom = true;
+		char octaveText[32];
+		char octaveNum[2];
+		strcpy(octaveText, "[-] octave: ");
+		_itoa(currentOctave, octaveNum, 10);
+		strcat(octaveText, octaveNum);
+		strcat(octaveText, " [+]");
+
+		float btn_x=.1;
+		float btn_y = .0;
+		float btn_w = ui::style::box::width / 1.5;
+		float btn_h = ui::style::box::height / 1.2;
+
+		if (paramEdit::ButtonPressed(octaveText, btn_x, btn_y, btn_w, btn_h) && drag.isFree())
+		{
+			currentOctave += isMouseOver(btn_x, btn_y, btn_w / 2., btn_h) ? -1 : 1;
+			currentOctave = clamp(currentOctave, 0, 8);
+
+			drag.set(drag.context::commonUIButtons);
+			currentCmd = -1;
+			paramEdit::currentParam = -1;
+		}
+
+		btn_y += ui::style::text::height;
+		char stepText[32];
+		char stepNum[2];
+		strcpy(stepText, "[-] step: ");
+		_itoa(currentStep, stepNum, 10);
+		strcat(stepText, stepNum);
+		strcat(stepText, " [+]");
+
+		if (paramEdit::ButtonPressed(stepText, btn_x, btn_y, btn_w, btn_h) && drag.isFree())
+		{
+			currentStep += isMouseOver(btn_x, btn_y, btn_w / 2., btn_h) ? -1 : 1;
+			currentStep = clamp(currentStep, 0, 8);
+
+			drag.set(drag.context::commonUIButtons);
+			currentCmd = -1;
+			paramEdit::currentParam = -1;
+		}
+
+	}
+
 	void showTrack()
 	{
 
@@ -258,12 +310,18 @@ namespace paramEdit
 			}
 		}
 
+
+		showTrackControls();
 	}
 
-	int currentOctave = 0;
+
 
 	int getNoteFromKey(WPARAM wParam)
 	{
+		if (GetAsyncKeyState(VK_CONTROL)||
+			GetAsyncKeyState(VK_SHIFT) || 
+			GetAsyncKeyState(164)) return -1;
+
 		char noteKey[] = "ZSXDCVGBHNJMQ2W3ER5T6Y7U";
 		int s = strlen(noteKey);
 		for (int i = 0; i < s; i++)
@@ -273,14 +331,36 @@ namespace paramEdit
 				return i + currentOctave * 12 + 1;
 			}
 		}
-		
+
 		if (wParam == VK_OEM_3) return 255;
-		
+
 		return -1;
+	}
+
+	void stepControl(WPARAM wParam)
+	{
+		if (GetAsyncKeyState(VK_CONTROL) && (wParam >= '0' && wParam <= '8'))
+		{
+			currentStep = wParam - '0';
+		}
 	}
 
 	void trackerKeys(WPARAM wParam)
 	{
+
+		stepControl(wParam);
+
+		switch (wParam)
+		{
+		case VK_OEM_4:
+			currentOctave = clamp(currentOctave - 1, 0, 8);
+			break;
+		case VK_OEM_6:
+			currentOctave = clamp(currentOctave + 1, 0, 8);
+			break;
+		}
+
+		//note editing section
 		if (currentChannel < 0 || currentClip < 0 && currentNote < 0) return;
 
 		auto i = tracker::track_desc.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
@@ -289,23 +369,48 @@ namespace paramEdit
 		if (note >= 0)
 		{
 			cmdParamDesc[i].param[currentNote + 1].value[0] = note;
+			if (currentNote + currentStep < tracker::track_desc.channel[currentChannel].clip[currentClip].length)
+			{
+				currentNote += currentStep;
+			}
+			//currentNote = currentNote % tracker::track_desc.channel[currentChannel].clip[currentClip].length;
 		}
 
 		switch (wParam)
 		{
-			case VK_OEM_4:
-				currentOctave=clamp(currentOctave-1, 0, 8);
+			case VK_DELETE:
+			{
+				auto len = tracker::track_desc.channel[currentChannel].clip[currentClip].length;	
+				auto index = tracker::track_desc.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
+				for (int n = currentNote; n < len-1 ; n++)
+				{
+					cmdParamDesc[index].param[n+1].value[0] = cmdParamDesc[index].param[n+2].value[0];
+				}
+				cmdParamDesc[index].param[len].value[0] = 0;
 				break;
-			case VK_OEM_6:
-				currentOctave = clamp(currentOctave+1, 0, 8);
+			}
+
+			case VK_INSERT:
+			{
+				auto len = tracker::track_desc.channel[currentChannel].clip[currentClip].length;
+				auto index = tracker::track_desc.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
+				for (int n = len - 2; n >= currentNote; n--)
+				{
+					cmdParamDesc[index].param[n + 2].value[0] = cmdParamDesc[index].param[n + 1].value[0];
+				}
+				cmdParamDesc[index].param[currentNote+1].value[0] = 0;
 				break;
+			}
+
+
 			case VK_RETURN:
 				cmdParamDesc[i].param[currentNote+1].value[0]=0;
+				currentNote += currentStep;
+				currentNote = currentNote % tracker::track_desc.channel[currentChannel].clip[currentClip].length;
 				break;
 			case VK_LEFT:
 				if (currentNote > 0) currentNote--;
 				break;
-
 			case VK_RIGHT:
 				if (currentNote < tracker::track_desc.channel[currentChannel].clip[currentClip].length - 1) currentNote++;
 				break;

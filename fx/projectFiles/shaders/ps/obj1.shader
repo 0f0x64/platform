@@ -52,10 +52,10 @@ float calcWalls(float2 uv)
     for (int i = 0; i < 5; i++)
     {
   
-        float2 xy = uv - .5 - .25 * float2(sin(i * 4. + time.x * .01), sin(i * 5. + time.x * .02));
-        float2 uv4 = float2(atan2(xy.y, xy.x) * 1, 12 / (length(xy) + .1) + time.y * .1);
-        walls += pow(saturate(1 - 2 * length(xy)), 62) * 120;
-        uv5 += uv4;
+        float2 xy = uv - .5 - .5 * float2(sin(i * 4. + time.x * .01), .5*sin(i * 5. + time.x * .012));
+        float2 uv4 = float2(atan2(xy.y, xy.x) * 2, 2 / (length(xy) - .1) + time.y * .1);
+        //walls += pow(saturate(1 - 2 * length(xy)), 2) * 12;
+        uv5 += uv4*2;
         
     }
   
@@ -75,10 +75,13 @@ float3 sphere(float2 uv)
 
     pos *= .35;
     float wc = pow(calcWalls(sin((uv * PI) * float2(4, 3))), .01);
-    pos *= wc * .6 + 1;
+    pos *= wc * .6 + 2;
     uv = abs(uv - .5);
-    pos /= 1 + .24 * ((sin(uv.x * PI * 2) * cos(uv.y * PI * 4+time.y*.01))) ;
-    pos *= 1.5;
+    pos /= 1 + .4 * ((sin(uv.x * PI * 2*2) * cos(uv.y * PI * 4+time.y*.01))) ;
+    pos *= 1.8;
+    pos.y*=.5;
+    pos.y-=.1*sin(length(pos.xz)*8+time.x*.1);
+   // pos=clamp(pos,-1,1);
   
     
     return pos;

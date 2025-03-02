@@ -22,6 +22,7 @@
 	#define SECONDARY_DISPLAY_IF_AVAILABLE false
 	#define USE_SHADER_MINIFIER false
 	#define objPath "../fx/Editor_Debug"
+	#define vsWindowManagement true
 #endif
 
 #define FRAMES_PER_SECOND 60

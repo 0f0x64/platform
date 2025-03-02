@@ -21,6 +21,27 @@ static bool isWin11()
 	return false;
 }
 
+HWND vsHWND = NULL;
+RECT primaryRC;
+
+static BOOL CALLBACK enumWindowCallback(HWND hWnd, LPARAM lparam) 
+{
+	int length = GetWindowTextLength(hWnd);
+	char* buffer = new char[length + 1];
+	GetWindowText(hWnd, buffer, length + 1);
+	std::string windowTitle(buffer);
+	delete[] buffer;
+
+	if (IsWindowVisible(hWnd) && length != 0) 
+	{
+		if (std::string::npos != windowTitle.find("platform"))
+		{
+			vsHWND = hWnd;
+		};
+	}
+	return TRUE;
+}
+
 void SetRenderWindowPosition()
 {
 	RECT rect = { 0,0,0,0 };
@@ -69,13 +90,20 @@ void SetRenderWindowPosition()
 			{
 				MONITORINFO monitorInfo = { sizeof(MONITORINFO) };
 				GetMonitorInfo(MonitorFromWindow(hWnd, 0), &monitorInfo);
+				primaryRC = monitorInfo.rcWork;
 				auto rc = monitorInfo.rcWork;
 				rc.right /= 2.;
-				SetWindowPos(hWnd, HWND_TOPMOST, -rect.left, 0, rc.right - rc.left+ rect.left*2, rc.bottom+rect.left, SWP_SHOWWINDOW);//window on top
+				SetWindowPos(hWnd, HWND_TOPMOST, -rect.left, 0, rc.right - rc.left+ rect.left*2+6, rc.bottom+rect.left, SWP_SHOWWINDOW);//window on top
 
-				
 				UpdateWindow(hWnd);
 				SetFocus(hWnd);
+
+				#if vsWindowManagement
+					EnumWindows(enumWindowCallback, NULL);
+					RECT vsRC = { 0,0,0,0 };
+					GetWindowRect(vsHWND,&vsRC);
+					SetWindowPos(vsHWND, HWND_TOP, rc.right, vsRC.top, rc.right, vsRC.bottom - vsRC.top, SWP_SHOWWINDOW);
+				#endif	
 
 				GetClientRect(hWnd, &rc);
 				width = rc.right - rc.left;
