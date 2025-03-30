@@ -5,9 +5,10 @@ namespace Textures
 	#define mainRTIndex 0
 
 	enum tType { flat, cube };
+	enum tFormat { u8, s8, s16, s32 };
 
 	DXGI_FORMAT dxTFormat[4] = { DXGI_FORMAT_R8G8B8A8_UNORM ,DXGI_FORMAT_R8G8B8A8_SNORM ,DXGI_FORMAT_R16G16B16A16_FLOAT ,DXGI_FORMAT_R32G32B32A32_FLOAT };
-	enum tFormat { u8, s8, s16, s32 };
+
 	D3D11_TEXTURE2D_DESC tdesc;
 	D3D11_SHADER_RESOURCE_VIEW_DESC svDesc;
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;

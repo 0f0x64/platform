@@ -107,7 +107,7 @@ namespace BasicCam
 		positionF at_c =  { XMVectorGetX(at), XMVectorGetY(at),  XMVectorGetZ(at) };
 		positionF up_c =  { XMVectorGetX(up), XMVectorGetY(up),  XMVectorGetZ(up) };
 
-		gapi.cam(eye_c, at_c, up_c, angle);
+		Camera::Camera(eye_c, at_c, up_c, angle);
 	}
 
 

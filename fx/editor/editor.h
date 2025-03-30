@@ -308,9 +308,9 @@ namespace editor
 			drag.setFree();
 		}
 
-		gapi.rt(texture::mainRT);
-		gapi.cull(cullmode::off);
-		gapi.depth(depthmode::off);
+		Textures::RenderTarget(texture::mainRT);
+		Rasterizer::Cull(cullmode::off);
+		Depth::Depth(depthmode::off);
 
 
 		//if (paramEdit::editContext)
@@ -368,8 +368,8 @@ namespace editor
 			strcpy(modeText, "music");
 			break;
 		}
-
-		gapi.setScissors({ 0,0,dx11::width,dx11::height });
+		
+		Rasterizer::Scissors({ 0,0,dx11::width,dx11::height });
 		ui::Box::Setup();
 		ui::style::Base();
 		ui::style::button::hAlign = ui::style::align_h::center;

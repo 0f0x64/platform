@@ -75,21 +75,4 @@ namespace dx11
 		Textures::Init();
 	}
 
-	struct {
-		void setIA(topology t) { InputAssembler::IA(t); }
-		void rt(texture i, int level =0) { Textures::RenderTarget(i,level); }
-		void mips() { Textures::CreateMipMap(); }
-		void depth(depthmode i) { Depth::Depth(i); }
-		void draw(int quadcount, int instances = 1) { Draw::NullDrawer(quadcount, instances); }
-		void cam(positionF eye, positionF at, positionF up, float angle) { Camera::Camera(eye, at, up, angle); }
-		void clear(color4 c) { Draw::Clear(c); }
-		void clearDepth() { Draw::ClearDepth(); }
-		void blend(blendmode mode, blendop op = blendop::add) { Blend::Blending(mode, op); }
-		void cull(cullmode i) { Rasterizer::Cull(i); }
-		void setScissors(rect r) { Rasterizer::Scissors(r); }
-		void copyColor(texture dst, texture src) { Textures::CopyColor(dst, src); }
-		void copyDepth(texture dst, texture src) { Textures::CopyDepth(dst, src); }
-	} gapi;
-	
-
 }

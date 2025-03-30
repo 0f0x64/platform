@@ -208,8 +208,8 @@ namespace TimeLine
 
 	void DrawCursor(float y)
 	{
-		gapi.blend(blendmode::alpha);
-		gapi.setIA(topology::lineList);
+		InputAssembler::IA(topology::lineList);
+		Blend::Blending(blendmode::alpha);
 
 		float cursor = TimeToScreen(timer::timeCursor - pos);
 		if (cursor<screenLeft || cursor > screenRight) return;
@@ -222,7 +222,7 @@ namespace TimeLine
 
 		ui::Line::Draw(1, 1, 1, 1, .75f + .25f * sinf((float)timer::frameBeginTime * .01f));
 
-		gapi.setIA(topology::triList);
+		InputAssembler::IA(topology::triList);
 		TimeToStr(timer::timeCursor, true);
 		ui::Text::Draw(timeStr, cursor, y - ui::style::text::height * 2.f);
 	}
@@ -372,7 +372,7 @@ namespace TimeLine
 		screenEnd = ScreenToTime(right);
 		end = min(timelineLen, screenEnd);
 
-		gapi.setScissors(rect{ (int)(screenLeft*dx11::width), 0, (int)(screenRight*dx11::width), dx11::height });
+		Rasterizer::Scissors(rect{ (int)(screenLeft*dx11::width), 0, (int)(screenRight*dx11::width), dx11::height });
 
 		ui::style::Base();
 		editor::ui::style::box::outlineBrightness = 0;
@@ -383,19 +383,20 @@ namespace TimeLine
 		ps::letter_ps.samplers.s1AddressV = addr::clamp;
 		ps::letter_ps.textures.tex = (texture)ui::fontTextureIndex;
 
-		gapi.blend(blendmode::alpha);
-		gapi.setIA(topology::lineList);
+		Blend::Blending(blendmode::alpha);
+		InputAssembler::IA(topology::lineList);
 		DrawMakers(1);
 
-		gapi.blend(blendmode::alpha);
-		gapi.setIA(topology::triList);
+		Blend::Blending(blendmode::alpha);
+		InputAssembler::IA(topology::triList);
+
 		DrawBPMGrid(0.025);
 		DrawTimeStamps(1 - ui::style::text::height * 1.25f);
 		DrawGridStamps(ui::style::text::height * .25f);
 
 		DrawCursor(1);
 
-		gapi.setScissors(rect{ 0, 0, dx11::width, dx11::height });
+		Rasterizer::Scissors(rect{ 0, 0, dx11::width, dx11::height });
 
 	}
 

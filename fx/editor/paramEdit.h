@@ -803,7 +803,7 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 		yPos = max(yPos, top - cmdCounter * lead + lead);
 		yPos = min(yPos, bottom - lead);
 
-		gapi.setScissors(rect{ 0, (int)(top*dx11::height), dx11::width, (int)(bottom*dx11::height) });
+		Rasterizer::Scissors(rect{ 0, (int)(top*dx11::height), dx11::width, (int)(bottom*dx11::height) });
 
 		x = ui::style::text::width / 2.f;
 		y = yPos;
@@ -831,7 +831,7 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 			ui::Box::Draw(cursorX, cursorY);
 		}
 
-		gapi.setScissors(rect{ 0, 0, width, height });
+		Rasterizer::Scissors(rect{ 0, 0, width, height });
 
 /*		if (!action && ui::lbDown && clickOnEmptyPlace) {
 

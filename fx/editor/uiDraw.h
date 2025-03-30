@@ -106,10 +106,11 @@ namespace ui
 
 		void Setup()
 		{
-			gapi.setIA(topology::lineList);
-			gapi.blend(blendmode::alpha);
-			gapi.cull(cullmode::off);
-			gapi.depth(depthmode::off);
+			InputAssembler::IA(topology::lineList);
+			Blend::Blending(blendmode::alpha);
+			Rasterizer::Cull(cullmode::off);
+			Depth::Depth(depthmode::off);
+
 		}
 
 		typedef struct {
@@ -185,10 +186,10 @@ namespace ui
 
 		void Setup()
 		{
-			gapi.setIA(topology::triList);
-			gapi.blend(blendmode::alpha, blendop::add);
-			gapi.cull(cullmode::off);
-			gapi.depth(depthmode::off);
+			InputAssembler::IA(topology::triList);
+			Blend::Blending(blendmode::alpha, blendop::add);
+			Rasterizer::Cull(cullmode::off);
+			Depth::Depth(depthmode::off);
 		}
 
 		void Draw(float x, float y, float w = style::box::width, float h = style::box::height)
@@ -216,8 +217,7 @@ namespace ui
 			ps::box_ps.params.signed_progress = (float)( ui::style::box::signed_progress ? 1 : 0);
 			ps::box_ps.set();
 
-			gapi.draw(1, 1);
-
+			Draw::NullDrawer(1, 1);
 		}
 
 	}
@@ -247,10 +247,10 @@ namespace ui
 
 		void Setup()
 		{
-			gapi.setIA(topology::triList);
-			gapi.blend(blendmode::alpha, blendop::add);
-			gapi.cull(cullmode::off);
-			gapi.depth(depthmode::off);
+			InputAssembler::IA(topology::triList);
+			Blend::Blending(blendmode::alpha, blendop::add);
+			Rasterizer::Cull(cullmode::off);
+			Depth::Depth(depthmode::off);
 
 			ps::letter_ps.samplers.s1Filter = filter::linear;
 			ps::letter_ps.samplers.s1AddressU = addr::clamp;
@@ -289,8 +289,7 @@ namespace ui
 			ps::letter_ps.params.a = style::text::a;
 
 			ps::letter_ps.set();
-
-			gapi.draw(1, strlen(str));
+			Draw::NullDrawer(1, strlen(str));
 
 		}
 	}

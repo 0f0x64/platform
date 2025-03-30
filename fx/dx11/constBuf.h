@@ -92,7 +92,6 @@ namespace ConstBuf
 		context->PSSetConstantBuffers(i, 1, &buffer[i]);
 	}
 
-
 	namespace getbyname {
 		enum { drawerV, drawerP, drawerMat, camera, frame, global };
 	}
