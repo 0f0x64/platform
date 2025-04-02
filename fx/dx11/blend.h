@@ -50,7 +50,7 @@ namespace Blend
 		context->OMSetBlendState(blendState[0][0], blendFactor, 0xffffffff);
 	}
 
-	void Blending(blendmode mode = blendmode::off, blendop operation = blendop::add)
+	void Set(blendmode mode = blendmode::off, blendop operation = blendop::add)
 	{
 		float blendFactor[4] = { .0f,.0f,.0f,.0f };
 		context->OMSetBlendState(blendState[(int)mode][(int)operation], blendFactor, 0xffffffff);

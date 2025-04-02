@@ -209,7 +209,7 @@ namespace TimeLine
 	void DrawCursor(float y)
 	{
 		InputAssembler::IA(topology::lineList);
-		Blend::Blending(blendmode::alpha);
+		Blend::Set(blendmode::alpha);
 
 		float cursor = TimeToScreen(timer::timeCursor - pos);
 		if (cursor<screenLeft || cursor > screenRight) return;
@@ -383,11 +383,11 @@ namespace TimeLine
 		ps::letter_ps.samplers.s1AddressV = addr::clamp;
 		ps::letter_ps.textures.tex = (texture)ui::fontTextureIndex;
 
-		Blend::Blending(blendmode::alpha);
+		Blend::Set(blendmode::alpha);
 		InputAssembler::IA(topology::lineList);
 		DrawMakers(1);
 
-		Blend::Blending(blendmode::alpha);
+		Blend::Set(blendmode::alpha);
 		InputAssembler::IA(topology::triList);
 
 		DrawBPMGrid(0.025);

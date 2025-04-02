@@ -37,7 +37,7 @@ namespace gfx {
 	}
 	API(SetBlendMode, blendmode mode, blendop op) {
 		//regDrawer(eld);
-		Blend::Blending(mode, op);
+		Blend::Set(mode, op);
 	}
 
 	API(SetCull, cullmode mode) {

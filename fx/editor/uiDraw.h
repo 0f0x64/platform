@@ -107,7 +107,7 @@ namespace ui
 		void Setup()
 		{
 			InputAssembler::IA(topology::lineList);
-			Blend::Blending(blendmode::alpha);
+			Blend::Set(blendmode::alpha);
 			Rasterizer::Cull(cullmode::off);
 			Depth::Depth(depthmode::off);
 
@@ -187,7 +187,7 @@ namespace ui
 		void Setup()
 		{
 			InputAssembler::IA(topology::triList);
-			Blend::Blending(blendmode::alpha, blendop::add);
+			Blend::Set(blendmode::alpha, blendop::add);
 			Rasterizer::Cull(cullmode::off);
 			Depth::Depth(depthmode::off);
 		}
@@ -248,7 +248,7 @@ namespace ui
 		void Setup()
 		{
 			InputAssembler::IA(topology::triList);
-			Blend::Blending(blendmode::alpha, blendop::add);
+			Blend::Set(blendmode::alpha, blendop::add);
 			Rasterizer::Cull(cullmode::off);
 			Depth::Depth(depthmode::off);
 

@@ -1,6 +1,8 @@
 namespace ConstBuf
 {
 	ID3D11Buffer* buffer[6];
+	
+	enum class cBuffer { drawerV, drawerP, drawerMat, camera, frame, global };
 
 	#define constCount 32
 
@@ -32,6 +34,8 @@ namespace ConstBuf
 	//b5
 	XMFLOAT4 global[constCount];//update once on start
 
+	//char* cBufPtr[6] = { &drawerV,&drawerP,&drawerMat,&camera ,&frame,&global };
+
 	int roundUp(int n, int r)
 	{
 		return 	n - (n % r) + r;
@@ -53,12 +57,12 @@ namespace ConstBuf
 
 	void Init()
 	{
-		Create(buffer[0], sizeof(drawerV));
-		Create(buffer[1], sizeof(drawerP));
-		Create(buffer[2], sizeof(drawerMat));
-		Create(buffer[3], sizeof(camera));
-		Create(buffer[4], sizeof(frame));
-		Create(buffer[5], sizeof(global));
+		Create(buffer[(int)cBuffer::drawerV], sizeof(drawerV));
+		Create(buffer[(int)cBuffer::drawerP], sizeof(drawerP));
+		Create(buffer[(int)cBuffer::drawerMat], sizeof(drawerMat));
+		Create(buffer[(int)cBuffer::camera], sizeof(camera));
+		Create(buffer[(int)cBuffer::frame], sizeof(frame));
+		Create(buffer[(int)cBuffer::global], sizeof(global));
 	}
 
 	template <typename T>
@@ -74,12 +78,12 @@ namespace ConstBuf
 
 	void UpdateDrawerMat()
 	{
-		context->UpdateSubresource(ConstBuf::buffer[2], 0, NULL, &drawerMat, 0, 0);
+		context->UpdateSubresource(buffer[2], 0, NULL, &drawerMat, 0, 0);
 	}
 
 	void UpdateCamera()
 	{
-		context->UpdateSubresource(ConstBuf::buffer[3], 0, NULL, &camera, 0, 0);
+		context->UpdateSubresource(buffer[3], 0, NULL, &camera, 0, 0);
 	}
 
 	void ConstToVertex(int i)
@@ -92,9 +96,7 @@ namespace ConstBuf
 		context->PSSetConstantBuffers(i, 1, &buffer[i]);
 	}
 
-	namespace getbyname {
-		enum { drawerV, drawerP, drawerMat, camera, frame, global };
-	}
-
+	
+	
 } 
 

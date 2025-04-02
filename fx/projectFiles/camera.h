@@ -107,7 +107,7 @@ namespace BasicCam
 		positionF at_c =  { XMVectorGetX(at), XMVectorGetY(at),  XMVectorGetZ(at) };
 		positionF up_c =  { XMVectorGetX(up), XMVectorGetY(up),  XMVectorGetZ(up) };
 
-		Camera::Camera(eye_c, at_c, up_c, angle);
+		Camera::Set(eye_c, at_c, up_c, angle);
 	}
 
 
