@@ -100,9 +100,10 @@ void SetRenderWindowPosition()
 
 				#if vsWindowManagement
 					EnumWindows(enumWindowCallback, NULL);
-					RECT vsRC = { 0,0,0,0 };
+					RECT vsRC = { 0,0,0,0 };	
 					GetWindowRect(vsHWND,&vsRC);
 					SetWindowPos(vsHWND, HWND_TOP, rc.right, vsRC.top, rc.right, vsRC.bottom - vsRC.top, SWP_SHOWWINDOW);
+					UpdateWindow(vsHWND);
 				#endif	
 
 				GetClientRect(hWnd, &rc);

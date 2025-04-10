@@ -179,6 +179,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		#if vsWindowManagement
 			auto rc = editor::primaryRC;
 			SetWindowPos(editor::vsHWND, HWND_TOP, rc.right, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_SHOWWINDOW);
+			UpdateWindow(editor::vsHWND);
 		#endif
 
 	#endif
