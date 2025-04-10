@@ -80,8 +80,8 @@ void SetRenderWindowPosition()
 				//SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) & (~WS_CAPTION));//no header
 				ShowWindow(hWnd, SW_MAXIMIZE);
 
-				width = dm.dmPelsWidth;
-				height = dm.dmPelsHeight;
+				//width = dm.dmPelsWidth;
+				//height = dm.dmPelsHeight;
 
 				return;
 			}
@@ -107,8 +107,8 @@ void SetRenderWindowPosition()
 				#endif	
 
 				GetClientRect(hWnd, &rc);
-				width = rc.right - rc.left;
-				height = rc.bottom - rc.top;
+				//width = rc.right - rc.left;
+				//height = rc.bottom - rc.top;
 
 				return;
 			}

@@ -108,6 +108,9 @@
     <FxCompile>
       <ObjectFileOutput />
     </FxCompile>
+    <Manifest>
+      <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Reflector|Win32'">
     <ClCompile>

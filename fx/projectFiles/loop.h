@@ -43,7 +43,9 @@ namespace Loop
 		BasicCam::camCounter = 0;
 
 		if (!isPrecalc)
+		{
 			Precalc();
+		}
 
 		cmdCounter = precalcOfs;
 

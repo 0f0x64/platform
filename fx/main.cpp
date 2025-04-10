@@ -1,7 +1,5 @@
 #ifdef REFLECTOR
-
-#include "reflector.h"
-
+	#include "reflector.h"
 #else
 
 #include "settings.h" 
@@ -11,7 +9,9 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #define WINDOWS_IGNORE_PACKING_MISMATCH
+
 #include <windows.h>
+
 HINSTANCE hInst;
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 HWND hWnd;
@@ -57,7 +57,7 @@ using namespace dx11;
 	#define CALLER_INFO const char* srcFileName, int srcLine 
 	#define API(fname, ...) void fname##_impl(__VA_ARGS__)
 #else
-#define API(fname, ...) void fname##_(__VA_ARGS__)
+	#define API(fname, ...) void fname##_(__VA_ARGS__)
 	#define CALLER_INFO
 #endif
 
@@ -65,34 +65,57 @@ using namespace dx11;
 
 #include "projectFiles\loop.h"
 
+void UpdateFrame(double time)
+{
+	if (time >= timer::nextFrameTime)
+	{
+		timer::frameBeginTime = timer::GetCounter();
+
+		#if !EditMode
+			timer::timeCursor = (int)((timer::frameBeginTime - timer::startTime) * SAMPLING_FREQ / 1000.f);
+		#endif
+
+		#if EditMode
+			editor::UpdateAspect();
+			editor::RecompilationCheck(Loop::isPrecalc);
+		#endif
+
+		cmdCounter = 0;
+
+		Loop::mainLoop();
+
+		#if EditMode
+			editor::Process();
+		#endif	
+
+		Draw::Present();
+
+		timer::frameEndTime = timer::GetCounter();
+		timer::frameRenderingDuration = timer::frameEndTime - timer::frameBeginTime;
+		timer::nextFrameTime = timer::frameBeginTime + FRAME_LEN;
+	}
+
+	Sleep((DWORD)min(FRAME_LEN, max(FRAME_LEN - timer::frameRenderingDuration, 0)));
+}
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	#if EditMode
-		SetProcessDPIAware();
-	#endif
-
 	hInst = (HINSTANCE)GetModuleHandle(0);
 	width = GetSystemMetrics(SM_CXSCREEN);
 	height = GetSystemMetrics(SM_CYSCREEN);
 	HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
-	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
+	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL};
 	RegisterClassEx(&wcex);
-	hWnd = CreateWindow("fx", "fx", WS_OVERLAPPEDWINDOW, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
+	hWnd = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_OVERLAPPEDWINDOW, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
+	
 	ShowCursor(EditMode);
-
-	#if !EditMode
-		ShowWindow(hWnd, SW_MAXIMIZE);
-	#endif
-
-
-	#if EditMode
-		editor::Init();
-	#endif	
 
 	dx11::Init();
 
 	#if EditMode
-		editor::ui::Init();
+		editor::Init();
+	#else
+		ShowWindow(hWnd, SW_MAXIMIZE);
 	#endif	
 
 	MSG msg = { 0 };
@@ -101,13 +124,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	while (msg.message != WM_QUIT)
 	{
-		double time = timer::GetCounter();
-		
 		#if EditMode
 			
 			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
-				if (msg.message == WM_QUIT) break;
+				if (msg.message == WM_QUIT)
+				{
+					break;
+				}
+
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
@@ -118,70 +143,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		#else
 
 			PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
-			if (GetAsyncKeyState(VK_ESCAPE)) break;
-			if (timer::frameBeginTime / 1000. > DEMO_DURATION) break;
+			if (GetAsyncKeyState(VK_ESCAPE) || timer::frameBeginTime / 1000. > DEMO_DURATION)
+			{
+				break;
+			}
 
 		#endif
 
-		
-
-		if (time >= timer::nextFrameTime)
-		{
-			timer::frameBeginTime = timer::GetCounter();
-
-			#if EditMode
-				RECT rect;
-				GetClientRect(hWnd, &rect);
-				int width = rect.right - rect.left;
-				int height = rect.bottom - rect.top;
-				dx11::aspect = float(height) / float(width);
-				dx11::iaspect = float(width) / float(height);
-			#else
-				timer::timeCursor = (int)((timer::frameBeginTime - timer::startTime) * SAMPLING_FREQ / 1000.f);
-			#endif
-
-			//pre-loop
-			#if EditMode
-				if (editor::codeRecompiled) {
-					editor::codeRecompiled = false;
-					Loop::isPrecalc = false;
-					paramsAreLoaded = false;
-				}
-				cmdLevel = 0;
-			#endif	
-			cmdCounter = 0;
-			//-------
-			Loop::mainLoop();
-			//post-loop
-			#if EditMode
-				paramsAreLoaded = true;
-			#endif
-			//-------
-
-			#if EditMode
-				editor::Process();
-			#endif	
-
-			Draw::Present();
-
-			timer::frameEndTime = timer::GetCounter();
-			timer::frameRenderingDuration = timer::frameEndTime - timer::frameBeginTime;
-			timer::nextFrameTime = timer::frameBeginTime + FRAME_LEN;
-		}
-
-		Sleep((DWORD)min(FRAME_LEN, max(FRAME_LEN - timer::frameRenderingDuration,0)));
+		UpdateFrame(timer::GetCounter());
 		
 	}
 
 	#if EditMode
-			editor::paramEdit::Save(currentCmd);
-
-		#if vsWindowManagement
-			auto rc = editor::primaryRC;
-			SetWindowPos(editor::vsHWND, HWND_TOP, rc.right, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_SHOWWINDOW);
-			UpdateWindow(editor::vsHWND);
-		#endif
-
+		editor::SaveAndExit();
 	#endif
 
 	ExitProcess(0);

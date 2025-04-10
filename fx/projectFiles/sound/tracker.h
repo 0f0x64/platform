@@ -132,8 +132,8 @@ namespace tracker
 #endif
 		curChannel = 0;
 
-		kick(83, -6, 14, switcher::off, switcher::off);
-		snare(76, 58, 14, switcher::off, switcher::on);
+		kick(45, -6, 14, switcher::on, switcher::off);
+		snare(86, 58, 14, switcher::off, switcher::on);
 
 		track_desc.channelsCount = curChannel;
 	

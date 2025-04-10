@@ -201,6 +201,7 @@ namespace editor
 	{
 		SelfLocate();
 		SetRenderWindowPosition();
+		ui::Init();
 		ViewCam::Init();
 	}
 
@@ -277,6 +278,7 @@ namespace editor
 	
 	void Process()
 	{
+		paramsAreLoaded = true;
 		paramEdit::top = 0;
 		paramEdit::bottom = 1;
 
@@ -388,4 +390,38 @@ namespace editor
 		
 
 	}
+
+	void SaveAndExit()
+	{
+		editor::paramEdit::Save(currentCmd);
+
+		#if vsWindowManagement
+				auto rc = editor::primaryRC;
+				//SetWindowPos(editor::vsHWND, HWND_TOP, rc.right, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_SHOWWINDOW);
+				SetWindowPos(editor::vsHWND, HWND_TOP, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_SHOWWINDOW);
+				UpdateWindow(editor::vsHWND);
+		#endif
+	}
+
+	void UpdateAspect()
+	{
+		RECT rect;
+		GetClientRect(hWnd, &rect);
+		int width = rect.right - rect.left;
+		int height = rect.bottom - rect.top;
+		dx11::aspect = float(height) / float(width);
+		dx11::iaspect = float(width) / float(height);
+	}
+
+	void RecompilationCheck(bool &precalc)
+	{
+		if (codeRecompiled) {
+			codeRecompiled = false;
+			paramsAreLoaded = false;
+			precalc = false;
+		}
+
+		cmdLevel = 0;
+	}
+
 }
