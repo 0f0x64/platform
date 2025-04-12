@@ -18,7 +18,7 @@
 #ifdef EDITOR_DEBUG
 	#define EditMode true
 	#define DebugMode true
-	#define DirectXDebugMode false
+	#define DirectXDebugMode true
 	#define SECONDARY_DISPLAY_IF_AVAILABLE false
 	#define USE_SHADER_MINIFIER false
 	#define objPath "../fx/Editor_Debug"

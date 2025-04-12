@@ -87,6 +87,7 @@ namespace Textures
 		LogIfError("CreateShaderResourceView error\n");
 	}
 
+
 	void rtView(int i)
 	{
 		renderTargetViewDesc.Format = tdesc.Format;
