@@ -36,7 +36,10 @@ static BOOL CALLBACK enumWindowCallback(HWND hWnd, LPARAM lparam)
 	{
 		if (std::string::npos != windowTitle.find("platform"))
 		{
-			vsHWND = hWnd;
+			if (std::string::npos != windowTitle.find("Visual Studio"))
+			{
+				vsHWND = hWnd;
+			}
 		};
 	}
 	return TRUE;
@@ -106,7 +109,7 @@ void SetRenderWindowPosition()
 					GetWindowRect(vsHWND, &vsRC);
 					vsRC.right = (monitorInfo.rcWork.right) / 2 -rc.left*2;
 					vsRC.left = (monitorInfo.rcWork.right) / 2 + rc.left;
-					SetWindowPos(vsHWND, HWND_TOP, vsRC.left, rc.left, vsRC.right, vsRC.bottom-rc.left, SWP_SHOWWINDOW);
+					SetWindowPos(vsHWND, HWND_TOP, vsRC.left, rc.left, vsRC.right, rc.bottom-rc.top, SWP_SHOWWINDOW);
 					UpdateWindow(vsHWND);
 				#endif	
 
