@@ -2,59 +2,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
+
+	/*case WM_SIZING:
+	{
+		if (false)
+		{
+			PRECT rectp = (PRECT)lParam;
+
+			width = rectp->right - rectp->left;
+			height = rectp->bottom - rectp->top;
+
+			resize = true;
+			//UpdateFrame(timer::GetCounter());
+		}
+		return true;
+	}*/
+
 	case WM_SIZE:
 	{
 		if (swapChain)
 		{
-			RECT r;
-			GetWindowRect(hWnd, &r);
-			width = r.right - r.left;
-			height = r.bottom - r.top;
+			width = LOWORD(lParam);
+			height = HIWORD(lParam);
 
-			context->OMSetRenderTargets(0, 0, 0);
-
-			// Release all outstanding references to the swap chain's buffers.
-			if (dx11::Textures::Texture[0].pTexture)
-			{
-				dx11::Textures::Texture[0].pTexture->Release();
-			}
-
-			if (dx11::Textures::Texture[0].pDepth)
-			{
-				dx11::Textures::Texture[0].pDepth->Release();
-			}
-
-			if (dx11::Textures::Texture[0].RenderTargetView[0][0])
-			{
-				dx11::Textures::Texture[0].RenderTargetView[0][0]->Release();
-			}
-			if (dx11::Textures::Texture[0].DepthStencilView[0])
-			{
-				dx11::Textures::Texture[0].DepthStencilView[0]->Release();
-			}
-			
-			HRESULT hr;
-			// Preserve the existing buffer count and format.
-			// Automatically choose the width and height to match the client rect for HWNDs.
-			hr = swapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
-
-			// Perform error handling here!
-
-			// Get buffer and create a render-target-view.
-
-
-			hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D),
-				(void**)&dx11::Textures::Texture[0].pTexture);
-			// Perform error handling here!
-
-			//hr = device->CreateRenderTargetView(pBuffer, NULL, &dx11::Textures::Texture[0].RenderTargetView[0][0]);
-
-			//pBuffer->Release();
-			
-			dx11::Textures::Create(0, dx11::Textures::tType::flat, dx11::Textures::tFormat::u8, XMFLOAT2((float)width, (float)height), false, true);
-
+			resize = true;
+			//dx11::Resize();
+		
+			//UpdateFrame(timer::GetCounter());
 		}
-		break;
+		return 0;
 	}
 
 	case WM_MOUSEMOVE:

@@ -37,6 +37,11 @@ namespace Camera
 			proj = XMMatrixPerspectiveFovLH(DegreesToRadians(angle), width / (FLOAT)height, 0.01f, 100.0f);
 		}
 
+		void pInit()
+		{
+			proj = XMMatrixPerspectiveFovLH(DegreesToRadians(angle), width / (FLOAT)height, 0.01f, 100.0f);
+		}
+
 	} viewCam;
 
 	#endif

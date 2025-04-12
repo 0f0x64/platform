@@ -86,7 +86,7 @@ namespace tracker
 
 		track_desc.channel[curChannel].clipCounter = -1;
 		
-		Clip(83, 11, 6, 1, overdub::off, 0);
+		Clip(0, 11, 6, 1, overdub::off, 0);
 		Pitch(11, 27, 25, 27, 25, 0, 27, 25, 27, 25, 27, 0);
 
 		Clip(3, 4, 1, 1, overdub::off, 0);

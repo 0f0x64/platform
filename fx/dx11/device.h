@@ -35,7 +35,7 @@ namespace Device
 		hr = device->CreateRenderTargetView(Textures::Texture[0].pTexture, NULL, &Textures::Texture[0].RenderTargetView[0][0]);
 		LogIfError("rt not created\n");
 
-		//Textures::Texture[0].pTexture->Release();
+		Textures::Texture[0].pTexture->Release();
 
 	}
 

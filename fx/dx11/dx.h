@@ -75,4 +75,29 @@ namespace dx11
 		Textures::Init();
 	}
 
+#if EditMode
+	void Resize()
+	{
+		aspect = float(height) / float(width);
+		iaspect = float(width) / float(height);
+
+		//context->OMSetRenderTargets(0, 0, 0);
+		ID3D11RenderTargetView* nullViews[] = { nullptr };
+		context->OMSetRenderTargets(1, nullViews, 0);
+
+		Textures::Texture[0].RenderTargetView[0][0]->Release();
+		Textures::Texture[0].DepthStencilView[0]->Release();
+
+		swapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+		swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&Textures::Texture[0].pTexture);
+		device->CreateRenderTargetView(Textures::Texture[0].pTexture, NULL, &Textures::Texture[0].RenderTargetView[0][0]);
+		Textures::Texture[0].pTexture->Release();
+		Textures::Texture[0].pDepth->Release();
+		
+		Textures::Create(0, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2((float)width, (float)height), false, true);
+		
+		Camera::viewCam.pInit();
+	}
+#endif
+
 }

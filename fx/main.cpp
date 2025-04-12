@@ -65,8 +65,16 @@ using namespace dx11;
 
 #include "projectFiles\loop.h"
 
+bool resize = false;
+
 void UpdateFrame(double time)
 {
+	if (resize)
+	{
+		dx11::Resize();
+		resize = false;
+	}
+
 	if (time >= timer::nextFrameTime)
 	{
 		timer::frameBeginTime = timer::GetCounter();
@@ -137,6 +145,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				{
 					break;
 				}
+
+				if (msg.message == WM_SIZING)
+				{
+					UpdateFrame(timer::GetCounter());
+					break;
+				}
+
 
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
