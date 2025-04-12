@@ -295,7 +295,7 @@ const char* basic =
 "    color += saturate(10 - 35 * d)* sin(d * 127 + time.x) * 4 * hilight;\n"
 "    \n"
 "    color.rgb = pow(ACESFilm(color.rgb),1/2.2);\n"
-"    \n"
+"\n"
 "    return float4(color, 1);\n"
 "}\n"
 ;

@@ -80,8 +80,8 @@ void SetRenderWindowPosition()
 				//SetWindowLong(hWnd, GWL_STYLE, GetWindowLong(hWnd, GWL_STYLE) & (~WS_CAPTION));//no header
 				ShowWindow(hWnd, SW_MAXIMIZE);
 
-				//width = dm.dmPelsWidth;
-				//height = dm.dmPelsHeight;
+				width = dm.dmPelsWidth;
+				height = dm.dmPelsHeight;
 
 				return;
 			}
@@ -93,22 +93,26 @@ void SetRenderWindowPosition()
 				primaryRC = monitorInfo.rcWork;
 				auto rc = monitorInfo.rcWork;
 				rc.right /= 2.;
-				SetWindowPos(hWnd, HWND_TOPMOST, -rect.left, 0, rc.right - rc.left+ rect.left*2+6, rc.bottom+rect.left, SWP_SHOWWINDOW);//window on top
+
+				AdjustWindowRect(&rc, GetWindowLongPtr(hWnd, GWL_STYLE), NULL);
+				SetWindowPos(hWnd, HWND_TOPMOST, rc.left, 0, rc.right - rc.left, rc.bottom, SWP_SHOWWINDOW);//window on top
 
 				UpdateWindow(hWnd);
 				SetFocus(hWnd);
 
 				#if vsWindowManagement
+					RECT vsRC = { 0,0,0,0 };
 					EnumWindows(enumWindowCallback, NULL);
-					RECT vsRC = { 0,0,0,0 };	
-					GetWindowRect(vsHWND,&vsRC);
-					SetWindowPos(vsHWND, HWND_TOP, rc.right, vsRC.top, rc.right, vsRC.bottom - vsRC.top, SWP_SHOWWINDOW);
+					GetWindowRect(vsHWND, &vsRC);
+					vsRC.right = (monitorInfo.rcWork.right) / 2 -rc.left*2;
+					vsRC.left = (monitorInfo.rcWork.right) / 2 + rc.left;
+					SetWindowPos(vsHWND, HWND_TOP, vsRC.left, rc.left, vsRC.right, vsRC.bottom-rc.left, SWP_SHOWWINDOW);
 					UpdateWindow(vsHWND);
 				#endif	
 
 				GetClientRect(hWnd, &rc);
-				//width = rc.right - rc.left;
-				//height = rc.bottom - rc.top;
+				width = rc.right - rc.left;
+				height = rc.bottom - rc.top;
 
 				return;
 			}

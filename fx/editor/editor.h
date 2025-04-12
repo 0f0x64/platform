@@ -200,7 +200,6 @@ namespace editor
 	void Init()
 	{
 		SelfLocate();
-		SetRenderWindowPosition();
 		ui::Init();
 		ViewCam::Init();
 	}
@@ -399,6 +398,7 @@ namespace editor
 				auto rc = editor::primaryRC;
 				//SetWindowPos(editor::vsHWND, HWND_TOP, rc.right, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_SHOWWINDOW);
 				SetWindowPos(editor::vsHWND, HWND_TOP, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_SHOWWINDOW);
+				ShowWindow(editor::vsHWND, SW_MAXIMIZE);
 				UpdateWindow(editor::vsHWND);
 		#endif
 	}
