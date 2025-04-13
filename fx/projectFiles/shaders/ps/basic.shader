@@ -21,15 +21,30 @@ float3 FresnelSchlick(float3 F0, float3 v, float3 n)
     return saturate(F0 + (1.0 - F0) * pow(1.0 - saturate(cosTheta), 5.0));
 }
 
+float3 rotY(float3 pos, float a)
+{
+    float3x3 m =
+    {
+        cos(a), 0, sin(a),
+        0, 1, 0,
+        -sin(a), 0, cos(a)
+    };
+    pos = mul(pos, m);
+    return pos;
+}
+
 float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
     float2 uv = input.uv;
     float3 albedo = float3(1, 1, 1);
-    float roughness = 0;
-    float metalness = 1;
+    albedo = (sin(uv.x*112)*sin(uv.y*12))*.5+.5;
+   // return float4(albedo,1);
+    float roughness = .25;
+    float metalness = 0;
     float3 F0 = .04;
     
     float3 nrml = normals.SampleLevel(sam1, input.uv,1).xyz;
+    //nrml=rotY(nrml,time.x*.1);
     //nrml *= -(1 - isFrontFace * 2);
     float3 eye = input.vpos.xyz;
     eye = normalize(mul((view[0]), float4(eye, 1)));

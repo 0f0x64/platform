@@ -3,33 +3,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
 
-	/*case WM_SIZING:
-	{
-		if (false)
-		{
-			PRECT rectp = (PRECT)lParam;
-
-			width = rectp->right - rectp->left;
-			height = rectp->bottom - rectp->top;
-
-			resize = true;
-			//UpdateFrame(timer::GetCounter());
-		}
-		return true;
-	}*/
-
 	case WM_SIZE:
 	{
-		if (swapChain)
-		{
-			width = LOWORD(lParam);
-			height = HIWORD(lParam);
-
-			resize = true;
-			//dx11::Resize();
-		
-			//UpdateFrame(timer::GetCounter());
-		}
+		width = LOWORD(lParam);
+		height = HIWORD(lParam);
+		resize = true;
 		return 0;
 	}
 

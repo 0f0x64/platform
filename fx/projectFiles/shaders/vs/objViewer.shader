@@ -37,7 +37,10 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     float4 normal = float4(normals.SampleLevel(sam1, uv, 0).xyz, 1);
     normal = mul(normal, transpose(model));
     //---
-    
+   // pos.xyz = rotY(pos.xyz,time.x*.1);
+    //normal.xyz = rotY(normal.xyz,time.x*.1);
+
+
     output.vnorm = normal;
     
     output.wpos = float4(pos.xyz, 0);

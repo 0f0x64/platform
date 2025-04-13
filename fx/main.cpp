@@ -24,6 +24,7 @@ HWND hWnd;
 	#include <regex>
 	#include <vector>
 	#include <typeinfo>
+
 #endif
 
 int cmdCounter = 0;//reset it in loop start point
@@ -65,15 +66,26 @@ using namespace dx11;
 
 #include "projectFiles\loop.h"
 
-bool resize = false;
+#if EditMode
+	bool resize = true;
+#endif
 
 void UpdateFrame(double time)
 {
-	if (resize)
-	{
-		dx11::Resize();
-		resize = false;
-	}
+	#if EditMode
+
+		if (IsIconic(hWnd))
+		{
+			return;
+		}
+
+		if (resize)
+		{
+			dx11::Resize();
+			resize = false;
+		}
+
+	#endif
 
 	if (time >= timer::nextFrameTime)
 	{
@@ -118,15 +130,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	
 	ShowCursor(EditMode);
 
-	
+	dx11::Init();
 
 	#if EditMode
 		editor::SetRenderWindowPosition();
-		dx11::Init();
 		editor::Init();
 	#else
 		ShowWindow(hWnd, SW_MAXIMIZE);
-		dx11::Init();
 	#endif	
 
 	MSG msg = { 0 };
@@ -146,15 +156,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					break;
 				}
 
-				if (msg.message == WM_SIZING)
-				{
-					UpdateFrame(timer::GetCounter());
-					break;
-				}
-
-
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
+
 			}
 
 			editor::WatchFiles();

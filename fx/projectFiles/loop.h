@@ -51,6 +51,7 @@ namespace Loop
 
 		frameConst();
 
+		
 		gfx::SetInputAsm(topology::triList);
 		gfx::SetBlendMode(blendmode::off, blendop::add);
 
@@ -66,12 +67,15 @@ namespace Loop
 
 		gfx::SetDepthMode(depthmode::on);
 		gfx::ClearRTDepth();
-		gfx::SetCull(cullmode::off);
+		gfx::SetCull(cullmode::back);
 		gfx::SetBlendMode(blendmode::alpha, blendop::add);
 		
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 1, 0, 16, 0);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 0, 0, 0);
+		
 
-		tracker::Track(120);
+		//gfx::SetRT(texture::mainRT, 0);
+		//gfx::ClearRT(0, 0, 0, 255);
+		//tracker::Track(120);
 
 		//gApi.ClearRT(0, 0, 0, 0);
 

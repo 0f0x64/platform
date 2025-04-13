@@ -98,7 +98,7 @@ void SetRenderWindowPosition()
 				rc.right /= 2.;
 
 				AdjustWindowRect(&rc, GetWindowLongPtr(hWnd, GWL_STYLE), NULL);
-				SetWindowPos(hWnd, HWND_TOPMOST, rc.left, 0, rc.right - rc.left, rc.bottom, SWP_SHOWWINDOW);//window on top
+				SetWindowPos(hWnd, HWND_TOP, rc.left, 0, rc.right - rc.left, rc.bottom, SWP_SHOWWINDOW);//window on top
 
 				UpdateWindow(hWnd);
 				SetFocus(hWnd);

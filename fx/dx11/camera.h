@@ -28,19 +28,21 @@ namespace Camera
 
 		void Init()
 		{
-			XMVECTOR Eye = XMVectorSet(0,111,113.f, 0.0f);
-			XMVECTOR At = XMVectorSet( 0,0,0, 0.0f);
-			XMVECTOR Up = XMVectorSet( 0,1,0, 0.0f);
+			XMVECTOR At = XMVECTOR{ 0,0,0,1 };
+			XMVECTOR Eye = XMVECTOR{ 0,0,13,1 };
+			XMVECTOR Up = XMVECTOR{ 0,1,0,1 };
 
 			world = XMMatrixIdentity();
 			view = XMMatrixLookAtLH(Eye, At, Up);
 			proj = XMMatrixPerspectiveFovLH(DegreesToRadians(angle), width / (FLOAT)height, 0.01f, 100.0f);
 		}
 
-		void pInit()
-		{
-			proj = XMMatrixPerspectiveFovLH(DegreesToRadians(angle), width / (FLOAT)height, 0.01f, 100.0f);
-		}
+		#if EditMode
+			void pInit()
+			{
+				proj = XMMatrixPerspectiveFovLH(DegreesToRadians(angle), width / (FLOAT)height, 0.01f, 100.0f);
+			}
+		#endif
 
 	} viewCam;
 

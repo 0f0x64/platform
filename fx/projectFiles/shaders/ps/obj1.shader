@@ -65,6 +65,36 @@ float calcWalls(float2 uv)
     return walls;
 }
 
+float3 getTpos(float2 a, float R,float p,float q)
+{    
+        return float3((R + cos(a.x * q)) * cos(a.x * p), 
+                      (R + cos(a.x * q)) * sin(a.x * p),
+                      sin(a.x * q));
+}
+
+float3 torusKnot(float2 a)
+{
+    float R = 1.5;
+    float r = .24;
+
+    float p=5;
+    float q=7;
+
+    float3 pos = getTpos(a,R,p,q);
+    float3 T = pos - getTpos(a+float2(.01,0),R,p,q);
+    float3 N = pos+T;
+                    
+    float3 B = cross(T,N);
+    N = cross(B,T);
+    
+    B= normalize(B);
+    N= normalize(N);
+
+    pos += r * (cos(a.y) * N + sin(a.y) * B);
+
+    return pos;
+}
+
 float3 sphere(float2 uv)
 {
 
@@ -83,7 +113,21 @@ float3 sphere(float2 uv)
     pos.y-=.1*sin(length(pos.xz)*8+time.x*.1);
    // pos=clamp(pos,-1,1);
   
-    
+    pos.xyz=torusKnot(a);
+    float3 pos2 = torusKnot(a+float2(.01,0));
+    float3 pos3 = torusKnot(a+float2(.0,01));
+    float3 t =pos2-pos.xyz;
+    float3 b =pos3-pos.xyz;
+    float3 n = cross(t,b);
+    float a1= sin(a.x*4096/4)+sin(a.y*256/4+a.x*256);
+    a1=saturate(a1);
+    float3 ofs= n*(pow(a1,11)*5)*5.5*(sin(a.x*22+a.y*12)*.25+1+sin(time.x*sin(a.x+a.y)*.1)*.2);
+    //ofs*=.42;
+    //pos+=ofs*2;
+    //pos.y-=pow(length(ofs.xyz),2);
+    //pos = rotY(pos, time.x * 0.1);
+
+
     return pos;
 }
 
