@@ -175,7 +175,7 @@ namespace paramEdit {
 				caller.append(cmdParamDesc[cmdIndex].funcName);
 				caller.append("(");
 
-				int j = 0;
+				unsigned int j = 0;
 				for (int i = 0; i < cmdParamDesc[cmdIndex].pCount; i++)
 				{
 					auto sType = cmdParamDesc[cmdIndex].param[i].typeIndex;
@@ -521,7 +521,7 @@ bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 	ui::style::BaseColor(ui::style::button::inverted);
 	ui::style::box::outlineBrightness = over ? .25f : 0.1f;
 	ui::Box::Draw(x, y, w, h);
-	float th = ui::style::button::zoom ? (h*1.25 - h*ui::style::button::inner*2.) : ui::style::text::height;
+	float th = ui::style::button::zoom ? (h*1.25f - h*ui::style::button::inner*2.f) : ui::style::text::height;
 	float tw = ui::Text::getTextLen(str, th);
 
 	float tx = 0;
@@ -533,7 +533,7 @@ bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 		tx = x + ui::style::button::inner*h;
 		break;
 	case ui::style::align_h::center:
-		tx = x + (w  - tw) / 2.;
+		tx = x + (w  - tw) / 2.f;
 		break;
 	case ui::style::align_h::right:
 		//todo
@@ -546,7 +546,7 @@ bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 		ty = y + ui::style::button::inner * h;
 		break;
 	case ui::style::align_v::center:
-		ty = y + h/2.-th/4.;
+		ty = y + h/2.f-th/4.f;
 		break;
 	case ui::style::align_v::bottom:
 		//todo
@@ -586,8 +586,8 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 {
 
 	int paramIndex = getParamIndexByStr(cmdIndex, pName.c_str());
-	float range = cmdParamDesc[cmdIndex].param[paramIndex]._max - cmdParamDesc[cmdIndex].param[paramIndex]._min;
-	ui::style::box::signed_progress = cmdParamDesc[cmdIndex].param[paramIndex]._min < 0 ? 1 :0;
+	float range = (float)(cmdParamDesc[cmdIndex].param[paramIndex]._max - cmdParamDesc[cmdIndex].param[paramIndex]._min);
+	ui::style::box::signed_progress = cmdParamDesc[cmdIndex].param[paramIndex]._min < 0.f ? 1.f :0.f;
 	ui::style::box::progress_x = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range;
 	std::string buttonText = pName + "::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value[0]);
 	if (ButtonPressed(cmdIndex,buttonText.c_str(), x, y, w, h))
@@ -604,7 +604,7 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 
 	if (drag.check(cmdIndex, paramIndex, 0))
 	{
-		cmdParamDesc[cmdIndex].param[paramIndex].value[0] = storedParam[0] + ui::mouseDelta.x * dx11::width;
+		cmdParamDesc[cmdIndex].param[paramIndex].value[0] = (int)(storedParam[0] + ui::mouseDelta.x * dx11::width);
 		pLimits(cmdIndex, paramIndex, 0);
 	}
 	ui::style::box::progress_x = 0;

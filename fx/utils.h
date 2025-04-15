@@ -20,6 +20,12 @@ float clamp(float x, float left, float right)
 	return min(max(x, left), right);
 }
 
+int clamp(int x, int left, int right)
+{
+	return min(max(x, left), right);
+}
+
+
 float sign(float val) {
-	return (0 < val) - (val < 0);
+	return (float)((0.f < val) - (val < 0.f));
 }

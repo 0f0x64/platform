@@ -90,12 +90,12 @@ namespace paramEdit
 
 		float btn_x=.1;
 		float btn_y = .0;
-		float btn_w = ui::style::box::width / 1.5;
-		float btn_h = ui::style::box::height / 1.2;
+		float btn_w = ui::style::box::width / 1.5f;
+		float btn_h = ui::style::box::height / 1.2f;
 
 		if (paramEdit::ButtonPressed(octaveText, btn_x, btn_y, btn_w, btn_h) && drag.isFree())
 		{
-			currentOctave += isMouseOver(btn_x, btn_y, btn_w / 2., btn_h) ? -1 : 1;
+			currentOctave += isMouseOver(btn_x, btn_y, btn_w / 2.f, btn_h) ? -1 : 1;
 			currentOctave = clamp(currentOctave, 0, 8);
 
 			drag.set(drag.context::commonUIButtons);
@@ -113,7 +113,7 @@ namespace paramEdit
 
 		if (paramEdit::ButtonPressed(stepText, btn_x, btn_y, btn_w, btn_h) && drag.isFree())
 		{
-			currentStep += isMouseOver(btn_x, btn_y, btn_w / 2., btn_h) ? -1 : 1;
+			currentStep += isMouseOver(btn_x, btn_y, btn_w / 2.f, btn_h) ? -1 : 1;
 			currentStep = clamp(currentStep, 0, 8);
 
 			drag.set(drag.context::commonUIButtons);
@@ -143,12 +143,12 @@ namespace paramEdit
 			{
 				Rasterizer::Scissors(rect{ 0, (int)(top * dx11::height), dx11::width, (int)(bottom * dx11::height) });
 				channelIndex = tracker::track_desc.channel[ch].cmdIndex;
-				float  ch_lead = ui::style::box::height * 2.2;
+				float  ch_lead = ui::style::box::height * 2.2f;
 				clipYpos += ch_lead;
 
 				float ch_y = clipYpos;
-				float ch_h = ch_lead * .8;
-				bool over = isMouseOver(0, ch_y - x / 2., TimeLine::screenLeft - x, ch_lead * .9);
+				float ch_h = ch_lead * .8f;
+				bool over = isMouseOver(0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f);
 
 				if (iter == 1)
 				{
@@ -156,28 +156,28 @@ namespace paramEdit
 					ui::style::BaseButton();
 					ui::style::button::zoom = false;
 					ui::style::button::vAlign = ui::style::align_v::top;
-					Button(channelIndex, cmdParamDesc[channelIndex].funcName, 0, ch_y - x / 2., TimeLine::screenLeft - x, ch_lead * .9);
+					Button(channelIndex, cmdParamDesc[channelIndex].funcName, 0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f);
 
-					ui::style::box::rounded = .5;
-					float bw = aspect * ch_h / 2.2;
-					float bx = TimeLine::screenLeft - x * 2 - bw;
+					ui::style::box::rounded = .5f;
+					float bw = aspect * ch_h / 2.2f;
+					float bx = TimeLine::screenLeft - x * 2.f - bw;
 
 					ui::style::button::zoom = true;
 					ui::style::button::hAlign = ui::style::align_h::center;
 					ui::style::button::vAlign = ui::style::align_v::center;
-					ui::style::box::rounded = .5;
-					float sm_h = ch_h / 2.2;
-					float slot_h = ch_h / 2.;
-					float low = ch_y + ch_h / 2. + (slot_h - sm_h) / 2.;
+					ui::style::box::rounded = .5f;
+					float sm_h = ch_h / 2.2f;
+					float slot_h = ch_h / 2.f;
+					float low = ch_y + ch_h / 2.f + (slot_h - sm_h) / 2.f;
 
-					processSwitcher(channelIndex, "solo", bx, ch_y + (slot_h - sm_h) / 2., bw, sm_h, "S");
+					processSwitcher(channelIndex, "solo", bx, ch_y + (slot_h - sm_h) / 2.f, bw, sm_h, "S");
 					processSwitcher(channelIndex, "mute", bx, low, bw, sm_h, "M");
 
 					ui::style::button::inverted = false;
-					ui::style::box::rounded = .15;
+					ui::style::box::rounded = .15f;
 
-					processSlider(channelIndex, "vol", x, low, bw * 4, sm_h);
-					processSlider(channelIndex, "pan", x + bw * 4.5, low, bw * 2, sm_h);
+					processSlider(channelIndex, "vol", x, low, bw * 4.f, sm_h);
+					processSlider(channelIndex, "pan", x + bw * 4.5f, low, bw * 2.f, sm_h);
 
 					ui::style::Base();
 				}
@@ -188,7 +188,7 @@ namespace paramEdit
 				{
 					int clipIndex = tracker::track_desc.channel[ch].clip[clp].cmdIndex;
 					auto clp_desc = tracker::track_desc.channel[ch].clip[clp];
-					float frame = SAMPLING_FREQ / FRAMES_PER_SECOND;
+					int frame = SAMPLING_FREQ / FRAMES_PER_SECOND;
 					float sWidth = TimeLine::TimeToScreen(frame * 60 * 60 * clp_desc.length * clp_desc.repeat / (editor::TimeLine::bpm * clp_desc.bpmScale));
 					float h = ch_h;
 					float clip_x = TimeLine::getScreenPos(frame * 60 * 60 * clp_desc.position / editor::TimeLine::bpm);
@@ -222,16 +222,16 @@ namespace paramEdit
 							pLimits(clipIndex, posIndex);
 						}
 
-						float c = clp + 222;
-						ui::style::box::r = .4 + .3 * sin(c * 12.123);
-						ui::style::box::g = .4 + .3 * sin(c * 23.123);
-						ui::style::box::b = .4 + .3 * sin(c * 44.123);
+						float c = (float)(clp + 222);
+						ui::style::box::r = .4f + .3f * sin(c * 12.123f);
+						ui::style::box::g = .4f + .3f * sin(c * 23.123f);
+						ui::style::box::b = .4f + .3f * sin(c * 44.123f);
 						clipStyleApply(clipIndex, over);
 						ui::Box::Draw(clip_x, clip_y, sWidth, h / 3);
 
 						for (int r = 0; r < clp_desc.repeat; r++)
 						{
-							ui::Box::Draw(clip_x + r * clp_desc.length * note_step, clip_y + h / 1.5, note_step * clp_desc.length, h / 3);
+							ui::Box::Draw(clip_x + r * clp_desc.length * note_step, clip_y + h / 1.5f, note_step * clp_desc.length, h / 3.f);
 						}
 
 					}

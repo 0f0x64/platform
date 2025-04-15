@@ -46,7 +46,7 @@ namespace tracker
 		int length;
 		int repeat;
 		int bpmScale;
-		float swing;
+		int swing;
 		overdub overDub;//overwrite or mix
 
 		int cmdIndex;
@@ -74,7 +74,7 @@ namespace tracker
 
 		int channelsCount;
 
-		float masterBPM;
+		int masterBPM;
 
 	} track_desc;
 }

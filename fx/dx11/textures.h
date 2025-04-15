@@ -16,7 +16,7 @@ namespace Textures
 
 	ID3D11RenderTargetView* mrtView[8];
 
-	typedef struct {
+	struct {
 
 		ID3D11Texture2D* pTexture;
 		ID3D11ShaderResourceView* TextureResView;
@@ -32,9 +32,7 @@ namespace Textures
 		bool mipMaps;
 		bool depth;
 
-	} textureDesc;
-
-	textureDesc Texture[max_tex];
+	} Texture[max_tex];
 
 	byte currentRT = 0;
 
@@ -135,9 +133,9 @@ namespace Textures
 		tdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 		tdesc.MiscFlags = 0;
 		HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &Texture[i].pDepth);
-		#if DebugMode
-				if (FAILED(hr)) { Log("CreateDepthStencilView error\n"); return; }
-		#endif	
+		
+		LogIfError ("CreateDepthStencilView error\n");
+		
 
 		descDSV.Format = DXGI_FORMAT_D32_FLOAT;
 		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
@@ -175,7 +173,7 @@ namespace Textures
 		Texture[i].mipMaps = mipMaps;
 		Texture[i].depth = depth;
 
-		if (i > 0)
+		if (i > 0)// main rt skipped, init in device init
 		{
 			CreateTex(i);
 			ShaderRes(i);
@@ -198,7 +196,7 @@ namespace Textures
 
 	void SetViewport(texture texId, byte level = 0)
 	{
-		XMFLOAT2 size = Textures::Texture[(int)texId].size;
+		XMFLOAT2 size = Texture[(int)texId].size;
 		float denom = powf(2, level);
 
 		D3D11_VIEWPORT vp;

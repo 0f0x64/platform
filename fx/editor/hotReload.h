@@ -102,7 +102,7 @@ void reflectSourceChanges(std::filesystem::path fileName)
 						}
 						else
 						{
-							for (int k = 0; k < ts; k++)
+							for (unsigned int k = 0; k < (unsigned int)ts; k++)
 							{
 								if (pC + k>= tCount)
 								{

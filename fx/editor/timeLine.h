@@ -7,9 +7,9 @@ namespace TimeLine
 	const int minute = SAMPLING_FREQ * FRAMES_PER_SECOND;
 	const int timelineLen = second * (int) DEMO_DURATION;
 
-	float bpm = 120;
-	float bpmMaj = 4;
-	float bpmMin = 4;
+	int bpm = 120;
+	int bpmMaj = 4;
+	int bpmMin = 4;
 
 	float screenLeft = .0f;
 	float screenRight = 1.f;

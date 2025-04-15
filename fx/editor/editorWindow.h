@@ -95,7 +95,7 @@ void SetRenderWindowPosition()
 				GetMonitorInfo(MonitorFromWindow(hWnd, 0), &monitorInfo);
 				primaryRC = monitorInfo.rcWork;
 				auto rc = monitorInfo.rcWork;
-				rc.right /= 2.;
+				rc.right /= 2;
 
 				AdjustWindowRect(&rc, GetWindowLongPtr(hWnd, GWL_STYLE), NULL);
 				SetWindowPos(hWnd, HWND_TOP, rc.left, 0, rc.right - rc.left, rc.bottom, SWP_SHOWWINDOW);//window on top

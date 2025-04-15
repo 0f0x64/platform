@@ -376,7 +376,7 @@ namespace editor
 		ui::style::button::hAlign = ui::style::align_h::center;
 		ui::style::button::zoom = true;
 
-		if (paramEdit::ButtonPressed(modeText, 0, 0, ui::style::box::width/1.5, ui::style::box::height/1.2) && drag.isFree())
+		if (paramEdit::ButtonPressed(modeText, 0, 0, ui::style::box::width/1.5f, ui::style::box::height/1.2f) && drag.isFree())
 		{
 			editorMode = (editorMode_)((int)editorMode+1);
 			editorMode = (editorMode_)((int)editorMode%editorMode_count);

@@ -58,7 +58,7 @@ namespace style {
 		text::height = .035f*1.;
 		text::tracking = 5.f;
 
-		box::r = box::g = box::b = inverted ? white/1.5: black;
+		box::r = box::g = box::b = inverted ? white/1.5f: black;
 		box::a = 1.f;
 		box::width = .12f;
 		box::height = text::height*.8f;
@@ -79,7 +79,7 @@ namespace style {
 
 		text::r = text::g = text::b = inverted ? black : white;
 		text::a = 1.f;
-		box::r = box::g = box::b = inverted ? white / 1.5 : black;
+		box::r = box::g = box::b = inverted ? white / 1.5f : black;
 		box::a = 1.f;
 	}
 };
