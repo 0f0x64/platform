@@ -1,3 +1,20 @@
+#include "editor\cmdEditService.h"
+
+#undef regDrawer
+#undef API
+#undef CALLER_INFO
+
+#define regDrawer(name) cmdParamDesc[cmdCounter-1].uiDraw = &name; track_desc.channel[curChannel].cmdIndex = cmdCounter - 1
+#define regfuncGroup(name) strcpy(cmdParamDesc[cmdCounter-1].funcGroup, #name); 
+#define REFLECTION true
+
+#if REFLECTION
+	#define CALLER_INFO const char* srcFileName, int srcLine 
+	#define API(fname, ...) void fname##_impl(__VA_ARGS__)
+#endif
+
+bool resize = true;
+
 using namespace dx11;
 
 

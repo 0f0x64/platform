@@ -2,9 +2,6 @@
 	#include "reflector.h"
 #else
 
-#include "settings.h" 
-#include "tools.h"
-
 // windows environment
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -13,8 +10,16 @@
 #include <windows.h>
 
 HINSTANCE hInst;
-LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 HWND hWnd;
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
+// --------------------
+
+#include <math.h>
+#include "settings.h" 
+#include "tools.h"
+#include "timer.h"
+#include "utils.h"
 
 #if EditMode
 	#include <iostream>
@@ -29,46 +34,25 @@ HWND hWnd;
 
 int cmdCounter = 0;//reset it in loop start point
 
-#include <math.h>
-#include "timer.h"
-#include "utils.h"
 #include "types.h"
-
 #include "dx11\dx.h"
 #include <Xaudio2.h>
-#include "vMachine.h"
-
 #include "projectFiles\sound\track_struct.h"
 
 using namespace dx11;
 
 #include "generated\constBufReflect.h"
 
-#if EditMode
-	#define regDrawer(name) cmdParamDesc[cmdCounter-1].uiDraw = &name; track_desc.channel[curChannel].cmdIndex = cmdCounter - 1
-	#define regfuncGroup(name) strcpy(cmdParamDesc[cmdCounter-1].funcGroup, #name); 
-	#include "editor\cmdEditService.h"
-	#include "editor\editor.h"
-	#define REFLECTION true
-#else
-	#define regDrawer(name)
-#endif
+#define regDrawer(name)
+#define API(fname, ...) void fname##_(__VA_ARGS__)
+#define CALLER_INFO
 
-#if REFLECTION
-	#define CALLER_INFO const char* srcFileName, int srcLine 
-	#define API(fname, ...) void fname##_impl(__VA_ARGS__)
-#else
-	#define API(fname, ...) void fname##_(__VA_ARGS__)
-	#define CALLER_INFO
+#if EditMode
+	#include "editor\editor.h"
 #endif
 
 #include "generated\apiReflection.h"
-
 #include "projectFiles\loop.h"
-
-#if EditMode
-	bool resize = true;
-#endif
 
 void UpdateFrame(double time)
 {

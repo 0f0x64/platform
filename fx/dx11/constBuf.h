@@ -34,7 +34,7 @@ namespace ConstBuf
 	//b5
 	XMFLOAT4 global[constCount];//update once on start
 
-	//char* cBufPtr[6] = { &drawerV,&drawerP,&drawerMat,&camera ,&frame,&global };
+	char* cBufPtr[6] = { (char*) & drawerV,(char*)&drawerP,(char*)&drawerMat,(char*)&camera ,(char*)&frame,(char*)&global};
 
 	int roundUp(int n, int r)
 	{
@@ -84,6 +84,11 @@ namespace ConstBuf
 	void UpdateCamera()
 	{
 		context->UpdateSubresource(buffer[3], 0, NULL, &camera, 0, 0);
+	}
+
+	void Update(cBuffer i)
+	{
+		context->UpdateSubresource(buffer[(int)i], 0, NULL, cBufPtr[(int)i], 0, 0);
 	}
 
 	void ConstToVertex(int i)

@@ -36,6 +36,7 @@ namespace Loop
 		BasicCam::processCam();
 	}
 
+	
 	void mainLoop()
 	{
 	
@@ -71,6 +72,7 @@ namespace Loop
 		gfx::SetBlendMode(blendmode::alpha, blendop::add);
 		
 		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 0, 0, 0);
+		
 		
 
 		//gfx::SetRT(texture::mainRT, 0);

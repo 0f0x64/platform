@@ -170,9 +170,6 @@
     <ClInclude Include="types.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="vMachine.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="tools.h">
       <Filter>Source Files</Filter>
     </ClInclude>

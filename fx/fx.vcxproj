@@ -257,7 +257,6 @@
     <ClInclude Include="tools.h" />
     <ClInclude Include="types.h" />
     <ClInclude Include="utils.h" />
-    <ClInclude Include="vMachine.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="projectFiles\shaders\lib\constants.shader" />
