@@ -39,10 +39,10 @@ namespace Loop
 		BasicCam::processCam();
 	}
 
-	
 	void mainLoop()
 	{
 	
+
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
 

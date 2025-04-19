@@ -1,3 +1,26 @@
+
+struct {
+	int x, y;
+
+	void set(int _x,int _y,const char* c,int l )
+	{
+		x=_x;
+		y = _y;
+	}
+
+} object;
+
+
+#define pos(_x,_y) object.set(_x,_y,__FILE__,__LINE__)
+//#define pos(_x,_y) object.x=_x;object.y=_y;
+
+int main()
+{
+
+	pos(11, 10);
+
+
+
 check unused shaders & includes
 
 refactor api for working with external resources - use pouinters instead indicies
