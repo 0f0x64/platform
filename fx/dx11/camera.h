@@ -55,21 +55,27 @@ namespace Camera
 		XMVECTOR At =  XMVectorSet(at.x, at.y, at.z, 0.0f);
 		XMVECTOR Up =  XMVectorSet(up.x, up.y, up.z, 0.0f);
 
-		ConstBuf::camera.world[0] = XMMatrixIdentity();
-		ConstBuf::camera.view[0] = XMMatrixTranspose(XMMatrixLookAtLH(Eye, At, Up));
-		ConstBuf::camera.proj[0] = XMMatrixTranspose(XMMatrixPerspectiveFovLH(DegreesToRadians(angle), dx11::iaspect, 0.01f, 100.0f));
+		ConstBuf::camera = {
+			.world = XMMatrixIdentity(),
+			.view = XMMatrixTranspose(XMMatrixLookAtLH(Eye, At, Up)),
+			.proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(DegreesToRadians(angle), dx11::iaspect, 0.01f, 100.0f))
+		};
 
 		#if EditMode
-		if (viewCam.overRide)
-		{
-			ConstBuf::camera.world[0] = viewCam.world;
-			ConstBuf::camera.view[0] = XMMatrixTranspose(viewCam.view);
-			ConstBuf::camera.proj[0] = XMMatrixTranspose(viewCam.proj);
-		}
+
+			if (viewCam.overRide)
+			{
+				ConstBuf::camera = {
+					.world = viewCam.world,
+					.view = XMMatrixTranspose(viewCam.view),
+					.proj = XMMatrixTranspose(viewCam.proj)
+				};
+			}
+
 		#endif	
 
-		ConstBuf::UpdateCamera();
-		ConstBuf::ConstToVertex(3);
-		ConstBuf::ConstToPixel(3);
+		ConstBuf::Update(ConstBuf::cBuffer::camera);
+		ConstBuf::ConstToVertex(ConstBuf::cBuffer::camera);
+		ConstBuf::ConstToPixel(ConstBuf::cBuffer::camera);
 	}
 }

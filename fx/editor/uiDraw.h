@@ -94,10 +94,10 @@ namespace ui
 	{
 		void LineNullDrawer(int vertexCount, int instances)
 		{
-			ConstBuf::Update(0, ConstBuf::drawerV);
-			ConstBuf::ConstToVertex(0);
-			ConstBuf::Update(1, ConstBuf::drawerP);
-			ConstBuf::ConstToPixel(1);
+			ConstBuf::Update(ConstBuf::cBuffer::drawerV);
+			ConstBuf::ConstToVertex(ConstBuf::cBuffer::drawerV);
+			ConstBuf::Update(ConstBuf::cBuffer::drawerP);
+			ConstBuf::ConstToPixel(ConstBuf::cBuffer::drawerP);
 
 			ConstBuffer::f4arrayUpdateAndSet();
 

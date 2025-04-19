@@ -34,7 +34,7 @@ namespace ConstBuf
 	//b5
 	XMFLOAT4 global[constCount];//update once on start
 
-	char* cBufPtr[6] = { (char*) & drawerV,(char*)&drawerP,(char*)&drawerMat,(char*)&camera ,(char*)&frame,(char*)&global};
+	char* cBufPtr[6] = { (char*)&drawerV,(char*)&drawerP,(char*)&drawerMat,(char*)&camera ,(char*)&frame,(char*)&global};
 
 	int roundUp(int n, int r)
 	{
@@ -65,40 +65,19 @@ namespace ConstBuf
 		Create(buffer[(int)cBuffer::global], sizeof(global));
 	}
 
-	template <typename T>
-	void Update(int i, T* data)
-	{
-		context->UpdateSubresource(buffer[i], 0, NULL, data, 0, 0);
-	}
-
-	void UpdateFrame()
-	{
-		context->UpdateSubresource(buffer[4], 0, NULL, &frame, 0, 0);
-	}
-
-	void UpdateDrawerMat()
-	{
-		context->UpdateSubresource(buffer[2], 0, NULL, &drawerMat, 0, 0);
-	}
-
-	void UpdateCamera()
-	{
-		context->UpdateSubresource(buffer[3], 0, NULL, &camera, 0, 0);
-	}
-
 	void Update(cBuffer i)
 	{
 		context->UpdateSubresource(buffer[(int)i], 0, NULL, cBufPtr[(int)i], 0, 0);
 	}
 
-	void ConstToVertex(int i)
+	void ConstToVertex(cBuffer i)
 	{
-		context->VSSetConstantBuffers(i, 1, &buffer[i]);
+		context->VSSetConstantBuffers((int)i, 1, &buffer[(int)i]);
 	}
 
-	void ConstToPixel(int i)
+	void ConstToPixel(cBuffer i)
 	{
-		context->PSSetConstantBuffers(i, 1, &buffer[i]);
+		context->PSSetConstantBuffers((int)i, 1, &buffer[(int)i]);
 	}
 
 	

@@ -13,10 +13,10 @@ namespace Draw
 
 	void NullDrawer(int quadCount, unsigned int instances = 1)
 	{
-		ConstBuf::Update(0, ConstBuf::drawerV);
-		ConstBuf::ConstToVertex(0);
-		ConstBuf::Update(1, ConstBuf::drawerP);
-		ConstBuf::ConstToPixel(1);
+		ConstBuf::Update(ConstBuf::cBuffer::drawerV);
+		ConstBuf::ConstToVertex(ConstBuf::cBuffer::drawerV);
+		ConstBuf::Update(ConstBuf::cBuffer::drawerP);
+		ConstBuf::ConstToPixel(ConstBuf::cBuffer::drawerP);
 
 		context->DrawInstanced(quadCount * 6, instances, 0, 0);
 	}

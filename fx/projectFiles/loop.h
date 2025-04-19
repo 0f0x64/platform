@@ -17,17 +17,20 @@ namespace Loop
 	void Precalc()
 	{
 		gfx::SetInputAsm(topology::lineList);
-		ConstBuf::Update(5, ConstBuf::global);
-		for (int i = 0; i < 6; i++) { ConstBuf::ConstToVertex(i); ConstBuf::ConstToPixel(i); }
+		ConstBuf::Update(ConstBuf::cBuffer::global);
+		for (int i = 0; i < 6; i++) { ConstBuf::ConstToVertex((ConstBuf::cBuffer)i); ConstBuf::ConstToPixel((ConstBuf::cBuffer)i); }
 		isPrecalc = true;
 		precalcOfs = cmdCounter;
 	}
 
 	void frameConst()
 	{
-		ConstBuf::frame.time = XMFLOAT4{ (float)(timer::frameBeginTime * .01) ,(float)timer::timeCursor/SAMPLES_IN_FRAME,0,0};
-		ConstBuf::frame.aspect = XMFLOAT4{dx11::aspect,dx11::iaspect, 0, 0};
-		ConstBuf::UpdateFrame();
+		ConstBuf::frame = {
+			.time = XMFLOAT4{ (float)(timer::frameBeginTime * .01) ,(float)timer::timeCursor / SAMPLES_IN_FRAME,0,0},
+			.aspect = XMFLOAT4{dx11::aspect,dx11::iaspect, 0, 0}
+		};
+
+		ConstBuf::Update(ConstBuf::cBuffer::frame);
 	}
 
 	API(cameraMan)

@@ -12,36 +12,89 @@ namespace Object {
 		int denom = (int)pow(2, (float)quality);
 		float q = intToFloatDenom;
 		
-		ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixTranslation(pos.x/q, pos.y/q, pos.z/q));
+		ConstBuf::drawerMat = {
 
-		#if EditMode
-			ConstBuf::drawerMat.hilight = cmdCounter - 1 == hilightedCmd ? 1.f : 0.f;
-		#else 
-			ConstBuf::drawerMat.hilight = 0.f;
-		#endif
+			.model = XMMatrixTranspose(XMMatrixTranslation(pos.x / q, pos.y / q, pos.z / q)),
 
-		ConstBuf::UpdateDrawerMat();
+			#if EditMode
+				.hilight = cmdCounter - 1 == hilightedCmd ? 1.f : 0.f
+			#else 
+				.hilight = 0.f
+			#endif
+		};
+
+		ConstBuf::Update(ConstBuf::cBuffer::drawerMat);
 
 		float gX = Textures::Texture[(int)geometry].size.x / denom;
 		float gY = Textures::Texture[(int)geometry].size.y / denom;
 
-		vs::objViewer.textures.positions = geometry;
-		vs::objViewer.textures.normals = normals;
-		vs::objViewer.samplers.sam1Filter = filter::linear;
-		vs::objViewer.samplers.sam1AddressU = addr::wrap;
-		vs::objViewer.samplers.sam1AddressV = addr::clamp;
-		vs::objViewer.params.gX = gX;
-		vs::objViewer.params.gY = gY;
+		vs::objViewer = {
+
+			.params = {
+				.gX = gX,
+				.gY = gY
+			},
+
+			.textures = {
+				.positions = geometry,
+				.normals = normals
+				},
+
+			.samplers = {
+				.sam1Filter = filter::linear,
+				.sam1AddressU = addr::wrap,
+				.sam1AddressV = addr::clamp
+			}
+		};
+
 		vs::objViewer.set();
 
-		ps::basic.textures.env = texture::env;
-		ps::basic.textures.normals = normals;
-		ps::basic.samplers.sam1Filter = filter::linear;
-		ps::basic.samplers.sam1AddressU = addr::wrap;
-		ps::basic.samplers.sam1AddressV = addr::wrap;
+		ps::basic = 
+		{
+			.params = {
+				},
+
+			.textures = {
+				.env = texture::env,
+				.normals = normals
+			},
+
+			.samplers = {
+				.sam1Filter = filter::linear,
+				.sam1AddressU = addr::wrap,
+				.sam1AddressV = addr::wrap
+				}
+		};
 
 		ps::basic.set();
+
 		gfx::Draw((int)gX*(int)gY, 1);
+	}
+
+	API(CalcNormals, texture srcGeomerty, texture targetNrml)
+	{
+		gfx::SetRT(targetNrml, 0);
+
+		vs::quad.set();
+
+		ps::genNormals = {
+
+			.textures = {
+				.geo = srcGeomerty
+			},
+
+			.samplers = {
+				.sam1Filter = filter::linear,
+				.sam1AddressU = addr::wrap,
+				.sam1AddressV = addr::wrap
+			}
+		};
+
+		ps::genNormals.set();
+
+		gfx::Draw(1, 1);
+		gfx::CreateMips();
+
 	}
 
 	API(CalcObject,texture targetGeo, texture targetNrml)
@@ -58,18 +111,7 @@ namespace Object {
 		gfx::CreateMips();
 
 		//normals
-		gfx::SetRT(targetNrml,0);
-		vs::quad.set();
-
-		ps::genNormals.samplers.sam1Filter = filter::linear;
-		ps::genNormals.samplers.sam1AddressU = addr::wrap;
-		ps::genNormals.samplers.sam1AddressV = addr::wrap;
-
-		ps::genNormals.textures.geo = targetGeo;
-		ps::genNormals.set();
-
-		gfx::Draw(1,1);
-		gfx::CreateMips();
+		CalcNormals(targetGeo, targetNrml);
 	}
 
 }

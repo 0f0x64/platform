@@ -832,6 +832,49 @@ cmdLevel--;
 namespace Object {
 #ifdef REFLECTION
 
+#define CalcNormals(srcGeomerty, targetNrml) CalcNormals_ref (__FILE__, __LINE__, srcGeomerty, targetNrml)
+enum class CalcNormals_param {srcGeomerty, targetNrml};
+void CalcNormals_impl(  texture srcGeomerty, texture targetNrml);
+void CalcNormals_ref ( CALLER_INFO,  texture srcGeomerty, texture targetNrml)
+{
+if (paramsAreLoaded) {
+	if (!cmdParamDesc[cmdCounter].param[0].bypass)  srcGeomerty = (texture)cmdParamDesc[cmdCounter].param[0].value[0];
+	if (!cmdParamDesc[cmdCounter].param[1].bypass)  targetNrml = (texture)cmdParamDesc[cmdCounter].param[1].value[0];
+} else {
+	strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
+	cmdParamDesc[cmdCounter].caller.line = srcLine;
+	cmdParamDesc[cmdCounter].pCount = 2;
+	cmdParamDesc[cmdCounter].param[0].value[0] = (int)srcGeomerty;
+	cmdParamDesc[cmdCounter].param[0].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[0].type, "texture"); 
+	strcpy(cmdParamDesc[cmdCounter].param[0].name, "srcGeomerty"); 
+	cmdParamDesc[cmdCounter].param[1].value[0] = (int)targetNrml;
+	cmdParamDesc[cmdCounter].param[1].bypass = false;
+	strcpy(cmdParamDesc[cmdCounter].param[1].type, "texture"); 
+	strcpy(cmdParamDesc[cmdCounter].param[1].name, "targetNrml"); 
+
+		editor::paramEdit::setParamsAttr();
+		editor::paramEdit::setBypass();
+}
+
+AddToUI("CalcNormals"); 
+cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
+cmdLevel++;
+
+cmdCounter++;
+
+CalcNormals_impl (srcGeomerty, targetNrml);
+cmdLevel--;
+}
+
+#else
+#undef CalcNormals
+#define CalcNormals(srcGeomerty, targetNrml) CalcNormals_( srcGeomerty, targetNrml)
+#endif
+}
+namespace Object {
+#ifdef REFLECTION
+
 #define CalcObject(targetGeo, targetNrml) CalcObject_ref (__FILE__, __LINE__, targetGeo, targetNrml)
 enum class CalcObject_param {targetGeo, targetNrml};
 void CalcObject_impl( texture targetGeo, texture targetNrml);
