@@ -367,10 +367,33 @@ namespace editor
 			} 
 		}
 
+		/*bool changed = false;
+
+		for (int i = 0; i < cmdParamDescBack.pCount; i++)
+		{
+			auto cnt = cmdParamDescBack.param[i]._dim;
+
+			for (int j = 0; j < cnt; j++)
+			{
+				if (cmdParamDescBack.param[i].value[j] != cmdParamDesc[currentCmd_backup].param[i].value[j])
+				{
+					changed = true;
+					break;
+				}
+
+			}
+
+			if (changed) break;
+		}*/
+
+
 		
 		if (currentCmd_backup != currentCmd)
+		//if (changed)
 		{
+			
 			paramEdit::Save(currentCmd_backup);
+			SetForegroundWindow(vsHWND);
 		}
 		//ViewCam::setCamMat();
 		//ui::Text::Draw(str, tx, ty, th, th);

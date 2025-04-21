@@ -15,7 +15,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 // --------------------
 
-#include <math.h>
+#include "math.h"
 #include "settings.h" 
 #include "tools.h"
 #include "timer.h"
@@ -29,14 +29,13 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 	#include <regex>
 	#include <vector>
 	#include <typeinfo>
-
 #endif
 
 int cmdCounter = 0;//reset it in loop start point
 
 #include "types.h"
 #include "dx11\dx.h"
-#include <Xaudio2.h>
+#include "Xaudio2.h"
 #include "projectFiles\sound\track_struct.h"
 
 using namespace dx11;
@@ -102,6 +101,8 @@ void UpdateFrame(double time)
 	Sleep((DWORD)min(FRAME_LEN, max(FRAME_LEN - timer::frameRenderingDuration, 0)));
 }
 
+//int time_activate = 0;
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	hInst = (HINSTANCE)GetModuleHandle(0);
@@ -133,6 +134,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		#if EditMode
 			
+			cmdParamDescBack = cmdParamDesc[currentCmd];
+
 			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
 				if (msg.message == WM_QUIT)
@@ -142,7 +145,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
-
+				
 			}
 
 			editor::WatchFiles();
@@ -157,9 +160,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			}
 
 		#endif
-
+			
 		UpdateFrame(timer::GetCounter());
 		
+		/*if (hWnd != GetFocus() && time_activate == 0)
+		{
+			time_activate = timer::GetCounter();
+		}
+		
+		if (time_activate !=0 && timer::GetCounter() > time_activate + 1000)
+		{
+			SetForegroundWindow(hWnd);
+			time_activate = 0;
+		}*/
+
 	}
 
 	#if EditMode

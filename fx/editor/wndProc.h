@@ -12,6 +12,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 
 	case WM_MOUSEMOVE:
+		
 		break;
 
 	/*case WM_SETCURSOR:

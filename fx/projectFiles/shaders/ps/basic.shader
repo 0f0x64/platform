@@ -33,17 +33,24 @@ float3 rotY(float3 pos, float a)
     return pos;
 }
 
+#define PI 3.1415926535897932384626433832795
+
 float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
     float2 uv = input.uv;
     float3 albedo = float3(1, 1, 1);
-    albedo = (sin(uv.x*112)*sin(uv.y*12))*.5+.5;
-   // return float4(albedo,1);
-    float roughness = .25;
-    float metalness = 0;
+    albedo = sin(uv.x*158)*(sin(uv.y*2));
+    albedo=saturate(albedo)*float3(1,.5,.2);
+
+
+    //return float4(albedo,1);
+    float roughness = .71;
+    float metalness = 0.;
     float3 F0 = .04;
     
-    float3 nrml = normals.SampleLevel(sam1, input.uv,1).xyz;
+    float3 nrml = normals.SampleLevel(sam1, input.uv,6).xyz;
+    nrml += normals.SampleLevel(sam1, input.uv,0).xyz*.01;
+    nrml=normalize(nrml);
     //nrml=rotY(nrml,time.x*.1);
     //nrml *= -(1 - isFrontFace * 2);
     float3 eye = input.vpos.xyz;
@@ -73,6 +80,6 @@ float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
     color += saturate(10 - 35 * d)* sin(d * 127 + time.x) * 4 * hilight;
     
     color.rgb = pow(ACESFilm(color.rgb),1/2.2);
-
+        
     return float4(color, 1);
 }

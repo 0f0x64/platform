@@ -35,7 +35,7 @@ namespace Loop
 
 	API(cameraMan)
 	{
-		BasicCam::setCamKey(0, keyType::set, -1212, -685, -1676, 4, 56, 0, -2, 233, -102, 60, sliderType::follow, 2, 3, 8, camAxis::local, 0, 50, 0, 0);
+		BasicCam::setCamKey(0, keyType::set, 3021, 22, 46, 2, 51, 0, 0, 508, 77, 65, sliderType::follow, 0, 0, -1, camAxis::local, 0, 3, 0, 0);
 		BasicCam::processCam();
 	}
 

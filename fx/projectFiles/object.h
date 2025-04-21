@@ -43,7 +43,7 @@ namespace Object {
 			.samplers = {
 				.sam1Filter = filter::linear,
 				.sam1AddressU = addr::wrap,
-				.sam1AddressV = addr::clamp
+				.sam1AddressV = addr::wrap
 			}
 		};
 

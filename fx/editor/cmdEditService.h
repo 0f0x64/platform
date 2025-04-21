@@ -1,6 +1,6 @@
 typedef void (*PVFN)(int i, float &x, float &y, float w, float lead, float sel);
 
-struct {
+struct ParamDesc {
 
 	char funcName[255];
 	char funcGroup[255];
@@ -28,7 +28,10 @@ struct {
 
 	int stackLevel = 0;
 
-} cmdParamDesc[1000];
+};
+
+ParamDesc cmdParamDesc[1000];
+ParamDesc cmdParamDescBack;
 
 bool paramsAreLoaded = false;
 int cmdLevel = 0;
