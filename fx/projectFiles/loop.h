@@ -39,9 +39,51 @@ namespace Loop
 		BasicCam::processCam();
 	}
 
+#define REFLECTION1
+
+#ifdef REFLECTION1
+	#define CALLER const char* srcFileName, int srcLine,
+	#define FUNC run(CALLER params in, bool b = reflect_p())
+#else
+	#define CALLER
+#endif
+
+#define CMD namespace
+
+	CMD obj {
+
+		struct params {
+			int x;
+			int y;
+			texture target;
+		};
+
+		bool reflect_p()
+		{
+			return true;
+		}
+
+		void FUNC
+		{
+			
+			int a = 0;
+		}
+
+	};
+
+	#define obj(...) obj::run(__FILE__,__LINE__,__VA_ARGS__)
+
+
 	void mainLoop()
 	{
 	
+		obj({
+			.x = 10,
+			.y = 20, 
+			.target = texture::mainRT
+			});
+
+		
 
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
@@ -72,9 +114,9 @@ namespace Loop
 		gfx::SetDepthMode(depthmode::on);
 		gfx::ClearRTDepth();
 		gfx::SetCull(cullmode::back);
-		gfx::SetBlendMode(blendmode::alpha, blendop::add);
+		gfx::SetBlendMode(blendmode::off, blendop::add);
 		
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 0, 0, 0);
+		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 120, 82, 112);
 		
 		
 

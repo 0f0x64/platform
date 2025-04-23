@@ -403,6 +403,8 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 				std::string pNameList;
 				std::string pNameListComplexType;
 				std::string pNameListOut;
+				std::vector<std::string>pTypes;
+				std::vector<std::string>pNames;
 
 				res = s.find("(", res + marker.length());
 				if (found)
@@ -414,9 +416,6 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 						if (s.at(x) == ',' || s.at(x) == ')') { res = x;  break; }
 						if (s.at(x) != ' ') funcName.push_back(s.at(x));
 					}
-
-					std::string fReflection = "..\\fx\\generated\\reflection\\" + funcName + "_ref.h";
-					ofstream ofile(fReflection);
 
 					for (auto x = res + 1; x < declEnd; x++)
 					{
@@ -532,9 +531,12 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 						}
 						else
 						{
-							overrider.append("\tif (!cmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass) ");
+							overrider.append("\t\tif (!cmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass) ");
 
 							auto typeIndex = getTypeIndex(type.c_str());
+
+							pTypes.push_back(type);
+							pNames.push_back(name);
 
 							if (isTypeEnum(typeIndex))
 							{
@@ -542,11 +544,21 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 								pNameListComplexType.append(name);
 								pNameListOut.append(name);
 								overrider.append(" " + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = (int)" + name + ";\n");
+								loader.append("\t\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = (int)" + name + ";\n");
 								isTypeKnown = true;
 							}
 							else
 							{
+								if (getTypeDim(typeIndex) == 1)
+								{
+									pNameList.append(name);
+									pNameListComplexType.append(name);
+									pNameListOut.append(name);
+									overrider.append("\t\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+									loader.append("\t\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ";\n");
+									isTypeKnown = true;
+								}
+
 								if (getTypeDim(typeIndex) == 3)
 								{
 									pNameList.append(name + "_x, " + name + "_y, " + name + "_z");
@@ -557,9 +569,9 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 									overrider.append("\t\t\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
 									overrider.append("\t\t}\n");
 
-									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
-									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
-									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
+									loader.append("\t\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
+									loader.append("\t\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
+									loader.append("\t\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
 
 									isTypeKnown = true;
 								}
@@ -570,28 +582,20 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 									pNameListComplexType.append(name);
 									pNameListOut.append(type + " {" + name + "_x, " + name + "_y, " + name + "_z, " + name + "_w }");
 
-									overrider.append("\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-									overrider.append("\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
-									overrider.append("\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
-									overrider.append("\t" + name + ".w = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3];\n");
+									overrider.append("\t\t" + name + ".x = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+									overrider.append("\t\t" + name + ".y = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1];\n");
+									overrider.append("\t\t" + name + ".z = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2];\n");
+									overrider.append("\t\t" + name + ".w = cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3];\n");
 
-									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
-									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
-									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
-									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3] = " + name + ".w;\n");
+									loader.append("\t\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ".x;\n");
+									loader.append("\t\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[1] = " + name + ".y;\n");
+									loader.append("\t\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[2] = " + name + ".z;\n");
+									loader.append("\t\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[3] = " + name + ".w;\n");
 
 									isTypeKnown = true;
 								}
 
-								if (getTypeDim(typeIndex) == 1)
-								{
-									pNameList.append(name);
-									pNameListComplexType.append(name);
-									pNameListOut.append(name);
-									overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-									loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ";\n");
-									isTypeKnown = true;
-								}
+
 							}
 
 							if (!isTypeKnown)
@@ -599,16 +603,16 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 								pNameList.append(name);
 								pNameListComplexType.append(name);
 								pNameListOut.append(name);
-								overrider.append("\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
-								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ";\n");
+								overrider.append("\t\t" + name + " = (" + type + ")cmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0];\n");
+								loader.append("\t\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].value[0] = " + name + ";\n");
 							}
 							else
 							{
-								loader.append("\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass = false;\n");
+								loader.append("\t\tcmdParamDesc[cmdCounter].param[" + pCountStr + "].bypass = false;\n");
 							}
 
-							loader.append("\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].type, \"" + type + "\"); \n");
-							loader.append("\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].name, \"" + name + "\"); \n");
+							loader.append("\t\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].type, \"" + type + "\"); \n");
+							loader.append("\t\tstrcpy(cmdParamDesc[cmdCounter].param[" + pCountStr + "].name, \"" + name + "\"); \n");
 						}
 
 						name.clear();
@@ -622,32 +626,88 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 					{
 						for (int nsi = 0; nsi < nsDepth; nsi++)
 						{
-							_ofile << "namespace " + nsName[nsi] + " {\n";
+							_ofile << "namespace " + nsName[nsi] + " {\n\n";
 						}
 						_ofile << "#ifdef REFLECTION\n\n";
-						
-						_ofile << "#define " << funcName << "(";
-						_ofile << pNameList << ") " << funcName << "_ref (__FILE__, __LINE__";
-						if (pCount > 0) _ofile << ", ";
-						if (variadic) _ofile << "__VA_ARGS__";
-						_ofile << pNameListOut << ")\n";
 
-						if (pCount > 0 && !variadic)
-						{
-							_ofile << "enum class " << funcName << "_param {" << pNameListComplexType << "};\n";
 
+						//if (pCount > 0 && !variadic)
+						//{
+							//_ofile << "enum class " << funcName << "_param {" << pNameListComplexType << "};\n";
+						//}
+
+						_ofile << "void " << funcName << "_impl" << funcParams_clean << ";\n\n";
+
+						//REFLECTION FUNC
+						_ofile << "void " + funcName + "_reflect (CALLER_INFO";
+						if (pNames.size() > 0) {
+							_ofile << ", ";
 						}
 
-						_ofile << "void " << funcName << "_impl" << funcParams_clean << ";\n";
+						for (int p = 0; p < pNames.size(); p++)
+						{
+							_ofile << pTypes[p] + " &" + pNames[p];
+							if (p != pNames.size()-1) _ofile << ", ";
+						}
+						_ofile << ")\n{\n\n";
+						//_ofile << "auto cmd = &cmdParamDesc[cmdCounter];
+						_ofile << "\tif (paramsAreLoaded) {\n";
+						_ofile << overrider;
+						_ofile << "\t} else {\n";
+
+						_ofile << "\t\tstrcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);\n";
+						_ofile << "\t\tcmdParamDesc[cmdCounter].caller.line = srcLine;\n";
+						auto st = variadic ? "count+1" : std::to_string(pCount);
+						if (variadic)
+						{
+							_ofile << "\t\tcmdParamDesc[cmdCounter].param[0].value[0] = count ;\n";
+						}
+						_ofile << "\t\tcmdParamDesc[cmdCounter].pCount = " << st << ";\n";
+
+						if (!variadic)
+						{
+							loader.append("\n\t\teditor::paramEdit::setParamsAttr();\n");
+							loader.append("\t\teditor::paramEdit::setBypass();\n");
+						}
+
+						_ofile << loader;
+						_ofile << "\t}\n";
+
+						_ofile << "\n\tAddToUI(\"" << funcName << "\"); \n";
+						_ofile << "\tcmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;\n";
+
+						_ofile << "\tcmdLevel++;\n\n";
+						_ofile << "\tcmdCounter++;\n";
+
+						_ofile << "\n}\n\n";
+
+						//---------------
+						_ofile << "#define " + funcName + "(" + pNameList + ") " + funcName + "_ref (__FILE__, __LINE__";
+						if (pCount > 0) _ofile << ", ";
+						if (variadic) _ofile << "__VA_ARGS__";
+						_ofile << pNameListOut << ")\n\n";
+
 						_ofile << "void " << funcName << "_ref " << funcParams << "\n";
 						_ofile << "{\n";
+
 						//reflection code
 						if (variadic)
 						{
-							_ofile << "VA_READ\n\n";
+							_ofile << "\tVA_READ\n\n";
 						}
 
-						if (pCount > 0)
+						_ofile << "\t" + funcName + "_reflect (srcFileName, srcLine";
+						if (pNames.size() > 0) {
+							_ofile << ", ";
+						}
+						for (int p = 0; p < pNames.size(); p++)
+						{
+							_ofile << pNames[p];
+							if (p != pNames.size() - 1) _ofile << ", ";
+						}
+						_ofile << ");\n";
+
+						/*if (pCount > 0)
 						{
 							_ofile << "if (paramsAreLoaded) {\n";
 							_ofile << overrider;
@@ -683,10 +743,10 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 						_ofile << "cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;\n";
 
 						_ofile << "cmdLevel++;\n\n";
-						_ofile << "cmdCounter++;\n\n";
+						_ofile << "cmdCounter++;\n\n";*/
 
 						//caller
-						_ofile << funcName << "_impl (";
+						_ofile << "\t" + funcName << "_impl (";
 						if (variadic)
 						{
 							_ofile << "count, 0 ";
@@ -699,7 +759,7 @@ void ScanFile(std::string fname, ofstream& _ofile, std::string marker)
 
 						//post-call - adjust cmd level;
 
-						_ofile << "cmdLevel--;\n";
+						_ofile << "\tcmdLevel--;\n";
 						_ofile << "}\n\n";
 						_ofile << "#else\n";
 
