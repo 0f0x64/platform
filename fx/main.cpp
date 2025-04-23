@@ -13,7 +13,7 @@ HINSTANCE hInst;
 HWND hWnd;
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-// --------------------
+// ----------------------
 
 #include "math.h"
 #include "settings.h" 
