@@ -8,6 +8,7 @@ struct ParamDesc {
 	struct {
 		char fileName[MAX_PATH];
 		int line;
+		int column;
 	} caller;
 
 	PVFN uiDraw = NULL;

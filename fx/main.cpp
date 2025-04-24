@@ -26,9 +26,12 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 	#include <string>
 	#include <filesystem>
 	#include <fstream>
+	#include <istream>
+
 	#include <regex>
 	#include <vector>
 	#include <typeinfo>
+	#include <source_location>
 #endif
 
 int cmdCounter = 0;//reset it in loop start point
