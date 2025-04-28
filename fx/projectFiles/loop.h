@@ -60,14 +60,20 @@ namespace Loop
 	{
 		int* rawData = (int*)in;
 
-		//get param struct
 		{
+			std::string fn = currentFunc.function_name();
+			auto rb = fn.find("(");
+			auto fp = fn.rfind("::",rb);
+			auto op = fn.rfind("::", fp-2);
+			std::string objName = fn.substr(op+2, fp - op-2);
+
+
 			std::ifstream ifile(currentFunc.file_name());
 			std::string s;
 			std::string funcStr;
 			int lc = 1;
 
-			std::streampos paramsPos = 0;
+			bool obj_is_found = false;
 
 			if (ifile.is_open())
 			{
@@ -78,34 +84,40 @@ namespace Loop
 
 					if (s.find("struct") != std::string::npos)
 					{
-						if (s.find("params") != std::string::npos)
+						if (s.find(objName.c_str()) != std::string::npos)
 						{
-							paramsPos = ifile.tellg();
+							obj_is_found = true;
+						}
+					}
+
+					if (obj_is_found)
+					{
+						unsigned int fs = s.find("struct");
+						if ( fs != std::string::npos)
+						{
+							unsigned int fp = s.find("params",fs);
+							if (fp != std::string::npos)
+							{
+								unsigned int fb = s.find("{",fp);
+								if (fb != std::string::npos) 
+								{
+									std::string pStr;
+									while (true)
+									{
+										char a;
+										ifile.get(a);
+										if (a == '}') break;
+										pStr += a;
+									}
+
+									int t = 0;
+
+								}
+							}
 						}
 					}
 
 					lc++;
-				}
-
-				ifile.seekg(paramsPos);
-
-				
-				bool leftBr = false;
-				std::string paramStr;
-				while (true)
-				{
-					if (!getline(ifile, s)) break;
-
-					//if (s.find("{") != std::string::npos) leftBr = true;
-					//if (leftBr) 
-					{
-						paramStr.append(s);
-						if (s.find("}") != std::string::npos) {
-							break;
-						}
-					}
-
-					
 				}
 
 				ifile.close();
@@ -174,6 +186,8 @@ namespace Loop
 
 		std::string funcName = funcStr.substr(start, nameEnd- start);
 
+
+
 		//
 
 		int pCount = sizeof(*in)/sizeof(int);
@@ -219,7 +233,7 @@ namespace Loop
 #define reflect reflect_f(&in, caller, std::source_location::current())
 #define reflect_close cmdLevel--
 
-	struct object1{
+	struct object1 {
 
 		#pragma pack(push, 1)
 		struct params {
