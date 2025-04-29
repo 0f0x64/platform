@@ -66,7 +66,7 @@ namespace Loop
 			auto fp = fn.rfind("::",rb);
 			auto op = fn.rfind("::", fp-2);
 			std::string objName = fn.substr(op+2, fp - op-2);
-
+			std::string functionName = fn.substr(fp + 2, rb - fp - 2);
 
 			std::ifstream ifile(currentFunc.file_name());
 			std::string s;
@@ -82,40 +82,55 @@ namespace Loop
 					if (!getline(ifile, s)) break;
 					if (lc == currentFunc.line()) break;
 
-					if (s.find("struct") != std::string::npos)
+					std::string lineStr;
+					unsigned int t = 0;
+					while (t<s.length())
 					{
-						if (s.find(objName.c_str()) != std::string::npos)
-						{
-							obj_is_found = true;
-						}
+						if (s.at(t)!=' ' && s.at(t) != '\t') lineStr += s.at(t);
+						t++;
+					}
+
+					if (lineStr == "struct" + objName + "{")
+					{
+						obj_is_found = true;
 					}
 
 					if (obj_is_found)
 					{
-						unsigned int fs = s.find("struct");
-						if ( fs != std::string::npos)
+
+						if (lineStr == "structparams{")
 						{
-							unsigned int fp = s.find("params",fs);
-							if (fp != std::string::npos)
+							std::string pStr;
+							while (true)
 							{
-								unsigned int fb = s.find("{",fp);
-								if (fb != std::string::npos) 
-								{
-									std::string pStr;
-									while (true)
-									{
-										char a;
-										ifile.get(a);
-										if (a == '}') break;
-										pStr += a;
-									}
-
-									int t = 0;
-
-								}
+								char a;
+								ifile.get(a);
+								if (a == '}') break;
+								if (a != '\t' && a!= '\n') pStr += a;
 							}
+
+							constexpr auto regex_str = R"(;)";
+							const std::regex reg{ regex_str };
+							const auto tokens = regex_split(pStr, reg);
+							
+							constexpr auto regex_p = R"( )";
+							const std::regex reg_p{ regex_p };
+
+							for (int i = 0;i < tokens.size();i++)
+							{
+								const auto tokens_p = regex_split(tokens[i], reg_p);
+
+							}
+
+
+
+
+							break;
 						}
 					}
+					
+						
+					
 
 					lc++;
 				}
