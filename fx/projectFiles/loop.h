@@ -56,16 +56,17 @@ namespace Loop
 		strcpy(cmdParamDesc[cmdCounter].funcName, funcName + x);
 	}
 
+	
 	void reflect_f(auto* in, const std::source_location caller, const std::source_location currentFunc)//name and types without names
 	{
-		int* rawData = (int*)in;
+		char* rawData = (char*)in;
 
 		{
 			std::string fn = currentFunc.function_name();
 			auto rb = fn.find("(");
-			auto fp = fn.rfind("::",rb);
-			auto op = fn.rfind("::", fp-2);
-			std::string objName = fn.substr(op+2, fp - op-2);
+			auto fp = fn.rfind("::", rb);
+			auto op = fn.rfind("::", fp - 2);
+			std::string objName = fn.substr(op+2, fp - op - 2);
 			std::string functionName = fn.substr(fp + 2, rb - fp - 2);
 
 			std::ifstream ifile(currentFunc.file_name());
@@ -109,15 +110,25 @@ namespace Loop
 								if (a != '\t' && a!= '\n') pStr += a;
 							}
 
-							constexpr auto regex_str = R"(;)";
-							const std::regex reg{ regex_str };
-							const auto tokens = regex_split(pStr, reg);
+							const std::regex reg{ R"(;)" };
+							auto tokens = regex_split(pStr, reg);
 							
-							constexpr auto regex_p = R"( )";
-							const std::regex reg_p{ regex_p };
-
 							for (int i = 0;i < tokens.size();i++)
 							{
+								std::string clean_p;
+								for (int j = 0; j < tokens[i].size(); j++)
+								{
+									if (tokens[i].at(j) == ' ')
+									{
+
+									}
+									else
+									{
+										clean_p += tokens[i].at(j);
+									}
+
+								}
+								const std::regex reg_p{ R"( )" };
 								const auto tokens_p = regex_split(tokens[i], reg_p);
 
 							}
@@ -247,20 +258,24 @@ namespace Loop
 
 #define reflect reflect_f(&in, caller, std::source_location::current())
 #define reflect_close cmdLevel--
+#define prm(type,name) type,name
 
 	struct object1 {
 
 		#pragma pack(push, 1)
 		struct params {
-			int x; 
-			int y;
-			int z;
+			int   x; 
+			int y ;
+			  int z;  
 			texture target;
 		};
 		#pragma pack(pop)
 
 		void set(params in CALLER)
 		{
+
+			
+
 		reflect;
 
 			int c = 0;
@@ -302,7 +317,7 @@ namespace Loop
 		frameConst();
 
 		obj.set({
-			.x = 0,
+			.x = 111,
 			.y = 10,
 			.z = 22,
 			.target = texture::mainRT
