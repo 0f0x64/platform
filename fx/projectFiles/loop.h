@@ -100,19 +100,19 @@ namespace Loop
 		cmdParamDesc[cmdCounter].caller.column = caller.column();
 	}
 
-	void CopyStrWithSkipper(std::string& in, std::string& lineStr, char* skippers )
+	void CopyStrWithSkipper(std::string& in, std::string& lineStr, std::string skippers )
 	{
 		unsigned int t = 0;
 		while (t < in.length())
 		{
 			bool passed = true;
-			for (int i = 0;i < strlen(skippers);i++)
+			for (int i = 0;i < skippers.size();i++)
 			{
-				if (in.at(t) == skippers[i]) passed = false;
+				if (in.at(t) == skippers.at(i)) passed = false;
 			}
 
 			if (passed)	lineStr += in.at(t);
-			}
+			
 
 			t++;
 		}
@@ -147,12 +147,6 @@ namespace Loop
 					if (lc == currentFunc.line()) break;
 
 					std::string lineStr;
-					/*unsigned int t = 0;
-					while (t<s.length())
-					{
-						if (s.at(t)!=' ' && s.at(t) != '\t') lineStr += s.at(t);
-						t++;
-					}*/
 					CopyStrWithSkipper(s, lineStr, " \t");
 
 					if (lineStr == "struct" + objName + "{")
@@ -184,6 +178,8 @@ namespace Loop
 								SetParamType(i, typeStr.c_str());
 								SetParamName(i, nameStr.c_str());
 							}
+
+							auto a = cmdParamDesc[cmdCounter];
 
 							break;
 						}
