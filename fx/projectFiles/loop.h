@@ -120,8 +120,9 @@ namespace Loop
 
 	void reflect_f(auto* in, const std::source_location caller, const std::source_location currentFunc)//name and types without names
 	{
-		char* rawData = (char*)in;
+		int* rawData = (int*)in;
 
+		if (!paramsAreLoaded)  //variables -> reflected struct
 		{
 			FillCaller(caller);
 
@@ -179,8 +180,6 @@ namespace Loop
 								SetParamName(i, nameStr.c_str());
 							}
 
-							auto a = cmdParamDesc[cmdCounter];
-
 							break;
 						}
 					}
@@ -190,104 +189,101 @@ namespace Loop
 
 				ifile.close();
 			}
-		}
+		
 
-		//get caller string
-		std::string inFilePath = caller.file_name();
-		std::ifstream ifile(inFilePath);
+			//get caller string
+			std::ifstream ifileCaller(caller.file_name());
 
-		std::string s;
-		std::string funcStr;
-		int lc = 1;
+			std::string funcStr;
+			lc = 1;
 
-		if (ifile.is_open())
-		{
+			if (ifileCaller.is_open())
+			{
+				while (true)
+				{
+					if (!getline(ifileCaller, s)) break;
+					if (lc == caller.line()) break;
+
+					lc++;
+				}
+
+				funcStr.append(s);
+		
+				while (s.find(";") == std::string::npos)
+				{
+					getline(ifileCaller, s);
+					funcStr.append(s);
+				}
+			
+			
+				ifileCaller.close();
+			}
+
+			//isolate caller
+			unsigned int start = caller.column();
 			while (true)
 			{
-				if (!getline(ifile, s)) break;
-				if (lc == caller.line()) break;
+				if (start == 0 ||
+					funcStr.at(start) == ' ' ||
+					funcStr.at(start) == '\t' ||
+					funcStr.at(start) == ';')
+				{
+					start++;
+					break;
+				}
 
-				lc++;
+				start--;
 			}
+			unsigned int end = funcStr.find(";")+1;
+			std::string funcStrClean = funcStr.substr(start, end - start);
 
-			funcStr.append(s);
-		
-			while (s.find(";") == std::string::npos)
+			//find name
+			unsigned nameEnd = start;
+			while (true)
 			{
-				getline(ifile, s);
-				funcStr.append(s);
-			}
-			
-			
-			ifile.close();
-		}
-
-		//isolate caller
-		unsigned int start = caller.column();
-		while (true)
-		{
-			if (start == 0 ||
-				funcStr.at(start) == ' ' ||
-				funcStr.at(start) == '\t' ||
-				funcStr.at(start) == ';')
-			{
-				start++;
-				break;
+				if (funcStr.at(nameEnd) == ' ' ||
+					funcStr.at(nameEnd) == '(')
+				{
+					break;
+				}
+				nameEnd++;
 			}
 
-			start--;
-		}
-		unsigned int end = funcStr.find(";")+1;
-		std::string funcStrClean = funcStr.substr(start, end - start);
+			std::string funcName = funcStr.substr(start, nameEnd- start);
 
-		//find name
-		unsigned nameEnd = start;
-		while (true)
-		{
-			if (funcStr.at(nameEnd) == ' ' ||
-				funcStr.at(nameEnd) == '(')
-			{
-				break;
-			}
-			nameEnd++;
-		}
+			strcpy(cmdParamDesc[cmdCounter].funcName, funcName.c_str());
 
-		std::string funcName = funcStr.substr(start, nameEnd- start);
+			//
+
+			int pCount = sizeof(*in)/sizeof(int);
+			auto c = &cmdParamDesc[cmdCounter];
 
 
-
-		//
-
-		int pCount = sizeof(*in)/sizeof(int);
-		auto c = &cmdParamDesc[cmdCounter];
-
-		if (paramsAreLoaded) //variables <- reflected struct
-		{
-			for (int i = 0; i < pCount; i++)
-			{
-				if (!c->param[i].bypass) *(rawData + i) = c->param[i].value[0];
-			}
-		
-		}
-		else //variables -> reflected struct
-		{
-			strcpy(c->caller.fileName, caller.file_name());
-			c->caller.line = caller.line();
-			c->caller.column = caller.column();
 			c->pCount = pCount;
-			 
+
 			for (int i = 0; i < pCount; i++)
 			{
 				c->param[i].value[0] = *(rawData + i);
-				c->param[i].bypass  = false;
+				c->param[i].bypass = false;
 			}
 
 			editor::paramEdit::setParamsAttr();
 			//editor::paramEdit::setBypass();//logic change needed
 
 		}
+		else//variables <- reflected struct
+		{
+			auto c = &cmdParamDesc[cmdCounter];
 
-		AddToUI2(funcName.c_str());
+			for (int i = 0; i < c->pCount; i++)
+			{
+				if (!c->param[i].bypass) *(rawData + i) = c->param[i].value[0];
+			}
+
+
+		}
+
+		AddToUI2(cmdParamDesc[cmdCounter].funcName);
 		cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 		cmdLevel++;
 
