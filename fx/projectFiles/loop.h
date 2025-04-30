@@ -56,12 +56,75 @@ namespace Loop
 		strcpy(cmdParamDesc[cmdCounter].funcName, funcName + x);
 	}
 
-	
+	void removeDoubleSpaces(std::string& str) {
+		std::regex pattern("\\s{2,}");
+		str = std::regex_replace(str, pattern, " ");
+	}
+
+	void getTypeAndName(std::string& src, std::string& typeStr, std::string& nameStr)
+	{
+		bool type = false;
+		bool name = false;
+
+		for (int j = 0; j < src.size(); j++)
+		{
+			char a = src.at(j);
+
+			if (a != ' ' && typeStr.empty()) type = true;
+			if (a == ' ' && !typeStr.empty()) type = false;
+
+			if (a != ' ' && !typeStr.empty() && !type) name = true;
+			if (a == ' ' && !typeStr.empty() && !nameStr.empty()) break;
+
+			if (type) typeStr += a;
+			if (name) nameStr += a;
+
+		}
+	}
+
+
+	void SetParamType(int index, const char* type)
+	{
+		strcpy(cmdParamDesc[cmdCounter].param[index].type, type);
+	}
+
+	void SetParamName(int index, const char* name)
+	{
+		strcpy(cmdParamDesc[cmdCounter].param[index].name, name);
+	}
+
+	void FillCaller(const std::source_location caller)
+	{
+		strcpy(cmdParamDesc[cmdCounter].caller.fileName, caller.file_name());
+		cmdParamDesc[cmdCounter].caller.line = caller.line();
+		cmdParamDesc[cmdCounter].caller.column = caller.column();
+	}
+
+	void CopyStrWithSkipper(std::string& in, std::string& lineStr, char* skippers )
+	{
+		unsigned int t = 0;
+		while (t < in.length())
+		{
+			bool passed = true;
+			for (int i = 0;i < strlen(skippers);i++)
+			{
+				if (in.at(t) == skippers[i]) passed = false;
+			}
+
+			if (passed)	lineStr += in.at(t);
+			}
+
+			t++;
+		}
+	}
+
 	void reflect_f(auto* in, const std::source_location caller, const std::source_location currentFunc)//name and types without names
 	{
 		char* rawData = (char*)in;
 
 		{
+			FillCaller(caller);
+
 			std::string fn = currentFunc.function_name();
 			auto rb = fn.find("(");
 			auto fp = fn.rfind("::", rb);
@@ -71,7 +134,7 @@ namespace Loop
 
 			std::ifstream ifile(currentFunc.file_name());
 			std::string s;
-			std::string funcStr;
+			
 			int lc = 1;
 
 			bool obj_is_found = false;
@@ -84,12 +147,13 @@ namespace Loop
 					if (lc == currentFunc.line()) break;
 
 					std::string lineStr;
-					unsigned int t = 0;
+					/*unsigned int t = 0;
 					while (t<s.length())
 					{
 						if (s.at(t)!=' ' && s.at(t) != '\t') lineStr += s.at(t);
 						t++;
-					}
+					}*/
+					CopyStrWithSkipper(s, lineStr, " \t");
 
 					if (lineStr == "struct" + objName + "{")
 					{
@@ -115,33 +179,15 @@ namespace Loop
 							
 							for (int i = 0;i < tokens.size();i++)
 							{
-								std::string clean_p;
-								for (int j = 0; j < tokens[i].size(); j++)
-								{
-									if (tokens[i].at(j) == ' ')
-									{
-
-									}
-									else
-									{
-										clean_p += tokens[i].at(j);
-									}
-
-								}
-								const std::regex reg_p{ R"( )" };
-								const auto tokens_p = regex_split(tokens[i], reg_p);
-
+								std::string typeStr, nameStr;
+								getTypeAndName(tokens[i], typeStr, nameStr);
+								SetParamType(i, typeStr.c_str());
+								SetParamName(i, nameStr.c_str());
 							}
-
-
-
 
 							break;
 						}
 					}
-					
-						
-					
 
 					lc++;
 				}
@@ -238,9 +284,6 @@ namespace Loop
 			{
 				c->param[i].value[0] = *(rawData + i);
 				c->param[i].bypass  = false;
-				strcpy(c->param[i].type, "type");
-				strcpy(c->param[i].type, "name");
-
 			}
 
 			editor::paramEdit::setParamsAttr();
@@ -264,9 +307,9 @@ namespace Loop
 
 		#pragma pack(push, 1)
 		struct params {
-			int   x; 
-			int y ;
-			  int z;  
+			int        x; 
+			int y    ;
+			       int z;  
 			texture target;
 		};
 		#pragma pack(pop)
