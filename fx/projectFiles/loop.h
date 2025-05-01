@@ -128,8 +128,15 @@ namespace Loop
 		return *p == 0;
 	}
 
+	void SaveToSource()
+	{
+
+	}
+
 	void reflect_f(auto* in, const std::source_location caller, const std::source_location currentFunc)//name and types without names
 	{
+		auto c = &cmdParamDesc[cmdCounter];
+		c->reflection_type = 1;
 
 		if (!paramsAreLoaded)  //variables -> reflected struct
 		{
@@ -186,15 +193,18 @@ namespace Loop
 								std::string typeStr, nameStr;
 								getTypeAndName(tokens[i], typeStr, nameStr);
 								auto typeID = getTypeIndex(typeStr.c_str());
-								cmdParamDesc[cmdCounter].param[i]._dim = typeID == -1 ? 1 : typeDesc[typeID]._dim;
+								c->param[i].typeIndex = typeID;
+								c->param[i]._dim = typeID == -1 ? 1 : typeDesc[typeID]._dim;
+								c->param[i]._min = typeID == -1 ? INT_MIN : typeDesc[typeID]._min;
+								c->param[i]._max = typeID == -1 ? INT_MAX : typeDesc[typeID]._max;
 
 								SetParamType(i, typeStr.c_str());
 								SetParamName(i, nameStr.c_str());
-								cmdParamDesc[cmdCounter].param[i].offset = param_ofs;
-								param_ofs += cmdParamDesc[cmdCounter].param[i].size;
+								c->param[i].offset = param_ofs;
+								param_ofs += c->param[i].size;
 							}
 
-							cmdParamDesc[cmdCounter].pCount = tokens.size();
+							c->pCount = tokens.size();
 
 							break;
 						}
@@ -231,30 +241,42 @@ namespace Loop
 				funcStr += s.c_str() + ofs;
 				std::erase(funcStr,' ');
 
-				while (true)
+				if (!funcStr.find(";"))
 				{
-					char a;
-					ifileCaller.get(a);
-					if (a != ' ' && a != '\t' && a!= '\n') funcStr += a;
-					if (a == ';') break;
+					while (true)
+					{
+						char a;
+						ifileCaller.get(a);
+						funcStr += a;
+						if (a == ';') break;
+					}
 				}
+
+				std::erase(funcStr,' ');
+				std::erase(funcStr,'\t');
+				std::erase(funcStr,'\n');
 			
 				auto br = funcStr.find('(');
 
 				funcName = funcStr.substr(0, br);
-				strcpy(cmdParamDesc[cmdCounter].funcName, funcName.c_str());
-			
+				strcpy(c->funcName, funcName.c_str());
+
+				auto funcStrEnd = funcStr.find(";");
+				if (funcStrEnd < funcStr.size()) funcStrEnd++;
+				funcStr.erase(funcStrEnd, funcStr.size() - funcStrEnd);
 				std::string paramStr = funcStr.substr(br+2, funcStr.size()-3 - (br + 2));
+
 				const std::regex reg{ R"(,)" };
 				auto pTokens = regex_split(paramStr, reg);
 
+				//TODO - prevent missmatch pTokens.size with pCount
 				for (int i = 0; i < pTokens.size(); i++)
 				{
 					std::string pname = pTokens[i].substr(1, pTokens[i].find('=')-1);
 					auto pId = getParamIndexByStr(cmdCounter, pname.c_str());
 					std::string pvalue = pTokens[i].substr(pTokens[i].find('=') + 1, pTokens[i].size());
 					
-					cmdParamDesc[cmdCounter].param[i].bypass = false;
+					c->param[i].bypass = false;
 
 					if (isTypeEnum(cmdParamDesc[cmdCounter].param[pId].typeIndex))
 					{
@@ -262,62 +284,68 @@ namespace Loop
 						pTypeStr += "::";
 						if (pvalue.find(pTypeStr) == std::string::npos)
 						{
-							cmdParamDesc[cmdCounter].param[i].bypass = true;
+							c->param[i].bypass = true;
 						}
 					}
 					else
 					{
 						if (!isParam(pvalue)) {
-							cmdParamDesc[cmdCounter].param[i].bypass = true;
+							c->param[i].bypass = true;
+
+							for (int j = 0; j < c->param[i]._dim; j++)
+							{
+								c->param[i].value[j] = *(int*)((char*)in + c->param[i].offset + sizeof(int) * j);
+							}
 						}
+						else
+						{
+							c->param[i].value[0] = std::stoi(pvalue);
+						}
+
 					}
-
-
 				}
 
 				ifileCaller.close();
 
-				auto c = &cmdParamDesc[cmdCounter];
+				/*auto c = &cmdParamDesc[cmdCounter];
 				
-				editor::paramEdit::setParamsAttr();
+		
 
 				for (int i = 0; i < cmdParamDesc[cmdCounter].pCount; i++)
 				{
-					auto dim = c->param[i]._dim;
-					for (int j=0;j<dim;j++)
+					for (int j=0;j< c->param[i]._dim;j++)
 					{
 						c->param[i].value[j] = *(int*)((char*)in + c->param[i].offset + sizeof(int)*j);
 					}
-
-
-
-					//c->param[i].bypass = false;
-
-				}
-
-
+				}*/
 			}
-
-
-			//editor::paramEdit::setBypass();//logic change needed
-
 		}
 		else//variables <- reflected struct
 		{
-			auto c = &cmdParamDesc[cmdCounter];
+			bool changed = false;
 
 			for (int i = 0; i < c->pCount; i++)
 			{
 				auto dim = c->param[i]._dim;
 				for (int j = 0; j < dim; j++)
 				{
+					if (*(int*)((char*)in + c->param[i].offset + sizeof(int) * j) != c->param[i].value[j])
+					{
+						changed = true;
+					}
+
 					*(int*)((char*)in + c->param[i].offset + sizeof(int) * j) = c->param[i].value[j];
 				}
 			}
+
+			if (changed && currentCmd != cmdCounter)
+			{
+				SaveToSource();
+			}
 		}
 
-		cmdParamDesc[cmdCounter].stackLevel = cmdLevel;
-		cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
+		c->stackLevel = cmdLevel;
+		c->uiDraw = &editor::paramEdit::showStackItem;
 		cmdLevel++;
 
 		cmdCounter++;
@@ -384,12 +412,8 @@ namespace Loop
 
 		frameConst();
 
- obj1.set   ({
-			.x = 211,
-			.y = 2,
-			.z = 12,
-			.target = texture::env
-			});
+		obj1.set(211, 2, 212, texture::mainRT);
+
 
 		
 		gfx::SetInputAsm(topology::triList);

@@ -21,19 +21,25 @@ bool compareBySrcLine(const callInfo& a, const callInfo& b)
 
 void reflectSourceChanges(std::filesystem::path fileName)
 {
+	paramsAreLoaded = false;
+	return;
+
 	std::vector<callInfo> lines;
 	bool empty = true;
 
 	for (int i = 0; i < cmdCounter; i++)
 	{
-		auto fn = fileName.string();
-		auto callerFn = std::string(cmdParamDesc[i].caller.fileName);
-		
-		if (!callerFn.compare(fn))
+		if (cmdParamDesc[i].reflection_type == 0)
 		{
-			callInfo c = { cmdParamDesc[i].caller.line ,i };
-			lines.push_back(c);
-			empty = false;
+			auto fn = fileName.string();
+			auto callerFn = std::string(cmdParamDesc[i].caller.fileName);
+
+			if (!callerFn.compare(fn))
+			{
+				callInfo c = { cmdParamDesc[i].caller.line ,i };
+				lines.push_back(c);
+				empty = false;
+			}
 		}
 	}
 
@@ -58,7 +64,6 @@ void reflectSourceChanges(std::filesystem::path fileName)
 		{
 			if (lc == currentLine)
 			{
-				//while ()
 				//get all numeric params
 
 				unsigned int pos = 0;

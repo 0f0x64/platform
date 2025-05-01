@@ -2,6 +2,8 @@ typedef void (*PVFN)(int i, float &x, float &y, float w, float lead, float sel);
 
 struct ParamDesc {
 
+	int reflection_type = 0;
+
 	char funcName[255];
 	char funcGroup[255];
 
