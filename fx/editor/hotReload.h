@@ -58,6 +58,7 @@ void reflectSourceChanges(std::filesystem::path fileName)
 		{
 			if (lc == currentLine)
 			{
+				//while ()
 				//get all numeric params
 
 				unsigned int pos = 0;

@@ -50,10 +50,10 @@ namespace Loop
 	{
 		cmdParamDesc[cmdCounter].stackLevel = cmdLevel;
 
-		int x = strlen(funcName) - 1;;
-		for (x; x > 0; x--) { if (funcName[x] == '.') { x++; break; } };
+		//int x = strlen(funcName) - 1;;
+		//for (x; x > 0; x--) { if (funcName[x] == '.') { x++; break; } };
 
-		strcpy(cmdParamDesc[cmdCounter].funcName, funcName + x);
+		//strcpy(cmdParamDesc[cmdCounter].funcName, funcName + x);
 	}
 
 	void removeDoubleSpaces(std::string& str) {
@@ -86,6 +86,9 @@ namespace Loop
 	void SetParamType(int index, const char* type)
 	{
 		strcpy(cmdParamDesc[cmdCounter].param[index].type, type);
+		cmdParamDesc[cmdCounter].param[index].typeIndex = getTypeIndex(type);
+		auto base_sz = sizeof(int);
+		cmdParamDesc[cmdCounter].param[index].size = base_sz * cmdParamDesc[cmdCounter].param[index]._dim;
 	}
 
 	void SetParamName(int index, const char* name)
@@ -118,9 +121,15 @@ namespace Loop
 		}
 	}
 
+	bool isParam(std::string line)
+	{
+		char* p;
+		strtol(line.c_str(), &p, 10);
+		return *p == 0;
+	}
+
 	void reflect_f(auto* in, const std::source_location caller, const std::source_location currentFunc)//name and types without names
 	{
-		int* rawData = (int*)in;
 
 		if (!paramsAreLoaded)  //variables -> reflected struct
 		{
@@ -131,8 +140,7 @@ namespace Loop
 			auto fp = fn.rfind("::", rb);
 			auto op = fn.rfind("::", fp - 2);
 			std::string objName = fn.substr(op+2, fp - op - 2);
-			std::string functionName = fn.substr(fp + 2, rb - fp - 2);
-
+			std::string funcName;
 			std::ifstream ifile(currentFunc.file_name());
 			std::string s;
 			
@@ -172,13 +180,21 @@ namespace Loop
 							const std::regex reg{ R"(;)" };
 							auto tokens = regex_split(pStr, reg);
 							
+							int param_ofs = 0;
 							for (int i = 0;i < tokens.size();i++)
 							{
 								std::string typeStr, nameStr;
 								getTypeAndName(tokens[i], typeStr, nameStr);
+								auto typeID = getTypeIndex(typeStr.c_str());
+								cmdParamDesc[cmdCounter].param[i]._dim = typeID == -1 ? 1 : typeDesc[typeID]._dim;
+
 								SetParamType(i, typeStr.c_str());
 								SetParamName(i, nameStr.c_str());
+								cmdParamDesc[cmdCounter].param[i].offset = param_ofs;
+								param_ofs += cmdParamDesc[cmdCounter].param[i].size;
 							}
+
+							cmdParamDesc[cmdCounter].pCount = tokens.size();
 
 							break;
 						}
@@ -207,68 +223,82 @@ namespace Loop
 					lc++;
 				}
    
-				auto ofs = s.rfind(".", caller.column());
-				while (true)
-				{
-					if (ofs == 0 || std::isalpha(s.at(ofs)) break;
+				auto ofs = s.rfind(".", caller.column())-1;
+				while (ofs > 0 && std::isalnum(s.at(ofs))) ofs--;
 
-				}
+				if (!std::isalnum(s.at(ofs))) ofs++;
 
+				funcStr += s.c_str() + ofs;
+				std::erase(funcStr,' ');
 
-				funcStr += s.c_str()+ ofs;
-		
 				while (true)
 				{
 					char a;
 					ifileCaller.get(a);
-
-					if (a != ' ' && a != '\t' && a!= '\n')
-					{
-						funcStr += a;
-					}
-
+					if (a != ' ' && a != '\t' && a!= '\n') funcStr += a;
 					if (a == ';') break;
 				}
 			
+				auto br = funcStr.find('(');
+
+				funcName = funcStr.substr(0, br);
+				strcpy(cmdParamDesc[cmdCounter].funcName, funcName.c_str());
 			
-				ifileCaller.close();
-			}
+				std::string paramStr = funcStr.substr(br+2, funcStr.size()-3 - (br + 2));
+				const std::regex reg{ R"(,)" };
+				auto pTokens = regex_split(paramStr, reg);
 
-
-		/*	unsigned int end = funcStr.size();
-			std::string funcStrClean = funcStr.substr(start, end - start);
-
-			//find name
-			unsigned nameEnd = start;
-			while (true)
-			{
-				if (funcStr.at(nameEnd) == ' ' ||
-					funcStr.at(nameEnd) == '(')
+				for (int i = 0; i < pTokens.size(); i++)
 				{
-					break;
+					std::string pname = pTokens[i].substr(1, pTokens[i].find('=')-1);
+					auto pId = getParamIndexByStr(cmdCounter, pname.c_str());
+					std::string pvalue = pTokens[i].substr(pTokens[i].find('=') + 1, pTokens[i].size());
+					
+					cmdParamDesc[cmdCounter].param[i].bypass = false;
+
+					if (isTypeEnum(cmdParamDesc[cmdCounter].param[pId].typeIndex))
+					{
+						std::string pTypeStr = cmdParamDesc[cmdCounter].param[pId].type;
+						pTypeStr += "::";
+						if (pvalue.find(pTypeStr) == std::string::npos)
+						{
+							cmdParamDesc[cmdCounter].param[i].bypass = true;
+						}
+					}
+					else
+					{
+						if (!isParam(pvalue)) {
+							cmdParamDesc[cmdCounter].param[i].bypass = true;
+						}
+					}
+
+
 				}
-				nameEnd++;
+
+				ifileCaller.close();
+
+				auto c = &cmdParamDesc[cmdCounter];
+				
+				editor::paramEdit::setParamsAttr();
+
+				for (int i = 0; i < cmdParamDesc[cmdCounter].pCount; i++)
+				{
+					auto dim = c->param[i]._dim;
+					for (int j=0;j<dim;j++)
+					{
+						c->param[i].value[j] = *(int*)((char*)in + c->param[i].offset + sizeof(int)*j);
+					}
+
+
+
+					//c->param[i].bypass = false;
+
+				}
+
+
 			}
 
-			std::string funcName = funcStr.substr(start, nameEnd- start);
 
-			strcpy(cmdParamDesc[cmdCounter].funcName, funcName.c_str());
-			*/
-			//
-
-			int pCount = sizeof(*in)/sizeof(int);
-			auto c = &cmdParamDesc[cmdCounter];
-
-
-			c->pCount = pCount;
-
-			for (int i = 0; i < pCount; i++)
-			{
-				c->param[i].value[0] = *(rawData + i);
-				c->param[i].bypass = false;
-			}
-
-			editor::paramEdit::setParamsAttr();
 			//editor::paramEdit::setBypass();//logic change needed
 
 		}
@@ -278,13 +308,15 @@ namespace Loop
 
 			for (int i = 0; i < c->pCount; i++)
 			{
-				if (!c->param[i].bypass) *(rawData + i) = c->param[i].value[0];
+				auto dim = c->param[i]._dim;
+				for (int j = 0; j < dim; j++)
+				{
+					*(int*)((char*)in + c->param[i].offset + sizeof(int) * j) = c->param[i].value[j];
+				}
 			}
-
-
 		}
 
-		AddToUI2(cmdParamDesc[cmdCounter].funcName);
+		cmdParamDesc[cmdCounter].stackLevel = cmdLevel;
 		cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
 		cmdLevel++;
 
@@ -323,7 +355,7 @@ namespace Loop
 	} ;
 
 	
-	object1 obj;
+	object1 obj1;
 
 	void mainLoop()
 	{
@@ -352,11 +384,11 @@ namespace Loop
 
 		frameConst();
 
-	   obj.set({
-			.x = 111,
-			.y = 10,
-			.z = 22,
-			.target = texture::mainRT
+ obj1.set   ({
+			.x = 211,
+			.y = 2,
+			.z = 12,
+			.target = texture::env
 			});
 
 		

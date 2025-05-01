@@ -25,6 +25,8 @@ struct ParamDesc {
 		int _min;
 		int _max;
 		int _dim;
+		int size;
+		int offset;
 	} param[255];
 
 	int stackLevel = 0;
