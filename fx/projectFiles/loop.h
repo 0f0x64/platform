@@ -206,35 +206,36 @@ namespace Loop
 
 					lc++;
 				}
-
-				funcStr.append(s);
-		
-				while (s.find(";") == std::string::npos)
+   
+				auto ofs = s.rfind(".", caller.column());
+				while (true)
 				{
-					getline(ifileCaller, s);
-					funcStr.append(s);
+					if (ofs == 0 || std::isalpha(s.at(ofs)) break;
+
+				}
+
+
+				funcStr += s.c_str()+ ofs;
+		
+				while (true)
+				{
+					char a;
+					ifileCaller.get(a);
+
+					if (a != ' ' && a != '\t' && a!= '\n')
+					{
+						funcStr += a;
+					}
+
+					if (a == ';') break;
 				}
 			
 			
 				ifileCaller.close();
 			}
 
-			//isolate caller
-			unsigned int start = caller.column();
-			while (true)
-			{
-				if (start == 0 ||
-					funcStr.at(start) == ' ' ||
-					funcStr.at(start) == '\t' ||
-					funcStr.at(start) == ';')
-				{
-					start++;
-					break;
-				}
 
-				start--;
-			}
-			unsigned int end = funcStr.find(";")+1;
+		/*	unsigned int end = funcStr.size();
 			std::string funcStrClean = funcStr.substr(start, end - start);
 
 			//find name
@@ -252,7 +253,7 @@ namespace Loop
 			std::string funcName = funcStr.substr(start, nameEnd- start);
 
 			strcpy(cmdParamDesc[cmdCounter].funcName, funcName.c_str());
-
+			*/
 			//
 
 			int pCount = sizeof(*in)/sizeof(int);
@@ -351,7 +352,7 @@ namespace Loop
 
 		frameConst();
 
-		obj.set({
+	   obj.set({
 			.x = 111,
 			.y = 10,
 			.z = 22,
