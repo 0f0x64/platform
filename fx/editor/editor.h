@@ -392,8 +392,8 @@ namespace editor
 		//if (changed)
 		{
 			
-			paramEdit::Save(currentCmd_backup);
-			SetForegroundWindow(vsHWND);
+			//paramEdit::Save(currentCmd_backup);
+			//SetForegroundWindow(vsHWND);
 		}
 		//ViewCam::setCamMat();
 		//ui::Text::Draw(str, tx, ty, th, th);

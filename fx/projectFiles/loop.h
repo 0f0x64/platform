@@ -399,6 +399,33 @@ namespace Loop
 						lc++;
 					}
 
+					int cCount = 0;
+					while (true)
+					{
+						char a;
+						ifile.get(a);
+						if (cCount < c->caller.line) ofile << a; else break;
+						cCount++;
+
+					}
+					ofile << callStr;
+
+					while (true)
+					{
+						char a;
+						ifile.get(a);
+						if (a==';') break;
+					}
+
+					while (true)
+					{
+						char a;
+						ifile.get(a);
+						ofile << a;
+						if (a == '\n') break;
+					}
+
+
 					while (getline(ifile, s))
 					{
 						ofile << s << "\n";
