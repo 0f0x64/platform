@@ -241,7 +241,7 @@ namespace Loop
 				funcStr += s.c_str() + ofs;
 				std::erase(funcStr,' ');
 
-				if (!funcStr.find(";"))
+				if (std::string::npos == funcStr.find(";"))
 				{
 					while (true)
 					{
@@ -351,7 +351,8 @@ namespace Loop
 			if (changed )
 			{
 				std::string callStr;
-				callStr = c->funcName;
+				std::string funcStr = c->funcName;
+				callStr = funcStr.substr(funcStr.find('.')+1, funcStr.size());
 				callStr += "({\n";
 
 				for (int i = 0; i < c->pCount; i++)
@@ -362,6 +363,8 @@ namespace Loop
 
 					if (isTypeEnum(c->param[i].typeIndex))
 					{
+						callStr += c->param[i].type;
+						callStr += "::";
 						callStr += getStrValue(c->param[i].typeIndex, c->param[i].value[0]);
 					}
 					else {
@@ -399,12 +402,12 @@ namespace Loop
 						lc++;
 					}
 
-					int cCount = 0;
+					int cCount = 1;
 					while (true)
 					{
 						char a;
 						ifile.get(a);
-						if (cCount < c->caller.line) ofile << a; else break;
+						if (cCount < c->caller.column) ofile << a; else break;
 						cCount++;
 
 					}
@@ -441,7 +444,7 @@ namespace Loop
 					Log(inFilePath.c_str());
 					Log("\n");
 
-					SetForegroundWindow(editor::vsHWND);
+					//SetForegroundWindow(editor::vsHWND);
 				}
 
 			}
@@ -514,7 +517,13 @@ namespace Loop
 
 		frameConst();
 
-		obj1.set({ .x = 11, .y= 2, .z =112, .target = texture::obj1nrml });
+		obj1.set({ 
+			.x = 11, 
+			.y = 2, 
+			.z = 112, 
+			.target = texture::obj1nrml 
+			});
+		int a = 0;
 
 
 		
