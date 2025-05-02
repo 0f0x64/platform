@@ -285,17 +285,20 @@ namespace Loop
 						if (pvalue.find(pTypeStr) == std::string::npos)
 						{
 							c->param[i].bypass = true;
+							c->param[i].value[0] = *(int*)((char*)in + c->param[i].offset);
+						} 
+						else {
+							auto enumStart = pvalue.find("::") + 2;
+							std::string enumStr = pvalue.substr(enumStart, pvalue.size()- enumStart);
+							c->param[i].value[0] = GetEnumValue(c->param[i].typeIndex, enumStr.c_str());
+
 						}
 					}
 					else
 					{
 						if (!isParam(pvalue)) {
 							c->param[i].bypass = true;
-
-							for (int j = 0; j < c->param[i]._dim; j++)
-							{
-								c->param[i].value[j] = *(int*)((char*)in + c->param[i].offset + sizeof(int) * j);
-							}
+							c->param[i].value[0] = *(int*)((char*)in + c->param[i].offset);
 						}
 						else
 						{
@@ -326,7 +329,14 @@ namespace Loop
 
 			for (int i = 0; i < c->pCount; i++)
 			{
-				auto dim = c->param[i]._dim;
+				if (*(int*)((char*)in + c->param[i].offset) != c->param[i].value[0])
+				{
+					changed = true;
+				}
+
+				*(int*)((char*)in + c->param[i].offset) = c->param[i].value[0];
+
+				/*auto dim = c->param[i]._dim;
 				for (int j = 0; j < dim; j++)
 				{
 					if (*(int*)((char*)in + c->param[i].offset + sizeof(int) * j) != c->param[i].value[j])
@@ -335,12 +345,78 @@ namespace Loop
 					}
 
 					*(int*)((char*)in + c->param[i].offset + sizeof(int) * j) = c->param[i].value[j];
-				}
+				}*/
 			}
 
-			if (changed && currentCmd != cmdCounter)
+			if (changed )
 			{
-				SaveToSource();
+				std::string callStr;
+				callStr = c->funcName;
+				callStr += "({\n";
+
+				for (int i = 0; i < c->pCount; i++)
+				{
+					callStr += ".";
+					callStr += c->param[i].name;
+					callStr += " = ";
+
+					if (isTypeEnum(c->param[i].typeIndex))
+					{
+						callStr += getStrValue(c->param[i].typeIndex, c->param[i].value[0]);
+					}
+					else {
+						callStr += std::to_string(c->param[i].value[0]);
+					}
+
+					if (i != c->pCount - 1) callStr += ",";
+
+					callStr += "\n";
+				}
+
+				callStr += "});\n";
+
+				//save
+				const char* filename = c->caller.fileName;
+				const int lineNum =	c->caller.line;
+
+				using namespace std;
+				string inFilePath = filename;
+				string outFilePath = inFilePath + "_";
+
+				editor::justSaved = true;
+				string s;
+				ifstream ifile(inFilePath);
+				ofstream ofile(outFilePath);
+
+				std::string caller;
+
+				int lc = 1;
+				if (ifile.is_open())
+				{
+					while (lc < lineNum && getline(ifile, s))
+					{
+						ofile << s << "\n";
+						lc++;
+					}
+
+					while (getline(ifile, s))
+					{
+						ofile << s << "\n";
+					}
+
+					ifile.close();
+					ofile.close();
+
+					remove(inFilePath.c_str());
+					rename(outFilePath.c_str(), inFilePath.c_str());
+
+					Log("Modified:  ");
+					Log(inFilePath.c_str());
+					Log("\n");
+
+					SetForegroundWindow(editor::vsHWND);
+				}
+
 			}
 		}
 
@@ -354,15 +430,14 @@ namespace Loop
 
 #define reflect reflect_f(&in, caller, std::source_location::current())
 #define reflect_close cmdLevel--
-#define prm(type,name) type,name
 
 	struct object1 {
 
 		#pragma pack(push, 1)
 		struct params {
-			int        x; 
-			int y    ;
-			       int z;  
+			int x; 
+			int y;
+			int z;
 			texture target;
 		};
 		#pragma pack(pop)
@@ -412,7 +487,7 @@ namespace Loop
 
 		frameConst();
 
-		obj1.set(211, 2, 212, texture::mainRT);
+		obj1.set({ .x = 11, .y= 2, .z =112, .target = texture::obj1nrml });
 
 
 		
