@@ -3,6 +3,7 @@ typedef void (*PVFN)(int i, float &x, float &y, float w, float lead, float sel);
 struct ParamDesc {
 
 	int reflection_type = 0;
+	bool single_line;
 
 	char funcName[255];
 	char funcGroup[255];
@@ -20,6 +21,7 @@ struct ParamDesc {
 
 	struct {
 		int value[4];
+		char strValue[255];
 		char type[255];
 		int typeIndex;
 		char name[255];

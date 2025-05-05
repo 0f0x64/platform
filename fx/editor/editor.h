@@ -391,7 +391,7 @@ namespace editor
 		if (currentCmd_backup != currentCmd)
 		//if (changed)
 		{
-			
+			paramEdit::SaveToSource(currentCmd_backup);
 			//paramEdit::Save(currentCmd_backup);
 			//SetForegroundWindow(vsHWND);
 		}
@@ -432,6 +432,7 @@ namespace editor
 
 	void SaveAndExit()
 	{
+		editor::paramEdit::SaveToSource(currentCmd);
 		editor::paramEdit::Save(currentCmd);
 
 		#if vsWindowManagement
