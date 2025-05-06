@@ -242,7 +242,7 @@ namespace paramEdit {
 					if (!getline(ifile, s)) break;
 					if (lc == currentFunc.line()) break;
 
-					std::string lineStr;
+					/*std::string lineStr;
 					CopyStrWithSkipper(s, lineStr, " \t");
 
 					if (lineStr == "namespace" + objName + "{")
@@ -250,10 +250,10 @@ namespace paramEdit {
 						obj_is_found = true;
 					}
 
-					if (obj_is_found)
+					if (obj_is_found)*/
 					{
 
-						if (lineStr == "structparams{")
+						//if (lineStr == "structparams{")
 						{
 							std::string pStr;
 							while (true)

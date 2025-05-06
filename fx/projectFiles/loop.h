@@ -45,52 +45,24 @@ namespace Loop
 #define reflect_close2 cmdLevel--;}
 
 
-#define api2(name, ...) __pragma (pack(push,1)) struct CAT(name,_params) {__VA_ARGS__}; __pragma (pack(pop))\
-	void name(CAT(name,_params) in CALLER) { reflect;
+#define cmd(name, ...) __pragma (pack(push,1)) struct CAT(name,_params) {__VA_ARGS__}; __pragma (pack(pop))\
+	void name(CAT(name,_params) in CALLER)
 
-	namespace object1 {
+	
 
-#pragma pack(push, 1)
-		struct params {
-			int x;
-			int y;
-			int z;
-			texture target;
-		};
-#pragma pack(pop)
+	namespace f1 {
 
-		void set(params in CALLER)
+		cmd(func2, int x; int y; int z;)
 		{
 			reflect;
 
+			int A = in.x;
 			int c = 0;
 
 			reflect_close;
-		};
-
-
-	}
-
-
-	api2(func2, int x; int y; int z = 10;)
-	{
-	int A = in.x;
-	int c = 0;
-
-	reflect_close2;
-	}
-
-
-	int fun4()
-	{
-		return 0;
-	}
-
-	void fun3(int a =fun4())
-	{
+		}
 
 	}
-
 
 	void mainLoop()
 	{
@@ -108,11 +80,10 @@ namespace Loop
 
 
 
-		object1::set({
+		f1::func2({
             	.x = 8,
             	.y = 1716,
-            	.z = 22,
-            	.target = texture::env
+            	.z = 22
             });
 		
 		gfx::SetInputAsm(topology::triList);
