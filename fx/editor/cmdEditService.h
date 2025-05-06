@@ -4,6 +4,7 @@ struct ParamDesc {
 
 	int reflection_type = 0;
 	bool single_line;
+	bool init_with_names;
 
 	char funcName[255];
 	char funcGroup[255];

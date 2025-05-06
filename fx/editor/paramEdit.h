@@ -93,9 +93,13 @@ namespace paramEdit {
 				callStr += "\t";
 			}
 
-			callStr += ".";
-			callStr += c->param[i].name;
-			callStr += " = ";
+			if (c->init_with_names)
+			{
+				callStr += ".";
+				callStr += c->param[i].name;
+				callStr += " = ";
+			}
+
 
 			if (c->param[i].bypass)
 			{
@@ -355,9 +359,26 @@ namespace paramEdit {
 				//TODO - prevent missmatch pTokens.size with pCount
 				for (int i = 0; i < pTokens.size(); i++)
 				{
-					std::string pname = pTokens[i].substr(1, pTokens[i].find('=') - 1);
-					auto pId = getParamIndexByStr(cmdCounter, pname.c_str());
-					std::string pvalue = pTokens[i].substr(pTokens[i].find('=') + 1, pTokens[i].size());
+					std::string pname;
+					std::string pvalue;
+					auto pId = i;
+					auto eqPos = pTokens[i].find('=');
+
+					if (eqPos != std::string::npos)//init with field names
+					{
+						pname = pTokens[i].substr(1, eqPos - 1);
+						pId = getParamIndexByStr(cmdCounter, pname.c_str());
+						pvalue = pTokens[i].substr(pTokens[i].find('=') + 1, pTokens[i].size());
+						c->init_with_names = true;
+					}
+					else //init without field names
+					{
+						pvalue = pTokens[i];
+						c->init_with_names = false;
+					}
+
+					
+					
 
 					c->param[i].bypass = false;
 

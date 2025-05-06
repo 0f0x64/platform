@@ -42,41 +42,54 @@ namespace Loop
 #define CALLER ,const std::source_location caller = std::source_location::current()
 #define reflect editor::paramEdit::reflect_f(&in, caller, std::source_location::current())
 #define reflect_close cmdLevel--
+#define reflect_close2 cmdLevel--;}
 
-#define api2(name, ...) struct CAT(name,_params) {__VA_ARGS__};\
-	void name(CAT(name,_params) in CALLER)
+
+#define api2(name, ...) __pragma (pack(push,1)) struct CAT(name,_params) {__VA_ARGS__}; __pragma (pack(pop))\
+	void name(CAT(name,_params) in CALLER) { reflect;
 
 	namespace object1 {
 
-		#pragma pack(push, 1)
+#pragma pack(push, 1)
 		struct params {
-			int x; 
+			int x;
 			int y;
 			int z;
 			texture target;
 		};
-		#pragma pack(pop)
+#pragma pack(pop)
 
 		void set(params in CALLER)
 		{
-		reflect;
+			reflect;
 
 			int c = 0;
 
-		reflect_close;
+			reflect_close;
 		};
 
-	
+
 	}
 
-	
-	api2(func2, int x; int y; int z=10;)
+
+	api2(func2, int x; int y; int z = 10;)
 	{
-		reflect;
-		int a = 0;
-		reflect_close;
+	int A = in.x;
+	int c = 0;
+
+	reflect_close2;
 	}
 
+
+	int fun4()
+	{
+		return 0;
+	}
+
+	void fun3(int a =fun4())
+	{
+
+	}
 
 
 	void mainLoop()
@@ -93,14 +106,14 @@ namespace Loop
 
 		frameConst();
 
-		int b = 22;
+
 
 		object1::set({
             	.x = 8,
-            	.y = 0,
-            	.z = b,
-            	.target = texture::mainRT
-            }); 
+            	.y = 1716,
+            	.z = 22,
+            	.target = texture::env
+            });
 		
 		gfx::SetInputAsm(topology::triList);
 		gfx::SetBlendMode(blendmode::off, blendop::add);
