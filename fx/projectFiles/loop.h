@@ -46,17 +46,31 @@ namespace Loop
 
 
 #define cmd(name, ...) __pragma (pack(push,1)) struct CAT(name,_params) {__VA_ARGS__}; __pragma (pack(pop))\
-	void name(CAT(name,_params) in CALLER)
+void name(CAT(name,_params) in ,const std::source_location caller = std::source_location::current())
 
-	
+
+
 
 	namespace f1 {
 
-		cmd(func2, int x; int y; int z;)
+		cmd(func2, int x;int y; int z;)
 		{
 			reflect;
 
 			int A = in.x;
+			int c = 0;
+
+			reflect_close;
+		}
+
+	}
+
+	namespace f2 {
+
+		cmd(func2)
+		{
+			reflect;
+
 			int c = 0;
 
 			reflect_close;
@@ -81,10 +95,12 @@ namespace Loop
 
 
 		f1::func2({
-            	.x = 8,
-            	.y = 1716,
-            	.z = 22
-            });
+			.x = 8,
+			.y = 45,
+			.z = -161
+		});
+
+		f2::func2({});
 		
 		gfx::SetInputAsm(topology::triList);
 		gfx::SetBlendMode(blendmode::off, blendop::add);

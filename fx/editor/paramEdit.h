@@ -74,11 +74,11 @@ namespace paramEdit {
 		return *p == 0;
 	}
 
-	void CreateCallStr(int cmdIndex, std::string& callStr)
+	void CreateCallStr(int cmdIndex, std::string& callStr, std::string& tab)
 	{
 		auto c = &cmdParamDesc[cmdIndex];
 		std::string funcStr = c->funcName;
-		callStr = funcStr.substr(funcStr.find('::') + 2, funcStr.size());
+		callStr = funcStr;// .substr(funcStr.find('::') + 2, funcStr.size());
 		callStr += "({";
 			if (!c->single_line)
 			{
@@ -89,7 +89,7 @@ namespace paramEdit {
 		{
 			if (!c->single_line)
 			{
-				for (int i = 0; i < c->caller.column; i++) { callStr += " "; }
+				callStr += tab;
 				callStr += "\t";
 			}
 
@@ -125,9 +125,9 @@ namespace paramEdit {
 		}
 
 		if (!c->single_line) {
-			for (int i = 0; i < c->caller.column; i++) { callStr += " "; }
+			callStr += tab;
 		}
-
+		
 		callStr += "});";
 	}
 
@@ -135,6 +135,8 @@ namespace paramEdit {
 	{
 		if (cmdIndex < 0) return;
 		auto c = &cmdParamDesc[cmdIndex];
+
+		if (c->pCount == 0) return;
 
 		if (c->reflection_type != 1) return;
 
@@ -164,17 +166,39 @@ namespace paramEdit {
 				lc++;
 			}
 
-			CreateCallStr(cmdIndex, callStr);
-
+			std::string tab;
+			int nc = 0;
 			int cCount = 1;
 			while (true)
 			{
 				char a;
 				ifile.get(a);
-				if (cCount < c->caller.column) ofile << a; else break;
+
+				if (a == c->funcName[nc])
+				{
+					nc++;
+				}
+				else
+				{
+					nc = 0;
+				}
+
+				tab += a;
+
+				//if (cCount < c->caller.column) ofile << a; else break;
 				cCount++;
 
+				if (nc == strlen(c->funcName))
+				{
+					break;
+				}
+
 			}
+			tab.erase(tab.size() - nc,nc);
+
+			ofile << tab;
+
+			CreateCallStr(cmdIndex, callStr, tab);
 
 			ofile << callStr;
 
@@ -227,7 +251,7 @@ namespace paramEdit {
 			auto fp = fn.rfind("::", rb);
 			auto op = fn.rfind("::", fp - 2);
 			std::string objName = fn.substr(op + 2, fp - op - 2);
-			std::string funcName;
+			std::string funcName = fn.substr(fp + 2, rb - fp - 2);;
 			std::ifstream ifile(currentFunc.file_name());
 			std::string s;
 
@@ -242,27 +266,53 @@ namespace paramEdit {
 					if (!getline(ifile, s)) break;
 					if (lc == currentFunc.line()) break;
 
-					/*std::string lineStr;
+					std::string lineStr;
 					CopyStrWithSkipper(s, lineStr, " \t");
 
-					if (lineStr == "namespace" + objName + "{")
+					if (std::string::npos != lineStr.find("namespace" + objName))
 					{
 						obj_is_found = true;
 					}
 
-					if (obj_is_found)*/
+					if (obj_is_found)
 					{
-
-						//if (lineStr == "structparams{")
+						std::string Declaration = "cmd(" + funcName;
+						auto cmdDecl = lineStr.find(Declaration);
+						if (std::string::npos != cmdDecl)
 						{
 							std::string pStr;
-							while (true)
+
+							if (std::string::npos == lineStr.find(")", cmdDecl))
 							{
 								char a;
 								ifile.get(a);
-								if (a == '}') break;
-								if (a != '\t' && a != '\n') pStr += a;
+								s += a;
+								if (a == ')') break;
 							}
+
+							auto cmdOfs = s.find("cmd");
+							auto commaOfs = s.find(",",cmdOfs);
+
+							if (commaOfs == std::string::npos)//no params
+							{
+								strcpy(c->funcName, (objName+"::"+funcName).c_str());
+								c->pCount = 0;
+								c->stackLevel = cmdLevel;
+								c->uiDraw = &showStackItem;
+								cmdLevel++;
+								cmdCounter++;
+								return;
+							}
+
+							int i = commaOfs + 1;
+							while (true)
+							{
+								if (s.at(i) == ')') break;
+
+								pStr+= s.at(i);
+								i++;
+							}
+
 
 							const std::regex reg{ R"(;)" };
 							auto tokens = regex_split(pStr, reg);
