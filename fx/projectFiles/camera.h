@@ -14,43 +14,56 @@ namespace BasicCam
 	XMVECTOR camSlide;
 	XMVECTOR camFly;
 
-	API(setCamKey, timestamp camTime, keyType camType, position eye, position at, position up, int angle, sliderType sType, position slide, camAxis axisType, rotation fly, int jitter)
+	cmd(setCamKey, timestamp camTime; keyType camType;
+					int eye_x; int eye_y; int eye_z;
+					int at_x; int at_y; int at_z;
+					int up_x; int up_y; int up_z;
+					int angle;
+					sliderType sType;
+					int slide_x; int slide_y; int slide_z;
+					camAxis axisType;
+					int fly_x; int fly_y; int fly_z;
+					int jitter;)
 	{
+		reflect;
+
 		if (!camPass) {
 
 			int t = timer::timeCursor / SAMPLES_IN_FRAME;
 
 			camData* sCam;
 
-			if (camTime <= t || camCounter == 0)
+			if (in.camTime <= t || camCounter == 0)
 			{
 				sCam = &Prev;
-				prevTime = camTime;
+				prevTime = in.camTime;
 				if (camCounter == 0) prevTime = 0;
 
-				currentCamType = camType;
-				slider = sType;
-				camAxisType = axisType;
-				camJitter = jitter;
+				currentCamType = in.camType;
+				slider = in.sType;
+				camAxisType = in.axisType;
+				camJitter = in.jitter;
 
-				camSlide = XMVectorSet((float)slide.x, (float)slide.y, (float)slide.z,0);
-				camFly = XMVectorSet((float)fly.x, (float)fly.y, (float)fly.z,0);
+				camSlide = XMVectorSet((float)in.slide_x, (float)in.slide_y, (float)in.slide_z,0);
+				camFly = XMVectorSet((float)in.fly_x, (float)in.fly_y, (float)in.fly_z,0);
 
 			}
 			else
 			{
 				sCam = &Next;
 				camPass = true;
-				nextTime = camTime;
+				nextTime = in.camTime;
 			}
 
-			sCam->eye = XMVectorSet((float)eye.x, (float)eye.y, (float)eye.z,0);
-			sCam->at = XMVectorSet((float)at.x, (float)at.y, (float)at.z,0);
-			sCam->up = XMVectorSet((float)up.x, (float)up.y, (float)up.z,0);
-			sCam->angle = (float)angle;
+			sCam->eye = XMVectorSet((float)in.eye_x, (float)in.eye_y, (float)in.eye_z,0);
+			sCam->at = XMVectorSet((float)in.at_x, (float)in.at_y, (float)in.at_z,0);
+			sCam->up = XMVectorSet((float)in.up_x, (float)in.up_y, (float)in.up_z,0);
+			sCam->angle = (float)in.angle;
 
 			camCounter++;
 		}
+
+		reflect_close;
 	}
 
 	void processCam()

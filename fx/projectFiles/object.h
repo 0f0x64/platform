@@ -1,20 +1,28 @@
 namespace Object {
 
-	API(ShowObject,texture geometry, texture normals, unsigned int quality, position pos)
+	cmd(Show, texture geometry;
+	texture normals;
+	int quality; 
+	int pos_x;
+	int pos_y;
+	int pos_z;
+		)
 	{
+		reflect;
+
 		#if EditMode //dynamic limits
-			auto r = max(Textures::Texture[(int)geometry].size.x, Textures::Texture[(int)geometry].size.y);
-			auto mipMaps = Textures::Texture[(int)geometry].mipMaps;
+			auto r = max(Textures::Texture[(int)in.geometry].size.x, Textures::Texture[(int)in.geometry].size.y);
+			auto mipMaps = Textures::Texture[(int)in.geometry].mipMaps;
 			cmdParamDesc[cmdCounter - 1].param[2]._min = 0;
 			cmdParamDesc[cmdCounter - 1].param[2]._max = max((mipMaps ? (UINT)(_log2(r)) : 0)-2,0);
 		#endif
 
-		int denom = (int)pow(2, (float)quality);
+		int denom = (int)pow(2, (float)in.quality);
 		float q = intToFloatDenom;
 		
 		ConstBuf::drawerMat = {
 
-			.model = XMMatrixTranspose(XMMatrixTranslation(pos.x / q, pos.y / q, pos.z / q)),
+			.model = XMMatrixTranspose(XMMatrixTranslation(in.pos_x / q, in.pos_y / q, in.pos_z / q)),
 
 			#if EditMode
 				.hilight = cmdCounter - 1 == hilightedCmd ? 1.f : 0.f
@@ -25,8 +33,8 @@ namespace Object {
 
 		ConstBuf::Update(ConstBuf::cBuffer::drawerMat);
 
-		float gX = Textures::Texture[(int)geometry].size.x / denom;
-		float gY = Textures::Texture[(int)geometry].size.y / denom;
+		float gX = Textures::Texture[(int)in.geometry].size.x / denom;
+		float gY = Textures::Texture[(int)in.geometry].size.y / denom;
 
 		vs::objViewer = {
 
@@ -36,8 +44,8 @@ namespace Object {
 			},
 
 			.textures = {
-				.positions = geometry,
-				.normals = normals
+				.positions = in.geometry,
+				.normals = in.normals
 				},
 
 			.samplers = {
@@ -56,7 +64,7 @@ namespace Object {
 
 			.textures = {
 				.env = texture::env,
-				.normals = normals
+				.normals = in.normals
 			},
 
 			.samplers = {
@@ -68,19 +76,23 @@ namespace Object {
 
 		ps::basic.set();
 
-		gfx::Draw((int)gX*(int)gY, 1);
+		Drawer::NullDrawer({ (int)gX * (int)gY, 1 });
+
+		reflect_close;
 	}
 
-	API(CalcNormals, texture srcGeomerty, texture targetNrml)
+	cmd(CalcNormals, texture srcGeomerty; texture targetNrml;)
 	{
-		gfx::SetRT(targetNrml, 0);
+		reflect;
+
+		RenderTarget::Set({ in.targetNrml, 0 });
 
 		vs::quad.set();
 
 		ps::genNormals = {
 
 			.textures = {
-				.geo = srcGeomerty
+				.geo = in.srcGeomerty
 			},
 
 			.samplers = {
@@ -92,26 +104,32 @@ namespace Object {
 
 		ps::genNormals.set();
 
-		gfx::Draw(1, 1);
-		gfx::CreateMips();
+		Drawer::NullDrawer({ 1, 1 });
+		RenderTarget::GenerateMips({});
+
+		reflect_close;
 
 	}
 
-	API(CalcObject,texture targetGeo, texture targetNrml)
+	cmd(Calc, texture targetGeo; texture targetNrml;)
 	{
-		gfx::SetBlendMode(blendmode::off, blendop::add);
-		gfx::SetCull(cullmode::off);
-		gfx::SetRT(targetGeo,0);
-		gfx::SetDepthMode(depthmode::off);
+		reflect;
+
+		BlendMode::Set({ blendmode::off, blendop::add });
+		Culling::Set({cullmode::off});
+		RenderTarget::Set({ in.targetGeo,0 });
+		DepthBuf::SetMode({ depthmode::off });
 
 		//pos
 		vs::quad.set();
 		ps::obj1.set();
-		gfx::Draw(1, 1);
-		gfx::CreateMips();
+		Drawer::NullDrawer({ 1, 1 });
+		RenderTarget::GenerateMips({});
 
 		//normals
-		CalcNormals(targetGeo, targetNrml);
+		CalcNormals({ in.targetGeo, in.targetNrml });
+
+		reflect_close;
 	}
 
 }

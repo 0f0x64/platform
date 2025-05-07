@@ -16,7 +16,7 @@ void name(CAT(name,_params) in ,const std::source_location caller = std::source_
 #include "cubemap.h"
 #include "object.h"
 
-#include "sound\tracker.h"
+//#include "sound\tracker.h"
 
 int precalcOfs = 0;
 
@@ -44,42 +44,20 @@ namespace Loop
 		ConstBuf::Update(ConstBuf::cBuffer::frame);
 	}
 
-	API(cameraMan)
-	{
-		BasicCam::setCamKey(0, keyType::set, 3021, 22, 46, 2, 51, 0, 0, 508, 77, 65, sliderType::follow, 0, 0, -1, camAxis::local, 0, 3, 0, 0);
-		BasicCam::processCam();
-	}
-
-
-	namespace f1 {
-
-		cmd(func2, int x;int y; int z;texture t1;)
+	namespace cameraMan {
+		cmd(run)
 		{
 			reflect;
-
-			int A = in.x;
-			int c = 0;
-
+			BasicCam::setCamKey({ 0, keyType::set, 3021, 22, 46, 2, 51, 0, 0, 508, 77, 65, sliderType::follow, 0, 0, -1, camAxis::local, 0, 3, 0, 0 });
+			BasicCam::processCam();
 			reflect_close;
 		}
-
 	}
 
-	namespace f2 {
-
-		cmd(func2)
-		{
-			reflect;
-
-			int c = 0;
-
-			reflect_close;
-		}
-
-	}
-
+		
 	void mainLoop()
 	{
+		/*
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
 
@@ -91,36 +69,36 @@ namespace Loop
 		cmdCounter = precalcOfs;
 
 		frameConst();
-
-
-		f1::func2({
-			.x = 21,
-			.y = 0,
-			.z = 1,
-			.t1 = texture::mainRT
-		});
-
-		f2::func2({});
 		
 		InputAsm::set({ topology::triList });
-		gfx::SetBlendMode(blendmode::off, blendop::add);
+		BlendMode::Set({ blendmode::off, blendop::add });
 
-		Cubemap::CalcCubemap(texture::env);
-		Object::CalcObject(texture::obj1pos, texture::obj1nrml);
+		Cubemap::Calc({ texture::env });
+		Object::Calc({ texture::obj1pos, texture::obj1nrml });
 
-		gfx::SetRT(texture::mainRT, 0);
-		gfx::ClearRT(255, 255, 255, 255);
+		RenderTarget::Set({ texture::mainRT, 0 });
+		RenderTarget::Clear({ 255, 255, 255, 255 });
 
-		cameraMan();
+		cameraMan::run({});
 
-		Cubemap::ShowCubemap(texture::env);
+		Cubemap::Show({texture::env});
 
-		gfx::SetDepthMode(depthmode::on);
-		gfx::ClearRTDepth();
-		gfx::SetCull(cullmode::back);
-		gfx::SetBlendMode(blendmode::off, blendop::add);
-		
-		Object::ShowObject(texture::obj1pos, texture::obj1nrml, 0, 120, 82, 112);
+		DepthBuf::SetMode({ depthmode::on });
+		DepthBuf::Clear({});
+		Culling::Set({cullmode::back});
+		BlendMode::Set({
+			blendmode::off,
+			blendop::add
+		});
+		*/
+		Object::Show({ 
+			texture::obj1pos, 
+			texture::obj1nrml, 
+			0, 
+			120,
+			82, 
+			112 
+			});
 		
 		
 

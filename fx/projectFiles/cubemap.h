@@ -1,29 +1,33 @@
 namespace Cubemap {
 
-	API(CalcCubemap, texture target)
+	cmd(Calc, texture target;)
 	{
-		gfx::SetBlendMode(blendmode::off, blendop::add);
-		gfx::SetRT(target, 0);
-		gfx::SetCull(cullmode::off);
-		gfx::SetDepthMode(depthmode::off);
-		gfx::ClearRT(0, 0, 0, 1);
+		reflect;
+		BlendMode::Set({ blendmode::off, blendop::add });
+		RenderTarget::Set({in.target, 0});
+		Culling::Set({cullmode::off});
+		DepthBuf::SetMode({depthmode::off});
+		RenderTarget::Clear({0, 0, 0, 1});
 
 		vs::quad.set();
 		ps::cubemapCreator.set();
-		gfx::Draw(1, 1);
-		gfx::CreateMips();
+		Drawer::NullDrawer({ 1, 1 });
+		RenderTarget::GenerateMips({});
+		reflect_close;
 	}
 
-	API(ShowCubemap,texture envTexture)
+	cmd(Show, texture envTexture;)
 	{
-		gfx::SetDepthMode(depthmode::off);
-		gfx::SetBlendMode(blendmode::off, blendop::add);
-		gfx::SetCull(cullmode::back);
+		reflect;
+
+		DepthBuf::SetMode({ depthmode::off });
+		BlendMode::Set({ blendmode::off, blendop::add });
+		Culling::Set({ cullmode::back });
 
 		ps::cubeMapViewer = {
 
 			.textures = {
-				.env = envTexture
+				.env = in.envTexture
 				},
 
 			.samplers {
@@ -45,7 +49,9 @@ namespace Cubemap {
 
 		vs::simpleCube.set();
 
-		gfx::Draw(gX * gY,1);
+		Drawer::NullDrawer({ gX * gY,1 });
+
+		reflect_close;
 	}
 
 }

@@ -1,19 +1,19 @@
 namespace tracker
 {
-
-	API(oscillator, int a, int b)
+	/*
+	cmd(oscillator, int a, int b)
 	{
 		int d = 011;
 	}
 
-	API(eq, int a)
+	cmd(eq, int a)
 	{
 		int b = 1;
 	}
 
 	byte curChannel;
 
-	API(Pitch, int count, unsigned char ...)
+	cmd(Pitch, int count, unsigned char ...)
 	{
 
 	#if !EditMode
@@ -30,9 +30,9 @@ namespace tracker
 		c.note[(int)layers::pitch].cmdIndex = cmdCounter - 1;
 	}
 
-	API(Clip, timestamp pos, int len, int repeat, int bpmScale, overdub overDub, int swing)
+	cmd(Clip, timestamp pos, int len, int repeat, int bpmScale, overdub overDub, int swing)
 	{
-		//check range
+		
 		track_desc.channel[curChannel].clipCounter++;
 		clip_& c = track_desc.channel[curChannel].clip[track_desc.channel[curChannel].clipCounter];
 
@@ -55,18 +55,6 @@ namespace tracker
 		w = editor::paramEdit::tabLen;
 		editor::paramEdit::mouseOverItem = editor::paramEdit::showButton(x, y, w, editor::ui::style::text::height * 2.f - editor::ui::style::text::height * .2f , sel, i);
 
-		/*
-		editor::paramEdit::mouseOverItem = editor::isMouseOver(x, y, w, editor::ui::style::box::height*2);
-		editor::ui::style::box::outlineBrightness = editor::paramEdit::mouseOverItem ? 1.f : 0.1f;
-
-		editor::ui::Box::Setup();
-		editor::paramEdit::setBStyle(sel);
-		editor::ui::Box::Draw(x, y, w, editor::ui::style::text::height * .8f*2.);
-
-		editor::ui::Text::Setup();
-		editor::paramEdit::setTStyle(sel);
-		editor::ui::Text::Draw(cmdParamDesc[i].funcName, x + editor::paramEdit::insideX, y + editor::paramEdit::insideY);*/
-
 		y += lead*2;
 	}
 
@@ -75,13 +63,13 @@ namespace tracker
 
 
 
-	API(kick, volume vol, panorama pan, volume send, switcher solo, switcher mute)
+	cmd(kick, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
 	#if EditMode
 			regfuncGroup(channel);
 			regDrawer(channelDraw);
 
-	#endif // Editor
+	#endif 
 
 
 		track_desc.channel[curChannel].clipCounter = -1;
@@ -99,7 +87,7 @@ namespace tracker
 
 
 
-	API(snare, volume vol, panorama pan, volume send, switcher solo, switcher mute)
+	cmd(snare, volume vol, panorama pan, volume send, switcher solo, switcher mute)
 	{
 	#if EditMode
 		regfuncGroup(channel);
@@ -124,7 +112,7 @@ namespace tracker
 
 	}
 
-	API (Track, int masterBPM)
+	cmd (Track, int masterBPM)
 	{
 		//regDrawer(playTrack_dc);
 #if EditMode
@@ -138,5 +126,6 @@ namespace tracker
 		track_desc.channelsCount = curChannel;
 	
 	}
+	*/
 
 }

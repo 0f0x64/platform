@@ -17,13 +17,32 @@ namespace RenderTarget {
 		Textures::RenderTarget(in.targetRT, in.level);
 		reflect_close;
 	}
-}
 
-namespace Texture {
-
-	cmd(CreateMips) {
+	cmd(GenerateMips) {
 		reflect;
 		Textures::CreateMipMap();
+		reflect_close;
+	}
+
+	cmd(Clear, int r; int g; int b; int a;)
+	{
+		reflect;
+		Draw::Clear({ in.r,in.g, in.b, in.a });
+		reflect_close;
+	}
+}
+
+namespace Copy {
+
+	cmd(Color, texture dst; texture src;) 
+	{
+		reflect;
+		Textures::CopyColor(in.dst, in.src);
+		reflect_close;
+	}
+	cmd(Depth, texture dst; texture src;) {
+		reflect;
+		Textures::CopyDepth(in.dst, in.src);
 		reflect_close;
 	}
 }
@@ -51,15 +70,10 @@ namespace Drawer {
 		reflect_close;
 	}
 
-	cmd(Clear, int r;int g; int b;int a;)
-	{
-		reflect;
-		Draw::Clear({in.r,in.g, in.b, in.a });
-		reflect_close;
-	}
+
 }
 
-namespace Camera
+namespace Cam
 {
 	cmd(Set, int eye_x; int eye_y; int eye_z; int at_x; int at_y; int at_z; int up_x; int up_y; int up_z; int angle;)
 	{
@@ -78,15 +92,23 @@ namespace BlendMode {
 	}
 }
 
-API(SetCull, cullmode mode) {
-	Rasterizer::Cull(mode);
+namespace Culling {
+
+	cmd(Set, cullmode mode;)
+	{
+		reflect;
+		Rasterizer::Cull(in.mode);
+		reflect_close;
+	}
 }
-API(SetScissors, rect bbox) {
-	Rasterizer::Scissors(bbox);
+
+namespace Scissors {
+
+	cmd(Set, rect bbox;)
+	{
+		reflect;
+		Rasterizer::Scissors(in.bbox);
+		reflect_close;
+	}
 }
-API(CopyRTColor, texture dst, texture src) {
-	Textures::CopyColor(dst, src);
-}
-API(CopyRTDepth, texture dst, texture src) {
-	Textures::CopyDepth(dst, src);
-}
+

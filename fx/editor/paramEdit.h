@@ -311,6 +311,7 @@ namespace paramEdit {
 							int i = commaOfs + 1;
 							while (true)
 							{
+								if (i >= s.size()) break;
 								if (s.at(i) == ')') break;
 
 								pStr+= s.at(i);
@@ -374,7 +375,17 @@ namespace paramEdit {
 				{
 					c->single_line = false;
 				}
-				auto ofs = s.rfind("::", caller.column()) - 1;
+				auto ofs = s.rfind("::", caller.column());
+
+				if (ofs == std::string::npos)
+				{
+					ofs = 0;
+				}
+				else
+				{
+					ofs--;
+				}
+
 				while (ofs > 0 && std::isalnum(s.at(ofs))) ofs--;
 
 				if (!std::isalnum(s.at(ofs))) ofs++;
