@@ -225,52 +225,6 @@ namespace gfx {
 
 #ifdef REFLECTION
 
-void SetInputAsm_impl(  topology topo);
-
-void SetInputAsm_reflect (CALLER_INFO, topology &topo)
-{
-
-	if (paramsAreLoaded) {
-		if (!cmdParamDesc[cmdCounter].param[0].bypass)  topo = (topology)cmdParamDesc[cmdCounter].param[0].value[0];
-	} else {
-		strcpy(cmdParamDesc[cmdCounter].caller.fileName,srcFileName);
-		cmdParamDesc[cmdCounter].caller.line = srcLine;
-		cmdParamDesc[cmdCounter].pCount = 1;
-		cmdParamDesc[cmdCounter].param[0].value[0] = (int)topo;
-		cmdParamDesc[cmdCounter].param[0].bypass = false;
-		strcpy(cmdParamDesc[cmdCounter].param[0].type, "topology"); 
-		strcpy(cmdParamDesc[cmdCounter].param[0].name, "topo"); 
-
-		editor::paramEdit::setParamsAttr();
-		editor::paramEdit::setBypass();
-	}
-
-	AddToUI("SetInputAsm"); 
-	cmdParamDesc[cmdCounter].uiDraw = &editor::paramEdit::showStackItem;
-	cmdLevel++;
-
-	cmdCounter++;
-
-}
-
-#define SetInputAsm(topo) SetInputAsm_ref (__FILE__, __LINE__, topo)
-
-void SetInputAsm_ref ( CALLER_INFO,  topology topo)
-{
-	SetInputAsm_reflect (srcFileName, srcLine, topo);
-	SetInputAsm_impl (topo);
-	cmdLevel--;
-}
-
-#else
-#undef SetInputAsm
-#define SetInputAsm(topo) SetInputAsm_( topo)
-#endif
-}
-namespace gfx {
-
-#ifdef REFLECTION
-
 void SetRT_impl(  texture targetRT, int level);
 
 void SetRT_reflect (CALLER_INFO, texture &targetRT, int &level)

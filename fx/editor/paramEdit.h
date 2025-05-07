@@ -250,6 +250,10 @@ namespace paramEdit {
 			auto rb = fn.find("(");
 			auto fp = fn.rfind("::", rb);
 			auto op = fn.rfind("::", fp - 2);
+			if (op == std::string::npos)
+			{
+				op = fn.rfind(" ", fp - 2)-1;
+			}
 			std::string objName = fn.substr(op + 2, fp - op - 2);
 			std::string funcName = fn.substr(fp + 2, rb - fp - 2);;
 			std::ifstream ifile(currentFunc.file_name());

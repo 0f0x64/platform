@@ -1,8 +1,6 @@
 namespace gfx {
 
-	API(SetInputAsm, topology topo) {
-		InputAssembler::IA(topo);
-	}
+
 
 	API(SetRT, texture targetRT, int level) {
 		Textures::RenderTarget(targetRT, level);
@@ -53,4 +51,6 @@ namespace gfx {
 		Textures::CopyDepth(dst, src);
 	}
 }
+
+
 

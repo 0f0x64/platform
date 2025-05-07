@@ -191,6 +191,9 @@
     <ClInclude Include="reflector.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="gApi.h">
+      <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

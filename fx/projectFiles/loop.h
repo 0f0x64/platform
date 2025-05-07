@@ -1,5 +1,16 @@
 
+#define CALLER ,const std::source_location caller = std::source_location::current()
+#define reflect editor::paramEdit::reflect_f(&in, caller, std::source_location::current())
+#define reflect_close cmdLevel--
+#define reflect_close2 cmdLevel--;}
+
+
+#define cmd(name, ...) __pragma (pack(push,1)) struct CAT(name,_params) {__VA_ARGS__}; __pragma (pack(pop))\
+void name(CAT(name,_params) in ,const std::source_location caller = std::source_location::current())
+
+
 #include "graphicsAPI.h"
+#include "gApi.h"
 
 #include "camera.h"
 #include "cubemap.h"
@@ -16,7 +27,7 @@ namespace Loop
 
 	void Precalc()
 	{
-		gfx::SetInputAsm(topology::lineList);
+		InputAsm::set({topology::triList});
 		ConstBuf::Update(ConstBuf::cBuffer::global);
 		for (int i = 0; i < 6; i++) { ConstBuf::ConstToVertex((ConstBuf::cBuffer)i); ConstBuf::ConstToPixel((ConstBuf::cBuffer)i); }
 		isPrecalc = true;
@@ -39,21 +50,10 @@ namespace Loop
 		BasicCam::processCam();
 	}
 
-#define CALLER ,const std::source_location caller = std::source_location::current()
-#define reflect editor::paramEdit::reflect_f(&in, caller, std::source_location::current())
-#define reflect_close cmdLevel--
-#define reflect_close2 cmdLevel--;}
-
-
-#define cmd(name, ...) __pragma (pack(push,1)) struct CAT(name,_params) {__VA_ARGS__}; __pragma (pack(pop))\
-void name(CAT(name,_params) in ,const std::source_location caller = std::source_location::current())
-
-
-
 
 	namespace f1 {
 
-		cmd(func2, int x;int y; int z;)
+		cmd(func2, int x;int y; int z;texture t1;)
 		{
 			reflect;
 
@@ -93,16 +93,16 @@ void name(CAT(name,_params) in ,const std::source_location caller = std::source_
 		frameConst();
 
 
-
 		f1::func2({
-			.x = 8,
-			.y = 45,
-			.z = -161
+			.x = 21,
+			.y = 0,
+			.z = 1,
+			.t1 = texture::mainRT
 		});
 
 		f2::func2({});
 		
-		gfx::SetInputAsm(topology::triList);
+		InputAsm::set({ topology::triList });
 		gfx::SetBlendMode(blendmode::off, blendop::add);
 
 		Cubemap::CalcCubemap(texture::env);
