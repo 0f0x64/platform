@@ -1,6 +1,6 @@
 namespace InputAsm {
 
-	cmd(set, topology topo;) {
+	cmd(Set, topology topo;) {
 
 		reflect;
 
@@ -40,6 +40,7 @@ namespace Copy {
 		Textures::CopyColor(in.dst, in.src);
 		reflect_close;
 	}
+
 	cmd(Depth, texture dst; texture src;) {
 		reflect;
 		Textures::CopyDepth(in.dst, in.src);
@@ -104,10 +105,10 @@ namespace Culling {
 
 namespace Scissors {
 
-	cmd(Set, rect bbox;)
+	cmd(Set, int x; int y; int x1; int y1;)
 	{
 		reflect;
-		Rasterizer::Scissors(in.bbox);
+		Rasterizer::Scissors({ in.x ,in.y,in.x1,in.y1});
 		reflect_close;
 	}
 }

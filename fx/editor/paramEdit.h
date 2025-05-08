@@ -46,7 +46,6 @@ namespace paramEdit {
 	{
 		strcpy(cmdParamDesc[cmdCounter].caller.fileName, caller.file_name());
 		cmdParamDesc[cmdCounter].caller.line = caller.line();
-		cmdParamDesc[cmdCounter].caller.column = caller.column();
 	}
 
 	void CopyStrWithSkipper(std::string& in, std::string& lineStr, std::string skippers)
@@ -78,7 +77,7 @@ namespace paramEdit {
 	{
 		auto c = &cmdParamDesc[cmdIndex];
 		std::string funcStr = c->funcName;
-		callStr = funcStr;// .substr(funcStr.find('::') + 2, funcStr.size());
+		callStr = funcStr;
 		callStr += "({";
 			if (!c->single_line)
 			{
@@ -185,7 +184,7 @@ namespace paramEdit {
 
 				tab += a;
 
-				//if (cCount < c->caller.column) ofile << a; else break;
+				
 				cCount++;
 
 				if (nc == strlen(c->funcName))
@@ -197,6 +196,11 @@ namespace paramEdit {
 			tab.erase(tab.size() - nc,nc);
 
 			ofile << tab;
+
+			for (int i = 0; i < tab.size(); i++)
+			{
+				if (tab.at(i) != ' ' && tab.at(i) != '\t') tab.at(i) = ' ';
+			}
 
 			CreateCallStr(cmdIndex, callStr, tab);
 
@@ -256,6 +260,11 @@ namespace paramEdit {
 			}
 			std::string objName = fn.substr(op + 2, fp - op - 2);
 			std::string funcName = fn.substr(fp + 2, rb - fp - 2);;
+
+			//auto fnStart = fn.rfind(" ", rb)+1;
+			//std::string fullName = fn.substr(fnStart, rb - fnStart);
+
+			strcpy(c->funcName, (objName + "::" + funcName).c_str());
 			std::ifstream ifile(currentFunc.file_name());
 			std::string s;
 
@@ -288,10 +297,13 @@ namespace paramEdit {
 
 							if (std::string::npos == lineStr.find(")", cmdDecl))
 							{
-								char a;
-								ifile.get(a);
-								s += a;
-								if (a == ')') break;
+								while (true)
+								{
+									char a;
+									ifile.get(a);
+									s += a;
+									if (a == ')') break;
+								}
 							}
 
 							auto cmdOfs = s.find("cmd");
@@ -299,7 +311,6 @@ namespace paramEdit {
 
 							if (commaOfs == std::string::npos)//no params
 							{
-								strcpy(c->funcName, (objName+"::"+funcName).c_str());
 								c->pCount = 0;
 								c->stackLevel = cmdLevel;
 								c->uiDraw = &showStackItem;
@@ -308,15 +319,11 @@ namespace paramEdit {
 								return;
 							}
 
-							int i = commaOfs + 1;
-							while (true)
-							{
-								if (i >= s.size()) break;
-								if (s.at(i) == ')') break;
-
-								pStr+= s.at(i);
-								i++;
-							}
+							auto end = s.find(")");
+							end = s.rfind(";", end);
+							pStr = s.substr(commaOfs + 1, end -1 - commaOfs);
+							std::erase(pStr, '\t');
+							std::erase(pStr, '\n');
 
 
 							const std::regex reg{ R"(;)" };
@@ -367,7 +374,7 @@ namespace paramEdit {
 
 					lc++;
 				}
-				if (s.find(";", caller.column()) !=std::string::npos)
+				if (s.find(";") !=std::string::npos)
 				{
 					c->single_line = true;
 				}
@@ -375,48 +382,31 @@ namespace paramEdit {
 				{
 					c->single_line = false;
 				}
-				auto ofs = s.rfind("::", caller.column());
+				auto pStart = s.find("{") + 1;
+				std::string funcStr = s.substr(pStart, funcStr.size()-pStart);
 
-				if (ofs == std::string::npos)
-				{
-					ofs = 0;
-				}
-				else
-				{
-					ofs--;
-				}
-
-				while (ofs > 0 && std::isalnum(s.at(ofs))) ofs--;
-
-				if (!std::isalnum(s.at(ofs))) ofs++;
-
-				funcStr += s.c_str() + ofs;
-				std::erase(funcStr, ' ');
-
-				if (std::string::npos == funcStr.find(";"))
+				auto pEnd = funcStr.find("}");
+				if (std::string::npos == pEnd)
 				{
 					while (true)
 					{
 						char a;
 						ifileCaller.get(a);
+						if (a == '}') break;
 						funcStr += a;
-						if (a == ';') break;
+						
 					}
+				}
+				else
+				{
+					funcStr = funcStr.substr(0, pEnd);
 				}
 
 				std::erase(funcStr, ' ');
 				std::erase(funcStr, '\t');
 				std::erase(funcStr, '\n');
 
-				auto br = funcStr.find('(');
-
-				funcName = funcStr.substr(0, br);
-				strcpy(c->funcName, funcName.c_str());
-
-				auto funcStrEnd = funcStr.find(";");
-				if (funcStrEnd < funcStr.size()) funcStrEnd++;
-				funcStr.erase(funcStrEnd, funcStr.size() - funcStrEnd);
-				std::string paramStr = funcStr.substr(br + 2, funcStr.size() - 3 - (br + 2));
+				std::string paramStr = funcStr;
 
 				const std::regex reg{ R"(,)" };
 				auto pTokens = regex_split(paramStr, reg);

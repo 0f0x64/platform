@@ -1,11 +1,12 @@
 namespace Object {
 
-	cmd(Show, texture geometry;
-	texture normals;
-	int quality; 
-	int pos_x;
-	int pos_y;
-	int pos_z;
+	cmd(Show, 
+		texture geometry;
+		texture normals;
+		int quality; 
+		int pos_x;
+		int pos_y;
+		int pos_z;
 		)
 	{
 		reflect;
@@ -76,7 +77,7 @@ namespace Object {
 
 		ps::basic.set();
 
-		Drawer::NullDrawer({ (int)gX * (int)gY, 1 });
+		Drawer::NullDrawer({(int)gX*(int)gY,2});
 
 		reflect_close;
 	}

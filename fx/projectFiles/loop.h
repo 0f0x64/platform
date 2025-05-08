@@ -27,7 +27,7 @@ namespace Loop
 
 	void Precalc()
 	{
-		InputAsm::set({topology::triList});
+		InputAsm::Set({topology::triList});
 		ConstBuf::Update(ConstBuf::cBuffer::global);
 		for (int i = 0; i < 6; i++) { ConstBuf::ConstToVertex((ConstBuf::cBuffer)i); ConstBuf::ConstToPixel((ConstBuf::cBuffer)i); }
 		isPrecalc = true;
@@ -57,7 +57,7 @@ namespace Loop
 		
 	void mainLoop()
 	{
-		/*
+		
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
 
@@ -70,14 +70,14 @@ namespace Loop
 
 		frameConst();
 		
-		InputAsm::set({ topology::triList });
+		InputAsm::Set({topology::triList});
 		BlendMode::Set({ blendmode::off, blendop::add });
 
 		Cubemap::Calc({ texture::env });
-		Object::Calc({ texture::obj1pos, texture::obj1nrml });
+		Object::Calc({texture::obj1pos,texture::obj1nrml});
 
 		RenderTarget::Set({ texture::mainRT, 0 });
-		RenderTarget::Clear({ 255, 255, 255, 255 });
+		RenderTarget::Clear({255,255,255,255});
 
 		cameraMan::run({});
 
@@ -87,20 +87,19 @@ namespace Loop
 		DepthBuf::Clear({});
 		Culling::Set({cullmode::back});
 		BlendMode::Set({
-			blendmode::off,
-			blendop::add
+			.mode = blendmode::off,
+			.op = blendop::add
 		});
-		*/
-		Object::Show({ 
-			texture::obj1pos, 
-			texture::obj1nrml, 
-			0, 
-			120,
-			82, 
-			112 
-			});
 		
-		
+		Object::Show({
+			.geometry = texture::obj1pos,
+			.normals = texture::obj1nrml,
+			.quality = 0,
+			.pos_x = 122,
+			.pos_y = 0,
+			.pos_z = 0
+		});
+	
 
 		//gfx::SetRT(texture::mainRT, 0);
 		//gfx::ClearRT(0, 0, 0, 255);
