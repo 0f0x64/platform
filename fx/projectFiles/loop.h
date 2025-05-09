@@ -16,7 +16,7 @@ void name(CAT(name,_params) in ,const std::source_location caller = std::source_
 #include "cubemap.h"
 #include "object.h"
 
-//#include "sound\tracker.h"
+#include "sound\tracker.h"
 
 int precalcOfs = 0;
 
@@ -54,10 +54,9 @@ namespace Loop
 		}
 	}
 
-		
 	void mainLoop()
 	{
-		
+		/*
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
 
@@ -95,15 +94,15 @@ namespace Loop
 			.geometry = texture::obj1pos,
 			.normals = texture::obj1nrml,
 			.quality = 0,
-			.pos_x = 122,
+			.pos_x = 0,
 			.pos_y = 0,
 			.pos_z = 0
 		});
 	
-
-		//gfx::SetRT(texture::mainRT, 0);
-		//gfx::ClearRT(0, 0, 0, 255);
-		//tracker::Track(120);
+	*/
+		RenderTarget::Set({texture::mainRT,0});
+		RenderTarget::Clear({ 0, 0, 0, 255 });
+		tracker::Track({ 120 });
 
 		//gApi.ClearRT(0, 0, 0, 0);
 
