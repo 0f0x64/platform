@@ -54,9 +54,8 @@ namespace Loop
 		}
 	}
 
-	void mainLoop()
+	void scene1()
 	{
-		/*
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
 
@@ -68,28 +67,28 @@ namespace Loop
 		cmdCounter = precalcOfs;
 
 		frameConst();
-		
-		InputAsm::Set({topology::triList});
-		BlendMode::Set({ blendmode::off, blendop::add });
+
+		InputAsm::Set({ topology::triList });
+		BlendMode::Set({ blendmode::off,blendop::add });
 
 		Cubemap::Calc({ texture::env });
-		Object::Calc({texture::obj1pos,texture::obj1nrml});
+		Object::Calc({ texture::obj1pos,texture::obj1nrml });
 
-		RenderTarget::Set({ texture::mainRT, 0 });
-		RenderTarget::Clear({255,255,255,255});
+		RenderTarget::Set({ texture::mainRT,0 });
+		RenderTarget::Clear({ 255,255,255,255 });
 
 		cameraMan::run({});
 
-		Cubemap::Show({texture::env});
+		Cubemap::Show({ texture::env });
 
 		DepthBuf::SetMode({ depthmode::on });
 		DepthBuf::Clear({});
-		Culling::Set({cullmode::back});
+		Culling::Set({ cullmode::back });
 		BlendMode::Set({
 			.mode = blendmode::off,
 			.op = blendop::add
-		});
-		
+			});
+
 		Object::Show({
 			.geometry = texture::obj1pos,
 			.normals = texture::obj1nrml,
@@ -97,14 +96,32 @@ namespace Loop
 			.pos_x = 0,
 			.pos_y = 0,
 			.pos_z = 0
-		});
-	
-	*/
-		RenderTarget::Set({texture::mainRT,0});
-		RenderTarget::Clear({ 0, 0, 0, 255 });
-		tracker::Track({ 120 });
+			});
+	}
 
-		//gApi.ClearRT(0, 0, 0, 0);
+
+	void track()
+	{
+		if (!isPrecalc)
+		{
+			Precalc();
+		}
+
+		cmdCounter = precalcOfs;
+
+		frameConst();
+		
+		RenderTarget::Set({texture::mainRT,0});
+		RenderTarget::Clear({ 11, 11, 11, 255 });
+		DepthBuf::Clear({});
+		tracker::Track({ 120 });
+			
+	}
+
+	void mainLoop()
+	{
+		//scene1();
+		track();
 
 	}
 
