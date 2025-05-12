@@ -237,7 +237,6 @@
     <ClInclude Include="editor\viewCam.h" />
     <ClInclude Include="editor\wndProc.h" />
     <ClInclude Include="gApi.h" />
-    <ClInclude Include="generated\apiReflection.h" />
     <ClInclude Include="generated\constBufReflect.h" />
     <ClInclude Include="generated\libList.h" />
     <ClInclude Include="generated\processedShaders.h" />

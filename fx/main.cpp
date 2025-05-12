@@ -55,7 +55,6 @@ using namespace dx11;
 	#include "editor\editor.h"
 #endif
 
-#include "generated\apiReflection.h"
 #include "projectFiles\loop.h"
 
 void UpdateFrame(double time)
