@@ -46,8 +46,10 @@ using namespace dx11;
 #include "generated\constBufReflect.h"
 
 #define regDrawer(name)
-#define API(fname, ...) void fname##_(__VA_ARGS__)
-#define CALLER_INFO
+#define reflect
+#define reflect_close
+#define cmd(name, ...) __pragma (pack(push,1)) struct CAT(name,_params) {__VA_ARGS__}; __pragma (pack(pop))\
+	void name(CAT(name,_params) in)
 
 #if EditMode
 	#include "editor\editor.h"

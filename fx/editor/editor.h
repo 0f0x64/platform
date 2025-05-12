@@ -1,23 +1,24 @@
 #include "editor\cmdEditService.h"
 
 #undef regDrawer
-#undef API
-#undef CALLER_INFO
+#undef reflect
+#undef reflect_close
+#undef cmd(name, ...)
 
 #define regDrawer(name) track_desc.channel[curChannel].cmdIndex = cmdCounter - 1
 #define regfuncGroup(name) strcpy(cmdParamDesc[cmdCounter-1].funcGroup, #name); 
 #define REFLECTION true
 
 #if REFLECTION
-	#define CALLER_INFO const char* srcFileName, int srcLine 
-	#define API(fname, ...) void fname##_impl(__VA_ARGS__)
+	#define reflect editor::paramEdit::reflect_f(&in, caller, std::source_location::current())
+	#define reflect_close cmdLevel--
+	#define cmd(name, ...) __pragma (pack(push,1)) struct CAT(name,_params) {__VA_ARGS__}; __pragma (pack(pop))\
+	void name(CAT(name,_params) in ,const std::source_location caller = std::source_location::current())
 #endif
 
 bool resize = true;
 
 using namespace dx11;
-
-
 
 std::vector<std::string> regex_split(const std::string& str, const std::regex& reg) {
 

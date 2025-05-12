@@ -1,15 +1,4 @@
 
-#define CALLER ,const std::source_location caller = std::source_location::current()
-#define reflect editor::paramEdit::reflect_f(&in, caller, std::source_location::current())
-#define reflect_close cmdLevel--
-#define reflect_close2 cmdLevel--;}
-
-
-#define cmd(name, ...) __pragma (pack(push,1)) struct CAT(name,_params) {__VA_ARGS__}; __pragma (pack(pop))\
-void name(CAT(name,_params) in ,const std::source_location caller = std::source_location::current())
-
-
-#include "graphicsAPI.h"
 #include "gApi.h"
 
 #include "camera.h"
@@ -93,7 +82,7 @@ namespace Loop
 			.geometry = texture::obj1pos,
 			.normals = texture::obj1nrml,
 			.quality = 0,
-			.pos_x = 43,
+			.pos_x = 14,
 			.pos_y = 0,
 			.pos_z = 0
 		});
@@ -120,8 +109,8 @@ namespace Loop
 
 	void mainLoop()
 	{
-		//scene1();
-		track();
+		scene1();
+		//track();
 
 	}
 
