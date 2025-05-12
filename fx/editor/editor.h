@@ -4,7 +4,7 @@
 #undef API
 #undef CALLER_INFO
 
-#define regDrawer(name) cmdParamDesc[cmdCounter-1].uiDraw = &name; track_desc.channel[curChannel].cmdIndex = cmdCounter - 1
+#define regDrawer(name) track_desc.channel[curChannel].cmdIndex = cmdCounter - 1
 #define regfuncGroup(name) strcpy(cmdParamDesc[cmdCounter-1].funcGroup, #name); 
 #define REFLECTION true
 

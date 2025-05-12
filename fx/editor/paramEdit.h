@@ -330,23 +330,39 @@ namespace paramEdit {
 							auto tokens = regex_split(pStr, reg);
 
 							int param_ofs = 0;
+							int j = 0;
 							for (int i = 0; i < tokens.size(); i++)
 							{
 								std::string typeStr, nameStr;
 								getTypeAndName(tokens[i], typeStr, nameStr);
 								auto typeID = getTypeIndex(typeStr.c_str());
-								c->param[i].typeIndex = typeID;
-								c->param[i]._dim = typeID == -1 ? 1 : typeDesc[typeID]._dim;
-								c->param[i]._min = typeID == -1 ? INT_MIN : typeDesc[typeID]._min;
-								c->param[i]._max = typeID == -1 ? INT_MAX : typeDesc[typeID]._max;
+								c->param[j].typeIndex = typeID;
+								c->param[j]._dim = typeID == -1 ? 1 : typeDesc[typeID]._dim;
+								c->param[j]._min = typeID == -1 ? INT_MIN : typeDesc[typeID]._min;
+								c->param[j]._max = typeID == -1 ? INT_MAX : typeDesc[typeID]._max;
 
-								SetParamType(i, typeStr.c_str());
-								SetParamName(i, nameStr.c_str());
-								c->param[i].offset = param_ofs;
-								param_ofs += c->param[i].size;
+								auto br = nameStr.find("[");
+								int cnt = 1;
+								if (br != std::string::npos)
+								{
+									auto rbr = nameStr.find("]");
+									auto cs = nameStr.substr(br + 1, rbr - br);
+									cnt = std::stoi(cs);
+
+								}
+
+								for (int k=0;k<cnt;k++)
+								{
+									SetParamType(j, typeStr.c_str());
+									SetParamName(j, nameStr.c_str());
+									c->param[j].offset = param_ofs;
+									param_ofs += c->param[i].size;
+									j++;
+									
+								}
 							}
 
-							c->pCount = tokens.size();
+							c->pCount = j;
 
 							break;
 						}
@@ -382,9 +398,19 @@ namespace paramEdit {
 				{
 					c->single_line = false;
 				}
+
+				auto s2 = s;
+				std::erase(s2, ' ');
+				std::erase(s2, '\t');
+
+				auto br = s2.find("(");
+				auto fcn = s2.substr(0, br);
+
+				strcpy(c->funcName, fcn.c_str());
+
+
 				auto pStart = s.find("{") + 1;
 				std::string funcStr = s.substr(pStart, funcStr.size()-pStart);
-
 				auto pEnd = funcStr.find("}");
 				if (std::string::npos == pEnd)
 				{
@@ -410,9 +436,9 @@ namespace paramEdit {
 
 				const std::regex reg{ R"(,)" };
 				auto pTokens = regex_split(paramStr, reg);
-
+				c->pCount = pTokens.size();
 				//TODO - prevent missmatch pTokens.size with pCount
-				for (int i = 0; i < pTokens.size(); i++)
+				for (int i = 0; i < c->pCount; i++)
 				{
 					std::string pname;
 					std::string pvalue;

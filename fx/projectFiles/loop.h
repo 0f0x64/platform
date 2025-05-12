@@ -87,16 +87,16 @@ namespace Loop
 		BlendMode::Set({
 			.mode = blendmode::off,
 			.op = blendop::add
-			});
+		});
 
 		Object::Show({
 			.geometry = texture::obj1pos,
 			.normals = texture::obj1nrml,
 			.quality = 0,
-			.pos_x = 0,
+			.pos_x = 43,
 			.pos_y = 0,
 			.pos_z = 0
-			});
+		});
 	}
 
 

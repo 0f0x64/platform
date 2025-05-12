@@ -194,7 +194,7 @@ namespace Textures
 		context->PSSetShaderResources(0, 128, null);
 	}
 
-	void SetViewport(texture texId, byte level = 0)
+	void SetViewport(texture texId, int level = 0)
 	{
 		XMFLOAT2 size = Texture[(int)texId].size;
 		float denom = powf(2, level);

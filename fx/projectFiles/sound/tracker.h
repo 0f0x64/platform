@@ -1,6 +1,6 @@
 namespace tracker
 {
-	byte curChannel;
+	int curChannel;
 
 	
 	cmd(oscillator, int a; int b;)
@@ -55,16 +55,16 @@ namespace tracker
 
 	#if EditMode
 		regfuncGroup(channel);
-		//regDrawer(channelDraw);
+		regDrawer(channelDraw);
 	#endif	
 
 		track_desc.channel[curChannel].clipCounter = -1;
 
-		Clip({ 21, 10, 6, 1, overdub::off, 0 });
-		Pitch({ 8, 27, 29, 29, 29, 29, 29, 29, 29 });
+		Clip({24,10,6,1,overdub::off,0});
+		Pitch({8,1,1,0,1,3,0,0,0});
 
-		Clip({ 33, 4, 1, 1, overdub::off, 0 });
-		Pitch({ 3, 27, 39, 27 });
+		Clip({42,4,1,1,overdub::off,0});
+		Pitch({4,1,2,3,4});
 
 		oscillator({ 1, 2 });
 
@@ -91,11 +91,11 @@ namespace tracker
 
 		snare({
 			.vol = 0,
-			.pan = -25,
+			.pan = 26,
 			.send = 14,
-			.solo = switcher::off,
-			.mute = switcher::off 
-			});
+			.solo = switcher::on,
+			.mute = switcher::on
+		});
 
 		track_desc.channelsCount = curChannel;
 
