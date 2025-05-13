@@ -37,12 +37,22 @@ float4 PS(VS_OUTPUT_POS_UV input) : SV_Target
     float4 color = float4(r, g, b, a);
     
     float2 uvs = (input.uv - .5);
+
     float progressX = progress_x < input.uv.x ? 0. : .125;
     progressX+=progress_x>0 ? abs(uvs.y)*saturate(pow(saturate(1-2*abs(input.uv.x-progress_x)),28)) :0;
     float signedProgressX = saturate(pow(saturate(1-2*abs(uvs.x-progress_x)),8));
     signedProgressX*=4*pow(abs(uvs.y),2);
     progressX=lerp(progressX,signedProgressX,signed_progress);
-    color += progressX;
+
+    float iuv = 1. - input.uv.y;
+    float progressY = progress_y < iuv ? 0. : .125;
+    progressY+=progress_y>0 ? abs(uvs.x)*saturate(pow(saturate(1-2*abs(iuv-progress_y)),28)) :0;
+    float signedProgressY = saturate(pow(saturate(1-2*abs(uvs.y-progress_y)),8));
+    signedProgressY*=4*pow(abs(uvs.x),2);
+    progressY=lerp(progressY,signedProgressY,signed_progress);
+
+
+    color += progressX+progressY;
     float d = calcRA(uvs, input.sz, rad);
     float embossMask = sign(d) - saturate(d * edge * input.sz);
     float emboss = embossMask * dot(atan(uvs - .1), -.25);

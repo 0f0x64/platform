@@ -1,6 +1,5 @@
 
 #include "gApi.h"
-
 #include "camera.h"
 #include "cubemap.h"
 #include "object.h"
@@ -34,6 +33,7 @@ namespace Loop
 	}
 
 	namespace cameraMan {
+
 		cmd(run)
 		{
 			reflect;
@@ -57,7 +57,7 @@ namespace Loop
 
 		frameConst();
 
-		InputAsm::Set({ topology::triList });
+		InputAsm::Set({topology::triList});
 		BlendMode::Set({ blendmode::off,blendop::add });
 
 		Cubemap::Calc({ texture::env });
@@ -82,7 +82,7 @@ namespace Loop
 			.geometry = texture::obj1pos,
 			.normals = texture::obj1nrml,
 			.quality = 0,
-			.pos_x = 14,
+			.pos_x = -41,
 			.pos_y = 0,
 			.pos_z = 0
 		});
@@ -109,8 +109,8 @@ namespace Loop
 
 	void mainLoop()
 	{
-		scene1();
-		//track();
+		//scene1();
+		track();
 
 	}
 

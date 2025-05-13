@@ -642,151 +642,6 @@ namespace paramEdit {
 
 	}
 
-	//create c++ call string and save it into source file
-	void Save(int cmdIndex)
-	{
-		if (cmdIndex < 0) return;
-		if (cmdParamDesc[cmdIndex].reflection_type == 1) return;
-		
-		justSaved = true;
-
-		std::vector<std::string> genParams;
-
-		for (int i = 0; i < cmdParamDesc[cmdIndex].pCount; i++)
-		{
-			auto sType = cmdParamDesc[cmdIndex].param[i].typeIndex;
-			
-			if (isTypeEnum(sType))
-			{
-				genParams.push_back(std::string(cmdParamDesc[cmdIndex].param[i].type) +
-					"::" + std::string(getStrValue(sType, (int)cmdParamDesc[cmdIndex].param[i].value[0])));
-			}
-			else
-			{
-				char pStr[32];
-				for (int x = 0; x < getTypeDim(sType); x++)
-				{
-					_itoa(cmdParamDesc[cmdIndex].param[i].value[x], pStr, 10);
-					genParams.push_back(std::string(pStr));
-				}
-			}
-
-		}
-
-
-		const char* filename = cmdParamDesc[cmdIndex].caller.fileName;
-		const int lineNum = cmdParamDesc[cmdIndex].caller.line;
-
-		using namespace std;
-		string inFilePath = filename;
-		string outFilePath = inFilePath + "_";
-
-		string s;
-		ifstream ifile(inFilePath);
-		ofstream ofile(outFilePath);
-
-		std::string caller;
-
-		int lc = 1;
-		if (ifile.is_open())
-		{
-			while (lc < lineNum && getline(ifile, s))
-			{
-				ofile << s << "\n";
-				lc++;
-			}
-
-			getline(ifile, s);
-
-			unsigned int pos = 0;
-			pos = s.find(cmdParamDesc[cmdIndex].funcName);
-			if (pos != string::npos)
-			{
-				unsigned int startFuncPos = pos;
-				pos = s.find("(") + 1;
-				unsigned int posEnd = 0;
-				posEnd = s.find(";", pos);
-				posEnd = s.rfind(")", posEnd);
-				string s2;
-				s2.append(s.substr(pos, posEnd - pos));
-				s2.erase(remove(s2.begin(), s2.end(), ' '), s2.end());
-				s2.erase(remove(s2.begin(), s2.end(), '\t'), s2.end());
-
-				constexpr auto regex_str = R"(,)";
-				const std::regex reg{ regex_str };
-				auto tokens = regex_split(s2, reg);
-
-				caller.append(cmdParamDesc[cmdIndex].funcName);
-				caller.append("(");
-
-				unsigned int j = 0;
-				for (int i = 0; i < cmdParamDesc[cmdIndex].pCount; i++)
-				{
-					auto sType = cmdParamDesc[cmdIndex].param[i].typeIndex;
-					for (int x = 0; x < getTypeDim(sType); x++)
-					{
-						if (j >= tokens.size()) tokens.push_back("0");
-
-						/*if (!isNumber(tokens[i].c_str()))
-						{
-							caller.append(tokens[i]);
-						}*/
-
-						if (cmdParamDesc[cmdIndex].param[i].bypass)
-						{
-							caller.append(tokens[i]);
-						}
-						else
-						{
-							caller.append(genParams[j]);
-						}
-
-						caller.append(", ");
-
-						j++;
-					}
-				}
-
-				if (cmdParamDesc[cmdIndex].pCount > 0)
-				{
-					caller.erase(caller.size() - 2);
-				}
-				caller.append(")");
-
-				string pre = s.substr(0, startFuncPos);
-				posEnd = s.find(";", startFuncPos);
-				string post = s.substr(posEnd, s.length() - posEnd);
-
-				ofile << pre << caller << post << "\n";
-			}
-
-			while (getline(ifile, s))
-			{
-				ofile << s << "\n";
-			}
-
-			ifile.close();
-			ofile.close();
-
-			remove(inFilePath.c_str());
-			rename(outFilePath.c_str(), inFilePath.c_str());
-
-			Log("Modified:  ");
-			Log(inFilePath.c_str());
-			Log("\n");
-
-
-
-			return;
-		}
-
-		Log("unable to open source file\n");
-	}
-
-
-
-	
-
 	//SHOW STACK
 
 	bool mouseOverItem = false;
@@ -1068,6 +923,12 @@ bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 	float th = ui::style::button::zoom ? (h*1.25f - h*ui::style::button::inner*2.f) : ui::style::text::height;
 	float tw = ui::Text::getTextLen(str, th);
 
+	if (ui::style::button::zoom)
+	{
+		th *= w / (tw+ w*ui::style::button::inner * 2.f);
+		tw *= w / (tw + w*ui::style::button::inner * 2.f);
+	}
+
 	float tx = 0;
 	float ty = 0;
 
@@ -1126,14 +987,17 @@ bool ButtonPressed(const char* str, float x, float y, float w, float h)
 	return ui::lbDown & drag.isFree() & Button(str, x, y, w, h);
 }
 
-void processSlider(int cmdIndex, std::string pName,float x, float y,float w,float h)
+enum class dir {x,y};
+
+void processSlider(int cmdIndex, std::string pName,float x, float y,float w,float h, dir direction)
 {
 
 	int paramIndex = getParamIndexByStr(cmdIndex, pName.c_str());
 	float range = (float)(cmdParamDesc[cmdIndex].param[paramIndex]._max - cmdParamDesc[cmdIndex].param[paramIndex]._min);
 	ui::style::box::signed_progress = cmdParamDesc[cmdIndex].param[paramIndex]._min < 0.f ? 1.f :0.f;
-	ui::style::box::progress_x = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range;
-	std::string buttonText = pName + "::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value[0]);
+	ui::style::box::progress_y = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range*(float)(direction);
+	ui::style::box::progress_x = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range * (1.- (float)direction);
+	std::string buttonText = pName;// +"::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value[0]);
 	if (ButtonPressed(cmdIndex,buttonText.c_str(), x, y, w, h))
 	{
 		storedParam[0] = cmdParamDesc[cmdIndex].param[paramIndex].value[0];
@@ -1148,7 +1012,9 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 
 	if (drag.check(cmdIndex, paramIndex, 0))
 	{
-		cmdParamDesc[cmdIndex].param[paramIndex].value[0] = (int)(storedParam[0] + ui::mouseDelta.x * dx11::width);
+		float delta = direction == dir::x ? ui::mouseDelta.x : -ui::mouseDelta.y;
+		delta *= dx11::width;
+		cmdParamDesc[cmdIndex].param[paramIndex].value[0] = (int)(storedParam[0] + delta);
 		pLimits(cmdIndex, paramIndex, 0);
 	}
 	ui::style::box::progress_x = 0;

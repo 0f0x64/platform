@@ -393,9 +393,9 @@ namespace editor
 		//if (changed)
 		{
 			paramEdit::SaveToSource(currentCmd_backup);
-			//paramEdit::Save(currentCmd_backup);
-			SetForegroundWindow(vsHWND);
+			//SetForegroundWindow(vsHWND);
 		}
+
 		//ViewCam::setCamMat();
 		//ui::Text::Draw(str, tx, ty, th, th);
 
@@ -434,7 +434,6 @@ namespace editor
 	void SaveAndExit()
 	{
 		editor::paramEdit::SaveToSource(currentCmd);
-		editor::paramEdit::Save(currentCmd);
 
 		#if vsWindowManagement
 				auto rc = editor::primaryRC;
