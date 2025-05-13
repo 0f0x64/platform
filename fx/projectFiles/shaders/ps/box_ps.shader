@@ -17,6 +17,17 @@ cbuffer params : register(b1)
 }
 //]
 
+float2 rot(float2 pos,float a)
+{
+    float2x2 m =
+    {
+        cos(a), -sin(a),
+        sin(a), cos(a)
+    };
+    return mul(pos, m);
+
+}
+
 float roundedBoxSDF(float2 CenterPosition, float2 Size, float Radius)
 {
     return length(max(abs(CenterPosition) - Size + Radius, 0.0)) - Radius;
@@ -51,8 +62,21 @@ float4 PS(VS_OUTPUT_POS_UV input) : SV_Target
     signedProgressY*=4*pow(abs(uvs.x),2);
     progressY=lerp(progressY,signedProgressY,signed_progress);
 
+    float2 uvsR = rot(uvs,progress_radial.x*3.14*3/2);
+    float ang = saturate(1.-18*abs(uvsR.x));
+    float progressR = ang*saturate(sign(-uvsR.y-.25));
+    progressR += saturate(1-18*abs(length(uvs)-.45));
+    progressR *= saturate(1-2*length(uvs));
+    progressR = saturate(progressR*3);
+  
+    //if (progress_y>0||progress_x>0) 
+    //if (progress_y>0||progress_x>0) 
+    progressR=0;
+    
+   
 
-    color += progressX+progressY;
+    color += progressX+progressY+progressR;
+    color += progressR;
     float d = calcRA(uvs, input.sz, rad);
     float embossMask = sign(d) - saturate(d * edge * input.sz);
     float emboss = embossMask * dot(atan(uvs - .1), -.25);

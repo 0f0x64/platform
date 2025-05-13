@@ -177,8 +177,8 @@ namespace paramEdit
 					ui::style::box::rounded = .15f;
 
 					ui::style::button::zoom = true;
-					processSlider(channelIndex, "vol", x+bw*4., ch_y + (slot_h - sm_h) / 2.f, bw * 1.f, sm_h*2, dir::y);
-				//	processSlider(channelIndex, "pan", x + bw , ch_y + (slot_h - sm_h) / 2.f, bw * 2.f, sm_h*2, dir::x);
+					processSlider(channelIndex, "vol", x+bw*4., ch_y + (slot_h - sm_h) / 2.f, bw * .75f, sm_h*2, dir::y);
+					processSlider(channelIndex, "pan", x + bw*5 , ch_y + (slot_h - sm_h) / 2.f, bw*2 , sm_h*2, dir::r);
 				//	processSlider(channelIndex, "send", x + bw*2 , ch_y + (slot_h - sm_h) / 2.f, bw * 2.f, sm_h*2, dir::y);
 					ui::style::button::zoom = false;
 					ui::style::Base();

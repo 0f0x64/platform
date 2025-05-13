@@ -987,7 +987,7 @@ bool ButtonPressed(const char* str, float x, float y, float w, float h)
 	return ui::lbDown & drag.isFree() & Button(str, x, y, w, h);
 }
 
-enum class dir {x,y};
+enum class dir {x,y,r};
 
 void processSlider(int cmdIndex, std::string pName,float x, float y,float w,float h, dir direction)
 {
@@ -995,9 +995,24 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 	int paramIndex = getParamIndexByStr(cmdIndex, pName.c_str());
 	float range = (float)(cmdParamDesc[cmdIndex].param[paramIndex]._max - cmdParamDesc[cmdIndex].param[paramIndex]._min);
 	ui::style::box::signed_progress = cmdParamDesc[cmdIndex].param[paramIndex]._min < 0.f ? 1.f :0.f;
-	ui::style::box::progress_y = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range*(float)(direction);
-	ui::style::box::progress_x = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range * (1.- (float)direction);
-	std::string buttonText = pName;// +"::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value[0]);
+	
+	ui::style::box::progress_x = ui::style::box::progress_y = ui::style::box::progress_radial = 0;
+	if (direction == dir::x)
+	{ 
+		ui::style::box::progress_x = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range;
+	}
+
+	if (direction == dir::y)
+	{
+		ui::style::box::progress_y = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range;
+	}
+
+	if (direction == dir::r) 
+	{
+		ui::style::box::progress_radial = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range;
+	}
+	
+	std::string buttonText = pName +"::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value[0]);
 	if (ButtonPressed(cmdIndex,buttonText.c_str(), x, y, w, h))
 	{
 		storedParam[0] = cmdParamDesc[cmdIndex].param[paramIndex].value[0];
@@ -1012,7 +1027,7 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 
 	if (drag.check(cmdIndex, paramIndex, 0))
 	{
-		float delta = direction == dir::x ? ui::mouseDelta.x : -ui::mouseDelta.y;
+		float delta = direction == dir::y ? ui::mouseDelta.y : -ui::mouseDelta.x;
 		delta *= dx11::width;
 		cmdParamDesc[cmdIndex].param[paramIndex].value[0] = (int)(storedParam[0] + delta);
 		pLimits(cmdIndex, paramIndex, 0);

@@ -63,7 +63,7 @@ namespace tracker
 		Clip({24,10,6,1,overdub::off,0});
 		Pitch({8,1,1,0,1,3,0,0,0});
 
-		Clip({34,4,1,1,overdub::off,0});
+		Clip({43,4,1,1,overdub::off,0});
 		Pitch({4,1,3,0,0});
 
 		oscillator({ 1, 2 });
@@ -90,8 +90,8 @@ namespace tracker
 		curChannel = 0;
 
 		snare({
-			.vol = 72,
-			.pan = 22,
+			.vol = 46,
+			.pan = -29,
 			.send = 74,
 			.solo = switcher::off,
 			.mute = switcher::off
