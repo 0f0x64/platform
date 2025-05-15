@@ -17,11 +17,9 @@ namespace style {
 		float soft;
 		float edge;
 		float outlineBrightness;
-		float progress_x = 0;
-		float progress_y = 0;
-		float progress_radial = 0;
+		float progress = 0;
 		float signed_progress = 0;
-
+		float slider_type = 0;
 	};
 
 	enum class align_h { left, right, center };
@@ -66,10 +64,9 @@ namespace style {
 		box::soft = 5.f;
 		box::edge = 15.f;
 		box::outlineBrightness = 0.1f;
-		box::progress_x = 0;
-		box::progress_y = 0;
-		box::progress_radial = 0;
+		box::progress = 0;
 		box::signed_progress = 0;
+		box::slider_type = 0;
 	}
 
 	void BaseColor(bool inverted = false)

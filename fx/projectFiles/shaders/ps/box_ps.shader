@@ -1,5 +1,6 @@
 #include <../lib/constBuf.shader>
 #include <../lib/io.shader>
+#include <../lib/constants.shader>
 
 //[
 cbuffer params : register(b1)
@@ -10,10 +11,9 @@ cbuffer params : register(b1)
     float soft;
     float edge;
     float outlineBrightness;
-    float progress_x;
-    float progress_y;
-    float progress_radial;
+    float progress;
     float signed_progress;
+    float slider_type;
 }
 //]
 
@@ -49,34 +49,45 @@ float4 PS(VS_OUTPUT_POS_UV input) : SV_Target
     
     float2 uvs = (input.uv - .5);
 
-    float progressX = progress_x < input.uv.x ? 0. : .125;
-    progressX+=progress_x>0 ? abs(uvs.y)*saturate(pow(saturate(1-2*abs(input.uv.x-progress_x)),28)) :0;
-    float signedProgressX = saturate(pow(saturate(1-2*abs(uvs.x-progress_x)),8));
-    signedProgressX*=4*pow(abs(uvs.y),2);
-    progressX=lerp(progressX,signedProgressX,signed_progress);
+    float signedProgress =0;
+    float Progress =0;
 
+    if (slider_type==1)
+    {
+    Progress = progress < input.uv.x ? 0. : .125;
+    Progress+=progress>0 ? abs(uvs.y)*saturate(pow(saturate(1-2*abs(input.uv.x-progress)),28)) :0;
+    signedProgress = saturate(pow(saturate(1-2*abs(uvs.x-progress)),8));
+    signedProgress*=4*pow(abs(uvs.x),2);
+    }
+
+    if (slider_type==2)
+    {
     float iuv = 1. - input.uv.y;
-    float progressY = progress_y < iuv ? 0. : .125;
-    progressY+=progress_y>0 ? abs(uvs.x)*saturate(pow(saturate(1-2*abs(iuv-progress_y)),28)) :0;
-    float signedProgressY = saturate(pow(saturate(1-2*abs(uvs.y-progress_y)),8));
-    signedProgressY*=4*pow(abs(uvs.x),2);
-    progressY=lerp(progressY,signedProgressY,signed_progress);
-
-    float2 uvsR = rot(uvs,progress_radial.x*3.14*3/2);
-    float ang = saturate(1.-18*abs(uvsR.x));
-    float progressR = ang*saturate(sign(-uvsR.y-.25));
-    progressR += saturate(1-18*abs(length(uvs)-.45));
-    progressR *= saturate(1-2*length(uvs));
-    progressR = saturate(progressR*3);
-  
-    //if (progress_y>0||progress_x>0) 
-    //if (progress_y>0||progress_x>0) 
-    progressR=0;
+    Progress = progress < iuv ? 0. : .125;
+    Progress+=progress>0 ? (.4+abs(uvs.x*2))*saturate(pow(saturate(1-2*abs(iuv-progress)),28)) :0;
+    signedProgress = saturate(pow(saturate(1-2*abs(uvs.y-progress)),8));
+    signedProgress*=4*pow(abs(uvs.y),2);
     
-   
+    }
 
-    color += progressX+progressY+progressR;
-    color += progressR;
+    if (slider_type==3)
+    {
+    float2 uvsR = rot(uvs,progress.x*PI*3/2);
+    float ang = saturate(1.-28*abs(uvsR.x));
+    Progress = ang*saturate(sign(-uvsR.y-.2));
+    Progress += saturate(1-38*abs(length(uvs)-.45));
+    //Progress *= saturate(1-2.5*length(uvs))*4;
+    Progress *= abs(atan2(uvs.x,uvs.y))>PI/4.2;
+    signedProgress = Progress;
+    
+    }
+  
+    
+    
+    Progress=lerp(Progress,signedProgress,signed_progress);
+   
+    color += Progress;
+
     float d = calcRA(uvs, input.sz, rad);
     float embossMask = sign(d) - saturate(d * edge * input.sz);
     float emboss = embossMask * dot(atan(uvs - .1), -.25);

@@ -211,10 +211,10 @@ namespace ui
 			ps::box_ps.params.soft = box::soft;
 			ps::box_ps.params.edge = box::edge;
 			ps::box_ps.params.outlineBrightness = box::outlineBrightness;
-			ps::box_ps.params.progress_x = ui::style::box::progress_x;
-			ps::box_ps.params.progress_y = ui::style::box::progress_y;
-			ps::box_ps.params.progress_radial = ui::style::box::progress_radial;
+			ps::box_ps.params.progress = ui::style::box::progress;
 			ps::box_ps.params.signed_progress = (float)( ui::style::box::signed_progress ? 1 : 0);
+			ps::box_ps.params.slider_type = (float)(ui::style::box::slider_type);
+
 			ps::box_ps.set();
 
 			Draw::NullDrawer(1, 1);

@@ -170,6 +170,7 @@ namespace paramEdit
 					float slot_h = ch_h / 2.f;
 					float low = ch_y + ch_h / 2.f + (slot_h - sm_h) / 2.f;
 
+					ui::style::button::zoom = false;
 					processSwitcher(channelIndex, "solo", bx, ch_y + (slot_h - sm_h) / 2.f, bw, sm_h, "S");
 					processSwitcher(channelIndex, "mute", bx, low, bw, sm_h, "M");
 
@@ -177,8 +178,14 @@ namespace paramEdit
 					ui::style::box::rounded = .15f;
 
 					ui::style::button::zoom = true;
-					processSlider(channelIndex, "vol", x+bw*4., ch_y + (slot_h - sm_h) / 2.f, bw * .75f, sm_h*2, dir::y);
+					
+					processSlider(channelIndex, "vol", x + bw*4., ch_y + (slot_h - sm_h) / 2.f, bw * .75f, sm_h*2, dir::y);
+					
+					ui::style::box::rounded = .5f;
 					processSlider(channelIndex, "pan", x + bw*5 , ch_y + (slot_h - sm_h) / 2.f, bw*2 , sm_h*2, dir::r);
+
+					ui::style::box::slider_type = 0;
+
 				//	processSlider(channelIndex, "send", x + bw*2 , ch_y + (slot_h - sm_h) / 2.f, bw * 2.f, sm_h*2, dir::y);
 					ui::style::button::zoom = false;
 					ui::style::Base();

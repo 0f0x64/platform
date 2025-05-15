@@ -90,8 +90,8 @@ namespace tracker
 		curChannel = 0;
 
 		snare({
-			.vol = 46,
-			.pan = -29,
+			.vol = 74,
+			.pan = -90,
 			.send = 74,
 			.solo = switcher::off,
 			.mute = switcher::off

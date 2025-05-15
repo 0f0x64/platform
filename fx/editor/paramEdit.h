@@ -996,22 +996,9 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 	float range = (float)(cmdParamDesc[cmdIndex].param[paramIndex]._max - cmdParamDesc[cmdIndex].param[paramIndex]._min);
 	ui::style::box::signed_progress = cmdParamDesc[cmdIndex].param[paramIndex]._min < 0.f ? 1.f :0.f;
 	
-	ui::style::box::progress_x = ui::style::box::progress_y = ui::style::box::progress_radial = 0;
-	if (direction == dir::x)
-	{ 
-		ui::style::box::progress_x = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range;
-	}
-
-	if (direction == dir::y)
-	{
-		ui::style::box::progress_y = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range;
-	}
-
-	if (direction == dir::r) 
-	{
-		ui::style::box::progress_radial = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range;
-	}
-	
+	ui::style::box::progress = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range;;
+	ui::style::box::slider_type = (int)direction+1;
+		
 	std::string buttonText = pName +"::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value[0]);
 	if (ButtonPressed(cmdIndex,buttonText.c_str(), x, y, w, h))
 	{
@@ -1027,12 +1014,12 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 
 	if (drag.check(cmdIndex, paramIndex, 0))
 	{
-		float delta = direction == dir::y ? ui::mouseDelta.y : -ui::mouseDelta.x;
+		float delta = direction == dir::y ? -ui::mouseDelta.y : ui::mouseDelta.x;
 		delta *= dx11::width;
 		cmdParamDesc[cmdIndex].param[paramIndex].value[0] = (int)(storedParam[0] + delta);
 		pLimits(cmdIndex, paramIndex, 0);
 	}
-	ui::style::box::progress_x = 0;
+	ui::style::box::progress = 0;
 }
 
 void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w, float h, const char* shortName = "")
