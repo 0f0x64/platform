@@ -10,20 +10,32 @@ namespace Device
 		aspect = float(height) / float(width);
 		iaspect = float(width) / float(height);
 
-		DXGI_SWAP_CHAIN_DESC sd;
-		ZeroMemory(&sd, sizeof(sd));
-		sd.BufferCount = 2;
-		sd.BufferDesc.Width = width;
-		sd.BufferDesc.Height = height;
-		sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		sd.BufferDesc.RefreshRate.Numerator = FRAMES_PER_SECOND;
-		sd.BufferDesc.RefreshRate.Denominator = 1;
-		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-		sd.OutputWindow = hWnd;
-		sd.SampleDesc.Count = 1;
-		sd.SampleDesc.Quality = 0;
-		sd.Windowed = EditMode;
+		DXGI_SWAP_CHAIN_DESC sd= {
+
+				.BufferDesc = {
+					.Width = (UINT)width,
+					.Height = (UINT)height,
+					.RefreshRate = {
+						.Numerator = FRAMES_PER_SECOND,
+						.Denominator = 1
+						},
+					.Format = DXGI_FORMAT_R8G8B8A8_UNORM,
+					.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED,
+					.Scaling = DXGI_MODE_SCALING_UNSPECIFIED
+				},
+
+				.SampleDesc = {
+					.Count = 1,
+					.Quality = 0
+				},
+
+				.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
+				.BufferCount = 2,
+				.OutputWindow = hWnd,
+				.Windowed = EditMode,
+				.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL,
+				.Flags = 0
+		};
 
 		hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
 		LogIfError("device not created\n");

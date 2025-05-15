@@ -77,6 +77,16 @@ namespace Object {
 
 		ps::basic.set();
 
+		
+		/*if (dx11::Shaders::PS[(int)dx11::Shaders::pixel::basic].params)
+		{
+			dx11::ConstBuf::Create(dx11::Shaders::PS[(int)dx11::Shaders::pixel::basic].params, sizeof(ps::basic.params));
+		}
+		context->UpdateSubresource(dx11::Shaders::PS[(int)dx11::Shaders::pixel::basic].params, 0, NULL, &ps::basic.params, 0, 0);
+		context->PSSetConstantBuffers(6, 1, &dx11::Shaders::PS[(int)dx11::Shaders::pixel::basic].params);
+		*/
+
+
 		Drawer::NullDrawer({(int)gX*(int)gY,2});
 
 		reflect_close;

@@ -109,8 +109,8 @@ namespace Loop
 
 	void mainLoop()
 	{
-		//scene1();
-		track();
+		scene1();
+		//track();
 
 	}
 

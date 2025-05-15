@@ -15,11 +15,13 @@ namespace Shaders {
 	typedef struct {
 		ID3D11VertexShader* pShader;
 		ID3DBlob* pBlob;
+		ID3D11Buffer* params;
 	} VertexShader;
 
 	typedef struct {
 		ID3D11PixelShader* pShader;
 		ID3DBlob* pBlob;
+		ID3D11Buffer* params;
 	} PixelShader;
 
 	VertexShader VS[255];
@@ -70,9 +72,7 @@ namespace Shaders {
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name);
 
-			HRESULT hr;
-
-			hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", "vs_4_1", NULL, NULL, &VS[i].pBlob, &pErrorBlob);
+			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", "vs_4_1", NULL, NULL, &VS[i].pBlob, &pErrorBlob);
 			CompilerLog(source, hr, "vertex shader compiled: ");
 
 			if (hr == S_OK)
@@ -87,9 +87,7 @@ namespace Shaders {
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name);
 
-			HRESULT hr;
-
-			hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS", "ps_4_1", NULL, NULL, &PS[i].pBlob, &pErrorBlob);
+			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS", "ps_4_1", NULL, NULL, &PS[i].pBlob, &pErrorBlob);
 			CompilerLog(source, hr, "pixel shader compiled: ");
 
 			if (hr == S_OK)

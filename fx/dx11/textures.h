@@ -40,17 +40,22 @@ namespace Textures
 	{
 		auto cTex = Texture[i];
 
-		tdesc.Width = (UINT)cTex.size.x;
-		tdesc.Height = (UINT)cTex.size.y;
-		tdesc.MipLevels = cTex.mipMaps ? (UINT)(_log2(max(cTex.size.x, cTex.size.y))) : 0;
-		tdesc.ArraySize = 1;
-		tdesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-		tdesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-		tdesc.CPUAccessFlags = 0;
-		tdesc.SampleDesc.Count = 1;
-		tdesc.SampleDesc.Quality = 0;
-		tdesc.Usage = D3D11_USAGE_DEFAULT;
-		tdesc.Format = dxTFormat[cTex.format];
+		tdesc = {
+			.Width = (UINT)cTex.size.x,
+			.Height = (UINT)cTex.size.y,
+			.MipLevels = cTex.mipMaps ? (UINT)(_log2(max(cTex.size.x, cTex.size.y))) : 0,
+			.ArraySize = 1,
+			.Format = dxTFormat[cTex.format],
+			.SampleDesc = {
+				.Count = 1,
+				.Quality = 0,
+				},
+			.Usage = D3D11_USAGE_DEFAULT,
+			.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET,
+			.CPUAccessFlags = 0,
+			.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS
+		};
+		
 
 		if (cTex.type == cube)
 		{
@@ -132,16 +137,16 @@ namespace Textures
 		tdesc.Format = DXGI_FORMAT_R32_TYPELESS;
 		tdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 		tdesc.MiscFlags = 0;
+
 		HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &Texture[i].pDepth);
 		
 		LogIfError ("CreateDepthStencilView error\n");
-		
 
 		descDSV.Format = DXGI_FORMAT_D32_FLOAT;
 		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		descDSV.Flags = 0;
 
-		for (unsigned int m = 0; m < max(1,tdesc.MipLevels); m++)
+		for (unsigned int m = 0; m < max(1, tdesc.MipLevels); m++)
 		{
 			descDSV.Texture2D.MipSlice = m;
 			HRESULT hr = device->CreateDepthStencilView(Texture[i].pDepth, &descDSV, &Texture[i].DepthStencilView[m]);
@@ -199,14 +204,15 @@ namespace Textures
 		XMFLOAT2 size = Texture[(int)texId].size;
 		float denom = powf(2, level);
 
-		D3D11_VIEWPORT vp;
+		D3D11_VIEWPORT vp = {
+			.TopLeftX = 0,
+			.TopLeftY = 0,
+			.Width = (FLOAT)size.x / denom,
+			.Height = (FLOAT)size.y / denom,
+			.MinDepth = 0.0f,
+			.MaxDepth = 1.0f
+		};
 
-		vp.Width = (FLOAT)size.x / denom;
-		vp.Height = (FLOAT)size.y / denom;
-		vp.MinDepth = 0.0f;
-		vp.MaxDepth = 1.0f;
-		vp.TopLeftX = 0;
-		vp.TopLeftY = 0;
 
 		context->RSSetViewports(1, &vp);
 

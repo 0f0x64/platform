@@ -52,7 +52,7 @@ namespace ConstBuf
 		bd.StructureByteStride = 16;
 
 		HRESULT hr = device->CreateBuffer(&bd, NULL, &buf);
-		LogIfError("constant bufferV fail\n");
+		LogIfError("constant buffer fail\n");
 	}
 
 	void Init()

@@ -1,4 +1,5 @@
 	#define Shader(VariableName) VariableName,
+
 	enum vertex {
 		#include "generated\vsList.h"
 	};
