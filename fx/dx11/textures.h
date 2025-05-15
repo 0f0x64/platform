@@ -7,7 +7,12 @@ namespace Textures
 	enum tType { flat, cube };
 	enum tFormat { u8, s8, s16, s32 };
 
-	DXGI_FORMAT dxTFormat[4] = { DXGI_FORMAT_R8G8B8A8_UNORM ,DXGI_FORMAT_R8G8B8A8_SNORM ,DXGI_FORMAT_R16G16B16A16_FLOAT ,DXGI_FORMAT_R32G32B32A32_FLOAT };
+	DXGI_FORMAT dxTFormat[] = { 
+		DXGI_FORMAT_R8G8B8A8_UNORM,
+		DXGI_FORMAT_R8G8B8A8_SNORM,
+		DXGI_FORMAT_R16G16B16A16_FLOAT,
+		DXGI_FORMAT_R32G32B32A32_FLOAT 
+	};
 
 	D3D11_TEXTURE2D_DESC tdesc;
 	D3D11_SHADER_RESOURCE_VIEW_DESC svDesc;
@@ -36,10 +41,8 @@ namespace Textures
 
 	byte currentRT = 0;
 
-	void CreateTex(int i)
+	void fill_tdesc(auto &cTex)
 	{
-		auto cTex = Texture[i];
-
 		tdesc = {
 			.Width = (UINT)cTex.size.x,
 			.Height = (UINT)cTex.size.y,
@@ -55,6 +58,13 @@ namespace Textures
 			.CPUAccessFlags = 0,
 			.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS
 		};
+	}
+
+	void CreateTex(int i)
+	{
+		auto cTex = Texture[i];
+
+		fill_tdesc(cTex);
 		
 
 		if (cTex.type == cube)
@@ -125,17 +135,10 @@ namespace Textures
 	{
 		auto cTex = Texture[i];
 
-		tdesc.Width = (UINT)cTex.size.x;
-		tdesc.Height = (UINT)cTex.size.y;
-		tdesc.MipLevels = cTex.mipMaps ? (UINT)(_log2(max(cTex.size.x, cTex.size.y))) : 0;
-		tdesc.CPUAccessFlags = 0;
-		tdesc.SampleDesc.Count = 1;
-		tdesc.SampleDesc.Quality = 0;
-		tdesc.Usage = D3D11_USAGE_DEFAULT;
+		fill_tdesc(cTex);
 
-		tdesc.ArraySize = 1;
-		tdesc.Format = DXGI_FORMAT_R32_TYPELESS;
 		tdesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+		tdesc.Format = DXGI_FORMAT_R32_TYPELESS;
 		tdesc.MiscFlags = 0;
 
 		HRESULT hr = device->CreateTexture2D(&tdesc, NULL, &Texture[i].pDepth);

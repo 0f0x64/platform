@@ -2,6 +2,9 @@ namespace Shaders {
 
 	#include "dx11\shadersReflection.h"
 
+	char VertexShaderModel[] = "vs_4_1";
+	char PixelShaderModel[] = "ps_4_1";
+
 	#if !EditMode
 
 	#include "..\generated\processedShaders.h"
@@ -72,7 +75,7 @@ namespace Shaders {
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name);
 
-			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", "vs_4_1", NULL, NULL, &VS[i].pBlob, &pErrorBlob);
+			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", VertexShaderModel, NULL, NULL, &VS[i].pBlob, &pErrorBlob);
 			CompilerLog(source, hr, "vertex shader compiled: ");
 
 			if (hr == S_OK)
@@ -87,7 +90,7 @@ namespace Shaders {
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name);
 
-			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS", "ps_4_1", NULL, NULL, &PS[i].pBlob, &pErrorBlob);
+			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS", PixelShaderModel, NULL, NULL, &PS[i].pBlob, &pErrorBlob);
 			CompilerLog(source, hr, "pixel shader compiled: ");
 
 			if (hr == S_OK)
@@ -179,7 +182,7 @@ namespace Shaders {
 
 			VS[n].pBlob = NULL;
 			auto ptr = processIncludes(shaderText);
-			hr = D3DCompile(ptr, strlen(ptr), NULL, NULL, NULL, "VS", "vs_4_1", NULL, NULL, &VS[n].pBlob, &pErrorBlob);
+			hr = D3DCompile(ptr, strlen(ptr), NULL, NULL, NULL, "VS", VertexShaderModel, NULL, NULL, &VS[n].pBlob, &pErrorBlob);
 
 			LogBlobIfError;
 
@@ -199,7 +202,7 @@ namespace Shaders {
 
 			PS[n].pBlob = NULL;
 			auto ptr = processIncludes(shaderText);
-			hr = D3DCompile(ptr, strlen(ptr), NULL, NULL, NULL, "PS", "ps_4_1", NULL, NULL, &PS[n].pBlob, &pErrorBlob);
+			hr = D3DCompile(ptr, strlen(ptr), NULL, NULL, NULL, "PS", PixelShaderModel, NULL, NULL, &PS[n].pBlob, &pErrorBlob);
 
 			LogBlobIfError;
 
