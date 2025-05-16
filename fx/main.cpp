@@ -43,7 +43,7 @@ int cmdCounter = 0;//reset it in loop start point
 
 using namespace dx11;
 
-#include "generated\constBufReflect.h"
+
 
 #define regDrawer(name)
 #define reflect

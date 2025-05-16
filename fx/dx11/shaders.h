@@ -32,6 +32,14 @@ namespace Shaders {
 
 	ID3DBlob* pErrorBlob;
 
+	void updateAndSetCB()
+	{
+	//context->UpdateSubresource(dx11::Shaders::PS[(int)dx11::Shaders::pixel::basic].params, 0, NULL, &ps::basic.params, 0, 0);
+	//	context->PSSetConstantBuffers(6, 1, &dx11::Shaders::PS[(int)dx11::Shaders::pixel::basic].params);
+
+	}
+
+
 	#if EditMode
 
 		bool firstRun = true;
@@ -229,3 +237,18 @@ namespace Shaders {
 	}
 
 }
+
+#include "generated\constBufReflect.h"
+
+void paramConstBufInit()
+{
+	int i = 0;
+	#define Shader(name) dx11::ConstBuf::Create(dx11::Shaders::VS[i].params, sizeof(dx11::vs::##name.params));i++;
+	#include "../generated/vsList.h"
+
+	i = 0;
+	#define Shader(name) dx11::ConstBuf::Create(dx11::Shaders::PS[i].params, sizeof(dx11::ps::##name.params));i++;
+	#include "../generated/psList.h"
+}
+
+#undef Shader

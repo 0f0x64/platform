@@ -1,3 +1,5 @@
+void paramConstBufInit();
+
 namespace ConstBuf
 {
 	ID3D11Buffer* buffer[6];
@@ -63,6 +65,8 @@ namespace ConstBuf
 		Create(buffer[(int)cBuffer::camera], sizeof(camera));
 		Create(buffer[(int)cBuffer::frame], sizeof(frame));
 		Create(buffer[(int)cBuffer::global], sizeof(global));
+
+		paramConstBufInit();
 	}
 
 	void Update(cBuffer i)

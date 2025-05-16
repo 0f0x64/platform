@@ -51,9 +51,9 @@ namespace Camera
 	void Set(positionF eye, positionF at, positionF up, float angle)
 	{
 
-		XMVECTOR Eye = XMVectorSet(eye.x,eye.y,eye.z, 0.0f);
-		XMVECTOR At =  XMVectorSet(at.x, at.y, at.z, 0.0f);
-		XMVECTOR Up =  XMVectorSet(up.x, up.y, up.z, 0.0f);
+		XMVECTOR Eye = XMVECTOR{eye.x,eye.y,eye.z, 0.0f};
+		XMVECTOR At =  XMVECTOR{at.x, at.y, at.z, 0.0f};
+		XMVECTOR Up =  XMVECTOR{up.x, up.y, up.z, 0.0f};
 
 		ConstBuf::camera = {
 			.world = XMMatrixIdentity(),

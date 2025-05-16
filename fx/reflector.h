@@ -307,20 +307,31 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 		}
 	}
 
-	if (isParams) ofile << params << "} params;\n\n";
+	if (isParams) { 
+		ofile << params << "} params;\n\n"; 
+	}
+	else {
+		ofile << "struct {} params;\n\n";
+	}
+
 	if (isTextures) ofile << textures << "} textures;\n\n";
 	if (isSamplers) ofile << samplers << "} samplers;\n\n";
 
 	ofile << "void set () {\n";
+
 	if (type == sType::vertex) ofile << "Shaders::vShader(";
 	if (type == sType::pixel) ofile << "Shaders::pShader(";
 	ofile << sIndex << ");\n";
 	if (type == sType::vertex && isParams)
 	{
+		ofile << "context->UpdateSubresource(dx11::Shaders::VS[" << sIndex << "].params, 0, NULL, &params, 0, 0);\n";
+		ofile << "context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[" << sIndex << "].params);\n";
 		ofile << "memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));\n";
 	}
 	if (type == sType::pixel && isParams)
 	{
+		ofile << "context->UpdateSubresource(dx11::Shaders::PS[" << sIndex << "].params, 0, NULL, &params, 0, 0);\n";
+		ofile << "context->PSSetConstantBuffers(1, 1, &dx11::Shaders::VS[" << sIndex << "].params);\n";
 		ofile << "memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));\n";
 	}
 

@@ -81,7 +81,6 @@ namespace dx11
 		aspect = float(height) / float(width);
 		iaspect = float(width) / float(height);
 
-		//context->OMSetRenderTargets(0, 0, 0);
 		ID3D11RenderTargetView* nullViews[] = { nullptr };
 		context->OMSetRenderTargets(1, nullViews, 0);
 
