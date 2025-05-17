@@ -3,7 +3,7 @@
 #include <../lib/constants.shader>
 
 //[
-cbuffer params : register(b1)
+cbuffer params : register(b0)
 {
     float sx,sy,sz;
 };

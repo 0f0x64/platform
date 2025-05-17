@@ -2,7 +2,7 @@
 #include <../lib/constBuf.shader>
 
 //[
-cbuffer params : register(b1)
+cbuffer params : register(b0)
 {
     float r, g, b, a;
 };

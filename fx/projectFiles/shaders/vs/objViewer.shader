@@ -28,7 +28,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
 {
     VS_OUTPUT output = (VS_OUTPUT) 0;
     
-    float4 grid = getGrid(vID, 1, float2(gX,gY));
+    float4 grid = getGrid(vID, 1, int2(gX,gY));
     float2 uv = grid.xy;
     
     float4 pos = float4(positions.SampleLevel(sam1, uv, 0).xyz,1);

@@ -427,7 +427,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 	if (type == sType::pixel && isParams)
 	{
 		ofile << "context->UpdateSubresource(dx11::Shaders::PS[" << sIndex << "].params, 0, NULL, &params, 0, 0);\n";
-		ofile << "context->PSSetConstantBuffers(1, 1, &dx11::Shaders::PS[" << sIndex << "].params);\n";
+		ofile << "context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[" << sIndex << "].params);\n";
 	}
 	if (type == sType::vertex) ofile << "Shaders::vShader(";
 	if (type == sType::pixel) ofile << "Shaders::pShader(";

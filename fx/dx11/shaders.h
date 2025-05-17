@@ -2,8 +2,8 @@ namespace Shaders {
 
 	#include "dx11\shadersReflection.h"
 
-	char VertexShaderModel[] = "vs_4_1";
-	char PixelShaderModel[] = "ps_4_1";
+	const char VertexShaderModel[] = "vs_4_1";
+	const char PixelShaderModel[] = "ps_4_1";
 
 	#if !EditMode
 
@@ -31,14 +31,6 @@ namespace Shaders {
 	PixelShader PS[255];
 
 	ID3DBlob* pErrorBlob;
-
-	void updateAndSetCB()
-	{
-	//context->UpdateSubresource(dx11::Shaders::PS[(int)dx11::Shaders::pixel::basic].params, 0, NULL, &ps::basic.params, 0, 0);
-	//	context->PSSetConstantBuffers(6, 1, &dx11::Shaders::PS[(int)dx11::Shaders::pixel::basic].params);
-
-	}
-
 
 	#if EditMode
 

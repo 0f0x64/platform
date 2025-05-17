@@ -82,7 +82,7 @@ namespace Loop
 			.geometry = texture::obj1pos,
 			.normals = texture::obj1nrml,
 			.quality = 0,
-			.pos_x = 113,
+			.pos_x = 210,
 			.pos_y = 0,
 			.pos_z = 0
 		});
