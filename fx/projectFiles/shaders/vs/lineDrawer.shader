@@ -3,6 +3,10 @@
 #include <../lib/constants.shader>
 
 //[
+cbuffer params : register(b0)
+{
+    float4 _pos [4000];
+}
 
 cbuffer geo : register(b6)
 {

@@ -180,6 +180,8 @@ struct int2 { int x; int y; };
 struct int3 { int x; int y; int z; };
 struct int4 { int x; int y; int z; int w; };
 
+#define float4x4 XMMATRIX
+
 
 const float intToFloatDenom = 255.f;
 

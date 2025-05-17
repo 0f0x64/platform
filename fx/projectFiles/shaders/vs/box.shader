@@ -4,7 +4,7 @@
 #include <../lib/utils.shader>
 
 //[
-cbuffer geo : register(b6)
+cbuffer params : register(b0)
 {
     float4 pos_size[256];
 }

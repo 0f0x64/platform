@@ -11,6 +11,7 @@ SamplerState sam1 : register(s0);
 cbuffer params : register(b0)
 {
     int gX, gY;
+    float4x4 model;
 }
 //]
 

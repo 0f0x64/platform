@@ -94,13 +94,7 @@ namespace ui
 	{
 		void LineNullDrawer(int vertexCount, int instances)
 		{
-		/*	ConstBuf::Update(ConstBuf::cBuffer::drawerV);
-			ConstBuf::ConstToVertex(ConstBuf::cBuffer::drawerV);
-			ConstBuf::Update(ConstBuf::cBuffer::drawerP);
-			ConstBuf::ConstToPixel(ConstBuf::cBuffer::drawerP);*/
-
 			ConstBuffer::f4arrayUpdateAndSet();
-
 			context->DrawInstanced(vertexCount, instances, 0, 0);
 		}
 
@@ -145,10 +139,13 @@ namespace ui
 
 		void Draw3d(int count, float r = 1, float g = 1, float b = 1, float a = 1)
 		{
-			ps::lineDrawer_ps.params.color = { r,g,b,a };
+			ps::lineDrawerUV_ps.params.color = { r,g,b,a };
 			ps::lineDrawerUV_ps.set();
 
 			ConstBuffer::pCounter = 0;
+			vs::lineDrawer3d.params = {
+				.model = ConstBuf::camera.view[0]
+			};
 
 			for (int i = 0; i < count; i++)
 			{
@@ -191,8 +188,10 @@ namespace ui
 			using namespace style;
 
 			ConstBuffer::pCounter = 0;
-			ConstBuffer::SetFloat4Const(x, y, w, h);
-			ConstBuffer::f4arrayUpdateAndSet();
+
+			vs::box.params = {
+				.pos_size = {x, y, w, h}
+			};
 
 			vs::box.set();
 
@@ -269,7 +268,8 @@ namespace ui
 
 			for (unsigned int i = 0; i < strlen(str); i++)
 			{
-				ConstBuffer::SetFloat4Const(x + offset, y, (float)(str[i] - 32), 0);
+				   ConstBuffer::SetFloat4Const(x + offset, y, (float)(str[i] - 32), 0);
+				vs::letter.params._pos_size[i] = { x + offset, y, (float)(str[i] - 32), 0};
 				offset += getLetterOffset(str[i], w * aspect);
 			}
 

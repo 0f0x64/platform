@@ -21,19 +21,6 @@ namespace Object {
 		int denom = (int)pow(2, (float)in.quality);
 		float q = intToFloatDenom;
 		
-		ConstBuf::drawerMat = {
-
-			.model = XMMatrixTranspose(XMMatrixTranslation(in.pos_x / q, in.pos_y / q, in.pos_z / q)),
-
-			#if EditMode
-				.hilight = cmdCounter - 1 == hilightedCmd ? 1.f : 0.f
-			#else 
-				.hilight = 0.f
-			#endif
-		};
-
-		ConstBuf::Update(ConstBuf::cBuffer::drawerMat);
-
 		int gX = Textures::Texture[(int)in.geometry].size.x / denom;
 		int gY = Textures::Texture[(int)in.geometry].size.y / denom;
 
@@ -41,7 +28,8 @@ namespace Object {
 
 			.params = {
 				.gX = gX,
-				.gY = gY
+				.gY = gY,
+				.model = XMMatrixTranspose(XMMatrixTranslation(in.pos_x / q, in.pos_y / q, in.pos_z / q)),
 			},
 
 			.textures = {
@@ -61,6 +49,11 @@ namespace Object {
 		ps::basic = 
 		{
 			.params = {
+				#if EditMode
+					.hilight = cmdCounter - 1 == hilightedCmd ? 1.f : 0.f
+				#else 
+					.hilight = 0.f
+				#endif
 				},
 
 			.textures = {

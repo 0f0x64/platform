@@ -11,7 +11,7 @@ SamplerState sam1 : register(s0);
 //[
 cbuffer params : register(b0)
 {
-    float r,g,b,a;
+    float hilight;
 };
 //]
 

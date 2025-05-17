@@ -2,9 +2,14 @@ namespace vs{
 
 struct { 
 
-struct {} params;
+struct 
+{
+float4 pos_size[256];
+} params;
 
 void set () {
+context->UpdateSubresource(dx11::Shaders::VS[0].params, 0, NULL, &params, 0, 0);
+context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[0].params);
 Shaders::vShader(0);
 }
 
@@ -20,6 +25,7 @@ struct
 {
 float width;
 float height;
+float4 _pos_size[256];
 } params;
 
 void set () {
@@ -36,9 +42,14 @@ namespace vs{
 
 struct { 
 
-struct {} params;
+struct 
+{
+float4 _pos [4000];
+} params;
 
 void set () {
+context->UpdateSubresource(dx11::Shaders::VS[2].params, 0, NULL, &params, 0, 0);
+context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[2].params);
 Shaders::vShader(2);
 }
 
@@ -50,9 +61,15 @@ namespace vs{
 
 struct { 
 
-struct {} params;
+struct 
+{
+float4x4 model;
+float4 _pos [4000];
+} params;
 
 void set () {
+context->UpdateSubresource(dx11::Shaders::VS[3].params, 0, NULL, &params, 0, 0);
+context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[3].params);
 Shaders::vShader(3);
 }
 
@@ -68,6 +85,7 @@ struct
 {
 int gX;
 int gY;
+float4x4 model;
 } params;
 
 struct 
@@ -136,10 +154,7 @@ struct {
 
 struct 
 {
-float r;
-float g;
-float b;
-float a;
+float hilight;
 } params;
 
 struct 
@@ -318,10 +333,7 @@ struct {
 
 struct 
 {
-float r;
-float g;
-float b;
-float a;
+float4 color;
 } params;
 
 void set () {

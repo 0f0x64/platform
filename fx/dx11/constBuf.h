@@ -8,18 +8,6 @@ namespace ConstBuf
 
 	#define constCount 32
 
-	//b0 - use "params" label in shader
-	float drawerV[constCount];//update per draw call
-
-	//b1 - use "params" label in shader
-	float drawerP[constCount];//update per draw call
-
-	//b2
-	struct {
-		XMMATRIX model;
-		float hilight;
-	} drawerMat;//update per draw call
-
 	//b3 
 	struct {
 		XMMATRIX world[2];
@@ -36,7 +24,7 @@ namespace ConstBuf
 	//b5
 	XMFLOAT4 global[constCount];//update once on start
 
-	char* cBufPtr[6] = { (char*)&drawerV,(char*)&drawerP,(char*)&drawerMat,(char*)&camera ,(char*)&frame,(char*)&global};
+	char* cBufPtr[6] = { NULL,NULL,NULL,(char*)&camera ,(char*)&frame,(char*)&global};
 
 	int roundUp(int n, int r)
 	{
@@ -61,7 +49,6 @@ namespace ConstBuf
 	{
 		paramConstBufInit();
 
-		Create(buffer[(int)cBuffer::drawerMat], sizeof(drawerMat));
 		Create(buffer[(int)cBuffer::camera], sizeof(camera));
 		Create(buffer[(int)cBuffer::frame], sizeof(frame));
 		Create(buffer[(int)cBuffer::global], sizeof(global));

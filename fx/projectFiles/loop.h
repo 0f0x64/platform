@@ -17,7 +17,7 @@ namespace Loop
 	{
 		InputAsm::Set({topology::triList});
 		ConstBuf::Update(ConstBuf::cBuffer::global);
-		for (int i = 2; i < 6; i++) { ConstBuf::ConstToVertex((ConstBuf::cBuffer)i); ConstBuf::ConstToPixel((ConstBuf::cBuffer)i); }
+		for (int i = 3; i < 6; i++) { ConstBuf::ConstToVertex((ConstBuf::cBuffer)i); ConstBuf::ConstToPixel((ConstBuf::cBuffer)i); }
 		isPrecalc = true;
 		precalcOfs = cmdCounter;
 	}
@@ -82,7 +82,7 @@ namespace Loop
 			.geometry = texture::obj1pos,
 			.normals = texture::obj1nrml,
 			.quality = 0,
-			.pos_x = 210,
+			.pos_x = 108,
 			.pos_y = 0,
 			.pos_z = 0
 		});

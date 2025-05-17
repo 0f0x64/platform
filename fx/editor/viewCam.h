@@ -272,9 +272,6 @@ namespace ViewCam
 		XMVECTOR Eye = currentCamera.ViewVec;
 		//ConstBuf::drawerMat.model = XMMatrixTranspose(XMMatrixLookAtLH(Eye, XMVECTOR{ 0,0,0 }, currentCamera.upVec));
 		auto m = ConstBuf::camera.view[0];
-		ConstBuf::drawerMat.model = ConstBuf::camera.view[0];
-		ConstBuf::Update(ConstBuf::cBuffer::drawerMat);
-
 		ui::Line::Draw3d(counter * 3 / 2, 1, 1, 1, axisAlpha);
 	}
 
