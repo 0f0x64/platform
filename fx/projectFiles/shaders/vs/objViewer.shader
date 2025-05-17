@@ -10,7 +10,7 @@ SamplerState sam1 : register(s0);
 //[
 cbuffer params : register(b0)
 {
-    float gX, gY;
+    int gX, gY;
 }
 //]
 

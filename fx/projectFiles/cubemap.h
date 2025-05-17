@@ -43,8 +43,8 @@ namespace Cubemap {
 		int gY = 3;
 
 		vs::simpleCube.params = {
-			.gX = (float)gX,
-			.gY = (float)gY
+			.gX = gX,
+			.gY = gY
 		};
 
 		vs::simpleCube.set();

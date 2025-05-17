@@ -23,10 +23,9 @@ float height;
 } params;
 
 void set () {
-Shaders::vShader(1);
 context->UpdateSubresource(dx11::Shaders::VS[1].params, 0, NULL, &params, 0, 0);
 context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[1].params);
-memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
+Shaders::vShader(1);
 }
 
 } letter;
@@ -67,8 +66,8 @@ struct {
 
 struct 
 {
-float gX;
-float gY;
+int gX;
+int gY;
 } params;
 
 struct 
@@ -85,10 +84,9 @@ addr sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::vShader(4);
 context->UpdateSubresource(dx11::Shaders::VS[4].params, 0, NULL, &params, 0, 0);
 context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[4].params);
-memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
+Shaders::vShader(4);
 Textures::TextureToShader((texture)textures.positions, 0, targetshader::vertex); 
 Textures::TextureToShader((texture)textures.normals, 1, targetshader::vertex); 
 Sampler::Sampler(targetshader::vertex, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
@@ -118,15 +116,14 @@ struct {
 
 struct 
 {
-float gX;
-float gY;
+int gX;
+int gY;
 } params;
 
 void set () {
-Shaders::vShader(6);
 context->UpdateSubresource(dx11::Shaders::VS[6].params, 0, NULL, &params, 0, 0);
 context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[6].params);
-memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));
+Shaders::vShader(6);
 }
 
 } simpleCube;
@@ -160,10 +157,9 @@ addr sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::pShader(0);
 context->UpdateSubresource(dx11::Shaders::PS[0].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(1, 1, &dx11::Shaders::VS[0].params);
-memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+context->PSSetConstantBuffers(1, 1, &dx11::Shaders::PS[0].params);
+Shaders::pShader(0);
 Textures::TextureToShader((texture)textures.env, 0, targetshader::pixel); 
 Textures::TextureToShader((texture)textures.normals, 1, targetshader::pixel); 
 Textures::TextureToShader((texture)textures.albedo, 2, targetshader::pixel); 
@@ -195,10 +191,9 @@ float slider_type;
 } params;
 
 void set () {
-Shaders::pShader(1);
 context->UpdateSubresource(dx11::Shaders::PS[1].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(1, 1, &dx11::Shaders::VS[1].params);
-memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+context->PSSetConstantBuffers(1, 1, &dx11::Shaders::PS[1].params);
+Shaders::pShader(1);
 }
 
 } box_ps;
@@ -215,10 +210,9 @@ float p;
 } params;
 
 void set () {
-Shaders::pShader(2);
 context->UpdateSubresource(dx11::Shaders::PS[2].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(1, 1, &dx11::Shaders::VS[2].params);
-memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+context->PSSetConstantBuffers(1, 1, &dx11::Shaders::PS[2].params);
+Shaders::pShader(2);
 }
 
 } cubemapCreator;
@@ -307,10 +301,9 @@ addr s1AddressV;
 } samplers;
 
 void set () {
-Shaders::pShader(5);
 context->UpdateSubresource(dx11::Shaders::PS[5].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(1, 1, &dx11::Shaders::VS[5].params);
-memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+context->PSSetConstantBuffers(1, 1, &dx11::Shaders::PS[5].params);
+Shaders::pShader(5);
 Textures::TextureToShader((texture)textures.tex, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.s1Filter, samplers.s1AddressU, samplers.s1AddressV); 
 }
@@ -332,10 +325,9 @@ float a;
 } params;
 
 void set () {
-Shaders::pShader(6);
 context->UpdateSubresource(dx11::Shaders::PS[6].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(1, 1, &dx11::Shaders::VS[6].params);
-memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+context->PSSetConstantBuffers(1, 1, &dx11::Shaders::PS[6].params);
+Shaders::pShader(6);
 }
 
 } lineDrawerUV_ps;
@@ -348,17 +340,13 @@ struct {
 
 struct 
 {
-float r;
-float g;
-float b;
-float a;
+float4 color;
 } params;
 
 void set () {
-Shaders::pShader(7);
 context->UpdateSubresource(dx11::Shaders::PS[7].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(1, 1, &dx11::Shaders::VS[7].params);
-memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+context->PSSetConstantBuffers(1, 1, &dx11::Shaders::PS[7].params);
+Shaders::pShader(7);
 }
 
 } lineDrawer_ps;
@@ -377,10 +365,9 @@ float sz;
 } params;
 
 void set () {
-Shaders::pShader(8);
 context->UpdateSubresource(dx11::Shaders::PS[8].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(1, 1, &dx11::Shaders::VS[8].params);
-memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+context->PSSetConstantBuffers(1, 1, &dx11::Shaders::PS[8].params);
+Shaders::pShader(8);
 }
 
 } obj1;
@@ -399,10 +386,9 @@ float b;
 } params;
 
 void set () {
-Shaders::pShader(9);
 context->UpdateSubresource(dx11::Shaders::PS[9].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(1, 1, &dx11::Shaders::VS[9].params);
-memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));
+context->PSSetConstantBuffers(1, 1, &dx11::Shaders::PS[9].params);
+Shaders::pShader(9);
 }
 
 } simpleFx;

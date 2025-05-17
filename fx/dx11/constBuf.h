@@ -59,14 +59,14 @@ namespace ConstBuf
 
 	void Init()
 	{
-		Create(buffer[(int)cBuffer::drawerV], sizeof(drawerV));
-		Create(buffer[(int)cBuffer::drawerP], sizeof(drawerP));
+		paramConstBufInit();
+
 		Create(buffer[(int)cBuffer::drawerMat], sizeof(drawerMat));
 		Create(buffer[(int)cBuffer::camera], sizeof(camera));
 		Create(buffer[(int)cBuffer::frame], sizeof(frame));
 		Create(buffer[(int)cBuffer::global], sizeof(global));
 
-		paramConstBufInit();
+		
 	}
 
 	void Update(cBuffer i)

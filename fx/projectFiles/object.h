@@ -34,8 +34,8 @@ namespace Object {
 
 		ConstBuf::Update(ConstBuf::cBuffer::drawerMat);
 
-		float gX = Textures::Texture[(int)in.geometry].size.x / denom;
-		float gY = Textures::Texture[(int)in.geometry].size.y / denom;
+		int gX = Textures::Texture[(int)in.geometry].size.x / denom;
+		int gY = Textures::Texture[(int)in.geometry].size.y / denom;
 
 		vs::objViewer = {
 

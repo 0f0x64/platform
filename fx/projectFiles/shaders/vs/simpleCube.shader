@@ -6,7 +6,7 @@
 //[
 cbuffer params : register(b0)
 {
-    float  gX,gY;
+    int  gX,gY;
 }
 //]
 

@@ -124,10 +124,7 @@ namespace ui
 
 		void Draw(int count, float r = 1, float g = 1, float b = 1, float a = 1)
 		{
-			ps::lineDrawer_ps.params.r = r;
-			ps::lineDrawer_ps.params.g = g;
-			ps::lineDrawer_ps.params.b = b;
-			ps::lineDrawer_ps.params.a = a;
+			ps::lineDrawer_ps.params.color = { r,g,b,a };
 			ps::lineDrawer_ps.set();
 
 			ConstBuffer::pCounter = 0;
@@ -148,10 +145,7 @@ namespace ui
 
 		void Draw3d(int count, float r = 1, float g = 1, float b = 1, float a = 1)
 		{
-			ps::lineDrawerUV_ps.params.r = r;
-			ps::lineDrawerUV_ps.params.g = g;
-			ps::lineDrawerUV_ps.params.b = b;
-			ps::lineDrawerUV_ps.params.a = a;
+			ps::lineDrawer_ps.params.color = { r,g,b,a };
 			ps::lineDrawerUV_ps.set();
 
 			ConstBuffer::pCounter = 0;

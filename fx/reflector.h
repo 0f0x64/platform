@@ -120,6 +120,18 @@ void Process(string shaderName, string inPath, string outPath, ofstream& ofile)
 
 }
 
+void removeDoubleSpaces(std::string& str) {
+	std::regex pattern("\\s{2,}");
+	str = std::regex_replace(str, pattern, " ");
+}
+
+std::vector<std::string> regex_split(const std::string& str, const std::regex& reg) {
+
+	const std::sregex_token_iterator beg{ str.cbegin(), str.cend(), reg, -1 };
+	const std::sregex_token_iterator end{};
+	return { beg, end };
+}
+
 enum sType { vertex, pixel };
 
 void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType type, int sIndex)
@@ -215,6 +227,8 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 				samplersCounter++;
 			}
 
+			std:string cbText;
+
 			res = s.find(cb);
 			if (found)
 			{
@@ -222,8 +236,89 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 				if (found)
 				{
 					isParams = true;
-					unsigned int pos = 0;
+
+					res = s.find("{");
+					if (found)
+					{
+						auto lbr = res;
+						res = s.find("}");
+						if (found)
+						{
+							cbText.append(s.substr(lbr + 1, res - (lbr + 1)));
+							params += cbText;
+							break;
+						}
+						else
+						{
+							cbText.append(s.substr(lbr + 1, s.length() - (lbr + 1)));
+						}
+					}
+					else
+					{
+
+						bool lbr = false;
+
+						while (true)
+						{
+							char a;
+							in.get(a);
+							if (a == '{')
+							{
+								break;
+							}
+						}
+					}
+					
 					while (true)
+					{
+						char a;
+						in.get(a);
+						if (a == '}')
+						{
+							break;
+						}
+
+						cbText += a;
+					}
+
+
+
+					removeDoubleSpaces(cbText);
+					std::erase(cbText, '\t');
+					std::erase(cbText, '\n');
+					if (cbText.at(0) == ' ') cbText.erase(0, 1);
+
+					const std::regex reg{ R"(;)" };
+					auto tokens = regex_split(cbText, reg);
+
+					for (int i = 0;i < tokens.size();i++)
+					{
+						while (tokens[i].at(0) == ' ') tokens[i].erase(0, 1);
+
+						if (tokens[i].find(",") != std::string::npos)
+						{
+							tokens[i].at(tokens[i].find(" ")) = ',';
+
+							const std::regex reg{ R"(,)" };
+							auto tokens_ins = regex_split(tokens[i], reg);
+							for (int j = 1;j < tokens_ins.size();j++)
+							{
+								std::erase(tokens_ins[j], ' ');
+								params += tokens_ins[0]+" "+ tokens_ins[j]+";\n";
+
+							}
+						}
+						else
+						{
+							params += tokens[i]+";\n";
+						}
+
+					}
+
+					//params += cbText;
+
+					unsigned int pos = 0;
+					/*while (true)
 					{
 						res = s.find("{");
 						if (found)
@@ -234,20 +329,25 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 						pos = 0;
 
-						if (!getline(in, s))
+/*						if (!getline(in, s))
 						{
 							Log(shaderName.c_str());
 							Log(" unexpected eof: unclosed bracket in constant buffer\n");
 							ExitProcess(-1);
 						};
-					}
+					}*/
 
-					while (true)
+
+
+					//while (true)
 					{
-						unsigned int endCB = s.length();
+
+						/*unsigned int endCB = s.length();
 						auto res = s.find("}", pos);
 						if (found) endCB = res;
 						if (pos >= endCB) break;
+
+						
 
 						res = s.find(cType, pos);
 						if (found)
@@ -300,7 +400,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 							};
 
 							pos = 0;
-						}
+						}*/
 					}
 				}
 			}
@@ -319,21 +419,20 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 	ofile << "void set () {\n";
 
-	if (type == sType::vertex) ofile << "Shaders::vShader(";
-	if (type == sType::pixel) ofile << "Shaders::pShader(";
-	ofile << sIndex << ");\n";
 	if (type == sType::vertex && isParams)
 	{
 		ofile << "context->UpdateSubresource(dx11::Shaders::VS[" << sIndex << "].params, 0, NULL, &params, 0, 0);\n";
 		ofile << "context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[" << sIndex << "].params);\n";
-		ofile << "memcpy((char*)ConstBuf::drawerV,&params,sizeof(params));\n";
 	}
 	if (type == sType::pixel && isParams)
 	{
 		ofile << "context->UpdateSubresource(dx11::Shaders::PS[" << sIndex << "].params, 0, NULL, &params, 0, 0);\n";
-		ofile << "context->PSSetConstantBuffers(1, 1, &dx11::Shaders::VS[" << sIndex << "].params);\n";
-		ofile << "memcpy((char*)ConstBuf::drawerP,&params,sizeof(params));\n";
+		ofile << "context->PSSetConstantBuffers(1, 1, &dx11::Shaders::PS[" << sIndex << "].params);\n";
 	}
+	if (type == sType::vertex) ofile << "Shaders::vShader(";
+	if (type == sType::pixel) ofile << "Shaders::pShader(";
+	ofile << sIndex << ");\n";
+
 
 	if (isTextures)	ofile << texturesSet;
 	if (isSamplers) ofile << samplersSet;

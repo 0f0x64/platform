@@ -173,6 +173,14 @@ bool ta = texturesToEnumType();
 
 #endif
 
+struct float2 { float x; float y; };
+struct float3 { float x; float y; float z; };
+struct float4 { float x; float y; float z; float w; };
+struct int2 { int x; int y; };
+struct int3 { int x; int y; int z; };
+struct int4 { int x; int y; int z; int w; };
+
+
 const float intToFloatDenom = 255.f;
 
 createType(vector3, 0, 0, 3, float x; float y; float z;);
