@@ -268,12 +268,12 @@ namespace ui
 
 			for (unsigned int i = 0; i < strlen(str); i++)
 			{
-				//ConstBuffer::SetFloat4Const(x + offset, y, (float)(str[i] - 32), 0);
+				ConstBuffer::SetFloat4Const(x + offset, y, (float)(str[i] - 32), 0);
 				vs::letter.params.pos_size[i] = { x + offset, y, (float)(str[i] - 32), 0};
 				offset += getLetterOffset(str[i], w * aspect);
 			}
 
-			//ConstBuffer::f4arrayUpdateAndSet();
+			ConstBuffer::f4arrayUpdateAndSet();
 
 			vs::letter.set();
 
