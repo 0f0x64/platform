@@ -230,7 +230,9 @@ namespace Shaders {
 
 }
 
+
 #include "generated\constBufReflect.h"
+
 
 void paramConstBufInit()
 {

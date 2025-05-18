@@ -84,7 +84,7 @@ namespace Loop
 			.quality = 0,
 			.pos_x = 108,
 			.pos_y = 0,
-			.pos_z = 0
+			.pos_z = 0,
 		});
 	}
 

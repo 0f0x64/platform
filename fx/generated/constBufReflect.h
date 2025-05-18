@@ -25,7 +25,7 @@ struct
 {
 float width;
 float height;
-float4 _pos_size[256];
+float4 pos_size[256];
 } params;
 
 void set () {
