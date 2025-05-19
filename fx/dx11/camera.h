@@ -75,7 +75,6 @@ namespace Camera
 		#endif	
 
 		ConstBuf::Update(ConstBuf::cBuffer::camera);
-		ConstBuf::ConstToVertex(ConstBuf::cBuffer::camera);
-		ConstBuf::ConstToPixel(ConstBuf::cBuffer::camera);
+		ConstBuf::Set(ConstBuf::cBuffer::camera, ConstBuf::target::both);
 	}
 }

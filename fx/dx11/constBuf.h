@@ -59,15 +59,27 @@ namespace ConstBuf
 		context->UpdateSubresource(buffer[(int)i], 0, NULL, cBufPtr[(int)i], 0, 0);
 	}
 
-	void ConstToVertex(cBuffer i)
+	void Update(ID3D11Buffer* buf, auto& data)
 	{
-		context->VSSetConstantBuffers((int)i, 1, &buffer[(int)i]);
+		context->UpdateSubresource(buf, 0, NULL, &data, 0, 0);
 	}
 
-	void ConstToPixel(cBuffer i)
+	enum class target {vertex,pixel,both};
+
+	void Set(cBuffer i, target shader)
 	{
-		context->PSSetConstantBuffers((int)i, 1, &buffer[(int)i]);
+		if (shader == target::vertex || shader == target::both)
+		{
+			context->VSSetConstantBuffers((int)i, 1, &buffer[(int)i]);
+		}
+
+		if (shader == target::pixel || shader == target::both)
+		{
+			context->PSSetConstantBuffers((int)i, 1, &buffer[(int)i]);
+		}
+
 	}
+
 
 	
 	

@@ -19,8 +19,7 @@ namespace Loop
 		ConstBuf::Update(ConstBuf::cBuffer::global);
 
 		for (int i = 1 ;i < 4; i++) { 
-			ConstBuf::ConstToVertex((ConstBuf::cBuffer)i); 
-			ConstBuf::ConstToPixel((ConstBuf::cBuffer)i); 
+			ConstBuf::Set((ConstBuf::cBuffer)i,ConstBuf::target::both); 
 		}
 
 		isPrecalc = true;
@@ -87,9 +86,9 @@ namespace Loop
 			.geometry = texture::obj1pos,
 			.normals = texture::obj1nrml,
 			.quality = 0,
-			.pos_x = 52,
-			.pos_y = 0,
-			.pos_z = 0
+			.pos_x = 24,
+			.pos_y = 56,
+			.pos_z = 24
 		});
 	}
 
