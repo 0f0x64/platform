@@ -61,40 +61,10 @@ namespace ui
 	#include "font.h"
 	#include "style.h"
 
-	namespace ConstBuffer
-	{
-		ID3D11Buffer* float4arrayBuf;
-
-		XMFLOAT4 float4array[float4ArraySize];
-
-		void Create()
-		{
-			ConstBuf::Create(float4arrayBuf, sizeof(float4array));
-		}
-
-		void f4arrayUpdateAndSet()
-		{
-			context->UpdateSubresource(float4arrayBuf, 0, NULL, float4array, 0, 0);
-			context->VSSetConstantBuffers(6, 1, &float4arrayBuf);
-		}
-
-		int pCounter = 0;
-
-		void SetFloat4Const(float x, float y, float z = 0, float w = 1)
-		{
-			float4array[pCounter].x = x;
-			float4array[pCounter].y = y;
-			float4array[pCounter].z = z;
-			float4array[pCounter].w = w;
-			pCounter++;
-		}
-	}
-
 	namespace Line
 	{
 		void LineNullDrawer(int vertexCount, int instances)
 		{
-			ConstBuffer::f4arrayUpdateAndSet();
 			context->DrawInstanced(vertexCount, instances, 0, 0);
 		}
 
@@ -107,32 +77,25 @@ namespace ui
 
 		}
 
-		typedef struct {
-			float x;
-			float y;
-			float z;
-			float w;
-		} line4;
-
-		line4 buffer[2048];
+		float4 buffer[4000];
 
 		void Draw(int count, float r = 1, float g = 1, float b = 1, float a = 1)
 		{
 			ps::lineDrawer_ps.params.color = { r,g,b,a };
 			ps::lineDrawer_ps.set();
 
-			ConstBuffer::pCounter = 0;
+			int pCounter = 0;
 
 			for (int i = 0; i < count; i++)
 			{
-				ConstBuffer::SetFloat4Const(buffer[i*2].x, buffer[i*2].y, buffer[i*2].z, buffer[i * 2].w);
-				ConstBuffer::SetFloat4Const(buffer[i*2+1].x, buffer[i*2+1].y, buffer[i*2+1].z, buffer[i * 2 + 1].w);
+				vs::lineDrawer.params.position[pCounter] = buffer[i * 2]; pCounter++;
+				vs::lineDrawer.params.position[pCounter] = buffer[i * 2 + 1]; pCounter++;
 
-				if (ConstBuffer::pCounter > float4ArraySize - 2 || i == count - 1)
+				if (pCounter > float4ArraySize - 2 || i == count - 1)
 				{
 					vs::lineDrawer.set();
-					LineNullDrawer(ConstBuffer::pCounter, 1);
-					ConstBuffer::pCounter = 0;
+					LineNullDrawer(pCounter, 1);
+					pCounter = 0;
 				}
 			}
 		}
@@ -142,33 +105,28 @@ namespace ui
 			ps::lineDrawerUV_ps.params.color = { r,g,b,a };
 			ps::lineDrawerUV_ps.set();
 
-			ConstBuffer::pCounter = 0;
-			vs::lineDrawer3d.params = {
-				.model = ConstBuf::camera.view[0]
-			};
+			int pCounter = 0;
+
+			vs::lineDrawer3d.params.model = ConstBuf::camera.view[0];
 
 			for (int i = 0; i < count; i++)
 			{
-				ConstBuffer::SetFloat4Const(buffer[i * 2].x, buffer[i * 2].y, buffer[i * 2].z, buffer[i * 2].w);
-				ConstBuffer::SetFloat4Const(buffer[i * 2 + 1].x, buffer[i * 2 + 1].y, buffer[i * 2 + 1].z,  buffer[i * 2 + 1].w);
+				vs::lineDrawer3d.params.position[pCounter] = buffer[i * 2]; pCounter++;
+				vs::lineDrawer3d.params.position[pCounter] = buffer[i * 2 + 1]; pCounter++;
 
-				if (ConstBuffer::pCounter > float4ArraySize - 2 || i == count - 1)
+				if (pCounter > float4ArraySize - 2 || i == count - 1)
 				{
 					vs::lineDrawer3d.set();
-					LineNullDrawer(ConstBuffer::pCounter, 1);
-					ConstBuffer::pCounter = 0;
+					LineNullDrawer(pCounter, 1);
+					pCounter = 0;
 				}
 			}
 		}
 
 		void StoreLine(int counter, float x, float y, float x1, float y1)
 		{
-			ui::Line::buffer[counter * 2].x = x;
-			ui::Line::buffer[counter * 2].y = y;
-			ui::Line::buffer[counter * 2].w = 0;
-			ui::Line::buffer[counter * 2 + 1].x = x1;
-			ui::Line::buffer[counter * 2 + 1].y = y1;
-			ui::Line::buffer[counter * 2 + 1].w = 1;
+			ui::Line::buffer[counter * 2] = { x,y,0,1 };
+			ui::Line::buffer[counter * 2 + 1] = { x1,y1,0,1 };
 		}
 	}
 
@@ -187,7 +145,7 @@ namespace ui
 		{
 			using namespace style;
 
-			ConstBuffer::pCounter = 0;
+			int pCounter = 0;
 
 			vs::box.params = {
 				.pos_size = {x, y, w, h}
@@ -262,18 +220,13 @@ namespace ui
 			vs::letter.params.width = w * aspect;
 			vs::letter.params.height = h;
 
-			ConstBuffer::pCounter = 0;
-
 			float offset = 0.f;
 
 			for (unsigned int i = 0; i < strlen(str); i++)
 			{
-				ConstBuffer::SetFloat4Const(x + offset, y, (float)(str[i] - 32), 0);
 				vs::letter.params.pos_size[i] = { x + offset, y, (float)(str[i] - 32), 0};
 				offset += getLetterOffset(str[i], w * aspect);
 			}
-
-			ConstBuffer::f4arrayUpdateAndSet();
 
 			vs::letter.set();
 
@@ -317,7 +270,6 @@ namespace ui
 		CreateFontTexture();
 		LoadFont();
 		CalcKerning();
-		ConstBuffer::Create();
 	}
 
 	void Draw()

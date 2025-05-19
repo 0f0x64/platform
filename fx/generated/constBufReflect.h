@@ -25,6 +25,7 @@ struct
 {
 float width;
 float height;
+float2 padding;
 float4 pos_size[256];
 } params;
 
@@ -44,7 +45,7 @@ struct {
 
 struct 
 {
-float4 _pos [4000];
+float4 position [4000];
 } params;
 
 void set () {
@@ -64,7 +65,7 @@ struct {
 struct 
 {
 float4x4 model;
-float4 _pos [4000];
+float4 position [4000];
 } params;
 
 void set () {

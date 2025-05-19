@@ -2,29 +2,29 @@ void paramConstBufInit();
 
 namespace ConstBuf
 {
-	ID3D11Buffer* buffer[6];
+	ID3D11Buffer* buffer[4];
 	
-	enum class cBuffer { drawerV, drawerP, drawerMat, camera, frame, global };
+	enum class cBuffer { reserved, camera , frame, global };
 
 	#define constCount 32
 
-	//b3 
+	//b1 
 	struct {
 		XMMATRIX world[2];
 		XMMATRIX view[2];
 		XMMATRIX proj[2];
 	} camera;//update per camera set
 
-	//b4
+	//b2
 	struct {
 		XMFLOAT4 time;
 		XMFLOAT4 aspect;
 	} frame;//update per frame
 
-	//b5
+	//b3
 	XMFLOAT4 global[constCount];//update once on start
 
-	char* cBufPtr[6] = { NULL,NULL,NULL,(char*)&camera ,(char*)&frame,(char*)&global};
+	char* cBufPtr[] = { NULL, (char*)&camera ,(char*)&frame,(char*)&global};
 
 	int roundUp(int n, int r)
 	{
@@ -52,8 +52,6 @@ namespace ConstBuf
 		Create(buffer[(int)cBuffer::camera], sizeof(camera));
 		Create(buffer[(int)cBuffer::frame], sizeof(frame));
 		Create(buffer[(int)cBuffer::global], sizeof(global));
-
-		
 	}
 
 	void Update(cBuffer i)

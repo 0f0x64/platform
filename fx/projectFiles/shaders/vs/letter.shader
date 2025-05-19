@@ -7,11 +7,14 @@
 cbuffer params : register(b0)
 {
     float width, height;
+    float2 padding;
     float4 pos_size[256];
 }
 
 cbuffer geo : register(b6)
 {
+    			float www;
+			float hjhh;
     float4 _pos_size[256];
 }
 //]

@@ -7,14 +7,8 @@
 cbuffer params : register(b0)
 {
     float4x4 model;
-    float4 _pos [4000];
+    float4 position [4000];
 }
-
-cbuffer geo : register(b6)
-{
-    float4 position[4000];
-}
-
 //]
 
 
