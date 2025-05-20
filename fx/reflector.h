@@ -46,7 +46,6 @@ const char* shaderExtension = ".shader";
 void Log(const char* message)
 {
 	printf("%s", message);
-
 }
 
 char pathToExe[MAX_PATH];
