@@ -2,7 +2,6 @@ typedef void (*PVFN)(int i, float &x, float &y, float w, float lead, float sel);
 
 struct ParamDesc {
 
-	int reflection_type = 0;
 	bool single_line;
 	bool init_with_names;
 

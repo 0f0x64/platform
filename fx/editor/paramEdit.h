@@ -137,8 +137,6 @@ namespace paramEdit {
 
 		if (c->pCount == 0) return;
 
-		if (c->reflection_type != 1) return;
-
 		std::string callStr;
 		
 
@@ -244,7 +242,6 @@ namespace paramEdit {
 	void reflect_f(auto* in, const std::source_location caller, const std::source_location currentFunc)//name and types without names
 	{
 		auto c = &cmdParamDesc[cmdCounter];
-		c->reflection_type = 1;
 
 		if (!paramsAreLoaded)  //variables -> reflected struct
 		{

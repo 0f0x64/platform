@@ -103,6 +103,7 @@ void UpdateFrame(double time)
 	}
 
 	Sleep((DWORD)min(FRAME_LEN, max(FRAME_LEN - timer::frameRenderingDuration, 0)));
+
 }
 
 //int time_activate = 0;

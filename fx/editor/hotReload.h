@@ -14,142 +14,6 @@ typedef struct {
 	int indexInStack;
 } callInfo;
 
-bool compareBySrcLine(const callInfo& a, const callInfo& b)
-{
-	return a.srcFlieLine < b.srcFlieLine;
-}
-
-void reflectSourceChanges(std::filesystem::path fileName)
-{
-	paramsAreLoaded = false;
-	return;
-
-	std::vector<callInfo> lines;
-	bool empty = true;
-
-	for (int i = 0; i < cmdCounter; i++)
-	{
-		if (cmdParamDesc[i].reflection_type == 0)
-		{
-			auto fn = fileName.string();
-			auto callerFn = std::string(cmdParamDesc[i].caller.fileName);
-
-			if (!callerFn.compare(fn))
-			{
-				callInfo c = { cmdParamDesc[i].caller.line ,i };
-				lines.push_back(c);
-				empty = false;
-			}
-		}
-	}
-
-	if (empty) return;
-
-	std::sort(lines.begin(), lines.end(), compareBySrcLine);
-	auto aaa = lines.size();
-	using namespace std;
-
-	string s;
-	ifstream ifile(fileName);
-
-	std::string caller;
-
-	int lc = 1;
-	if (ifile.is_open())
-	{
-		int currentLine = lines[0].srcFlieLine;
-		int lineArrayCounter = 0;
-
-		while (getline(ifile, s))
-		{
-			if (lc == currentLine)
-			{
-				//get all numeric params
-
-				unsigned int pos = 0;
-				int cCmd = lines[lineArrayCounter].indexInStack;
-				pos = s.find(cmdParamDesc[cCmd].funcName);
-				if (pos != string::npos)
-				{
-					unsigned int startFuncPos = pos;
-					pos = s.find("(") + 1;
-					unsigned int posEnd = 0;
-					posEnd = s.find(";", pos);
-					posEnd = s.rfind(")", posEnd);
-					string s2;
-					s2.append(s.substr(pos, posEnd - pos));
-					s2.erase(remove(s2.begin(), s2.end(), ' '), s2.end());
-					s2.erase(remove(s2.begin(), s2.end(), '\t'), s2.end());
-
-					constexpr auto regex_str = R"(,)";
-					const std::regex reg{ regex_str };
-					const auto tokens = regex_split(s2, reg);
-					const auto tCount = tokens.size();
-
-					int pC = 0;
-					for (int j=0;j<cmdParamDesc[cCmd].pCount;j++)
-					{
-						auto typeIndex = getTypeIndex(cmdParamDesc[cCmd].param[j].type);
-						auto ts = getTypeDim(typeIndex);
-
-						if (cmdParamDesc[cCmd].param[j].bypass) {
-							pC+= ts; continue;
-						}
-
-						if (isTypeEnum(typeIndex))
-						{
-							auto evP = tokens[pC].find("::") + 2;
-							std::string eV = tokens[pC].substr(evP,tokens[pC].length()-evP);
-						 	auto v = GetEnumValue(typeIndex, eV.c_str());
-							if (v != INT_MAX)
-							{
-								cmdParamDesc[cCmd].param[j].value[0] = v;
-							}
-						}
-						else
-						{
-							for (unsigned int k = 0; k < (unsigned int)ts; k++)
-							{
-								if (pC + k>= tCount)
-								{
-									cmdParamDesc[cCmd].param[j].value[k] = 0;
-								}
-								else
-								{
-									auto t = tokens[pC + k];
-									if (isNumber(t))
-									{
-										auto v = atoi(t.c_str());
-										cmdParamDesc[cCmd].param[j].value[k] = v;
-									}
-								}
-							}
-						}
-
-						pC += ts;
-					}
-				}
-				//
-
-				lineArrayCounter++;
-
-				if (lineArrayCounter == lines.size())
-				{
-					ifile.close();
-					return;
-				}
-
-				currentLine = lines[lineArrayCounter].srcFlieLine;
-			}
-
-
-			lc++;
-		}
-	}
-
-	ifile.close();
-}
-
 //#define SUBSCRIBE FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME
 #define SUBSCRIBE FILE_NOTIFY_CHANGE_FILE_NAME
 
@@ -245,19 +109,18 @@ void WatchFiles()
 						std::filesystem::path p = fn;
 						auto ap = std::filesystem::absolute(p);
 
-						if (justSaved)
+						if (editor::justSaved)
 						{
-							justSaved = false;
+							editor::justSaved = false;
 						}
-						else {
-							reflectSourceChanges(ap);
-
+						else 
+						{
+							paramsAreLoaded = false;
 							Log("Modified: ");
 							Log(s2);
 							Log(" - data updated from source file");
 							Log("\n");
 						}
-
 					}
 					#endif	
 
