@@ -1,14 +1,15 @@
+
 #include <../lib/constBuf.shader>
 #include <../lib/io.shader>
 #include <../lib/constants.shader>
 #include <../lib/utils.shader>
 
-//[
+
 cbuffer params : register(b0)
 {
     int  gX,gY;
 }
-//]
+
 
 float3 rotY(float3 p, float a)
 {

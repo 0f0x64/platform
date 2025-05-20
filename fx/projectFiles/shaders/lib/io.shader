@@ -19,4 +19,3 @@ struct VS_OUTPUT
     float4 vnorm : NORMAL1;
     float2 uv : TEXCOORD0;
 };
-

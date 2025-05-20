@@ -2,13 +2,6 @@
 #include <../lib/io.shader>
 #include <../lib/constants.shader>
 
-//[
-cbuffer params : register(b0)
-{
-    float p;
-}
-//]
-
 struct PS_OUTPUT
 {
     float4 c0 : SV_Target0;

@@ -2,12 +2,12 @@
 #include <../lib/io.shader>
 #include <../lib/constants.shader>
 
-//[
+
 cbuffer params : register(b0)
 {
     float sx,sy,sz;
 };
-//]
+
 
 float3 rotX(float3 pos,float a)
 {
@@ -147,6 +147,7 @@ float4 PS(VS_OUTPUT input) : SV_Target
     
     float3 pos = sphere(uv)*2;
     //
+    //return 1;
     return float4(pos, 1.);
 
 }

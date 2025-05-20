@@ -3,17 +3,16 @@
 #include <../lib/constants.shader>
 #include <../lib/utils.shader>
 
+
 Texture2D positions : register(t0);
 Texture2D normals : register(t1);
 SamplerState sam1 : register(s0);
 
-//[
 cbuffer params : register(b0)
 {
     int gX, gY;
     float4x4 model;
 }
-//]
 
 float3 rotY(float3 p, float a)
 {

@@ -276,6 +276,13 @@ void WatchFiles()
 
 						char pureName[255];
 						char* pShadersDir = strstr(s2, "\\");
+
+						if (pShadersDir[1] == 'u' && pShadersDir[2] == 'i')
+						{
+							pShadersDir +=3;
+						}
+
+
 						char* pSlash = strstr(pShadersDir, "\\");
 						strcpy(pureName, pSlash+4);
 						//strcpy(pureName, s2 + 3);// 3= len vs/ps with backslash

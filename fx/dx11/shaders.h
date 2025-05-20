@@ -1,5 +1,10 @@
 namespace Shaders {
 
+#if EditMode
+	#include "generated\uiShaderMargin.h"
+#endif // EditMode
+
+
 	#include "dx11\shadersReflection.h"
 
 	const char VertexShaderModel[] = "vs_4_1";
@@ -59,10 +64,23 @@ namespace Shaders {
 
 		wchar_t shaderPathW[MAX_PATH];
 
-		LPCWSTR nameToPatchLPCWSTR(const char* name)
+		enum class stype {vertex, pixel};
+
+		LPCWSTR nameToPatchLPCWSTR(const char* name, int i, stype type)
 		{
 			char path[MAX_PATH];
 			strcpy(path, shadersPath);
+
+			if (type == stype::vertex)
+			{
+				if (i >= UIvShadersStart) strcat(path, "/ui");
+			}
+			if (type == stype::pixel)
+			{
+				if (i >= UIpShadersStart) strcat(path, "/ui");
+			}
+
+
 			strcat(path, name);
 
 			int len = MultiByteToWideChar(CP_ACP, 0, path, -1, NULL, 0);
@@ -73,7 +91,7 @@ namespace Shaders {
 
 		void CreateVS(int i, const char* name)
 		{
-			LPCWSTR source = nameToPatchLPCWSTR(name);
+			LPCWSTR source = nameToPatchLPCWSTR(name,i,stype::vertex);
 
 			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", VertexShaderModel, NULL, NULL, &VS[i].pBlob, &pErrorBlob);
 			CompilerLog(source, hr, "vertex shader compiled: ");
@@ -88,7 +106,7 @@ namespace Shaders {
 
 		void CreatePS(int i, const char* name)
 		{
-			LPCWSTR source = nameToPatchLPCWSTR(name);
+			LPCWSTR source = nameToPatchLPCWSTR(name, i, stype::pixel);
 
 			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS", PixelShaderModel, NULL, NULL, &PS[i].pBlob, &pErrorBlob);
 			CompilerLog(source, hr, "pixel shader compiled: ");

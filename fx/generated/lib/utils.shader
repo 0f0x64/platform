@@ -1,1 +1,1 @@
-float4 getGrid(uint f,float g,float2 u){uint G=f/6;float2 L[6]={0,0,1,0,1,1,0,0,1,1,0,1},x=L[f%6],J=(float2(G%uint(u.x),G/uint(u.x))+(x-.5)*g+.5)/u;return float4(J,x);}
+float4 getGrid(uint f,float x,int2 A){uint g=f/6;float2 s[6]={0,0,1,0,1,1,0,0,1,1,0,1},i=s[f%6],u=(float2(g%A.x,g/A.x)+(i-.5)*x+.5)/float2(A.x,A.y);return float4(u,i);}float3 ACESFilm(float3 A){float f=2.51f,i=.03f,u=2.43f,g=.59f,x=.14f;return saturate(A*(f*A+i)/(A*(u*A+g)+x));}

@@ -1,4 +1,6 @@
-#define EditMode true
+#define EDITOR
+//#define FINAL_RELEASE_CRINKLER
+//TODO: use command line params instead defines
 
 #include "..\fx\settings.h"
 
@@ -19,9 +21,14 @@
 
 using namespace std;
 
+string uiShaderMargin = "..\\fx\\generated\\uiShaderMargin.h";//final output
+
 string shaderFile = "..\\fx\\generated\\processedShaders.h";//final output
 string shaderCompilerFile = "..\\fx\\generated\\processedShadersCompile.h";//final output
 string constReflectFile = "..\\fx\\generated\\constBufReflect.h";//final output
+
+string UIinVPath = "..\\fx\\projectFiles\\shaders\\ui\\vs\\";
+string UIinPPath = "..\\fx\\projectFiles\\shaders\\ui\\ps\\";
 
 string inVPath = "..\\fx\\projectFiles\\shaders\\vs\\";
 string inPPath = "..\\fx\\projectFiles\\shaders\\ps\\";
@@ -149,7 +156,6 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 	string smp = "SamplerState ";
 	string cb = "cbuffer ";
 	string cbName = "params";
-	string cType = "float ";
 
 	string params = "struct \n{\n";
 	string textures = "struct \n{\n";
@@ -445,6 +451,9 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 }
 
+int UIvShadersStart = 0;
+int UIpShadersStart = 0;
+
 int vShadersCount = 0;
 int pShadersCount = 0;
 int libShadersCount = 0;
@@ -470,6 +479,9 @@ int main()
 {
 	SelfLocate();
 
+	const std::filesystem::path UIvsSandbox{ UIinVPath };
+	const std::filesystem::path UIpsSandbox{ UIinPPath };
+
 	const std::filesystem::path vsSandbox{ inVPath };
 	const std::filesystem::path psSandbox{ inPPath };
 	const std::filesystem::path libSandbox{ inLibPath };
@@ -481,11 +493,23 @@ int main()
 	remove(vsListFile.c_str());
 	ofstream vsfile(vsListFile);
 	catToFile(vsSandbox, vsfile, vsList, vShadersCount, "Shader(", ")\n");
+	
+	UIvShadersStart = vShadersCount;
+#ifndef FINAL_RELEASE_CRINKLER
+	catToFile(UIvsSandbox, vsfile, vsList, vShadersCount, "Shader(", ")\n");
+#endif
+
 	vsfile.close();
 
 	remove(psListFile.c_str());
 	ofstream psfile(psListFile);
 	catToFile(psSandbox, psfile, psList, pShadersCount, "Shader(", ")\n");
+
+	UIpShadersStart = pShadersCount;
+#ifndef FINAL_RELEASE_CRINKLER
+	catToFile(UIpsSandbox, psfile, psList, pShadersCount, "Shader(", ")\n");
+#endif
+
 	psfile.close();
 
 	remove(libListFile.c_str());
@@ -515,16 +539,18 @@ int main()
 	i = 0;
 	while (i < vShadersCount)
 	{
-		Process(vsList[i], inVPath, outVPath, ofile);
-		ConstBufReflector(vsList[i], inVPath, oReflect, sType::vertex, i);
+		bool UImargin = i >= UIvShadersStart;
+		Process(vsList[i], UImargin ? UIinVPath : inVPath, outVPath, ofile);
+		ConstBufReflector(vsList[i], UImargin ? UIinVPath : inVPath, oReflect, sType::vertex, i);
 		i++;
 	}
 
 	i = 0;
 	while (i < pShadersCount)
 	{
-		Process(psList[i], inPPath, outPPath, ofile);
-		ConstBufReflector(psList[i], inPPath, oReflect, sType::pixel, i);
+		bool UImargin = i >= UIpShadersStart;
+		Process(psList[i], UImargin ? UIinPPath : inPPath, outPPath, ofile);
+		ConstBufReflector(psList[i], UImargin ? UIinPPath : inPPath, oReflect, sType::pixel, i);
 		i++;
 	}
 
@@ -540,6 +566,16 @@ int main()
 	ofile.close();
 
 	//-- compiler function
+
+	remove(uiShaderMargin.c_str());
+	ofstream uiMfile(uiShaderMargin);
+
+#ifndef FINAL_RELEASE_CRINKLER
+	uiMfile << "int UIvShadersStart = " << UIvShadersStart << ";\n";
+	uiMfile << "int UIpShadersStart = " << UIpShadersStart << ";\n";
+#endif
+
+	uiMfile.close();
 
 	remove(shaderCompilerFile.c_str());
 	ofstream oSCfile(shaderCompilerFile);

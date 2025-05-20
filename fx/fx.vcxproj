@@ -242,6 +242,7 @@
     <ClInclude Include="generated\processedShaders.h" />
     <ClInclude Include="generated\processedShadersCompile.h" />
     <ClInclude Include="generated\psList.h" />
+    <ClInclude Include="generated\uiShaderMargin.h" />
     <ClInclude Include="generated\vsList.h" />
     <ClInclude Include="projectFiles\camera.h" />
     <ClInclude Include="projectFiles\cubemap.h" />
@@ -263,24 +264,18 @@
     <None Include="projectFiles\shaders\lib\io.shader" />
     <None Include="projectFiles\shaders\lib\utils.shader" />
     <None Include="projectFiles\shaders\ps\basic.shader" />
-    <None Include="projectFiles\shaders\ps\box_ps.shader" />
-    <None Include="projectFiles\shaders\ps\lineDrawerUV_ps.shader" />
-    <None Include="projectFiles\shaders\ps\lineDrawer_ps.shader" />
     <None Include="projectFiles\shaders\ps\cubemapCreator.shader" />
     <None Include="projectFiles\shaders\ps\genNormals.shader" />
-    <None Include="projectFiles\shaders\ps\letter_ps.shader" />
     <None Include="projectFiles\shaders\ps\obj1.shader" />
-    <None Include="projectFiles\shaders\ps\simpleFx.shader">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Release|Win32'">
-      </ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Editor_Release|Win32'">
-      </DeploymentContent>
-    </None>
     <None Include="projectFiles\shaders\ps\cubeMapViewer.shader" />
-    <None Include="projectFiles\shaders\vs\box.shader" />
-    <None Include="projectFiles\shaders\vs\letter.shader" />
-    <None Include="projectFiles\shaders\vs\lineDrawer.shader" />
-    <None Include="projectFiles\shaders\vs\lineDrawer3d.shader" />
+    <None Include="projectFiles\shaders\ui\ps\box_ps.shader" />
+    <None Include="projectFiles\shaders\ui\ps\letter_ps.shader" />
+    <None Include="projectFiles\shaders\ui\ps\lineDrawerUV_ps.shader" />
+    <None Include="projectFiles\shaders\ui\ps\lineDrawer_ps.shader" />
+    <None Include="projectFiles\shaders\ui\vs\box.shader" />
+    <None Include="projectFiles\shaders\ui\vs\letter.shader" />
+    <None Include="projectFiles\shaders\ui\vs\lineDrawer.shader" />
+    <None Include="projectFiles\shaders\ui\vs\lineDrawer3d.shader" />
     <None Include="projectFiles\shaders\vs\objViewer.shader" />
     <None Include="projectFiles\shaders\vs\quad.shader" />
     <None Include="projectFiles\shaders\vs\simpleCube.shader" />

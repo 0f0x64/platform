@@ -2,18 +2,19 @@
 #include <../lib/io.shader>
 #include <../lib/utils.shader>
 
+
 TextureCube env : register(t0);
 Texture2D normals : register(t1);
 TextureCube albedo : register(t2);
 
 SamplerState sam1 : register(s0);
 
-//[
+
 cbuffer params : register(b0)
 {
     float hilight;
 };
-//]
+
 
 float3 FresnelSchlick(float3 F0, float3 v, float3 n)
 {
@@ -80,6 +81,6 @@ float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
     color += saturate(10 - 35 * d)* sin(d * 127 + time.x) * 4 * hilight;
     
     color.rgb = pow(ACESFilm(color.rgb),1/2.2);
-        
+
     return float4(color, 1);
 }

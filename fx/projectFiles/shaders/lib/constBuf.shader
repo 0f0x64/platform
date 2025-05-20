@@ -1,4 +1,3 @@
-//[
 cbuffer camera : register(b1)
 {
     float4x4 world[2];
@@ -16,4 +15,3 @@ cbuffer global : register(b3)
 {
     float4 gConst[32];
 };
-//]
