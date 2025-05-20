@@ -16,7 +16,7 @@ texture normals;
 } textures;
 
 struct 
-{ 
+{
 filter sam1Filter;
 addr sam1AddressU;
 addr sam1AddressV;
