@@ -112,7 +112,7 @@ namespace Object {
 		BlendMode::Set({ blendmode::off, blendop::add });
 		Culling::Set({cullmode::off});
 		RenderTarget::Set({ in.targetGeo,0 });
-		DepthBuf::SetMode({ depthmode::off });
+		DepthBuf::Mode({ depthmode::off });
 
 		//pos
 		vs::quad.set();

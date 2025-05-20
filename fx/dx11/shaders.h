@@ -2,8 +2,7 @@ namespace Shaders {
 
 #if EditMode
 	#include "generated\uiShaderMargin.h"
-#endif // EditMode
-
+#endif
 
 	#include "dx11\shadersReflection.h"
 

@@ -74,7 +74,7 @@ namespace Loop
 
 		Cubemap::Show({ texture::env });
 
-		DepthBuf::SetMode({ depthmode::on });
+		DepthBuf::Mode({ depthmode::on });
 		DepthBuf::Clear({});
 		Culling::Set({ cullmode::back });
 		BlendMode::Set({
@@ -111,8 +111,10 @@ namespace Loop
 			
 	}
 
+
 	void mainLoop()
 	{
+		
 		scene1();
 		//track();
 

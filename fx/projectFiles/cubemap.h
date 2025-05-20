@@ -6,7 +6,7 @@ namespace Cubemap {
 		BlendMode::Set({ blendmode::off, blendop::add });
 		RenderTarget::Set({in.target, 0});
 		Culling::Set({cullmode::off});
-		DepthBuf::SetMode({depthmode::off});
+		DepthBuf::Mode({depthmode::off});
 		RenderTarget::Clear({0, 0, 0, 1});
 
 		vs::quad.set();
@@ -20,7 +20,7 @@ namespace Cubemap {
 	{
 		reflect;
 
-		DepthBuf::SetMode({ depthmode::off });
+		DepthBuf::Mode({ depthmode::off });
 		BlendMode::Set({ blendmode::off, blendop::add });
 		Culling::Set({ cullmode::back });
 

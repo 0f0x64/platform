@@ -50,7 +50,7 @@ namespace Copy {
 
 namespace DepthBuf {
 	
-	cmd(SetMode, depthmode mode;) {
+	cmd(Mode, depthmode mode;) {
 		reflect;
 		Depth::Depth(in.mode);
 		reflect_close;
