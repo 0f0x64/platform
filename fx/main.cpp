@@ -153,6 +153,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				
 			}
 
+			editor::WatchFiles();
+			editor::WatchForRecompilation();
+
+
 		#else
 
 			PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
@@ -165,8 +169,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			
 		UpdateFrame(timer::GetCounter());
 
-		editor::WatchFiles();
-		editor::WatchForRecompilation();
+
 
 	}
 

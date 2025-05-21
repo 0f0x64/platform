@@ -441,10 +441,8 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 		ofile << "context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[" << sIndex << "].params);\n";
 	}
 
-
 	if (isTextures)	ofile << texturesSet;
 	if (isSamplers) ofile << samplersSet;
-
 
 	ofile << "}\n";
 

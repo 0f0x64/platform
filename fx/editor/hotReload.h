@@ -71,13 +71,9 @@ void WatchFiles()
 			//event = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(&change_buf[offset]);
 			WideCharToMultiByte(CP_ACP, NULL, event->FileName, event->FileNameLength / sizeof(WCHAR), fileName, sizeof(fileName), NULL, NULL);
 
-			char modifedExt[nameBufLen];
-			strcpy(modifedExt, Shaders::shaderExtension);
-			strcat(modifedExt, "~RF");//visual studio only hack!
-
 			#if SRC_WATCH
-			char* h = strstr(fileName, ".h");
-			if (h && *(h+2) == 0 && event->Action == FILE_ACTION_RENAMED_NEW_NAME)
+			char* h = strstr(fileName, headerExtension);
+			if (h && !strcmp(h, headerExtension) && event->Action == FILE_ACTION_RENAMED_NEW_NAME)
 			{
 				char s2[nameBufLen];
 				memset(s2, NULL, nameBufLen);
@@ -85,11 +81,11 @@ void WatchFiles()
 				memcpy(s2, fileName, bytes);
 				s2[bytes + 1] = 0;
 
-				//if (editor::justSaved)
+				if (editor::justSaved)
 				{
-					//editor::justSaved = false;
+					editor::justSaved = false;
 				}
-				//else 
+				else 
 				{
 					paramsAreLoaded = false;
 					Log("Modified: ");
@@ -101,8 +97,9 @@ void WatchFiles()
 			}
 			#endif	
 
-			char* s = strstr(fileName, ".shader");
-			if (s && event->Action == FILE_ACTION_RENAMED_NEW_NAME)
+			char* s = strstr(fileName, Shaders::shaderExtension);
+
+			if (s && !strcmp(s, Shaders::shaderExtension) && event->Action == FILE_ACTION_RENAMED_NEW_NAME)
 					{
 						char s2[nameBufLen];
 						memset(s2, NULL, nameBufLen);
