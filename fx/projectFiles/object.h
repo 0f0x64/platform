@@ -24,6 +24,11 @@ namespace Object {
 		int gX = Textures::Texture[(int)in.geometry].size.x / denom;
 		int gY = Textures::Texture[(int)in.geometry].size.y / denom;
 
+		if (!paramsAreLoaded)
+		{
+			int a = 0 ;
+		}
+
 		vs::objViewer = {
 
 			.params = {

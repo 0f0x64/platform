@@ -68,7 +68,7 @@ void UpdateFrame(double time)
 
 		if (resize)
 		{
-			dx11::Resize();
+ 			dx11::Resize();
 			resize = false;
 		}
 
@@ -153,9 +153,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				
 			}
 
-			editor::WatchFiles();
-			editor::WatchForRecompilation();
-
 		#else
 
 			PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
@@ -167,17 +164,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		#endif
 			
 		UpdateFrame(timer::GetCounter());
-		
-		/*if (hWnd != GetFocus() && time_activate == 0)
-		{
-			time_activate = timer::GetCounter();
-		}
-		
-		if (time_activate !=0 && timer::GetCounter() > time_activate + 1000)
-		{
-			SetForegroundWindow(hWnd);
-			time_activate = 0;
-		}*/
+
+		editor::WatchFiles();
+		editor::WatchForRecompilation();
 
 	}
 

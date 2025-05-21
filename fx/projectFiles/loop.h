@@ -76,7 +76,7 @@ namespace Loop
 
 		DepthBuf::Mode({ depthmode::on });
 		DepthBuf::Clear({});
-		Culling::Set({ cullmode::back });
+		Culling::Set({cullmode::back});
 		BlendMode::Set({
 			.mode = blendmode::off,
 			.op = blendop::add
@@ -86,9 +86,9 @@ namespace Loop
 			.geometry = texture::obj1pos,
 			.normals = texture::obj1nrml,
 			.quality = 0,
-			.pos_x = 119,
-			.pos_y = 1118,
-			.pos_z = 110
+			.pos_x = 11,
+			.pos_y = 1,
+			.pos_z = 1111
 		});
 	}
 

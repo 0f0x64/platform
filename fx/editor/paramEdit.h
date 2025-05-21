@@ -479,6 +479,7 @@ namespace paramEdit {
 							auto enumStart = pvalue.find("::") + 2;
 							std::string enumStr = pvalue.substr(enumStart, pvalue.size() - enumStart);
 							c->param[i].value[0] = GetEnumValue(c->param[i].typeIndex, enumStr.c_str());
+							*(int*)((char*)in + c->param[i].offset) = c->param[i].value[0];
 
 						}
 					}
@@ -492,6 +493,7 @@ namespace paramEdit {
 						else
 						{
 							c->param[i].value[0] = std::stoi(pvalue);
+							*(int*)((char*)in + c->param[i].offset) = c->param[i].value[0];
 						}
 
 					}
