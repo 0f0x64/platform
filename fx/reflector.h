@@ -292,6 +292,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 					std::erase(cbText, '\t');
 					std::erase(cbText, '\n');
 					if (cbText.at(0) == ' ') cbText.erase(0, 1);
+					while (cbText.at(cbText.length() - 1) == ' ') cbText.erase(cbText.length() - 1, 1);
 
 					const std::regex reg{ R"(;)" };
 					auto tokens = regex_split(cbText, reg);
@@ -299,6 +300,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 					for (int i = 0;i < tokens.size();i++)
 					{
 						while (tokens[i].at(0) == ' ') tokens[i].erase(0, 1);
+						
 
 						if (tokens[i].find(",") != std::string::npos)
 						{

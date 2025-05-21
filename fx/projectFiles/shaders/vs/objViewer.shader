@@ -10,8 +10,9 @@ SamplerState sam1 : register(s0);
 
 cbuffer params : register(b0)
 {
-    int gX, gY;
     float4x4 model;
+    int gX;
+    int gY;
 }
 
 float3 rotY(float3 p, float a)
@@ -45,8 +46,9 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     
     output.wpos = float4(pos.xyz, 0);
     output.vpos = mul(float4(pos.xyz, 1), view[0]);
-    
+
     output.pos = mul(pos, mul(view[0], proj[0]));
+
    // output.pos.x*= aspect.x;
     output.uv = grid.xy;
     return output;

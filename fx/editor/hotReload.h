@@ -9,11 +9,6 @@ uint8_t change_buf[changeBufLen];
 bool codeRecompiled = false;
 bool justSaved = false;
 
-typedef struct {
-	int srcFlieLine;
-	int indexInStack;
-} callInfo;
-
 //#define SUBSCRIBE FILE_NOTIFY_CHANGE_LAST_WRITE | FILE_NOTIFY_CHANGE_FILE_NAME
 #define SUBSCRIBE FILE_NOTIFY_CHANGE_FILE_NAME
 
@@ -101,14 +96,6 @@ void WatchFiles()
 						memcpy(s2, fileName, bytes);
 						s2[bytes + 1] = 0;
 
-						char fn[1024];
-						strcpy(fn, userSpacePath);
-						strcat(fn, "\\");
-						strcat(fn, s2);
-
-						std::filesystem::path p = fn;
-						auto ap = std::filesystem::absolute(p);
-
 						if (editor::justSaved)
 						{
 							editor::justSaved = false;
@@ -145,15 +132,9 @@ void WatchFiles()
 							pShadersDir +=3;
 						}
 
-
 						char* pSlash = strstr(pShadersDir, "\\");
 						strcpy(pureName, pSlash+4);
-						//strcpy(pureName, s2 + 3);// 3= len vs/ps with backslash
 						pureName[strlen(pureName) - shaderExtensionLen] = 0;
-
-						//char s3[255];
-						//strcpy(s3, "/");
-						//strcat(s3, s2);
 
 						// detect vertex/pixel shader and slot
 						if (pSlash[1] == 'v')
@@ -178,7 +159,6 @@ void WatchFiles()
 							{
 								if (!strcmp(Shaders::psList[i], pureName))
 								{
-									//    / ps\basic.shader
 									Shaders::CreatePS(i, pSlash);
 									break;
 								}

@@ -370,6 +370,11 @@ namespace paramEdit {
 
 				ifile.close();
 			}
+			else
+			{
+				Log(currentFunc.file_name());
+				Log(" - file reading error\n");
+			}
 
 
 			//get caller string
@@ -493,18 +498,11 @@ namespace paramEdit {
 				}
 
 				ifileCaller.close();
-
-				/*auto c = &cmdParamDesc[cmdCounter];
-
-
-
-				for (int i = 0; i < cmdParamDesc[cmdCounter].pCount; i++)
-				{
-					for (int j=0;j< c->param[i]._dim;j++)
-					{
-						c->param[i].value[j] = *(int*)((char*)in + c->param[i].offset + sizeof(int)*j);
-					}
-				}*/
+			}
+			else
+			{
+				Log(caller.file_name());
+				Log(" - file reading error\n");
 			}
 		}
 		else//variables <- reflected struct
@@ -512,22 +510,8 @@ namespace paramEdit {
 
 			for (int i = 0; i < c->pCount; i++)
 			{
-
 				*(int*)((char*)in + c->param[i].offset) = c->param[i].value[0];
-
-				/*auto dim = c->param[i]._dim;
-				for (int j = 0; j < dim; j++)
-				{
-					if (*(int*)((char*)in + c->param[i].offset + sizeof(int) * j) != c->param[i].value[j])
-					{
-						changed = true;
-					}
-
-					*(int*)((char*)in + c->param[i].offset + sizeof(int) * j) = c->param[i].value[j];
-				}*/
 			}
-
-
 		}
 
 		c->stackLevel = cmdLevel;

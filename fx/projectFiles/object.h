@@ -27,9 +27,9 @@ namespace Object {
 		vs::objViewer = {
 
 			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(in.pos_x / q, in.pos_y / q, in.pos_z / q)),
 				.gX = gX,
 				.gY = gY,
-				.model = XMMatrixTranspose(XMMatrixTranslation(in.pos_x / q, in.pos_y / q, in.pos_z / q)),
 			},
 
 			.textures = {
@@ -70,7 +70,7 @@ namespace Object {
 
 		ps::basic.set();
 
-		Drawer::NullDrawer({(int)gX*(int)gY,2});
+		Drawer::NullDrawer({(int)gX*(int)gY,1});
 
 		reflect_close;
 	}

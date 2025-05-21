@@ -4,9 +4,9 @@ struct {
 
 struct 
 {
+float4x4 model;
 int gX;
 int gY;
-float4x4 model;
 } params;
 
 struct 

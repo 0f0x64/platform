@@ -87,8 +87,8 @@ namespace Loop
 			.normals = texture::obj1nrml,
 			.quality = 0,
 			.pos_x = 119,
-			.pos_y = 98,
-			.pos_z = 1124
+			.pos_y = 1118,
+			.pos_z = 110
 		});
 	}
 
