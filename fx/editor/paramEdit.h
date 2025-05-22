@@ -460,42 +460,40 @@ namespace paramEdit {
 						c->init_with_names = false;
 					}
 
-					
-					
-
 					c->param[i].bypass = false;
 
-					if (isTypeEnum(cmdParamDesc[cmdCounter].param[pId].typeIndex))
+					if (pvalue.length()>0)
 					{
-						std::string pTypeStr = cmdParamDesc[cmdCounter].param[pId].type;
-						pTypeStr += "::";
-						if (pvalue.find(pTypeStr) == std::string::npos)
-						{
-							c->param[i].bypass = true;
-							strcpy(c->param[i].strValue, pvalue.c_str());
-							c->param[i].value[0] = *(int*)((char*)in + c->param[i].offset);
-						}
-						else {
-							auto enumStart = pvalue.find("::") + 2;
-							std::string enumStr = pvalue.substr(enumStart, pvalue.size() - enumStart);
-							c->param[i].value[0] = GetEnumValue(c->param[i].typeIndex, enumStr.c_str());
-							*(int*)((char*)in + c->param[i].offset) = c->param[i].value[0];
 
-						}
-					}
-					else
-					{
-						if (!isParam(pvalue)) {
-							c->param[i].bypass = true;
-							c->param[i].value[0] = *(int*)((char*)in + c->param[i].offset);
-							strcpy(c->param[i].strValue, pvalue.c_str());
+						if (isTypeEnum(cmdParamDesc[cmdCounter].param[pId].typeIndex))
+						{
+							std::string pTypeStr = cmdParamDesc[cmdCounter].param[pId].type;
+							pTypeStr += "::";
+							if (pvalue.find(pTypeStr) == std::string::npos)
+							{
+								c->param[i].bypass = true;
+								strcpy(c->param[i].strValue, pvalue.c_str());
+								c->param[i].value[0] = *(int*)((char*)in + c->param[i].offset);
+							}
+							else {
+								auto enumStart = pvalue.find("::") + 2;
+								std::string enumStr = pvalue.substr(enumStart, pvalue.size() - enumStart);
+								c->param[i].value[0] = GetEnumValue(c->param[i].typeIndex, enumStr.c_str());
+							}
 						}
 						else
 						{
-							c->param[i].value[0] = std::stoi(pvalue);
-							*(int*)((char*)in + c->param[i].offset) = c->param[i].value[0];
-						}
+							if (!isParam(pvalue)) {
+								c->param[i].bypass = true;
+								c->param[i].value[0] = *(int*)((char*)in + c->param[i].offset);
+								strcpy(c->param[i].strValue, pvalue.c_str());
+							}
+							else
+							{
+								c->param[i].value[0] = std::stoi(pvalue);
+							}
 
+						}
 					}
 				}
 
@@ -507,7 +505,7 @@ namespace paramEdit {
 				Log(" - file reading error\n");
 			}
 		}
-		else//variables <- reflected struct
+		//else//variables <- reflected struct
 		{
 
 			for (int i = 0; i < c->pCount; i++)
