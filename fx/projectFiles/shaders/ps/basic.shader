@@ -81,6 +81,6 @@ float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
     color += saturate(10 - 35 * d)* sin(d * 127 + time.x) * 4 * hilight;
     
     color.rgb = pow(ACESFilm(color.rgb),1/2.2);
-
+    //return 1;
     return float4(color, 1);
 }
