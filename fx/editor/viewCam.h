@@ -353,19 +353,19 @@ namespace ViewCam
 					{
 						float q = intToFloatDenom;
 						auto eye = currentCamera.ViewVec*q + currentCamera.Target*q;
-						cmdParamDesc[currentCmd].param[2].value[0] = (int)XMVectorGetX(eye);
-						cmdParamDesc[currentCmd].param[2].value[1] = (int)XMVectorGetY(eye);
-						cmdParamDesc[currentCmd].param[2].value[2] = (int)XMVectorGetZ(eye);
+						cmdParamDesc[currentCmd].param[2].value = (int)XMVectorGetX(eye);
+						cmdParamDesc[currentCmd].param[3].value = (int)XMVectorGetY(eye);
+						cmdParamDesc[currentCmd].param[4].value = (int)XMVectorGetZ(eye);
 						auto at = currentCamera.Target*q;			 
-						cmdParamDesc[currentCmd].param[3].value[0] = (int)XMVectorGetX(at);
-						cmdParamDesc[currentCmd].param[3].value[1] = (int)XMVectorGetY(at);
-						cmdParamDesc[currentCmd].param[3].value[2] = (int)XMVectorGetZ(at);
+						cmdParamDesc[currentCmd].param[5].value = (int)XMVectorGetX(at);
+						cmdParamDesc[currentCmd].param[6].value = (int)XMVectorGetY(at);
+						cmdParamDesc[currentCmd].param[7].value = (int)XMVectorGetZ(at);
 						auto up = currentCamera.upVec*q;			 
-						cmdParamDesc[currentCmd].param[4].value[0] = (int)XMVectorGetX(up);
-						cmdParamDesc[currentCmd].param[4].value[1] = (int)XMVectorGetY(up);
-						cmdParamDesc[currentCmd].param[4].value[2] = (int)XMVectorGetZ(up);
+						cmdParamDesc[currentCmd].param[8].value = (int)XMVectorGetX(up);
+						cmdParamDesc[currentCmd].param[9].value = (int)XMVectorGetY(up);
+						cmdParamDesc[currentCmd].param[10].value = (int)XMVectorGetZ(up);
 
-						cmdParamDesc[currentCmd].param[5].value[0] = (int)Camera::viewCam.angle;
+						cmdParamDesc[currentCmd].param[11].value = (int)Camera::viewCam.angle;
 
 					}
 

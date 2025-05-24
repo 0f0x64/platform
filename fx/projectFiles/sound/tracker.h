@@ -60,8 +60,8 @@ namespace tracker
 
 		track_desc.channel[curChannel].clipCounter = -1;
 
-		Clip({30,10,6,1,overdub::off,0});
-		Pitch({8,27,27,26,25,27,27,29,30});
+		Clip({25,10,6,1,overdub::off,0});
+		Pitch({8,27,27,25,25,27,27,29,30});
 
 		Clip({51,4,1,1,overdub::off,0});
 		Pitch({4,1,3,0,0});
@@ -90,7 +90,7 @@ namespace tracker
 		curChannel = 0;
 
 		snare({
-			.vol = 46,
+			.vol = 71,
 			.pan = -31,
 			.send = 74,
 			.solo = switcher::off,

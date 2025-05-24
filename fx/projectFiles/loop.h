@@ -41,7 +41,30 @@ namespace Loop
 		cmd(run)
 		{
 			reflect;
-			BasicCam::setCamKey({ 0, keyType::set, 3021, 22, 46, 2, 51, 0, 0, 508, 77, 65, sliderType::follow, 0, 0, -1, camAxis::local, 0, 3, 0, 0 });
+			BasicCam::setCamKey({
+				.camTime = 0,
+				.camType = keyType::set,
+				.eye_x = 3021,
+				.eye_y = 22,
+				.eye_z = 46,
+				.at_x = 2,
+				.at_y = 51,
+				.at_z = 0,
+				.up_x = 0,
+				.up_y = 508,
+				.up_z = 77,
+				.angle = 65,
+				.sType = sliderType::follow,
+				.slide_x = 0, 
+				.slide_y = 0, 
+				.slide_z = -1,
+				.axisType = camAxis::local,
+				.fly_x = 0, 
+				.fly_y = 3, 
+				.fly_z = 0,
+				.jitter = 0
+				});
+
 			BasicCam::processCam();
 			reflect_close;
 		}
@@ -86,9 +109,9 @@ namespace Loop
 			.geometry = texture::obj1pos,
 			.normals = texture::obj1nrml,
 			.quality = 0,
-			.pos_x = 575,
-			.pos_y = 122,
-			.pos_z = 11
+			.pos_x = -25,
+			.pos_y = -31,
+			.pos_z = 7
 		});
 	}
 
@@ -115,8 +138,8 @@ namespace Loop
 	void mainLoop()
 	{
 		
-		//scene1();
-		track();
+		scene1();
+		//track();
 
 	}
 

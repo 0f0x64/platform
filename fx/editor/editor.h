@@ -27,13 +27,13 @@ std::vector<std::string> regex_split(const std::string& str, const std::regex& r
 	return { beg, end };
 }
 
-int getParamByStr(int i, const char* str, int index = 0)
+int getParamByStr(int i, const char* str)
 {
 	for (int j = 0; j < cmdParamDesc[i].pCount; j++)
 	{
 		if (!strcmp(cmdParamDesc[i].param[j].name, str))
 		{
-			return cmdParamDesc[i].param[j].value[index];
+			return cmdParamDesc[i].param[j].value;
 		}
 	}
 
@@ -72,15 +72,15 @@ public:
 		return dragID.cmd == (int)context::free;
 	}
 
-	bool check(int cmd, int param, int subparam)
+	bool check(int cmd, int param)
 	{
-		return (cmd == dragID.cmd) && (param == dragID.param) && (subparam == dragID.subparam);
+		return (cmd == dragID.cmd) && (param == dragID.param);
 	}
 
-	bool check(int cmd, const char* paramName, int subparam = 0)
+	bool check(int cmd, const char* paramName)
 	{
 		auto param = getParamIndexByStr(cmd,paramName);
-		return (cmd == dragID.cmd) && (param == dragID.param) && (subparam == dragID.subparam);
+		return (cmd == dragID.cmd) && (param == dragID.param);
 	}
 
 	bool check(context i)
@@ -93,9 +93,9 @@ public:
 		dragID.cmd = (int)i;
 	}
 
-	void set(int cmd, int param, int subparam)
+	void set(int cmd, int param)
 	{
-		dragID = { cmd,param,subparam };
+		dragID = { cmd,param };
 	}
 
 	void setFree()
@@ -163,9 +163,8 @@ namespace editor
 		float yPos = 0.05;
 		float yPosLast;
 
-		int storedParam[4] = { 0,0,0,0 };
+		int storedParam = 0;
 		int currentParam = -1;
-		int subParam = 0;
 
 		bool action = false;
 		bool clickOnEmptyPlace;
@@ -201,10 +200,10 @@ namespace editor
 
 		float selYpos = 0.5;
 
-		void pLimits(int cCmd = currentCmd, int cParam = currentParam, int cSubParam = subParam)
+		void pLimits(int cCmd = currentCmd, int cParam = currentParam)
 		{
 			auto cp = cmdParamDesc[cCmd].param[cParam];
-			cmdParamDesc[cCmd].param[cParam].value[cSubParam] = clamp(cp.value[cSubParam], cp._min, cp._max);
+			cmdParamDesc[cCmd].param[cParam].value = clamp(cp.value, cp._min, cp._max);
 		}
 
 	}

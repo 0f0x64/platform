@@ -33,8 +33,7 @@ namespace paramEdit {
 	{
 		strcpy(cmdParamDesc[cmdCounter].param[index].type, type);
 		cmdParamDesc[cmdCounter].param[index].typeIndex = getTypeIndex(type);
-		auto base_sz = sizeof(int);
-		cmdParamDesc[cmdCounter].param[index].size = base_sz * cmdParamDesc[cmdCounter].param[index]._dim;
+		cmdParamDesc[cmdCounter].param[index].size = sizeof(int);
 	}
 
 	void SetParamName(int index, const char* name)
@@ -110,11 +109,11 @@ namespace paramEdit {
 				{
 					callStr += c->param[i].type;
 					callStr += "::";
-					callStr += getStrValue(c->param[i].typeIndex, c->param[i].value[0]);
+					callStr += getStrValue(c->param[i].typeIndex, c->param[i].value);
 				}
 				else
 				{
-					callStr += std::to_string(c->param[i].value[0]);
+					callStr += std::to_string(c->param[i].value);
 				}
 			}
 
@@ -334,7 +333,6 @@ namespace paramEdit {
 								getTypeAndName(tokens[i], typeStr, nameStr);
 								auto typeID = getTypeIndex(typeStr.c_str());
 								c->param[j].typeIndex = typeID;
-								c->param[j]._dim = typeID == -1 ? 1 : typeDesc[typeID]._dim;
 								c->param[j]._min = typeID == -1 ? INT_MIN : typeDesc[typeID]._min;
 								c->param[j]._max = typeID == -1 ? INT_MAX : typeDesc[typeID]._max;
 
@@ -473,24 +471,24 @@ namespace paramEdit {
 							{
 								c->param[i].bypass = true;
 								strcpy(c->param[i].strValue, pvalue.c_str());
-								c->param[i].value[0] = *(int*)((char*)in + c->param[i].offset);
+								c->param[i].value = *(int*)((char*)in + c->param[i].offset);
 							}
 							else {
 								auto enumStart = pvalue.find("::") + 2;
 								std::string enumStr = pvalue.substr(enumStart, pvalue.size() - enumStart);
-								c->param[i].value[0] = GetEnumValue(c->param[i].typeIndex, enumStr.c_str());
+								c->param[i].value = GetEnumValue(c->param[i].typeIndex, enumStr.c_str());
 							}
 						}
 						else
 						{
 							if (!isParam(pvalue)) {
 								c->param[i].bypass = true;
-								c->param[i].value[0] = *(int*)((char*)in + c->param[i].offset);
+								c->param[i].value = *(int*)((char*)in + c->param[i].offset);
 								strcpy(c->param[i].strValue, pvalue.c_str());
 							}
 							else
 							{
-								c->param[i].value[0] = std::stoi(pvalue);
+								c->param[i].value = std::stoi(pvalue);
 							}
 
 						}
@@ -505,12 +503,14 @@ namespace paramEdit {
 				Log(" - file reading error\n");
 			}
 		}
-		//else//variables <- reflected struct
+		
+		
+		//variables <- reflected struct
 		{
 
 			for (int i = 0; i < c->pCount; i++)
 			{
-				*(int*)((char*)in + c->param[i].offset) = c->param[i].value[0];
+				*(int*)((char*)in + c->param[i].offset) = c->param[i].value;
 			}
 		}
 
@@ -551,13 +551,11 @@ namespace paramEdit {
 			{
 				cmdParamDesc[cmdCounter].param[i]._min = INT_MIN;
 				cmdParamDesc[cmdCounter].param[i]._max = INT_MAX;
-				cmdParamDesc[cmdCounter].param[i]._dim = 1;
 			}
 			else
 			{
 				cmdParamDesc[cmdCounter].param[i]._min = typeDesc[pid]._min;
 				cmdParamDesc[cmdCounter].param[i]._max = typeDesc[pid]._max;
-				cmdParamDesc[cmdCounter].param[i]._dim = typeDesc[pid]._dim;
 			}
 		}
 	}
@@ -614,7 +612,7 @@ namespace paramEdit {
 
 					cmdParamDesc[cmdCounter].param[n].bypass = bypass;
 					
-					j+= cmdParamDesc[cmdCounter].param[n]._dim;
+					j+= 1;
 				}
 			}
 		}
@@ -746,7 +744,6 @@ namespace paramEdit {
 					action = true;
 					currentCmd = i;
 					currentParam = -1;
-					subParam = 0;
 				}
 			}
 		}
@@ -769,11 +766,16 @@ namespace paramEdit {
 
 			for (int j = 0; j < cmdParamDesc[i].pCount; j++)
 			{
-				if (!isType(cmdParamDesc[i].param[j].type, "position")) continue;
+				float _x = 0;
+				float _y = 0;
+				float _z = 0;
 
-				float _x = (float)cmdParamDesc[i].param[j].value[0];
-				float _y = (float)cmdParamDesc[i].param[j].value[1];
-				float _z = (float)cmdParamDesc[i].param[j].value[2];
+				if (isType(cmdParamDesc[i].param[j].type, "pos_x"))
+				{
+					_x = (float)cmdParamDesc[i].param[j].value;
+					_y = (float)cmdParamDesc[i].param[j + 1].value;
+					_z = (float)cmdParamDesc[i].param[j + 2].value;
+				}
 
 				XMVECTOR p = XMVECTOR{ _x / intToFloatDenom, _y / intToFloatDenom, _z / intToFloatDenom, 1. };
 				
@@ -807,7 +809,6 @@ namespace paramEdit {
 				{
 					currentCmd = i;
 					currentParam = -1;
-					subParam = 0;
 					ViewCam::TransCam(_x / intToFloatDenom, _y / intToFloatDenom, _z / intToFloatDenom);
 					vScroll = true;
 				}
@@ -831,7 +832,7 @@ namespace paramEdit {
 			{
 				if (!isType(cmdParamDesc[i].param[j].type, "timestamp")) continue;
 
-				int _x = cmdParamDesc[i].param[j].value[0];
+				int _x = cmdParamDesc[i].param[j].value;
 
 				float px = TimeLine::getScreenPos(_x*SAMPLES_IN_FRAME);
 				float py = .94;
@@ -859,8 +860,7 @@ namespace paramEdit {
 					drag.set(drag.context::timeKey);
 					currentCmd = i;
 					currentParam = -1;
-					subParam = 0;
-					storedParam[0] = cmdParamDesc[i].param[j].value[0];
+					storedParam = cmdParamDesc[i].param[j].value;
 					vScroll = true;
 
 					curCmdLevel = cmdParamDesc[currentCmd].stackLevel;
@@ -878,12 +878,12 @@ namespace paramEdit {
 				{
 					if (ui::lbDown)
 					{
-						cmdParamDesc[i].param[j].value[0] = storedParam[0] + TimeLine::ScreenToTime( ui::mouseDelta.x)/SAMPLES_IN_FRAME;
+						cmdParamDesc[i].param[j].value = storedParam + TimeLine::ScreenToTime( ui::mouseDelta.x)/SAMPLES_IN_FRAME;
 						pLimits(currentCmd,j);
 					}
 					else
 					{
-						storedParam[0] = cmdParamDesc[i].param[j].value[0];
+						storedParam = cmdParamDesc[i].param[j].value;
 					}
 				}
 
@@ -977,28 +977,28 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 	float range = (float)(cmdParamDesc[cmdIndex].param[paramIndex]._max - cmdParamDesc[cmdIndex].param[paramIndex]._min);
 	ui::style::box::signed_progress = cmdParamDesc[cmdIndex].param[paramIndex]._min < 0.f ? 1.f :0.f;
 	
-	ui::style::box::progress = cmdParamDesc[cmdIndex].param[paramIndex].value[0] / range;;
+	ui::style::box::progress = cmdParamDesc[cmdIndex].param[paramIndex].value / range;;
 	ui::style::box::slider_type = (int)direction+1;
 		
-	std::string buttonText = pName +"::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value[0]);
+	std::string buttonText = pName +"::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value);
 	if (ButtonPressed(cmdIndex,buttonText.c_str(), x, y, w, h))
 	{
-		storedParam[0] = cmdParamDesc[cmdIndex].param[paramIndex].value[0];
-		drag.set(cmdIndex, paramIndex, 0);
+		storedParam = cmdParamDesc[cmdIndex].param[paramIndex].value;
+		drag.set(cmdIndex, paramIndex);
 
 		if (ui::dblClk && ui::style::box::signed_progress)
 		{
-			storedParam[0] = cmdParamDesc[cmdIndex].param[paramIndex].value[0] = 0;
+			storedParam = cmdParamDesc[cmdIndex].param[paramIndex].value = 0;
 			ui::dblClk = false;
 		}
 	}
 
-	if (drag.check(cmdIndex, paramIndex, 0))
+	if (drag.check(cmdIndex, paramIndex))
 	{
 		float delta = direction == dir::y ? -ui::mouseDelta.y : ui::mouseDelta.x;
 		delta *= dx11::width;
-		cmdParamDesc[cmdIndex].param[paramIndex].value[0] = (int)(storedParam[0] + delta);
-		pLimits(cmdIndex, paramIndex, 0);
+		cmdParamDesc[cmdIndex].param[paramIndex].value = (int)(storedParam + delta);
+		pLimits(cmdIndex, paramIndex);
 	}
 	ui::style::box::progress = 0;
 }
@@ -1006,12 +1006,12 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w, float h, const char* shortName = "")
 {
 	int paramIndex = getParamIndexByStr(cmdIndex, pName.c_str());
-	ui::style::button::inverted = cmdParamDesc[cmdIndex].param[paramIndex].value[0] == 0 ? false : true;
+	ui::style::button::inverted = cmdParamDesc[cmdIndex].param[paramIndex].value == 0 ? false : true;
 
 	if (ButtonPressed(cmdIndex,shortName ? shortName : pName.c_str(), x, y, w, h))
 	{
-		drag.set(cmdIndex, paramIndex, 0);
-		cmdParamDesc[cmdIndex].param[paramIndex].value[0] = 1 - cmdParamDesc[cmdIndex].param[paramIndex].value[0];
+		drag.set(cmdIndex, paramIndex);
+		cmdParamDesc[cmdIndex].param[paramIndex].value = 1 - cmdParamDesc[cmdIndex].param[paramIndex].value;
 	}
 }
 
@@ -1035,17 +1035,15 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 
 			auto w = tabLen * .9f;
 			auto sType = cmdParamDesc[currentCmd].param[i].typeIndex;
-			int subCount = cmdParamDesc[currentCmd].param[i]._dim;
 
 			if (!cmdParamDesc[currentCmd].param[i].bypass)
 			{
-				for (int p = 0; p < subCount; p++) //process clicks
-				{
-					if (isMouseOver(_x, y + float(p) * lead, w, ui::style::box::height))
-					{
-						clickOnEmptyPlace = false;
 
-						if (ui::lbDown && !action)
+				if (isMouseOver(_x, y, w, ui::style::box::height))
+				{
+					clickOnEmptyPlace = false;
+
+					if (ui::lbDown && !action)
 						{
 							action = true;
 
@@ -1057,13 +1055,12 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 							{
 								currentParam = i;
 								cursorPos = 0;
-								storedParam[p] = cmdParamDesc[currentCmd].param[currentParam].value[p];
-								subParam = p;
+								storedParam = cmdParamDesc[currentCmd].param[currentParam].value;
 							}
 
 						}
-					}
 				}
+				
 			}
 
 			float sel = currentParam == i ? 1.f : 0.f;
@@ -1072,40 +1069,39 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 			ui::Text::Setup();
 			ui::Text::Draw(cmdParamDesc[currentCmd].param[i].name, x + insideX, y + insideY);
 
-			for (int p = 0; p < subCount; p++)
-			{
-				float sel_ = currentParam == i ? 1.f : 0.f;
-				sel_ *= (float)(subParam == p);
-				setBStyle(sel_);
+			
+			
+			float sel_ = currentParam == i ? 1.f : 0.f;
+			setBStyle(sel_);
 
-				bool mo = isMouseOver(_x, y + float(p) * lead, w, ui::style::box::height);
+			bool mo = isMouseOver(_x, y, w, ui::style::box::height);
 
-				ui::style::box::outlineBrightness = lerp(0.1f, 1.f, (float)mo);
-				ui::style::box::a = cmdParamDesc[currentCmd].param[i].bypass ? .25f : 1.f;
+			ui::style::box::outlineBrightness = lerp(0.1f, 1.f, (float)mo);
+			ui::style::box::a = cmdParamDesc[currentCmd].param[i].bypass ? .25f : 1.f;
 
-				ui::Box::Setup();
-				ui::Box::Draw(_x, y + float(p) * lead, w, ui::style::text::height * .8f);
+			ui::Box::Setup();
+			ui::Box::Draw(_x, y, w, ui::style::text::height * .8f);
 
-				auto val =  getStrValue(sType, (int)cmdParamDesc[currentCmd].param[i].value[p]);
+			auto val =  getStrValue(sType, (int)cmdParamDesc[currentCmd].param[i].value);
 
-				setTStyle(sel_);
-				ui::Text::Draw(val, x + valueDrawOffset, y + float(p) * lead + insideY);
+			setTStyle(sel_);
+			ui::Text::Draw(val, x + valueDrawOffset, y + insideY);
 
-				if (sel_) {
-					inCurPos = ui::Text::getTextLen(vstr, ui::style::text::width, cursorPos);
-					cursorPos = clamp(cursorPos, 0, (int)strlen(vstr));
-				}
+			if (sel_) {
+				inCurPos = ui::Text::getTextLen(vstr, ui::style::text::width, cursorPos);
+				cursorPos = clamp(cursorPos, 0, (int)strlen(vstr));
 			}
+			
 
 			if (sel && isTypeEnum(sType) && getEnumCount(sType) == 2)
 			{
-				cmdParamDesc[currentCmd].param[i].value[0] = 1 - cmdParamDesc[currentCmd].param[i].value[0];
+				cmdParamDesc[currentCmd].param[i].value = 1 - cmdParamDesc[currentCmd].param[i].value;
 				action = false;
 			}
 
 			if (sel && isTypeEnum(sType) && getEnumCount(sType) != 2)
 			{
-				auto val = cmdParamDesc[currentCmd].param[i].value[0];
+				auto val = cmdParamDesc[currentCmd].param[i].value;
 
 				for (int e = 0; e < getEnumCount(sType); e++)
 				{
@@ -1128,7 +1124,7 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 						{
 							action = true;
 							currentParam = -1;
-							cmdParamDesc[currentCmd].param[i].value[0] = e;
+							cmdParamDesc[currentCmd].param[i].value = e;
 						}
 					}
 				}
@@ -1139,11 +1135,11 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 			{
 				showCursor = true;
 				cursorX = x + valueDrawOffset + inCurPos;
-				cursorY = y + insideY + subParam * lead;
+				cursorY = y + insideY;
 			}
 
-			pCountV += subCount;
-			y += lead* subCount;
+			pCountV += 1;
+			y += lead;
 		}
 
 		//drag by mouse
@@ -1151,12 +1147,12 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 		{
 			if (ui::lbDown)
 			{
-				cmdParamDesc[currentCmd].param[currentParam].value[subParam] = storedParam[subParam] + (int)(ui::mouseDelta.x * width);
+				cmdParamDesc[currentCmd].param[currentParam].value = storedParam + (int)(ui::mouseDelta.x * width);
 				pLimits();
 			}
 			else
 			{
-				storedParam[subParam] = cmdParamDesc[currentCmd].param[currentParam].value[subParam];
+				storedParam = cmdParamDesc[currentCmd].param[currentParam].value;
 			}
 		}
 	}

@@ -19,7 +19,7 @@ struct ParamDesc {
 	int pCount;
 
 	struct {
-		int value[4];
+		int value;
 		char strValue[255];
 		char type[255];
 		int typeIndex;
@@ -27,7 +27,6 @@ struct ParamDesc {
 		bool bypass;
 		int _min;
 		int _max;
-		int _dim;
 		int size;
 		int offset;
 	} param[255];

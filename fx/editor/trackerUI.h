@@ -219,15 +219,15 @@ namespace paramEdit
 
 						if (over && ui::lbDown && drag.isFree())
 						{
-							drag.set(clipIndex, posIndex, 0);
-							storedParam[0] = cmdParamDesc[clipIndex].param[posIndex].value[0];
+							drag.set(clipIndex, posIndex);
+							storedParam = cmdParamDesc[clipIndex].param[posIndex].value;
 							currentCmd = clipIndex;
 							currentClipIndex = clipIndex;
 						}
 
-						if (ui::lbDown && drag.check(clipIndex, posIndex, 0))
+						if (ui::lbDown && drag.check(clipIndex, posIndex))
 						{
-							cmdParamDesc[clipIndex].param[posIndex].value[0] = storedParam[0] + TimeLine::ScreenToTime(ui::mouseDelta.x) / (frame * 60 * 60 / editor::TimeLine::bpm);
+							cmdParamDesc[clipIndex].param[posIndex].value = storedParam + TimeLine::ScreenToTime(ui::mouseDelta.x) / (frame * 60 * 60 / editor::TimeLine::bpm);
 							pLimits(clipIndex, posIndex);
 						}
 
@@ -301,7 +301,7 @@ namespace paramEdit
 
 								if (over && ui::lbDown)
 								{
-									storedParam[0] = pitchValue;
+									storedParam = pitchValue;
 									currentCmd = pitchLayerIndex;
 									currentParam = n;
 
@@ -377,7 +377,7 @@ namespace paramEdit
 
 		if (note >= 0)
 		{
-			cmdParamDesc[i].param[currentNote + 1].value[0] = note;
+			cmdParamDesc[i].param[currentNote + 1].value = note;
 			if (currentNote + currentStep < tracker::track_desc.channel[currentChannel].clip[currentClip].length)
 			{
 				currentNote += currentStep;
@@ -393,9 +393,9 @@ namespace paramEdit
 				auto index = tracker::track_desc.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
 				for (int n = currentNote; n < len-1 ; n++)
 				{
-					cmdParamDesc[index].param[n+1].value[0] = cmdParamDesc[index].param[n+2].value[0];
+					cmdParamDesc[index].param[n+1].value = cmdParamDesc[index].param[n+2].value;
 				}
-				cmdParamDesc[index].param[len].value[0] = 0;
+				cmdParamDesc[index].param[len].value = 0;
 				break;
 			}
 
@@ -405,15 +405,15 @@ namespace paramEdit
 				auto index = tracker::track_desc.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
 				for (int n = len - 2; n >= currentNote; n--)
 				{
-					cmdParamDesc[index].param[n + 2].value[0] = cmdParamDesc[index].param[n + 1].value[0];
+					cmdParamDesc[index].param[n + 2].value = cmdParamDesc[index].param[n + 1].value;
 				}
-				cmdParamDesc[index].param[currentNote+1].value[0] = 0;
+				cmdParamDesc[index].param[currentNote+1].value = 0;
 				break;
 			}
 
 
 			case VK_RETURN:
-				cmdParamDesc[i].param[currentNote+1].value[0]=0;
+				cmdParamDesc[i].param[currentNote+1].value=0;
 				currentNote += currentStep;
 				currentNote = currentNote % tracker::track_desc.channel[currentChannel].clip[currentClip].length;
 				break;
