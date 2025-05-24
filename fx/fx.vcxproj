@@ -200,7 +200,7 @@
       <EnableDpiAwareness>false</EnableDpiAwareness>
     </Manifest>
     <PreBuildEvent>
-      <Command>$(TargetDir)../Reflector/platform.exe</Command>
+      <Command>$(TargetDir)../Reflector/platform.exe -minifier -release</Command>
     </PreBuildEvent>
     <FxCompile>
       <ObjectFileOutput />

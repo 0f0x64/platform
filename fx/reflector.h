@@ -1,7 +1,3 @@
-#define EDITOR
-//#define FINAL_RELEASE_CRINKLER
-//TODO: use command line params instead defines
-
 #include "..\fx\settings.h"
 
 #define _CRT_SECURE_NO_WARNINGS 
@@ -20,6 +16,9 @@
 #include <regex>
 
 using namespace std;
+
+bool minifier = false;
+bool final_release = false;
 
 string uiShaderMargin = "..\\fx\\generated\\uiShaderMargin.h";//final output
 
@@ -45,6 +44,7 @@ const char* shaderExtension = ".shader";
 
 void Log(const char* message)
 {
+	OutputDebugString(message);
 	printf("%s", message);
 }
 
@@ -64,65 +64,69 @@ std::vector <std::string> libList;
 void Process(string shaderName, string inPath, string outPath, ofstream& ofile)
 {
 	Log(shaderName.c_str());
-	Log("\n");
 
 	ofile << "const char* " << shaderName.c_str() << " = ";
 
-#if USE_SHADER_MINIFIER
-	string _pathToExe = pathToExe;
-
-	string minifierCmdLine = _pathToExe + "\\shader_minifier.exe " +
-		" --hlsl --format Text --no-remove-unused --preserve-all-globals --no-inlining --preserve-externals " +
-		inPath + shaderName + shaderExtension +
-		" -o " + outPath + shaderName + shaderExtension;
-
-
-
-	STARTUPINFO si;
-	ZeroMemory(&si, sizeof(STARTUPINFO));
-	PROCESS_INFORMATION pi;
-
-	if (CreateProcess(NULL, const_cast<char*>(minifierCmdLine.c_str()), NULL, NULL, FALSE, NULL, NULL, pathToExe, &si, &pi))
+	if (minifier)
 	{
-		WaitForSingleObject(pi.hProcess, INFINITE);
-		CloseHandle(pi.hProcess);
-		CloseHandle(pi.hThread);
-	};
+		string _pathToExe = pathToExe;
 
-	string inFilePath = outPath + shaderName + shaderExtension;
+		string minifierCmdLine = _pathToExe + "\\shader_minifier.exe " +
+			" --hlsl --format Text --no-remove-unused --preserve-all-globals --no-inlining --preserve-externals " +
+			inPath + shaderName + shaderExtension +
+			" -o " + outPath + shaderName + shaderExtension;
 
-	string s;
-	ifstream ifile(inFilePath);
 
-	if (ifile.is_open())
+
+		STARTUPINFO si;
+		ZeroMemory(&si, sizeof(STARTUPINFO));
+		PROCESS_INFORMATION pi;
+
+		if (CreateProcess(NULL, const_cast<char*>(minifierCmdLine.c_str()), NULL, NULL, FALSE, NULL, NULL, pathToExe, &si, &pi))
+		{
+			WaitForSingleObject(pi.hProcess, INFINITE);
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+		};
+
+		string inFilePath = outPath + shaderName + shaderExtension;
+
+		string s;
+		ifstream ifile(inFilePath);
+
+		if (ifile.is_open())
+		{
+			while (getline(ifile, s))
+			{
+				ofile << '"' << s << "\\n" << '"' << endl;
+
+			}
+		}
+
+		ofile << ";\n\n";
+
+		Log(" - compressed by minifier");
+	}
+	else
 	{
+		string inFilePath = inPath + shaderName + shaderExtension;
+
+		ofile << "\n";
+
+		string s;
+		ifstream ifile(inFilePath);
+
 		while (getline(ifile, s))
 		{
 			ofile << '"' << s << "\\n" << '"' << endl;
 
 		}
-	}
 
-	ofile << ";\n\n";
-
-#else
-
-	string inFilePath = inPath + shaderName + shaderExtension;
-
-	ofile << "\n";
-
-	string s;
-	ifstream ifile(inFilePath);
-
-	while (getline(ifile, s))
-	{
-		ofile << '"' << s << "\\n" << '"' << endl;
+		ofile << ";\n\n";
 
 	}
 
-	ofile << ";\n\n";
-
-#endif
+	Log("\n");
 
 }
 
@@ -475,8 +479,24 @@ void catToFile(const std::filesystem::path& sandbox, ofstream& ofile, std::vecto
 	}
 }
 
-int main()
+int main(int argc, char* argv[])
 {
+	for (int i{}; i < argc; ++i)
+	{
+		if (strcmp(argv[i], "-minifier") == 0)
+		{
+			minifier = true;
+			Log("using shader minifier\n");
+		}
+
+		if (strcmp(argv[i], "-release") == 0)
+		{
+			final_release = true;
+			Log("release config - ui shaders will be removed\n");
+		}
+
+	}
+
 	SelfLocate();
 
 	const std::filesystem::path UIvsSandbox{ UIinVPath };
@@ -493,11 +513,13 @@ int main()
 	remove(vsListFile.c_str());
 	ofstream vsfile(vsListFile);
 	catToFile(vsSandbox, vsfile, vsList, vShadersCount, "Shader(", ")\n");
-	
+
 	UIvShadersStart = vShadersCount;
-#ifndef FINAL_RELEASE_CRINKLER
-	catToFile(UIvsSandbox, vsfile, vsList, vShadersCount, "Shader(", ")\n");
-#endif
+	
+	if (!final_release)
+	{
+		catToFile(UIvsSandbox, vsfile, vsList, vShadersCount, "Shader(", ")\n");
+	}
 
 	vsfile.close();
 
@@ -506,9 +528,11 @@ int main()
 	catToFile(psSandbox, psfile, psList, pShadersCount, "Shader(", ")\n");
 
 	UIpShadersStart = pShadersCount;
-#ifndef FINAL_RELEASE_CRINKLER
-	catToFile(UIpsSandbox, psfile, psList, pShadersCount, "Shader(", ")\n");
-#endif
+
+	if (!final_release)
+	{
+		catToFile(UIpsSandbox, psfile, psList, pShadersCount, "Shader(", ")\n");
+	}
 
 	psfile.close();
 
@@ -570,10 +594,11 @@ int main()
 	remove(uiShaderMargin.c_str());
 	ofstream uiMfile(uiShaderMargin);
 
-#ifndef FINAL_RELEASE_CRINKLER
-	uiMfile << "int UIvShadersStart = " << UIvShadersStart << ";\n";
-	uiMfile << "int UIpShadersStart = " << UIpShadersStart << ";\n";
-#endif
+	if (!final_release)
+	{
+		uiMfile << "int UIvShadersStart = " << UIvShadersStart << ";\n";
+		uiMfile << "int UIpShadersStart = " << UIpShadersStart << ";\n";
+	}
 
 	uiMfile.close();
 

@@ -219,7 +219,7 @@ namespace Textures
 
 		context->RSSetViewports(1, &vp);
 
-		rect r = rect{ 0,0,(int)vp.Width ,(int)vp.Height };
+		float4 r = float4{ 0,0,vp.Width ,vp.Height };
 		Rasterizer::Scissors(r);
 	}
 

@@ -372,7 +372,7 @@ namespace TimeLine
 		screenEnd = ScreenToTime(right);
 		end = min(timelineLen, screenEnd);
 
-		Rasterizer::Scissors(rect{ (int)(screenLeft*dx11::width), 0, (int)(screenRight*dx11::width), dx11::height });
+		Rasterizer::Scissors(float4{ screenLeft*dx11::width, 0, screenRight*dx11::width, (float)dx11::height });
 
 		ui::style::Base();
 		editor::ui::style::box::outlineBrightness = 0;
@@ -396,7 +396,7 @@ namespace TimeLine
 
 		DrawCursor(1);
 
-		Rasterizer::Scissors(rect{ 0, 0, dx11::width, dx11::height });
+		Rasterizer::Scissors(float4{ 0, 0, (float)dx11::width, (float)dx11::height });
 
 	}
 

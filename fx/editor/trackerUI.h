@@ -76,7 +76,7 @@ namespace paramEdit
 
 	void showTrackControls()
 	{
-		Rasterizer::Scissors({ 0,0,dx11::width,dx11::height });
+		Rasterizer::Scissors({ 0,0,(float)dx11::width,(float)dx11::height });
 		ui::Box::Setup();
 		ui::style::Base();
 		ui::style::button::hAlign = ui::style::align_h::center;
@@ -141,7 +141,7 @@ namespace paramEdit
 
 			for (int ch = 0; ch < tracker::track_desc.channelsCount; ch++)
 			{
-				Rasterizer::Scissors(rect{ 0, (int)(top * dx11::height), dx11::width, (int)(bottom * dx11::height) });
+				Rasterizer::Scissors(float4{ 0, (float)top * dx11::height, (float)dx11::width, (float)(bottom * dx11::height) });
 				channelIndex = tracker::track_desc.channel[ch].cmdIndex;
 				float  ch_lead = ui::style::box::height * 2.2f;
 				clipYpos += ch_lead;
@@ -191,7 +191,7 @@ namespace paramEdit
 					ui::style::Base();
 				}
 
-				Rasterizer::Scissors(rect{ (int)(TimeLine::screenLeft * dx11::width), (int)(top * dx11::height), dx11::width, (int)(bottom * dx11::height) });
+				Rasterizer::Scissors(float4{ (float)(TimeLine::screenLeft * dx11::width), (float)(top * dx11::height), (float)dx11::width, (float)(bottom * dx11::height) });
 
 				for (int clp = 0; clp <= tracker::track_desc.channel[ch].clipCounter; clp++)
 				{

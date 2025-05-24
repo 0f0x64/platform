@@ -4,7 +4,6 @@ struct {
 	char name[255];
 	int _min;
 	int _max;
-	int _dim;
 
 	char enumString[255][255];
 	int enumCount = 0;
@@ -81,12 +80,6 @@ int getTypeIndex(const char* t1)
 	return -1;
 }
 
-int getTypeDim(int typeIndex)
-{
-	if (typeIndex < 0) return 1;
-	return typeDesc[typeIndex]._dim;
-}
-
 int getTypeMin(int typeIndex)
 {
 	if (typeIndex < 0) return INT_MIN;
@@ -104,10 +97,9 @@ bool isNumber(const std::string& token)
 	return std::regex_match(token, std::regex("(\\+|-)?[0-9]*(\\.?([0-9]+))$"));
 }
 
-bool fillTypeTable(const char* name, int _min_value, int _max_value, int _dim, const char* enumStr = NULL)
+bool fillTypeTable(const char* name, int _min_value, int _max_value, const char* enumStr = NULL)
 {
 	strcpy(typeDesc[typeCount].name, name);
-	typeDesc[typeCount]._dim = _dim;
 	typeDesc[typeCount]._min = _min_value;
 	typeDesc[typeCount]._max = _max_value;
 
@@ -141,7 +133,6 @@ bool fillTypeTable(const char* name, int _min_value, int _max_value, int _dim, c
 bool texturesToEnumType()
 {
 	strcpy(typeDesc[typeCount].name, "texture");
-	typeDesc[typeCount]._dim = 1;
 	typeDesc[typeCount]._min = 0;
 	typeDesc[typeCount]._max = 0;
 	typeDesc[typeCount].enumCount = 0;
@@ -161,9 +152,8 @@ bool texturesToEnumType()
 
 bool ta = texturesToEnumType();
 
-#define createType(name, _min, _max, _dim, ...) typedef struct {  __VA_ARGS__ } name; bool name##_r = fillTypeTable(#name, _min,_max,_dim);
-#define createSimpleType(name, _min, _max) typedef int name; bool name##_r = fillTypeTable(#name, _min,_max,1);
-#define enumType(name, ...) enum class name:int { __VA_ARGS__}; bool name##_t = fillTypeTable(#name, 0, INT_MAX, 1, #__VA_ARGS__);
+#define createSimpleType(name, _min, _max) typedef int name; bool name##_r = fillTypeTable(#name, _min,_max);
+#define enumType(name, ...) enum class name:int { __VA_ARGS__}; bool name##_t = fillTypeTable(#name, 0, INT_MAX, #__VA_ARGS__);
 
 #else
 
@@ -185,23 +175,6 @@ struct int4 { int x; int y; int z; int w; };
 
 const float intToFloatDenom = 255.f;
 
-createType(vector3, 0, 0, 3, float x; float y; float z;);
-createType(vector4, 0, 0, 4, float x; float y; float z; float w;);
-createType(vector3i, 0, 0, 3, int x; int y; int z;);
-createType(vector4i, 0, 0, 4, int x; int y; int z; int w;);
-
-//internal 
-typedef vector3 positionF;
-typedef vector3 sizeF;
-typedef vector3 rotationF;
-//----
-
-createType(position, INT_MIN, INT_MAX, 3, int x; int y; int z;);
-createType(size, INT_MIN, INT_MAX, 3, int x; int y; int z;);
-createType(rotation, INT_MIN, INT_MAX, 3, int x; int y; int z;);
-createType(color, 0, 255, 3, int x; int y; int z;);
-createType(color4, 0, 255, 4, int x; int y; int z; int w;);
-createType(rect, INT_MIN, INT_MAX, 4, int x; int y; int z; int w;);
 createSimpleType(timestamp, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
 createSimpleType(duration_time, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
 createSimpleType(volume, 0, 100);

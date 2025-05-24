@@ -27,7 +27,7 @@ namespace RenderTarget {
 	cmd(Clear, int r; int g; int b; int a;)
 	{
 		reflect;
-		Draw::Clear({ in.r,in.g, in.b, in.a });
+		Draw::Clear({ (float)in.r,(float)in.g, (float)in.b, (float)in.a });
 		reflect_close;
 	}
 }
@@ -109,7 +109,7 @@ namespace Scissors {
 	cmd(Set, int x; int y; int x1; int y1;)
 	{
 		reflect;
-		Rasterizer::Scissors({ in.x ,in.y,in.x1,in.y1});
+		Rasterizer::Scissors({ (float)in.x ,(float)in.y,(float)in.x1,(float)in.y1});
 		reflect_close;
 	}
 }

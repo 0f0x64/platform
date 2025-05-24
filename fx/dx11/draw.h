@@ -1,7 +1,7 @@
 namespace Draw
 { 
 
-	void Clear(color4 color)
+	void Clear(float4 color)
 	{
 		context->ClearRenderTargetView(Textures::Texture[Textures::currentRT].RenderTargetView[0][0], XMVECTORF32{ color.x/255.f,color.y / 255.f,color.z / 255.f,color.w / 255.f });
 	}

@@ -367,29 +367,8 @@ namespace editor
 			} 
 		}
 
-		/*bool changed = false;
 
-		for (int i = 0; i < cmdParamDescBack.pCount; i++)
-		{
-			auto cnt = cmdParamDescBack.param[i]._dim;
-
-			for (int j = 0; j < cnt; j++)
-			{
-				if (cmdParamDescBack.param[i].value[j] != cmdParamDesc[currentCmd_backup].param[i].value[j])
-				{
-					changed = true;
-					break;
-				}
-
-			}
-
-			if (changed) break;
-		}*/
-
-
-		
 		if (currentCmd_backup != currentCmd)
-		//if (changed)
 		{
 			paramEdit::SaveToSource(currentCmd_backup);
 			//SetForegroundWindow(vsHWND);
@@ -410,7 +389,7 @@ namespace editor
 			break;
 		}
 		
-		Rasterizer::Scissors({ 0,0,dx11::width,dx11::height });
+		Rasterizer::Scissors({ 0,0,(float)dx11::width,(float)dx11::height });
 		ui::Box::Setup();
 		ui::style::Base();
 		ui::style::button::hAlign = ui::style::align_h::center;

@@ -1192,7 +1192,7 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 		yPos = max(yPos, top - cmdCounter * lead + lead);
 		yPos = min(yPos, bottom - lead);
 
-		Rasterizer::Scissors(rect{ 0, (int)(top*dx11::height), dx11::width, (int)(bottom*dx11::height) });
+		Rasterizer::Scissors(float4{ 0, top*dx11::height, (float)dx11::width, (float)bottom*dx11::height });
 
 		x = ui::style::text::width / 2.f;
 		y = yPos;
@@ -1220,7 +1220,7 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 			ui::Box::Draw(cursorX, cursorY);
 		}
 
-		Rasterizer::Scissors(rect{ 0, 0, width, height });
+		Rasterizer::Scissors(float4{ 0, 0, (float)width, (float)height });
 
 /*		if (!action && ui::lbDown && clickOnEmptyPlace) {
 

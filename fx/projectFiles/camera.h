@@ -116,9 +116,9 @@ namespace BasicCam
 
 		at += .0001f * camJitter * XMVectorSin((XMVectorSet(100, 111, 161,0) * (float)camJitter * sTime / 1000.f));
 		
-		positionF eye_c = { XMVectorGetX(eye),XMVectorGetY(eye), XMVectorGetZ(eye) };
-		positionF at_c =  { XMVectorGetX(at), XMVectorGetY(at),  XMVectorGetZ(at) };
-		positionF up_c =  { XMVectorGetX(up), XMVectorGetY(up),  XMVectorGetZ(up) };
+		float3 eye_c = { XMVectorGetX(eye),XMVectorGetY(eye), XMVectorGetZ(eye) };
+		float3 at_c =  { XMVectorGetX(at), XMVectorGetY(at),  XMVectorGetZ(at) };
+		float3 up_c =  { XMVectorGetX(up), XMVectorGetY(up),  XMVectorGetZ(up) };
 
 		Camera::Set(eye_c, at_c, up_c, angle);
 	}

@@ -48,7 +48,7 @@ namespace Camera
 
 	#endif
 
-	void Set(positionF eye, positionF at, positionF up, float angle)
+	void Set(float3 eye, float3 at, float3 up, float angle)
 	{
 
 		XMVECTOR Eye = XMVECTOR{eye.x,eye.y,eye.z, 0.0f};
