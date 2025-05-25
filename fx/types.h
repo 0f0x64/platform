@@ -107,6 +107,7 @@ bool fillTypeTable(const char* name, int _min_value, int _max_value, const char*
 	{
 		int counter = 0;
 		int j = 0;
+
 		for (unsigned int i = 0; i <= strlen(enumStr); i++)
 		{
 			if (*(enumStr + i) == ' ') continue;
@@ -152,12 +153,11 @@ bool texturesToEnumType()
 
 bool ta = texturesToEnumType();
 
-#define createSimpleType(name, _min, _max) typedef int name; bool name##_r = fillTypeTable(#name, _min,_max);
-#define enumType(name, ...) enum class name:int { __VA_ARGS__}; bool name##_t = fillTypeTable(#name, 0, INT_MAX, #__VA_ARGS__);
+#define createType(name,type, _min, _max) typedef type name; bool name##_r = fillTypeTable(#name, _min,_max);
+#define enumType(name, ...) enum class name:int { __VA_ARGS__}; bool name##_t = fillTypeTable(#name, 0, 255, #__VA_ARGS__);
 
 #else
 
-#define createType(name, _min, _max, _dim, ...) typedef struct {  __VA_ARGS__ } name;
 #define createSimpleType(name, _min, _max) typedef int name;
 #define enumType(name, ...) enum class name:int { __VA_ARGS__};
 
@@ -171,14 +171,19 @@ struct int3 { int x; int y; int z; };
 struct int4 { int x; int y; int z; int w; };
 
 #define float4x4 XMMATRIX
-
+#define t8 unsigned char
+#define t8s signed char
+#define t16 unsigned short
+#define t16s signed short
+#define t32 unsigned int
+#define t32s signed int
 
 const float intToFloatDenom = 255.f;
 
-createSimpleType(timestamp, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
-createSimpleType(duration_time, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
-createSimpleType(volume, 0, 100);
-createSimpleType(panorama, -90, 90);
+createType(timestamp, t32, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
+createType(duration_time, t32, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
+createType(volume, t8, 0, 100);
+createType(panorama, t8s, -90, 90);
 
 enumType(blendmode, off, on, alpha);
 enumType(blendop, add, sub, revsub, min, max);
@@ -192,6 +197,7 @@ enumType(keyType, set, slide);
 enumType(visibility, on, off, solo);
 enumType(camAxis, local, global);
 enumType(sliderType, follow, pan, slide);
+
 enumType(switcher, off, on);
 enumType(overdub, off, on);
 enumType(layers, pitch, variation, retrigger, slide, send0, send1, send2, send3);
@@ -202,16 +208,7 @@ enum class texture:int {
 #include "projectFiles\texList.h"	
 };
 
-unsigned char va_params[255];
 
-#define VA_READ \
-va_list args;\
-va_start(args, count);\
-va_params[0] = count;\
-for (int i = 1; i <= count; i++)\
-{\
-	va_params[i] = va_arg(args, unsigned char);\
-};
 
 
 
