@@ -3,7 +3,7 @@ namespace Object {
 	cmd(Show, 
 		texture geometry;
 		texture normals;
-		int quality; 
+		int8u quality; 
 		int pos_x;
 		int pos_y;
 		int pos_z;

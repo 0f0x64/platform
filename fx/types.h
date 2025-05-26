@@ -1,3 +1,5 @@
+#define float4x4 XMMATRIX
+
 #if EditMode
 
 struct {
@@ -7,6 +9,7 @@ struct {
 
 	char enumString[255][255];
 	int enumCount = 0;
+	int size;
 
 } typeDesc[255];
 
@@ -67,6 +70,12 @@ bool isTypeEnum(int typeIndex)
 	return typeDesc[typeIndex].enumCount != 0 ? true : false;
 }
 
+int getTypeSize(int typeIndex)
+{
+	if (typeIndex < 0) return 4;
+	return typeDesc[typeIndex].size;
+}
+
 int getTypeIndex(const char* t1)
 {
 	for (int i = 0; i < typeCount; i++)
@@ -97,11 +106,12 @@ bool isNumber(const std::string& token)
 	return std::regex_match(token, std::regex("(\\+|-)?[0-9]*(\\.?([0-9]+))$"));
 }
 
-bool fillTypeTable(const char* name, int _min_value, int _max_value, const char* enumStr = NULL)
+bool fillTypeTable(int size, const char* name, int _min_value, int _max_value, const char* enumStr = NULL)
 {
 	strcpy(typeDesc[typeCount].name, name);
 	typeDesc[typeCount]._min = _min_value;
 	typeDesc[typeCount]._max = _max_value;
+	typeDesc[typeCount].size =size;
 
 	if (enumStr)
 	{
@@ -137,6 +147,7 @@ bool texturesToEnumType()
 	typeDesc[typeCount]._min = 0;
 	typeDesc[typeCount]._max = 0;
 	typeDesc[typeCount].enumCount = 0;
+	typeDesc[typeCount].size = 1;
 
 	int tc = 1;
 #undef CreateTexture
@@ -153,13 +164,26 @@ bool texturesToEnumType()
 
 bool ta = texturesToEnumType();
 
-#define createType(name,type, _min, _max) typedef type name; bool name##_r = fillTypeTable(#name, _min,_max);
-#define enumType(name, ...) enum class name:int { __VA_ARGS__}; bool name##_t = fillTypeTable(#name, 0, 255, #__VA_ARGS__);
+#define createType32s(name, _min, _max) typedef int name; bool name##_r = fillTypeTable(sizeof(int), #name, _min,_max);
+#define createType32u(name, _min, _max) typedef unsigned int name; bool name##_r = fillTypeTable(sizeof(unsigned int), #name, _min,_max);
+#define createType16s(name, _min, _max) typedef short name; bool name##_r = fillTypeTable(sizeof(short), #name, _min,_max);
+#define createType16u(name, _min, _max) typedef unsigned short name; bool name##_r = fillTypeTable(sizeof(unsigned short), #name, _min,_max);
+#define createType8s(name, _min, _max) typedef char name; bool name##_r = fillTypeTable(sizeof(char), #name, _min,_max);
+#define createType8u(name, _min, _max) typedef unsigned char name; bool name##_r = fillTypeTable(sizeof(unsigned char), #name, _min,_max);
+
+#define createTypeEnum(name, ...) enum class name:unsigned char { __VA_ARGS__}; bool name##_t = fillTypeTable(sizeof(int), #name, 0, 255, #__VA_ARGS__);
 
 #else
 
-#define createSimpleType(name, _min, _max) typedef int name;
-#define enumType(name, ...) enum class name:int { __VA_ARGS__};
+#define createType32s (name, _min, _max) typedef int name;
+#define createType32u (name, _min, _max) typedef unsigned int name;
+#define createType16s (name, _min, _max) typedef short name;
+#define createType16u (name, _min, _max) typedef unsigned short name;
+#define createType8s (name, _min, _max) typedef char name;
+#define createType8u (name, _min, _max) typedef unsigned char name;
+
+
+#define createTypeEnum(name, ...) enum class name:unsigned char { __VA_ARGS__};
 
 #endif
 
@@ -170,41 +194,41 @@ struct int2 { int x; int y; };
 struct int3 { int x; int y; int z; };
 struct int4 { int x; int y; int z; int w; };
 
-#define float4x4 XMMATRIX
-#define t8 unsigned char
-#define t8s signed char
-#define t16 unsigned short
-#define t16s signed short
-#define t32 unsigned int
-#define t32s signed int
 
 const float intToFloatDenom = 255.f;
 
-createType(timestamp, t32, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
-createType(duration_time, t32, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
-createType(volume, t8, 0, 100);
-createType(panorama, t8s, -90, 90);
+createType32u(int32u, 0, UINT32_MAX);
+createType32s(int32s, INT32_MIN, INT32_MAX);
+createType16u(int16u, 0, UINT16_MAX);
+createType16s(int16s, INT16_MIN, INT16_MAX);
+createType8u(int8u, 0, 255);
+createType8s(int8s, INT8_MIN, INT8_MAX);
 
-enumType(blendmode, off, on, alpha);
-enumType(blendop, add, sub, revsub, min, max);
-enumType(depthmode, off, on, readonly, writeonly);
-enumType(filter, linear, point, minPoint_magLinear);
-enumType(addr, clamp, wrap);
-enumType(cullmode, off, front, back, wireframe);
-enumType(topology, triList, lineList, lineStrip);
-enumType(targetshader, vertex, pixel, both);
-enumType(keyType, set, slide);
-enumType(visibility, on, off, solo);
-enumType(camAxis, local, global);
-enumType(sliderType, follow, pan, slide);
+createType32s(timestamp, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
+createType32s(duration_time, 0, (int)DEMO_DURATION* SAMPLING_FREQ);
+createType8u(volume, 0, 100);
+createType8s(panorama, -90, 90);
 
-enumType(switcher, off, on);
-enumType(overdub, off, on);
-enumType(layers, pitch, variation, retrigger, slide, send0, send1, send2, send3);
+createTypeEnum(blendmode, off, on, alpha);
+createTypeEnum(blendop, add, sub, revsub, min, max);
+createTypeEnum(depthmode, off, on, readonly, writeonly);
+createTypeEnum(filter, linear, point, minPoint_magLinear);
+createTypeEnum(addr, clamp, wrap);
+createTypeEnum(cullmode, off, front, back, wireframe);
+createTypeEnum(topology, triList, lineList, lineStrip);
+createTypeEnum(targetshader, vertex, pixel, both);
+createTypeEnum(keyType, set, slide);
+createTypeEnum(visibility, on, off, solo);
+createTypeEnum(camAxis, local, global);
+createTypeEnum(sliderType, follow, pan, slide);
+
+createTypeEnum(switcher, off, on);
+createTypeEnum(overdub, off, on);
+createTypeEnum(layers, pitch, variation, retrigger, slide, send0, send1, send2, send3);
 
 #undef CreateTexture
 #define CreateTexture(name,type,format,width,height,mip,depth) name,
-enum class texture:int {
+enum class texture:unsigned char {
 #include "projectFiles\texList.h"	
 };
 

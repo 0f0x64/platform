@@ -33,7 +33,7 @@ namespace paramEdit {
 	{
 		strcpy(cmdParamDesc[cmdCounter].param[index].type, type);
 		cmdParamDesc[cmdCounter].param[index].typeIndex = getTypeIndex(type);
-		cmdParamDesc[cmdCounter].param[index].size = sizeof(int);
+		cmdParamDesc[cmdCounter].param[index].size = getTypeSize(cmdParamDesc[cmdCounter].param[index].typeIndex);
 	}
 
 	void SetParamName(int index, const char* name)
@@ -483,7 +483,39 @@ namespace paramEdit {
 						{
 							if (!isParam(pvalue)) {
 								c->param[i].bypass = true;
-								c->param[i].value = *(int*)((char*)in + c->param[i].offset);
+								//if (c->param[i]._min < 0)
+								{
+									switch (c->param[i].size)
+									{
+									case 1:
+										c->param[i].value = *(char*)((char*)in + c->param[i].offset);
+										break;
+									case 2:
+										c->param[i].value = *(short*)((char*)in + c->param[i].offset);
+										break;
+									case 4:
+										c->param[i].value = *(int*)((char*)in + c->param[i].offset);
+										break;
+
+									}
+								}
+								/*
+								else
+								{
+									switch (c->param[i].size)
+									{
+									case 1:
+										c->param[i].value = *(unsigned char*)((char*)in + c->param[i].offset);
+										break;
+									case 2:
+										c->param[i].value = *(unsigned short*)((char*)in + c->param[i].offset);
+										break;
+									case 4:
+										c->param[i].value = *(unsigned int*)((char*)in + c->param[i].offset);
+										break;
+
+									}
+								}*/
 								strcpy(c->param[i].strValue, pvalue.c_str());
 							}
 							else
@@ -510,7 +542,41 @@ namespace paramEdit {
 
 			for (int i = 0; i < c->pCount; i++)
 			{
-				*(int*)((char*)in + c->param[i].offset) = c->param[i].value;
+				//if (c->param[i]._min < 0)
+				{
+					switch (c->param[i].size)
+					{
+					case 1:
+						*(char*)((char*)in + c->param[i].offset) = c->param[i].value;
+						break;
+					case 2:
+						*(short*)((char*)in + c->param[i].offset) = c->param[i].value;
+						break;
+					case 4:
+						*(int*)((char*)in + c->param[i].offset) = c->param[i].value;
+						break;
+
+					}
+				}
+				/*else
+				{
+					switch (c->param[i].size)
+					{
+					case 1:
+						*(unsigned char*)((char*)in + c->param[i].offset) = c->param[i].value;
+						break;
+					case 2:
+						*(unsigned short*)((char*)in + c->param[i].offset) = c->param[i].value;
+						break;
+					case 4:
+						*(unsigned int*)((char*)in + c->param[i].offset) = c->param[i].value;
+						break;
+
+					}
+				}*/
+
+
+				
 			}
 		}
 
@@ -538,26 +604,6 @@ namespace paramEdit {
 	void setTStyle(float sel)
 	{
 		ui::style::text::r = ui::style::text::g = ui::style::text::b = ui::style::text::b = lerp(.8f, .2f, sel);;
-	}
-
-	void setParamsAttr()
-	{
-		for (int i = 0; i < cmdParamDesc[cmdCounter].pCount; i++)
-		{
-			auto pid = getTypeIndex(cmdParamDesc[cmdCounter].param[i].type);
-			cmdParamDesc[cmdCounter].param[i].typeIndex = pid;
-
-			if (pid < 0)
-			{
-				cmdParamDesc[cmdCounter].param[i]._min = INT_MIN;
-				cmdParamDesc[cmdCounter].param[i]._max = INT_MAX;
-			}
-			else
-			{
-				cmdParamDesc[cmdCounter].param[i]._min = typeDesc[pid]._min;
-				cmdParamDesc[cmdCounter].param[i]._max = typeDesc[pid]._max;
-			}
-		}
 	}
 
 	//detect expressions and variables in caller and set bypass

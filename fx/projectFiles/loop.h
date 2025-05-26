@@ -88,16 +88,16 @@ namespace Loop
 		BlendMode::Set({ blendmode::off,blendop::add });
 
 		Cubemap::Calc({ texture::env });
-		Object::Calc({ texture::obj1pos,texture::obj1nrml });
+		Object::Calc({texture::obj1pos,texture::obj1nrml});
 
-		RenderTarget::Set({ texture::mainRT,0 });
-		RenderTarget::Clear({ 255,255,255,255 });
+		RenderTarget::Set({texture::mainRT,0});
+		RenderTarget::Clear({255,255,255,255});
 
 		cameraMan::run({});
 
-		Cubemap::Show({ texture::env });
+		Cubemap::Show({texture::env});
 
-		DepthBuf::Mode({ depthmode::on });
+		DepthBuf::Mode({depthmode::on});
 		DepthBuf::Clear({});
 		Culling::Set({cullmode::back});
 		BlendMode::Set({
@@ -109,9 +109,9 @@ namespace Loop
 			.geometry = texture::obj1pos,
 			.normals = texture::obj1nrml,
 			.quality = 0,
-			.pos_x = 623,
-			.pos_y = 430,
-			.pos_z = 111
+			.pos_x = 512,
+			.pos_y = 0,
+			.pos_z = 1
 		});
 	}
 
@@ -138,8 +138,8 @@ namespace Loop
 	void mainLoop()
 	{
 		
-		scene1();
-		//track();
+		//scene1();
+		track();
 
 	}
 
