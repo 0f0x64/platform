@@ -139,10 +139,10 @@ namespace paramEdit
 			clipYpos = ui::style::box::height;
 			TimeLine::screenLeft = x + enumDrawOffset - insideX;
 
-			for (int ch = 0; ch < tracker::track_desc.channelsCount; ch++)
+			for (int ch = 0; ch < track.channelsCount; ch++)
 			{
 				Rasterizer::Scissors(float4{ 0, (float)top * dx11::height, (float)dx11::width, (float)(bottom * dx11::height) });
-				channelIndex = tracker::track_desc.channel[ch].cmdIndex;
+				channelIndex = track.channels[ch].cmdIndex;
 				float  ch_lead = ui::style::box::height * 2.2f;
 				clipYpos += ch_lead;
 
@@ -193,10 +193,10 @@ namespace paramEdit
 
 				Rasterizer::Scissors(float4{ (float)(TimeLine::screenLeft * dx11::width), (float)(top * dx11::height), (float)dx11::width, (float)(bottom * dx11::height) });
 
-				for (int clp = 0; clp <= tracker::track_desc.channel[ch].clipCounter; clp++)
+				for (int clp = 0; clp <= tracker::track.channel[ch].clipCounter; clp++)
 				{
-					int clipIndex = tracker::track_desc.channel[ch].clip[clp].cmdIndex;
-					auto clp_desc = tracker::track_desc.channel[ch].clip[clp];
+					int clipIndex = tracker::track.channel[ch].clip[clp].cmdIndex;
+					auto clp_desc = tracker::track.channel[ch].clip[clp];
 					int frame = SAMPLING_FREQ / FRAMES_PER_SECOND;
 					float sWidth = TimeLine::TimeToScreen(frame * 60 * 60 * clp_desc.length * clp_desc.repeat / (editor::TimeLine::bpm * clp_desc.bpmScale));
 					float h = ch_h;
@@ -248,7 +248,7 @@ namespace paramEdit
 					// show all layers
 					for (int r = 0; r < clp_desc.repeat; r++)
 					{
-						int pitchLayerIndex = tracker::track_desc.channel[ch].clip[clp].note[(int)layers::pitch].cmdIndex;
+						int pitchLayerIndex = tracker::track.channel[ch].clip[clp].note[(int)layers::pitch].cmdIndex;
 
 						for (int n = 1; n <= clp_desc.length; n++)
 						{
@@ -280,7 +280,7 @@ namespace paramEdit
 
 								ui::style::BaseColor((n - 1 == currentNote) && currentClipIndex == clipIndex);
 								//ui::style::BaseColor();
-								auto pitchValue = tracker::track_desc.channel[ch].clip[clp].note[(int)layers::pitch].note_pitch[n - 1];
+								auto pitchValue = tracker::track.channel[ch].clip[clp].note[(int)layers::pitch].note_pitch[n - 1];
 								if (pitchValue == 0)
 								{
 									ui::style::box::r *= 0.75;
@@ -372,25 +372,25 @@ namespace paramEdit
 		//note editing section
 		if (currentChannel < 0 || currentClip < 0 && currentNote < 0) return;
 
-		auto i = tracker::track_desc.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
+		auto i = tracker::track.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
 		auto note = getNoteFromKey(wParam);
 
 		if (note >= 0)
 		{
 			cmdParamDesc[i].param[currentNote + 1].value = note;
-			if (currentNote + currentStep < tracker::track_desc.channel[currentChannel].clip[currentClip].length)
+			if (currentNote + currentStep < tracker::track.channel[currentChannel].clip[currentClip].length)
 			{
 				currentNote += currentStep;
 			}
-			//currentNote = currentNote % tracker::track_desc.channel[currentChannel].clip[currentClip].length;
+			//currentNote = currentNote % tracker::track.channel[currentChannel].clip[currentClip].length;
 		}
 
 		switch (wParam)
 		{
 			case VK_DELETE:
 			{
-				auto len = tracker::track_desc.channel[currentChannel].clip[currentClip].length;	
-				auto index = tracker::track_desc.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
+				auto len = tracker::track.channel[currentChannel].clip[currentClip].length;	
+				auto index = tracker::track.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
 				for (int n = currentNote; n < len-1 ; n++)
 				{
 					cmdParamDesc[index].param[n+1].value = cmdParamDesc[index].param[n+2].value;
@@ -401,8 +401,8 @@ namespace paramEdit
 
 			case VK_INSERT:
 			{
-				auto len = tracker::track_desc.channel[currentChannel].clip[currentClip].length;
-				auto index = tracker::track_desc.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
+				auto len = tracker::track.channel[currentChannel].clip[currentClip].length;
+				auto index = tracker::track.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
 				for (int n = len - 2; n >= currentNote; n--)
 				{
 					cmdParamDesc[index].param[n + 2].value = cmdParamDesc[index].param[n + 1].value;
@@ -415,13 +415,13 @@ namespace paramEdit
 			case VK_RETURN:
 				cmdParamDesc[i].param[currentNote+1].value=0;
 				currentNote += currentStep;
-				currentNote = currentNote % tracker::track_desc.channel[currentChannel].clip[currentClip].length;
+				currentNote = currentNote % tracker::track.channel[currentChannel].clip[currentClip].length;
 				break;
 			case VK_LEFT:
 				if (currentNote > 0) currentNote--;
 				break;
 			case VK_RIGHT:
-				if (currentNote < tracker::track_desc.channel[currentChannel].clip[currentClip].length - 1) currentNote++;
+				if (currentNote < tracker::track.channel[currentChannel].clip[currentClip].length - 1) currentNote++;
 				break;
 
 		}

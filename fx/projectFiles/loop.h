@@ -116,7 +116,7 @@ namespace Loop
 	}
 
 
-	void track()
+	void track__()
 	{
 		if (!isPrecalc)
 		{
@@ -130,7 +130,7 @@ namespace Loop
 		RenderTarget::Set({texture::mainRT,0});
 		RenderTarget::Clear({ 11, 11, 11, 255 });
 		DepthBuf::Clear({});
-		tracker::Track({ 120 });
+		tracker::Track({});
 			
 	}
 
@@ -139,7 +139,7 @@ namespace Loop
 	{
 		
 		//scene1();
-		track();
+		track__();
 
 	}
 

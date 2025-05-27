@@ -39,7 +39,8 @@ int cmdCounter = 0;//reset it in loop start point
 #include "types.h"
 #include "dx11\dx.h"
 #include "Xaudio2.h"
-#include "projectFiles\sound\track_struct.h"
+#include "projectFiles\sound\trackStruct.h"
+_track track;
 
 using namespace dx11;
 

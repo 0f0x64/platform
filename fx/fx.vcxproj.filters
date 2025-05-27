@@ -179,9 +179,6 @@
     <ClInclude Include="projectFiles\sound\tracker.h">
       <Filter>Source Files\sound</Filter>
     </ClInclude>
-    <ClInclude Include="projectFiles\sound\track_struct.h">
-      <Filter>Source Files\sound</Filter>
-    </ClInclude>
     <ClInclude Include="editor\trackerUI.h">
       <Filter>Source Files\editor</Filter>
     </ClInclude>
@@ -196,6 +193,12 @@
     </ClInclude>
     <ClInclude Include="generated\uiShaderMargin.h">
       <Filter>Source Files\generated</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\sound\trackData.h">
+      <Filter>Source Files\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\sound\trackStruct.h">
+      <Filter>Source Files\sound</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
