@@ -78,6 +78,7 @@ namespace tracker
 
 	}
 	
+
 #define sDecl(name) struct name
 #define pDecl(type, name) type name
 
@@ -112,17 +113,53 @@ namespace tracker
 	};
 
 #define trackParam \
-	pDecl(int,masterBPM);\
-	pDecl(int,volume);\
+	pDecl(int32u,masterBPM);\
+	pDecl(int8u,volume);\
+	pDecl(int8u,channelsCount);\
 	pDecl(channel,channels[32]);
 
 	struct track {
 		trackParam
 	};
 
-#undef cDelc
-#define cDecl(type,name) str+=  std::to_string(c.name);
 
+	void processVal(std::string& str, int32u	var, const char* varName) { str+=".";str+= varName; str+=" = "; str += std::to_string(var); str += ";\n"; }
+	void processVal(std::string& str, int32s	var, const char* varName) { str+=".";str+= varName; str+=" = "; str += std::to_string(var);	str += ";\n"; }
+	void processVal(std::string& str, int16u	var, const char* varName) { str+=".";str+= varName; str+=" = "; str += std::to_string(var);	str += ";\n"; }
+	void processVal(std::string& str, int16s	var, const char* varName) { str+=".";str+= varName; str+=" = "; str += std::to_string(var);	str += ";\n"; }
+	void processVal(std::string& str, int8u		var, const char* varName)  { str+=".";str+= varName; str+=" = "; str += std::to_string(var);	str += ";\n"; }
+	void processVal(std::string& str, int8s		var, const char* varName)  { str+=".";str+= varName; str+=" = "; str += std::to_string(var);	str += ";\n"; }
+	void processVal(std::string& str, switcher	var, const char* varName) { str += ".";str += varName; str += " = "; str += std::to_string((int)var);str += ";\n"; }
+
+	void processVal(std::string& str, channel var, const char* varName) { str += ".channels = {\n"; }
+	void processVal(std::string& str, clip var, const char* varName) { str += ".clips = {\n"; }
+
+
+
+	track track1;
+
+	void genTrackText()
+	{
+		#undef pDelc
+		#define pDecl(type,name) processVal(str, track1.name, #name);
+
+		std::string str;
+		str += "track1 = {\n";
+		trackParam;
+
+		#undef pDelc
+		#define pDecl(type,name) processVal(str, track1.channel[i].name, #name);
+
+		for (int i = 0;i < track1.channelsCount;i++)
+		{
+			channelParam
+		}
+
+
+		str += "}\n};";
+
+		int a = 0;
+	}
 
 	/*#pragma pack (push,1)
 	struct clip{
@@ -162,11 +199,14 @@ namespace tracker
 
 	_ts track;*/
 
+
+
 	void ttt()
 	{
-		track track1 = {
+		 track1 = {
 			.masterBPM = 120,
 			.volume = 10,
+			.channelsCount = 2,
 			.channels = {
 				channel {
 					.vol = 0,
@@ -256,6 +296,9 @@ namespace tracker
 		reflect;
 
 		ttt();
+
+		genTrackText();
+
 		//regDrawer(playTrack_dc);
 #if EditMode
 		editor::TimeLine::bpm = track_desc.masterBPM = in.masterBPM;
