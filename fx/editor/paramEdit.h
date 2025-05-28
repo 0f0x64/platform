@@ -990,7 +990,6 @@ bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 	return over;
 }
 
-
 bool Button(int cmdIndex, const char* str, float x, float y, float w, float h)
 {
 	bool over = isMouseOver(x, y, w, h);
@@ -1061,7 +1060,55 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 	}
 }
 
+//TRACKER
 
+void processSwitcher(std::string pName, float x, float y, float w, float h, int ch, auto& var, const char* shortName = "")
+{
+	ui::style::button::inverted = var == switcher::off ? false : true;
+
+	if (ButtonPressed(shortName ? shortName : pName.c_str(), x, y, w, h) && drag.isFree())
+	{
+		var = (switcher)(1 - (int)var);
+		drag.set(drag.context::commonUIButtons);
+	}
+}
+
+
+void processSlider(std::string pName, float x, float y, float w, float h, auto& var, dir direction)
+{
+
+/*
+	float range = (float)(cmdParamDesc[cmdIndex].param[paramIndex]._max - cmdParamDesc[cmdIndex].param[paramIndex]._min);
+	ui::style::box::signed_progress = cmdParamDesc[cmdIndex].param[paramIndex]._min < 0.f ? 1.f : 0.f;
+
+	ui::style::box::progress = cmdParamDesc[cmdIndex].param[paramIndex].value / range;;
+	ui::style::box::slider_type = (int)direction + 1;
+
+	std::string buttonText = pName + "::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value);
+	if (ButtonPressed(cmdIndex, buttonText.c_str(), x, y, w, h))
+	{
+		storedParam = cmdParamDesc[cmdIndex].param[paramIndex].value;
+		drag.set(cmdIndex, paramIndex);
+
+		if (ui::dblClk && ui::style::box::signed_progress)
+		{
+			storedParam = cmdParamDesc[cmdIndex].param[paramIndex].value = 0;
+			ui::dblClk = false;
+		}
+	}
+
+	if (drag.check(cmdIndex, paramIndex))
+	{
+		float delta = direction == dir::y ? -ui::mouseDelta.y : ui::mouseDelta.x;
+		delta *= dx11::width;
+		cmdParamDesc[cmdIndex].param[paramIndex].value = (int)(storedParam + delta);
+		pLimits(cmdIndex, paramIndex);
+	}
+	ui::style::box::progress = 0;
+	*/
+}
+
+//
 
 	void showParams()
 	{

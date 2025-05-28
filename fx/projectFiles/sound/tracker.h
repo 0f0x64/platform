@@ -156,16 +156,23 @@ namespace tracker
 	}
 #endif
 
+	bool tInit = false;
 
 	cmd(Track)
 	{
 		reflect;
 
+		if (!tInit)
+		{
+			#include "trackData.h"
+			tInit = true;
+		}
+
 		#if EditMode
 			editor::TimeLine::bpm = track.masterBPM;
 		#endif
 
-		#include "trackData.h"
+
 
 		reflect_close;
 	}

@@ -130,7 +130,6 @@ namespace paramEdit
 		ui::Box::Setup();
 
 		int topUIElementIndex = -1;
-		int channelIndex = 0;
 
 		bool clippingTest = ui::mousePos.x >= TimeLine::screenLeft && ui::mousePos.x < TimeLine::screenRight;
 
@@ -142,7 +141,6 @@ namespace paramEdit
 			for (int ch = 0; ch < track.channelsCount; ch++)
 			{
 				Rasterizer::Scissors(float4{ 0, (float)top * dx11::height, (float)dx11::width, (float)(bottom * dx11::height) });
-				channelIndex = track.channels[ch].cmdIndex;
 				float  ch_lead = ui::style::box::height * 2.2f;
 				clipYpos += ch_lead;
 
@@ -156,7 +154,7 @@ namespace paramEdit
 					ui::style::BaseButton();
 					ui::style::button::zoom = false;
 					ui::style::button::vAlign = ui::style::align_v::top;
-					Button(channelIndex, cmdParamDesc[channelIndex].funcName, 0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f);
+					Button("channel", 0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f);
 
 					ui::style::box::rounded = .5f;
 					float bw = aspect * ch_h / 2.2f;
@@ -171,18 +169,18 @@ namespace paramEdit
 					float low = ch_y + ch_h / 2.f + (slot_h - sm_h) / 2.f;
 
 					ui::style::button::zoom = false;
-					processSwitcher(channelIndex, "solo", bx, ch_y + (slot_h - sm_h) / 2.f, bw, sm_h, "S");
-					processSwitcher(channelIndex, "mute", bx, low, bw, sm_h, "M");
+					processSwitcher("solo", bx, ch_y + (slot_h - sm_h) / 2.f, bw, sm_h,ch, track.channels[ch].solo, "S");
+					processSwitcher("mute", bx, low, bw, sm_h, ch, track.channels[ch].mute, "M");
 
 					ui::style::button::inverted = false;
 					ui::style::box::rounded = .15f;
 
 					ui::style::button::zoom = true;
 					
-					processSlider(channelIndex, "vol", x + bw*4., ch_y + (slot_h - sm_h) / 2.f, bw * .75f, sm_h*2, dir::y);
+					processSlider("vol", x + bw*4., ch_y + (slot_h - sm_h) / 2.f, bw * .75f, sm_h*2, track.channels[ch].vol,dir::y);
 					
 					ui::style::box::rounded = .5f;
-					processSlider(channelIndex, "pan", x + bw*5 , ch_y + (slot_h - sm_h) / 2.f, bw*2 , sm_h*2, dir::r);
+					//processSlider(channelIndex, "pan", x + bw*5 , ch_y + (slot_h - sm_h) / 2.f, bw*2 , sm_h*2, dir::r);
 
 					ui::style::box::slider_type = 0;
 
@@ -192,8 +190,8 @@ namespace paramEdit
 				}
 
 				Rasterizer::Scissors(float4{ (float)(TimeLine::screenLeft * dx11::width), (float)(top * dx11::height), (float)dx11::width, (float)(bottom * dx11::height) });
-
-				for (int clp = 0; clp <= tracker::track.channel[ch].clipCounter; clp++)
+				/*
+				for (int clp = 0; clp <= track.channels[ch].clipsCount; clp++)
 				{
 					int clipIndex = tracker::track.channel[ch].clip[clp].cmdIndex;
 					auto clp_desc = tracker::track.channel[ch].clip[clp];
@@ -316,6 +314,7 @@ namespace paramEdit
 					}
 
 				}
+				*/
 			}
 		}
 
@@ -372,7 +371,8 @@ namespace paramEdit
 		//note editing section
 		if (currentChannel < 0 || currentClip < 0 && currentNote < 0) return;
 
-		auto i = tracker::track.channel[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
+		/*
+		auto i = tracker::track.channels[currentChannel].clip[currentClip].note[(int)layers::pitch].cmdIndex;
 		auto note = getNoteFromKey(wParam);
 
 		if (note >= 0)
@@ -424,7 +424,7 @@ namespace paramEdit
 				if (currentNote < tracker::track.channel[currentChannel].clip[currentClip].length - 1) currentNote++;
 				break;
 
-		}
+		}*/
 	}
 
 }
