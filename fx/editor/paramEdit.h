@@ -1,5 +1,6 @@
 namespace paramEdit {
 
+
 	void showStackItem(int i, float& x, float& y, float w, float lead, float sel);
 
 	void removeDoubleSpaces(std::string& str) {
@@ -939,7 +940,7 @@ namespace paramEdit {
 		}
 	}
 
-	
+	int buttonIndex = 0;
 
 bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 {
@@ -1010,6 +1011,7 @@ bool ButtonPressed(int cmdIndex, const char* str, float x, float y, float w, flo
 
 bool ButtonPressed(const char* str, float x, float y, float w, float h)
 {
+	buttonIndex++;
 	return ui::lbDown & drag.isFree() & Button(str, x, y, w, h);
 }
 
@@ -1074,38 +1076,40 @@ void processSwitcher(std::string pName, float x, float y, float w, float h, int 
 }
 
 
-void processSlider(std::string pName, float x, float y, float w, float h, auto& var, dir direction)
+void processSlider(std::string pName, float x, float y, float w, float h, auto& var, dir direction, int _min, int _max)
 {
+	float range = _max-_min;
+	ui::style::box::signed_progress = _min < 0.f ? 1.f : 0.f;
 
-/*
-	float range = (float)(cmdParamDesc[cmdIndex].param[paramIndex]._max - cmdParamDesc[cmdIndex].param[paramIndex]._min);
-	ui::style::box::signed_progress = cmdParamDesc[cmdIndex].param[paramIndex]._min < 0.f ? 1.f : 0.f;
-
-	ui::style::box::progress = cmdParamDesc[cmdIndex].param[paramIndex].value / range;;
+	ui::style::box::progress = var / range;;
 	ui::style::box::slider_type = (int)direction + 1;
 
-	std::string buttonText = pName + "::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value);
-	if (ButtonPressed(cmdIndex, buttonText.c_str(), x, y, w, h))
+	std::string buttonText = pName.length() == 0 ? std::to_string(var) : pName + "::" + std::to_string(var);
+	if (ButtonPressed(buttonText.c_str(), x, y, w, h))
 	{
-		storedParam = cmdParamDesc[cmdIndex].param[paramIndex].value;
-		drag.set(cmdIndex, paramIndex);
+		storedParam = var;
+		drag.set(buttonIndex);
 
 		if (ui::dblClk && ui::style::box::signed_progress)
 		{
-			storedParam = cmdParamDesc[cmdIndex].param[paramIndex].value = 0;
+			storedParam = var = 0;
 			ui::dblClk = false;
 		}
 	}
 
-	if (drag.check(cmdIndex, paramIndex))
+	if (drag.check(buttonIndex))
 	{
 		float delta = direction == dir::y ? -ui::mouseDelta.y : ui::mouseDelta.x;
+		if (direction == dir::r)
+		{
+			delta =  -ui::mouseDelta.y + ui::mouseDelta.x;
+		}
 		delta *= dx11::width;
-		cmdParamDesc[cmdIndex].param[paramIndex].value = (int)(storedParam + delta);
-		pLimits(cmdIndex, paramIndex);
+		var = clamp((int)(storedParam + delta),_min,_max);
+
 	}
 	ui::style::box::progress = 0;
-	*/
+	
 }
 
 //

@@ -88,9 +88,19 @@ public:
 		return ((int)i == dragID.cmd);
 	}
 
+	bool check(int i)
+	{
+		return (i == dragID.cmd);
+	}
+
 	void set(context i)
 	{
 		dragID.cmd = (int)i;
+	}
+
+	void set(int i)
+	{
+		dragID.cmd = i;
 	}
 
 	void set(int cmd, int param)

@@ -125,7 +125,7 @@ namespace paramEdit
 
 	void showTrack()
 	{
-
+		buttonIndex = 0;
 		x = ui::style::text::height / 6.f * aspect;
 		ui::Box::Setup();
 
@@ -154,6 +154,7 @@ namespace paramEdit
 					ui::style::BaseButton();
 					ui::style::button::zoom = false;
 					ui::style::button::vAlign = ui::style::align_v::top;
+
 					Button("channel", 0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f);
 
 					ui::style::box::rounded = .5f;
@@ -175,12 +176,13 @@ namespace paramEdit
 					ui::style::button::inverted = false;
 					ui::style::box::rounded = .15f;
 
-					ui::style::button::zoom = true;
+					ui::style::button::zoom = false;
 					
-					processSlider("vol", x + bw*4., ch_y + (slot_h - sm_h) / 2.f, bw * .75f, sm_h*2, track.channels[ch].vol,dir::y);
+					processSlider("vol", x, ch_y + sm_h, bw * 5, sm_h, track.channels[ch].vol,dir::x, 0, 100);
 					
 					ui::style::box::rounded = .5f;
-					//processSlider(channelIndex, "pan", x + bw*5 , ch_y + (slot_h - sm_h) / 2.f, bw*2 , sm_h*2, dir::r);
+					
+					processSlider("", x + bw*5.2 , ch_y + slot_h/4., bw*1.8 , sm_h*1.8, track.channels[ch].pan, dir::r, -90,90);
 
 					ui::style::box::slider_type = 0;
 

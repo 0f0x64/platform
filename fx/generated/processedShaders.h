@@ -696,7 +696,7 @@ const char* box_ps =
 "    {\n"
 "    float2 uvsR = rot(uvs,progress.x*PI*3/2);\n"
 "    float ang = saturate(1.-28*abs(uvsR.x));\n"
-"    Progress = ang*saturate(sign(-uvsR.y-.2));\n"
+"    Progress = ang*saturate(sign(-uvsR.y-.32));\n"
 "    Progress += saturate(1-38*abs(length(uvs)-.45));\n"
 "    //Progress *= saturate(1-2.5*length(uvs))*4;\n"
 "    Progress *= abs(atan2(uvs.x,uvs.y))>PI/4.2;\n"

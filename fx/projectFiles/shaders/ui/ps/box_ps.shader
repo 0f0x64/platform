@@ -74,7 +74,7 @@ float4 PS(VS_OUTPUT_POS_UV input) : SV_Target
     {
     float2 uvsR = rot(uvs,progress.x*PI*3/2);
     float ang = saturate(1.-28*abs(uvsR.x));
-    Progress = ang*saturate(sign(-uvsR.y-.2));
+    Progress = ang*saturate(sign(-uvsR.y-.32));
     Progress += saturate(1-38*abs(length(uvs)-.45));
     //Progress *= saturate(1-2.5*length(uvs))*4;
     Progress *= abs(atan2(uvs.x,uvs.y))>PI/4.2;
@@ -86,10 +86,10 @@ float4 PS(VS_OUTPUT_POS_UV input) : SV_Target
     
     Progress=lerp(Progress,signedProgress,signed_progress);
    
-    color += Progress;
+    color += Progress-sign(slider_type)*.1;
 
     float d = calcRA(uvs, input.sz, rad);
-    float embossMask = sign(d) - saturate(d * edge * input.sz);
+    float embossMask = sign(d) -saturate(d * edge * input.sz);
     float emboss = embossMask * dot(atan(uvs - .1), -.25);
     color.rgb += emboss;
     float2 s = input.sz;
