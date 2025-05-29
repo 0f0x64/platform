@@ -32,6 +32,7 @@ namespace style {
 		align_v vAlign = align_v::center;
 		bool zoom = false;
 		bool inverted = false;
+		bool selected = false;
 		float inner = .1;
 
 	};
@@ -42,6 +43,7 @@ namespace style {
 		button::vAlign = align_v::center;
 		button::zoom = false;
 		button::inverted = false;
+		button::selected = false;
 		button::inner = .1;
 	}
 
@@ -69,7 +71,7 @@ namespace style {
 		box::slider_type = 0;
 	}
 
-	void BaseColor(bool inverted = false)
+	void BaseColor(bool inverted = false, bool selected = false)
 	{
 		float white = .8f;
 		float black = .2f;
@@ -78,5 +80,10 @@ namespace style {
 		text::a = 1.f;
 		box::r = box::g = box::b = inverted ? white / 1.5f : black;
 		box::a = 1.f;
+
+		if (selected)
+		{
+			box::r = box::g = box::b = black;
+		}
 	}
 };

@@ -941,11 +941,12 @@ namespace paramEdit {
 	}
 
 	int buttonIndex = 0;
+	int currentButtonIndex = 0;
 
 bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 {
 
-	ui::style::BaseColor(ui::style::button::inverted);
+	ui::style::BaseColor(ui::style::button::inverted, ui::style::button::selected);
 	ui::style::box::outlineBrightness = over ? .25f : 0.1f;
 	ui::Box::Draw(x, y, w, h);
 	float th = ui::style::button::zoom ? (h*1.25f - h*ui::style::button::inner*2.f) : ui::style::text::height;
@@ -1012,6 +1013,11 @@ bool ButtonPressed(int cmdIndex, const char* str, float x, float y, float w, flo
 bool ButtonPressed(const char* str, float x, float y, float w, float h)
 {
 	buttonIndex++;
+	if (ui::lbDown & drag.isFree() && isMouseOver(x, y, w, h))
+	{
+		currentButtonIndex = buttonIndex;
+	}
+
 	return ui::lbDown & drag.isFree() & Button(str, x, y, w, h);
 }
 
@@ -1071,7 +1077,7 @@ void processSwitcher(std::string pName, float x, float y, float w, float h, int 
 	if (ButtonPressed(shortName ? shortName : pName.c_str(), x, y, w, h) && drag.isFree())
 	{
 		var = (switcher)(1 - (int)var);
-		drag.set(drag.context::commonUIButtons);
+		drag.set(buttonIndex);
 	}
 }
 

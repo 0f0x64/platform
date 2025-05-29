@@ -159,8 +159,11 @@ namespace paramEdit
 
 					float channelW = TimeLine::screenLeft - x;
 					float channelH = ch_lead * .9f;
-
-					Button("channel", 0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f);
+					if (currentButtonIndex == buttonIndex + 1)
+					{
+						ui::style::button::selected = true;
+					}
+					ButtonPressed("channel", 0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f);
 
 					ui::style::box::rounded = .5f;
 					float bw = aspect * ch_h / 2.2f;
@@ -203,40 +206,36 @@ namespace paramEdit
 				/*
 				for (int clp = 0; clp <= track.channels[ch].clipsCount; clp++)
 				{
-					int clipIndex = tracker::track.channel[ch].clip[clp].cmdIndex;
-					auto clp_desc = tracker::track.channel[ch].clip[clp];
+					auto* clp_desc = &track.channels[ch].clips[clp];
 					int frame = SAMPLING_FREQ / FRAMES_PER_SECOND;
-					float sWidth = TimeLine::TimeToScreen(frame * 60 * 60 * clp_desc.length * clp_desc.repeat / (editor::TimeLine::bpm * clp_desc.bpmScale));
+					float sWidth = TimeLine::TimeToScreen(frame * 60 * 60 * clp_desc.len * clp_desc.repeat / (editor::TimeLine::bpm * clp_desc.bpmScale));
 					float h = ch_h;
-					float clip_x = TimeLine::getScreenPos(frame * 60 * 60 * clp_desc.position / editor::TimeLine::bpm);
+					float clip_x = TimeLine::getScreenPos(frame * 60 * 60 * clp_desc.pos / editor::TimeLine::bpm);
 					float clip_y = clipYpos;
-					float note_step = sWidth / clp_desc.length / clp_desc.repeat;
+					float note_step = sWidth / clp_desc.len / clp_desc.repeat;
 					bool over = drag.isFree() && isMouseOver(clip_x, clip_y, sWidth, h);
 
 					if (ui::mousePos.x < TimeLine::screenLeft || ui::mousePos.x >= TimeLine::screenRight) over = false;
 
 					if (iter == 0)
 					{
-						if (over) topUIElementIndex = clipIndex;
+						if (over) topUIElementIndex = buttonIndex;
 					}
 					else
 					{
-						over = over && (clipIndex == topUIElementIndex);
-
-						int posIndex = getParamIndexByStr(clipIndex, "pos");
+						over = over && (clp == topUIElementIndex);
 
 						if (over && ui::lbDown && drag.isFree())
 						{
-							drag.set(clipIndex, posIndex);
-							storedParam = cmdParamDesc[clipIndex].param[posIndex].value;
-							currentCmd = clipIndex;
-							currentClipIndex = clipIndex;
+							drag.set(buttonIndex);
+							storedParam = clp_desc.pos;
+							currentClipIndex = buttonIndex;
 						}
 
-						if (ui::lbDown && drag.check(clipIndex, posIndex))
+						if (ui::lbDown && drag.check(currentClipIndex))
 						{
-							cmdParamDesc[clipIndex].param[posIndex].value = storedParam + TimeLine::ScreenToTime(ui::mouseDelta.x) / (frame * 60 * 60 / editor::TimeLine::bpm);
-							pLimits(clipIndex, posIndex);
+							clp_desc->pos = max(0,storedParam + TimeLine::ScreenToTime(ui::mouseDelta.x) / (frame * 60 * 60 / editor::TimeLine::bpm));
+					
 						}
 
 						float c = (float)(clp + 222);
