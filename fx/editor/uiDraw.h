@@ -210,7 +210,7 @@ namespace ui
 
 		}
 
-		void Draw(const char* str, float x, float y, float w = style::text::width, float h = style::text::height)
+		void Draw(const char* str, float x, float y, float w = style::text::width, float h = style::text::height, bool centered = false)
 		{
 			if (strlen(str) == 0)
 			{
@@ -226,6 +226,14 @@ namespace ui
 			{
 				vs::letter.params.pos_size[i] = { x + offset, y, (float)(str[i] - 32), 0};
 				offset += getLetterOffset(str[i], w * aspect);
+			}
+
+			if (centered)
+			{
+				for (unsigned int i = 0; i < strlen(str); i++)
+				{
+					vs::letter.params.pos_size[i].x -=offset/2.;
+				}
 			}
 
 			vs::letter.set();

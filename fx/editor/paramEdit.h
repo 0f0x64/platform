@@ -1076,7 +1076,7 @@ void processSwitcher(std::string pName, float x, float y, float w, float h, int 
 }
 
 
-void processSlider(std::string pName, float x, float y, float w, float h, auto& var, dir direction, int _min, int _max)
+void processSlider(std::string pName, float x, float y, float w, float h, auto& var, dir direction, int _min, int _max, bool displayNum=true)
 {
 	float range = _max-_min;
 	ui::style::box::signed_progress = _min < 0.f ? 1.f : 0.f;
@@ -1084,7 +1084,17 @@ void processSlider(std::string pName, float x, float y, float w, float h, auto& 
 	ui::style::box::progress = var / range;;
 	ui::style::box::slider_type = (int)direction + 1;
 
-	std::string buttonText = pName.length() == 0 ? std::to_string(var) : pName + "::" + std::to_string(var);
+	std::string buttonText = "";
+	if (pName.length() > 0)
+	{
+		buttonText = pName;
+		if (displayNum) buttonText += "::" + std::to_string(var);
+	}
+	else
+	{
+		if (displayNum) buttonText += std::to_string(var);
+	}
+
 	if (ButtonPressed(buttonText.c_str(), x, y, w, h))
 	{
 		storedParam = var;

@@ -73,11 +73,17 @@ float4 PS(VS_OUTPUT_POS_UV input) : SV_Target
     if (slider_type==3)
     {
     float2 uvsR = rot(uvs,progress.x*PI*3/2);
-    float ang = saturate(1.-28*abs(uvsR.x));
-    Progress = ang*saturate(sign(-uvsR.y-.32));
-    Progress += saturate(1-38*abs(length(uvs)-.45));
+    float ang = sign(saturate(1.-28*abs(uvsR.x)));
+    Progress = ang*saturate(sign(-uvsR.y-.2));
+    Progress += saturate(1-25*abs(length(uvs)-.45));
     //Progress *= saturate(1-2.5*length(uvs))*4;
-    Progress *= abs(atan2(uvs.x,uvs.y))>PI/4.2;
+    Progress *= (abs(atan2(uvs.x,uvs.y))>PI/4.2)*.5;
+
+    float pAng = (sign(uvs.x)*sign(progress.x));
+    pAng*=saturate(-sign(progress.x)*sign(uvsR.x));
+    pAng*=saturate(1-25*abs(length(uvs)-.45));
+    Progress +=saturate(pAng);
+
     signedProgress = Progress;
     
     }

@@ -125,6 +125,8 @@ namespace paramEdit
 
 	void showTrack()
 	{
+		TimeLine::screenLeft = .2*dx11::aspect;
+
 		buttonIndex = 0;
 		x = ui::style::text::height / 6.f * aspect;
 		ui::Box::Setup();
@@ -136,7 +138,7 @@ namespace paramEdit
 		for (int iter = 0; iter < 2; iter++)
 		{
 			clipYpos = ui::style::box::height;
-			TimeLine::screenLeft = x + enumDrawOffset - insideX;
+
 
 			for (int ch = 0; ch < track.channelsCount; ch++)
 			{
@@ -155,6 +157,9 @@ namespace paramEdit
 					ui::style::button::zoom = false;
 					ui::style::button::vAlign = ui::style::align_v::top;
 
+					float channelW = TimeLine::screenLeft - x;
+					float channelH = ch_lead * .9f;
+
 					Button("channel", 0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f);
 
 					ui::style::box::rounded = .5f;
@@ -169,20 +174,23 @@ namespace paramEdit
 					float slot_h = ch_h / 2.f;
 					float low = ch_y + ch_h / 2.f + (slot_h - sm_h) / 2.f;
 
-					ui::style::button::zoom = false;
-					processSwitcher("solo", bx, ch_y + (slot_h - sm_h) / 2.f, bw, sm_h,ch, track.channels[ch].solo, "S");
-					processSwitcher("mute", bx, low, bw, sm_h, ch, track.channels[ch].mute, "M");
+					ui::style::button::zoom = true;
+					processSwitcher("solo", bx, ch_y + (slot_h - sm_h) / 2.f, bw, sm_h,ch, track.channels[ch].solo, "   S   ");
+					processSwitcher("mute", bx, low, bw, sm_h, ch, track.channels[ch].mute, "   M   ");
 
 					ui::style::button::inverted = false;
 					ui::style::box::rounded = .15f;
 
 					ui::style::button::zoom = false;
 					
-					processSlider("vol", x, ch_y + sm_h, bw * 5, sm_h, track.channels[ch].vol,dir::x, 0, 100);
+					processSlider("vol", x, ch_y + sm_h, channelW/1.75, sm_h, track.channels[ch].vol,dir::x, 0, 100);
 					
 					ui::style::box::rounded = .5f;
 					
-					processSlider("", x + bw*5.2 , ch_y + slot_h/4., bw*1.8 , sm_h*1.8, track.channels[ch].pan, dir::r, -90,90);
+					ui::style::button::zoom = true;
+					processSlider("   pan   ", x + bw*5.2 , ch_y + slot_h/10., channelH/1.75, channelH/1.75, track.channels[ch].pan, dir::r, -90,90,false);
+					ui::Text::Draw(std::to_string(track.channels[ch].pan).c_str(), x + bw * 5.2+ channelH / 1.75/2., ch_y + slot_h*1.25, channelH / 1.9, channelH / 1.9,true);
+
 
 					ui::style::box::slider_type = 0;
 
