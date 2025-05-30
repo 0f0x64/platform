@@ -83,7 +83,7 @@ namespace style {
 
 		if (selected)
 		{
-			box::r = box::g = box::b = black;
+			box::r = box::g = box::b = black+.075;
 		}
 	}
 };

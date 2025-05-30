@@ -1073,7 +1073,7 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 void processSwitcher(std::string pName, float x, float y, float w, float h, int ch, auto& var, const char* shortName = "")
 {
 	ui::style::button::inverted = var == switcher::off ? false : true;
-
+	ui::style::button::selected = false;
 	if (ButtonPressed(shortName ? shortName : pName.c_str(), x, y, w, h) && drag.isFree())
 	{
 		var = (switcher)(1 - (int)var);

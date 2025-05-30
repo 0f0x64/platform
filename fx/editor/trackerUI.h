@@ -76,6 +76,8 @@ namespace paramEdit
 
 	void showTrackControls()
 	{
+		ui::style::button::selected = false;
+		
 		Rasterizer::Scissors({ 0,0,(float)dx11::width,(float)dx11::height });
 		ui::Box::Setup();
 		ui::style::Base();
@@ -88,22 +90,24 @@ namespace paramEdit
 		strcat(octaveText, octaveNum);
 		strcat(octaveText, " [+]");
 
-		float btn_x=.1;
-		float btn_y = .0;
-		float btn_w = ui::style::box::width / 1.5f;
-		float btn_h = ui::style::box::height / 1.2f;
+		float btn_x=.0;
+		float btn_y = ui::style::text::height;
+		float btn_w = ui::style::box::width;
+		float btn_h = ui::style::box::height;
+
+		ui::style::button::zoom = false;
 
 		if (paramEdit::ButtonPressed(octaveText, btn_x, btn_y, btn_w, btn_h) && drag.isFree())
 		{
 			currentOctave += isMouseOver(btn_x, btn_y, btn_w / 2.f, btn_h) ? -1 : 1;
 			currentOctave = clamp(currentOctave, 0, 8);
 
-			drag.set(drag.context::commonUIButtons);
+			drag.set(buttonIndex);
 			currentCmd = -1;
 			paramEdit::currentParam = -1;
 		}
 
-		btn_y += ui::style::text::height;
+		btn_x += ui::style::text::width/2.+ btn_w;
 		char stepText[32];
 		char stepNum[2];
 		strcpy(stepText, "[-] step: ");
@@ -116,7 +120,7 @@ namespace paramEdit
 			currentStep += isMouseOver(btn_x, btn_y, btn_w / 2.f, btn_h) ? -1 : 1;
 			currentStep = clamp(currentStep, 0, 8);
 
-			drag.set(drag.context::commonUIButtons);
+			drag.set(buttonIndex);
 			currentCmd = -1;
 			paramEdit::currentParam = -1;
 		}
@@ -127,7 +131,7 @@ namespace paramEdit
 	{
 		TimeLine::screenLeft = .2*dx11::aspect;
 
-		buttonIndex = 0;
+		
 		x = ui::style::text::height / 6.f * aspect;
 		ui::Box::Setup();
 
@@ -138,7 +142,7 @@ namespace paramEdit
 		for (int iter = 0; iter < 2; iter++)
 		{
 			clipYpos = ui::style::box::height;
-
+			buttonIndex = 0;
 
 			for (int ch = 0; ch < track.channelsCount; ch++)
 			{
@@ -159,11 +163,14 @@ namespace paramEdit
 
 					float channelW = TimeLine::screenLeft - x;
 					float channelH = ch_lead * .9f;
-					if (currentButtonIndex == buttonIndex + 1)
+					if (currentChannel == ch)
 					{
 						ui::style::button::selected = true;
 					}
-					ButtonPressed("channel", 0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f);
+					if (ButtonPressed("channel", 0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f))
+					{
+						currentChannel = ch;
+					}
 
 					ui::style::box::rounded = .5f;
 					float bw = aspect * ch_h / 2.2f;
@@ -203,23 +210,24 @@ namespace paramEdit
 				}
 
 				Rasterizer::Scissors(float4{ (float)(TimeLine::screenLeft * dx11::width), (float)(top * dx11::height), (float)dx11::width, (float)(bottom * dx11::height) });
-				/*
+				
 				for (int clp = 0; clp <= track.channels[ch].clipsCount; clp++)
 				{
 					auto* clp_desc = &track.channels[ch].clips[clp];
+					if (clp_desc->repeat == 0) continue;
 					int frame = SAMPLING_FREQ / FRAMES_PER_SECOND;
-					float sWidth = TimeLine::TimeToScreen(frame * 60 * 60 * clp_desc.len * clp_desc.repeat / (editor::TimeLine::bpm * clp_desc.bpmScale));
+					float sWidth = TimeLine::TimeToScreen(frame * 60 * 60 * clp_desc->len * clp_desc->repeat / (editor::TimeLine::bpm * clp_desc->bpmScale));
 					float h = ch_h;
-					float clip_x = TimeLine::getScreenPos(frame * 60 * 60 * clp_desc.pos / editor::TimeLine::bpm);
+					float clip_x = TimeLine::getScreenPos(frame * 60 * 60 * clp_desc->pos / editor::TimeLine::bpm);
 					float clip_y = clipYpos;
-					float note_step = sWidth / clp_desc.len / clp_desc.repeat;
+					float note_step = sWidth / clp_desc->len / clp_desc->repeat;
 					bool over = drag.isFree() && isMouseOver(clip_x, clip_y, sWidth, h);
 
 					if (ui::mousePos.x < TimeLine::screenLeft || ui::mousePos.x >= TimeLine::screenRight) over = false;
 
 					if (iter == 0)
 					{
-						if (over) topUIElementIndex = buttonIndex;
+						if (over) topUIElementIndex = ++buttonIndex;
 					}
 					else
 					{
@@ -228,7 +236,7 @@ namespace paramEdit
 						if (over && ui::lbDown && drag.isFree())
 						{
 							drag.set(buttonIndex);
-							storedParam = clp_desc.pos;
+							storedParam = clp_desc->pos;
 							currentClipIndex = buttonIndex;
 						}
 
@@ -242,52 +250,50 @@ namespace paramEdit
 						ui::style::box::r = .4f + .3f * sin(c * 12.123f);
 						ui::style::box::g = .4f + .3f * sin(c * 23.123f);
 						ui::style::box::b = .4f + .3f * sin(c * 44.123f);
-						clipStyleApply(clipIndex, over);
+						//clipStyleApply(clipIndex, over);
 						ui::Box::Draw(clip_x, clip_y, sWidth, h / 3);
 
-						for (int r = 0; r < clp_desc.repeat; r++)
+						for (int r = 0; r < clp_desc->repeat; r++)
 						{
-							ui::Box::Draw(clip_x + r * clp_desc.length * note_step, clip_y + h / 1.5f, note_step * clp_desc.length, h / 3.f);
+							ui::Box::Draw(clip_x + r * clp_desc->len * note_step, clip_y + h / 1.5f, note_step * clp_desc->len, h / 3.f);
 						}
 
 					}
-
+					/*
 					// show all layers
-					for (int r = 0; r < clp_desc.repeat; r++)
+					for (int r = 0; r < clp_desc->repeat; r++)
 					{
-						int pitchLayerIndex = tracker::track.channel[ch].clip[clp].note[(int)layers::pitch].cmdIndex;
-
-						for (int n = 1; n <= clp_desc.length; n++)
+						for (int n = 1; n <= clp_desc->len; n++)
 						{
 
 							float h = ui::style::text::height * .58f / 1.f;
-							float x = clip_x + (n - 1) * note_step + (r * clp_desc.length * note_step);
+							float x = clip_x + (n - 1) * note_step + (r * clp_desc->len * note_step);
 							float y = clip_y + h;
 
 							bool over = clippingTest && drag.isFree() && isMouseOver(x, y, note_step, h);
 
 							if (iter == 0)
 							{
-								if (over) topUIElementIndex = pitchLayerIndex;
+								//if (over) topUIElementIndex = pitchLayerIndex;
 								continue;
 							}
 
-							over = (pitchLayerIndex == topUIElementIndex) && over;
+							//over = (pitchLayerIndex == topUIElementIndex) && over;
 
 							if (iter == 1)
 							{
 								if (ui::lbDown && over)
 								{
 									currentChannel = ch;
-									currentClipIndex = clipIndex;
+									//currentClipIndex = clipIndex;
 									currentClip = clp;
 								}
 
-								noteStyleApply(pitchLayerIndex, over);
+								//noteStyleApply(pitchLayerIndex, over);
 
-								ui::style::BaseColor((n - 1 == currentNote) && currentClipIndex == clipIndex);
-								//ui::style::BaseColor();
-								auto pitchValue = tracker::track.channel[ch].clip[clp].note[(int)layers::pitch].note_pitch[n - 1];
+								//ui::style::BaseColor((n - 1 == currentNote) && currentClipIndex == clipIndex);
+								
+								auto pitchValue = track.channels[ch].clips[clp].pitch[n - 1];
 								if (pitchValue == 0)
 								{
 									ui::style::box::r *= 0.75;
@@ -309,7 +315,7 @@ namespace paramEdit
 								if (over && ui::lbDown)
 								{
 									storedParam = pitchValue;
-									currentCmd = pitchLayerIndex;
+									//currentCmd = pitchLayerIndex;
 									currentParam = n;
 
 									currentChannel = ch;
@@ -321,9 +327,10 @@ namespace paramEdit
 							}
 						}
 					}
+					*/
 
 				}
-				*/
+				
 			}
 		}
 
