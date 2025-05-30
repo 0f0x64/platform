@@ -229,6 +229,9 @@ namespace editor
 		SelfLocate();
 		ui::Init();
 		ViewCam::Init();
+		TimeLine::screenLeft = .21;
+		TimeLine::zoomOut = (int)(TimeLine::timelineLen / (TimeLine::screenRight - TimeLine::screenLeft));
+		TimeLine::pos = -TimeLine::ScreenToTime(TimeLine::screenLeft);
 	}
 
 	enum class editorMode_ {

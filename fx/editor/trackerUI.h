@@ -5,17 +5,18 @@ namespace paramEdit
 	int currentClipIndex = -1;
 	int currentNote = -1;
 	int currentLayer = -1;
+	int currentClipID = -1;
 
-	void clipStyleApply(int i, bool over)
+	void clipStyleApply(int i, int k, bool over)
 	{
-		ui::style::box::rounded = .145;
-		ui::style::box::edge = 100;
-		ui::style::box::soft = 30;
-		ui::style::box::outlineBrightness = over ? .8f : 0.5f;
+		ui::style::box::rounded = .35;
+		ui::style::box::edge = 21;
+		ui::style::box::soft = 20;
+		ui::style::box::outlineBrightness = over ? .1f : 0.0f;
 
-		if (currentCmd == i)
+		if (k == i)
 		{
-			ui::style::box::r = ui::style::box::g = ui::style::box::b = .6f;
+			ui::style::box::r = ui::style::box::g = ui::style::box::b = .5f;
 		}
 
 		ui::style::box::a = 1;
@@ -131,91 +132,84 @@ namespace paramEdit
 	{
 		TimeLine::screenLeft = .2*dx11::aspect;
 
-		
+		int frame = SAMPLING_FREQ / FRAMES_PER_SECOND;
 		x = ui::style::text::height / 6.f * aspect;
 		ui::Box::Setup();
 
-		int topUIElementIndex = -1;
-
+		if (drag.isFree())
+		{
+			currentClipIndex = -1;
+		}
 		bool clippingTest = ui::mousePos.x >= TimeLine::screenLeft && ui::mousePos.x < TimeLine::screenRight;
 
-		for (int iter = 0; iter < 2; iter++)
-		{
-			clipYpos = ui::style::box::height;
+			clipYpos = ui::style::box::height*2.2;
 			buttonIndex = 0;
 
 			for (int ch = 0; ch < track.channelsCount; ch++)
 			{
 				Rasterizer::Scissors(float4{ 0, (float)top * dx11::height, (float)dx11::width, (float)(bottom * dx11::height) });
-				float  ch_lead = ui::style::box::height * 2.2f;
-				clipYpos += ch_lead;
+				float  ch_lead = ui::style::box::height * 6.2f;
 
 				float ch_y = clipYpos;
 				float ch_h = ch_lead * .8f;
 				bool over = isMouseOver(0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f);
 
-				if (iter == 1)
+				ui::style::Base();
+				ui::style::BaseButton();
+				ui::style::button::zoom = false;
+				ui::style::button::vAlign = ui::style::align_v::top;
+
+				float channelW = TimeLine::screenLeft - x;
+				float channelH = ch_lead * .9f;
+				if (currentChannel == ch)
 				{
-					ui::style::Base();
-					ui::style::BaseButton();
-					ui::style::button::zoom = false;
-					ui::style::button::vAlign = ui::style::align_v::top;
-
-					float channelW = TimeLine::screenLeft - x;
-					float channelH = ch_lead * .9f;
-					if (currentChannel == ch)
-					{
-						ui::style::button::selected = true;
-					}
-					if (ButtonPressed("channel", 0, ch_y - x / 2.f, TimeLine::screenLeft - x, ch_lead * .9f))
-					{
-						currentChannel = ch;
-					}
-
-					ui::style::box::rounded = .5f;
-					float bw = aspect * ch_h / 2.2f;
-					float bx = TimeLine::screenLeft - x * 2.f - bw;
-
-					ui::style::button::zoom = true;
-					ui::style::button::hAlign = ui::style::align_h::center;
-					ui::style::button::vAlign = ui::style::align_v::center;
-					ui::style::box::rounded = .5f;
-					float sm_h = ch_h / 2.2f;
-					float slot_h = ch_h / 2.f;
-					float low = ch_y + ch_h / 2.f + (slot_h - sm_h) / 2.f;
-
-					ui::style::button::zoom = true;
-					processSwitcher("solo", bx, ch_y + (slot_h - sm_h) / 2.f, bw, sm_h,ch, track.channels[ch].solo, "   S   ");
-					processSwitcher("mute", bx, low, bw, sm_h, ch, track.channels[ch].mute, "   M   ");
-
-					ui::style::button::inverted = false;
-					ui::style::box::rounded = .15f;
-
-					ui::style::button::zoom = false;
-					
-					processSlider("vol", x, ch_y + sm_h, channelW/1.75, sm_h, track.channels[ch].vol,dir::x, 0, 100);
-					
-					ui::style::box::rounded = .5f;
-					
-					ui::style::button::zoom = true;
-					processSlider("   pan   ", x + bw*5.2 , ch_y + slot_h/10., channelH/1.75, channelH/1.75, track.channels[ch].pan, dir::r, -90,90,false);
-					ui::Text::Draw(std::to_string(track.channels[ch].pan).c_str(), x + bw * 5.2+ channelH / 1.75/2., ch_y + slot_h*1.25, channelH / 1.9, channelH / 1.9,true);
-
-
-					ui::style::box::slider_type = 0;
-
-				//	processSlider(channelIndex, "send", x + bw*2 , ch_y + (slot_h - sm_h) / 2.f, bw * 2.f, sm_h*2, dir::y);
-					ui::style::button::zoom = false;
-					ui::style::Base();
+					ui::style::button::selected = true;
+				}
+				if (ButtonPressed("channel", 0, ch_y, TimeLine::screenLeft - x, ch_lead * .9f))
+				{
+					currentChannel = ch;
 				}
 
+				ui::style::box::rounded = .5f;
+				float bw = aspect * .05 / 2.2f;
+				float bx = TimeLine::screenLeft - x * 2.f - bw;
+
+				ui::style::button::zoom = true;
+				ui::style::button::hAlign = ui::style::align_h::center;
+				ui::style::button::vAlign = ui::style::align_v::center;
+				ui::style::box::rounded = .5f;
+				float sm_h = ch_h / 2.2f;
+				float slot_h = ch_h / 2.f;
+				float low = ch_y + ch_h / 2.f + (slot_h - sm_h) / 2.f;
+
+				ui::style::button::zoom = true;
+				processSwitcher("solo", bx, ch_y + (slot_h - sm_h) / 2.f, bw, bw, ch, track.channels[ch].solo, "   S   ");
+				processSwitcher("mute", bx, low, bw, bw, ch, track.channels[ch].mute, "   M   ");
+
+				ui::style::button::inverted = false;
+				ui::style::box::rounded = .15f;
+
+				ui::style::button::zoom = false;
+
+				processSlider("vol", x, ch_y + ui::style::text::height, channelW / 1.75, ui::style::text::height, track.channels[ch].vol, dir::x, 0, 100);
+
+				ui::style::box::rounded = .5f;
+
+				ui::style::button::zoom = true;
+				processSlider("   pan   ", x + bw * 5.2, ch_y + slot_h / 10., .035*aspect, .035, track.channels[ch].pan, dir::r, -90, 90, false);
+				ui::Text::Draw(std::to_string(track.channels[ch].pan).c_str(), x + bw * 5.2 + channelH / 1.75 / 2. * aspect, ch_y + slot_h * 1.25, channelH / 1.9, channelH / 1.9, true);
+
+				ui::style::button::zoom = false;
+				ui::style::Base();
+
+
 				Rasterizer::Scissors(float4{ (float)(TimeLine::screenLeft * dx11::width), (float)(top * dx11::height), (float)dx11::width, (float)(bottom * dx11::height) });
-				
+
 				for (int clp = 0; clp <= track.channels[ch].clipsCount; clp++)
 				{
 					auto* clp_desc = &track.channels[ch].clips[clp];
 					if (clp_desc->repeat == 0) continue;
-					int frame = SAMPLING_FREQ / FRAMES_PER_SECOND;
+					
 					float sWidth = TimeLine::TimeToScreen(frame * 60 * 60 * clp_desc->len * clp_desc->repeat / (editor::TimeLine::bpm * clp_desc->bpmScale));
 					float h = ch_h;
 					float clip_x = TimeLine::getScreenPos(frame * 60 * 60 * clp_desc->pos / editor::TimeLine::bpm);
@@ -223,42 +217,40 @@ namespace paramEdit
 					float note_step = sWidth / clp_desc->len / clp_desc->repeat;
 					bool over = drag.isFree() && isMouseOver(clip_x, clip_y, sWidth, h);
 
-					if (ui::mousePos.x < TimeLine::screenLeft || ui::mousePos.x >= TimeLine::screenRight) over = false;
-
-					if (iter == 0)
+					if (ui::mousePos.x < TimeLine::screenLeft || ui::mousePos.x >= TimeLine::screenRight)
 					{
-						if (over) topUIElementIndex = ++buttonIndex;
+						over = false;
+						if (ui::lbDown) {
+							currentClipIndex = -1;
+						}
 					}
-					else
+
+					buttonIndex++;
+					if (over && ui::lbDown && drag.isFree())
 					{
-						over = over && (clp == topUIElementIndex);
+			
 
-						if (over && ui::lbDown && drag.isFree())
-						{
-							drag.set(buttonIndex);
-							storedParam = clp_desc->pos;
-							currentClipIndex = buttonIndex;
-						}
-
-						if (ui::lbDown && drag.check(currentClipIndex))
-						{
-							clp_desc->pos = max(0,storedParam + TimeLine::ScreenToTime(ui::mouseDelta.x) / (frame * 60 * 60 / editor::TimeLine::bpm));
-					
-						}
-
-						float c = (float)(clp + 222);
-						ui::style::box::r = .4f + .3f * sin(c * 12.123f);
-						ui::style::box::g = .4f + .3f * sin(c * 23.123f);
-						ui::style::box::b = .4f + .3f * sin(c * 44.123f);
-						//clipStyleApply(clipIndex, over);
-						ui::Box::Draw(clip_x, clip_y, sWidth, h / 3);
-
-						for (int r = 0; r < clp_desc->repeat; r++)
-						{
-							ui::Box::Draw(clip_x + r * clp_desc->len * note_step, clip_y + h / 1.5f, note_step * clp_desc->len, h / 3.f);
-						}
-
+						storedParam = clp_desc->pos;
+						currentClipIndex = buttonIndex;
+						currentClipID = clp;
+						currentChannel = ch;
 					}
+
+
+
+					float c = (float)(clp + 222);
+					//ui::style::box::r = .4f + .3f * sin(c * 12.123f);
+					//ui::style::box::g = .4f + .3f * sin(c * 23.123f);
+					//ui::style::box::b = .4f + .3f * sin(c * 44.123f);
+					clipStyleApply(buttonIndex, currentClipIndex, over);
+					//ui::Box::Draw(clip_x, clip_y, sWidth, h / 3);
+
+					for (int r = 0; r < clp_desc->repeat; r++)
+					{
+						ui::Box::Draw(clip_x + r * clp_desc->len * note_step, clip_y, note_step * clp_desc->len, h / 4.f);
+					}
+
+
 					/*
 					// show all layers
 					for (int r = 0; r < clp_desc->repeat; r++)
@@ -292,7 +284,7 @@ namespace paramEdit
 								//noteStyleApply(pitchLayerIndex, over);
 
 								//ui::style::BaseColor((n - 1 == currentNote) && currentClipIndex == clipIndex);
-								
+
 								auto pitchValue = track.channels[ch].clips[clp].pitch[n - 1];
 								if (pitchValue == 0)
 								{
@@ -327,13 +319,23 @@ namespace paramEdit
 							}
 						}
 					}
-					*/
+
 
 				}
-				
-			}
-		}
+				*/
 
+
+				}
+				clipYpos += ch_lead;
+			}
+
+
+			if (ui::lbDown && currentClipIndex >= 0)
+			{
+				drag.set(currentClipIndex);
+				track.channels[currentChannel].clips[currentClipID].pos = max(0, storedParam + TimeLine::ScreenToTime(ui::mouseDelta.x) / (frame * 60 * 60 / editor::TimeLine::bpm));
+
+			}
 
 		showTrackControls();
 	}

@@ -11,9 +11,9 @@ track = {
 			.clipsCount = 2,
 			.clips {
 				clip {
-					.pos = 0,
+					.pos = 11,
 					.len = 10,
-					.repeat = 1,
+					.repeat = 3,
 					.bpmScale = 1,
 					.overDub = 0,
 					.swing = 0,
@@ -27,7 +27,7 @@ track = {
 				clip {
 					.pos = 0,
 					.len = 10,
-					.repeat = 1,
+					.repeat = 4,
 					.bpmScale = 1,
 					.overDub = 0,
 					.swing = 0,
@@ -48,7 +48,7 @@ track = {
 			.clipsCount = 1,
 			.clips {
 				clip {
-					.pos = 0,
+					.pos = 120,
 					.len = 10,
 					.repeat = 1,
 					.bpmScale = 1,

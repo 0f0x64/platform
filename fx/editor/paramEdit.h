@@ -977,7 +977,7 @@ bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 	switch (ui::style::button::vAlign)
 	{
 	case ui::style::align_v::top:
-		ty = y + ui::style::button::inner * h;
+		ty = y + ui::style::button::inner * ui::style::text::height;
 		break;
 	case ui::style::align_v::center:
 		ty = y + h/2.f-th/4.f;
@@ -1120,7 +1120,7 @@ void processSlider(std::string pName, float x, float y, float w, float h, auto& 
 		{
 			delta =  -ui::mouseDelta.y + ui::mouseDelta.x;
 		}
-		delta *= dx11::width;
+		delta *= dx11::width/2.2;
 		var = clamp((int)(storedParam + delta),_min,_max);
 
 	}
