@@ -945,11 +945,10 @@ namespace paramEdit {
 
 bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 {
-
 	ui::style::BaseColor(ui::style::button::inverted, ui::style::button::selected);
 	ui::style::box::outlineBrightness = over ? .25f : 0.1f;
 	ui::Box::Draw(x, y, w, h);
-	float th = ui::style::button::zoom ? (h*1.25f - h*ui::style::button::inner*2.f) : ui::style::text::height;
+	float th = ui::style::button::zoom ? (h*1.25f - h*ui::style::button::inner*2.f) : ui::style::text::height*1080./dx11::height;
 	float tw = ui::Text::getTextLen(str, th);
 
 	if (ui::style::button::zoom)
@@ -964,7 +963,7 @@ bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 	switch (ui::style::button::hAlign)
 	{
 	case ui::style::align_h::left:
-		tx = x + ui::style::button::inner*h;
+		tx = x + ui::style::button::inner* 1920./ dx11::width;
 		break;
 	case ui::style::align_h::center:
 		tx = x + (w  - tw) / 2.f;
@@ -977,7 +976,7 @@ bool ShowButton(const char* str,float x, float y, float w,float h, bool over)
 	switch (ui::style::button::vAlign)
 	{
 	case ui::style::align_v::top:
-		ty = y + ui::style::button::inner * ui::style::text::height;
+		ty = y + ui::style::button::inner * 1080./dx11::height;
 		break;
 	case ui::style::align_v::center:
 		ty = y + h/2.f-th/4.f;

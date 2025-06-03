@@ -33,7 +33,7 @@ namespace style {
 		bool zoom = false;
 		bool inverted = false;
 		bool selected = false;
-		float inner = .1;
+		float inner = .01;
 
 	};
 
@@ -44,7 +44,7 @@ namespace style {
 		button::zoom = false;
 		button::inverted = false;
 		button::selected = false;
-		button::inner = .1;
+		button::inner = .01;
 	}
 
 	void Base(bool inverted = false)

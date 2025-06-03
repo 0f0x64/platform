@@ -130,10 +130,14 @@ namespace paramEdit
 
 	void showTrack()
 	{
-		TimeLine::screenLeft = .2*dx11::aspect;
+		TimeLine::screenLeft = .15*1920./dx11::width;;
+
+		float xScaller = 1920. / dx11::width;
+		float yScaller = 1080. / dx11::height;
+		float yTextH = ui::style::text::height * 1080. / dx11::height;
 
 		int frame = SAMPLING_FREQ / FRAMES_PER_SECOND;
-		x = ui::style::text::height / 6.f * aspect;
+		x = ui::style::text::height / 6.f;
 		ui::Box::Setup();
 
 		if (drag.isFree())
@@ -142,13 +146,16 @@ namespace paramEdit
 		}
 		bool clippingTest = ui::mousePos.x >= TimeLine::screenLeft && ui::mousePos.x < TimeLine::screenRight;
 
-			clipYpos = ui::style::box::height*2.2;
+			clipYpos = ui::style::box::height*2.6*yScaller;
 			buttonIndex = 0;
+
+
+			
 
 			for (int ch = 0; ch < track.channelsCount; ch++)
 			{
 				Rasterizer::Scissors(float4{ 0, (float)top * dx11::height, (float)dx11::width, (float)(bottom * dx11::height) });
-				float  ch_lead = ui::style::box::height * 6.2f;
+				float ch_lead = ui::style::box::height * 6.2f* yScaller;
 
 				float ch_y = clipYpos;
 				float ch_h = ch_lead * .8f;
@@ -191,7 +198,7 @@ namespace paramEdit
 
 				ui::style::button::zoom = false;
 
-				processSlider("vol", x, ch_y + ui::style::text::height, channelW / 1.75, ui::style::text::height, track.channels[ch].vol, dir::x, 0, 100);
+				processSlider("vol", x, ch_y + yTextH, channelW / 1.75, yTextH, track.channels[ch].vol, dir::x, 0, 100);
 
 				ui::style::box::rounded = .5f;
 
