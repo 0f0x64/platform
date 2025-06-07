@@ -106,7 +106,7 @@ namespace TimeLine
 
 	float getHeight(int time)
 	{
-		float baseH = ui::style::text::height / 4.f;
+		float baseH = .01*1080./dx11::height;
 		float h = baseH * .75f;
 		if (time % (second) == 0) h = baseH * 1.25f;
 		if (time % (second * 5) == 0) h = baseH * 1.5f;
@@ -137,6 +137,8 @@ namespace TimeLine
 		step = GetAdaptiveStepBPM(ScreenToTime(ui::style::text::height * 1.f));
 		calcIterVars();
 
+		float baseH = .03 * 1080. / dx11::height;
+
 		for (int i = 0; i < iter; i++)
 		{
 			int time = (int)( (i+start) * step);
@@ -148,7 +150,7 @@ namespace TimeLine
 			editor::ui::style::box::g = .1f * ((i+start) % 2) + .15f;
 			editor::ui::style::box::b = .1f * ((i+start) % 2) + .15f;
 
-			ui::Box::Draw(x, y - editor::ui::style::text::height*.75f , x1 - x, editor::ui::style::text::height/1.5f );
+			ui::Box::Draw(x, y, x1 - x, baseH);
 		}
 	}
 
@@ -176,6 +178,9 @@ namespace TimeLine
 
 	void DrawTimeStamps(float y)
 	{
+		ui::style::text::height = .03 * 1080. / dx11::height;
+		ui::style::text::width = ui::style::text::height;
+
 		step = GetAdaptiveStepTime(ScreenToTime(ui::style::text::height * 1.f));
 		calcIterVars();
 
@@ -371,6 +376,7 @@ namespace TimeLine
 		right = screenRight + TimeToScreen(pos);
 		screenEnd = ScreenToTime(right);
 		end = min(timelineLen, screenEnd);
+		float baseH = .03 * 1080. / dx11::height;
 
 		Rasterizer::Scissors(float4{ screenLeft*dx11::width, 0, screenRight*dx11::width, (float)dx11::height });
 
@@ -390,9 +396,9 @@ namespace TimeLine
 		Blend::Set(blendmode::alpha);
 		InputAssembler::IA(topology::triList);
 
-		DrawBPMGrid(0.025);
-		DrawTimeStamps(1 - ui::style::text::height * 1.25f);
-		DrawGridStamps(ui::style::text::height * .25f);
+		DrawBPMGrid(0.0);
+		DrawTimeStamps(1 - baseH*2.);
+		DrawGridStamps(0);
 
 		DrawCursor(1);
 
