@@ -75,11 +75,11 @@ float3 getTpos(float2 a, float R,float p,float q)
 float3 torusKnot(float2 a)
 {
     
-    float R = 1.5;
-    float r = .24;
+    float R = 3.5;
+    float r = 4.;
 
-    float p=1;
-    float q=3;
+    float p=3;
+    float q=6;
 
     float3 pos = getTpos(a,R,p,q);
     float3 T = pos - getTpos(a+float2(.01,0),R,p,q);
@@ -124,18 +124,18 @@ float3 sphere(float2 uv)
     float3 t =normalize(pos2-pos1.xyz);
     float3 b =normalize(pos4-pos3.xyz);
     float3 n = cross(t,b);
-    float a1= sin(a.x*PI*4096/2)+sin(a.y*PI*256/2);
+    float a1= sin(a.x*PI*46/2)+sin(a.y*PI*2/2);
     //a1*=sin(a.x+a.y)*.25;
     //a1=abs(a1);
     float3 ofs= n*a1*.450+n*.1;
-    ofs+= (t+b/5)*a1;
+    //ofs+= (t+b/5)*a1;
     //ofs*=.6;
-    pos+=ofs*.7;
-    //pos.y+=pow(a1,2)*.4;
+    //pos+=ofs*.7;
+    //pos+=n*sin(pos*.033);
 
 
-    pos+=a1*float3(sin(pos.x*214),sin(pos.y*212),sin(pos.z*122))*.05;
-    pos = rotY(pos, time.x * 0.01);
+//    pos+=a1*float3(sin(pos.x*214),sin(pos.y*212),sin(pos.z*122))*.05;
+  //  pos = rotZ(pos, time.x * 0.01);
 
     return pos;
 }

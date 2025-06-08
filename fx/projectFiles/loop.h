@@ -91,17 +91,17 @@ namespace Loop
 		Object::Calc({texture::obj1pos,texture::obj1nrml});
 
 		RenderTarget::Set({texture::mainRT,0});
-		RenderTarget::Clear({255,255,255,255});
+		RenderTarget::Clear({0,0,0,0});
 
 		cameraMan::run({});
 
-		Cubemap::Show({texture::env});
+		//Cubemap::Show({texture::env});
 
-		DepthBuf::Mode({depthmode::on});
+		DepthBuf::Mode({depthmode::off});
 		DepthBuf::Clear({});
 		Culling::Set({cullmode::back});
 		BlendMode::Set({
-			.mode = blendmode::off,
+			.mode = blendmode::on,
 			.op = blendop::add
 		});
 

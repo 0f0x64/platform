@@ -36,8 +36,36 @@ float3 rotY(float3 pos, float a)
 
 #define PI 3.1415926535897932384626433832795
 
+float hash( float n ) {
+        return frac(sin(n)*43758.5453);
+    }
+     
+    float noise( float3 x ) {
+        // The noise function returns a value in the range -1.0f -> 1.0f
+        float3 p = floor(x);
+        float3 f = frac(x);
+     
+        f = f*f*(3.0-2.0*f);
+        float n = p.x + p.y*57.0 + 113.0*p.z;
+     
+        float a= lerp(lerp(lerp( hash(n+0.0), hash(n+1.0),f.x),
+               lerp( hash(n+57.0), hash(n+58.0),f.x),f.y),
+               lerp(lerp( hash(n+113.0), hash(n+114.0),f.x),
+               lerp( hash(n+170.0), hash(n+171.0),f.x),f.y),f.z);
+               
+               return a+.1;
+    }
+
 float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
+    //return 1;
+    float3 c = saturate(1.-2.*length(input.uv-.5))*.3;
+    //c.x+=noise(input.id.x*.001)*.5;
+    //c.y+=noise(input.id.x*.0003)*.6;
+    c.z*=noise(input.id.x*.2)*3.1;
+    c*=float3(.05,.05,.5)*.61+.25;
+return float4(c,1);
+
     float2 uv = input.uv;
     float3 albedo = float3(1, 1, 1);
     albedo = sin(uv.x*158)*(sin(uv.y*2));

@@ -7,6 +7,16 @@ float4 getGrid(uint vID, float sep,int2 dim)
     return float4(grid, uv);
 }
 
+float4 getGridP(uint vID, float sep,int2 dim)
+{
+    uint index = vID / 6;
+    float2 map[6] = { 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
+    float2 uv = map[vID % 6];
+    float2 grid = (float2((index % dim.x), index / dim.x)) / float2(dim.x,dim.y);
+    return float4(grid, uv);
+}
+
+
 float3 ACESFilm(float3 x)
 {
     float a = 2.51f;
