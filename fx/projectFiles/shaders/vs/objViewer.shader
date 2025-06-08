@@ -78,10 +78,11 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     float2 uv = grid.xy;
     
     float4 pos = float4(positions.SampleLevel(sam1, uv, 0).xyz,1);
-    pos*=12.;
-    pos.x+=noise(pos.xyz*.125+time.x*.003)*35;
-    pos.y+=noise(pos.xyz*.131+time.x*.0014)*35;
-    pos.z+=noise(pos.xyz*.153+time.x*.005)*35;
+    pos.xyz*=12.;
+    pos-=.8;
+    pos.x+=noise(pos.xyz*.125+.25*time.x*.003)*35;
+    pos.y+=noise(pos.xyz*.131+.25*time.x*.0014)*35;
+    pos.z+=noise(pos.xyz*.153+.25*time.x*.005)*35;
 
     
     pos = mul(pos, model);
@@ -97,7 +98,11 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     pos.y-=noise(pos.xyz*.0031)*75;
     pos.z-=noise(pos.xyz*.0053)*75;
    
-    
+    pos.xyz=pos.xyz*.4+ normalize(pos.xyz)*101;
+
+    pos.x-=noise(pos.xyz*.125)*5;
+    pos.y-=noise(pos.xyz*.131)*5;
+    pos.z-=noise(pos.xyz*.153)*5;
 
     float4 normal = float4(normals.SampleLevel(sam1, uv, 0).xyz, 1);
     normal = mul(normal, transpose(model));
