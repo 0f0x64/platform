@@ -134,7 +134,7 @@ namespace TimeLine
 
 	void DrawBPMGrid(float y)
 	{
-		step = GetAdaptiveStepBPM(ScreenToTime(ui::style::text::height * 1.f));
+		step = GetAdaptiveStepBPM(ScreenToTime(.04*1920./width));
 		calcIterVars();
 
 		float baseH = .03 * 1080. / dx11::height;
@@ -156,7 +156,7 @@ namespace TimeLine
 
 	void DrawMakers(float y)
 	{
-		step = GetAdaptiveStepTime(ScreenToTime(8.f / width));
+		step = GetAdaptiveStepTime(ScreenToTime(.01*1920. / width));
 		calcIterVars();
 
 		for (int i = 0; i < iter; i++)
@@ -181,7 +181,7 @@ namespace TimeLine
 		ui::style::text::height = .03 * 1080. / dx11::height;
 		ui::style::text::width = ui::style::text::height;
 
-		step = GetAdaptiveStepTime(ScreenToTime(ui::style::text::height * 1.f));
+		step = GetAdaptiveStepTime(ScreenToTime(.1*1920./width));
 		calcIterVars();
 
 		for (int i = 0; i < iter; i++)
@@ -199,7 +199,8 @@ namespace TimeLine
 
 	void DrawGridStamps(float y)
 	{
-		step = GetAdaptiveStepBPM(ScreenToTime(ui::style::text::height * 1.f));
+		float baseH = .03 * 1080. / dx11::height;
+		step = GetAdaptiveStepBPM(ScreenToTime(.04 * 1920. / width));
 		calcIterVars();
 
 		for (int i = 0; i < iter; i++)
@@ -207,18 +208,21 @@ namespace TimeLine
 			int time = (int)((i + start) * step);
 			float x = TimeToScreen(time) - left + screenLeft;
 			BPMToStr(time);
-			ui::Text::Draw(timeStr, x, y);
+			ui::Text::Draw(timeStr, x, y+baseH*.25);
 		}
 	}
 
 	void DrawCursor(float y)
 	{
+		float h = 10*.01*1080. / dx11::height;
+		float hc= 8 * .01 * 1080. / dx11::height;
+
 		InputAssembler::IA(topology::lineList);
 		Blend::Set(blendmode::alpha);
 
 		float cursor = TimeToScreen(timer::timeCursor - pos);
 		if (cursor<screenLeft || cursor > screenRight) return;
-		ui::Line::StoreLine(0, cursor, y, cursor, y - ui::style::text::height * 1.25f);
+		ui::Line::StoreLine(0, cursor, y, cursor, y - hc);
 
 		if (uiContext == uiContext_::timeline)
 		{
@@ -229,7 +233,7 @@ namespace TimeLine
 
 		InputAssembler::IA(topology::triList);
 		TimeToStr(timer::timeCursor, true);
-		ui::Text::Draw(timeStr, cursor, y - ui::style::text::height * 2.f);
+		ui::Text::Draw(timeStr, cursor, y - h);
 	}
 
 	int Quantize(int x, int q)

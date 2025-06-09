@@ -175,12 +175,12 @@ bool ta = texturesToEnumType();
 
 #else
 
-#define createType32s (name, _min, _max) typedef int name;
-#define createType32u (name, _min, _max) typedef unsigned int name;
-#define createType16s (name, _min, _max) typedef short name;
-#define createType16u (name, _min, _max) typedef unsigned short name;
-#define createType8s (name, _min, _max) typedef char name;
-#define createType8u (name, _min, _max) typedef unsigned char name;
+#define createType32s(name, _min, _max) typedef int name;
+#define createType32u(name, _min, _max) typedef unsigned int name;
+#define createType16s(name, _min, _max) typedef short name;
+#define createType16u(name, _min, _max) typedef unsigned short name;
+#define createType8s(name, _min, _max) typedef char name;
+#define createType8u(name, _min, _max) typedef unsigned char name;
 
 
 #define createTypeEnum(name, ...) enum class name:unsigned char { __VA_ARGS__};
