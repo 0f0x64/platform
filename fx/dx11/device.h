@@ -1,3 +1,8 @@
+#if forceAdapter
+	#include "dxgi.h"
+	#pragma comment(lib, "DXGI.lib")
+#endif
+
 namespace Device
 {
 
@@ -6,6 +11,29 @@ namespace Device
 	void Init()
 	{
 		HRESULT hr;
+
+#if forceAdapter
+		char aName[128];
+		IDXGIFactory* pFactory;
+		hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)(&pFactory));
+		UINT i = 0;
+		IDXGIAdapter* pAdapter;
+		std::vector <IDXGIAdapter*> vAdapters;
+		std::vector<std::string> adaptersNames;
+
+		while (pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND)
+		{
+			DXGI_ADAPTER_DESC aDesc;
+			pAdapter->GetDesc(&aDesc);
+
+			memset(aName, NULL, 128);
+			WideCharToMultiByte(CP_ACP, NULL, aDesc.Description, 128, aName, 128, NULL, NULL);
+			adaptersNames.push_back(aName);
+			vAdapters.push_back(pAdapter);
+			++i;
+		}
+		pFactory->Release();
+#endif
 
 		aspect = float(height) / float(width);
 		iaspect = float(width) / float(height);
@@ -37,7 +65,14 @@ namespace Device
 				.Flags = 0
 		};
 
+#if forceAdapter
+		hr = D3D11CreateDeviceAndSwapChain(vAdapters[adapterNum], D3D_DRIVER_TYPE_UNKNOWN, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
+		Log("using ");
+		Log(adaptersNames[adapterNum].c_str());
+		Log("\n");
+#else
 		hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
+#endif
 		LogIfError("device not created\n");
 
 		Textures::Texture[0].pTexture = NULL;

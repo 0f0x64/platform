@@ -1,4 +1,5 @@
 #ifdef FINAL_RELEASE_CRINKLER
+	#define forceAdapter false
 	#define EditMode false
 	#define DebugMode false
 	#define DirectXDebugMode false
@@ -6,6 +7,8 @@
 #endif
 
 #ifdef EDITOR
+	#define forceAdapter true
+	#define adapterNum 0
 	#define EditMode true
 	#define DebugMode true
 	#define DirectXDebugMode false
@@ -14,6 +17,8 @@
 #endif
 
 #ifdef EDITOR_DEBUG
+	#define forceAdapter true
+	#define adapterNum 0
 	#define EditMode true
 	#define DebugMode true
 	#define DirectXDebugMode false
