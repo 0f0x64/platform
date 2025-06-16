@@ -240,7 +240,7 @@ namespace editor
 
 	int editorMode_count = 2;
 
-	editorMode_ editorMode = editorMode_::music;
+	editorMode_ editorMode = editorMode_::graphics;
 
 	void ProcessContext()
 	{

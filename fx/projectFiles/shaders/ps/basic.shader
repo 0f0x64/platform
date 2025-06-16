@@ -39,18 +39,21 @@ float3 rotY(float3 pos, float a)
 float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
     float2 uv = input.uv;
+    float2 grd = (sin(256*(uv))-.5)*2;
+    //return pow(saturate((max(grd.x,grd.y))),5);;
     float3 albedo = float3(1, 1, 1);
-    albedo = sin(uv.x*158)*(sin(uv.y*2));
+    albedo = sin(sin(uv.x*8*PI)*2+uv.y*92);
+    albedo=lerp(albedo, sin(uv.y*222),smoothstep(0,1,1-uv.y));
     albedo=saturate(albedo)*float3(1,.5,.2);
 
 
     //return float4(albedo,1);
-    float roughness = .71;
+    float roughness = .85;
     float metalness = 0.;
     float3 F0 = .04;
     
-    float3 nrml = normals.SampleLevel(sam1, input.uv,6).xyz;
-    nrml += normals.SampleLevel(sam1, input.uv,0).xyz*.01;
+    float3 nrml = normals.SampleLevel(sam1, input.uv,7).xyz;
+    nrml += normals.SampleLevel(sam1, input.uv,1).xyz*.02;
     nrml=normalize(nrml);
     //nrml=rotY(nrml,time.x*.1);
     //nrml *= -(1 - isFrontFace * 2);

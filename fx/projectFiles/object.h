@@ -40,7 +40,7 @@ namespace Object {
 			.samplers = {
 				.sam1Filter = filter::linear,
 				.sam1AddressU = addr::wrap,
-				.sam1AddressV = addr::wrap
+				.sam1AddressV = addr::clamp
 			}
 		};
 
@@ -116,7 +116,7 @@ namespace Object {
 
 		//pos
 		vs::quad.set();
-		ps::obj1.set();
+		ps::cat.set();
 		Drawer::NullDrawer({ 1, 1 });
 		RenderTarget::GenerateMips({});
 

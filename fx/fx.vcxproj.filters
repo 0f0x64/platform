@@ -267,5 +267,8 @@
     <None Include="projectFiles\shaders\ui\vs\lineDrawer3d.shader">
       <Filter>Source Files\projectFiles\shadersSource\ui\vs</Filter>
     </None>
+    <None Include="projectFiles\shaders\ps\cat.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
   </ItemGroup>
 </Project>

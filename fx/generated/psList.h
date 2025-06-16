@@ -1,4 +1,5 @@
 Shader(basic)
+Shader(cat)
 Shader(cubemapCreator)
 Shader(cubeMapViewer)
 Shader(genNormals)

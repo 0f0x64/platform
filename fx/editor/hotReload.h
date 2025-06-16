@@ -104,7 +104,11 @@ void WatchFiles()
 						char s2[nameBufLen];
 						memset(s2, NULL, nameBufLen);
 						ptrdiff_t bytes = ((char*)s) - ((char*)fileName) + shaderExtensionLen;
-						memcpy(s2, fileName, bytes);
+						
+						for (int k = 0; k < bytes; k++)
+						{
+							s2[k] = fileName[k] == '\\' ? '/' : fileName[k];
+						}
 						s2[bytes + 1] = 0;
 
 						Log("Modified:  ");
@@ -112,14 +116,14 @@ void WatchFiles()
 						Log("\n");
 
 						char pureName[255];
-						char* pShadersDir = strstr(s2, "\\");
+						char* pShadersDir = strstr(s2, "/");
 
 						if (pShadersDir[1] == 'u' && pShadersDir[2] == 'i')
 						{
 							pShadersDir +=3;
 						}
 
-						char* pSlash = strstr(pShadersDir, "\\");
+						char* pSlash = strstr(pShadersDir, "/");
 						strcpy(pureName, pSlash+4);
 						pureName[strlen(pureName) - shaderExtensionLen] = 0;
 
