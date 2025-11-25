@@ -85,7 +85,7 @@ namespace Loop
 		frameConst();
 
 		InputAsm::Set({topology::triList});
-		BlendMode::Set({ blendmode::off,blendop::add });
+		BlendMode::Set({blendmode::off,blendop::add});
 
 		Cubemap::Calc({ texture::env });
 		Object::Calc({texture::obj1pos,texture::obj1nrml});

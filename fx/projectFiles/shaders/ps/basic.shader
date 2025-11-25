@@ -40,7 +40,7 @@ float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
     float2 uv = input.uv;
     float2 grd = (sin(256*(uv))-.5)*2;
-    //return pow(saturate((max(grd.x,grd.y))),5);;
+    return pow(saturate((max(grd.x,grd.y))),5);;
     float3 albedo = float3(1, 1, 1);
     albedo = sin(sin(uv.x*8*PI)*2+uv.y*92);
     albedo=lerp(albedo, sin(uv.y*222),smoothstep(0,1,1-uv.y));

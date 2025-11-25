@@ -99,6 +99,19 @@ float3 torusKnot(float2 a)
 static float lcoef=0;
 static float3 sym=float3(0,0,0);
 
+void select(float2 pos,float2 modPos,float rad, float p)
+{
+    float coef = rad/distance(pos,modPos);
+    coef=smoothstep(0,1,coef);
+    lcoef=pow(coef,p);
+}
+
+float2 density(float2 pos,float2 modPos,float rad,float p)
+{
+    select(pos,modPos,rad, p);
+    return lerp(pos,modPos,lcoef*.9);
+}
+
 void select(float3 pos,float3 modPos,float rad, float p)
 {
     float3 sPos = lerp(pos,abs(pos),sym);
@@ -122,37 +135,51 @@ float3 zoom(float3 pos,float3 modPos, float3 ofs)
 
 float3 sphere(float2 uv)
 {
-    //uv=frac(uv);
-    //uv.y=sin(uv.y*PI);
-    //uv.x=sin(uv.x*PI*2);
-    float2 a = (uv-.5) * PI * 2;
-    a.x *= -1;
-    float3 pos = float3(sin(a.x), sin(a.y / 2), cos(a.x));
-    pos.xz *= cos(a.y/2 );
-    pos = pos.zxy;
-    
-    pos=rotZ(pos,pos.x);
 
-    pos.z*=2;
-    pos.x*=.35;
-    pos.y*=.35;
-     pos.y*=1-pos.z*.1;
+
+    float2 a = (uv-.5) * PI * 2;
+   // a.x *= -1;
+    
+    float R = 1;
+    float3 pos = float3(R*sin(a.x), a.y / 4, R*cos(a.x));
+    pos.xz *= cos(a.y/2 );
+    pos=normalize(pos);
+    pos = pos.yxz;
+    
+    float3 mpos = float3(0.,-.8,0.);
+    
+    select(pos,mpos,.2,1);
+
+
+  pos=lerp(pos,mpos+(1+.2-distance(pos,mpos))*normalize(pos-mpos),lcoef);
+
+    //pos=lerp(pos,normalize(pos-mpos)*4+mpos,lcoef);
+    //pos = lerp(pos,mpos,lcoef*length(normalize(pos-mpos)));
+
+   // pos=rotZ(pos,pos.x);
+
+ //   pos.z*=2;
+  //  pos.x*=.35;
+   // pos.y*=.35;
+
+//pos= move(pos,float3(0,-1,0));
+
 
     sym=float3(0,0,0);
     select(pos,float3(0,0,2.3),.4,3);
-    pos = zoom(pos,float3(0,0,2.2),float3(3,3,1.3));
+//    pos = zoom(pos,float3(0,0,2.2),float3(3,3,1.3));
    
     //head and neck
     select(pos,float3(0,0,2.3),.7,1.2);
-    pos = rotX(pos,lcoef*.2);
-    pos = move(pos,float3(0,lcoef*.3,-lcoef*.1));
+ //   pos = rotX(pos,lcoef*.2);
+//    pos = move(pos,float3(0,lcoef*.3,-lcoef*.1));
 
     //tail
    select(pos,float3(.0,0.,-1.6),.9,25);
-    pos = zoom(pos,float3(.0,0.,-1.6),float3(.2,.2,1));
+ //   pos = zoom(pos,float3(.0,0.,-1.6),float3(.2,.2,1));
     select(pos,float3(.0,0.,-1.6),.9,11);
-    pos=rotX(pos,-1.8*sin(pos.z*1+3.5)*lcoef);
-     pos=rotY(pos,-.8*sin(pos.z*1+3.5)*lcoef);
+  //  pos=rotX(pos,-1.8*sin(pos.z*1+3.5)*lcoef);
+  //   pos=rotY(pos,-.8*sin(pos.z*1+3.5)*lcoef);
      //tail ainm
     select(pos,float3(.0,1.8,-1.2),.6,11);
     //pos=rotY(pos,-1.8*sin(time.x*.1)*lcoef);
@@ -162,17 +189,17 @@ float3 sphere(float2 uv)
 
     sym=float3(1,0,0);
    select(pos,float3(.15,-.1,1.),.13,8);
-    pos = move(pos,float3(0,-.7,0));
+  //  pos = move(pos,float3(0,-.7,0));
     lcoef=pow(lcoef,.2);
   //  pos = zoom(pos,float3(0,0,0.),float3(1.5,1,1));
 
     sym=float3(1,0,0);
      select(pos,float3(.35,-.1,-.4),.15,5);
-    pos = move(pos,float3(0,-.7,0));
+    //pos = move(pos,float3(0,-.7,0));
     lcoef=pow(lcoef,.2);
 //    pos = zoom(pos,float3(0,0,0.),float3(1.5,1,1));
 
-    pos.xz*=.7;
+    //pos.xz*=.7;
 
     return pos;
 }
@@ -198,11 +225,11 @@ float4 PS(VS_OUTPUT input) : SV_Target
     ofs+= (-b)*a1*(.5+.2*sin(dot(b,t)*444));
     
     float m =saturate(1-abs(uv.y-.5)*2.1);
-    m=pow(m,.25);
-    pos+=ofs*m*.5;
-    pos.y-=a1*.4*saturate(-pos.y);
+ //   m=pow(m,.25);
+  //  pos+=ofs*m*.5;
+  //  pos.y-=a1*.4*saturate(-pos.y);
     
-    pos+=a1*float3(sin(pos.x*1214),sin(pos.y*2112),sin(pos.y*1122))*.05*m;
+  //  pos+=a1*float3(sin(pos.x*1214),sin(pos.y*2112),sin(pos.y*1122))*.05*m;
 //    pos = rotY(pos, time.x * 0.01);
 
     //
