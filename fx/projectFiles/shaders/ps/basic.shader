@@ -62,9 +62,10 @@ float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
     float3 c = saturate(1.-2.*length(input.uv-.5))*.3;
     //c.x+=noise(input.id.x*.001)*.5;
     //c.y+=noise(input.id.x*.0003)*.6;
-    c.z*=noise(input.id.x*.2)*3.1;
-    c*=float3(.05,.05,.5)*.61+.25;
-return float4(c,1);
+    c.z*=noise(input.id.x*1.2)*3.1;
+    c*=float3(.5,.5,.5)*.61+.25;
+    float p = noise(input.uv.xyy*5+float3(input.id.xx*0.0001,0));
+return float4(c*input.rgba*p,1);
 
     float2 uv = input.uv;
     float3 albedo = float3(1, 1, 1);

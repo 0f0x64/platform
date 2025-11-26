@@ -70,6 +70,12 @@ float hash( float n ) {
                return a-.5;
     }
 
+    float3 noise3(float3 p)
+    {
+        
+        return float3(noise(p.x),noise(p.y),noise(p.z));
+    }
+
 VS_OUTPUT VS(uint vID : SV_VertexID)
 {
     VS_OUTPUT output = (VS_OUTPUT) 0;
@@ -80,29 +86,23 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     float4 pos = float4(positions.SampleLevel(sam1, uv, 0).xyz,1);
     pos.xyz*=12.;
     pos-=.8;
-    pos.x+=noise(pos.xyz*.125+.25*time.x*.003)*35;
-    pos.y+=noise(pos.xyz*.131+.25*time.x*.0014)*35;
-    pos.z+=noise(pos.xyz*.153+.25*time.x*.005)*35;
+    float qid = floor(vID/6);
 
-    
+    pos.xyz = noise3(qid*float3(.0001,.0002,.0003));
+    pos.xyz = noise3(pos.xyz*1116+time.x*.00)*10;
+
+    pos.xyz=rotX(pos.xyz,noise(pos.xyz+time.x*.0));
+    pos.xyz=rotY(pos.xyz,noise(pos.xyz+time.x*.0));
+    pos.xyz=rotZ(pos.xyz,noise(pos.xyz+time.x*.0));
+
+  
+
+
+    //pos.xyz=lerp(pos.xyz,normalize(pos.xyz)*38,18.5*pow(noise(pos),3)+.5);
+    pos.xyz=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85);
     pos = mul(pos, model);
 
-    pos.z=1;
-    //pos.xy*=3;
 
-    pos.xyz=rotX(pos,pos.x*.005*(time.y*.01));
-    pos.xyz=rotY(pos,pos.y*.003*(time.y*.01));
-    pos.xyz=rotZ(pos,pos.z*.002*(time.y*.01));
-
-    pos.x-=noise(pos.xyz*.0025)*75;
-    pos.y-=noise(pos.xyz*.0031)*75;
-    pos.z-=noise(pos.xyz*.0053)*75;
-   
-    pos.xyz=pos.xyz*.4+ normalize(pos.xyz)*101;
-
-    pos.x-=noise(pos.xyz*.125)*5;
-    pos.y-=noise(pos.xyz*.131)*5;
-    pos.z-=noise(pos.xyz*.153)*5;
 
     float4 normal = float4(normals.SampleLevel(sam1, uv, 0).xyz, 1);
     normal = mul(normal, transpose(model));
@@ -117,11 +117,23 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     output.vpos = mul(float4(pos.xyz, 1), view[0]);
 
     output.pos = mul(pos, view[0]);
-    output.pos.xy+=(grid.zw-.5)*.5;
+    
+    float br = (qid%20000) ==  0  ? 1 : 0;
+    float st = (qid%1205) ==  0  ? 1 : 0;
+    output.pos.xy+=(grid.zw-.5)*br*42.5;
+
+    output.pos.xy+=(grid.zw-.5)*lerp(.3,.2,st);
+    
+    
     output.pos = mul(output.pos, proj[0]);
 
    // output.pos.x*= aspect.x;
     output.uv = grid.zw;
     output.id = float4(floor(vID/6),0,0,0) ;
+    output.rgba = br ? .45 : .25*(noise(pos.xyz)+.5);
+
+    output.rgba += (st ? 11 : 0)*(1-br);
+    //output.rgba = (st*(1-br) ? 6 : output.rgba);
+
     return output;
 }
