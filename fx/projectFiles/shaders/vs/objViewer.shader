@@ -88,21 +88,32 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     pos-=.8;
     float qid = floor(vID/6);
 
-    pos.xyz = noise3(qid*float3(.0001,.0002,.0003));
-    pos.xyz = noise3(pos.xyz*1116+time.x*.00)*10;
+    pos.xyz = noise3(qid*float3(.0001,.0002,.0003)*5);
+    pos.xyz = noise3(pos.xyz*66+time.x*.0)*10;
 
-    pos.xyz=rotX(pos.xyz,noise(pos.xyz+time.x*.0));
-    pos.xyz=rotY(pos.xyz,noise(pos.xyz+time.x*.0));
-    pos.xyz=rotZ(pos.xyz,noise(pos.xyz+time.x*.0));
+    pos.xyz=lerp(pos.xyz,noise(pos.xyz*1.2)/(pos.xyz*4),noise(pos*2.3));
 
-  
+    pos.xyz=rotX(pos.xyz,2.22*noise(pos.xyz)+time.y*.0001);
+    pos.xyz=rotY(pos.xyz,.33*noise(pos.xyz)+time.y*.0002);
+    pos.xyz=rotZ(pos.xyz,.44*noise(pos.xyz)+time.y*.0003);
+
+
+    //pos.xyz=rotX(pos.xyz,length(pos.xyz)*6);
+    //pos.xyz=rotY(pos.xyz,length(pos.xyz)*6);
+    //pos.xyz=rotZ(pos.xyz,length(pos.xyz)*6);
 
 
     //pos.xyz=lerp(pos.xyz,normalize(pos.xyz)*38,18.5*pow(noise(pos),3)+.5);
-    pos.xyz=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85);
+    pos.xyz=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85+.3);
+    
+    //pos.xyz=normalize(pos.xyz)*44;
+
     pos = mul(pos, model);
 
-
+    float f=100;
+    //pos.x+=time.x;
+    //pos=frac((pos+f/2)/f)*f-f/2;
+  
 
     float4 normal = float4(normals.SampleLevel(sam1, uv, 0).xyz, 1);
     normal = mul(normal, transpose(model));
@@ -119,10 +130,12 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     output.pos = mul(pos, view[0]);
     
     float br = (qid%20000) ==  0  ? 1 : 0;
+    float br2 = (qid%6000) ==  0  ? 1 : 0;
     float st = (qid%1205) ==  0  ? 1 : 0;
     output.pos.xy+=(grid.zw-.5)*br*42.5;
+    output.pos.xy+=(grid.zw-.5)*br2*14.5*(sin(qid*.1)+1.1);
 
-    output.pos.xy+=(grid.zw-.5)*lerp(.3,.2,st);
+    output.pos.xy+=(grid.zw-.5)*lerp(pow(.25*(sin(qid*.000001)+2.1),2.5),.4,st);
     
     
     output.pos = mul(output.pos, proj[0]);
@@ -130,9 +143,13 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
    // output.pos.x*= aspect.x;
     output.uv = grid.zw;
     output.id = float4(floor(vID/6),0,0,0) ;
-    output.rgba = br ? .45 : .25*(noise(pos.xyz)+.5);
+    output.rgba = br ? .35 : .25*(abs(noise(pos.xyz))+.5);
+    output.rgba = br2 ? .1: output.rgba ;
 
-    output.rgba += (st ? 11 : 0)*(1-br);
+    output.rgba += (st ? 4 : 0)*(1-br);
+
+    //output.rgba*=pow(1-abs(pos.x/f*2),.5);
+    output.rgba*=saturate(output.pos.w*.04);
     //output.rgba = (st*(1-br) ? 6 : output.rgba);
 
     return output;

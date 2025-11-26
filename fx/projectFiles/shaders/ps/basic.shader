@@ -60,11 +60,14 @@ float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
     //return 1;
     float3 c = saturate(1.-2.*length(input.uv-.5))*.3;
-    //c.x+=noise(input.id.x*.001)*.5;
-    //c.y+=noise(input.id.x*.0003)*.6;
-    c.z*=noise(input.id.x*1.2)*3.1;
+    c=pow(c,2.4)*8;
+    c.x*=.2+noise(input.id.x*1.1)*3.1;
+    c.y*=.1+noise(c.xxx*.2)*9;
+    //c.z*=1+noise(c.xyy*5)*3;
+    //c.y*=1+noise(input.id.x*22.03+c.x*.22)*3.1;
+    c.z*=1.3+noise(input.id.x*2)*2.1;
     c*=float3(.5,.5,.5)*.61+.25;
-    float p = noise(input.uv.xyy*5+float3(input.id.xx*0.0001,0));
+    float p = noise(input.uv.xxy*5+float3(input.id.xx*0.0001,0));
 return float4(c*input.rgba*p,1);
 
     float2 uv = input.uv;
