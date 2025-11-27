@@ -86,31 +86,40 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     float qid = floor(vID/6);
 
     float3 pos;
-    pos.xyz = noise3(qid*float3(.0001,.0002,.0003)*5);
-    pos.xyz = noise3(pos.xyz*66+time.x*.0)*10;
+    pos = noise3(qid*float3(.0001,.0002,.0003)*5);
+    pos = noise3(pos.xyz*13)*10;
 
-    pos.xyz=lerp(pos.xyz,noise(pos.xyz*1.2)/(pos.xyz*4),noise(pos*2.3));
+    pos=lerp(pos,noise(pos.xyz*1.2)/(pos*4),noise(pos*2.3));
 
-    pos.xyz=rotX(pos.xyz,2.22*noise(pos.xyz)+time.y*.0001);
-    pos.xyz=rotY(pos.xyz,1.33*noise(pos.xyz)+time.y*.0002);
-    pos.xyz=rotZ(pos.xyz,.44*noise(pos.xyz)+time.y*.0003);
+    pos=rotX(pos,2.22*noise(pos)+time.y*.0001);
+    pos=rotY(pos,1.33*noise(pos)+time.y*.0002);
+    pos=rotZ(pos,.44* noise(pos)+time.y*.0003);
 
+    //float ff= (time.y-21*60)*.001;
+    //ff=pow(ff,5)*(length(pos)*112);
+   // pos=rotZ(pos,ff);
+    //pos=rotY(pos-pos/4,ff)+pos/4;
+    //pos=rotZ(pos-pos/4,ff)+pos/4;
 
   
-    //pos.xyz=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85+.3);
-    pos.xyz=lerp(pos.xyz*22,normalize(pos.xyz)*38,(4.5*noise(pos)+.85)/12+17-time.y*.01-3);
+    //pos=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85+.3);
+    pos=lerp(pos*22,normalize(pos)*38,(4.5*noise(pos)+.85)/12+17-time.y*.01-3);
     
-//    pos.xyz=normalize(pos.xyz)*44;
+    
+
+    
 
 
-    pos=rotX(pos,time.x*.005);
-    pos=rotY(pos,time.x*.006);
-    pos=rotZ(pos,time.x*.007);
+ //   pos=rotX(pos,time.x*.005);
+  //  pos=rotY(pos,time.x*.006);
+   // pos=rotZ(pos,time.x*.007);
 
+    //pos.y*=pow(2/(length(pos.xz)+1),1.03);
+    //pos.y*=5/(length(pos.xz)+1)*2.3;
 
-    pos = mul(float4(pos,1), model);
+    
 
-    float f=75;
+    float f=175;
     //pos.x+=time.x;    
     //pos=frac((pos+f/2)/f)*f-f/2;
   
@@ -132,7 +141,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     output.pos.xy+=(grid.zw-.5)*br*42.5*2*scale;
     output.pos.xy+=(grid.zw-.5)*br2*14.5*(sin(qid*.1)+1.1)*4.5*scale/output.pos.z*50;
 
-    output.pos.xy+=(gzw)*lerp(pow(.25*(sin(qid*.000001)+2.1),2.5),.4,st)*1.75;
+    output.pos.xy+=(gzw)*lerp(pow(.25*(sin(qid*.000001)+2.1),2.5),.2,st)*1.75;
     
     
     
@@ -142,14 +151,17 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
 
     float3 n =.25*(abs(noise3(frac(pos.xyz*.035)))+.5);
     float4 neb = float4(n*1.2,1);
-    output.rgba = br ? .35 : neb;
-    output.rgba = br2 ? .1*2: output.rgba ;
-    output.rgba += (st ? 3 : 0)*(1-br);
+    output.rgba = br ? .25 : neb;
+    output.rgba = br2 ? .1*4: output.rgba ;
+   // output.rgba += (st ? 15 : 0)*(1-br);
  //   output.rgba*=pow(1-length(pos/f*1.8),.5);
     
     output.rgba/=max(length(scale)*1.5,1);
     output.rgba*=saturate(output.pos.w*.04);
-    //output.rgba = (st*(1-br) ? 6 : output.rgba);
+    
+
+    output.rgba *= min(length(scale)*.5,1);
+    output.rgba = (st*(1-br) ? 6 : output.rgba);
 
     return output;
 }
