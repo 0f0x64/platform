@@ -83,72 +83,71 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     float4 grid = getGridP(vID, 1, int2(gX,gY));
     float2 uv = grid.xy;
     
-    float4 pos = float4(positions.SampleLevel(sam1, uv, 0).xyz,1);
-    pos.xyz*=12.;
-    pos-=.8;
     float qid = floor(vID/6);
 
+    float3 pos;
     pos.xyz = noise3(qid*float3(.0001,.0002,.0003)*5);
     pos.xyz = noise3(pos.xyz*66+time.x*.0)*10;
 
     pos.xyz=lerp(pos.xyz,noise(pos.xyz*1.2)/(pos.xyz*4),noise(pos*2.3));
 
     pos.xyz=rotX(pos.xyz,2.22*noise(pos.xyz)+time.y*.0001);
-    pos.xyz=rotY(pos.xyz,.33*noise(pos.xyz)+time.y*.0002);
+    pos.xyz=rotY(pos.xyz,1.33*noise(pos.xyz)+time.y*.0002);
     pos.xyz=rotZ(pos.xyz,.44*noise(pos.xyz)+time.y*.0003);
 
 
-    //pos.xyz=rotX(pos.xyz,length(pos.xyz)*6);
-    //pos.xyz=rotY(pos.xyz,length(pos.xyz)*6);
-    //pos.xyz=rotZ(pos.xyz,length(pos.xyz)*6);
-
-
-    //pos.xyz=lerp(pos.xyz,normalize(pos.xyz)*38,18.5*pow(noise(pos),3)+.5);
-    pos.xyz=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85+.3);
+  
+    //pos.xyz=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85+.3);
+    pos.xyz=lerp(pos.xyz*22,normalize(pos.xyz)*38,(4.5*noise(pos)+.85)/12+17-time.y*.01-3);
     
-    //pos.xyz=normalize(pos.xyz)*44;
+//    pos.xyz=normalize(pos.xyz)*44;
 
-    pos = mul(pos, model);
 
-    float f=100;
-    //pos.x+=time.x;
+    pos=rotX(pos,time.x*.005);
+    pos=rotY(pos,time.x*.006);
+    pos=rotZ(pos,time.x*.007);
+
+
+    pos = mul(float4(pos,1), model);
+
+    float f=75;
+    //pos.x+=time.x;    
     //pos=frac((pos+f/2)/f)*f-f/2;
   
 
-    float4 normal = float4(normals.SampleLevel(sam1, uv, 0).xyz, 1);
-    normal = mul(normal, transpose(model));
-    //---
-  // pos.xyz = rotY(pos.xyz,time.x*.1);
-    //normal.xyz = rotY(normal.xyz,time.x*.1);
 
-
-    output.vnorm = normal;
-    
+    output.vnorm = 0;
     output.wpos = float4(pos.xyz, 0);
     output.vpos = mul(float4(pos.xyz, 1), view[0]);
 
-    output.pos = mul(pos, view[0]);
+    output.pos = mul(float4(pos,1), view[0]);
+        output.pos = mul(output.pos, proj[0]);
     
+        float2 scale = float2(proj[0]._m00,proj[0]._m11)*(output.pos.w)*.01;
+        float2 gzw=(grid.zw-.5)*scale;
+
     float br = (qid%20000) ==  0  ? 1 : 0;
     float br2 = (qid%6000) ==  0  ? 1 : 0;
     float st = (qid%1205) ==  0  ? 1 : 0;
-    output.pos.xy+=(grid.zw-.5)*br*42.5;
-    output.pos.xy+=(grid.zw-.5)*br2*14.5*(sin(qid*.1)+1.1);
+    output.pos.xy+=(grid.zw-.5)*br*42.5*2*scale;
+    output.pos.xy+=(grid.zw-.5)*br2*14.5*(sin(qid*.1)+1.1)*4.5*scale/output.pos.z*50;
 
-    output.pos.xy+=(grid.zw-.5)*lerp(pow(.25*(sin(qid*.000001)+2.1),2.5),.4,st);
+    output.pos.xy+=(gzw)*lerp(pow(.25*(sin(qid*.000001)+2.1),2.5),.4,st)*1.75;
     
     
-    output.pos = mul(output.pos, proj[0]);
+    
 
-   // output.pos.x*= aspect.x;
     output.uv = grid.zw;
     output.id = float4(floor(vID/6),0,0,0) ;
-    output.rgba = br ? .35 : .25*(abs(noise(pos.xyz))+.5);
-    output.rgba = br2 ? .1: output.rgba ;
 
-    output.rgba += (st ? 4 : 0)*(1-br);
-
-    //output.rgba*=pow(1-abs(pos.x/f*2),.5);
+    float3 n =.25*(abs(noise3(frac(pos.xyz*.035)))+.5);
+    float4 neb = float4(n*1.2,1);
+    output.rgba = br ? .35 : neb;
+    output.rgba = br2 ? .1*2: output.rgba ;
+    output.rgba += (st ? 3 : 0)*(1-br);
+ //   output.rgba*=pow(1-length(pos/f*1.8),.5);
+    
+    output.rgba/=max(length(scale)*1.5,1);
     output.rgba*=saturate(output.pos.w*.04);
     //output.rgba = (st*(1-br) ? 6 : output.rgba);
 

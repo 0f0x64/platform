@@ -68,7 +68,7 @@ float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
     c.z*=1.3+noise(input.id.x*2)*2.1;
     c*=float3(.5,.5,.5)*.61+.25;
     float p = noise(input.uv.xxy*5+float3(input.id.xx*0.0001,0));
-return float4(c*input.rgba*p,1);
+return float4(c*input.rgba*p*2,1);
 
     float2 uv = input.uv;
     float3 albedo = float3(1, 1, 1);
