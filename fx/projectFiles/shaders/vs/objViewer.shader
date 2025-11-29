@@ -105,7 +105,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     //pos=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85+.3);
     pos=lerp(pos*22,normalize(pos)*38,(4.5*noise(pos)+.85)/12+17-time.y*.01-3);
     
-    
+   // pos=normalize(pos)*72;
 
     
 
@@ -135,13 +135,14 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
         float2 scale = float2(proj[0]._m00,proj[0]._m11)*(output.pos.w)*.01;
         float2 gzw=(grid.zw-.5)*scale;
 
-    float br = (qid%20000) ==  0  ? 1 : 0;
+    
     float br2 = (qid%6000) ==  0  ? 1 : 0;
-    float st = (qid%1205) ==  0  ? 1 : 0;
-    output.pos.xy+=(grid.zw-.5)*br*42.5*2*scale;
+    float st = (qid%3206) ==  0  ? 1 : 0;
+    float br = (qid%1000000) ==  0  ? 1 : 0;
+    output.pos.xy+=(grid.zw-.5)*br*32.5*2*scale;
     output.pos.xy+=(grid.zw-.5)*br2*14.5*(sin(qid*.1)+1.1)*4.5*scale/output.pos.z*50;
 
-    output.pos.xy+=(gzw)*lerp(pow(.25*(sin(qid*.000001)+2.1),2.5),.2,st)*1.75;
+    output.pos.xy+=(gzw)*lerp(pow(.25*(sin(qid*.000001)+2.1),3.),.2,st)*1.75;
     
     
     
@@ -149,11 +150,12 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     output.uv = grid.zw;
     output.id = float4(floor(vID/6),0,0,0) ;
 
-    float3 n =.25*(abs(noise3(frac(pos.xyz*.035)))+.5);
+    float3 n =.125*(abs(noise3(frac(pos.xyz*.035)))+.5);
     float4 neb = float4(n*1.2,1);
-    output.rgba = br ? .25 : neb;
+    output.rgba = neb;
     output.rgba = br2 ? .1*4: output.rgba ;
-   // output.rgba += (st ? 15 : 0)*(1-br);
+    output.rgba = (st ? 64*(1-br)*output.rgba : output.rgba);
+    output.rgba = br ? float4(2.95,2,5,1) : output.rgba;
  //   output.rgba*=pow(1-length(pos/f*1.8),.5);
     
     output.rgba/=max(length(scale)*1.5,1);
@@ -161,7 +163,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     
 
     output.rgba *= min(length(scale)*.5,1);
-    output.rgba = (st*(1-br) ? 6 : output.rgba);
+    //output.rgba = (st*(1-br) ? n*16 : output.rgba);
 
     return output;
 }
