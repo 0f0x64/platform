@@ -105,7 +105,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     //pos=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85+.3);
     pos=lerp(pos*22,normalize(pos)*38,(4.5*noise(pos)+.85)/12+17-time.y*.01-3);
     
-   // pos=normalize(pos)*72;
+    pos=normalize(pos)*72;
 
     
 
@@ -120,7 +120,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     
 
     float f=175;
-    //pos.x+=time.x;    
+   // pos.x+=time.x;    
     //pos=frac((pos+f/2)/f)*f-f/2;
   
 
@@ -156,9 +156,9 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     output.rgba = br2 ? .1*4: output.rgba ;
     output.rgba = (st ? 64*(1-br)*output.rgba : output.rgba);
     output.rgba = br ? float4(2.95,2,5,1) : output.rgba;
- //   output.rgba*=pow(1-length(pos/f*1.8),.5);
+    output.rgba*=pow(1-length(pos/f*1.8),.5);
     
-    output.rgba/=max(length(scale)*1.5,1);
+   // output.rgba/=max(length(scale)*1.5,1);
     output.rgba*=saturate(output.pos.w*.04);
     
 
