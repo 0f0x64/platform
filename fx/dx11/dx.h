@@ -92,7 +92,6 @@ namespace dx11
 		device->CreateRenderTargetView(Textures::Texture[0].pTexture, NULL, &Textures::Texture[0].RenderTargetView[0][0]);
 		Textures::Texture[0].pTexture->Release();
 		Textures::Texture[0].pDepth->Release();
-		
 		Textures::Create(0, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2((float)width, (float)height), false, true);
 		
 		Camera::viewCam.pInit();

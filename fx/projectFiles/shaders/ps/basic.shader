@@ -59,7 +59,9 @@ float hash( float n ) {
 float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
     float3 c = saturate(1.-2.*length(input.uv-.5));
-    c*=.2;
+    c*=.13;
+
+   // c*=noise(input.uv.yxx*513);
     return float4(c*input.rgba*2,1);
 
 }
