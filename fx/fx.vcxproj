@@ -265,6 +265,7 @@
     <None Include="projectFiles\shaders\lib\io.shader" />
     <None Include="projectFiles\shaders\lib\utils.shader" />
     <None Include="projectFiles\shaders\ps\basic.shader" />
+    <None Include="projectFiles\shaders\ps\cat.shader" />
     <None Include="projectFiles\shaders\ps\cubemapCreator.shader" />
     <None Include="projectFiles\shaders\ps\genNormals.shader" />
     <None Include="projectFiles\shaders\ps\obj1.shader" />

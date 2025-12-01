@@ -55,7 +55,12 @@ namespace Shaders {
 				WideCharToMultiByte(CP_ACP, NULL, source, -1, shaderName, sizeof(shaderName), NULL, NULL);
 
 				Log(message);
-				Log((char*)shaderName);
+				char* shortShaderName = shaderName;
+				for (int i = 0; i < 4; i++)
+				{
+					shortShaderName = strstr(shortShaderName, "/") + 1;
+				}
+				Log((char*)shortShaderName);
 				Log("\n");
 			}
 		#endif

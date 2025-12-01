@@ -190,10 +190,31 @@ namespace ps{
 
 struct { 
 
-struct {} params;
+struct 
+{
+float sx;
+float sy;
+float sz;
+} params;
 
 void set () {
 Shaders::pShader(1);
+context->UpdateSubresource(dx11::Shaders::PS[1].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[1].params);
+}
+
+} cat;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct {} params;
+
+void set () {
+Shaders::pShader(2);
 }
 
 } cubemapCreator;
@@ -219,7 +240,7 @@ addr sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::pShader(2);
+Shaders::pShader(3);
 Textures::TextureToShader((texture)textures.env, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
@@ -247,7 +268,7 @@ addr sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::pShader(3);
+Shaders::pShader(4);
 Textures::TextureToShader((texture)textures.geo, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
@@ -268,9 +289,9 @@ float sz;
 } params;
 
 void set () {
-Shaders::pShader(4);
-context->UpdateSubresource(dx11::Shaders::PS[4].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[4].params);
+Shaders::pShader(5);
+context->UpdateSubresource(dx11::Shaders::PS[5].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[5].params);
 }
 
 } obj1;
