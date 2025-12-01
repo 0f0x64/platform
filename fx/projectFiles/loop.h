@@ -90,7 +90,7 @@ namespace Loop
 		//Cubemap::Calc({ texture::env });
 		//Object::Calc({texture::obj1pos,texture::obj1nrml});
 
-		RenderTarget::Set({texture::mainRT,0});
+		RenderTarget::Set({texture::pBuf,0});
 		RenderTarget::Clear({0,0,0,0});
 
 		cameraMan::run({});
@@ -113,6 +113,28 @@ namespace Loop
 			.pos_y = 0,
 			.pos_z = 1
 		});
+
+		RenderTarget::Set({ texture::mainRT,0 });
+		
+		BlendMode::Set({
+			.mode = blendmode::off,
+			.op = blendop::add
+		});
+
+		ps::output.textures.screen = texture::pBuf;
+		ps::output.samplers = {
+				.sam1Filter = filter::linear,
+				.sam1AddressU = addr::wrap,
+				.sam1AddressV = addr::wrap
+		};
+
+
+		vs::quad.set();
+		ps::output.set();
+		RenderTarget::Clear({ 0,250,0,0 });
+
+		Drawer::NullDrawer({ 1,1 });
+
 	}
 
 

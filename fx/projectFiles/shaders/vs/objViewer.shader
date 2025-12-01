@@ -91,16 +91,16 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
 
     pos=lerp(pos,noise(pos.xyz*1.2)/(pos*4),noise(pos*2.3));
 
-    pos=rotX(pos,2.22*noise(pos)+time.x*.01*.0);
-    pos=rotY(pos,1.33*noise(pos)+time.x*.02*.0);
-    pos=rotZ(pos,.44* noise(pos)+time.x*.03*.0);
+    pos=rotX(pos,2.22*noise(pos)+time.x*.01*.5);
+    pos=rotY(pos,1.33*noise(pos)+time.x*.02*.5);
+    pos=rotZ(pos,.44* noise(pos)+time.x*.03*.5);
     
     
     float ff= (time.y-21*60)*.00;
-    ff=6/(length(pos));
-    //pos=rotX(pos,ff);
-    //pos=rotY(pos-pos/4,ff)+pos/4;
-    //pos=rotZ(pos-pos/4,ff)+pos/4;
+    ff=11/(length(pos));
+    /*pos=rotX(pos,ff);
+    pos=rotY(pos-pos/4,ff)+pos/4;
+    pos=rotZ(pos-pos/4,ff)+pos/4;*/
     /*pos=rotX(pos,pos.x/4);
     pos=rotY(pos,pos.y/4);
     pos=rotX(pos,pos.y/4);*/
@@ -111,7 +111,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     //pos=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85+.3);
     pos=lerp(pos*22,normalize(pos)*38,(4.5*noise(pos)+.85)/12+tf);
     
-    pos=lerp(pos,normalize(pos)*192,pow(saturate(length(pos*.006)),.6)*.85);
+   // pos=lerp(pos,normalize(pos)*192,pow(saturate(length(pos*.006)),.6)*.85);
 
     float f=175;
    // pos.x+=time.x;    

@@ -13,9 +13,10 @@ CreatePS (1, shadersData::cubemapCreator);
 CreatePS (2, shadersData::cubeMapViewer);
 CreatePS (3, shadersData::genNormals);
 CreatePS (4, shadersData::obj1);
-CreatePS (5, shadersData::box_ps);
-CreatePS (6, shadersData::letter_ps);
-CreatePS (7, shadersData::lineDrawerUV_ps);
-CreatePS (8, shadersData::lineDrawer_ps);
+CreatePS (5, shadersData::output);
+CreatePS (6, shadersData::box_ps);
+CreatePS (7, shadersData::letter_ps);
+CreatePS (8, shadersData::lineDrawerUV_ps);
+CreatePS (9, shadersData::lineDrawer_ps);
 
 };
