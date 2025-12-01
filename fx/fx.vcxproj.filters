@@ -270,5 +270,8 @@
     <None Include="projectFiles\shaders\ps\cat.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
+    <None Include="projectFiles\shaders\ps\output.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
   </ItemGroup>
 </Project>

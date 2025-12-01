@@ -53,17 +53,17 @@ namespace Loop
 				.up_x = 0,
 				.up_y = 508,
 				.up_z = 77,
-				.angle = 65,
+				.angle = 67,
 				.sType = sliderType::follow,
-				.slide_x = 0, 
-				.slide_y = 0, 
+				.slide_x = 0,
+				.slide_y = 0,
 				.slide_z = -1,
 				.axisType = camAxis::local,
-				.fly_x = 0, 
-				.fly_y = 3, 
+				.fly_x = 0,
+				.fly_y = 3,
 				.fly_z = 0,
 				.jitter = 0
-				});
+			});
 
 			BasicCam::processCam();
 			reflect_close;
@@ -110,7 +110,7 @@ namespace Loop
 			.normals = texture::obj1nrml,
 			.quality = 0,
 			.pos_x = 2,
-			.pos_y = 0,
+			.pos_y = 4,
 			.pos_z = 1
 		});
 
@@ -131,9 +131,8 @@ namespace Loop
 
 		vs::quad.set();
 		ps::output.set();
-		RenderTarget::Clear({ 0,250,0,0 });
-
-		Drawer::NullDrawer({ 1,1 });
+		
+		Drawer::NullDrawer({1,1});
 
 	}
 

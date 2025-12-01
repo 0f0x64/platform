@@ -320,9 +320,9 @@ addr sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::pShader(5);
-context->UpdateSubresource(dx11::Shaders::PS[5].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[5].params);
+Shaders::pShader(6);
+context->UpdateSubresource(dx11::Shaders::PS[6].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[6].params);
 Textures::TextureToShader((texture)textures.screen, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
@@ -352,9 +352,9 @@ float slider_type;
 } params;
 
 void set () {
-Shaders::pShader(6);
-context->UpdateSubresource(dx11::Shaders::PS[6].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[6].params);
+Shaders::pShader(7);
+context->UpdateSubresource(dx11::Shaders::PS[7].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[7].params);
 }
 
 } box_ps;
@@ -387,9 +387,9 @@ addr s1AddressV;
 } samplers;
 
 void set () {
-Shaders::pShader(7);
-context->UpdateSubresource(dx11::Shaders::PS[7].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[7].params);
+Shaders::pShader(8);
+context->UpdateSubresource(dx11::Shaders::PS[8].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[8].params);
 Textures::TextureToShader((texture)textures.tex, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.s1Filter, samplers.s1AddressU, samplers.s1AddressV); 
 }
@@ -408,9 +408,9 @@ float4 color;
 } params;
 
 void set () {
-Shaders::pShader(8);
-context->UpdateSubresource(dx11::Shaders::PS[8].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[8].params);
+Shaders::pShader(9);
+context->UpdateSubresource(dx11::Shaders::PS[9].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[9].params);
 }
 
 } lineDrawerUV_ps;
@@ -427,9 +427,9 @@ float4 color;
 } params;
 
 void set () {
-Shaders::pShader(9);
-context->UpdateSubresource(dx11::Shaders::PS[9].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[9].params);
+Shaders::pShader(10);
+context->UpdateSubresource(dx11::Shaders::PS[10].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[10].params);
 }
 
 } lineDrawer_ps;

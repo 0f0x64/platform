@@ -18,7 +18,7 @@
 
 #ifdef EDITOR_DEBUG
 	#define forceAdapter true
-	#define adapterNum 0
+	#define adapterNum 1
 	#define EditMode true
 	#define DebugMode true
 	#define DirectXDebugMode false

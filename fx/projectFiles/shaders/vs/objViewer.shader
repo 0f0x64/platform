@@ -91,9 +91,11 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
 
     pos=lerp(pos,noise(pos.xyz*1.2)/(pos*4),noise(pos*2.3));
 
-    pos=rotX(pos,2.22*noise(pos)+time.x*.01*.5);
-    pos=rotY(pos,1.33*noise(pos)+time.x*.02*.5);
-    pos=rotZ(pos,.44* noise(pos)+time.x*.03*.5);
+    float rs = pow(length(pos.xy)*.04,2);
+
+    pos=rotX(pos,2.22*noise(pos)+time.x*.01*rs);
+    pos=rotY(pos,1.33*noise(pos)+time.x*.02*rs);
+    pos=rotZ(pos,.44* noise(pos)+time.x*.03*rs);
     
     
     float ff= (time.y-21*60)*.00;
@@ -107,11 +109,21 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
 
 
 
-  float tf= +17-time.y*.01-3;
+  float tf= -time.y*.002+3;
     //pos=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85+.3);
-    pos=lerp(pos*22,normalize(pos)*38,(4.5*noise(pos)+.85)/12+tf);
-    
-   // pos=lerp(pos,normalize(pos)*192,pow(saturate(length(pos*.006)),.6)*.85);
+  //  pos=lerp(pos*22,normalize(pos)*38,(4.5*noise(pos)+.85)/12+tf);
+    pos*=22;
+    //pos=lerp(pos,normalize(pos)*192,pow(saturate(length(pos*.006)),.6)*.5);
+
+    float hm = pow(sin(atan2(pos.x,pos.z)*2.),1);
+    pos.y*=.1;
+    pos.y*=length(pos*2)*.013;
+    pos.y+=pow(sin(length(pos*.01))+.1,5)*44.5*hm;
+    pos.y+=abs(noise(pos*.075))*22*pos.y*.18;
+    //pos.y-=44;
+    //pos*=2;
+
+
 
     float f=175;
    // pos.x+=time.x;    
