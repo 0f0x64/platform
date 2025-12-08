@@ -72,9 +72,196 @@ float hash( float n ) {
 
     float3 noise3(float3 p)
     {
-        
-        return float3(noise(p.x),noise(p.y),noise(p.z));
+        //return float3(noise(p.x),noise(p.y),noise(p.z));
+        return float3(noise(p.xyz),noise(p.yzx),noise(p.zxy));
     }
+
+struct pos_color
+{
+    float4 pos;
+    float4 rgba;
+};
+
+pos_color base(float qid,float div, float4 grid)
+{
+    pos_color outp;
+
+    float br2 = ((qid)%(316)) ==  0  ? 1 : 0;
+    float st = (qid%(3206)) ==  0  ? 1 : 0;
+    float br = (qid%(200000)) ==  0  ? 1 : 0;
+
+    float3 pos;
+    pos = noise3(qid*float3(.0001,.0002,.0003)*5);
+    pos = noise3(pos.xyz*33)*10;
+    pos=lerp(pos,normalize(1/(pos+1.6))*(.7-br*br2*st)*3,length(pos)/2);
+    pos=lerp(pos,noise(pos.xyz*1.2)/(pos*4),noise(pos*12.3));
+
+    float rs = length(pos)*.00+.5;
+
+    pos=rotX(pos,2.22*noise(pos)+time.x*.01*rs);
+    pos=rotY(pos,1.33*noise(pos)+time.x*.02*rs);
+    pos=rotZ(pos,.44* noise(pos)+time.x*.03*rs);
+    
+    pos+=normalize(pos)*br2*2.;
+
+    float tf= -time.y*.002+3;
+    pos=lerp(pos*12,normalize(pos)*38,(4.5*noise(pos)+.85)/12+tf);
+
+    float4 posT;
+    posT = mul(float4(pos,1), view[0]);
+    posT = mul(posT, proj[0]);
+    
+    float2 scale = float2(proj[0]._m00,proj[0]._m11);
+    float2 gzw=(grid.zw-.5)*scale;
+    posT.xy+=(grid.zw-.5)*br*142.5*scale;
+    posT.xy+=(grid.zw-.5)*br2*15.5*pow(sin(qid)*.5+.55,.25)*scale*2*max(pow(length(pos),1.8)*.00003,1);
+    posT.xy+=gzw*posT.w/250*(1-st);
+    posT.xy+=(gzw)*1.2*posT.w/300*st;
+
+    outp.pos = posT;
+
+
+    //color
+     float3 l1 = sin(pos.xyz*.0005)*18;
+    l1 = (noise3(pos*.001)+1)*42;
+    float3 l2= sin(length(pos)*.005*float3(1,2,5)-time.x*.0);
+    float3 n =.125*(abs(noise3(l1-l2)*float3(6,2,4)*1)+.95);
+    float4 neb = float4(n,1)*.7;
+    outp.rgba = neb;
+    outp.rgba = br2 ? .02*neb*7: outp.rgba ;
+    outp.rgba = (st ? pow(div,.25)*14*(1-br)*outp.rgba : outp.rgba);
+    outp.rgba = br ? float4(3.95,2,4,1)*.2 : outp.rgba;
+    
+    outp.rgba.b+=pow(saturate(length(pos)*.0041),2.4)*.16;
+  
+    if (!st&!br2&!br) outp.rgba/=outp.pos.w*.01*pow(div,.5);
+    if(st&&!br&&!br2) outp.rgba=float4(1,1,2,1)*2.;
+    outp.rgba*=saturate(posT.z*.001+.4);
+
+    return outp;
+}
+
+pos_color sagittarius (float qid,float div, float4 grid)
+{
+    pos_color outp;
+
+    float br2 = ((qid)%(316)) ==  0  ? 1 : 0;
+    float st = (qid%(3206)) ==  0  ? 1 : 0;
+    float br = (qid%(200000)) ==  0  ? 1 : 0;
+
+    float3 pos;
+    pos = noise3(qid*float3(.0001,.0002,.0003)*5);
+    pos = noise3(pos.xyz*33)*10;
+    pos=lerp(pos,normalize(1/(pos+1.6))*(.7-br*br2*st)*3,length(pos)/2);
+    pos=lerp(pos,noise(pos.xyz*1.2)/(pos*4),noise(pos*12.3));
+
+    float rs = length(pos)*.00+.5;
+   
+    pos+=normalize(pos)*br2*4.;
+    
+
+    float tf= -time.y*.002+3;
+    pos.xz*=7*(2+1.5*noise(pos*2))*(length(pos/2));
+
+    pos.y+=100;
+    float rock_mask = sin(-abs(length(pos)*.01)*2+11.5)*12*(1+sin(atan2(pos.x,pos.z)*8))*(saturate(length(pos)*.002));
+    rock_mask*=3+sin(atan2(pos.x,pos.z)*5)*1;
+    pos=rotY(pos,sin(atan2(pos.x,pos.z)*1)*.4);
+
+    pos.y-=(pow(rock_mask,2))*(1+noise(pos*.4)*1.5)*.48;
+    pos.y-=(pow(rock_mask,1))*(1+noise(pos*.4)*1.5)*12.48;
+    pos.y+=sin(atan2(pos.x,pos.z)*4)*62;
+    
+    pos-=noise(pos*.05)*15;
+
+    float lowf =pow(length(pos.xz)*.4,2.5)*.01;
+    pos.y+=min(lowf,190);
+    pos.y-=saturate(length(pos)*.007)*91;
+    //pos.y-=pow(length(pos.xyz),2)*.001/1.2;
+    pos.xz*=2-min(lowf/1111,1.1);
+    pos.xz*=1+saturate(-pos.y*.003);
+    
+    pos=lerp(pos,pos*.1,.1)*.5;
+    pos=lerp(pos,normalize(pos)*422,saturate(length(pos)*.0013)*1.2);
+    pos.xz*=.87+max(-pos.y,.0)*.0001;
+    pos.y*=1-max(-pos.y*2+noise(pos)*2,310)*.001;
+    
+    
+    pos.y+=-1111/pow(length(pos)*.1,13);
+    float f2=saturate(-pos.y*.001-.05);
+    pos=rotY(pos+pos/  3,f2*112);
+    
+
+    //star
+    float f=1-saturate(length(pos+float3(0,-10,0))*.00351*(noise(pos)+1.2));
+    f=step(.5,pow(f,1.2));
+    float3 ofs=float3(200,0,200);
+
+    pos = -ofs*f+lerp(pos+ofs*f,normalize(noise3(pos))*26*(noise(pos*2)+1),f/3);
+
+    pos*=1+noise(pos*.1)*f*155;
+    
+    float cf=295/(length(pos)+1);
+
+    pos= lerp(pos,rotX(pos,-time.x*.0251+length(pos)*.03)*cf,f);
+    pos= lerp(pos,rotY(pos,-time.x*.0262+length(pos)*.04)*cf,f);
+    pos= lerp(pos,rotZ(pos,-time.x*.0243+length(pos)*.05)*cf,f);
+
+
+    if (!(st||br||br2)) 
+    {
+        pos.y*=1+(12/(length(pow(pos.xz,4))*.001+.2))*f*2.2;
+       // pos.y*=1-.25*f;
+    }
+    pos*=1-f/1.13;
+
+   // pos.y*=1-pow(cos(length(pos*362))*f,5);    
+    //pos.y-=(1/pos.y)*f;
+    pos.y/=1.5;
+    pos*=1+f*2;
+  
+    pos.y+= 140*f;
+    pos.y-=85;
+  float3 pos2=pos;
+
+    float4 posT;
+
+    posT = mul(float4(pos,1), view[0]);
+    posT = mul(posT, proj[0]);
+    
+    float2 scale = float2(proj[0]._m00,proj[0]._m11);
+    float2 gzw=(grid.zw-.5)*scale;
+    posT.xy+=(grid.zw-.5)*br*212.5*scale;
+    posT.xy+=(grid.zw-.5)*br2*15.5*pow(sin(qid)*.5+.55,.25)*scale*2*max(length(pos2)*.00003,1)*1.4*(noise(pos*.01)*3+1);
+    posT.xy+=gzw*posT.w/250*(1-st);
+    posT.xy+=(gzw)*1.2*posT.w/300*st;
+
+    //posT.xy+=(gzw)*length(pos)*.0051;
+    
+    outp.pos = posT;
+
+
+    //color
+     float3 l1 = sin(pos2.xyz*.0005)*18;
+    l1 = (noise3(pos2*.001)+1)*42;
+    float3 l2= 1;
+    float3 n =.125*(abs(noise3(pos*.001)*float3(8,4,2)*2)+.5);
+    float4 neb = float4(n,1)*.7;
+    outp.rgba = neb;
+    outp.rgba = br2 ? .02*neb*7: outp.rgba ;
+    outp.rgba = (st ? pow(div,.25)*14*(1-br)*outp.rgba : outp.rgba);
+    outp.rgba = br ? float4(3.95,2,4,1)*.2 : outp.rgba;
+    
+    outp.rgba.b+=pow(saturate(length(pos2)*.0041),2.4)*.16;
+    outp.rgba*=1-sin(pow(outp.rgba.gbra,2.5)*1);
+    outp.rgba=lerp(outp.rgba,outp.rgba.bgra,f);
+  
+    if (!st&!br2&!br) outp.rgba/=outp.pos.w*.01*pow(div,.5);
+    if(st&&!br&&!br2) outp.rgba=float4(1,1,2,1)*2.;
+    outp.rgba*=saturate(posT.z*.001+.4);
+    //outp.rgba=1;
+    return outp;
+}
 
 VS_OUTPUT VS(uint vID : SV_VertexID)
 {
@@ -85,99 +272,17 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     
     float qid = floor(vID/6)/div;
     
-    float br2 = ((qid)%(316)) ==  0  ? 1 : 0;
-    float st = (qid%(3206)) ==  0  ? 1 : 0;
-    float br = (qid%(200000)) ==  0  ? 1 : 0;
+    //pos_color p = base(qid,div,grid);
+    pos_color p = sagittarius(qid,div,grid);
 
-
-    float3 pos;
-    pos = noise3(qid*float3(.0001,.0002,.0003)*5);
-    pos = noise3(pos.xyz*33)*10;
-
-    pos=lerp(pos,noise(pos.xyz*1.2)/(pos*4),noise(pos*2.3));
-
-    float rs = pow(length(pos.xy)*.04,2);
-    rs=.5;
-
-    pos=rotX(pos,2.22*noise(pos)+time.x*.01*rs);
-    pos=rotY(pos,1.33*noise(pos)+time.x*.02*rs);
-    pos=rotZ(pos,.44* noise(pos)+time.x*.03*rs);
-    
-    pos+=normalize(pos)*br2*3;
-    
-    float ff= (time.y-21*60)*.00;
-    ff=11/(length(pos));
-    /*pos=rotX(pos,ff);
-    pos=rotY(pos-pos/4,ff)+pos/4;
-    pos=rotZ(pos-pos/4,ff)+pos/4;*/
-    /*pos=rotX(pos,pos.x/4);
-    pos=rotY(pos,pos.y/4);
-    pos=rotX(pos,pos.y/4);*/
-
-
-
-  float tf= -time.y*.002+3;
-    //pos=lerp(pos.xyz,normalize(pos.xyz)*38,1.5*noise(pos)+.85+.3);
-    pos=lerp(pos*12,normalize(pos)*38,(4.5*noise(pos)+.85)/12+tf);
-    //pos*=22;
-    pos=lerp(pos,normalize(pos)*192,pow(saturate(length(pos*.006)),.6)*.5);
-
-    float hm = pow(sin(atan2(pos.x,pos.z)*2.),1);
-   // pos.y*=.1;
-   // pos.y*=length(pos*2)*.013;
-   // pos.y+=pow(sin(length(pos*.01))+.1,5)*44.5*hm;
-   // pos.y+=abs(noise(pos*.075))*22*pos.y*.18;
-    //pos.y-=44;
-    //pos*=2;
-
-    //pos+=noise3(pos*.02+float3(11.1,1,1))*222;
-
-
-    float f=175;
-   // pos.x+=time.x;    
-  //  pos=frac((pos+f/2)/f)*f-f/2;
-  
-
+    output.pos=p.pos;
 
     output.vnorm = 0;
-    output.wpos = float4(pos.xyz, 0);
-    output.vpos = mul(float4(pos.xyz, 1), view[0]);
-
-    output.pos = mul(float4(pos,1), view[0]);
-        output.pos = mul(output.pos, proj[0]);
-    
-        float2 scale = float2(proj[0]._m00,proj[0]._m11);
-        float2 gzw=(grid.zw-.5)*scale;
-
-    
-
-
-
-//    output.pos.xy+=(grid.zw-.5)*br*142.5*scale;
-    output.pos.xy+=(grid.zw-.5)*br2*15.5*pow(sin(qid)*.5+.55,.25)*scale*2*max(pow(length(pos),1.8)*.00003,1);
-    output.pos.xy+=gzw*output.pos.w/250*(1-st)*1.;
-  //  output.pos.xy+=(gzw)*1.2*output.pos.w/300*st;
-
+    output.wpos = 0;
+    output.vpos = 0;
     output.uv = grid.zw;
     output.id = float4(floor(vID/6)/div,0,0,0) ;
-
-    float3 l1 = sin(pos.xyz*.0005)*18;
-   // l1 = (noise3(pos*.001)+1)*42;
-    float3 l2= sin(length(pos)*.005*float3(1,2,5)-time.x*.0);
-    float3 n =.125*(abs(noise3(l1-l2)*float3(6,2,4)*1)+.95);
-    float4 neb = float4(n,1);
-    output.rgba = neb;
-    output.rgba = br2 ? .02*neb*7: output.rgba ;
-    output.rgba = (st ? pow(div,.25)*14*(1-br)*output.rgba : output.rgba);
-    output.rgba = br ? float4(3.95,2,4,1)*.2 : output.rgba;
-    
-    output.rgba.b+=pow(saturate(length(pos)*.0041),2.4)*.16;
-  
-    if (!st&!br2&!br) output.rgba/=output.pos.w*.01*pow(div,.5);
-    if(st&&!br&&!br2) output.rgba=float4(1,1,2,1)*1.5;
-    output.rgba*=saturate(output.pos.z*.001+.4);
-    //output.rgba*=.5;
-    //output.rgba*=pow(1-length(pos/f*1.8),.5);
+    output.rgba = p.rgba;
 
     return output;
 }
