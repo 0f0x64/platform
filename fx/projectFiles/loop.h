@@ -132,7 +132,7 @@ namespace Loop
 		vs::quad.set();
 		ps::output.set();
 		
-		Drawer::NullDrawer({1,1});
+		Drawer::NullDrawer({1,152});
 
 	}
 

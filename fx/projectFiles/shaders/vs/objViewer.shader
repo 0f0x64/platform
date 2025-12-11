@@ -76,6 +76,12 @@ float hash( float n ) {
         return float3(noise(p.xyz),noise(p.yzx),noise(p.zxy));
     }
 
+    float3 noise3_u(float3 p)
+    {
+        //return float3(noise(p.x),noise(p.y),noise(p.z));
+        return float3(noise(p.xyz),noise(p.yzx),noise(p.zxy))+.5;
+    }
+
 struct pos_color
 {
     float4 pos;
@@ -137,7 +143,7 @@ pos_color base(float qid,float div, float4 grid)
     if (!st&!br2&!br) outp.rgba/=outp.pos.w*.01*pow(div,.5);
     if(st&&!br&&!br2) outp.rgba=float4(1,1,2,1)*2.;
     outp.rgba*=saturate(posT.z*.001+.4);
-
+    outp.rgba*=.13*2;
     return outp;
 }
 
@@ -195,7 +201,7 @@ pos_color sagittarius (float qid,float div, float4 grid)
     //star
     float f=1-saturate(length(pos+float3(0,-10,0))*.00351*(noise(pos)+1.2));
     f=step(.5,pow(f,1.2));
-    float3 ofs=float3(200,0,200);
+    float3 ofs=float3(200,0,200)*0;
 
     pos = -ofs*f+lerp(pos+ofs*f,normalize(noise3(pos))*26*(noise(pos*2)+1),f/3);
 
@@ -210,15 +216,17 @@ pos_color sagittarius (float qid,float div, float4 grid)
 
     if (!(st||br||br2)) 
     {
-        pos.y*=1+(12/(length(pow(pos.xz,4))*.001+.2))*f*2.2;
-       // pos.y*=1-.25*f;
+        pos.y*=1+(12/(length(pow(pos.xz,4))*.001+.2))*f*7.2;
+       pos.xz=lerp(pos.xz,pos.xz*(1+pow((pos.y-470)*.005,3)*f*.15),.75);
+       //pos*=1+normalize(pos)*2*f;
+        // pos.y*=1-.25*f;
     }
     pos*=1-f/1.13;
 
    // pos.y*=1-pow(cos(length(pos*362))*f,5);    
     //pos.y-=(1/pos.y)*f;
     pos.y/=1.5;
-    pos*=1+f*2;
+    //pos*=1+f*2;
   
     pos.y+= 140*f;
     pos.y-=85;
@@ -229,7 +237,7 @@ pos_color sagittarius (float qid,float div, float4 grid)
     posT = mul(float4(pos,1), view[0]);
     posT = mul(posT, proj[0]);
     
-    float2 scale = float2(proj[0]._m00,proj[0]._m11);
+    float2 scale = float2(proj[0]._m00,proj[0]._m11)*2.3;
     float2 gzw=(grid.zw-.5)*scale;
     posT.xy+=(grid.zw-.5)*br*212.5*scale;
     posT.xy+=(grid.zw-.5)*br2*15.5*pow(sin(qid)*.5+.55,.25)*scale*2*max(length(pos2)*.00003,1)*1.4*(noise(pos*.01)*3+1);
@@ -252,28 +260,175 @@ pos_color sagittarius (float qid,float div, float4 grid)
     outp.rgba = (st ? pow(div,.25)*14*(1-br)*outp.rgba : outp.rgba);
     outp.rgba = br ? float4(3.95,2,4,1)*.2 : outp.rgba;
     
-    outp.rgba.b+=pow(saturate(length(pos2)*.0041),2.4)*.16;
-    outp.rgba*=1-sin(pow(outp.rgba.gbra,2.5)*1);
+    outp.rgba.b+=pow(saturate(length(pos2)*.0041),2.4)*.1;
+    outp.rgba*=1.2-sin(pow(outp.rgba.gbra,2.5)*1);
     outp.rgba=lerp(outp.rgba,outp.rgba.bgra,f);
   
     if (!st&!br2&!br) outp.rgba/=outp.pos.w*.01*pow(div,.5);
     if(st&&!br&&!br2) outp.rgba=float4(1,1,2,1)*2.;
     outp.rgba*=saturate(posT.z*.001+.4);
-    //outp.rgba=1;
+    //outp.rgba+=.015*length(scale);
+    outp.rgba*=.13*2;
+    return outp;
+}
+
+float hash_s(int qid)
+{
+    return hash(qid)-.5;
+}
+
+float3 rot3(float3 pos, float3 angle)
+{
+    return rotZ(rotY(rotX(pos,angle.x),angle.y),angle.z);
+}
+
+float3 hash3(int qid)
+{
+    return float3(hash(qid*.27),hash(qid*.28),hash(qid*.29))-.5;
+}
+
+float smooth(float x)
+{
+    return x + (x - (x * x * (3.0 - 2.0 * x)));
+
+}
+
+float3 shp(float2 uv)
+{
+    float2 a = uv * PI * 2;
+    a.x *= -1;
+    float3 pos = float3(sin(a.x), sin(a.y ), cos(a.x));
+    pos.xz *= cos(a.y );
+
+    return pos;
+}
+
+float3 quantize(float3 x,float q)
+{
+    return floor(x*q)/q;
+}
+
+float3 getTpos(float2 a, float R,float p,float q)
+{    
+        return float3((R + cos(a.x * q)) * cos(a.x * p), 
+                      (R + cos(a.x * q)) * sin(a.x * p),
+                      sin(a.x * q));
+}
+
+float3 torusKnot(float2 a)
+{
+    
+    float R = 3.5;
+    float r = 1.;
+
+    float p=1;
+    float q=3;
+
+    float3 pos = getTpos(a,R,p,q);
+    float3 T = pos - getTpos(a+float2(.01,0),R,p,q);
+    float3 N = pos+T;
+                    
+    float3 B = cross(T,N);
+    N = cross(B,T);
+    
+    B= normalize(B);
+    N= normalize(N);
+
+    pos += r * (cos(a.y) * N + sin(a.y) * B);
+
+    return pos;
+}
+
+pos_color sagittarius_v2 (int qid,float div, float4 grid)
+{
+    pos_color outp;
+
+    float br2 = ((qid)%(11316)) ==  0  ? 1 : 0;
+    float st = (qid%(3206)) ==  0  ? 1 : 0;
+    float br = (qid%(200000)) ==  0  ? 1 : 0;
+
+    float3 pos;
+    pos= hash3(qid*.05);
+    float3 h=hash3(qid);
+    pos = rot3(pos,h+qid/1122);
+    float y_fade=0;
+    pos=normalize(pos+float3(0,y_fade,0));
+
+    //float2 a = grid.xy * PI * 2;
+    float na=time.x*.0;
+
+    
+    pos*=1+noise3(pos*111.6)*1.6;
+    pos.y*=1.8;
+
+    pos*=1+noise3(pos*1.6);
+    pos = rot3(pos,2.2/(pow(pos,4)+1));
+    pos.y*=1.5;
+    pos*=1+noise3(pos);
+    //pos.y*=1.3;
+    pos*=1+noise3(pos*3.5+na)/3;
+    pos*=1.3;
+    
+    
+    pos*=1+max(noise3_u(pos*12.6)*.2-noise3_u(pos*2.6)*.5,0);
+    //pos*=2;
+    //pos=lerp(pos,normalize(pos)*22,1);
+    //pos.y=lerp(pos,normalize(pos)*3,abs(pos.y)).y;
+
+    //pos += torusKnot(a);
+
+    //pos = shp(grid.xy);
+    //pos*=noise(pos*2222);
+    //pos=normalize(pos);
+    //pos*=1+noise3(pos*1.6);
+    //pos*=1+max(noise3_u(pos*15.6)*.2-noise3_u(pos*2.6)*.5,0);
+    //pos*=5;
+
+
+    float4 posT;
+
+    posT = mul(float4(pos,1), view[0]);
+    posT = mul(posT, proj[0]);
+
+    float2 scale = float2(proj[0]._m00,proj[0]._m11);
+    float2 gzw=(grid.zw-.5)*scale;
+    gzw*=1+br2*92;
+    int q = qid%217116;
+    float s=sin(time.x/3+floor(qid/2))*34+60;
+    if (q==2) gzw*=float2(s,1);
+    if (q==1) gzw*=float2(1,s);
+    gzw=rotZ(gzw.xyx,time.x*.0+sin(pos)*0+45).xy;
+    posT.xy+=gzw*.004*posT.w*2*scale*2;
+
+    //posT.y*=1+q/3;
+
+    outp.pos=posT;
+    outp.rgba=float4(noise3(pos*.1+2)+.1,1)/7+.04;
+    
+    //outp.rgba/=1+br2;
+    outp.rgba/=.4*posT.z;
+    //outp.rgba+=q==0? 5:0;
+    if (q==1||q==2) outp.rgba*=50;
+    int q2 = qid%1716;
+    if (q2==0&&!br2) outp.rgba*=120;
+    outp.rgba/=length(scale*scale*scale)+1;
+    
+    
     return outp;
 }
 
 VS_OUTPUT VS(uint vID : SV_VertexID)
 {
     VS_OUTPUT output = (VS_OUTPUT) 0;
-    float div=4;
+    float div=1;
     float4 grid = getGridP(vID, 1, int2(gX,gY));
     float2 uv = grid.xy;
     
-    float qid = floor(vID/6)/div;
+    int qid = floor(vID/6)/div;
     
     //pos_color p = base(qid,div,grid);
-    pos_color p = sagittarius(qid,div,grid);
+    //pos_color p = sagittarius(qid,div,grid);
+    pos_color p = sagittarius_v2(qid,div,grid);
 
     output.pos=p.pos;
 
