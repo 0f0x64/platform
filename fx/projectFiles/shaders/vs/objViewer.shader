@@ -321,8 +321,8 @@ float3 torusKnot(float2 a)
     float R = 3.5;
     float r = 1.;
 
-    float p=1;
-    float q=3;
+    float p=4;
+    float q=2;
 
     float3 pos = getTpos(a,R,p,q);
     float3 T = pos - getTpos(a+float2(.01,0),R,p,q);
@@ -339,81 +339,154 @@ float3 torusKnot(float2 a)
     return pos;
 }
 
-pos_color sagittarius_v2 (int qid,float div, float4 grid)
-{
-    pos_color outp;
-
-    float br2 = ((qid)%(11316)) ==  0  ? 1 : 0;
-    float st = (qid%(3206)) ==  0  ? 1 : 0;
-    float br = (qid%(200000)) ==  0  ? 1 : 0;
-
-    float3 pos;
-    pos= hash3(qid*.05);
+    /*pos= hash3(qid*.05);
     float3 h=hash3(qid);
     pos = rot3(pos,h+qid/1122);
     float y_fade=0;
-    pos=normalize(pos+float3(0,y_fade,0));
+    pos=normalize(pos+float3(0,y_fade,0));*/
 
-    //float2 a = grid.xy * PI * 2;
-    float na=time.x*.0;
+//  pos*=1+max(noise3_u(pos*12.6)*.2-noise3_u(pos*2.6)*.5,0);
 
+float3 star(float3 pos)
+{
+    pos=normalize(pos)*22;
+    float f=1-saturate(length(pos+float3(0,-10,0))*.00351*(noise(pos)+1.2));
+    f=step(.5,pow(f,1.2));
+    float3 ofs=float3(200,0,200)*0.3;
+
+    pos = -ofs*f+lerp(pos+ofs*f,normalize(noise3(pos))*26*(noise(pos*2)+1),f/3);
+
+    pos*=1+noise(pos*.1)*f*155;
     
-    pos*=1+noise3(pos*111.6)*1.6;
+    float cf=115/(length(pos)+1);
+
+    pos= lerp(pos,rotX(pos,-time.x*.01251+length(pos)*.13)*cf,f);
+    pos= lerp(pos,rotY(pos,-time.x*.01262+length(pos)*.14)*cf,f);
+    pos= lerp(pos,rotZ(pos,-time.x*.01243+length(pos)*.15)*cf,f);
+
+
+       pos.y*=1+(12/(length(pow(pos.xz,13))*.001+.02))*f*111.2;
+       pos.xz=lerp(pos.xz,pos.xz*(3+pow(abs(pos.y)*.005,3)*f*.5),.75);
+       pos=lerp(pos,normalize(pos)*122,.61);
+         //pos.y*=1-.25*f;
+
+    pos*=1-f/1.13;
+    //pos=pos*(85/(length(pos)+45));
+    return pos/22;
+}
+
+pos_color sagittarius_v2 (uint qid,float div, float4 grid)
+{
+    pos_color outp;
+
+    uint outer=17;
+    uint floor=4;
+    uint star_=49;
+
+    //instances
+    uint cn=7;
+    float a= (qid%cn);
+    a=a*PI/180.;
+    a*=360./cn;
+
+    //geometry
+    float3 pos = shp(grid.xy);
+    //heigth
+    float h=(sin(a*3)+2)/2;
+    pos.y*=.8+h;
+    pos.y+=h;
+    //
+    
+    pos*=1+noise3(pos*111.6+1111/(a+1))*1.6;
     pos.y*=1.8;
-
-    pos*=1+noise3(pos*1.6);
-    pos = rot3(pos,2.2/(pow(pos,4)+1));
+    pos*=1+noise3(pos*1.6+1111/(a+1));
+    pos = rot3(pos,2.2/(pow(pos,14)+1));
     pos.y*=1.5;
-    pos*=1+noise3(pos);
-    //pos.y*=1.3;
-    pos*=1+noise3(pos*3.5+na)/3;
-    pos*=1.3;
+    pos*=1+noise3(pos+1111/(a+1));
+    pos*=1+noise3(pos*3.5)/3;
+    pos*=2;
+    float3 pos2=pos;
+    pos.y+=a/7;
+    pos.x+=17;
+    pos = rot3(pos,float3(-.9,0,.4));
+    if (qid%cn) pos=rotY(pos,a);
+
     
-    
-    pos*=1+max(noise3_u(pos*12.6)*.2-noise3_u(pos*2.6)*.5,0);
-    //pos*=2;
-    //pos=lerp(pos,normalize(pos)*22,1);
-    //pos.y=lerp(pos,normalize(pos)*3,abs(pos.y)).y;
+    pos*=-0.5;
+    pos.y*=1.4;
+    pos.y-=h;
 
-    //pos += torusKnot(a);
+  //if (qid%2==0) pos=lerp(pos2*5,normalize(pos2)*11,.9);
 
-    //pos = shp(grid.xy);
-    //pos*=noise(pos*2222);
-    //pos=normalize(pos);
-    //pos*=1+noise3(pos*1.6);
-    //pos*=1+max(noise3_u(pos*15.6)*.2-noise3_u(pos*2.6)*.5,0);
-    //pos*=5;
+    if (qid%outer==0) 
+    {
+        pos2=rot3(pos,pos2/5-4);
+        pos=normalize(pos2)*4+pos2;
+        
+    }
+
+        //floor
+    if (qid%floor==0) {
+        pos=pos2/4;
+        pos*=float3(3,.025,3);
+        pos.y-=4+noise(pos*3+time.x*.00125);
+        pos=rotY(pos,length(pos)*2-time.x*.0000135);
+          //pos=rotZ(pos,pow(length(pos2),15)*.00001);
+          //pos=rotX(pos,pow(length(pos2),5)*.00002);
+        pos+=noise3(pos*2);
+        pos+=noise3(pos*6)/6;
+        //pos.y-=length(pos)/6;
+        //pos*=2.5;
+    }
 
 
+    if (qid%star_==0) pos=star(pos2*.7);
+
+    //camera
     float4 posT;
-
     posT = mul(float4(pos,1), view[0]);
     posT = mul(posT, proj[0]);
 
+    //glow
+    float br2 = ((qid)%(11316)) ==  0  ? 1 : 0;
+
+    //size
     float2 scale = float2(proj[0]._m00,proj[0]._m11);
-    float2 gzw=(grid.zw-.5)*scale;
+    float2 gzw=(grid.zw-.5);
+    
+    //if (qid%113==0) gzw.x*=12;
+
     gzw*=1+br2*92;
-    int q = qid%217116;
-    float s=sin(time.x/3+floor(qid/2))*34+60;
-    if (q==2) gzw*=float2(s,1);
-    if (q==1) gzw*=float2(1,s);
-    gzw=rotZ(gzw.xyx,time.x*.0+sin(pos)*0+45).xy;
+
+    if (qid%outer==0) gzw*=(qid%150)==0 ? 13:1;
+    
     posT.xy+=gzw*.004*posT.w*2*scale*2;
 
-    //posT.y*=1+q/3;
-
     outp.pos=posT;
-    outp.rgba=float4(noise3(pos*.1+2)+.1,1)/7+.04;
     
-    //outp.rgba/=1+br2;
-    outp.rgba/=.4*posT.z;
-    //outp.rgba+=q==0? 5:0;
-    if (q==1||q==2) outp.rgba*=50;
-    int q2 = qid%1716;
-    if (q2==0&&!br2) outp.rgba*=120;
-    outp.rgba/=length(scale*scale*scale)+1;
+    //color
+   outp.rgba=float4(float3(2,0,0)*noise3(pos*.1+a)-.31,1)/17+.01;
+    //if (br2) outp.rgba/=4;
+    //if (qid%2!=0) 
+    outp.rgba.rgb+=float3(.4,.25,.1)/12;
+    outp.rgba/=.24*posT.w*length(scale);
+    uint q2 = (qid)%957;
+    //if (q2==0&&!br2&&!qid%star_==0) outp.rgba=1.5;
+    if (q2==0&&!br2) outp.rgba=.25;
+    //outp.rgba/=length(scale*scale*scale)+1;
     
+    //if(qid%floor==0&&!br2) outp.rgba+=float4(1,2,5,1)*.0015*length(pos)/3;
+    //outp.rgba*=smoothstep(35,0,length(pos));
+ //   outp.rgba=1;if (br2) outp.rgba*=0;
     
+     if (qid%star_==0) outp.rgba+=float4(0,0.01,.02,1)*4;
+     if (qid%floor==0) outp.rgba+=float4(0,0.001,.02,1)/2;
+
+     if (qid%star_==0) outp.rgba/=length(pos/14)+.4;
+
+     if (qid%outer==0) outp.rgba*=13;
+     if (qid%outer==0) outp.rgba*=(qid%150)==0 ? .13:1;
+     outp.rgba*=.5;
     return outp;
 }
 
@@ -424,7 +497,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     float4 grid = getGridP(vID, 1, int2(gX,gY));
     float2 uv = grid.xy;
     
-    int qid = floor(vID/6)/div;
+    uint qid = floor(vID/6)/div;
     
     //pos_color p = base(qid,div,grid);
     //pos_color p = sagittarius(qid,div,grid);
