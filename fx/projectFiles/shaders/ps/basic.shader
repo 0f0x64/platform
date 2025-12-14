@@ -61,7 +61,7 @@ float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
     float3 c = saturate(1.-2.*length(input.uv-.5));
 
 
-   // c*=noise(input.uv.yxx*513);
+    //c=noise(input.uv.xyx)/2+.5;
     return float4(c*input.rgba,1);
 
 }

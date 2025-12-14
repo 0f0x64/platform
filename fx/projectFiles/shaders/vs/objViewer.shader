@@ -381,7 +381,7 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
 
     uint outer=62;
     uint floor=8;
-    uint star_=19;
+    uint star_=12;
     uint star_2=4957;
     uint big_hl=2006;
 
@@ -429,7 +429,7 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
         pos=rotZ(pos,20*3.14/180.);
         pos+=noise3(pos*2)/.2;
         pos+=noise3(pos*6)/6;
-        pos=normalize(pos)*15+pos*.0;
+        pos=normalize(pos)*15+pos*11.0;
     }
 
         //floor
@@ -440,9 +440,9 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
         pos=rotY(pos,length(pos)*.07-time.x*.0000135+a);
         pos.y*=length(pos)/22;
         pos*=float3(1,.4,1);
-        pos.y-=2;
+        pos.y-=1.5;
         pos.y-=length(pos)/5;
-        pos*=1.5;
+        pos*=2.5;
     }
 
 
@@ -462,13 +462,16 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
     //
     //if (qid%113==0) gzw.xy*=32;
 
-    if ((qid%big_hl)==0) gzw*=102;
+    if (qid%big_hl==0&&qid%star_!=0) gzw*=102;
     
     //if (qid%star_==0) gzw/=2;
     //if (qid%star_2==0) gzw/=2;
     //if (qid%floor==0) gzw/=2;
-    if (qid%outer==0&&qid%floor!=0) gzw*=(qid%150)==0 ? abs(242*(noise(sin(pos*1.1)*1.5)))+1 :1;
-    if (qid%outer!=0&&qid%floor==0) gzw*=(qid%150)==0 ? abs(32*(noise(sin(pos*1.1)*1.5)))+1 :1;
+    if (qid%outer==0&&qid%floor!=0&&qid%star_!=0) gzw*=(qid%150)==0 ? abs(242*(noise(sin(pos*1.1)*1.5)))+1 :1;
+    if (qid%outer!=0&&qid%floor==0&&qid%star_!=0) gzw*=(qid%150)==0 ? abs(32*(noise(sin(pos*1.1)*1.5)))+1 :1;
+
+    //if (qid%outer!=0&&qid%floor!=0&&qid%star_==0) gzw*=(qid%111150)==0 ? 112 :1;
+    //if (qid==0) { posT=float4(0,0,0,1);gzw*= mul(float4(0,0,112,1),proj[0]).w/scale;}
     //if (qid%outer!=0&&qid%floor==0) gzw*=(qid%150)==0 ? pow(length(pos*3.1),2)*.01+1 :1;
 
     posT.xy+=gzw*.004*posT.w*2*scale*2;
@@ -498,15 +501,18 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
      if (qid%outer==0) outp.rgba=.6/(length(gzw)+1)*float4(4,5,6,1)/6;
      if (qid%outer==0) outp.rgba*=(qid%150)==0 ? 3:1.;
 
+     if (qid%star_==0) outp.rgba=float4(1,2,3,1)*.1;
+
      //if (qid%outer==0) outp.rgba*=(qid%150)==0 ? .13:1;
      
      //if (qid%star_==0) outp.rgba=float4(0,0.01,.02,1)*4;
      //if (qid%star_==0) outp.rgba/=length(pos/14)+.4;
      //outp.rgba*=length(scale*scale*scale);
+     //if (qid==0) outp.rgba=float4(1,2,3,1)/2;
      outp.rgba/=posT.w/10+.1;
      //if (qid%star_2==0&&!qid%big_hl==0) outp.rgba=3.;
      if (qid%star_2==0&&qid%big_hl!=0) outp.rgba=3.;
-
+     
      outp.rgba*=1.;
     return outp;
 }
