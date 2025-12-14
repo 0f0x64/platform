@@ -1,5 +1,5 @@
 CreateTexture(mainRT,flat, u8, width, height, false, true)
 CreateTexture(env, cube, s16, 1024, 1024, true, false)
-CreateTexture(obj1pos,  flat, s32, 2048, 4096, true, false)
+CreateTexture(obj1pos,  flat, s32, 1024, 4096, true, false)
 CreateTexture(obj1nrml,  flat, s32, 1024, 1024, true, false)
-CreateTexture(pBuf, flat, s16, width/2, height/2, true, false)
+CreateTexture(pBuf, flat, s16, width, height, true, false)
