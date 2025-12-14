@@ -439,7 +439,7 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
         pos+=noise3(pos*2)/.2;
         pos+=noise3(pos*4)/3;
         pos=rot3(pos,noise(pos/22)*5);
-        pos=normalize(pos)*15+pos*5.0;
+        pos=normalize(pos)*25+pos*5.0;
         pos=rot3(pos,1/pos);
     }
 
@@ -476,26 +476,37 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
     posT = mul(float4(pos,1), view[0]);
     posT = mul(posT, proj[0]);
 
-    //glow
-    //float br2 = ((qid)%(11316)) ==  0  ? 1 : 0;
-
     //size
     float2 scale = float2(proj[0]._m00,proj[0]._m11);
     float2 gzw=(grid.zw-.5)*(noise(sin(pos2*1.1)*11.5)*.3+.5);
     //
-    if (qid%11113==0) gzw.x*=62;
+   
 
-    if (qid%big_hl==0&&qid%star_!=0&&qid%floor_!=0&&qid%outer!=0) gzw*=102;
-    if (qid%big_hl==0&&qid%star_!=0&&qid%floor_==0&&qid%outer!=0) gzw*=5;
-    if (qid%big_hl==0&&qid%star_!=0&&qid%floor_!=0&&qid%outer==0) gzw*=152;
+    if (qid%big_hl==0&&qid%star_!=0&&qid%floor_!=0&&qid%outer!=0) gzw*=62;
+    if (qid%big_hl==0&&qid%star_!=0&&qid%floor_==0&&qid%outer!=0) gzw*=25;
+    if (qid%big_hl==0&&qid%star_!=0&&qid%floor_!=0&&qid%outer==0) gzw*=42;
     
     
-    if (qid%outer==0&&qid%floor_!=0&&qid%star_!=0) gzw*=(qid%150)==0 ? abs(242*(noise(sin(pos*1.1)*1.5)))+1 :1;
-    if (qid%outer!=0&&qid%floor_==0&&qid%star_!=0) gzw*=(qid%150)==0 ? abs(32*(noise(sin(pos*1.1)*1.5)))+1 :1;
+    if (qid%outer==0&&qid%floor_!=0&&qid%star_!=0) gzw*=(qid%150)==0 ? abs(242*(noise(sin(pos*1.1)*1.5)))+1 :1.;
+    if (qid%outer!=0&&qid%floor_==0&&qid%star_!=0) gzw*=(qid%150)==0 ? abs(32*(noise(sin(pos*1.1)*1.5)))+1 :1.4;
 
-    if (qid%outer!=0&&qid%floor_!=0&&qid%star_==0) gzw*=87/(pow(length(pos),3)*81+.01)/4+1 ;
+   if (qid%outer!=0&&qid%floor_!=0&&qid%star_==0) 
+   {
+       if (star_ ==qid)
+       {
+       pos=0;
+       posT = mul(float4(pos,1), view[0]);
+        posT = mul(posT, proj[0]);
+
+       gzw*=870 ;    
+       }
+      
+   }
+    
     //if (qid==0) { posT=float4(0,0,0,1);gzw*= mul(float4(0,0,112,1),proj[0]).w/scale;}
     //if (qid%outer!=0&&qid%floor==0) gzw*=(qid%150)==0 ? pow(length(pos*3.1),2)*.01+1 :1;
+
+
 
     posT.xy+=gzw*.004*posT.w*2*scale*2;
 
@@ -530,14 +541,14 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
 
      //if (qid%outer==0) outp.rgba*=(qid%150)==0 ? .13:1;
      
-     if (qid%floor_==0) outp.rgba=float4(1,2,5,1)*.04/2;
+     if (qid%floor_==0) outp.rgba=float4(1,2,5,1)*.04/4;
      //if (qid%star_==0) outp.rgba=float4(0,0.01,.02,1)*4;
      //if (qid%star_==0) outp.rgba/=length(pos/14)+.4;
      //outp.rgba*=length(scale*scale*scale);
      //if (qid==0) outp.rgba=float4(1,2,3,1)/2;
 
      
-     outp.rgba/=posT.w/10+.1;
+     outp.rgba/=posT.w/15+.1;
      //if (qid%star_2==0&&!qid%big_hl==0) outp.rgba=3.;
      if (qid%star_2==0&&qid%big_hl!=0) outp.rgba=(noise(pos)+1.2)*1.5;
 

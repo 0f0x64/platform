@@ -59,6 +59,31 @@ float hash( float n ) {
 float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
     float3 c = saturate(1.-2.*length(input.uv-.5));
+
+float2 uv=2*(input.uv-.5);
+float2 suv =abs(uv);
+float d=1/((length(uv.xy-uv.yx)+length(uv.xy+uv.yx))/3);
+d+=1/((suv.x+suv.y));
+
+    float col = 1.-suv.x;
+    float col2 = 1.-suv.y;
+    col=min(col,col2);
+    //col=pow(col,.5);
+
+float fade =saturate(col*2);
+d*=fade;
+
+//d=pow(d/52,15);
+//d=log(d);
+
+
+//c/=4;
+c=(d+c*0)/6;
+//if (dot(c.rgb,1)<0.5) discard;
+//c=d;
+//c=saturate(c);
+    //c=pow(c,1);
+    
     return float4(c*input.rgba,1);
 
 }
