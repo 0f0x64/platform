@@ -160,9 +160,7 @@ float hilight;
 
 struct 
 {
-texture env;
-texture normals;
-texture albedo;
+texture screen;
 } textures;
 
 struct 
@@ -176,9 +174,7 @@ void set () {
 Shaders::pShader(0);
 context->UpdateSubresource(dx11::Shaders::PS[0].params, 0, NULL, &params, 0, 0);
 context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[0].params);
-Textures::TextureToShader((texture)textures.env, 0, targetshader::pixel); 
-Textures::TextureToShader((texture)textures.normals, 1, targetshader::pixel); 
-Textures::TextureToShader((texture)textures.albedo, 2, targetshader::pixel); 
+Textures::TextureToShader((texture)textures.screen, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 

@@ -54,18 +54,8 @@ namespace Object {
 				#else 
 					.hilight = 0.f
 				#endif
-				},
-
-			.textures = {
-				.env = texture::env,
-				.normals = in.normals
-			},
-
-			.samplers = {
-				.sam1Filter = filter::linear,
-				.sam1AddressU = addr::wrap,
-				.sam1AddressV = addr::wrap
 				}
+
 		};
 
 		ps::basic.set();
