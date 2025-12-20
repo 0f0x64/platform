@@ -42,7 +42,7 @@ void Delete()
 	}
 
 	strcpy(vstr2, vstr);
-	strncpy(vstr2 + cursorPos, vstr + cursorPos + 1, strlen(vstr) - cursorPos);
+strncpy(vstr2 + cursorPos, vstr + cursorPos + 1, strlen(vstr) - cursorPos);
 
 	cmdParamDesc[currentCmd].param[currentParam].value = atoi(vstr2);
 	pLimits();

@@ -86,6 +86,7 @@ struct pos_color
 {
     float4 pos;
     float4 rgba;
+    float sz;
 };
 
 float hash_s(int qid)
@@ -144,6 +145,37 @@ float3 getTpos(float2 a, float R,float p,float q)
                       sin(a.x * q));
 }
 
+float4 transform(float3 pos,float2 grid, float size)
+{
+    float2 uv = grid-.5;
+    float2 scale = float2(proj[0]._m00,proj[0]._m11);
+    float4 posT;
+    posT = mul(float4(pos,1), view[0]);
+        float4 pt = mul(posT, proj[0]);
+        float2 sz = uv*.002*(posT.z/posT.w)*size;
+        sz = uv*size*.1;
+        posT.xy+=sz;
+        posT = mul(posT, proj[0]);
+
+        return posT;
+}
+
+float4 transform_unisize(float3 pos,float2 grid,float size)
+{
+    float2 uv = grid-.5;
+    float2 scale = float2(proj[0]._m00,proj[0]._m11);
+    float4 posT;
+    posT = mul(float4(pos,1), view[0]);
+        float4 pt = mul(posT, proj[0]);
+        float2 sz = uv*.002*(posT.z/posT.w)*size;
+
+        sz*=normalize(scale)*2;
+        posT = mul(posT, proj[0]);
+        posT.xy+=sz;
+
+        return posT;
+}
+
 float3 torusKnot(float2 a)
 {
     
@@ -175,9 +207,27 @@ float3 torusKnot(float2 a)
     pos=normalize(pos+float3(0,y_fade,0));*/
 
 //  pos*=1+max(noise3_u(pos*12.6)*.2-noise3_u(pos*2.6)*.5,0);
-
-float3 star(float3 pos)
+float3 pillar(float2 grid,float a, float t, float h)
 {
+    float3 pos = shp(grid.xy);
+    //heigth
+    pos.y*=.8+h;
+    pos.y+=h;
+
+    pos*=1+noise3(pos*111.6+1111/(a+1))*1.6;
+    pos.y*=1.8;
+    pos*=1+noise3(pos*1.6+1111/(a+1)+t);
+    pos = rot3(pos,2.2/(pow(pos,14)+1));
+    pos.y*=1.5;
+    pos*=1+noise3(pos+1111/(a+1)+t);
+    pos*=1+noise3(pos*3.5)/3;
+    pos*=2;
+    return pos;
+}
+pos_color star(uint qid, float4 grid)
+{
+    float3 pos = pillar(qid,0,0,1);
+    pos=shp(grid);
     pos=normalize(pos)*22;
     float f=1-saturate(length(pos+float3(0,-10,0))*.00351*(noise(pos)+1.2));
     f=step(.5,pow(f,1.2));
@@ -197,71 +247,125 @@ float3 star(float3 pos)
        pos.y*=1+(12/(length(pow(pos.xz,13))*.001+.02))*f*111.2;
        pos.xz=lerp(pos.xz,pos.xz*(3+pow(abs(pos.y)*.005,3)*f*.5),.75);
        pos=lerp(pos,normalize(pos)*122,.61);
-         //pos.y*=1-.25*f;
+ 
 
     pos*=1-f/1.13;
-    //pos=pos*(85/(length(pos)+45));
-    return pos/22;
+
+    pos_color p;
+
+    p.rgba = float4(float3(1,2,3),1)*.1+.0015;
+
+    if (qid==0)
+    {
+        //hilight
+        p.rgba/=14;
+        p.pos=transform(float3(0,0,0),grid.zw,11102);
+        p.sz=2;
+    }
+    else
+    {
+        p.pos = transform_unisize(pos/22.,grid.zw,3.);
+        p.sz=2;
+    } 
+    
+    return p;
 }
 
-float3 outer_space(float3 pos,float4 grid)
+pos_color outer_space(float3 pos,float4 grid, uint qid)
 {
+
+        uint glow = qid%(2364);
+
         pos=shp(grid.xy);
-        pos=rotZ(pos,120*3.14/180.);
-        pos+=noise3(pos*2)/.2;
-        pos+=noise3(pos*4)/3;
-        pos=rot3(pos,noise(pos/22)*5);
-        pos=normalize(pos)*25+pos*5.0;
-        pos=rot3(pos,1/pos);
-        return pos;
+       // pos.xz*=.1;
+       
+       // pos=rotZ(pos,1*3.14/180.);
+        //pos+=noise3(pos*112)/.2;
+       // pos+=noise3(pos*14)/3;
+     //   pos=rot3(pos,noise(pos/22)*5);
+      ///  pos=normalize(pos)*25+pos*5.0;
+     //   pos=rot3(pos,pos+555*noise3(pos*.21+77));
+       // pos+=.2*rot3(pos,4*pos+.001*noise3(pos*3));
+        pos+=.7*rot3(pos,31/pos+.1*noise3(pos*3));
+        pos=lerp(normalize(pos)*33,pos,.45);;
+       
+        pos_color p;
+
+        p.rgba = float4(float3(7,8,9),1)*.051+.0015;
+    if (glow==0)
+    {
+        //hilight
+        p.pos=transform(pos,grid.zw,102);
+       
+     
+         p.sz=2;
+    }
+    else
+    {
+        p.pos = transform_unisize(pos,grid.zw,1.);
+       
+         
+      //  p.rgba +=min(0,sign(noise(-pos2*.12-1.6)))/61.;
+   //p.rgba=0;
+         p.sz=1;
+
+    } 
+    
+    return p;
 }
 
-float3 floor_space(float3 pos,float4 grid, float a)
+
+
+pos_color floor_space(uint qid,float4 grid)
 {
+     uint glow = qid%(20394);
+    uint cn=7;
+    float a= (qid%cn);
+    a=a*PI/180.;
+    a*=360./cn;
+    float t=time.x*.1;
+    float3 pos = pillar(grid.xy,a,t,.5);  
+    float3 pos2=pos;
         pos/=float3(1,3,3);
         pos+=noise(pos*3+time.x*.05)*.5;
         pos=rot3(pos,float3(0,1.65,1.33));
         pos=rotY(pos,length(pos)*.36-(time.x*.00135)+a);
-        pos.y*=length(pos)/2;
+        pos.y*=length(pos)/2/2;
         pos.y-=1.5;
         pos.y-=length(pos)/5;
         pos*=2.36;
         pos.y-=1.5;
-        return pos;
+       
+
+        pos_color p;
+        p.rgba = float4(1,2,3,1)/120.+.0015;
+
+
+    
+        p.pos = transform_unisize(pos,grid.zw,2.);
+       ;
+
+       // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
+   
+         p.sz=1;
+
+   
+   
+    //density compensation
+    p.rgba/=min(pow(p.pos.w,1.1)*.1+.5,11);
+    return p;
 }
 
-float3 pillar(float2 grid,float a, float t, float h)
+
+
+
+
+pos_color pillars_array(uint qid,float4 grid)
 {
-    float3 pos = shp(grid.xy);
-    //heigth
-    pos.y*=.8+h;
-    pos.y+=h;
+    uint glow = qid%(10394);
 
-    pos*=1+noise3(pos*111.6+1111/(a+1))*1.6;
-    pos.y*=1.8;
-    pos*=1+noise3(pos*1.6+1111/(a+1)+t);
-    pos = rot3(pos,2.2/(pow(pos,14)+1));
-    pos.y*=1.5;
-    pos*=1+noise3(pos+1111/(a+1)+t);
-    pos*=1+noise3(pos*3.5)/3;
-    pos*=2;
-    return pos;
-}
-
-pos_color sagittarius_v2 (uint qid,float div, float4 grid)
-{
-    pos_color outp;
-
-    //percentage
-    uint outer=62;
-    uint floor_=11;
-    uint star_=15;
-    uint star_2=4957;
-    uint big_hl=2006;
-
-    float t=time.x*.01;
-    if (qid%floor_==0||qid%star_==0||qid%outer==0||qid%big_hl==0||qid%star_2==0) t=0;
-
+     float t=time.x*.01;
+     if (glow ==0)t=0;
     //pillars instances
     uint cn=7;
     float a= (qid%cn);
@@ -270,7 +374,7 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
     float h=(sin(a*3)+2)/2;
 
     //calc
-    float3 pos = pillar(grid,a,t,h);
+    float3 pos = pillar(grid.xy,a,t,h);
     float3 pos2=pos;
     
     //scatter
@@ -282,12 +386,63 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
     pos*=-0.5;
     pos.y*=1.4;
     pos.y-=h;
-    //animation
-    pos+=noise(pos2+time.x*.05)*.125;
+    //extra animation
     
-    if (qid%outer==0) pos = outer_space(pos2, grid);
-    if (qid%floor_==0) pos = floor_space(pos2,grid,a);
-    if (qid%star_==0) pos = star(pos2*.7);
+    
+
+
+    pos_color p;
+ p.rgba = float4(noise3_u(a*float3(13,15,12)*221+77+sin(pos2*1.4)),1)/30.+.0015;
+    if (glow==0)
+    {
+        //hilight
+        p.pos=transform(pos,grid.zw,92);
+        p.rgba*=2;
+     
+         p.sz=172;
+    }
+    else
+    {
+        p.pos = transform_unisize(pos,grid.zw,1.5);
+       ;
+
+       // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
+   
+         p.sz=1;
+
+    }
+   
+    //density compensation
+    p.rgba/=min(pow(p.pos.w,1.1)*.1+.5,11);
+    return p;
+}
+
+pos_color sagittarius_v2 (uint qid,float div, float4 grid)
+{
+    pos_color outp;
+
+
+    //percentage
+    uint outer=612;
+    uint floor_=11;
+    uint star_=15;
+    uint star_2=4957;
+    uint big_hl=2006;
+
+
+    float3 pos=0;
+    
+    outp = pillars_array(qid,grid);
+    if (qid%outer==0) outp = outer_space(0, grid, qid);
+    if (qid%floor_==0) outp = floor_space(qid,grid);
+    if (qid%star_==0) outp = star(qid,grid);
+
+    /*float3 pos2=pillar(grid,0,t,1);
+    float a=0;
+
+    if (qid%outer==0) pos = outer_space(0, grid);
+    if (qid%floor_==0) pos = floor_space(qid,pos2,grid);
+  //  if (qid%star_==0) pos = star(pos2*.7);
 
     //camera
     float4 posT;
@@ -300,7 +455,7 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
 
     //size
     float2 scale = float2(proj[0]._m00,proj[0]._m11);
-    float2 gzw=(grid.zw-.5)*(noise(sin(pos2*1.1)*11.5)*.3+.55);
+    float2 gzw=(grid.zw-.5);
     
     if (qid%big_hl==0&&qid%star_!=0)
     {
@@ -327,8 +482,22 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
        posT = mul(posT, proj[0]);
        gzw*=370 ;    
     }
+        posT = mul(float4(pos,1), view[0]);
+        float4 pt = mul(posT, proj[0]);
+        float2 sz = gzw*.002*(posT.z/posT.w);
 
-    posT.xy+=gzw*.016*posT.w*scale;
+    if (qid%big_hl==0)
+    {
+        posT.xy+=sz;
+        posT = mul(posT, proj[0]);
+    }else
+    {
+        sz*=normalize(scale)*2;
+        posT = mul(posT, proj[0]);
+
+        posT.xy+=sz;
+    }
+    
     outp.pos=posT;
     
     //color
@@ -350,8 +519,8 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
   
     outp.rgba/=posT.w/15+.1;
     if (qid%star_2==0&&qid%big_hl!=0) outp.rgba=(noise(pos)+1.2)*1.5;
-     
-    outp.rgba*=1.;
+     */
+
     return outp;
 }
 
@@ -411,14 +580,14 @@ float3 double_star(float2 grid,float a, float t, float h,uint qid,uint star2)
     return pos*2.5;
 }
 
-pos_color fish (uint qid,float div, float4 grid)
+/*pos_color fish (uint qid,float div, float4 grid)
 {
     pos_color outp;
 
     //percentage
     uint outer=262;
     uint star_2=4957;
-    uint big_hl=1203;
+    uint big_hl=1111111203;
 
     float t=time.x*.01;
     if (qid%outer==0||qid%big_hl==0||qid%star_2==0) t=0;
@@ -437,7 +606,7 @@ pos_color fish (uint qid,float div, float4 grid)
     //camera
     float4 posT;
 
-    if (qid%big_hl!=0)
+   // if (qid%big_hl!=0)
     {
         posT = mul(float4(pos,1), view[0]);
         posT = mul(posT, proj[0]);
@@ -445,23 +614,42 @@ pos_color fish (uint qid,float div, float4 grid)
 
     //size
     float2 scale = float2(proj[0]._m00,proj[0]._m11);
-    float2 gzw=(grid.zw-.5)*(noise(sin(pos*1.1)*11.5)*.3+.55);
+    float aspect_ = proj[0]._m11 / proj[0]._m00;
+    float2 gzw=(grid.zw-.5);//*(noise(sin(pos*1.1)*11.5)*.3+.55);
     
-    if (qid%big_hl==0)
+    
+    if (qid%outer==0) gzw*=(qid%150)==0 ? abs(242*(noise(sin(pos*1.1)*1.5)))+3 :1.;
+    if (qid%big_hl==0&&qid%outer!=0)
     {
         if (qid%outer==0) gzw*=42;
         else gzw*=42;
     }
-    
-    if (qid%outer==0) gzw*=(qid%150)==0 ? abs(242*(noise(sin(pos*1.1)*1.5)))+1 :1.;
 
-    if (qid%big_hl!=0)
-    {
         posT = mul(float4(pos,1), view[0]);
+        float4 pt = mul(posT, proj[0]);
+        float2 sz = gzw*.002*(posT.z/posT.w);
+        
+    if (qid%big_hl==0)
+    {
+
+        
+        posT.xy+=sz;
         posT = mul(posT, proj[0]);
+    }else
+    {
+        sz*=normalize(scale)*2;
+        posT = mul(posT, proj[0]);
+
+        posT.xy+=sz;
+    }
+    
+    
+    outp.sz=2;
+    if (qid%outer==0&&qid%150!=0) 
+    {
+        outp.sz=1;
     }
 
-    posT.xy+=gzw*.016*posT.w*scale;
     outp.pos=posT;
     
     //color
@@ -480,16 +668,17 @@ pos_color fish (uint qid,float div, float4 grid)
 
     if (qid%outer==0)
     {
-        if (qid%123==0) outp.rgba=2.6/(length(gzw)+1)*float4(4,5,6,1)/6*2;
-        else outp.rgba+=.474*.7;     
+        if (qid%123==0) outp.rgba=2.6/(length(gzw)+1)*float4(4,5,6,1)/6;
+        else 
+        outp.rgba+=.474*.7;     
     }
   
-    outp.rgba/=posT.w/15+.1;
-    if (qid%star_2==0&&qid%big_hl!=0) outp.rgba=(noise(pos)+1.2)*1.5;
+   // outp.rgba/=posT.w/15+.1;
+    //if (qid%star_2==0&&qid%big_hl!=0) outp.rgba=(noise(pos)+1.2)*1.5;
      
     outp.rgba*=1.;
     return outp;
-}
+}*/
 
 VS_OUTPUT VS(uint vID : SV_VertexID)
 {
@@ -500,9 +689,11 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     
     uint qid = floor(vID/6)/div;
     
-    //pos_color p = sagittarius_v2(qid,div,grid);
-    pos_color p = fish(qid,div,grid);
-
+    pos_color p = sagittarius_v2(qid,div,grid);
+    
+    //density compensation
+   // p.rgba/=min(pow(p.pos.w,1.1)*.1+.5,11);
+    
     output.pos=p.pos;
 
     output.vnorm = 0;
@@ -511,6 +702,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     output.uv = grid.zw;
     output.id = float4(floor(vID/6)/div,0,0,0) ;
     output.rgba = p.rgba;
+    output.sz1 = float4(p.sz,0,0,0);
 
     return output;
 }
