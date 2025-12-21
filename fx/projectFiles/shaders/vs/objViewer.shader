@@ -224,10 +224,36 @@ float3 pillar(float2 grid,float a, float t, float h)
     pos*=2;
     return pos;
 }
+
 pos_color star(uint qid, float4 grid)
 {
-    float3 pos = pillar(qid,0,0,1);
-    pos=shp(grid);
+   /* float2 uv=grid.xy;
+    float2 a = uv * PI * 2;
+    a.x *= -1;
+    float3 pos = float3(sin(a.x), a.y*8, cos(a.x));
+    
+    pos.y=frac(pos.y+time.x*.1)*.1;
+    pos+=noise3(qid*.001*float3(1,2,3))*.2;
+    pos.xz*=.01;;
+    pos.x+=1;
+    pos=rotZ(pos,a.y);
+    pos.x+=1;
+   // pos=rot3(pos,time.x*.05);
+ //   pos=rotX(pos,a.y*2);
+   //   pos+=noise3(qid*.001*float3(1,2,3))*.2;
+    //  pos=lerp(pos,1./(pos),saturate(1./(length(pos/55)+1)));
+    pos=lerp(normalize(pos+hash3(qid*.01))*1.5,pos,1.*(pow(length(pos),.2)));
+    
+    float b=qid%1448;
+    pos=rot3(pos,b*float3(30,120,60)*PI/180./3);
+    
+   // pos.y/=1*pow(saturate(length(pos*2.)),111)+.1;
+
+  // pos=lerp(normalize(pos),pos,saturate(abs(pos.y)*.5));
+
+    pos*=10;*/
+    
+   float3 pos = shp(grid);
     pos=normalize(pos)*22;
     float f=1-saturate(length(pos+float3(0,-10,0))*.00351*(noise(pos)+1.2));
     f=step(.5,pow(f,1.2));
@@ -250,21 +276,22 @@ pos_color star(uint qid, float4 grid)
  
 
     pos*=1-f/1.13;
+    
 
     pos_color p;
 
     p.rgba = float4(float3(1,2,3),1)*.1+.0015;
 
-    if (qid==0)
+  /*  if (qid==0)
     {
         //hilight
         p.rgba/=14;
         p.pos=transform(float3(0,0,0),grid.zw,11102);
         p.sz=2;
     }
-    else
+    else*/
     {
-        p.pos = transform_unisize(pos/22.,grid.zw,3.);
+        p.pos = transform_unisize(pos/16,grid.zw,6.);
         p.sz=2;
     } 
     
