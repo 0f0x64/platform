@@ -133,7 +133,12 @@ float3 shp(float2 uv)
     return pos;
 }
 
-float3 quantize(float3 x,float q)
+float3 quantize3(float3 x,float q)
+{
+    return floor(x*q)/q;
+}
+
+float quantize(float x,float q)
 {
     return floor(x*q)/q;
 }
@@ -227,72 +232,58 @@ float3 pillar(float2 grid,float a, float t, float h)
 
 pos_color star(uint qid, float4 grid)
 {
-   /* float2 uv=grid.xy;
+    float2 uv=grid.xy;
+    uint cnt=7;
+    uv=frac(uv*cnt);
+    float b = quantize(grid.x,cnt);
+    float ang=b*360.;
     float2 a = uv * PI * 2;
     a.x *= -1;
-    float3 pos = float3(sin(a.x), a.y*8, cos(a.x));
+    float3 pos = 0;
+    float r=18*hash(b)+1;
     
-    pos.y=frac(pos.y+time.x*.1)*.1;
-    pos+=noise3(qid*.001*float3(1,2,3))*.2;
-    pos.xz*=.01;;
-    pos.x+=1;
-    pos=rotZ(pos,a.y);
-    pos.x+=1;
-   // pos=rot3(pos,time.x*.05);
- //   pos=rotX(pos,a.y*2);
-   //   pos+=noise3(qid*.001*float3(1,2,3))*.2;
-    //  pos=lerp(pos,1./(pos),saturate(1./(length(pos/55)+1)));
-    pos=lerp(normalize(pos+hash3(qid*.01))*1.5,pos,1.*(pow(length(pos),.2)));
-    
-    float b=qid%1448;
-    pos=rot3(pos,b*float3(30,120,60)*PI/180./3);
-    
-   // pos.y/=1*pow(saturate(length(pos*2.)),111)+.1;
+    if (qid%12!=0)
+    {
+        r=hash(b*3111.123)*18+4;
+        pos+=7*noise3(qid*float3(1,2,3)/1000)*(pow(sin(a.y),3)+.1);
+        pos.x-=r;
+        float aaa=frac(a.y-PI+time.x*.01)*PI*2;
+        pos=rotZ(pos,aaa);
+        pos.x+=r;
+    }
+    else
+    {
+        pos+=7*noise3(qid*float3(1,2,3)/1000)*pow(sin(a.y),3);
+        float d=11*hash(qid/11000.)+1111;
+        pos.x+=d;
+        pos=rotZ(pos,(frac(abs(a.y)+time.x*.005)-.5)*.1);
+        pos.x-=d;
+        pos=rotY(pos,qid);
+        pos.xz*=pos.xz;
+    }
 
-  // pos=lerp(normalize(pos),pos,saturate(abs(pos.y)*.5));
-
-    pos*=10;*/
-    
-   float3 pos = shp(grid);
-    pos=normalize(pos)*22;
-    float f=1-saturate(length(pos+float3(0,-10,0))*.00351*(noise(pos)+1.2));
-    f=step(.5,pow(f,1.2));
-    float3 ofs=float3(200,0,200)*0.3;
-
-    pos = -ofs*f+lerp(pos+ofs*f,normalize(noise3(pos))*26*(noise(pos*2)+1),f/3);
-
-    pos*=1+noise(pos*.1)*f*155;
-    
-    float cf=115/(length(pos)+1);
-
-    pos= lerp(pos,rotX(pos,-time.x*.01251+length(pos)*.13/2)*cf,f);
-    pos= lerp(pos,rotY(pos,-time.x*.01262+length(pos)*.14/2)*cf,f);
-    pos= lerp(pos,rotZ(pos,-time.x*.01243+length(pos)*.15/2)*cf,f);
-
-
-       pos.y*=1+(12/(length(pow(pos.xz,13))*.001+.02))*f*111.2;
-       pos.xz=lerp(pos.xz,pos.xz*(3+pow(abs(pos.y)*.005,3)*f*.5),.75);
-       pos=lerp(pos,normalize(pos)*122,.61);
- 
-
-    pos*=1-f/1.13;
-    
-
+    pos+=rot3(pos,ang*float3(0,1,0)+length(pos)*.10-time.x*.01);
+    pos=rotY(pos,ang*PI/180.);
+    float3 q= smoothstep(0,1,saturate(length(pos)/15*(1+abs(pos.y))));
+    pos=lerp(normalize(pos+noise3(float3(a,qid/10000.)))*3,pos,q);
+    pos*=2;
+   
     pos_color p;
 
     p.rgba = float4(float3(1,2,3),1)*.1+.0015;
 
-  /*  if (qid==0)
+    if (qid==0)
     {
         //hilight
-        p.rgba/=14;
-        p.pos=transform(float3(0,0,0),grid.zw,11102);
+        p.rgba*=1;
+        p.pos=transform(float3(0,0,0),grid.zw,552);
         p.sz=2;
     }
-    else*/
+    else
     {
-        p.pos = transform_unisize(pos/16,grid.zw,6.);
+        p.pos = transform_unisize(pos/16,grid.zw,4.);
         p.sz=2;
+        p.rgba*=11/(abs(pos.y)*2+11.1);
     } 
     
     return p;
@@ -301,41 +292,28 @@ pos_color star(uint qid, float4 grid)
 pos_color outer_space(float3 pos,float4 grid, uint qid)
 {
 
-        uint glow = qid%(2364);
+    uint glow = qid%(64);
 
-        pos=shp(grid.xy);
-       // pos.xz*=.1;
-       
-       // pos=rotZ(pos,1*3.14/180.);
-        //pos+=noise3(pos*112)/.2;
-       // pos+=noise3(pos*14)/3;
-     //   pos=rot3(pos,noise(pos/22)*5);
-      ///  pos=normalize(pos)*25+pos*5.0;
-     //   pos=rot3(pos,pos+555*noise3(pos*.21+77));
-       // pos+=.2*rot3(pos,4*pos+.001*noise3(pos*3));
-        pos+=.7*rot3(pos,31/pos+.1*noise3(pos*3));
-        pos=lerp(normalize(pos)*33,pos,.45);;
-       
-        pos_color p;
+    pos=shp(grid.xy);
+    pos+=.7*rot3(pos,31/pos+.1*noise3(pos*3));
+    pos=lerp(normalize(pos)*33,pos,.45);;
+    
+    pos_color p;
 
-        p.rgba = float4(float3(7,8,9),1)*.051+.0015;
+    p.rgba = float4(float3(7,8,9),1)*.051+.0015;
+
     if (glow==0)
     {
         //hilight
         p.pos=transform(pos,grid.zw,102);
-       
-     
-         p.sz=2;
+        p.rgba/=14;
+        p.sz=2;
     }
     else
     {
         p.pos = transform_unisize(pos,grid.zw,1.);
-       
-         
-      //  p.rgba +=min(0,sign(noise(-pos2*.12-1.6)))/61.;
-   //p.rgba=0;
-         p.sz=1;
-
+        p.sz=1;
+        p.rgba*=3.8*(hash(qid))+.01;
     } 
     
     return p;
@@ -345,41 +323,63 @@ pos_color outer_space(float3 pos,float4 grid, uint qid)
 
 pos_color floor_space(uint qid,float4 grid)
 {
-     uint glow = qid%(20394);
+     uint glow = qid%11234;
+     uint stars= qid%3400;
     uint cn=7;
     float a= (qid%cn);
     a=a*PI/180.;
     a*=360./cn;
     float t=time.x*.1;
-    float3 pos = pillar(grid.xy,a,t,.5);  
+    float3 pos = pillar(grid.xy,0,t*.005,.5)/5;
     float3 pos2=pos;
-        pos/=float3(1,3,3);
-        pos+=noise(pos*3+time.x*.05)*.5;
-        pos=rot3(pos,float3(0,1.65,1.33));
-        pos=rotY(pos,length(pos)*.36-(time.x*.00135)+a);
-        pos.y*=length(pos)/2/2;
-        pos.y-=1.5;
-        pos.y-=length(pos)/5;
-        pos*=2.36;
-        pos.y-=1.5;
-       
+
+        pos.y*=.4*pow(length(pos),1)*4;
+        pos.xz*=9;
+        
+        pos=rotY(pos,length(pos)*.3+a+time.x*.005);
+        pos.y+=length(pos)/7;
+        pos.y-=4.5;
+        
+
+       pos+=noise3(qid*float3(1,2,3)*11.1)*2;
 
         pos_color p;
         p.rgba = float4(1,2,3,1)/120.+.0015;
 
+        if (stars==0)
+        {
+               p.pos = transform_unisize(pos,grid.zw,1.);
+               p.sz=1;
+        }
+    else
+    {
+        float sz=18;
+        if (glow==0) sz=619;
+        p.pos = transform_unisize(pos,grid.zw,sz);
+        p.sz=2;
+    }
+        
+       
 
-    
-        p.pos = transform_unisize(pos,grid.zw,2.);
-       ;
+   p.rgba = float4(noise3_u(a*float3(1,2,3)+77+sin(pos2*11.4)),1)/50.+.00015;
+   if (glow!=0&&stars!=0)
+   {
+     p.rgba.rgb*=noise(2*rotY(pos,length(pos)-time.x*.005))*3.2+.2;
 
-       // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
-   
-         p.sz=1;
+   }
+        p.rgba*=float4(1,2,3,1)/2;
+        
+        if (stars==0)
+        {
+            p.rgba*=540;
+             p.sz=1;
+        }
 
-   
-   
+        if (glow==0) p.rgba*=4;
+
     //density compensation
-    p.rgba/=min(pow(p.pos.w,1.1)*.1+.5,11);
+  //  p.rgba/=min(pow(p.pos.w,1.1)*.1+1.5,5);
+    
     return p;
 }
 
@@ -451,7 +451,7 @@ pos_color sagittarius_v2 (uint qid,float div, float4 grid)
 
     //percentage
     uint outer=612;
-    uint floor_=11;
+    uint floor_=23;
     uint star_=15;
     uint star_2=4957;
     uint big_hl=2006;
