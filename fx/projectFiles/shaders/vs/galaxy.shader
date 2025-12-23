@@ -14,6 +14,7 @@ cbuffer params : register(b0)
     int gX;
     int gY;
     float glow_p;
+    int skipper;
 }
 
 

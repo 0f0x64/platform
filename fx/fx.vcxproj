@@ -265,6 +265,7 @@
     <None Include="projectFiles\shaders\lib\io.shader" />
     <None Include="projectFiles\shaders\lib\utils.shader" />
     <None Include="projectFiles\shaders\ps\basic.shader" />
+    <None Include="projectFiles\shaders\ps\basicLow.shader" />
     <None Include="projectFiles\shaders\ps\cat.shader" />
     <None Include="projectFiles\shaders\ps\cubemapCreator.shader" />
     <None Include="projectFiles\shaders\ps\genNormals.shader" />
@@ -279,9 +280,13 @@
     <None Include="projectFiles\shaders\ui\vs\letter.shader" />
     <None Include="projectFiles\shaders\ui\vs\lineDrawer.shader" />
     <None Include="projectFiles\shaders\ui\vs\lineDrawer3d.shader" />
+    <None Include="projectFiles\shaders\vs\galaxy.shader" />
+    <None Include="projectFiles\shaders\vs\neitron_star.shader" />
     <None Include="projectFiles\shaders\vs\objViewer.shader" />
+    <None Include="projectFiles\shaders\vs\pillars.shader" />
     <None Include="projectFiles\shaders\vs\quad.shader" />
     <None Include="projectFiles\shaders\vs\simpleCube.shader" />
+    <None Include="projectFiles\shaders\vs\space.shader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

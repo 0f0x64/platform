@@ -70,6 +70,29 @@ namespace Loop
 		}
 	}
 
+	void Compose()
+	{
+		RenderTarget::Set({ texture::mainRT,0 });
+
+		BlendMode::Set({
+			.mode = blendmode::off,
+			.op = blendop::add
+			});
+
+		ps::output.textures.screen = texture::pBuf;
+		ps::output.textures.screenLow = texture::pBufLow;
+		ps::output.samplers = {
+				.sam1Filter = filter::linear,
+				.sam1AddressU = addr::wrap,
+				.sam1AddressV = addr::wrap
+		};
+
+		vs::quad.set();
+		ps::output.set();
+
+		Drawer::NullDrawer({ 1,1 });
+	}
+
 	void scene1()
 	{
 		BasicCam::camPass = false;
@@ -85,54 +108,21 @@ namespace Loop
 		frameConst();
 
 		InputAsm::Set({topology::triList});
-		BlendMode::Set({blendmode::off,blendop::add});
 
-		//Cubemap::Calc({ texture::env });
-		//Object::Calc({texture::obj1pos,texture::obj1nrml});
-
-		RenderTarget::Set({texture::pBuf,0});
-		RenderTarget::Clear({0,0,0,0});
-
-		cameraMan::run({});
-
-		//Cubemap::Show({texture::env});
-
-		DepthBuf::Mode({depthmode::off});
-		DepthBuf::Clear({});
-		Culling::Set({cullmode::back});
 		BlendMode::Set({
 			.mode = blendmode::on,
 			.op = blendop::add
-		});
+			});
 
-		Object::Show({
-			.geometry = texture::obj1pos,
-			.normals = texture::obj1nrml,
-			.quality = 0,
-			.pos_x = 1,
-			.pos_y = 4,
-			.pos_z = 1
-		});
+		DepthBuf::Mode({ depthmode::off });
 
-		RenderTarget::Set({ texture::mainRT,0 });
+		Culling::Set({ cullmode::back });
 		
-		BlendMode::Set({
-			.mode = blendmode::off,
-			.op = blendop::add
-		});
+		cameraMan::run({});
 
-		ps::output.textures.screen = texture::pBuf;
-		ps::output.samplers = {
-				.sam1Filter = filter::linear,
-				.sam1AddressU = addr::wrap,
-				.sam1AddressV = addr::wrap
-		};
+		Object::ShowParticles({});
 
-
-		vs::quad.set();
-		ps::output.set();
-		
-		Drawer::NullDrawer({1,1});
+		Compose();
 
 	}
 

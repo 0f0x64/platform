@@ -1,4 +1,5 @@
 Shader(basic)
+Shader(basicLow)
 Shader(cat)
 Shader(cubemapCreator)
 Shader(cubeMapViewer)
