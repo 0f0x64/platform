@@ -97,18 +97,41 @@ namespace Object {
 
 	unsigned int quality = 1;
 
-	void PillarsH(int gX,int gY)
+	enum class pMode { point,glow };
+	
+	void psModeSet(pMode mode)
 	{
-		ps::basic = { .params = {.hilight = 0.f } };
-		ps::basic.set();
+		switch (mode)
+		{
+			case pMode::point:
+			{
+				ps::basic = { .params = {.hilight = 0.f } };
+				ps::basic.set();
+				break;
+			}
+			case pMode::glow:
+			{
+				ps::basicLow = { .params = {.hilight = 0.f } };
+				ps::basicLow.set();
+				break;
+			}
+		}
+	}
+
+	void Pillars(int count,int skipper, pMode mode)
+	{
+		int gX = sqrt(count / skipper);
+		int gY = sqrt(count / skipper);
+
+		psModeSet(mode);
 
 		vs::pillars = {
 			.params = {
 				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
 				.gX = gX,
 				.gY = gY,
-				.glow_p = 1,
-				.skipper = 1,
+				.mode = (int)mode,
+				.skipper = skipper,
 			},
 		};
 
@@ -117,18 +140,20 @@ namespace Object {
 		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 	}
 
-	void OuterSpaceH(int gX, int gY)
+	void OuterSpace(int count, int skipper, pMode mode)
 	{
-		ps::basic = { .params = {.hilight = 0.f } };
-		ps::basic.set();
+		int gX = sqrt(count / skipper);
+		int gY = sqrt(count / skipper);
+
+		psModeSet(mode);
 
 		vs::space = {
 			.params = {
 				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
 				.gX = gX,
 				.gY = gY,
-				.glow_p = 1,
-				.skipper = 1,
+				.mode = (int)mode,
+				.skipper = skipper,
 			},
 		};
 
@@ -137,42 +162,77 @@ namespace Object {
 		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 	}
 
+	void NeutronStar(int count, int skipper, pMode mode)
+	{
+		int gX = sqrt(count / skipper);
+		int gY = sqrt(count / skipper);
+
+		psModeSet(mode);
+
+		vs::neitron_star = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)mode,
+				.skipper = skipper,
+			},
+		};
+
+		vs::neitron_star.set();
+
+		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
+	}
+
+	void Galaxy(int count, int skipper, pMode mode)
+	{
+		int gX = sqrt(count / skipper);
+		int gY = sqrt(count / skipper);
+
+		psModeSet(mode);
+
+		vs::galaxy = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)mode,
+				.skipper = skipper,
+			},
+		};
+
+		vs::galaxy.set();
+
+		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
+	}
+
 	cmd(ShowParticles)
 	{
 		reflect;
 
-		int glow = 1;
-
-		int gX = 1024 / quality;
-		int gY = 1024 / quality;
-
-		//pillars
+		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 
-		PillarsH(gX,gY);
-		OuterSpaceH(gX, gY);
+			Pillars(3725470,1,pMode::point);
+			OuterSpace(6853, 1, pMode::point);
+			NeutronStar(279620, 1, pMode::point);
+			Galaxy(182361, 4, pMode::point);
 
-		//pillars low
+		//mid
+			RenderTarget::Set({ texture::pBufMid,0 });
+			RenderTarget::Clear({ 0,0,0,0 });
+
+			Galaxy(182361, 4, pMode::glow);
+
+		//low
 		RenderTarget::Set({ texture::pBufLow,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 
-		ps::basicLow = { .params = {.hilight = 0.f } };
-		ps::basicLow.set();
-
-		vs::pillars = {
-			.params = {
-			.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
-			.gX = gX,
-			.gY = gY,
-			.glow_p = 0,
-			.skipper = 8000,
-			},
-		};
-
-		vs::pillars.set();
-
-		Drawer::NullDrawer({ 1, (int)gX * (int)gY / vs::pillars.params.skipper });
+			Pillars(3725470, 10394, pMode::glow);
+			OuterSpace(6853, 64, pMode::glow);
+			//NeutronStar(1024 * 1024, 1, pMode::glow);
+			//Galaxy(182361, 4, pMode::glow);
 
 		reflect_close;
 	}

@@ -7,30 +7,14 @@ struct
 float4x4 model;
 int gX;
 int gY;
-float glow_p;
+int mode;
 int skipper;
 } params;
-
-struct 
-{
-texture positions;
-texture normals;
-} textures;
-
-struct 
-{
-filter sam1Filter;
-addr sam1AddressU;
-addr sam1AddressV;
-} samplers;
 
 void set () {
 Shaders::vShader(0);
 context->UpdateSubresource(dx11::Shaders::VS[0].params, 0, NULL, &params, 0, 0);
 context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[0].params);
-Textures::TextureToShader((texture)textures.positions, 0, targetshader::vertex); 
-Textures::TextureToShader((texture)textures.normals, 1, targetshader::vertex); 
-Sampler::Sampler(targetshader::vertex, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
 } galaxy;
@@ -46,30 +30,14 @@ struct
 float4x4 model;
 int gX;
 int gY;
-float glow_p;
+int mode;
 int skipper;
 } params;
-
-struct 
-{
-texture positions;
-texture normals;
-} textures;
-
-struct 
-{
-filter sam1Filter;
-addr sam1AddressU;
-addr sam1AddressV;
-} samplers;
 
 void set () {
 Shaders::vShader(1);
 context->UpdateSubresource(dx11::Shaders::VS[1].params, 0, NULL, &params, 0, 0);
 context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[1].params);
-Textures::TextureToShader((texture)textures.positions, 0, targetshader::vertex); 
-Textures::TextureToShader((texture)textures.normals, 1, targetshader::vertex); 
-Sampler::Sampler(targetshader::vertex, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 
 } neitron_star;
@@ -123,7 +91,7 @@ struct
 float4x4 model;
 int gX;
 int gY;
-float glow_p;
+int mode;
 int skipper;
 } params;
 
@@ -180,7 +148,7 @@ struct
 float4x4 model;
 int gX;
 int gY;
-float glow_p;
+int mode;
 int skipper;
 } params;
 
@@ -436,6 +404,7 @@ float hilight;
 struct 
 {
 texture screen;
+texture screenMid;
 texture screenLow;
 } textures;
 
@@ -451,7 +420,8 @@ Shaders::pShader(7);
 context->UpdateSubresource(dx11::Shaders::PS[7].params, 0, NULL, &params, 0, 0);
 context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[7].params);
 Textures::TextureToShader((texture)textures.screen, 0, targetshader::pixel); 
-Textures::TextureToShader((texture)textures.screenLow, 1, targetshader::pixel); 
+Textures::TextureToShader((texture)textures.screenMid, 1, targetshader::pixel); 
+Textures::TextureToShader((texture)textures.screenLow, 2, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
 

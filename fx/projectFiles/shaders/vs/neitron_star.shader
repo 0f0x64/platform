@@ -3,17 +3,12 @@
 #include <../lib/constants.shader>
 #include <../lib/utils.shader>
 
-
-Texture2D positions : register(t0);
-Texture2D normals : register(t1);
-SamplerState sam1 : register(s0);
-
 cbuffer params : register(b0)
 {
     float4x4 model;
     int gX;
     int gY;
-    float glow_p;
+    int mode;
     int skipper;
 }
 
@@ -159,17 +154,10 @@ float3 double_star(float2 grid,float a, float t, float h,uint qid,uint star2)
 VS_OUTPUT VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
 {
     VS_OUTPUT output = (VS_OUTPUT) 0;
-    float div=1;
-    //float4 grid = getGridP(vID, 1, int2(gX,gY));
-    float4 grid;
     float2 map[6] = { 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
-    grid.zw= map[vID % 6];
-    grid.xy= float2(iID % gX, floor(iID / gX))/float2(gX,gY);
-    float2 uv = grid.xy;
+    float4 grid = {float2(iID % gX, floor(iID / gX))/float2(gX,gY), map[vID % 6]}; 
     
-    uint qid = iID;
-    
-    pos_color p = sagittarius_v2(qid,div,grid);
+    pos_color p = star(iID,grid);
     
     //density compensation
    // p.rgba/=min(pow(p.pos.w,1.1)*.1+.5,11);
@@ -180,7 +168,7 @@ VS_OUTPUT VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
     output.wpos = 0;
     output.vpos = 0;
     output.uv = grid.zw;
-    output.id = float4(iID/div,0,0,0) ;
+    output.id = float4(iID,0,0,0) ;
     output.rgba = p.rgba;
     output.sz1 = float4(p.sz,0,0,0);
 

@@ -8,7 +8,7 @@ cbuffer params : register(b0)
     float4x4 model;
     int gX;
     int gY;
-    float glow_p;
+    int mode;
     int skipper;
 }
 
@@ -24,11 +24,12 @@ pos_color outer_space(uint qid, float4 grid)
 
     p.rgba = float4(float3(7,8,9),1)*.051+.0015;
 
-    if (glow_p==0)
+
+    if (mode==1)
     {
         //hilight
         p.pos=transform(pos,grid.zw,102);
-        p.rgba/=14;
+        p.rgba/=4;
         p.sz=2;
     }
     else
@@ -36,7 +37,16 @@ pos_color outer_space(uint qid, float4 grid)
         p.pos = transform_unisize(pos,grid.zw,1.);
         p.sz=1;
         p.rgba*=3.8*(hash(qid))+.01;
+
+        if (qid%5==0)
+        {
+            p.pos=transform(pos,grid.zw,18);
+            p.rgba*=.1;
+            p.sz=2;
+        }
     } 
+
+
     
     return p;
 }

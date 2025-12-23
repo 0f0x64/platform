@@ -80,6 +80,7 @@ namespace Loop
 			});
 
 		ps::output.textures.screen = texture::pBuf;
+		ps::output.textures.screenMid = texture::pBufMid;
 		ps::output.textures.screenLow = texture::pBufLow;
 		ps::output.samplers = {
 				.sam1Filter = filter::linear,

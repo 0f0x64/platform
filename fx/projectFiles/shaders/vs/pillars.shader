@@ -8,7 +8,7 @@ cbuffer params : register(b0)
     float4x4 model;
     int gX;
     int gY;
-    float glow_p;
+    int mode;
     int skipper;
 }
 
@@ -35,7 +35,7 @@ pos_color pillars_array(uint qid,float4 grid)
      qid *= skipper;
      float t=time.x*.01;
 
-     if (glow_p==0)
+     if (mode==1)
      {
         t=0;
      }
@@ -65,7 +65,7 @@ pos_color pillars_array(uint qid,float4 grid)
     pos_color p;
     p.rgba = float4(noise3_u(a*float3(13,15,12)*221+77+sin(pos2*1.4)),1)/30.+.0015;
 
-    if (glow_p==0)
+    if (mode==1)
     {
         p.pos=transform(pos,grid.zw,92);
         p.rgba*=2;
