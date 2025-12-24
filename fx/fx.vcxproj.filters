@@ -291,5 +291,11 @@
     <None Include="projectFiles\shaders\lib\particleVS_main.shader">
       <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
     </None>
+    <None Include="projectFiles\shaders\vs\pillarsHand.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\hand_data.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
   </ItemGroup>
 </Project>

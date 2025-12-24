@@ -113,7 +113,7 @@ namespace Loop
 		BlendMode::Set({
 			.mode = blendmode::on,
 			.op = blendop::add
-			});
+		});
 
 		DepthBuf::Mode({ depthmode::off });
 
@@ -121,7 +121,8 @@ namespace Loop
 		
 		cameraMan::run({});
 
-		Object::ShowParticles({.quality = 1});
+		//Object::Saggitarius({.quality = 1});
+		Object::Zenith({.quality = 1});
 
 		Compose();
 

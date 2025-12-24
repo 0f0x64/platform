@@ -118,6 +118,28 @@ namespace Object {
 		}
 	}
 
+	void PillarsHand(int count, int skipper, pMode mode)
+	{
+		int gX = sqrt(count / skipper);
+		int gY = sqrt(count / skipper);
+
+		psModeSet(mode);
+
+		vs::pillarsHand = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)mode,
+				.skipper = skipper,
+			},
+		};
+
+		vs::pillarsHand.set();
+
+		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
+	}
+
 	void Pillars(int count,int skipper, pMode mode)
 	{
 		int gX = sqrt(count / skipper);
@@ -206,7 +228,39 @@ namespace Object {
 		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 	}
 
-	cmd(ShowParticles, int quality;)
+	cmd(Zenith, int quality;)
+	{
+		reflect;
+
+		int pillars_cnt = 3725470 / in.quality;
+		int outerSpace_cnt = 6853 / in.quality;
+		int galaxy_cnt = 182361 / in.quality;
+
+		//hi
+		RenderTarget::Set({ texture::pBuf,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		PillarsHand(pillars_cnt, 1, pMode::point);
+		OuterSpace(outerSpace_cnt, 1, pMode::point);
+//		Galaxy(galaxy_cnt, 14, pMode::point);
+
+		//mid
+		RenderTarget::Set({ texture::pBufMid,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+//		Galaxy(galaxy_cnt, 4, pMode::glow);
+
+		//low
+		RenderTarget::Set({ texture::pBufLow,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		PillarsHand(pillars_cnt, 1394, pMode::glow);
+		OuterSpace(outerSpace_cnt, 64, pMode::glow);
+
+		reflect_close;
+	}
+
+	cmd(Saggitarius, int quality;)
 	{
 		reflect;
 
