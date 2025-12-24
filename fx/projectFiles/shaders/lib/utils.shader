@@ -18,6 +18,11 @@ float4 getGridP(uint vID, float sep,int2 dim)
     return float4(grid, uv);
 }
 
+float4 getGridInst(uint vID, uint iID, int gX,int gY)
+{
+    float2 map[6] = { 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
+    return float4(float2(iID % gX, floor(iID / gX))/float2(gX,gY), map[vID % 6]); 
+}
 
 float3 ACESFilm(float3 x)
 {
@@ -187,3 +192,4 @@ float4 transform_unisize(float3 pos,float2 grid,float size)
 
         return posT;
 }
+

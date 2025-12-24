@@ -263,6 +263,7 @@
     <None Include="projectFiles\shaders\lib\constants.shader" />
     <None Include="projectFiles\shaders\lib\constBuf.shader" />
     <None Include="projectFiles\shaders\lib\io.shader" />
+    <None Include="projectFiles\shaders\lib\particleVS_main.shader" />
     <None Include="projectFiles\shaders\lib\utils.shader" />
     <None Include="projectFiles\shaders\ps\basic.shader" />
     <None Include="projectFiles\shaders\ps\basicLow.shader" />

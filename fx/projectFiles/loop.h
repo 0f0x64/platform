@@ -72,7 +72,7 @@ namespace Loop
 
 	void Compose()
 	{
-		RenderTarget::Set({ texture::mainRT,0 });
+		RenderTarget::Set({texture::mainRT,0});
 
 		BlendMode::Set({
 			.mode = blendmode::off,
@@ -91,7 +91,7 @@ namespace Loop
 		vs::quad.set();
 		ps::output.set();
 
-		Drawer::NullDrawer({ 1,1 });
+		Drawer::NullDrawer({1,1});
 	}
 
 	void scene1()
@@ -121,7 +121,7 @@ namespace Loop
 		
 		cameraMan::run({});
 
-		Object::ShowParticles({});
+		Object::ShowParticles({.quality = 1});
 
 		Compose();
 

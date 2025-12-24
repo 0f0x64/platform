@@ -288,5 +288,8 @@
     <None Include="projectFiles\shaders\vs\space.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
+    <None Include="projectFiles\shaders\lib\particleVS_main.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
   </ItemGroup>
 </Project>

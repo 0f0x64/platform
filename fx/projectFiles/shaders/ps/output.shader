@@ -22,7 +22,7 @@ float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
     float4 c2 = screenLow.SampleLevel(sam1,input.uv,0);
     float4 c3 = screenMid.SampleLevel(sam1,input.uv,0);
     c+=c2+c3;
-    c.b+=.25;
+   // c.b+=.25;
     c.rgb=ACESFilm(max(c.rgb,0)*.2);
     return float4(c.rgb,1);
 

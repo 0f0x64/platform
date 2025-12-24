@@ -9,7 +9,7 @@ cbuffer params : register(b0)
 
 #define PI 3.1415926535897932384626433832795
 
-float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
+float4 PS(VS_OUTPUT_PARTICLE input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
     float3 c = saturate(1.-2.*length(input.uv-.5));
 
@@ -19,8 +19,8 @@ float4 PS(VS_OUTPUT input, bool isFrontFace : SV_IsFrontFace) : SV_Target
           d+=2./(suv.x+suv.y);
     d*=saturate(1-max(suv.x,suv.y));
     //  d+=c*3;
-    if (length(input.sz1)<=1.1) return float4(15*input.rgba.rgb/9.,1);
+    if (length(input.size)<=1.1) return float4(15*input.color.rgb/9.,1);
 
-    return float4(d*input.rgba.rgb/9.,1);
+    return float4(d*input.color.rgb/9.,1);
 
 }

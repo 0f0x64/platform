@@ -30,12 +30,12 @@ float3 pillar(float2 grid,float a, float t, float h)
     return pos;
 }
 
-pos_color pillars_array(uint qid,float4 grid)
+pos_color CalcParticles(uint qid,float4 grid)
 {
      qid *= skipper;
      float t=time.x*.01;
-
-     if (mode==1)
+     uint inStars = 10000;
+     if (mode==1||qid%inStars==0)
      {
         t=0;
      }
@@ -67,8 +67,8 @@ pos_color pillars_array(uint qid,float4 grid)
 
     if (mode==1)
     {
-        p.pos=transform(pos,grid.zw,92);
-        p.rgba*=2;
+        p.pos=transform(pos,grid.zw,52);
+        p.rgba*=8;
         p.sz=172;
     }
     else
@@ -78,55 +78,17 @@ pos_color pillars_array(uint qid,float4 grid)
        // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
          p.sz=1;
 
+         if (qid%inStars==0)
+         {
+              p.pos = transform_unisize(pos,grid.zw,51.5);
+               p.sz=2;
+               p.rgba*=15;
+         }
     }
    
     //density compensation
-    p.rgba/=min(pow(p.pos.w,1.1)*.1+.5,11);
+    p.rgba/=min(pow(p.pos.w,1.1)*.21+.5,11);
     return p;
 }
 
-pos_color sagittarius_v2 (uint qid,float div, float4 grid)
-{
-    pos_color outp;
-
-
-    //percentage
-    uint outer=612;
-    uint floor_=23;
-    uint star_=15;
-    uint star_2=4957;
-    uint big_hl=2006;
-
-    float3 pos=0;
-    
-    outp = pillars_array(qid,grid);
- //   if (qid%outer==0) outp = outer_space(0, grid, qid);
-//    if (qid%floor_==0) outp = floor_space(qid,grid);
- //   if (qid%star_==0) outp = star(qid,grid);
-    
-    return outp;
-}
-
-VS_OUTPUT VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
-{
-    VS_OUTPUT output = (VS_OUTPUT) 0;
-    float2 map[6] = { 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
-    float4 grid = {float2(iID % gX, floor(iID / gX))/float2(gX,gY), map[vID % 6]}; 
-    
-    pos_color p = pillars_array(iID,grid);
-    
-    //density compensation
-   // p.rgba/=min(pow(p.pos.w,1.1)*.1+.5,11);
-    
-    output.pos=p.pos;
-
-    output.vnorm = 0;
-    output.wpos = 0;
-    output.vpos = 0;
-    output.uv = grid.zw;
-    output.id = float4(iID,0,0,0) ;
-    output.rgba = p.rgba;
-    output.sz1 = float4(p.sz,0,0,0);
-
-    return output;
-}
+#include <../lib/particleVS_main.shader>

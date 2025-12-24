@@ -12,87 +12,78 @@ cbuffer params : register(b0)
     int skipper;
 }
 
-pos_color star(uint qid, float4 grid)
+pos_color CalcParticles(uint qid, float4 grid)
 {
+   // grid.x=frac(grid.x);
     float2 uv=grid.xy;
-    uint cnt=7;
+    uint cnt=42;
     uv=frac(uv*cnt);
     float b = quantize(grid.x,cnt);
     float ang=b*360.;
     float2 a = uv * PI * 2;
     a.x *= -1;
     float3 pos = 0;
-    float r=18*hash(b)+1;
+    float r=hash(b*3111.123)*6+7;
+    r/=2;
+    float central = qid%15;
     
-    if (qid%12!=0)
-    {
-        r=hash(b*3111.123)*18+4;
-        pos+=7*noise3(qid*float3(1,2,3)/1000)*(pow(sin(a.y),3)+.1);
+
         pos.x-=r;
-        float aaa=frac(a.y-PI+time.x*.01)*PI*2;
-        pos=rotZ(pos,aaa);
+        float aaa=frac(a.y/PI+time.x*.0051*(qid%3+1)+qid/900.)*PI*2;
+        //aaa+=sin(aaa*6+time.x+b*2222)*.1;
+        //float aaa=(a.y+qid/100.);
+        if (central!=0)
+        {
+            pos=rotZ(pos,aaa);
+        } else{
+            pos=rotZ(pos,aaa/110);
+            pos.y=(aaa-PI)*10;
+            pos.xz*=1+pow(abs(aaa-PI),7)*.0001;
+
+        }
         pos.x+=r;
-    }
-    else
+
+        if(central!=0)
+        {
+            pos+=rot3(pos,ang*float3(1,2,3)+(length(pos)*.20)-time.x*.03);
+            //pos+=rot3(pos,ang*float3(1,2,3)*b/(length(pos)*.20+5)-time.x*.03);
+            //pos+=rot3(pos,.1*ang/(length(pos)*2)-time.x/30);
+
+        }
+
+    pos=rotY(pos,ang*PI/180.);
+        
+    float3 q= smoothstep(0,1,saturate(length(pos)/5*(1+abs(pos.y))));
+    pos=lerp(normalize(pos+noise3(float3(a,qid/1000.)))*3,pos,q);
+    pos*=2;
+    pos+=(pos/12)/((noise3(qid*float3(1,2,3)/68.+222)+.6)+.1);
+    //pos+=length(pos/22)*(noise3(grid.xyx*float3(1,2,3)*75+222)+.6);
+
+    if(central==0)
     {
-        pos+=7*noise3(qid*float3(1,2,3)/1000)*pow(sin(a.y),3);
-        float d=11*hash(qid/11000.)+1111;
-        pos.x+=d;
-        pos=rotZ(pos,(frac(abs(a.y)+time.x*.005)-.5)*.1);
-        pos.x-=d;
-        pos=rotY(pos,qid);
-        pos.xz*=pos.xz;
+        pos=rotX(pos,.1);
     }
 
-    pos+=rot3(pos,ang*float3(0,1,0)+length(pos)*.10-time.x*.01);
-    pos=rotY(pos,ang*PI/180.);
-    float3 q= smoothstep(0,1,saturate(length(pos)/15*(1+abs(pos.y))));
-    pos=lerp(normalize(pos+noise3(float3(a,qid/10000.)))*3,pos,q);
-    pos*=2;
-   
     pos_color p;
 
-    p.rgba = float4(float3(1,2,3),1)*.1+.0015;
+    p.rgba = float4(float3(1,2,3),1)*.015+.0015;
 
     if (qid==0)
     {
-        //hilight
-        p.rgba*=1;
+        //central hilight
+        p.rgba*=4.8;
         p.pos=transform(float3(0,0,0),grid.zw,552);
         p.sz=2;
     }
     else
     {
-        p.pos = transform_unisize(pos/16,grid.zw,4.);
+        p.pos = transform_unisize(pos/16,grid.zw,3.);
         p.sz=2;
-        p.rgba*=11/(abs(pos.y)*2+11.1);
+        
+       // p.rgba*=11/(abs(pos.y)*2+11.1);
     } 
     
     return p;
-}
-
-
-
-pos_color sagittarius_v2 (uint qid,float div, float4 grid)
-{
-    pos_color outp;
-
-
-    //percentage
-    uint outer=612;
-    uint floor_=23;
-    uint star_=15;
-    uint star_2=4957;
-    uint big_hl=2006;
-
-    float3 pos=0;
-    
-    //outp = pillars_array(qid,grid);
- //   if (qid%outer==0) outp = outer_space(0, grid, qid);
-//    if (qid%floor_==0) outp = floor_space(qid,grid);
-  outp = star(qid,grid);
-    
-    return outp;
 }
 
 float tri(float x)
@@ -151,26 +142,4 @@ float3 double_star(float2 grid,float a, float t, float h,uint qid,uint star2)
     return pos*2.5;
 }
 
-VS_OUTPUT VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
-{
-    VS_OUTPUT output = (VS_OUTPUT) 0;
-    float2 map[6] = { 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
-    float4 grid = {float2(iID % gX, floor(iID / gX))/float2(gX,gY), map[vID % 6]}; 
-    
-    pos_color p = star(iID,grid);
-    
-    //density compensation
-   // p.rgba/=min(pow(p.pos.w,1.1)*.1+.5,11);
-    
-    output.pos=p.pos;
-
-    output.vnorm = 0;
-    output.wpos = 0;
-    output.vpos = 0;
-    output.uv = grid.zw;
-    output.id = float4(iID,0,0,0) ;
-    output.rgba = p.rgba;
-    output.sz1 = float4(p.sz,0,0,0);
-
-    return output;
-}
+#include <../lib/particleVS_main.shader> 

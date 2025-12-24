@@ -95,7 +95,7 @@ namespace Object {
 		reflect_close;
 	}
 
-	unsigned int quality = 1;
+	
 
 	enum class pMode { point,glow };
 	
@@ -206,31 +206,36 @@ namespace Object {
 		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 	}
 
-	cmd(ShowParticles)
+	cmd(ShowParticles, int quality;)
 	{
 		reflect;
+
+		int pillars_cnt = 3725470/in.quality;
+		int outerSpace_cnt = 6853 / in.quality;
+		int neutronStar_cnt = 279620 / in.quality;
+		int galaxy_cnt = 182361 / in.quality;
 
 		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 
-			Pillars(3725470,1,pMode::point);
-			OuterSpace(6853, 1, pMode::point);
-			NeutronStar(279620, 1, pMode::point);
-			Galaxy(182361, 4, pMode::point);
+			Pillars(pillars_cnt,1,pMode::point);
+			OuterSpace(outerSpace_cnt, 1, pMode::point);
+			NeutronStar(neutronStar_cnt, 1, pMode::point);
+			Galaxy(galaxy_cnt, 14, pMode::point);
 
 		//mid
 			RenderTarget::Set({ texture::pBufMid,0 });
 			RenderTarget::Clear({ 0,0,0,0 });
 
-			Galaxy(182361, 4, pMode::glow);
+			Galaxy(galaxy_cnt, 4, pMode::glow);
 
 		//low
 		RenderTarget::Set({ texture::pBufLow,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 
-			Pillars(3725470, 10394, pMode::glow);
-			OuterSpace(6853, 64, pMode::glow);
+			Pillars(pillars_cnt, 10394, pMode::glow);
+			OuterSpace(outerSpace_cnt, 64, pMode::glow);
 			//NeutronStar(1024 * 1024, 1, pMode::glow);
 			//Galaxy(182361, 4, pMode::glow);
 

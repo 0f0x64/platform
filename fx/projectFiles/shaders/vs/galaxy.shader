@@ -30,9 +30,9 @@ float3 pillar(float2 grid,float a, float t, float h)
     return pos;
 }
 
-pos_color galaxy(uint qid,float4 grid)
+pos_color CalcParticles(uint qid,float4 grid)
 {
-    uint stars= qid%3400;
+    uint stars= qid%340;
     uint cn=7;
     float a= (qid%cn);
     a=a*PI/180.;
@@ -41,10 +41,10 @@ pos_color galaxy(uint qid,float4 grid)
     float3 pos = pillar(grid.xy,0,t*.005,.5)/5;
     float3 pos2=pos;
 
-        pos.y*=.4*pow(length(pos),1)*4;
+        pos.y*=0;
         pos.xz*=9;
-        
-        pos=rotY(pos,length(pos)*.3+a+time.x*.005);
+        pos.x*=.6;
+        pos=rotY(pos,length(pos)*.3+a-time.x*.005);
         pos.y+=length(pos)/7;
         pos.y-=4.5;
         
@@ -61,54 +61,43 @@ pos_color galaxy(uint qid,float4 grid)
         }
         else
         {
-            float sz=18;
-            if (mode==1) sz=29;
+            if (mode==0)
+            {
+            float sz=28;
+      
             p.pos = transform_unisize(pos,grid.zw,sz);
             p.sz=2;
+            } 
+            else
+            {
+                float sz=4;
+                p.pos = transform(pos,grid.zw,sz);
+                p.sz=2;
+            }
         }
 
         p.rgba = float4(noise3_u(a*float3(1,2,3)+77+sin(pos2*11.4)),1)/50.+.00015;
         if (mode!=0&&stars!=0)
         {
-            p.rgba.rgb*=noise(2*rotY(pos,length(pos)-time.x*.005))*3.2+.2;
+           // p.rgba.rgb*=noise(1*rotY(pos,length(pos)-time.x*.005))*3.2+.012;
 
         }
         p.rgba*=float4(1,2,3,1)/2;
         
-        if (stars==0)
+        if (stars==0&&mode==0)
         {
             p.rgba*=540;
             p.sz=1;
         }
 
-        if (stars!=0&&mode==1) p.rgba*=4;
+        if (stars!=0&&mode==1) p.rgba*=2.5;
+        if (stars!=0&&mode==0) p.rgba*=1.5;
+ 
 
     //density compensation
   //  p.rgba/=min(pow(p.pos.w,1.1)*.1+1.5,5);
     
     return p;
-}
+} 
 
-VS_OUTPUT VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
-{
-    VS_OUTPUT output = (VS_OUTPUT) 0;
-    float2 map[6] = { 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
-    float4 grid = {float2(iID % gX, floor(iID / gX))/float2(gX,gY), map[vID % 6]}; 
-    
-    pos_color p = galaxy(iID,grid);
-    
-    //density compensation
-   // p.rgba/=min(pow(p.pos.w,1.1)*.1+.5,11);
-    
-    output.pos=p.pos;
-
-    output.vnorm = 0;
-    output.wpos = 0;
-    output.vpos = 0;
-    output.uv = grid.zw;
-    output.id = float4(iID,0,0,0) ;
-    output.rgba = p.rgba;
-    output.sz1 = float4(p.sz,0,0,0);
-
-    return output;
-}
+#include <../lib/particleVS_main.shader>

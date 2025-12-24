@@ -22,3 +22,11 @@ struct VS_OUTPUT
     float4 rgba : TEXCOORD2;
     float4 sz1 : COLOR0;
 };
+
+struct VS_OUTPUT_PARTICLE
+{
+    float4 pos : SV_POSITION;
+    float2 uv : TEXCOORD0;
+    float4 color : COLOR0;
+    float size : COLOR1;
+};
