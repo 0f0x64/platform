@@ -61,7 +61,8 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     //pos = rot3(pos,2.2/(pow(pos,14)+1));
     //pos*=1+noise3(pos+1111/(a+1)+t)*.3;
     //pos*=1+noise3(pos*3.5)/5;
- 
+ //pos=rotY(pos,pow(max(-pos.y/1,0),2));
+ //pos.xz+=noise3(pos).y*pow(max(-pos.y/1,0),2)/2;
     return pos;
 }
 
@@ -88,23 +89,25 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     float3 pos = pillar(qid,iid,grid.xy,0,t,h);
     float3 pos2=pos;
     
+    
     //scatter
     
     //color
     pos_color p;
     p.rgba = float4(noise3_u(float3(113,115,1)*221+177+sin(pos2*.48)),1)/30.+.0015;
-
+    
        pos=rotX(pos,toRad(65));
        pos.y-=.5;
        pos.z+=1.2;
     if (mode==1)
     {
         p.pos=transform(pos,grid.zw,22);
-        p.rgba*=13;
+        p.rgba*=11;
         p.sz=172;
     }
     else
     {
+        p.rgba*=2;
         p.pos = transform_unisize(pos,grid.zw,1.5);
        //p.rgba=-noise(pos*.3+12)*.04+.02;;
        // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;

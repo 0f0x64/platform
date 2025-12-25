@@ -1,4 +1,6 @@
+Shader(fish)
 Shader(galaxy)
+Shader(insideNebula)
 Shader(neitron_star)
 Shader(objViewer)
 Shader(pillars)

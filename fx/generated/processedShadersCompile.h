@@ -1,18 +1,20 @@
 void Init ()
 {
 
-CreateVS (0, shadersData::galaxy);
-CreateVS (1, shadersData::neitron_star);
-CreateVS (2, shadersData::objViewer);
-CreateVS (3, shadersData::pillars);
-CreateVS (4, shadersData::pillarsHand);
-CreateVS (5, shadersData::quad);
-CreateVS (6, shadersData::simpleCube);
-CreateVS (7, shadersData::space);
-CreateVS (8, shadersData::box);
-CreateVS (9, shadersData::letter);
-CreateVS (10, shadersData::lineDrawer);
-CreateVS (11, shadersData::lineDrawer3d);
+CreateVS (0, shadersData::fish);
+CreateVS (1, shadersData::galaxy);
+CreateVS (2, shadersData::insideNebula);
+CreateVS (3, shadersData::neitron_star);
+CreateVS (4, shadersData::objViewer);
+CreateVS (5, shadersData::pillars);
+CreateVS (6, shadersData::pillarsHand);
+CreateVS (7, shadersData::quad);
+CreateVS (8, shadersData::simpleCube);
+CreateVS (9, shadersData::space);
+CreateVS (10, shadersData::box);
+CreateVS (11, shadersData::letter);
+CreateVS (12, shadersData::lineDrawer);
+CreateVS (13, shadersData::lineDrawer3d);
 CreatePS (0, shadersData::basic);
 CreatePS (1, shadersData::basicLow);
 CreatePS (2, shadersData::cat);

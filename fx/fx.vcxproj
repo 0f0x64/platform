@@ -283,6 +283,7 @@
     <None Include="projectFiles\shaders\ui\vs\lineDrawer.shader" />
     <None Include="projectFiles\shaders\ui\vs\lineDrawer3d.shader" />
     <None Include="projectFiles\shaders\vs\galaxy.shader" />
+    <None Include="projectFiles\shaders\vs\insideNebula.shader" />
     <None Include="projectFiles\shaders\vs\neitron_star.shader" />
     <None Include="projectFiles\shaders\vs\objViewer.shader" />
     <None Include="projectFiles\shaders\vs\pillars.shader" />
