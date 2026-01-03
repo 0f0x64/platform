@@ -17,50 +17,15 @@ float toRad(float a)
     return a*PI/180.;
 }
 
-float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
+float tri(float x)
 {
-    float3 pos = float3(hash(iid/200.),hash(iid/140.),hash(iid/120.))-.5;
-    pos=normalize(pos)*2;
-    pos+=pos*noise3(pos);
-
-    pos*=4;
-    //t=0;
-
-
-    //pos/=10;
-    //return pos;
-    //heigth
-    a=hash(iid/1000.);
-    //pos+=noise3(a*351*float3(4,25,67))*1.7;
-
-    pos = rot3(pos,noise3(pos*.8+float3(0,t,0))/6);
-    pos+= noise3(pos)*.8;
-    pos = rot3(pos,noise3(pos.zyx*1.6+float3(0,-t,0))/12);
-    float3 pos3=pos;
-    pos=(frac(pos/7)-.5)*14;
-    pos=lerp(pos,normalize(pos)*5+pos/2,saturate(length(pos/7)+.2));
-
-    //pos*=1+noise3(pos*1.6+1111/(a+1)+t)*.24;
-    //pos = rotY(pos,length(pos)*2);
-    //pos*=1+noise3(pos+1111/(a+1)+t)*.3;
-    //pos*=1+noise3(pos*3.5)/5;
-    if (mode==0)
-    {
-        if (iid%5==0)
-        {
-            pos=pos3/40;
-            pos*=1+noise(pos)*6;
-            pos=rot3(pos,pos*22+time.x*.05);
-        }
-    }
-
-    return pos*2;
+    return lerp(frac(x),1-frac(x),floor(frac(x/2)*2));
 }
-
-
 
 pos_color CalcParticles(uint qid,uint iid,float4 grid)
 {
+uint star2=110;
+
      qid *= skipper;
      float t=time.x*.004;
      uint inStars = 10000;
@@ -69,52 +34,75 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
         t=0;
      }
 
-    //pillars instances
+   float y1=(grid.y-.5)*2;
+    float y2=pow((smooth(grid.y)-.5)*2,3);
+    float y=lerp(y1,y2,0.);
+    float3 pos = float3(0,y,0);
 
+    pos.z=0;
+    float scale=sin(abs(grid.y-.5)*PI*2)/9+.1;
+    float scale2=scale;
+    scale2=pow(scale,3)*72;
 
-    //calc
-    float3 pos = pillar(qid,iid,grid.xy,0,t,0);
-    float3 pos2=pos;
-    
-    //scatter
-    
-    //color
-    pos_color p;
-    p.rgba = float4(noise3_u(float3(113,115,1)*221+177+sin(pos2*.48)),1)/110.+.0015;
-    p.rgba*=float4(1,2,6,1)/2;
-
-    if (mode==1)
+    float tm=time.x;
+        float dir=sign(y1)*((iid%2)-.5);
+    //
+    /*if (iid%star2==0)
     {
-        p.pos=transform(pos,grid.zw,22);
-        p.rgba*=12;
-        p.sz=172;
+        pos.y=frac(pos.y-time.x*.001*dir*sign(y1))*sign(pos.y);
+        pos-=noise3(iid/11100.)*scale2*1.2;
+    }*/
+
+    pos = rotZ(pos,pos.y*sign(pos.y)*7.85);
+
+    //if (iid%9==0&&iid%star2!=0) pos+=normalize(pos)*noise(pos*25);
+
+    pos.x+=(iid%2)*2;
+    pos=pos.yzx;
+    pos*=4;
+    pos.z-=4;
+    float3 g1 =noise3(pos*4)*pow(length(pos),1)*.1-.5;
+    float y3=grid.y;
+    float3 g=float3(y3/12.,y3/22.,y3/14.)*5134+g1;
+    
+    //if (iid%star2!=0)
+    {
+        //pos+=noise3((hash(iid/2112.)-.5)*float3(1,2,3)*12)*.2;
+        pos+=noise3(g*.2+tm.x*.15*dir)*scale2*.51;
+        pos+=noise3(grid.xyy*8+dir*tm.x*.0000*+iid/41111.)*2.3*scale2;
+      //pos+=noise3(pos*11.2)*.151;
     }
+
+    pos_color p;
+
+    {
+    float dir=(iid%2-.5);
+    float v=15;
+    float q= .5+lerp(grid.y,1-grid.y,iid%2)/2;
+    q=.5+dir*(lerp(saturate((1-grid.y)*v),saturate(grid.y*v),iid%2));
+    p.rgba=.0125*float4(lerp(float3(1,0.2,0.1),float3(0.1,0.2,1),q)*(noise3(pos*1.1)*.5+.6),1);
+    }
+
+
+    if (mode==0)
+    {
+        float sz=1.2;
+        p.sz=1;
+       
+    
+        p.pos = transform_unisize(pos,grid.zw,sz);
+        
+        p.rgba*=17;
+    } 
     else
     {
-        p.pos = transform_unisize(pos,grid.zw,1.5);
-       //p.rgba=-noise(pos*.3+12)*.04+.02;;
-       // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
-         p.sz=1;
-
-         if (iid%inStars==0)
-         {
-              p.pos = transform_unisize(pos,grid.zw,151.5);
-               p.sz=2;
-               p.rgba*=5;
-         }
-
+        float sz=14;
+        p.pos = transform(pos,grid.zw,sz);
+        p.sz=2;
+        p.rgba*=3;
     }
-          if (iid==0)
-         {
-              p.pos = transform(0,grid.zw,16.5);
-               p.sz=2;
-               p.rgba*=(float4(5,-.1,-1,1));
-               p.rgba*=10;
-         }
-  
-   
-    //density compensation
-    //p.rgba/=min(pow(p.pos.w,1.1)*.21+.5,11);
+
+
     return p;
 }
 

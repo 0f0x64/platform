@@ -77,7 +77,7 @@ namespace Loop
 		BlendMode::Set({
 			.mode = blendmode::off,
 			.op = blendop::add
-			});
+		});
 
 		ps::output.textures.screen = texture::pBuf;
 		ps::output.textures.screenMid = texture::pBufMid;
@@ -117,12 +117,14 @@ namespace Loop
 
 		DepthBuf::Mode({ depthmode::off });
 
-		Culling::Set({ cullmode::back });
+		Culling::Set({cullmode::back});
 		
 		cameraMan::run({});
 
 		//Object::Saggitarius({.quality = 1});
-		Object::Zenith({.quality = 1});
+		//Object::Zenith({.quality = 1});
+		//Object::Fish({.quality = 1});
+		Object::Libra({ .quality = 1 });
 
 		Compose();
 

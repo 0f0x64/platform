@@ -282,8 +282,10 @@
     <None Include="projectFiles\shaders\ui\vs\letter.shader" />
     <None Include="projectFiles\shaders\ui\vs\lineDrawer.shader" />
     <None Include="projectFiles\shaders\ui\vs\lineDrawer3d.shader" />
+    <None Include="projectFiles\shaders\vs\fish.shader" />
     <None Include="projectFiles\shaders\vs\galaxy.shader" />
     <None Include="projectFiles\shaders\vs\insideNebula.shader" />
+    <None Include="projectFiles\shaders\vs\libra_sph.shader" />
     <None Include="projectFiles\shaders\vs\neitron_star.shader" />
     <None Include="projectFiles\shaders\vs\objViewer.shader" />
     <None Include="projectFiles\shaders\vs\pillars.shader" />
@@ -291,6 +293,7 @@
     <None Include="projectFiles\shaders\vs\quad.shader" />
     <None Include="projectFiles\shaders\vs\simpleCube.shader" />
     <None Include="projectFiles\shaders\vs\space.shader" />
+    <None Include="projectFiles\shaders\vs\tree.shader" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />

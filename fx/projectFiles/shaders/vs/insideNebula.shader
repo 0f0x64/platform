@@ -38,13 +38,15 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     pos = rot3(pos,noise3(pos.zyx*1.6+float3(0,-t,0))/12);
     float3 pos3=pos;
     pos=(frac(pos/7)-.5)*14;
-    pos=lerp(pos,normalize(pos)*5+pos/2,saturate(length(pos/7)+.2));
+    //pos=lerp(pos,normalize(pos)*5+pos/2,saturate(length(pos/7)+.2));
+
 
     //pos*=1+noise3(pos*1.6+1111/(a+1)+t)*.24;
     //pos = rotY(pos,length(pos)*2);
     //pos*=1+noise3(pos+1111/(a+1)+t)*.3;
     //pos*=1+noise3(pos*3.5)/5;
-    if (mode==0)
+    
+    /*if (mode==0)
     {
         if (iid%5==0)
         {
@@ -52,7 +54,7 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
             pos*=1+noise(pos)*6;
             pos=rot3(pos,pos*22+time.x*.05);
         }
-    }
+    }*/
 
     return pos*2;
 }
@@ -85,7 +87,8 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
 
     if (mode==1)
     {
-        p.pos=transform(pos,grid.zw,22);
+        float s=hash(iid)*33+11;
+        p.pos=transform(pos,grid.zw,s);
         p.rgba*=12;
         p.sz=172;
     }
@@ -104,13 +107,13 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
          }
 
     }
-          if (iid==0)
+      /*    if (iid==0)
          {
               p.pos = transform(0,grid.zw,16.5);
                p.sz=2;
                p.rgba*=(float4(5,-.1,-1,1));
                p.rgba*=10;
-         }
+         }*/
   
    
     //density compensation

@@ -1,0 +1,168 @@
+#include <../lib/constBuf.shader>
+#include <../lib/io.shader>
+#include <../lib/constants.shader>
+#include <../lib/utils.shader>
+
+cbuffer params : register(b0)
+{
+    float4x4 model;
+    int gX;
+    int gY;
+    int mode;
+    int skipper;
+}
+
+float toRad(float a)
+{
+    return a*PI/180.;
+}
+
+float3 n3(uint iid)
+{
+    float q=1;
+    float a=11234.123/q;
+    float b=12345.234/q;
+    float c=13456.345/q;
+    float v1 = hash(iid/a);
+    float v2 = hash(iid/b);
+    float v3 = hash(iid/c);
+    return float3(v1,v2,v3);
+}
+
+float quantize2(float x, float q)
+{
+    return floor(x*q)/q;
+}
+
+float2 gety(float y, int branch_count,float power)
+{
+    float s=2;
+    float y2=pow(y,power);
+    float y0=pow(s,floor(y2*branch_count));
+    float y1=pow(s,floor(y2*branch_count)+1);
+    return float2(y0,y1);
+}
+
+float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
+{
+
+//grid.y+=.5;
+//grid.y*=.5;
+//grid.x*=.5;
+
+float3 pos=shp(grid)/18;
+//pos.y/=1.5;
+
+pos=float3(sin(grid.x*PI*2),(grid.y-.5)*2,cos(grid.x*PI*2));
+//pos.y=sin(grid.y*PI);
+pos.xz*=.5-abs(grid.y-.5);
+pos=normalize(pos);
+pos/=10;
+if (grid.y>.35)
+{
+//    if (sin(grid.x*PI*44)<-.95)
+    {
+    if (iid%5==0) {
+        pos=float3(sin(grid.x*PI*2),(grid.y-.5)*2,cos(grid.x*PI*2))/13;
+        pos.y=-0.065;
+    }
+else
+{
+    float g=(grid.y-.35)*2.1;
+    grid.x=quantize2(grid.x,3)+.1*sign(iid%2-.5);
+    pos=float3(sin(grid.x*PI*2),(1-grid.y)*8,cos(grid.x*PI*2))/18*float3(g,1,g);
+    pos.y-=.065;
+}
+   //pos=0;
+    }
+    //else
+    {
+    //grid.y=.62;
+    
+    //pos=shp(grid)/18;
+    }
+
+    //pos=0;
+}
+
+pos+=noise3(pos*22234.4+1222)*saturate(pos.y)/4;
+pos.x+=((iid%2)-.5)/1.9; 
+pos.y-=.05;
+
+//pos+=noise(pos*222+hash3(iid)*2+float3(0,time.x*.1,0))*.05;
+pos+=noise3(hash3(iid)*12.2)*.015;
+//if (iid%3==0) pos.y-=frac(time.x/100.+hash(iid))/121;
+
+    return pos*8;
+}
+
+
+
+pos_color CalcParticles(uint qid,uint iid,float4 grid)
+{
+     qid *= skipper;
+     float t=time.x*.004;
+     uint inStars = 10000;
+     if (mode==1||iid%inStars==0)
+     {
+        t=0;
+     }
+
+    //pillars instances
+
+
+    //calc
+    float3 pos = pillar(qid,iid,grid.xy,0,t,0);
+    float3 pos2=pos;
+    
+    //scatter
+    
+    //color
+    pos_color p;
+    p.rgba = float4(noise3_u(pos2/.1)*float3(7.4,2.5,0.),1)/14.+.015;
+    //p.rgba*=float4(1,5,1,1)*12;
+    p.rgba/=3;
+    //p.rgba=grid.y;
+    if (mode==1)
+    {
+        p.pos=transform(pos,grid.zw,22);
+        p.rgba*=3;
+        p.rgba*=pow(pos.y+2,2)/20;
+        p.sz=172;
+    }
+    else
+    {
+        p.pos = transform_unisize(pos,grid.zw,1.5);
+       //p.rgba=-noise(pos*.3+12)*.04+.02;;
+       // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
+         p.sz=1;
+
+         if (iid%inStars==0)
+         {
+         //     p.pos = transform_unisize(pos,grid.zw,11.5);
+           //    p.sz=2;
+               //p.rgba*=113;
+         }
+
+    }
+      /*    if (iid==0)
+         {
+              p.pos = transform(0,grid.zw,16.5);
+               p.sz=2;
+               p.rgba*=(float4(5,-.1,-1,1));
+               p.rgba*=10;
+         }*/
+  
+   
+    //density compensation
+    //p.rgba/=min(pow(p.pos.w,1.1)*.21+.5,11);
+    return p;
+}
+
+VS_OUTPUT_PARTICLE VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
+{
+    float4 grid = getGridInst(vID,iID,gX,gY); 
+    pos_color p = CalcParticles(vID,iID,grid);
+    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.rgba, p.sz};
+    return output;
+}

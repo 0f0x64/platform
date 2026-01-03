@@ -184,6 +184,50 @@ namespace Object {
 		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 	}
 
+	void Tree(int count, int skipper, pMode mode)
+	{
+		int gX = sqrt(count / skipper);
+		int gY = sqrt(count / skipper);
+
+		psModeSet(mode);
+
+		vs::tree = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)mode,
+				.skipper = skipper,
+			},
+		};
+
+		vs::tree.set();
+
+		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
+	}
+
+	void Libra_spheres(int count, int skipper, pMode mode)
+	{
+		int gX = sqrt(count / skipper);
+		int gY = sqrt(count / skipper);
+
+		psModeSet(mode);
+
+		vs::libra_sph = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)mode,
+				.skipper = skipper,
+			},
+		};
+
+		vs::libra_sph.set();
+
+		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
+	}
+
 	void Pillars(int count,int skipper, pMode mode)
 	{
 		int gX = sqrt(count / skipper);
@@ -272,11 +316,11 @@ namespace Object {
 		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 	}
 
-	cmd(Fish, int quality;)
+	cmd(Libra, int quality;)
 	{
 		reflect;
 
-		int pillars_cnt = 3725470 / 2 / in.quality;
+		int pillars_cnt = 1000*1000 ;
 		int outerSpace_cnt = 6853 / in.quality;
 		int galaxy_cnt = 182361 / in.quality;
 
@@ -284,8 +328,9 @@ namespace Object {
 		RenderTarget::Set({ texture::pBuf,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 
-		PillarsHand(pillars_cnt, 1, pMode::point);
-		InsideNebula(pillars_cnt, 1, pMode::point);
+		Tree(pillars_cnt, 1, pMode::point);
+		Libra_spheres(256*256, 1, pMode::point);
+		InsideNebula(pillars_cnt / 2, 1, pMode::point);
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 
 		//mid
@@ -296,8 +341,40 @@ namespace Object {
 		RenderTarget::Set({ texture::pBufLow,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 
-		PillarsHand(pillars_cnt, 1394 / 2, pMode::glow);
-		InsideNebula(pillars_cnt, 1394, pMode::glow);
+		Tree(pillars_cnt, 1394 / 2, pMode::glow);
+		InsideNebula(pillars_cnt / 2, 1394, pMode::glow);
+		Libra_spheres(256 * 256, 143, pMode::glow);
+		//	OuterSpace(outerSpace_cnt, 64, pMode::glow);
+
+		reflect_close;
+	}
+
+	cmd(Fish, int quality;)
+	{
+		reflect;
+
+		int pillars_cnt = 3725470  / in.quality;
+		int outerSpace_cnt = 6853 / in.quality;
+		int galaxy_cnt = 182361 / in.quality;
+
+		//hi
+		RenderTarget::Set({ texture::pBuf,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		DoubleStar(pillars_cnt, 1, pMode::point);
+		InsideNebula(pillars_cnt/2, 1, pMode::point);
+		OuterSpace(outerSpace_cnt, 1, pMode::point);
+
+		//mid
+		RenderTarget::Set({ texture::pBufMid,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		//low
+		RenderTarget::Set({ texture::pBufLow,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		DoubleStar(pillars_cnt, 1394 / 2, pMode::glow);
+		InsideNebula(pillars_cnt/2, 1394, pMode::glow);
 		//	OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
 		reflect_close;
