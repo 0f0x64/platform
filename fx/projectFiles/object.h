@@ -194,6 +194,33 @@ namespace Object {
 		reflect_close;
 	}
 
+	cmd(Pearl, int count; int skipper; pMode mode; int r; int g; int b;)
+	{
+		reflect;
+
+		int gX = sqrt(in.count / in.skipper);
+		int gY = sqrt(in.count / in.skipper);
+
+		psModeSet(in.mode);
+
+		vs::pearl = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)in.mode,
+				.skipper = in.skipper,
+				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1)
+			},
+		};
+
+		vs::pearl.set();
+
+		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
+
+		reflect_close;
+	}
+
 	cmd(Islands, int count; int skipper; pMode mode; int r; int g; int b;)
 	{
 		reflect;
@@ -458,7 +485,7 @@ namespace Object {
 		RenderTarget::Clear({ 0,0,0,0 });
 
 		Blob({ pillars_cnt,1,pMode::point,100,252,500 });
-		Islands({ pillars_cnt/4,1,pMode::point,130,112,10 });
+		Islands({ pillars_cnt/2,1,pMode::point,130,112,10 });
 		Waterfall({ pillars_cnt / 4,1,pMode::point,30,352,1100 });
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 //		Galaxy({ galaxy_cnt,14,pMode::point,254,220,41 });
@@ -467,6 +494,40 @@ namespace Object {
 		RenderTarget::Set({ texture::pBufMid,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 		Blob({ pillars_cnt,194,pMode::glow,100,252,600 });
+
+		//low
+		RenderTarget::Set({ texture::pBufLow,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
+		OuterSpace(outerSpace_cnt, 64, pMode::glow);
+
+		reflect_close;
+	}
+
+	cmd(Crab, int quality;)
+	{
+		reflect;
+
+		int pillars_cnt = 2000 * 1000;
+		int outerSpace_cnt = 6853 / in.quality;
+		int galaxy_cnt = 182361 / in.quality;
+
+		//hi
+		RenderTarget::Set({ texture::pBuf,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		Pearl({ pillars_cnt,1,pMode::point,600,252,100 });
+		InsideNebula({ pillars_cnt / 2, 1, pMode::point ,1500,100,00 });
+		//Islands({ pillars_cnt / 2,1,pMode::point,130,112,10 });
+		//Waterfall({ pillars_cnt / 4,1,pMode::point,30,352,1100 });
+		OuterSpace(outerSpace_cnt, 1, pMode::point);
+		//		Galaxy({ galaxy_cnt,14,pMode::point,254,220,41 });
+
+				//mid
+		RenderTarget::Set({ texture::pBufMid,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+		Pearl({ pillars_cnt,194,pMode::glow,600,252,100 });
 
 		//low
 		RenderTarget::Set({ texture::pBufLow,0 });

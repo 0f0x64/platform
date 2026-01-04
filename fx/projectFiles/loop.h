@@ -125,7 +125,8 @@ namespace Loop
 		//Object::Zenith({.quality = 1});
 		//Object::Fish({.quality = 1});
 		//Object::Libra({.quality = 1});
-		Object::Aquarius({.quality = 1});
+		//Object::Aquarius({.quality = 1});
+		Object::Crab({ .quality = 1 });
 
 		Compose();
 

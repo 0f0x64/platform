@@ -28,18 +28,50 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     pos*=4;
     
     a=hash(iid/1000.);
-    pos+=noise3(a*351*float3(4,25,67))*1.7;
+    //pos+=noise3(a*351*float3(4,25,67))*1.7;
 
-    pos = rot3(pos,noise3(pos*.8+float3(0,t,0))/6);
+    //pos = rot3(pos,noise3(pos*.8+float3(0,t,0))/6);
+    pos=rot3(pos,pos/3);
+    pos=rotY(pos,pos);
     pos+= noise3(pos)*.8;
-    pos = rot3(pos,noise3(pos.zyx*1.6+float3(0,-t,0))/12);
+    //pos = rot3(pos,noise3(pos.zyx*1.6+float3(0,-t,0))/12);
     
     //pos+=(frac(pos/7)-.5)*4;
-    pos=lerp(pos,normalize(pos)*10,saturate(length(pos/37)));
+    float3 pos2=pos;
+    
+    if (iid%2==0)
+    {
+        pos.y=-pow(((noise(pos+time.x/40))),3)*6;
+        pos.xz*=3;
+        float3 hole=float3(0,1,0)*13;
+        float dst=27/(distance(pos,hole));
+        pos-=normalize(hole-pos)*pow(dst,4);
+        pos.y+=3;
+        
+        pos=rotY(pos,length(pos)/5-time.x/300);
+
+        
+    }else{
+        pos=normalize(pos)*4;
+         pos=lerp(pos,normalize(pos)*18+pos/32,saturate(length(pos/12)));
+         pos/=4;
+         pos.y-=6;
+
+    }
+
+        if (iid%3==0)
+        {
+            pos=pos2;
+            //pos.y*=2;
+            float3 hole=float3(0,1,1)*11;
+            float dst=17/(distance(pos,hole));
+            pos-=normalize(hole-pos)*pow(dst,4);
+            pos.y+=1+sin(PI*3*atan2(pos.x,pos.z));
+        }
 
     //pos*=.9;
     float dst=3;
-    for (int i=0;i<32;i++)
+/*    for (int i=0;i<32;i++)
     {
         float4 j=(i+1)*float4(11,12,13,14)+time.x*.003;
         float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
@@ -47,8 +79,8 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
         dst=3/(distance(pos,hole));
         pos-=sign(i%3-.5)*normalize(hole-pos)*pow(dst,3);
        // pos=rot3(pos,saturate((hole*pos)/.1)*12);
-    }
-    pos=lerp(pos,normalize(pos)*18+pos/32,saturate(length(pos/12)));
+    }*/
+  
     //pos+= noise3(pos/6)*.8;
 
     
@@ -80,6 +112,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     pos_color p;
     p.rgba = float4(noise3_u(111+float3(113,11,111)*221+177+sin(pos2*.48)),1)/110.+.0015;
     p.rgba*=base_color/2;
+    p.rgba=lerp(p.rgba,p.rgba.bgra,saturate(pow(length(pos)/13,13)));
 
     if (mode==1)
     {

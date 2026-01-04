@@ -20,6 +20,8 @@ pos_color CalcParticles(uint qid, float4 grid)
     pos+=.7*rot3(pos,31/pos+.1*noise3(pos*3));
     pos=lerp(normalize(pos)*33,pos,.45);;
     
+
+
     pos_color p;
 
     p.rgba = float4(float3(3,6,9),1)*.051+.0015;

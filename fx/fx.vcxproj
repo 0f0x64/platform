@@ -283,6 +283,7 @@
     <None Include="projectFiles\shaders\ui\vs\lineDrawer.shader" />
     <None Include="projectFiles\shaders\ui\vs\lineDrawer3d.shader" />
     <None Include="projectFiles\shaders\vs\blob.shader" />
+    <None Include="projectFiles\shaders\vs\pearl.shader" />
     <None Include="projectFiles\shaders\vs\fish.shader" />
     <None Include="projectFiles\shaders\vs\galaxy.shader" />
     <None Include="projectFiles\shaders\vs\insideNebula.shader" />
