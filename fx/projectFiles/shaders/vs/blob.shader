@@ -22,42 +22,37 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
 {
     float3 pos = float3(hash(iid/200.),hash(iid/140.),hash(iid/120.))-.5;
     pos=normalize(pos)*2;
+
     pos+=pos*noise3(pos);
 
     pos*=4;
-    //t=0;
-
-
-    //pos/=10;
-    //return pos;
-    //heigth
+    
     a=hash(iid/1000.);
-    //pos+=noise3(a*351*float3(4,25,67))*1.7;
+    pos+=noise3(a*351*float3(4,25,67))*1.7;
 
     pos = rot3(pos,noise3(pos*.8+float3(0,t,0))/6);
     pos+= noise3(pos)*.8;
     pos = rot3(pos,noise3(pos.zyx*1.6+float3(0,-t,0))/12);
     float3 pos3=pos;
-    pos=(frac(pos/7)-.5)*14;
-    //pos=lerp(pos,normalize(pos)*5+pos/2,saturate(length(pos/7)+.2));
+    //pos+=(frac(pos/7)-.5)*4;
+    pos=lerp(pos,normalize(pos)*10,saturate(length(pos/37)));
 
-
-    //pos*=1+noise3(pos*1.6+1111/(a+1)+t)*.24;
-    //pos = rotY(pos,length(pos)*2);
-    //pos*=1+noise3(pos+1111/(a+1)+t)*.3;
-    //pos*=1+noise3(pos*3.5)/5;
-    
-    /*if (mode==0)
+    //pos*=.9;
+    float dst=3;
+    for (int i=0;i<32;i++)
     {
-        if (iid%5==0)
-        {
-            pos=pos3/40;
-            pos*=1+noise(pos)*6;
-            pos=rot3(pos,pos*22+time.x*.05);
-        }
-    }*/
+        float4 j=(i+1)*float4(11,12,13,14)+time.x*.003;
+        float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
+        hole=normalize(hole)*(8.3+.5*sin((pos)+time.x*.01));
+        dst=3/(distance(pos,hole));
+        pos-=sign(i%3-.5)*normalize(hole-pos)*pow(dst,3);
+       // pos=rot3(pos,saturate((hole*pos)/.1)*12);
+    }
+    pos=lerp(pos,normalize(pos)*18+pos/32,saturate(length(pos/12)));
+    pos+= noise3(pos/6)*.8;
 
-    return pos*2;
+    
+    return pos/2;
 }
 
 
@@ -83,22 +78,24 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     
     //color
     pos_color p;
-    p.rgba = float4(noise3_u(float3(113,115,1)*221+177+sin(pos2*.48)),1)/110.+.0015;
+    p.rgba = float4(noise3_u(111+float3(113,11,111)*221+177+sin(pos2*.48)),1)/110.+.0015;
     p.rgba*=base_color/2;
 
     if (mode==1)
     {
         float s=hash(iid)*33+11;
+        //s*=1.5;
         p.pos=transform(pos,grid.zw,s);
-        p.rgba*=12;
+        p.rgba*=.6;
         p.sz=172;
     }
     else
     {
-        p.pos = transform_unisize(pos,grid.zw,1.5);
+        p.pos = transform_unisize(pos,grid.zw,1.75);
        //p.rgba=-noise(pos*.3+12)*.04+.02;;
        // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
          p.sz=1;
+         p.rgba*=1.2;
 
          if (iid%inStars==0)
          {

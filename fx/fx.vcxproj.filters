@@ -309,5 +309,14 @@
     <None Include="projectFiles\shaders\vs\libra_sph.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
+    <None Include="projectFiles\shaders\vs\blob.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\islands.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\waterfall.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
   </ItemGroup>
 </Project>

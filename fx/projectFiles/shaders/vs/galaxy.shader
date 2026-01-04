@@ -10,6 +10,8 @@ cbuffer params : register(b0)
     int gY;
     int mode;
     int skipper;
+    float4 base_color;
+ 
 }
 
 float3 pillar(float2 grid,float a, float t, float h)
@@ -76,13 +78,13 @@ pos_color CalcParticles(uint qid,float4 grid)
             }
         }
 
-        p.rgba = float4(noise3_u(a*float3(1,2,3)+77+sin(pos2*11.4)),1)/50.+.00015;
+        p.rgba = float4(noise3_u(a*base_color.rgb+77+sin(pos2*11.4)),1)/50.+.00015;
         if (mode!=0&&stars!=0)
         {
            // p.rgba.rgb*=noise(1*rotY(pos,length(pos)-time.x*.005))*3.2+.012;
 
         }
-        p.rgba*=float4(1,2,3,1)/2;
+        p.rgba*=base_color/2;
         
         if (stars==0&&mode==0)
         {
