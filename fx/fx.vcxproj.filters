@@ -321,5 +321,8 @@
     <None Include="projectFiles\shaders\vs\pearl.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
+    <None Include="projectFiles\shaders\vs\transporter.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
   </ItemGroup>
 </Project>

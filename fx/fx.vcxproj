@@ -296,6 +296,7 @@
     <None Include="projectFiles\shaders\vs\quad.shader" />
     <None Include="projectFiles\shaders\vs\simpleCube.shader" />
     <None Include="projectFiles\shaders\vs\space.shader" />
+    <None Include="projectFiles\shaders\vs\transporter.shader" />
     <None Include="projectFiles\shaders\vs\tree.shader" />
     <None Include="projectFiles\shaders\vs\waterfall.shader" />
   </ItemGroup>

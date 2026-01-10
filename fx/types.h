@@ -215,7 +215,7 @@ createTypeEnum(depthmode, off, on, readonly, writeonly);
 createTypeEnum(filter, linear, point, minPoint_magLinear);
 createTypeEnum(addr, clamp, wrap);
 createTypeEnum(cullmode, off, front, back, wireframe);
-createTypeEnum(topology, triList, lineList, lineStrip);
+createTypeEnum(topology, triList, lineList, lineStrip, triStrip);
 createTypeEnum(targetshader, vertex, pixel, both);
 createTypeEnum(keyType, set, slide);
 createTypeEnum(visibility, on, off, solo);
