@@ -143,7 +143,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
         float s=hash(iid)*33+11;
         //s*=1.5;
         p.pos=transform(pos,grid.zw,s);
-        p.rgba*=.03;
+        p.rgba*=11.3;
         p.sz=172;
     }
     else

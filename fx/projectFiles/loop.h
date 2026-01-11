@@ -127,7 +127,9 @@ namespace Loop
 		//Object::Libra({.quality = 1});
 		//Object::Aquarius({.quality = 1});
 		//Object::Crab({ .quality = 1 });
-		Object::Twins({ .quality = 1 });
+		//Object::Twins({ .quality = 1 });
+		//Object::LeoBigStar({ .quality = 1 });
+		Object::Capri({ .quality = 1 });
 
 		Compose();
 
