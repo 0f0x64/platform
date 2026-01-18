@@ -107,9 +107,9 @@ pos_color CalcParticles(uint qid,float4 grid)
         if (qid==0)
         {
         p.pos=0;
-        p.pos = transform(0,grid.zw,342);
-        p.pos.y/=12;
-        p.rgba*=float4(12,5,12,1)/3+pow(1/(length(pos)),2);
+        p.pos = transform(0,grid.zw,542);
+        p.pos.y/=42;
+        p.rgba*=float4(1,5,11,1)/3+pow(1/(length(pos)),2);
         }else
         {
             p.rgba*=1+pow(2/length(pos),2);
