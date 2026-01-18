@@ -51,7 +51,7 @@ pos_color CalcParticles(uint qid,float4 grid)
         
         pos.y/=2;
         pos.y+=1.5;
-        pos.xz+=1*pos.y*(qid%2-.5);
+        //pos.xz+=1*pos.y*(qid%2-.5);
         pos.y*=-((qid%2)-.5)*2;
 
         pos+=noise3(pos-time.x/42)*saturate(length(pos)/4);
@@ -79,7 +79,7 @@ pos_color CalcParticles(uint qid,float4 grid)
                 float sz=1.1;
       
                 p.pos = transform_unisize(pos,grid.zw,sz);
-                p.rgba*=float4(col_g,1)*2;
+                p.rgba*=float4(col_g,1)*1;
                 p.sz=1;
             } 
             else
@@ -108,7 +108,11 @@ pos_color CalcParticles(uint qid,float4 grid)
         {
         p.pos=0;
         p.pos = transform(0,grid.zw,342);
-        p.rgba*=float4(12,5,12,1)/3+pow(1/length(pos),2);
+        p.pos.y/=12;
+        p.rgba*=float4(12,5,12,1)/3+pow(1/(length(pos)),2);
+        }else
+        {
+            p.rgba*=1+pow(2/length(pos),2);
         }
 
         //if (stars!=0&&mode==1) p.rgba*=2.5;
