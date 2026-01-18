@@ -275,6 +275,33 @@ namespace Object {
 		reflect_close;
 	}
 
+	cmd(Tau, int count; int skipper; pMode mode; int r; int g; int b;)
+	{
+		reflect;
+
+		int gX = sqrt(in.count / in.skipper);
+		int gY = sqrt(in.count / in.skipper);
+
+		psModeSet(in.mode);
+
+		vs::Tau = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)in.mode,
+				.skipper = in.skipper,
+				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1)
+			},
+		};
+
+		vs::Tau.set();
+
+		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
+
+		reflect_close;
+	}
+
 	cmd(Transporter, int count; int skipper; pMode mode; int r; int g; int b;)
 	{
 		reflect;
@@ -488,6 +515,36 @@ namespace Object {
 		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 	}
 
+	cmd(DoubleTwo, int count; int skipper; pMode mode; int r; int g; int b;)
+	{
+		reflect;
+		float r = in.r / 100.f;
+		float g = in.g / 100.f;
+		float b = in.b / 100.f;
+		float4 base_color = float4(r, g, b, 1);
+
+		int gX = sqrt(in.count / in.skipper);
+		int gY = sqrt(in.count / in.skipper);
+
+		psModeSet(in.mode);
+
+		vs::galaxy_2 = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)in.mode,
+				.skipper = in.skipper,
+				.base_color = base_color
+			},
+		};
+
+		vs::galaxy_2.set();
+
+		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
+		reflect_close;
+	}
+
 	cmd(Galaxy, int count; int skipper; pMode mode; int r; int g; int b;)
 	{
 		reflect;
@@ -688,6 +745,40 @@ namespace Object {
 		reflect_close;
 	}
 
+	cmd(Taurus, int quality;)
+	{
+		reflect;
+
+		int pillars_cnt = 2000 * 1000;
+		int outerSpace_cnt = 6853 / in.quality;
+		int galaxy_cnt = 182361 / in.quality;
+
+		//hi
+		RenderTarget::Set({ texture::pBuf,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		Tau({ pillars_cnt,1,pMode::point,100,252,1400 });
+		//InsideNebula({ pillars_cnt / 2, 1, pMode::point ,1500,100,00 });
+		//Islands({ pillars_cnt / 2,1,pMode::point,130,112,10 });
+		//Waterfall({ pillars_cnt / 4,1,pMode::point,30,352,1100 });
+		OuterSpace(outerSpace_cnt, 1, pMode::point);
+		//		Galaxy({ galaxy_cnt,14,pMode::point,254,220,41 });
+
+				//mid
+		RenderTarget::Set({ texture::pBufMid,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+		Tau({ pillars_cnt,194,pMode::glow,100,252,1400 });
+
+		//low
+		RenderTarget::Set({ texture::pBufLow,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
+		OuterSpace(outerSpace_cnt, 64, pMode::glow);
+
+		reflect_close;
+	}
+
 	cmd(Twins, int quality;)
 	{
 		reflect;
@@ -730,25 +821,29 @@ namespace Object {
 		int pillars_cnt = 3725470 / in.quality;
 		int outerSpace_cnt = 6853 / in.quality;
 		int galaxy_cnt = 182361 / in.quality;
+		int galaxy_cnt2 = 2182361 / in.quality;
 
 		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 
-		DoubleStar(pillars_cnt, 1, pMode::point);
-		InsideNebula({ pillars_cnt / 2, 1, pMode::point ,100,200,600});
+		//DoubleStar(pillars_cnt, 1, pMode::point);
+		DoubleTwo({ pillars_cnt, 1, pMode::point,90,130,800 });
+		//InsideNebula({ pillars_cnt / 2, 1, pMode::point ,100,200,600});
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 
 		//mid
 		RenderTarget::Set({ texture::pBufMid,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
+		DoubleTwo({ galaxy_cnt, 25, pMode::glow, 100, 200, 300 });
 
 		//low
 		RenderTarget::Set({ texture::pBufLow,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 
-		DoubleStar(pillars_cnt, 1394 / 2, pMode::glow);
-		InsideNebula({pillars_cnt / 2, 1394, pMode::glow, 100, 200, 600});
+		DoubleTwo({ galaxy_cnt, 2, pMode::glow,20,40,160 });
+		
+		//InsideNebula({pillars_cnt / 2, 1394, pMode::glow, 100, 200, 600});
 		//	OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
 		reflect_close;

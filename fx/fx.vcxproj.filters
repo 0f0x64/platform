@@ -330,5 +330,11 @@
     <None Include="projectFiles\shaders\vs\capriStar.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
+    <None Include="projectFiles\shaders\vs\Tau.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\galaxy_2.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
   </ItemGroup>
 </Project>

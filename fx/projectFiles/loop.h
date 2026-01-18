@@ -123,13 +123,14 @@ namespace Loop
 
 		//Object::Saggitarius({.quality = 1});
 		//Object::Zenith({.quality = 1});
-		//Object::Fish({.quality = 1});
+		Object::Fish({.quality = 1});
 		//Object::Libra({.quality = 1});
 		//Object::Aquarius({.quality = 1});
 		//Object::Crab({ .quality = 1 });
 		//Object::Twins({ .quality = 1 });
 		//Object::LeoBigStar({ .quality = 1 });
-		Object::Capri({ .quality = 1 });
+		//Object::Capri({ .quality = 1 });
+		//Object::Taurus({ .quality = 1 });
 
 		Compose();
 

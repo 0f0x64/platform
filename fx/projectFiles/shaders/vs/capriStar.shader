@@ -27,7 +27,7 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     uint inStars = 10000;
     float t2= (iid%inStars==0||mode!=0) ? 0: time.x;
 
-    pos+=pos*noise3(pos*3);
+    //pos+=pos*noise3(pos*3);
 
     pos*=4;
     
@@ -65,9 +65,11 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
         
     }else{
 
-    pos*=1+length(1/pos);
+    pos*=.6+length(1/pos);
     pos/=3;
-    pos=rot3(pos,length(pos)/3);
+    //pos=rot3(pos,length(pos)/3);
+    pos=rot3(pos,toRad(30)*(iid%3));
+    //pos=lerp(pos,normalize(pos)*6,saturate(length(pos/12)));
 
     }
 

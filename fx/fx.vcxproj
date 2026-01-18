@@ -284,6 +284,7 @@
     <None Include="projectFiles\shaders\ui\vs\lineDrawer3d.shader" />
     <None Include="projectFiles\shaders\vs\blob.shader" />
     <None Include="projectFiles\shaders\vs\capriStar.shader" />
+    <None Include="projectFiles\shaders\vs\galaxy_2.shader" />
     <None Include="projectFiles\shaders\vs\leo.shader" />
     <None Include="projectFiles\shaders\vs\pearl.shader" />
     <None Include="projectFiles\shaders\vs\fish.shader" />
@@ -298,6 +299,7 @@
     <None Include="projectFiles\shaders\vs\quad.shader" />
     <None Include="projectFiles\shaders\vs\simpleCube.shader" />
     <None Include="projectFiles\shaders\vs\space.shader" />
+    <None Include="projectFiles\shaders\vs\Tau.shader" />
     <None Include="projectFiles\shaders\vs\transporter.shader" />
     <None Include="projectFiles\shaders\vs\tree.shader" />
     <None Include="projectFiles\shaders\vs\waterfall.shader" />
