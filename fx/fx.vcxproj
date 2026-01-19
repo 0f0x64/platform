@@ -297,6 +297,8 @@
     <None Include="projectFiles\shaders\vs\pillars.shader" />
     <None Include="projectFiles\shaders\vs\pillarsHand.shader" />
     <None Include="projectFiles\shaders\vs\quad.shader" />
+    <None Include="projectFiles\shaders\vs\rocks.shader" />
+    <None Include="projectFiles\shaders\vs\scorpBall.shader" />
     <None Include="projectFiles\shaders\vs\simpleCube.shader" />
     <None Include="projectFiles\shaders\vs\space.shader" />
     <None Include="projectFiles\shaders\vs\Tau.shader" />
