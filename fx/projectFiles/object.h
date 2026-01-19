@@ -855,7 +855,7 @@ namespace Object {
 				//mid
 		RenderTarget::Set({ texture::pBufMid,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
-		ScorpBall({ pillars_cnt,194,pMode::glow,20,30,75 });
+		ScorpBall({ pillars_cnt,94,pMode::glow,20,30,75 });
 		//InsideNebula({ pillars_cnt , 134, pMode::glow ,40,16,10 });
 
 		//low

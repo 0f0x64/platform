@@ -23,23 +23,51 @@ float quantize2(float x, float q)
     return floor(x*q)/q;
 }
 
+float3 torus(float u, float v, float R, float r) {
+    float TWO_PI = 6.283185307;
+    float theta = u * TWO_PI/2; // Angle around the major ring
+    float phi = v * TWO_PI;   // Angle around the minor tube
+
+    float x = (R + r * cos(phi)) * cos(theta);
+    float y = (R + r * cos(phi)) * sin(theta);
+    float z = r * sin(phi);
+
+    return float3(x, y, z);
+}
+
 float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
 {
     float3 pos = float3(hash(iid/200.),hash(iid/140.),hash(iid/120.))-.5;
     uint inStars = 1232*3;
 
     float3 pos3=pos;
+    pos=torus(grid.x,grid.y,22,.125);
+    //pos+=hash3(iid);
+    pos.y-=42;
+    //pos=rot3(pos,iid%9);
+    pos=rot3(pos,iid%11/3*float3(4,5,6));
     
-    a=hash(iid/1000.);
-    grid.y=pow(grid.y,.6);
-    pos=float3(sin(grid.x*PI*2)/4,(grid.y-.5)*72,cos(grid.x*PI*2)/4)*.6;
+    //a=hash(iid/1000.);
+    //grid.y=pow(grid.y,.6);
+    //pos=float3(sin(grid.x*PI*2)/4,(grid.y-.5)*72,cos(grid.x*PI*2)/4)*.6;
     //pos/=12/(pos+.0);
     //pos.x=rotZ(pos,6/pos.y);
     //pos+=noise3(pos+time.x/15);
 
+    //pos+=((iid%16)-8)/9;
+  //  pos=rot3(pos,iid%16);
 
-
-        pos.xz*=1+pow(abs(pos.y),.05);
+    //pos=lerp(normalize(pos3)*10,pos,pow(smoothstep(0,1,saturate(length(pos/33))),3));
+    //pos=lerp(normalize(pos3)*10,pos,step(.3,saturate(length(pos/33.5))));
+pos=lerp(normalize(pos3)*10,pos*1.6,step(.3,saturate(length(pos/33.5))));
+    pos+=noise3(pos*12);
+    pos+=noise3(pos*2)*46;
+    //pos/=1.1;
+    pos=rot3(pos,noise3(pos/10+1122));
+    pos=rot3(pos,noise3(pos/5+1122)/5);
+    pos+=noise3(pos/4+112)*6;
+    //pos/=1.2;
+     //   pos.xz*=1+pow(abs(pos.y),.05);
     //pos.y=clamp(pos.y,-30,30);
     //pos.xz*=1+pow(abs(pos.y/11),3);
 
@@ -48,10 +76,10 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
 
     
 
-    pos=rot3(pos,iid%25*float3(61,12,25));
+  //  pos=rot3(pos,iid%25*float3(61,12,25));
 
     
-    pos.y-=pow(max(length(pos.xz)-1,0),.1);
+  //  pos.y-=pow(max(length(pos.xz)-1,0),.1);
     //pos=rotX(pos,length(pos));
     //pos.y*=2/(sin(length(pos.xz)/16)+1.3);
     //pos=rot3(pos,1/pos);
@@ -69,7 +97,7 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     //pos3*=1+sin(time.x*5)/8;
     //pos3=rot3(pos3,time.xxx/2*float3(6,4,5)/3);
     //pos=lerp(normalize(pos)*12,pos,smoothstep(0,1,saturate(length(pos/44))));
-    pos=lerp(normalize(pos)*8,pos,saturate(length(pos/44)));
+  //  pos=lerp(normalize(pos)*8,pos,saturate(length(pos/44)));
 
     //pos=lerp(pos,normalize(pos3)*42,pow(saturate(length(pos/109)),4));
     //pos=lerp(pos,normalize(pos3)*22,pow(smoothstep(0,1,saturate(length(pos/114))),2));
@@ -122,30 +150,32 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     
     //color
     pos_color p;
-    p.rgba = float4(noise3_u(111+float3(113,11,111)*221+177),1)/11.+.015;
+    p.rgba.a=1;
+    p.rgba.rgb = noise3_u(pos*14*float3(122,1,112))/31+float3(6,2,3)/52;
     
-    p.rgba*=.1;
-    p.rgba*=base_color*(pow(length(pos)/16,4)+.1);
+    p.rgba*=.5;
+//    p.rgba*=base_color*(pow(length(pos)/16,4)+.1);
     //p.rgba*=1+sin(grid.x*PI*8);
-    p.rgba=lerp(p.rgba,p.rgba.bgra,grid.y);
-    //p.rgba=lerp(p.rgba,base_color/144,1-saturate(pow(length(pos)/6,9)));
+    p.rgba=lerp(p.rgba,p.rgba.bgra,sin(length(pos)));
+//    p.rgba=lerp(p.rgba,base_color/144,1-saturate(pow(length(pos)/6,11)));
 
 
     if (mode==1)
     {
         float s=hash(iid)*33+11;
+        s=noise(iid)*62+11;
         //s*=1.5;
         p.pos=transform(pos,grid.zw,s);
-        p.rgba*=11.3;
+        p.rgba*=2.;
         p.sz=172;
     }
     else
     {
-        p.pos = transform(pos,grid.zw,.75);
+        p.pos = transform(pos,grid.zw,1.2);
        //p.rgba=-noise(pos*.3+12)*.04+.02;;
        // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
          p.sz=2;
-         p.rgba*=1.2;
+         //p.rgba*=1.2;
 
          if (iid%inStars==0)
          {
@@ -165,7 +195,16 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
   
    
     //density compensation
-    p.rgba/=min(pow(p.pos.w,1.1)*.1+1.5,5)/4;
+    if (mode==0)
+    {
+    p.rgba*=1*saturate(p.pos.w/27);
+    //p.rgba*=0;
+    }
+
+    if (mode==1)
+    {
+    p.rgba*=.3*saturate(21/p.pos.w);
+    }
     return p;
 }
 
