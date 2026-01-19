@@ -41,17 +41,19 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     uint inStars = 1232*3;
 
     float3 pos3=pos;
-    pos=torus(grid.x,grid.y,22,.125);
+    pos=torus(grid.x,grid.y,22,.1);
     //pos+=hash3(iid);
     pos.y-=42;
+    //pos=rot3(pos,time.x/1011);
     //pos=rot3(pos,iid%9);
-    pos=rot3(pos,iid%11/3*float3(4,5,6));
+    //pos=rot3(pos,iid%11/3*float3(4,5,6));
+    pos=rot3(pos,iid%15/3*float3(4,5,6));
     
     //a=hash(iid/1000.);
     //grid.y=pow(grid.y,.6);
     //pos=float3(sin(grid.x*PI*2)/4,(grid.y-.5)*72,cos(grid.x*PI*2)/4)*.6;
     //pos/=12/(pos+.0);
-    //pos.x=rotZ(pos,6/pos.y);
+    //pos.x=rotZ(pos,pos.y);
     //pos+=noise3(pos+time.x/15);
 
     //pos+=((iid%16)-8)/9;
@@ -68,8 +70,8 @@ pos=lerp(normalize(pos3)*10,pos*1.6,step(.3,saturate(length(pos/33.5))));
     pos+=noise3(pos/4+112)*6;
     //pos/=1.2;
      //   pos.xz*=1+pow(abs(pos.y),.05);
-    //pos.y=clamp(pos.y,-30,30);
-    //pos.xz*=1+pow(abs(pos.y/11),3);
+    //pos=clamp(pos,-30,30);
+    pos=normalize(pos)*10+pos/2;
 
 
     
