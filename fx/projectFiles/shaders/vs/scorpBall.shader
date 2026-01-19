@@ -25,7 +25,7 @@ float quantize2(float x, float q)
 
 float3 torus(float u, float v, float R, float r) {
     float TWO_PI = 6.283185307;
-    float theta = u * TWO_PI/2; // Angle around the major ring
+    float theta = u * TWO_PI; // Angle around the major ring
     float phi = v * TWO_PI;   // Angle around the minor tube
 
     float x = (R + r * cos(phi)) * cos(theta);
@@ -42,6 +42,7 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
 
     float3 pos3=pos;
     pos=torus(grid.x,grid.y,22,.1);
+    
     //pos+=hash3(iid);
     pos.y-=42;
     //pos=rot3(pos,time.x/1011);
@@ -135,7 +136,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
 {
      qid *= skipper;
      float t=time.x*.004;
-     uint inStars = 1232*3;
+     uint inStars = 1232*23;
      if (mode==1||iid%inStars==0)
      {
         t=0;
@@ -181,9 +182,9 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
 
          if (iid%inStars==0)
          {
-          //    p.pos = transform_unisize(pos,grid.zw,25.5);
-           //    p.sz=2;
-           //    p.rgba*=23;
+              p.pos = transform_unisize(pos,grid.zw,75.5);
+               p.sz=2;
+               p.rgba*=7;
          }
 
     }
