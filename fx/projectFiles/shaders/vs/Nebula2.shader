@@ -72,7 +72,7 @@ pos=lerp(normalize(pos3)*10,pos*1.6,step(.3,saturate(length(pos/33.5))));
     //pos/=1.2;
      //   pos.xz*=1+pow(abs(pos.y),.05);
     //pos=clamp(pos,-30,30);
-    pos=normalize(pos)*10+pos/2;
+    pos=normalize(pos)*16+pos/2;
 
 
     
@@ -204,13 +204,15 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     {
     p.rgba*=1*saturate(p.pos.w/27);
     //p.rgba*=0;
+
     }
 
     if (mode==1)
     {
     p.rgba*=.3*saturate(21/p.pos.w);
+    //p.rgba=.02;
     }
-
+    
    // p.rgba/=min(pow(p.pos.w,.5)*.1+1.5,5);
     return p;
 }

@@ -30,7 +30,7 @@ float fastInvSmoothstep(float x)
 
 float3 torus(float u, float v, float R, float r) {
     
-u = fastInvSmoothstep(u);
+//u = fastInvSmoothstep(u);
 
     float TWO_PI = 6.283185307;
     float theta = u * TWO_PI/2; // Angle around the major ring
@@ -39,9 +39,9 @@ u = fastInvSmoothstep(u);
     //r+=pow(sin(phi)+1,12)*pow(saturate(sin(theta*32)-.7)*4,1);
     //R+=pow(saturate(sin(theta*32)-.9)*4,4)*34;
 //    r+=pow(saturate(sin(phi)-.5),3)*pow(saturate(sin(theta*32)-.8),1)*84;
-    r*=pow(1-2*abs(u-.5),2);
+    r*=pow(1-2*abs(u-.5),3);
 
-    r+=1/abs(sin(theta*57+time.x/12)+1.1)/22;
+    r+=1/abs(sin(theta*20+time.x/12)+1.1)/22;
     r+=1/abs(sin(phi+time.x/12)+1.1)*1/abs(sin(theta*17+time.x/12)+1.1)/22;
     //r+=4*noise(phi*r*2+time.x/112)*noise(theta*r*2+time.x/112);    
     
@@ -59,20 +59,31 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
 
     float3 pos3=pos;
     float r2=pow(hash(iid%15),5)*23+22;
-    pos=torus(grid.x+hash(iid/234)/54,grid.y,22,1.);
+    float l=22;
+    pos=torus(grid.x+hash(iid%7)/8,grid.y,l,1.);
  
     
 
     //pos.x+=pow(hash(iid%15),5)*32;
-    pos.y-=42;
+    pos.y-=l*1.7;
 
     pos=rot3(pos,iid%15/3*float3(4,5,6)+noise3(pos/12+time.x/52)/15);
 
     pos=rot3(pos,iid%6);
 
-    pos=lerp(normalize(pos3)*22,pos,pow(smoothstep(0,1,saturate(length(pos/34))),4));
-    pos+=hash3(iid/12)/6;
+    pos=lerp(normalize(pos3)*22,pos,pow(smoothstep(0,1,saturate(length(pos/24))),5));
+    pos+=hash3(iid/12)/3;
+
+    if (length(pos)<19)
+    {
+        pos=normalize(hash3(iid))*19*(1-noise(pos/25)/3);
+        pos=rot3(pos,noise3(pos/3));
+        pos=rot3(pos,noise3(pos/2)/5);
+        //pos+=noise(pos*5);
+    }
+
     return pos/4;
+
 }
 
 
@@ -119,6 +130,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     }
     else
     {
+        float s=hash(iid)*4/(length(pos)/11+1);
         p.pos = transform(pos,grid.zw,1.2);
        //p.rgba=-noise(pos*.3+12)*.04+.02;;
        // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
@@ -147,9 +159,10 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     {
     p.rgba*=1*saturate(p.pos.w/27);
     //p.rgba*=0;
+    
     p.rgba*=-2;
     p.rgba/=saturate(length(pos)/3);
-    p.rgba=max(p.rgba,-.02);
+    p.rgba=max(p.rgba,-.03);
     }
 
     if (mode==1)
