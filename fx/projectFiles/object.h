@@ -329,6 +329,33 @@ namespace Object {
 		reflect_close;
 	}
 
+	cmd(Nebula2, int count; int skipper; pMode mode; int r; int g; int b;)
+	{
+		reflect;
+
+		int gX = sqrt(in.count / in.skipper);
+		int gY = sqrt(in.count / in.skipper);
+
+		psModeSet(in.mode);
+
+		vs::Nebula2 = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)in.mode,
+				.skipper = in.skipper,
+				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1)
+			},
+		};
+
+		vs::Nebula2.set();
+
+		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
+
+		reflect_close;
+	}
+
 	cmd(Rocks, int count; int skipper; pMode mode; int r; int g; int b;)
 	{
 		reflect;
@@ -845,7 +872,9 @@ namespace Object {
 		RenderTarget::Set({ texture::pBuf,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 
-		ScorpBall({ pillars_cnt,1,pMode::point,1390,925,111 });
+		
+		ScorpBall({ pillars_cnt/2,1,pMode::point,1390,925,111 });
+		Nebula2({ pillars_cnt,1,pMode::point,1390,925,111 });
 		//InsideNebula({ pillars_cnt , 1, pMode::point ,220,130,175 });
 		//Islands({ pillars_cnt / 2,1,pMode::point,130,112,10 });
 		//Waterfall({ pillars_cnt / 4,1,pMode::point,30,352,1100 });
@@ -855,7 +884,10 @@ namespace Object {
 				//mid
 		RenderTarget::Set({ texture::pBufMid,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
-		ScorpBall({ pillars_cnt,94,pMode::glow,20,30,75 });
+		
+		//ScorpBall({ pillars_cnt,1,pMode::point,1390,925,111 });
+		//ScorpBall({ pillars_cnt,94,pMode::glow,1,10,5 });
+		Nebula2({ pillars_cnt,94,pMode::glow,20,30,75 });
 		//InsideNebula({ pillars_cnt , 134, pMode::glow ,40,16,10 });
 
 		//low

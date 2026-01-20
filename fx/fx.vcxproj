@@ -286,6 +286,7 @@
     <None Include="projectFiles\shaders\vs\capriStar.shader" />
     <None Include="projectFiles\shaders\vs\galaxy_2.shader" />
     <None Include="projectFiles\shaders\vs\leo.shader" />
+    <None Include="projectFiles\shaders\vs\Nebula2.shader" />
     <None Include="projectFiles\shaders\vs\pearl.shader" />
     <None Include="projectFiles\shaders\vs\fish.shader" />
     <None Include="projectFiles\shaders\vs\galaxy.shader" />

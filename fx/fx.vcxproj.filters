@@ -342,5 +342,8 @@
     <None Include="projectFiles\shaders\vs\rocks.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
+    <None Include="projectFiles\shaders\vs\Nebula2.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
   </ItemGroup>
 </Project>

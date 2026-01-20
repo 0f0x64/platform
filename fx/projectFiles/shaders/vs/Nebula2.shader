@@ -23,28 +23,11 @@ float quantize2(float x, float q)
     return floor(x*q)/q;
 }
 
-float fastInvSmoothstep(float x)
-{
-    return x + (x - (x * x * (3.0 - 2.0 * x)));
-}
-
 float3 torus(float u, float v, float R, float r) {
-    
-u = fastInvSmoothstep(u);
-
     float TWO_PI = 6.283185307;
-    float theta = u * TWO_PI/2; // Angle around the major ring
+    float theta = u * TWO_PI; // Angle around the major ring
     float phi = v * TWO_PI;   // Angle around the minor tube
-    
-    //r+=pow(sin(phi)+1,12)*pow(saturate(sin(theta*32)-.7)*4,1);
-    //R+=pow(saturate(sin(theta*32)-.9)*4,4)*34;
-//    r+=pow(saturate(sin(phi)-.5),3)*pow(saturate(sin(theta*32)-.8),1)*84;
-    r*=pow(1-2*abs(u-.5),2);
 
-    r+=1/abs(sin(theta*57+time.x/12)+1.1)/22;
-    r+=1/abs(sin(phi+time.x/12)+1.1)*1/abs(sin(theta*17+time.x/12)+1.1)/22;
-    //r+=4*noise(phi*r*2+time.x/112)*noise(theta*r*2+time.x/112);    
-    
     float x = (R + r * cos(phi)) * cos(theta);
     float y = (R + r * cos(phi)) * sin(theta);
     float z = r * sin(phi);
@@ -58,20 +41,94 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     uint inStars = 1232*2;
 
     float3 pos3=pos;
-    float r2=pow(hash(iid%15),5)*23+22;
-    pos=torus(grid.x+hash(iid/234)/54,grid.y,22,1.);
- 
+    pos=torus(grid.x,grid.y,22,.1);
+    
+    //pos+=hash3(iid);
+    pos.y-=42;
+    //pos=rot3(pos,time.x/1011);
+    //pos=rot3(pos,iid%9);
+    //pos=rot3(pos,iid%11/3*float3(4,5,6));
+    pos=rot3(pos,iid%15/3*float3(4,5,6));
+    
+    //a=hash(iid/1000.);
+    //grid.y=pow(grid.y,.6);
+    //pos=float3(sin(grid.x*PI*2)/4,(grid.y-.5)*72,cos(grid.x*PI*2)/4)*.6;
+    //pos/=12/(pos+.0);
+    //pos.x=rotZ(pos,pos.y);
+    //pos+=noise3(pos+time.x/15);
+
+    //pos+=((iid%16)-8)/9;
+  //  pos=rot3(pos,iid%16);
+
+    //pos=lerp(normalize(pos3)*10,pos,pow(smoothstep(0,1,saturate(length(pos/33))),3));
+    //pos=lerp(normalize(pos3)*10,pos,step(.3,saturate(length(pos/33.5))));
+pos=lerp(normalize(pos3)*10,pos*1.6,step(.3,saturate(length(pos/33.5))));
+    pos+=noise3(pos*12);
+    pos+=noise3(pos*2)*46;
+    //pos/=1.1;
+    pos=rot3(pos,noise3(pos/10+1122));
+    pos=rot3(pos,noise3(pos/5+1122)/5);
+    pos+=noise3(pos/4+112)*6;
+    //pos/=1.2;
+     //   pos.xz*=1+pow(abs(pos.y),.05);
+    //pos=clamp(pos,-30,30);
+    pos=normalize(pos)*10+pos/2;
+
+
     
 
-    //pos.x+=pow(hash(iid%15),5)*32;
-    pos.y-=42;
+    
 
-    pos=rot3(pos,iid%15/3*float3(4,5,6)+noise3(pos/12+time.x/52)/15);
+  //  pos=rot3(pos,iid%25*float3(61,12,25));
 
-    pos=rot3(pos,iid%6);
+    
+  //  pos.y-=pow(max(length(pos.xz)-1,0),.1);
+    //pos=rotX(pos,length(pos));
+    //pos.y*=2/(sin(length(pos.xz)/16)+1.3);
+    //pos=rot3(pos,1/pos);
+    //pos.y+=sin(length(pos.xz)/9)*5;
+    //pos.xz*=1+1/(length(pos.xz)/8);
+    //pos+=.1/(noise3(pos)*length(pos)/3+.01);
 
-    pos=lerp(normalize(pos3)*22,pos,pow(smoothstep(0,1,saturate(length(pos/34))),4));
-    pos+=hash3(iid/12)/6;
+
+    
+    //pos3=rot3(pos3,length(pos)/122);
+
+    //pos3*=3;
+    //pos3=rot3(pos3,pos3/2);
+    //pos3+= noise3(pos3)*.8;
+    //pos3*=1+sin(time.x*5)/8;
+    //pos3=rot3(pos3,time.xxx/2*float3(6,4,5)/3);
+    //pos=lerp(normalize(pos)*12,pos,smoothstep(0,1,saturate(length(pos/44))));
+  //  pos=lerp(normalize(pos)*8,pos,saturate(length(pos/44)));
+
+    //pos=lerp(pos,normalize(pos3)*42,pow(saturate(length(pos/109)),4));
+    //pos=lerp(pos,normalize(pos3)*22,pow(smoothstep(0,1,saturate(length(pos/114))),2));
+    //pos=lerp(pos,normalize(pos),saturate(length(pos/72)));
+    //pos*=1.6;
+    
+    //pos = rot3(pos,noise3(pos.zyx*1.6+float3(0,-t,0))/12);
+    
+    //pos+=(frac(pos/7)-.5)*4;
+
+
+    //pos*=.9;
+/*    float dst=3;
+    for (int i=0;i<32;i++)
+    {
+        float4 j=(i+1)*float4(11,12,13,14)+time.x*.03;
+        float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
+        hole=normalize(hole)*(12.3+5*sin((pos)+time.x*.01));
+        dst=3/(distance(pos,hole));
+        pos-=normalize(hole-pos)*pow(dst,3);
+       // pos=rot3(pos,saturate((hole*pos)/.1)*12);
+    }*/
+  
+    //pos+= noise3(pos*3);
+    //pos+=rot3(pos,pos/14);
+
+
+    
     return pos/4;
 }
 
@@ -125,12 +182,12 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
          p.sz=2;
          //p.rgba*=1.2;
 
-       /*  if (iid%inStars==0)
+         if (iid%inStars==0)
          {
               p.pos = transform_unisize(pos,grid.zw,75.5);
                p.sz=2;
                p.rgba*=7;
-         }*/
+         }
 
     }
       /*    if (iid==0)
@@ -147,20 +204,12 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     {
     p.rgba*=1*saturate(p.pos.w/27);
     //p.rgba*=0;
-    p.rgba*=-2;
-    p.rgba/=saturate(length(pos)/3);
-    p.rgba=max(p.rgba,-.02);
     }
 
     if (mode==1)
     {
     p.rgba*=.3*saturate(21/p.pos.w);
-    
-    p.rgba*=-1;
-    p.rgba*=saturate(length(pos)/52);
     }
-    
-    
 
    // p.rgba/=min(pow(p.pos.w,.5)*.1+1.5,5);
     return p;
