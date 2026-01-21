@@ -305,6 +305,7 @@
     <None Include="projectFiles\shaders\vs\Tau.shader" />
     <None Include="projectFiles\shaders\vs\transporter.shader" />
     <None Include="projectFiles\shaders\vs\tree.shader" />
+    <None Include="projectFiles\shaders\vs\Virgo.shader" />
     <None Include="projectFiles\shaders\vs\waterfall.shader" />
   </ItemGroup>
   <ItemGroup>

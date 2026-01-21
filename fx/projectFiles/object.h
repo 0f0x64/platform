@@ -356,6 +356,33 @@ namespace Object {
 		reflect_close;
 	}
 
+	cmd(vrg, int count; int skipper; pMode mode; int r; int g; int b;)
+	{
+		reflect;
+
+		int gX = sqrt(in.count / in.skipper);
+		int gY = sqrt(in.count / in.skipper);
+
+		psModeSet(in.mode);
+
+		vs::Virgo = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)in.mode,
+				.skipper = in.skipper,
+				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1)
+			},
+		};
+
+		vs::Virgo.set();
+
+		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
+
+		reflect_close;
+	}
+
 	cmd(Rocks, int count; int skipper; pMode mode; int r; int g; int b;)
 	{
 		reflect;
@@ -895,6 +922,36 @@ namespace Object {
 		RenderTarget::Clear({ 0,0,0,0 });
 
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
+		OuterSpace(outerSpace_cnt, 64, pMode::glow);
+
+		reflect_close;
+	}
+
+	cmd(Virgo, int quality;)
+	{
+		reflect;
+
+		int pillars_cnt = 2000 * 1000;
+		int outerSpace_cnt = 6853 / in.quality;
+		int galaxy_cnt = 182361 / in.quality;
+
+		//hi
+		RenderTarget::Set({ texture::pBuf,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		vrg({ pillars_cnt,1,pMode::point,1390,925,111 });
+		OuterSpace(outerSpace_cnt, 1, pMode::point);
+		//Galaxy({ galaxy_cnt,14,pMode::point,254,220,41 });
+
+		//mid
+		RenderTarget::Set({ texture::pBufMid,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+		vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
+
+		//low
+		RenderTarget::Set({ texture::pBufLow,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
 		reflect_close;

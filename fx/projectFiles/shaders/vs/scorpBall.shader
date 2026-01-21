@@ -130,7 +130,6 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     }
     else
     {
-        float s=hash(iid)*4/(length(pos)/11+1);
         p.pos = transform(pos,grid.zw,1.2);
        //p.rgba=-noise(pos*.3+12)*.04+.02;;
        // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
