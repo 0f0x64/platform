@@ -116,32 +116,32 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     
     //color
     pos_color p;
-    p.rgba = float4(noise3_u(111+float3(113,11,111)*221+177+sin(pos2*.48)),1)/90.+.0015;
-    p.rgba*=base_color/3;
-    p.rgba=lerp(p.rgba,p.rgba.bgra,.25+.5*sin(length(pos)*2));
-    //p.rgba=lerp(p.rgba,p.rgba.grba,.5+.5*cos(length(pos)*1.01+2));
-    p.rgba.g+=.003;
+    p.color = float4(noise3_u(111+float3(113,11,111)*221+177+sin(pos2*.48)),1)/90.+.0015;
+    p.color*=base_color/3;
+    p.color=lerp(p.color,p.color.bgra,.25+.5*sin(length(pos)*2));
+    //p.color=lerp(p.color,p.color.grba,.5+.5*cos(length(pos)*1.01+2));
+    p.color.g+=.003;
     if (mode==1)
     {
         float s=hash(iid)*33+11;
         //s*=1.5;
         p.pos=transform(pos,grid.zw,s);
-        p.rgba*=1.3;
+        p.color*=1.3;
         p.sz=172;
     }
     else
     {
         p.pos = transform_unisize(pos,grid.zw,1.75);
-       //p.rgba=-noise(pos*.3+12)*.04+.02;;
-       // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
+       //p.color=-noise(pos*.3+12)*.04+.02;;
+       // p.color +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
          p.sz=1;
-         p.rgba*=1.2;
+         p.color*=1.2;
 
          if (iid%inStars==0)
          {
               p.pos = transform_unisize(pos,grid.zw,31.5);
                p.sz=2;
-               p.rgba*=23;
+               p.color*=23;
          }
 
     }
@@ -149,13 +149,13 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
          {
               p.pos = transform(0,grid.zw,16.5);
                p.sz=2;
-               p.rgba*=(float4(5,-.1,-1,1));
-               p.rgba*=10;
+               p.color*=(float4(5,-.1,-1,1));
+               p.color*=10;
          }*/
   
    
     //density compensation
-    //p.rgba/=min(pow(p.pos.w,1.1)*.21+.5,11);
+    //p.color/=min(pow(p.pos.w,1.1)*.21+.5,11);
     return p;
 }
 
@@ -163,6 +163,6 @@ VS_OUTPUT_PARTICLE VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
 {
     float4 grid = getGridInst(vID,iID,gX,gY); 
     pos_color p = CalcParticles(vID,iID,grid);
-    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.rgba, p.sz};
+    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.color, p.sz};
     return output;
 }

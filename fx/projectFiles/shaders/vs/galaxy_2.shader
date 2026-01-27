@@ -65,7 +65,7 @@ pos_color CalcParticles(uint qid,float4 grid)
 
         pos_color p;
         float3 col_g=lerp(base_color.rgb,base_color.bgr,pos.y/5+.5);
-        p.rgba = float4(noise3_u(a*col_g+77+sin(pos2*11.4)),1)/50.+.00015;
+        p.color = float4(noise3_u(a*col_g+77+sin(pos2*11.4)),1)/50.+.00015;
 
         if (stars==0)
         {
@@ -79,7 +79,7 @@ pos_color CalcParticles(uint qid,float4 grid)
                 float sz=1.1;
       
                 p.pos = transform_unisize(pos,grid.zw,sz);
-                p.rgba*=float4(col_g,1)*1;
+                p.color*=float4(col_g,1)*1;
                 p.sz=1;
             } 
             else
@@ -87,20 +87,20 @@ pos_color CalcParticles(uint qid,float4 grid)
                 float sz=40;
                 p.pos = transform(pos,grid.zw,sz);
                 p.sz=2;
-                p.rgba*=float4(col_g,1)*pow(length(pos),3.)/4823;
+                p.color*=float4(col_g,1)*pow(length(pos),3.)/4823;
             }
         }
 
         if (mode!=0&&stars!=0)
         {
-           // p.rgba.rgb*=noise(1*rotY(pos,length(pos)-time.x*.005))*3.2+.012;
+           // p.color.rgb*=noise(1*rotY(pos,length(pos)-time.x*.005))*3.2+.012;
 
         }
 
         
         if (stars==0&&mode==0)
         {
-            p.rgba*=34;
+            p.color*=34;
             p.sz=2;
         }
 
@@ -109,21 +109,21 @@ pos_color CalcParticles(uint qid,float4 grid)
         p.pos=0;
         p.pos = transform(0,grid.zw,542);
         p.pos.y/=42;
-        p.rgba*=float4(1,5,11,1)/3+pow(1/(length(pos)),2);
+        p.color*=float4(1,5,11,1)/3+pow(1/(length(pos)),2);
         }else
         {
-            p.rgba*=1+pow(2/length(pos),2);
+            p.color*=1+pow(2/length(pos),2);
         }
 
-        //if (stars!=0&&mode==1) p.rgba*=2.5;
-        //if (stars!=0&&mode==0) p.rgba*=1.5;
+        //if (stars!=0&&mode==1) p.color*=2.5;
+        //if (stars!=0&&mode==0) p.color*=1.5;
  
 
     //density compensation
-  //  p.rgba/=min(pow(p.pos.w,1.1)*.1+1.5,5);
-//  p.rgba=pos.y/5+.5;  
-  //p.rgba/=100;  
-  //p.rgba=saturate(p.rgba);
+  //  p.color/=min(pow(p.pos.w,1.1)*.1+1.5,5);
+//  p.color=pos.y/5+.5;  
+  //p.color/=100;  
+  //p.color=saturate(p.color);
     return p;
 } 
 

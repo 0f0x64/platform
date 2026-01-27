@@ -54,7 +54,7 @@ pos_color CalcParticles(uint qid,float4 grid)
         pos+=noise3(qid*float3(1,2,3)*11.1)*2;
 
         pos_color p;
-        p.rgba = float4(1,2,3,1)/120.+.0015;
+        p.color = float4(1,2,3,1)/120.+.0015;
 
         if (stars==0)
         {
@@ -78,26 +78,26 @@ pos_color CalcParticles(uint qid,float4 grid)
             }
         }
 
-        p.rgba = float4(noise3_u(a*base_color.rgb+77+sin(pos2*11.4)),1)/50.+.00015;
+        p.color = float4(noise3_u(a*base_color.rgb+77+sin(pos2*11.4)),1)/50.+.00015;
         if (mode!=0&&stars!=0)
         {
-           // p.rgba.rgb*=noise(1*rotY(pos,length(pos)-time.x*.005))*3.2+.012;
+           // p.color.rgb*=noise(1*rotY(pos,length(pos)-time.x*.005))*3.2+.012;
 
         }
-        p.rgba*=base_color/2;
+        p.color*=base_color/2;
         
         if (stars==0&&mode==0)
         {
-            p.rgba*=540;
+            p.color*=540;
             p.sz=1;
         }
 
-        if (stars!=0&&mode==1) p.rgba*=2.5;
-        if (stars!=0&&mode==0) p.rgba*=1.5;
+        if (stars!=0&&mode==1) p.color*=2.5;
+        if (stars!=0&&mode==0) p.color*=1.5;
  
 
     //density compensation
-  //  p.rgba/=min(pow(p.pos.w,1.1)*.1+1.5,5);
+  //  p.color/=min(pow(p.pos.w,1.1)*.1+1.5,5);
     
     return p;
 } 

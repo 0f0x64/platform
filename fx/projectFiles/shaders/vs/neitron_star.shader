@@ -66,12 +66,12 @@ pos_color CalcParticles(uint qid, float4 grid)
 
     pos_color p;
 
-    p.rgba = float4(float3(1,2,3),1)*.015+.0015;
+    p.color = float4(float3(1,2,3),1)*.015+.0015;
 
     if (qid==0)
     {
         //central hilight
-        p.rgba*=4.8;
+        p.color*=4.8;
         p.pos=transform(float3(0,0,0),grid.zw,552);
         p.sz=2;
     }
@@ -80,7 +80,7 @@ pos_color CalcParticles(uint qid, float4 grid)
         p.pos = transform_unisize(pos/16,grid.zw,3.);
         p.sz=2;
         
-       // p.rgba*=11/(abs(pos.y)*2+11.1);
+       // p.color*=11/(abs(pos.y)*2+11.1);
     } 
     
     return p;
