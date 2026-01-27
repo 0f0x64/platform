@@ -137,13 +137,13 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     pos_color p;
     float4 prgba = float4(noise3_u(pos2/.4/2)*float3(3.4,3.5,1.),1)/74.+float4(0,.015,0,0);
     float4 prgba2 = float4(noise3_u(pos2/.4/2)*float3(1.4,.5,0.),1)/4.+.0015;    
-    p.rgba = lerp(prgba,prgba2,saturate(.1-pos.y/13));
+    p.color = lerp(prgba,prgba2,saturate(.1-pos.y/13));
 
 
     if (mode==1)
     {
         p.pos=transform(pos,grid.zw,22);
-        p.rgba*=pow(pos.y+2,2)/20;
+        p.color*=pow(pos.y+2,2)/20;
         p.sz=172;
     }
     else
@@ -155,14 +155,14 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
          {
               p.pos = transform_unisize(pos,grid.zw,51.5);
                p.sz=2;
-               p.rgba=float4(0,1,1,0)/3;
+               p.color=float4(0,1,1,0)/3;
          }
 
     }
  
    
     //density compensation
-    //p.rgba/=min(pow(p.pos.w,1.1)*.21+.5,11);
+    //p.color/=min(pow(p.pos.w,1.1)*.21+.5,11);
     return p;
 }
 
@@ -170,6 +170,6 @@ VS_OUTPUT_PARTICLE VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
 {
     float4 grid = getGridInst(vID,iID,gX,gY); 
     pos_color p = CalcParticles(vID,iID,grid);
-    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.rgba, p.sz};
+    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.color, p.sz};
     return output;
 }

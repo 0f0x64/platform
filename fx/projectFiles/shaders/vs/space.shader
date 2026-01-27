@@ -58,26 +58,26 @@ pos_color CalcParticles(uint qid, float4 grid)
 
     pos_color p;
 
-    p.rgba = float4(float3(3,6,9),1)*.051+.0015;
+    p.color = float4(float3(3,6,9),1)*.051+.0015;
 
 
     if (mode==1)
     {
         //hilight
         p.pos=transform2(pos,grid.zw,302);
-        p.rgba/=5;
+        p.color/=5;
         p.sz=2;
     }
     else
     {
         p.pos = transform_unisize2(pos,grid.zw,1.);
         p.sz=1;
-        p.rgba*=3.8*(hash(qid))+.01;
+        p.color*=3.8*(hash(qid))+.01;
 
         if (qid%8==0)
         {
             p.pos=transform2(pos,grid.zw,63);
-            p.rgba*=.051;
+            p.color*=.051;
             p.sz=2;
         }
     } 

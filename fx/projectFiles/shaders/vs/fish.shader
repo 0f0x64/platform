@@ -34,8 +34,8 @@ uint star2=110;
         t=0;
      }
 
-   float y1=(grid.y-.5)*2;
-    float y2=pow((smooth(grid.y)-.5)*2,3);
+    float y1=(grid.y-.5)*2.;
+    float y2=pow((smoothf(grid.y)-.5)*2.,3.);
     float y=lerp(y1,y2,0.);
     float3 pos = float3(0,y,0);
 
@@ -80,7 +80,7 @@ uint star2=110;
     float v=15;
     float q= .5+lerp(grid.y,1-grid.y,iid%2)/2;
     q=.5+dir*(lerp(saturate((1-grid.y)*v),saturate(grid.y*v),iid%2));
-    p.rgba=.0125*float4(lerp(float3(1,0.2,0.1),float3(0.1,0.2,1),q)*(noise3(pos*1.1)*.5+.6),1);
+    p.color=.0125*float4(lerp(float3(1,0.2,0.1),float3(0.1,0.2,1),q)*(noise3(pos*1.1)*.5+.6),1);
     }
 
 
@@ -92,14 +92,14 @@ uint star2=110;
     
         p.pos = transform_unisize(pos,grid.zw,sz);
         
-        p.rgba*=17;
+        p.color*=17;
     } 
     else
     {
         float sz=14;
         p.pos = transform(pos,grid.zw,sz);
         p.sz=2;
-        p.rgba*=3;
+        p.color*=3;
     }
 
 
@@ -110,6 +110,6 @@ VS_OUTPUT_PARTICLE VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
 {
     float4 grid = getGridInst(vID,iID,gX,gY); 
     pos_color p = CalcParticles(vID,iID,grid);
-    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.rgba, p.sz};
+    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.color, p.sz};
     return output;
 }

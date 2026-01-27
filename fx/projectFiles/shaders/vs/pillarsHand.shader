@@ -94,7 +94,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     
     //color
     pos_color p;
-    p.rgba = float4(noise3_u(float3(113,115,1)*221+177+sin(pos2*.48)),1)/30.+.0015;
+    p.color = float4(noise3_u(float3(113,115,1)*221+177+sin(pos2*.48)),1)/30.+.0015;
     
        pos=rotX(pos,toRad(65));
        pos.y-=.5;
@@ -102,22 +102,22 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     if (mode==1)
     {
         p.pos=transform(pos,grid.zw,22);
-        p.rgba*=11;
+        p.color*=11;
         p.sz=172;
     }
     else
     {
-        p.rgba*=2;
+        p.color*=2;
         p.pos = transform_unisize(pos,grid.zw,1.5);
-       //p.rgba=-noise(pos*.3+12)*.04+.02;;
-       // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
+       //p.color=-noise(pos*.3+12)*.04+.02;;
+       // p.color +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
          p.sz=1;
 
          if (iid%inStars==0)
          {
               p.pos = transform_unisize(pos,grid.zw,51.5);
                p.sz=2;
-               p.rgba*=15;
+               p.color*=15;
          }else
          {
              float q=length(pos2.xyz+ofs.xyz)/4;
@@ -125,7 +125,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
              {
               p.pos = transform_unisize(pos,grid.zw,51.5);
                p.sz=2;
-               p.rgba*=15;
+               p.color*=15;
 
              }
          }
@@ -133,12 +133,12 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     
    float q=length(pos2.xyz+ofs.xyz)/4;
     //q=saturate(q);
-    p.rgba*=saturate(pow(abs(length(pos2+ofs)-q-3),2));
-    p.rgba+=saturate(1-q)*.1*lerp(float4(3,2,2,0),float4(0,0,4,0),q*2-.4);
-   p.rgba*=.2;
+    p.color*=saturate(pow(abs(length(pos2+ofs)-q-3),2));
+    p.color+=saturate(1-q)*.1*lerp(float4(3,2,2,0),float4(0,0,4,0),q*2-.4);
+   p.color*=.2;
    
     //density compensation
-    //p.rgba/=min(pow(p.pos.w,1.1)*.21+.5,11);
+    //p.color/=min(pow(p.pos.w,1.1)*.21+.5,11);
     return p;
 }
 
@@ -146,6 +146,6 @@ VS_OUTPUT_PARTICLE VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
 {
     float4 grid = getGridInst(vID,iID,gX,gY); 
     pos_color p = CalcParticles(vID,iID,grid);
-    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.rgba, p.sz};
+    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.color, p.sz};
     return output;
 }

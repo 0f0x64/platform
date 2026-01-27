@@ -367,3 +367,5 @@ FodyWeavers.xsd
 /fx/Reflector
 /fx/Editor_Release
 /fx/Editor_Debug
+Editor_Debug
+Editor_Release

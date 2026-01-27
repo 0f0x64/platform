@@ -63,31 +63,31 @@ pos_color CalcParticles(uint qid,float4 grid)
     
     //color
     pos_color p;
-    p.rgba = float4(noise3_u(a*float3(13,15,12)*221+77+sin(pos2*1.4)),1)/30.+.0015;
+    p.color = float4(noise3_u(a*float3(13,15,12)*221+77+sin(pos2*1.4)),1)/30.+.0015;
 
     if (mode==1)
     {
         p.pos=transform(pos,grid.zw,52);
-        p.rgba*=8;
+        p.color*=8;
         p.sz=172;
     }
     else
     {
         p.pos = transform_unisize(pos,grid.zw,1.5);
-    //   p.rgba+=-noise(pos*.12*float3(1,2,3)+2)*.1;;
-       // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
+    //   p.color+=-noise(pos*.12*float3(1,2,3)+2)*.1;;
+       // p.color +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
          p.sz=1;
 
          if (qid%inStars==0)
          {
               p.pos = transform_unisize(pos,grid.zw,51.5);
                p.sz=2;
-               p.rgba*=15;
+               p.color*=15;
          }
     }
    
     //density compensation
-    p.rgba/=min(pow(p.pos.w,1.1)*.21+.5,11);
+    p.color/=min(pow(p.pos.w,1.1)*.21+.5,11);
     return p;
 }
 

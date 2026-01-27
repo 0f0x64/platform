@@ -1,8 +1,8 @@
 #ifdef FINAL_RELEASE_CRINKLER
 	#define forceAdapter false
 	#define EditMode false
-	#define DebugMode false
-	#define DirectXDebugMode false
+	#define DebugMode 1//false
+	#define DirectXDebugMode 1//false
 	#define SECONDARY_DISPLAY_IF_AVAILABLE false
 #endif
 
@@ -32,7 +32,7 @@
 #define SAMPLES_IN_FRAME (SAMPLING_FREQ/FRAMES_PER_SECOND)
 #define FRAME_LEN (1000. / (float) FRAMES_PER_SECOND)
 
-#define DEMO_DURATION 35. //in seconds
+#define DEMO_DURATION 135. //in seconds
 
 //----------------------------------editor settings-----------------------------------------
 

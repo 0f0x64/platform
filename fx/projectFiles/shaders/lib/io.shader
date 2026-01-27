@@ -19,7 +19,7 @@ struct VS_OUTPUT
     float4 vnorm : NORMAL1;
     float2 uv : TEXCOORD0;
     float4 id : TEXCOORD1;
-    float4 rgba : TEXCOORD2;
+    float4 color : TEXCOORD2;
     float4 sz1 : COLOR0;
 };
 

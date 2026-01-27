@@ -104,7 +104,7 @@ float3 noise3_u(float3 p)
 struct pos_color
 {
     float4 pos;
-    float4 rgba;
+    float4 color;
     float sz;
 };
 
@@ -123,7 +123,7 @@ float3 hash3(int qid)
     return float3(hash(qid*.27),hash(qid*.28),hash(qid*.29))-.5;
 }
 
-float smooth(float x)
+float smoothf(float x)
 {
     return x + (x - (x * x * (3.0 - 2.0 * x)));
 
