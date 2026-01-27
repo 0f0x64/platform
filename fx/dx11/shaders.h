@@ -197,8 +197,10 @@ namespace Shaders {
 
 			return outText;
 		}
-#include <windows.h>
-#include <cstring>
+
+		/*
+		#include <windows.h>
+		#include <cstring>
 
 		bool CopyToClipboardANSI(const char* text) {
 			if (text == nullptr) return false;
@@ -231,7 +233,7 @@ namespace Shaders {
 
 			GlobalFree(hMem);
 			return false;
-		}
+		}*/
 
 		void CreateVS(int n, const char* shaderText)
 		{
@@ -240,8 +242,6 @@ namespace Shaders {
 			VS[n].pBlob = NULL;
 			auto ptr = processIncludes(shaderText);
 			hr = D3DCompile(ptr, strlen(ptr), NULL, NULL, NULL, "VS", VertexShaderModel, NULL, NULL, &VS[n].pBlob, &pErrorBlob);
-
-			CopyToClipboardANSI(ptr);
 
 			LogBlobIfError
 
