@@ -109,14 +109,14 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     
     //color
     pos_color p;
-    p.rgba.a=1;
-    p.rgba.rgb = noise3_u(pos*14*float3(122,1,112))/31+float3(6,2,3)/52;
+    p.color.a=1;
+    p.color.rgb = noise3_u(pos*14*float3(122,1,112))/31+float3(6,2,3)/52;
     
-    p.rgba*=.5;
-//    p.rgba*=base_color*(pow(length(pos)/16,4)+.1);
-    //p.rgba*=1+sin(grid.x*PI*8);
-    p.rgba=lerp(p.rgba,p.rgba.bgra,sin(length(pos)));
-//    p.rgba=lerp(p.rgba,base_color/144,1-saturate(pow(length(pos)/6,11)));
+    p.color*=.5;
+//    p.color*=base_color*(pow(length(pos)/16,4)+.1);
+    //p.color*=1+sin(grid.x*PI*8);
+    p.color=lerp(p.color,p.color.bgra,sin(length(pos)));
+//    p.color=lerp(p.color,base_color/144,1-saturate(pow(length(pos)/6,11)));
 
 
     if (mode==1)
@@ -125,22 +125,22 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
         s=noise(iid)*62+11;
         //s*=1.5;
         p.pos=transform(pos,grid.zw,s);
-        p.rgba*=2.;
+        p.color*=2.;
         p.sz=172;
     }
     else
     {
         p.pos = transform(pos,grid.zw,1.2);
-       //p.rgba=-noise(pos*.3+12)*.04+.02;;
-       // p.rgba +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
+       //p.color=-noise(pos*.3+12)*.04+.02;;
+       // p.color +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
          p.sz=2;
-         //p.rgba*=1.2;
+         //p.color*=1.2;
 
        /*  if (iid%inStars==0)
          {
               p.pos = transform_unisize(pos,grid.zw,75.5);
                p.sz=2;
-               p.rgba*=7;
+               p.color*=7;
          }*/
 
     }
@@ -148,33 +148,33 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
          {
               p.pos = transform(0,grid.zw,16.5);
                p.sz=2;
-               p.rgba*=(float4(5,-.1,-1,1));
-               p.rgba*=10;
+               p.color*=(float4(5,-.1,-1,1));
+               p.color*=10;
          }*/
   
    
     //density compensation
     if (mode==0)
     {
-    p.rgba*=1*saturate(p.pos.w/27);
-    //p.rgba*=0;
+    p.color*=1*saturate(p.pos.w/27);
+    //p.color*=0;
     
-    p.rgba*=-2;
-    p.rgba/=saturate(length(pos)/3);
-    p.rgba=max(p.rgba,-.03);
+    p.color*=-2;
+    p.color/=saturate(length(pos)/3);
+    p.color=max(p.color,-.03);
     }
 
     if (mode==1)
     {
-    p.rgba*=.3*saturate(21/p.pos.w);
+    p.color*=.3*saturate(21/p.pos.w);
     
-    p.rgba*=-1;
-    p.rgba*=saturate(length(pos)/52);
+    p.color*=-1;
+    p.color*=saturate(length(pos)/52);
     }
     
     
 
-   // p.rgba/=min(pow(p.pos.w,.5)*.1+1.5,5);
+   // p.color/=min(pow(p.pos.w,.5)*.1+1.5,5);
     return p;
 }
 
@@ -182,6 +182,6 @@ VS_OUTPUT_PARTICLE VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
 {
     float4 grid = getGridInst(vID,iID,gX,gY); 
     pos_color p = CalcParticles(vID,iID,grid);
-    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.rgba, p.sz};
+    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.color, p.sz};
     return output;
 }
