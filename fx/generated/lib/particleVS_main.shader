@@ -1,0 +1,1 @@
+VS_OUTPUT_PARTICLE VS(uint w:SV_VertexID,uint g:SV_InstanceID){float4 D=getGridInst(w,g,gX,gY);pos_color V=CalcParticles(g,D);return{V.pos,D.zw,V.xyzw,V.sz};}
