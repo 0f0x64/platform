@@ -1,0 +1,6 @@
+#include<../lib/constBuf.shader>
+#include<../lib/io.shader>
+#include<../lib/constants.shader>
+#include<../lib/utils.shader>
+cbuffer params:register(b0){float4x4 model;int gX;int gY;int mode;int skipper;};float toRad(float y){return y*PI/180.;}float tri(float b){return lerp(frac(b),1-frac(b),floor(frac(b/2)*2));}pos_color CalcParticles(uint y,uint b,float4 f){uint i=110;y*=skipper;float s=time.x*.004;i=10000;if(mode==1||b%i==0)s=0;s=(f.y-.5)*2.;float r=pow((smoothf(f.y)-.5)*2.,3.);r=lerp(s,r,0.);float3 t=float3(0,r,0);t.z=0;r=pow(sin(abs(f.y-.5)*PI*2)/9+.1,3)*72;float e=time.x;s=sign(s)*(b%2-.5);t=rotZ(t,t.y*sign(t.y)*7.85);t.x+=b%2*2;t=t.yzx*4;t.z-=4;float3 x=noise3(t*4)*length(t)*.1-.5;float m=f.y;x+=float3(m/12.,m/22.,m/14.)*5134;t+=noise3(x*.2+e.x*.15*s)*r*.51;t+=noise3(f.xyy*8+s*e.x*0.*b/41111.)*2.3*r;pos_color g;{float z=b%2-.5,P=15;z=(lerp(f.y,1-f.y,b%2),.5+z*lerp(saturate((1-f.y)*P),saturate(f.y*P),b%2));g.color=.0125*float4(lerp(float3(1,.2,.1),float3(.1,.2,1),z)*(noise3(t*1.1)*.5+.6),1);}if(mode==0){float s=1.2;g.sz=1;g.pos=transform_unisize(t,f.zw,s);g.color*=17;}else{float s=14;g.pos=transform(t,f.zw,s);g.sz=2;g.color*=3;}return g;}
+#include<../lib/particleVS_main2.shader>

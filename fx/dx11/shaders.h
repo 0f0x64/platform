@@ -197,6 +197,41 @@ namespace Shaders {
 
 			return outText;
 		}
+#include <windows.h>
+#include <cstring>
+
+		bool CopyToClipboardANSI(const char* text) {
+			if (text == nullptr) return false;
+
+			// 1. Calculate length and allocate global memory
+			size_t len = strlen(text) + 1;
+			HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
+			if (!hMem) return false;
+
+			// 2. Lock memory and copy the C-string
+			void* pLock = GlobalLock(hMem);
+			if (pLock) {
+				memcpy(pLock, text, len);
+				GlobalUnlock(hMem);
+			}
+			else {
+				GlobalFree(hMem);
+				return false;
+			}
+
+			// 3. Open clipboard and set data
+			if (OpenClipboard(NULL)) {
+				EmptyClipboard();
+				if (SetClipboardData(CF_TEXT, hMem) == NULL) {
+					GlobalFree(hMem); // Free only if SetClipboardData fails
+				}
+				CloseClipboard();
+				return true;
+			}
+
+			GlobalFree(hMem);
+			return false;
+		}
 
 		void CreateVS(int n, const char* shaderText)
 		{
@@ -206,7 +241,9 @@ namespace Shaders {
 			auto ptr = processIncludes(shaderText);
 			hr = D3DCompile(ptr, strlen(ptr), NULL, NULL, NULL, "VS", VertexShaderModel, NULL, NULL, &VS[n].pBlob, &pErrorBlob);
 
-			LogBlobIfError;
+			CopyToClipboardANSI(ptr);
+
+			LogBlobIfError
 
 			if (hr == S_OK)
 			{

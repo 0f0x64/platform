@@ -21,7 +21,7 @@ float toRad(float a)
 float2 random2( float2 p ) {
     return frac(sin(float2(dot(p,float2(127.1,311.7)),dot(p,float2(269.5,183.3))))*43758.5453);
 }
-
+//[
 float cellnoise(float2 p)
 {
     float2 st = p;
@@ -62,6 +62,7 @@ float cellnoise(float2 p)
     color += m_dist;
     return color.x;
 }
+//]
 
 float2 toPolar(float2 pos)
 {
@@ -196,10 +197,4 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     return p;
 }
 
-VS_OUTPUT_PARTICLE VS(uint vID : SV_VertexID,uint iID : SV_InstanceID)
-{
-    float4 grid = getGridInst(vID,iID,gX,gY); 
-    pos_color p = CalcParticles(vID,iID,grid);
-    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.color, p.sz};
-    return output;
-}
+#include <../lib/particleVS_main2.shader>

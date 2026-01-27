@@ -11,6 +11,7 @@ Global
 		Editor_Release_Debug|x86 = Editor_Release_Debug|x86
 		Editor_Release|x86 = Editor_Release|x86
 		Reflector|x86 = Reflector|x86
+		Release_no_minifier|x86 = Release_no_minifier|x86
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
@@ -21,6 +22,8 @@ Global
 		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Editor_Release|x86.Build.0 = Editor_Release|Win32
 		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Reflector|x86.ActiveCfg = Reflector|Win32
 		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Reflector|x86.Build.0 = Reflector|Win32
+		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release_no_minifier|x86.ActiveCfg = Release_no_minifier|Win32
+		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release_no_minifier|x86.Build.0 = Release_no_minifier|Win32
 		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release|x86.ActiveCfg = Release|Win32
 		{6F404B08-B1DB-4EAF-B14C-941C4C032963}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection

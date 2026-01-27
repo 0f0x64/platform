@@ -22,17 +22,17 @@ namespace dx11
 
 	#if DebugMode | EditMode
 
-		void Log(const char* message)
+		void Log(const char* message, const char* title = NULL)
 		{
 			#if EditMode
 				OutputDebugString(message);
 			#else	
-				MessageBox(hWnd, message, "", MB_OK);
+			MessageBox(hWnd, message, title , MB_OK);
 			#endif	
 		}
 
 		#define LogIfError(text)  if (FAILED(hr)) { Log("CreateTexture2D error\n"); return; } 
-		#define LogBlobIfError if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer()); }
+		#define LogBlobIfError if (FAILED(hr)) { char title[10];_itoa(n,title,10); Log((char*)pErrorBlob->GetBufferPointer(), title); }
 
 	#else
 		
