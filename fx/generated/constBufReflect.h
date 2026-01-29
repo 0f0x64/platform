@@ -591,6 +591,86 @@ context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[24].params);
 
 }
 
+namespace vs{
+
+struct { 
+
+struct 
+{
+float4 pos_size[256];
+} params;
+
+void set () {
+Shaders::vShader(25);
+context->UpdateSubresource(dx11::Shaders::VS[25].params, 0, NULL, &params, 0, 0);
+context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[25].params);
+}
+
+} box;
+
+}
+
+namespace vs{
+
+struct { 
+
+struct 
+{
+float width;
+float height;
+float2 padding;
+float4 pos_size[256];
+} params;
+
+void set () {
+Shaders::vShader(26);
+context->UpdateSubresource(dx11::Shaders::VS[26].params, 0, NULL, &params, 0, 0);
+context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[26].params);
+}
+
+} letter;
+
+}
+
+namespace vs{
+
+struct { 
+
+struct 
+{
+float4 position [4000];
+} params;
+
+void set () {
+Shaders::vShader(27);
+context->UpdateSubresource(dx11::Shaders::VS[27].params, 0, NULL, &params, 0, 0);
+context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[27].params);
+}
+
+} lineDrawer;
+
+}
+
+namespace vs{
+
+struct { 
+
+struct 
+{
+float4x4 model;
+float4 position [4000];
+} params;
+
+void set () {
+Shaders::vShader(28);
+context->UpdateSubresource(dx11::Shaders::VS[28].params, 0, NULL, &params, 0, 0);
+context->VSSetConstantBuffers(0, 1, &dx11::Shaders::VS[28].params);
+}
+
+} lineDrawer3d;
+
+}
+
 namespace ps{
 
 struct { 
@@ -775,6 +855,111 @@ Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1Addre
 }
 
 } output;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+float _aspect;
+float rad;
+float r;
+float g;
+float b;
+float a;
+float soft;
+float edge;
+float outlineBrightness;
+float progress;
+float signed_progress;
+float slider_type;
+} params;
+
+void set () {
+Shaders::pShader(8);
+context->UpdateSubresource(dx11::Shaders::PS[8].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[8].params);
+}
+
+} box_ps;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+float r;
+float g;
+float b;
+float a;
+float bold;
+} params;
+
+struct 
+{
+texture tex;
+} textures;
+
+struct 
+{
+filter s1Filter;
+addr s1AddressU;
+addr s1AddressV;
+} samplers;
+
+void set () {
+Shaders::pShader(9);
+context->UpdateSubresource(dx11::Shaders::PS[9].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[9].params);
+Textures::TextureToShader((texture)textures.tex, 0, targetshader::pixel); 
+Sampler::Sampler(targetshader::pixel, 0, samplers.s1Filter, samplers.s1AddressU, samplers.s1AddressV); 
+}
+
+} letter_ps;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+float4 color;
+} params;
+
+void set () {
+Shaders::pShader(10);
+context->UpdateSubresource(dx11::Shaders::PS[10].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[10].params);
+}
+
+} lineDrawerUV_ps;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+float4 color;
+} params;
+
+void set () {
+Shaders::pShader(11);
+context->UpdateSubresource(dx11::Shaders::PS[11].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[11].params);
+}
+
+} lineDrawer_ps;
 
 }
 

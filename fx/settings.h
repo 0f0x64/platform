@@ -27,6 +27,15 @@
 	#define vsWindowManagement true
 #endif
 
+#ifdef RELEASE_STANDART
+	#define forceAdapter false
+	#define EditMode false
+	#define DebugMode true
+	#define DirectXDebugMode true
+	#define SECONDARY_DISPLAY_IF_AVAILABLE false
+#endif
+
+
 #define FRAMES_PER_SECOND 60
 #define SAMPLING_FREQ 44100
 #define SAMPLES_IN_FRAME (SAMPLING_FREQ/FRAMES_PER_SECOND)

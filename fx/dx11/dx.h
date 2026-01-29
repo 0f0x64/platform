@@ -31,7 +31,7 @@ namespace dx11
 			#endif	
 		}
 
-		#define LogIfError(text)  if (FAILED(hr)) { Log("CreateTexture2D error\n"); return; } 
+		#define LogIfError(text)  if (FAILED(hr)) { Log(text); return; } 
 		#define LogBlobIfError if (FAILED(hr)) { char title[10];_itoa(n,title,10); Log((char*)pErrorBlob->GetBufferPointer(), title); }
 
 	#else

@@ -348,5 +348,8 @@
     <None Include="projectFiles\shaders\vs\Virgo.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
+    <None Include="projectFiles\shaders\lib\particleVS_main2.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
   </ItemGroup>
 </Project>
