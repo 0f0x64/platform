@@ -60,9 +60,10 @@ namespace Device
 				.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT,
 				.BufferCount = 2,
 				.OutputWindow = hWnd,
-				.Windowed = EditMode,
-				.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL,
-				.Flags = 0
+				.Windowed = true,//EditMode,
+				.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
+				//.Flags = 0
+				.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
 		};
 
 #if forceAdapter

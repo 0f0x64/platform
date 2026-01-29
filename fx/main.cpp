@@ -115,9 +115,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	width = GetSystemMetrics(SM_CXSCREEN);
 	height = GetSystemMetrics(SM_CYSCREEN);
 	HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
-	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL};
+#if EditMode
+	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
 	RegisterClassEx(&wcex);
 	hWnd = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_OVERLAPPEDWINDOW, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
+#else
+	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
+	RegisterClassEx(&wcex);
+	hWnd = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_POPUP | WS_VISIBLE, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
+#endif
 	
 	ShowCursor(EditMode);
 
@@ -160,7 +166,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 		#else
 
-			PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
+			// Проверяем сообщения Windows
+			if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+				continue;
+			}
+
+			//PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
 			if (GetAsyncKeyState(VK_ESCAPE) || timer::frameBeginTime / 1000. > DEMO_DURATION)
 			{
 				break;
@@ -187,18 +200,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 #else
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
-	case WM_CLOSE:
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	switch (message) {
+	case WM_DESTROY:
 		PostQuitMessage(0);
-		break;
+		return 0;
+	case WM_KEYDOWN:
+		if (wParam == VK_ESCAPE) DestroyWindow(hWnd); // Выход по Esc
+		return 0;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
-
-	return 0;
 }
 
 #endif

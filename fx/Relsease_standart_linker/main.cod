@@ -244,7 +244,7 @@ PUBLIC	??_C@_0CNB@NMOHKIGI@?6?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shad@ ; `stri
 PUBLIC	?space@shadersData@Shaders@dx11@@3PBDB		; dx11::Shaders::shadersData::space
 PUBLIC	??_C@_0HAA@NPEMPPIC@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; `string'
 PUBLIC	?Tau@shadersData@Shaders@dx11@@3PBDB		; dx11::Shaders::shadersData::Tau
-PUBLIC	??_C@_0KDP@CJEPBACK@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; `string'
+PUBLIC	??_C@_0KPJ@CKJAKIIE@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; `string'
 PUBLIC	?transporter@shadersData@Shaders@dx11@@3PBDB	; dx11::Shaders::shadersData::transporter
 PUBLIC	??_C@_0BAEK@BHDLOMKP@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; `string'
 PUBLIC	?tree@shadersData@Shaders@dx11@@3PBDB		; dx11::Shaders::shadersData::tree
@@ -1755,9 +1755,9 @@ CONST	SEGMENT
 	DB	'w,1.1)*.1+1.5,5)/4;', 0aH, '    return p;', 0aH, '}', 0aH, 0aH
 	DB	'#include <../lib/particleVS_main2.shader>', 0aH, 00H ; `string'
 CONST	ENDS
-;	COMDAT ??_C@_0KDP@CJEPBACK@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@
+;	COMDAT ??_C@_0KPJ@CKJAKIIE@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@
 CONST	SEGMENT
-??_C@_0KDP@CJEPBACK@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ DB '#inc'
+??_C@_0KPJ@CKJAKIIE@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ DB '#inc'
 	DB	'lude <../lib/constBuf.shader>', 0aH, '#include <../lib/io.sha'
 	DB	'der>', 0aH, '#include <../lib/constants.shader>', 0aH, '#incl'
 	DB	'ude <../lib/utils.shader>', 0aH, 0aH, 'cbuffer params : regis'
@@ -1768,53 +1768,56 @@ CONST	SEGMENT
 	DB	'}', 0aH, 0aH, 'float smin(float a, float b, float k) {', 0aH, ' '
 	DB	'   float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0);', 0aH, ' '
 	DB	'   return lerp(b, a, h) - k * h * (1.0 - h);', 0aH, '}', 0aH, 0aH
-	DB	'float3 pillar(uint qid,uint iid,float2 grid,float a1, float t'
-	DB	', float h1)', 0aH, '{', 0aH, '    float3 hs = float3(hash(iid'
-	DB	'/200.),hash(iid/140.),hash(iid/120.))-.5;', 0aH, '    float s'
-	DB	'=10;', 0aH, '    float3 pos;', 0aH, '    pos.xz=normalize(hs.'
-	DB	'xz)*s*(1-.5*cos(hs.y*PI));;', 0aH, '    pos.y=hs.y*s;', 0aH, ' '
-	DB	'   pos.xz*=cos(pos.y/PI);', 0aH, '    pos*=3;', 0aH, '    flo'
-	DB	'at sg=sign(iid%2-.5);', 0aH, '    ', 0aH, '    //pos+=noise3('
-	DB	'pos/2);', 0aH, '    //pos=rotY(pos,length(pos.xz)+time.x/124*'
-	DB	'sg);', 0aH, '    //pos+=noise3(pos/3);', 0aH, '    pos.x+=s*1'
-	DB	'.5;', 0aH, '    pos.x*=sg;', 0aH, '    ', 0aH, '    ', 0aH, ' '
-	DB	'   pos.xz=lerp(pos.xz,pos.xz*float2(-1,1),pow(5/length(pos.xz'
-	DB	'),8));', 0aH, '    //pos.y-=pow(pos.y/3.8,6);', 0aH, '    //p'
-	DB	'os.y/=1-pos.y;', 0aH, '    //pos+=log(pos);', 0aH, '    ', 0aH
-	DB	'   ', 0aH, '    ', 0aH, 0aH, '       ', 0aH, '    return pos/'
-	DB	'5;', 0aH, '}', 0aH, 0aH, 0aH, 0aH, 'pos_color CalcParticles(u'
-	DB	'int qid,uint iid,float4 grid)', 0aH, '{', 0aH, '     qid *= s'
-	DB	'kipper;', 0aH, '     float t=time.x*.004;', 0aH, '     uint i'
-	DB	'nStars = 3623;', 0aH, '     if (mode==1||iid%inStars==0)', 0aH
-	DB	'     {', 0aH, '        t=0;', 0aH, '     }', 0aH, 0aH, '    /'
-	DB	'/pillars instances', 0aH, 0aH, 0aH, '    //calc', 0aH, '    f'
-	DB	'loat3 pos = pillar(qid,iid,grid.xy,0,t,0);', 0aH, '    float3'
-	DB	' pos2=pos;', 0aH, '    ', 0aH, '    //scatter', 0aH, '    ', 0aH
-	DB	'    //color', 0aH, '    pos_color p;', 0aH, '    p.color = fl'
-	DB	'oat4(noise3_u(111+float3(113,11,111)*221+177+sin(pos2*.48)),1'
-	DB	')/90.+.015;', 0aH, '    //p.color*=base_color/3;', 0aH, '    '
-	DB	'//p.color=lerp(p.color,p.color.bgra,.25+.5*sin(length(pos.y)*'
-	DB	'2));', 0aH, '    //p.color=lerp(p.color,p.color.grba,.5+.5*co'
-	DB	's(length(pos)*1.01+2));', 0aH, '    //p.color.g+=.003;', 0aH, ' '
-	DB	'   if (mode==1)', 0aH, '    {', 0aH, '        float s=hash(ii'
-	DB	'd)*33+11;', 0aH, '        //s*=1.5;', 0aH, '        p.pos=tra'
-	DB	'nsform(pos,grid.zw,s);', 0aH, '        p.color*=0;', 0aH, '  '
-	DB	'      p.sz=172;', 0aH, '    }', 0aH, '    else', 0aH, '    {', 0aH
-	DB	'        p.pos = transform_unisize(pos,grid.zw,1.75);', 0aH, ' '
-	DB	'      //p.color=-noise(pos*.3+12)*.04+.02;;', 0aH, '       //'
-	DB	' p.color +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;', 0aH, ' '
-	DB	'        p.sz=1;', 0aH, '         p.color*=1.2;', 0aH, 0aH, ' '
-	DB	'        if (iid%inStars==0)', 0aH, '         {', 0aH, '      '
-	DB	'        p.pos = transform_unisize(pos,grid.zw,31.5);', 0aH, ' '
-	DB	'              p.sz=2;', 0aH, '               p.color*=23;', 0aH
-	DB	'         }', 0aH, 0aH, '    }', 0aH, '      /*    if (iid==0)'
-	DB	0aH, '         {', 0aH, '              p.pos = transform(0,gri'
-	DB	'd.zw,16.5);', 0aH, '               p.sz=2;', 0aH, '          '
-	DB	'     p.color*=(float4(5,-.1,-1,1));', 0aH, '               p.'
-	DB	'color*=10;', 0aH, '         }*/', 0aH, '  ', 0aH, '   ', 0aH, ' '
-	DB	'   //density compensation', 0aH, '    //p.color/=min(pow(p.po'
-	DB	's.w,1.1)*.21+.5,11);', 0aH, '    return p;', 0aH, '}', 0aH, 0aH
-	DB	'#include <../lib/particleVS_main2.shader>', 0aH, 00H ; `string'
+	DB	'float3 hash33(float3 p)', 0aH, '{', 0aH, '    return float3(h'
+	DB	'ash(p.x),hash(p.y),hash(p.z))-.5;', 0aH, '}', 0aH, 0aH, 'floa'
+	DB	't3 hash31(float p) {', 0aH, '   float3 p3 = frac(p * float3(.'
+	DB	'1031, .1030, .0973));', 0aH, '   p3 += dot(p3, p3.yzx + 33.33'
+	DB	');', 0aH, '   return frac((p3.xxy + p3.yzz) * p3.zyx); ', 0aH
+	DB	'}', 0aH, 0aH, 'pos_color CalcParticles(uint qid,uint iid,floa'
+	DB	't4 grid)', 0aH, '{', 0aH, 0aH, 'float4 _ColorHot = float4(1.0'
+	DB	', 0.9, 0.7,1);', 0aH, 'float4 _ColorCold = float4( 0.1, 0.0, '
+	DB	'0.4,1);', 0aH, 0aH, 'float form=smoothstep(0,1,smoothstep(0,1'
+	DB	',.5+.5*sin(time.x/32)));', 0aH, 0aH, 'float3 pos;', 0aH, '   '
+	DB	' pos_color p1;', 0aH, 0aH, '    uint inStars = 9623;', 0aH, ' '
+	DB	'   float t = time.x * 1.;', 0aH, ' ', 0aH, '    // if (iid%in'
+	DB	'Stars==0)', 0aH, '         {', 0aH, '             t=0;', 0aH, ' '
+	DB	'        }', 0aH, '    float4 a = float4(1.4 + sin(t*0.1)*0.1,'
+	DB	' -2.3, 2.4, -2.1 + cos(t*0.15)*0.1);', 0aH, '    float4 b = f'
+	DB	'loat4(0.8, -1.2 + sin(t*0.2)*0.05, 1.3, -1.5);', 0aH, 0aH, ' '
+	DB	'   float3 p = hash31((float)iid * 0.123) -.5;', 0aH, '    p=n'
+	DB	'ormalize(p)/1.5;', 0aH, '    float3 p_prev = p;', 0aH, '    ', 0aH
+	DB	'    for (int i = 0; i < 18; i++) {', 0aH, '        p_prev = p'
+	DB	';', 0aH, '        float3 next = noise3(p*8+22+a/b+(time.x/32)'
+	DB	'*0);', 0aH, '        ', 0aH, '        p -=next/(i+1)*(1-form)'
+	DB	';', 0aH, '        //p=rot3(p,p*3*(1-form));', 0aH, '        p'
+	DB	'=lerp(p,rot3(p,p*3),(1-form));', 0aH, '        p+=(rot3(p-p/2'
+	DB	',p*3)+p/2)/11*form;', 0aH, '        p += next/(i+1)*form;', 0aH
+	DB	0aH, 0aH, '    }', 0aH, '    ', 0aH, '    p+=noise3(p*11+(time'
+	DB	'.x/32))/14;', 0aH, 0aH, '    float delta = length(p - p_prev)'
+	DB	'*1;', 0aH, '    float heat = exp(-delta * 10); ', 0aH, 0aH, ' '
+	DB	'   p*=12;', 0aH, '    //p=rotZ(p,toRad(90)*(1-form))*4;', 0aH
+	DB	'    //p=rotZ(p,toRad(90)*(form));', 0aH, '    p=p.zxy*lerp(14'
+	DB	',6,form);', 0aH, 0aH, '    float3 jitter = (hash31((float)iid'
+	DB	') - 0.5) * 0.02;', 0aH, '    p += jitter/(pow(length(p),2)+.1'
+	DB	')*172;', 0aH, 0aH, '    float3 nebulaColor = lerp(_ColorCold.'
+	DB	'rgb, _ColorHot.rgb, pow(heat, 3.0));', 0aH, '    p1.color = f'
+	DB	'loat4(nebulaColor, 1);', 0aH, 0aH, '    pos=p;', 0aH, '    ', 0aH
+	DB	0aH, '     qid *= skipper;', 0aH, '     t=time.x*.004;', 0aH, 0aH
+	DB	'     if (mode==1||iid%inStars==0)', 0aH, '     {', 0aH, '    '
+	DB	'    t=0;', 0aH, '     }', 0aH, 0aH, '    if (mode==0)    ', 0aH
+	DB	'    {', 0aH, '         if (iid%inStars==0)', 0aH, '         {'
+	DB	0aH, '              p1.pos = transform(pos,grid.zw,75.5);', 0aH
+	DB	'              p1.sz=1.2;', 0aH, '              p1.color*=2;', 0aH
+	DB	'              p1.color*=lerp(0.03,1,form);', 0aH, '         }'
+	DB	0aH, '         else{', 0aH, '            p1.pos = transform_un'
+	DB	'isize(pos,grid.zw,2.);', 0aH, '            p1.sz=1.2;', 0aH, ' '
+	DB	'        }', 0aH, 0aH, '    }', 0aH, '    else', 0aH, '    {', 0aH
+	DB	'        p1.pos = transform(pos,grid.zw,121.2);', 0aH, '      '
+	DB	'  p1.color*=.01;', 0aH, '        p1.sz=1.2;', 0aH, '        p'
+	DB	'1.color*=lerp(0.03,1,form);', 0aH, 0aH, '    }', 0aH, 0aH, ' '
+	DB	'   //density compensation', 0aH, '    //p1.color/=min(pow(p1.'
+	DB	'pos.w,1.1)*.21+.5,11);', 0aH, '    return p1;', 0aH, '}', 0aH
+	DB	0aH, '#include <../lib/particleVS_main2.shader>', 0aH, 00H ; `string'
 CONST	ENDS
 ;	COMDAT ??_C@_0HAA@NPEMPPIC@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@
 CONST	SEGMENT
@@ -3278,7 +3281,7 @@ _DATA	SEGMENT
 ?scorpBall@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0PJB@DFFJMNHE@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::scorpBall
 ?simpleCube@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0CNB@NMOHKIGI@?6?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shad@ ; dx11::Shaders::shadersData::simpleCube
 ?space@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0HAA@NPEMPPIC@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::space
-?Tau@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0KDP@CJEPBACK@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::Tau
+?Tau@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0KPJ@CKJAKIIE@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::Tau
 ?transporter@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0BAEK@BHDLOMKP@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::transporter
 ?tree@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0NDB@GPGGGAGO@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::tree
 ?Virgo@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0BFLK@EMLDHGBJ@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::Virgo
@@ -4557,11 +4560,14 @@ EXTRN	__imp__Sleep@4:PROC
 EXTRN	__imp__ExitProcess@4:PROC
 EXTRN	__imp__GetModuleHandleA@4:PROC
 EXTRN	__imp__CreateSolidBrush@4:PROC
+EXTRN	__imp__TranslateMessage@4:PROC
+EXTRN	__imp__DispatchMessageA@4:PROC
 EXTRN	__imp__PeekMessageA@20:PROC
 EXTRN	__imp__DefWindowProcA@16:PROC
 EXTRN	__imp__PostQuitMessage@4:PROC
 EXTRN	__imp__RegisterClassExA@4:PROC
 EXTRN	__imp__CreateWindowExA@48:PROC
+EXTRN	__imp__DestroyWindow@4:PROC
 EXTRN	__imp__ShowWindow@8:PROC
 EXTRN	__imp__GetAsyncKeyState@4:PROC
 EXTRN	__imp__GetSystemMetrics@4:PROC
@@ -5447,15 +5453,15 @@ $LN2@scene1:
 ; 130  : 		//Object::Twins({ .quality = 1 });
 ; 131  : 		//Object::LeoBigStar({ .quality = 1 });
 ; 132  : 		//Object::Capri({ .quality = 1 });
-; 133  : 		//Object::Taurus({ .quality = 1 });
-; 134  : 		//Object::Scorpio({ .quality = 1 });
-; 135  : 		//Object::Aries({ .quality = 1 });
-; 136  : 		Object::Virgo({ .quality = 1 });
+; 133  : 		Object::Taurus({ .quality = 1 });
 
   0005b	6a 01		 push	 1
-  0005d	e8 00 00 00 00	 call	 ?Virgo@Object@@YAXUVirgo_params@1@@Z ; Object::Virgo
+  0005d	e8 00 00 00 00	 call	 ?Taurus@Object@@YAXUTaurus_params@1@@Z ; Object::Taurus
   00062	83 c4 18	 add	 esp, 24			; 00000018H
 
+; 134  : 		//Object::Scorpio({ .quality = 1 });
+; 135  : 		//Object::Aries({ .quality = 1 });
+; 136  : 		//Object::Virgo({ .quality = 1 });
 ; 137  : 
 ; 138  : 		Compose();
 
@@ -15768,18 +15774,19 @@ _sd$ = -60						; size = 60
   00024	59		 pop	 ecx
 
 ; 62   : 				.OutputWindow = hWnd,
-; 63   : 				.Windowed = EditMode,
-; 64   : 				.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL,
-; 65   : 				.Flags = 0
-; 66   : 		};
-; 67   : 
-; 68   : #if forceAdapter
-; 69   : 		hr = D3D11CreateDeviceAndSwapChain(vAdapters[adapterNum], D3D_DRIVER_TYPE_UNKNOWN, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
-; 70   : 		Log("using ");
-; 71   : 		Log(adaptersNames[adapterNum].c_str());
-; 72   : 		Log("\n");
-; 73   : #else
-; 74   : 		hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
+; 63   : 				.Windowed = true,//EditMode,
+; 64   : 				.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
+; 65   : 				//.Flags = 0
+; 66   : 				.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH
+; 67   : 		};
+; 68   : 
+; 69   : #if forceAdapter
+; 70   : 		hr = D3D11CreateDeviceAndSwapChain(vAdapters[adapterNum], D3D_DRIVER_TYPE_UNKNOWN, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
+; 71   : 		Log("using ");
+; 72   : 		Log(adaptersNames[adapterNum].c_str());
+; 73   : 		Log("\n");
+; 74   : #else
+; 75   : 		hr = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, DirectXDebugMode ? D3D11_CREATE_DEVICE_DEBUG : 0, 0, 0, D3D11_SDK_VERSION, &sd, &swapChain, &device, NULL, &context);
 
   00025	68 00 00 00 00	 push	 OFFSET ?context@dx11@@3PAUID3D11DeviceContext@1@A ; dx11::context
   0002a	56		 push	 esi
@@ -15817,14 +15824,14 @@ _sd$ = -60						; size = 60
   00089	c7 45 e8 20 00
 	00 00		 mov	 DWORD PTR _sd$[ebp+36], 32 ; 00000020H
   00090	89 4d ec	 mov	 DWORD PTR _sd$[ebp+40], ecx
-  00093	89 75 f4	 mov	 DWORD PTR _sd$[ebp+48], esi
-  00096	c7 45 f8 03 00
-	00 00		 mov	 DWORD PTR _sd$[ebp+52], 3
-  0009d	89 75 fc	 mov	 DWORD PTR _sd$[ebp+56], esi
+  00093	89 55 f4	 mov	 DWORD PTR _sd$[ebp+48], edx
+  00096	c7 45 f8 04 00
+	00 00		 mov	 DWORD PTR _sd$[ebp+52], 4
+  0009d	89 4d fc	 mov	 DWORD PTR _sd$[ebp+56], ecx
   000a0	e8 00 00 00 00	 call	 _D3D11CreateDeviceAndSwapChain@48
 
-; 75   : #endif
-; 76   : 		LogIfError("device not created\n");
+; 76   : #endif
+; 77   : 		LogIfError("device not created\n");
 
   000a5	85 c0		 test	 eax, eax
   000a7	79 0f		 jns	 SHORT $LN2@Init
@@ -15832,8 +15839,8 @@ _sd$ = -60						; size = 60
   000aa	68 00 00 00 00	 push	 OFFSET ??_C@_0BE@DGIFHACE@device?5not?5created?6@
 $LN9@Init:
 
-; 86   : 
-; 87   : 	}
+; 87   : 
+; 88   : 	}
 
   000af	e8 00 00 00 00	 call	 ?Log@dx11@@YAXPBD0@Z	; dx11::Log
   000b4	59		 pop	 ecx
@@ -15841,9 +15848,9 @@ $LN9@Init:
   000b6	eb 58		 jmp	 SHORT $LN1@Init
 $LN2@Init:
 
-; 77   : 
-; 78   : 		Textures::Texture[0].pTexture = NULL;
-; 79   : 		hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&Textures::Texture[0].pTexture);
+; 78   : 
+; 79   : 		Textures::Texture[0].pTexture = NULL;
+; 80   : 		hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&Textures::Texture[0].pTexture);
 
   000b8	8b 0d 00 00 00
 	00		 mov	 ecx, DWORD PTR ?swapChain@dx11@@3PAUIDXGISwapChain@1@A ; dx11::swapChain
@@ -15856,7 +15863,7 @@ $LN2@Init:
   000d1	51		 push	 ecx
   000d2	ff 50 24	 call	 DWORD PTR [eax+36]
 
-; 80   : 		LogIfError("swapchain error\n");
+; 81   : 		LogIfError("swapchain error\n");
 
   000d5	85 c0		 test	 eax, eax
   000d7	79 08		 jns	 SHORT $LN3@Init
@@ -15865,8 +15872,8 @@ $LN2@Init:
   000df	eb ce		 jmp	 SHORT $LN9@Init
 $LN3@Init:
 
-; 81   : 
-; 82   : 		hr = device->CreateRenderTargetView(Textures::Texture[0].pTexture, NULL, &Textures::Texture[0].RenderTargetView[0][0]);
+; 82   : 
+; 83   : 		hr = device->CreateRenderTargetView(Textures::Texture[0].pTexture, NULL, &Textures::Texture[0].RenderTargetView[0][0]);
 
   000e1	8b 0d 00 00 00
 	00		 mov	 ecx, DWORD PTR ?device@dx11@@3PAUID3D11Device@1@A ; dx11::device
@@ -15878,7 +15885,7 @@ $LN3@Init:
   000f5	51		 push	 ecx
   000f6	ff 50 24	 call	 DWORD PTR [eax+36]
 
-; 83   : 		LogIfError("rt not created\n");
+; 84   : 		LogIfError("rt not created\n");
 
   000f9	85 c0		 test	 eax, eax
   000fb	79 08		 jns	 SHORT $LN4@Init
@@ -15887,8 +15894,8 @@ $LN3@Init:
   00103	eb aa		 jmp	 SHORT $LN9@Init
 $LN4@Init:
 
-; 84   : 
-; 85   : 		Textures::Texture[0].pTexture->Release();
+; 85   : 
+; 86   : 		Textures::Texture[0].pTexture->Release();
 
   00105	a1 00 00 00 00	 mov	 eax, DWORD PTR ?Texture@Textures@dx11@@3PAU<unnamed-type-Texture>@12@A
   0010a	50		 push	 eax
@@ -15897,8 +15904,8 @@ $LN4@Init:
 $LN1@Init:
   00110	5e		 pop	 esi
 
-; 86   : 
-; 87   : 	}
+; 87   : 
+; 88   : 	}
 
   00111	c9		 leave
   00112	c3		 ret	 0
@@ -21339,46 +21346,61 @@ _wParam$ = 16						; size = 4
 _lParam$ = 20						; size = 4
 ?WndProc@@YGJPAUHWND__@@IIJ@Z PROC			; WndProc, COMDAT
 
-; 191  : {
+; 203  : LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
 
-; 192  : 	switch (message)
+; 204  : 	switch (message) {
 
-  00003	83 7d 0c 10	 cmp	 DWORD PTR _message$[ebp], 16 ; 00000010H
-  00007	74 07		 je	 SHORT $LN4@WndProc
+  00003	8b 45 0c	 mov	 eax, DWORD PTR _message$[ebp]
+  00006	48		 dec	 eax
+  00007	83 e8 01	 sub	 eax, 1
+  0000a	74 1f		 je	 SHORT $LN4@WndProc
+  0000c	2d fe 00 00 00	 sub	 eax, 254		; 000000feH
+  00011	74 07		 je	 SHORT $LN5@WndProc
 
-; 202  : }
+; 213  : 	}
+; 214  : }
 
-  00009	5d		 pop	 ebp
+  00013	5d		 pop	 ebp
 
-; 196  : 		break;
-; 197  : 	default:
-; 198  : 		return DefWindowProc(hWnd, message, wParam, lParam);
+; 211  : 	default:
+; 212  : 		return DefWindowProc(hWnd, message, wParam, lParam);
 
-  0000a	ff 25 00 00 00
+  00014	ff 25 00 00 00
 	00		 jmp	 DWORD PTR __imp__DefWindowProcA@16
+$LN5@WndProc:
+
+; 207  : 		return 0;
+; 208  : 	case WM_KEYDOWN:
+; 209  : 		if (wParam == VK_ESCAPE) DestroyWindow(hWnd); // Выход по Esc
+
+  0001a	83 7d 10 1b	 cmp	 DWORD PTR _wParam$[ebp], 27 ; 0000001bH
+  0001e	75 13		 jne	 SHORT $LN6@WndProc
+  00020	ff 75 08	 push	 DWORD PTR _hWnd$[ebp]
+  00023	ff 15 00 00 00
+	00		 call	 DWORD PTR __imp__DestroyWindow@4
+
+; 210  : 		return 0;
+
+  00029	eb 08		 jmp	 SHORT $LN6@WndProc
 $LN4@WndProc:
 
-; 193  : 	{
-; 194  : 	case WM_CLOSE:
-; 195  : 		PostQuitMessage(0);
+; 205  : 	case WM_DESTROY:
+; 206  : 		PostQuitMessage(0);
 
-  00010	6a 00		 push	 0
-  00012	ff 15 00 00 00
+  0002b	6a 00		 push	 0
+  0002d	ff 15 00 00 00
 	00		 call	 DWORD PTR __imp__PostQuitMessage@4
+$LN6@WndProc:
 
-; 199  : 	}
-; 200  : 
-; 201  : 	return 0;
+; 213  : 	}
+; 214  : }
 
-  00018	33 c0		 xor	 eax, eax
-
-; 202  : }
-
-  0001a	5d		 pop	 ebp
-  0001b	c2 10 00	 ret	 16			; 00000010H
+  00033	33 c0		 xor	 eax, eax
+  00035	5d		 pop	 ebp
+  00036	c2 10 00	 ret	 16			; 00000010H
 ?WndProc@@YGJPAUHWND__@@IIJ@Z ENDP			; WndProc
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -21430,7 +21452,12 @@ _WinMain@16 PROC					; COMDAT
   0002f	ff 15 00 00 00
 	00		 call	 DWORD PTR __imp__CreateSolidBrush@4
 
-; 118  : 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL};
+; 118  : #if EditMode
+; 119  : 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
+; 120  : 	RegisterClassEx(&wcex);
+; 121  : 	hWnd = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_OVERLAPPEDWINDOW, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
+; 122  : #else
+; 123  : 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
 
   00035	8b 0d 00 00 00
 	00		 mov	 ecx, DWORD PTR ?hInst@@3PAUHINSTANCE__@@A ; hInst
@@ -21439,8 +21466,8 @@ _WinMain@16 PROC					; COMDAT
   00042	53		 push	 ebx
   00043	c7 45 b4 30 00
 	00 00		 mov	 DWORD PTR _wcex$[ebp], 48 ; 00000030H
-  0004a	c7 45 b8 0b 00
-	00 00		 mov	 DWORD PTR _wcex$[ebp+4], 11 ; 0000000bH
+  0004a	c7 45 b8 40 00
+	00 00		 mov	 DWORD PTR _wcex$[ebp+4], 64 ; 00000040H
   00051	c7 45 bc 00 00
 	00 00		 mov	 DWORD PTR _wcex$[ebp+8], OFFSET ?WndProc@@YGJPAUHWND__@@IIJ@Z ; WndProc
   00058	89 5d c0	 mov	 DWORD PTR _wcex$[ebp+12], ebx
@@ -21451,7 +21478,7 @@ _WinMain@16 PROC					; COMDAT
 	00		 call	 DWORD PTR __imp__LoadCursorA@8
   0006a	89 45 d0	 mov	 DWORD PTR _wcex$[ebp+28], eax
 
-; 119  : 	RegisterClassEx(&wcex);
+; 124  : 	RegisterClassEx(&wcex);
 
   0006d	8d 45 b4	 lea	 eax, DWORD PTR _wcex$[ebp]
   00070	50		 push	 eax
@@ -21463,7 +21490,7 @@ _WinMain@16 PROC					; COMDAT
   00081	ff 15 00 00 00
 	00		 call	 DWORD PTR __imp__RegisterClassExA@4
 
-; 120  : 	hWnd = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_OVERLAPPEDWINDOW, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
+; 125  : 	hWnd = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_POPUP | WS_VISIBLE, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
 
   00087	53		 push	 ebx
   00088	ff 35 00 00 00
@@ -21474,32 +21501,33 @@ _WinMain@16 PROC					; COMDAT
   00091	53		 push	 ebx
   00092	53		 push	 ebx
   00093	53		 push	 ebx
-  00094	68 00 00 cf 00	 push	 13565952		; 00cf0000H
+  00094	68 00 00 00 90	 push	 -1879048192		; 90000000H
   00099	ff 75 dc	 push	 DWORD PTR _wcex$[ebp+40]
   0009c	ff 75 dc	 push	 DWORD PTR _wcex$[ebp+40]
   0009f	53		 push	 ebx
   000a0	ff 15 00 00 00
 	00		 call	 DWORD PTR __imp__CreateWindowExA@48
 
-; 121  : 	
-; 122  : 	ShowCursor(EditMode);
+; 126  : #endif
+; 127  : 	
+; 128  : 	ShowCursor(EditMode);
 
   000a6	53		 push	 ebx
   000a7	a3 00 00 00 00	 mov	 DWORD PTR ?hWnd@@3PAUHWND__@@A, eax ; hWnd
   000ac	ff 15 00 00 00
 	00		 call	 DWORD PTR __imp__ShowCursor@4
 
-; 123  : 
-; 124  : 	dx11::Init();
+; 129  : 
+; 130  : 	dx11::Init();
 
   000b2	e8 00 00 00 00	 call	 ?Init@dx11@@YAXXZ	; dx11::Init
 
-; 125  : 
-; 126  : 	#if EditMode
-; 127  : 		editor::SetRenderWindowPosition();
-; 128  : 		editor::Init();
-; 129  : 	#else
-; 130  : 		ShowWindow(hWnd, SW_MAXIMIZE);
+; 131  : 
+; 132  : 	#if EditMode
+; 133  : 		editor::SetRenderWindowPosition();
+; 134  : 		editor::Init();
+; 135  : 	#else
+; 136  : 		ShowWindow(hWnd, SW_MAXIMIZE);
 
   000b7	6a 03		 push	 3
   000b9	ff 35 00 00 00
@@ -21507,15 +21535,15 @@ _WinMain@16 PROC					; COMDAT
   000bf	ff 15 00 00 00
 	00		 call	 DWORD PTR __imp__ShowWindow@8
 
-; 131  : 	#endif	
-; 132  : 
-; 133  : 	MSG msg = { 0 };
+; 137  : 	#endif	
+; 138  : 
+; 139  : 	MSG msg = { 0 };
 
   000c5	6a 07		 push	 7
   000c7	59		 pop	 ecx
 
-; 134  : 
-; 135  : 	UpdateWindow(hWnd);
+; 140  : 
+; 141  : 	UpdateWindow(hWnd);
 
   000c8	ff 35 00 00 00
 	00		 push	 DWORD PTR ?hWnd@@3PAUHWND__@@A ; hWnd
@@ -21525,37 +21553,38 @@ _WinMain@16 PROC					; COMDAT
   000d5	ff 15 00 00 00
 	00		 call	 DWORD PTR __imp__UpdateWindow@4
 
-; 136  : 
-; 137  : 	timer::StartCounter();
+; 142  : 
+; 143  : 	timer::StartCounter();
 
   000db	e8 00 00 00 00	 call	 ?StartCounter@timer@@YAXXZ ; timer::StartCounter
-  000e0	eb 47		 jmp	 SHORT $LN17@WinMain
+  000e0	eb 61		 jmp	 SHORT $LN20@WinMain
 $LL2@WinMain:
 
-; 140  : 	{
-; 141  : 		#if EditMode
-; 142  : 			
-; 143  : 			cmdParamDescBack = cmdParamDesc[currentCmd];
-; 144  : 
-; 145  : 			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-; 146  : 			{
-; 147  : 				if (msg.message == WM_QUIT)
-; 148  : 				{
-; 149  : 					break;
-; 150  : 				}
-; 151  : 
-; 152  : 				TranslateMessage(&msg);
-; 153  : 				DispatchMessage(&msg);
-; 154  : 				
-; 155  : 			}
-; 156  : 
-; 157  : 			editor::WatchFiles();
-; 158  : 			editor::WatchForRecompilation();
-; 159  : 
-; 160  : 
-; 161  : 		#else
+; 146  : 	{
+; 147  : 		#if EditMode
+; 148  : 			
+; 149  : 			cmdParamDescBack = cmdParamDesc[currentCmd];
+; 150  : 
+; 151  : 			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+; 152  : 			{
+; 153  : 				if (msg.message == WM_QUIT)
+; 154  : 				{
+; 155  : 					break;
+; 156  : 				}
+; 157  : 
+; 158  : 				TranslateMessage(&msg);
+; 159  : 				DispatchMessage(&msg);
+; 160  : 				
+; 161  : 			}
 ; 162  : 
-; 163  : 			PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
+; 163  : 			editor::WatchFiles();
+; 164  : 			editor::WatchForRecompilation();
+; 165  : 
+; 166  : 
+; 167  : 		#else
+; 168  : 
+; 169  : 			// Проверяем сообщения Windows
+; 170  : 			if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
 
   000e2	6a 01		 push	 1
   000e4	53		 push	 ebx
@@ -21565,62 +21594,86 @@ $LL2@WinMain:
   000ea	50		 push	 eax
   000eb	ff 15 00 00 00
 	00		 call	 DWORD PTR __imp__PeekMessageA@20
+  000f1	85 c0		 test	 eax, eax
+  000f3	74 16		 je	 SHORT $LN4@WinMain
 
-; 164  : 			if (GetAsyncKeyState(VK_ESCAPE) || timer::frameBeginTime / 1000. > DEMO_DURATION)
+; 171  : 				TranslateMessage(&msg);
 
-  000f1	6a 1b		 push	 27			; 0000001bH
-  000f3	ff 15 00 00 00
+  000f5	8d 45 e4	 lea	 eax, DWORD PTR _msg$[ebp]
+  000f8	50		 push	 eax
+  000f9	ff 15 00 00 00
+	00		 call	 DWORD PTR __imp__TranslateMessage@4
+
+; 172  : 				DispatchMessage(&msg);
+
+  000ff	8d 45 e4	 lea	 eax, DWORD PTR _msg$[ebp]
+  00102	50		 push	 eax
+  00103	ff 15 00 00 00
+	00		 call	 DWORD PTR __imp__DispatchMessageA@4
+
+; 173  : 				continue;
+
+  00109	eb 38		 jmp	 SHORT $LN20@WinMain
+$LN4@WinMain:
+
+; 174  : 			}
+; 175  : 
+; 176  : 			//PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
+; 177  : 			if (GetAsyncKeyState(VK_ESCAPE) || timer::frameBeginTime / 1000. > DEMO_DURATION)
+
+  0010b	6a 1b		 push	 27			; 0000001bH
+  0010d	ff 15 00 00 00
 	00		 call	 DWORD PTR __imp__GetAsyncKeyState@4
-  000f9	66 85 c0	 test	 ax, ax
-  000fc	75 31		 jne	 SHORT $LN12@WinMain
-  000fe	c5 fb 10 05 00
+  00113	66 85 c0	 test	 ax, ax
+  00116	75 31		 jne	 SHORT $LN14@WinMain
+  00118	c5 fb 10 05 00
 	00 00 00	 vmovsd	 xmm0, QWORD PTR ?frameBeginTime@timer@@3NA
-  00106	c5 fb 59 05 00
+  00120	c5 fb 59 05 00
 	00 00 00	 vmulsd	 xmm0, xmm0, QWORD PTR __real@3f50624dd2f1a9fc
-  0010e	c5 f9 2f 05 00
+  00128	c5 f9 2f 05 00
 	00 00 00	 vcomisd xmm0, QWORD PTR __real@4060e00000000000
-  00116	77 17		 ja	 SHORT $LN12@WinMain
+  00130	77 17		 ja	 SHORT $LN14@WinMain
 
-; 165  : 			{
-; 166  : 				break;
-; 167  : 			}
-; 168  : 
-; 169  : 		#endif
-; 170  : 			
-; 171  : 		UpdateFrame(timer::GetCounter());
+; 178  : 			{
+; 179  : 				break;
+; 180  : 			}
+; 181  : 
+; 182  : 		#endif
+; 183  : 			
+; 184  : 		UpdateFrame(timer::GetCounter());
 
-  00118	e8 00 00 00 00	 call	 ?GetCounter@timer@@YANXZ ; timer::GetCounter
-  0011d	51		 push	 ecx
-  0011e	51		 push	 ecx
-  0011f	dd 1c 24	 fstp	 QWORD PTR [esp]
-  00122	e8 00 00 00 00	 call	 ?UpdateFrame@@YAXN@Z	; UpdateFrame
-  00127	59		 pop	 ecx
-  00128	59		 pop	 ecx
-$LN17@WinMain:
+  00132	e8 00 00 00 00	 call	 ?GetCounter@timer@@YANXZ ; timer::GetCounter
+  00137	51		 push	 ecx
+  00138	51		 push	 ecx
+  00139	dd 1c 24	 fstp	 QWORD PTR [esp]
+  0013c	e8 00 00 00 00	 call	 ?UpdateFrame@@YAXN@Z	; UpdateFrame
+  00141	59		 pop	 ecx
+  00142	59		 pop	 ecx
+$LN20@WinMain:
 
-; 138  : 
-; 139  : 	while (msg.message != WM_QUIT)
+; 144  : 
+; 145  : 	while (msg.message != WM_QUIT)
 
-  00129	83 7d e8 12	 cmp	 DWORD PTR _msg$[ebp+4], 18 ; 00000012H
-  0012d	75 b3		 jne	 SHORT $LL2@WinMain
-$LN12@WinMain:
+  00143	83 7d e8 12	 cmp	 DWORD PTR _msg$[ebp+4], 18 ; 00000012H
+  00147	75 99		 jne	 SHORT $LL2@WinMain
+$LN14@WinMain:
 
-; 172  : 
-; 173  : 
-; 174  : 
-; 175  : 	}
-; 176  : 
-; 177  : 	#if EditMode
-; 178  : 		editor::SaveAndExit();
-; 179  : 	#endif
-; 180  : 
-; 181  : 	ExitProcess(0);
+; 185  : 
+; 186  : 
+; 187  : 
+; 188  : 	}
+; 189  : 
+; 190  : 	#if EditMode
+; 191  : 		editor::SaveAndExit();
+; 192  : 	#endif
+; 193  : 
+; 194  : 	ExitProcess(0);
 
-  0012f	53		 push	 ebx
-  00130	ff 15 00 00 00
+  00149	53		 push	 ebx
+  0014a	ff 15 00 00 00
 	00		 call	 DWORD PTR __imp__ExitProcess@4
-$LN16@WinMain:
-  00136	cc		 int	 3
+$LN19@WinMain:
+  00150	cc		 int	 3
 _WinMain@16 ENDP
 _TEXT	ENDS
 END
