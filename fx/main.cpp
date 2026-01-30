@@ -126,8 +126,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #endif
 	
 	ShowCursor(EditMode);
-
+	
 	dx11::Init();
+	
 
 	#if EditMode
 		editor::SetRenderWindowPosition();

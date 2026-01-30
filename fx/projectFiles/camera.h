@@ -106,9 +106,9 @@ namespace BasicCam
 		
 		XMMATRIX fly;
 		sTime = (timer::timeCursor - prevTime * SAMPLES_IN_FRAME) * .00001f;
-		auto flyX = XMMatrixRotationAxis(axisX, DegreesToRadians(XMVectorGetX(camFly/100.) * sTime));
-		auto flyY = XMMatrixRotationAxis(axisY, DegreesToRadians(XMVectorGetY(camFly / 100.) * sTime));
-		auto flyZ = XMMatrixRotationAxis(axisZ, DegreesToRadians(XMVectorGetZ(camFly / 100.) * sTime));
+		auto flyX = XMMatrixRotationAxis(axisX, DegreesToRadians(XMVectorGetX(camFly) * sTime));
+		auto flyY = XMMatrixRotationAxis(axisY, DegreesToRadians(XMVectorGetY(camFly) * sTime));
+		auto flyZ = XMMatrixRotationAxis(axisZ, DegreesToRadians(XMVectorGetZ(camFly) * sTime));
 		fly = XMMatrixMultiply(XMMatrixMultiply( flyX,flyY),flyZ);
 
 		eye = XMVector4Transform(eye-at, fly)+at;

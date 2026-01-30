@@ -167,7 +167,7 @@ namespace Shaders {
 
 		char* processIncludes(const char* shaderText)
 		{
-			if (!outText) outText = new char[64000];
+			if (!outText) outText = new char[640000];
 			strcpy(outText, shaderText);
 			char* inc = outText;
 
