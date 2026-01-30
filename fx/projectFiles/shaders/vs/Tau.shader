@@ -3,6 +3,8 @@
 #include <../lib/constants.shader>
 #include <../lib/utils.shader>
 
+#include <../lib/girl_data.shader>
+
 cbuffer params : register(b0)
 {
     float4x4 model;
@@ -34,6 +36,17 @@ float3 hash31(float p) {
    return frac((p3.xxy + p3.yzz) * p3.zyx); 
 }
 
+float3 sm2(float x)
+{
+    return smoothstep(0,1,smoothstep(0,1,x));
+}
+
+float3 sm3(float3 x)
+{
+    return smoothstep(0,1,smoothstep(0,1,x));
+}
+
+
 pos_color CalcParticles(uint qid,uint iid,float4 grid)
 {
 
@@ -41,7 +54,7 @@ float4 _ColorHot = float4(1.0, 0.9, 0.7,1);
 float4 _ColorCold = float4( 0.1, 0.0, 0.4,1);
 
 float form=smoothstep(0,1,smoothstep(0,1,.5+.5*sin(time.x/32)));
-
+form =smoothstep(0,1,saturate((time.y/3000)));
 float3 pos;
     pos_color p1;
 
@@ -67,27 +80,50 @@ float3 pos;
         //p=rot3(p,p*3*(1-form));
         p=lerp(p,rot3(p,p*3),(1-form));
         p+=(rot3(p-p/2,p*3)+p/2)/11*form;
-        p += next/(i+1)*form;
+        p -= next/(i+1)*form;
 
 
     }
     
-    p+=noise3(p*11+(time.x/32))/14;
-
+    p+=noise3(p*11+(time.x/32))/14*saturate(length(p)/1);
+    
     float delta = length(p - p_prev)*1;
     float heat = exp(-delta * 10); 
 
     p*=12;
-    //p=rotZ(p,toRad(90)*(1-form))*4;
-    //p=rotZ(p,toRad(90)*(form));
-    p=p.zxy*lerp(14,6,form);
+    p=p.zxy*lerp(14,8,form);
 
     float3 jitter = (hash31((float)iid) - 0.5) * 0.02;
     p += jitter/(pow(length(p),2)+.1)*172;
 
+    float py = frac(iid/292100.-time.x/1000+hash(iid)/10);
+    float3 g=girl_vertex[iid%2921]/4.8;
+    g.y+=noise(time.x/50)*12;
+    g+=hash33(g+hash(iid))*1.3;
+    float margin = iid%2>(noise(g+time.x/10+222)*3+1);
+    g.xyz+=margin*noise3(iid/292100.+g/3)*12*(py);
+    g.xyz+=margin*noise3(g/3)*2;
+    g.y+=margin*pow(frac(iid/292100.+time.x/20),1)*7;
+
+
+    g=lerp(g,noise3(g/3)*133,sm2(sm2(form)) );
+    //g*=2;
+    float3 g2=normalize(hash3(iid))*84*hash(iid)+noise3(g/2)*25;
+
+    //p=lerp(g2,p,saturate(length(p)/112));
+    float girl = saturate(pow(length(p)/28,.75)-1.9);
+    p=lerp(g2,p,saturate(pow(length(p)/18,.75)-2));
+    p=lerp(g,p,saturate(pow(length(p)/13,.75)-2));
+
+    //p=lerp(g,p,0);
+
     float3 nebulaColor = lerp(_ColorCold.rgb, _ColorHot.rgb, pow(heat, 3.0));
     p1.color = float4(nebulaColor, 1);
 
+    p1.color.rgb=lerp(py/1000,p1.color.rgb,saturate(length(p)/30));
+    p1.color.rgb=(1-py*2)/1.;
+    p1.color.rgb=lerp(.2*nebulaColor,.02*float3(1,2,3),1-girl);
+        //p1.color = float4(nebulaColor, 1);
     pos=p;
     
 
@@ -117,9 +153,9 @@ float3 pos;
     else
     {
         p1.pos = transform(pos,grid.zw,121.2);
-        p1.color*=.01;
+        p1.color*=.5*(1-saturate(pow(length(p)/21,.75)));
         p1.sz=1.2;
-        p1.color*=lerp(0.03,1,form);
+       // p1.color=lerp(p1.color,1,form);
 
     }
 

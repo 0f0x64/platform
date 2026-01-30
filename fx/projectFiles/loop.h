@@ -44,26 +44,27 @@ namespace Loop
 			BasicCam::setCamKey({
 				.camTime = 0,
 				.camType = keyType::set,
-				.eye_x = 3021,
-				.eye_y = 22,
-				.eye_z = 46,
-				.at_x = 2,
-				.at_y = 51,
+				.eye_x = 0,
+				.eye_y = 0,
+				.eye_z = 255,
+				.at_x = 0,
+				.at_y = 0,
 				.at_z = 0,
 				.up_x = 0,
-				.up_y = 508,
-				.up_z = 77,
-				.angle = 67,
+				.up_y = 255,
+				.up_z = 0,
+				.angle = 1,
 				.sType = sliderType::follow,
 				.slide_x = 0,
 				.slide_y = 0,
-				.slide_z = -1,
-				.axisType = camAxis::local,
+				.slide_z = 0,
+				.axisType = camAxis::global,
 				.fly_x = 0,
-				.fly_y = 3,
+				.fly_y = 0,
 				.fly_z = 0,
 				.jitter = 0
 			});
+
 
 			BasicCam::processCam();
 			reflect_close;
