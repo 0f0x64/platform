@@ -1,3 +1,234 @@
+//live wheel param changer
+#include <atlbase.h>
+#import "libid:80cc9f66-e7d8-4ddd-85b6-d9e6cd0e93e2" version("8.0") lcid("0") raw_interfaces_only named_guids
+//----
+
+int a = 44;
+namespace editor
+{
+
+	struct {
+		bool newPos = false;
+		int line;
+		int column;
+		char fileName[MAX_PATH];
+		float mouseDelta;
+
+		void Update()
+		{
+			long newline = 0;
+			long newcolumn = 0;
+
+			HRESULT result;
+			CLSID clsid;
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			if (FAILED(result))
+				return;
+
+			CComPtr<IUnknown> punk;
+			result = ::GetActiveObject(clsid, NULL, &punk);
+			if (FAILED(result))
+				return;
+
+			CComPtr<EnvDTE::_DTE> DTE;
+			DTE = punk;
+
+			CComPtr<EnvDTE::ItemOperations> item_ops;
+			result = DTE->get_ItemOperations(&item_ops);
+			if (FAILED(result))
+				return;
+
+			CComPtr<EnvDTE::Document> doc;
+			result = DTE->get_ActiveDocument(&doc);
+			if (FAILED(result))
+				return;
+
+			CComBSTR _fileName;
+			doc->get_FullName(&_fileName);
+			_bstr_t wrapper(_fileName);
+			const char* newFileName = wrapper;
+
+			CComPtr<IDispatch> selection_dispatch;
+			result = doc->get_Selection(&selection_dispatch);
+			if (FAILED(result))
+				return;
+
+			CComPtr<EnvDTE::TextSelection> selection;
+			result = selection_dispatch->QueryInterface(&selection);
+			if (FAILED(result))
+				return;
+
+			EnvDTE::VirtualPoint* pActivePoint = nullptr;
+			HRESULT hr = selection->get_ActivePoint(&pActivePoint);
+
+			pActivePoint->get_Line(&newline);
+			pActivePoint->get_LineCharOffset(&newcolumn);
+
+			if (line != newline || column != newcolumn || strcmp(fileName, newFileName))
+			{
+				newPos = true;
+				strcpy(fileName, newFileName);
+				line = newline;
+				column = newcolumn;
+			}
+			else
+			{
+				newPos = false;
+			}
+
+		}
+
+		void InsertInSmallFile(const std::string& path, size_t pos, size_t pos_end, const std::string& text) {
+			// 1. Read the entire file into memory
+			std::ifstream in(path, std::ios::binary);
+			if (!in) return; // Handle file open error
+
+			std::string contents((std::istreambuf_iterator<char>(in)),
+				std::istreambuf_iterator<char>());
+			in.close();
+
+			// 2. Validate bounds
+			if (pos > contents.size()) pos = contents.size();
+			if (pos_end > contents.size()) pos_end = contents.size();
+			if (pos_end < pos) pos_end = pos; // Ensure range is valid
+
+			// 3. Replace the range [pos, pos_end) with text
+			// This effectively: 
+			// - Keeps everything from 0 to pos
+			// - Inserts 'text'
+			// - Keeps everything from pos_end to the end
+			int s = pos;
+			int e = pos_end;
+			contents.replace(pos, pos_end - pos, text);
+			int a = 123;
+			// 4. Overwrite the file with the modified content
+			std::ofstream out(path, std::ios::binary | std::ios::trunc);
+			out << contents;
+		}
+
+		char paramStr[100];
+
+		int pStart = 0;
+		int pEnd = 0;
+
+		void UpdateParamStr()
+		{
+			std::ifstream ifile(fileName);
+			std::string s;
+
+			int lc = 1;
+			pStart = 0;
+
+			if (!ifile.is_open()) return;
+
+			while (true)
+			{
+				if (!getline(ifile, s))
+				{
+					ifile.close();
+					return;
+				}
+				if (lc < line) {
+					pStart += s.length()+2;
+				}
+
+				if (lc == line) break;
+				lc++;
+			}
+
+			if (s.length() < 1) return;
+
+			int ofs = 0;
+
+			if (!std::isdigit(static_cast<unsigned char>(s[column - 1])) && s[column - 1] != '-')
+			{
+				if (column - 2 < 0)
+				{
+					strcpy(paramStr, "nan");
+					return;
+				}
+
+				if (column - 2 >= 0 && std::isdigit(static_cast<unsigned char>(s[column - 2])) && s[column - 1] != '-')
+				{
+					ofs = 1;
+				}
+				else
+				{
+					strcpy(paramStr, "nan");
+					return;
+				}
+			}
+
+			//search start
+			int start = column - 1 - ofs;
+			while (true)
+			{
+				start--;
+				if (start < 0) return;
+
+				if (start >= 0 && !std::isdigit(static_cast<unsigned char>(s[start])))
+				{
+					start++;
+					break;
+				}
+			}
+
+			//search for possible sign
+			int signPos = start;
+			while (true)
+			{
+				signPos--;
+				if (signPos < 0) break;
+
+				if (signPos >= 0)
+				{
+					if (s[signPos] == ' ')
+					{
+						continue;
+					}
+					else if (s[signPos] == '-')
+					{
+						break;
+					}
+				}
+			}
+
+			if (signPos >= 0) {
+				start = signPos;
+			}
+
+
+			//search end
+			int end = column - 1 - ofs;
+			while (true)
+			{
+				end++;
+				if (end >= s.length())
+				{
+					end--;
+					break;
+				}
+
+				if (!std::isdigit(static_cast<unsigned char>(s[end])))
+				{
+					//end--;
+					break;
+				}
+			}
+
+			pStart += start;
+			pEnd = pStart + (end-start);
+
+			size_t copied = s.copy(paramStr, end - start, start);
+			paramStr[copied] = '\0';
+
+			ifile.close();
+		}
+
+	} VsTextCurorPos;
+
+}
+
 #include "editor\cmdEditService.h"
 
 #undef regDrawer
@@ -307,6 +538,25 @@ namespace editor
 	
 	void Process()
 	{
+		VsTextCurorPos.Update();
+		if (VsTextCurorPos.newPos)
+		{
+			OutputDebugString(VsTextCurorPos.fileName);
+			char n[10];
+			_itoa(VsTextCurorPos.line, n, 10);
+			OutputDebugString(" line:");
+			OutputDebugString(n);
+			_itoa(VsTextCurorPos.column, n, 10);
+			OutputDebugString(" column:");
+			OutputDebugString(n);
+
+			OutputDebugString(" param:");
+			VsTextCurorPos.UpdateParamStr();
+			OutputDebugString(VsTextCurorPos.paramStr);
+			OutputDebugString("\n");
+
+		}
+
 		paramsAreLoaded = true;
 		paramEdit::top = 0;
 		paramEdit::bottom = 1;

@@ -109,6 +109,28 @@ void UpdateFrame(double time)
 
 //int time_activate = 0;
 
+#if DebugMode
+HHOOK hMouseHook;
+
+// The Callback function that intercepts mouse events
+LRESULT CALLBACK GlobalMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
+	if (nCode == HC_ACTION) {
+		if (wParam == WM_MOUSEWHEEL) {
+			MSLLHOOKSTRUCT* pMouseStruct = (MSLLHOOKSTRUCT*)lParam;
+			// Extract the scroll delta (120 = one notch up, -120 = one notch down)
+			short wheelDelta = HIWORD(pMouseStruct->mouseData);
+			if (GetAsyncKeyState(VK_SHIFT))
+			{
+				editor::VsTextCurorPos.mouseDelta = wheelDelta;
+				editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, "!!!bla!!!");
+			}
+		}
+	}
+	return CallNextHookEx(hMouseHook, nCode, wParam, lParam);
+}
+#endif
+
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	hInst = (HINSTANCE)GetModuleHandle(0);
@@ -119,6 +141,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
 	RegisterClassEx(&wcex);
 	hWnd = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_OVERLAPPEDWINDOW, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
+
+	hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, GlobalMouseProc, GetModuleHandle(NULL), 0);
+
+	if (!hMouseHook) {
+		//std::cerr << "Failed to install hook!" << std::endl;
+		return 1;
+	}
+
 #else
 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
 	RegisterClassEx(&wcex);
@@ -190,6 +220,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	#if EditMode
 		editor::SaveAndExit();
+		UnhookWindowsHookEx(hMouseHook);
 	#endif
 
 	ExitProcess(0);
