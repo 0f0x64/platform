@@ -349,7 +349,13 @@ namespace ViewCam
 				ui::style::box::outlineBrightness = 1.f;
 				if (ui::lbDown)
 				{
-					if (!strcmp(cmdParamDesc[currentCmd].funcName, "setCamKey"))
+					char* shortName = cmdParamDesc[currentCmd].funcName;
+					for (int i = 0; i < strlen(cmdParamDesc[currentCmd].funcName); i++)
+					{
+						if (cmdParamDesc[currentCmd].funcName[i] == ':') shortName = cmdParamDesc[currentCmd].funcName + i + 1;
+					}
+
+					if (!strcmp(shortName, "setCamKey"))
 					{
 						float q = intToFloatDenom;
 						auto eye = currentCamera.ViewVec*q + currentCamera.Target*q;

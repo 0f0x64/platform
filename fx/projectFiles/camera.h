@@ -73,6 +73,7 @@ namespace BasicCam
 		if (currentCamType == keyType::slide) a = (timer::timeCursor -prevTime*SAMPLES_IN_FRAME)/(float)((nextTime-prevTime)* SAMPLES_IN_FRAME);
 		
 		XMVECTOR eye, at, up;
+
 		float angle = lerp((float)Prev.angle, (float)Next.angle, a);
 		eye = XMVectorLerp(Prev.eye, Next.eye, a) / q;
 		at = XMVectorLerp(Prev.at, Next.at, a) / q;
