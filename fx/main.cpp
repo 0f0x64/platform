@@ -122,7 +122,14 @@ LRESULT CALLBACK GlobalMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 			if (GetAsyncKeyState(VK_SHIFT))
 			{
 				editor::VsTextCurorPos.mouseDelta = wheelDelta;
-				editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, "!!!bla!!!");
+				char* endptr;
+				long val = strtol(editor::VsTextCurorPos.paramStr, &endptr, 10);
+				if (editor::VsTextCurorPos.paramStr != endptr) {
+					val += wheelDelta / 120;
+					char modified[100];
+					_itoa(val, modified, 10);
+					editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, modified);
+				}
 			}
 		}
 	}
