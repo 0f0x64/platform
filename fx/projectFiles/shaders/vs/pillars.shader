@@ -80,12 +80,12 @@ pos_color CalcParticles(uint qid,float4 grid)
 
          if (qid%inStars==0)
          {
-              p.pos = transform_unisize(pos,grid.zw,51.5);
+              p.pos = transform_unisize(pos,grid.zw,171.5);
                p.sz=2;
                p.color*=15;
          }
     }
-   
+    //p.pos.x+=-359;
     //density compensation
     p.color/=min(pow(p.pos.w,1.1)*.21+.5,11);
     return p;

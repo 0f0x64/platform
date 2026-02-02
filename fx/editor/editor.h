@@ -3,16 +3,16 @@
 #import "libid:80cc9f66-e7d8-4ddd-85b6-d9e6cd0e93e2" version("8.0") lcid("0") raw_interfaces_only named_guids
 //----
 
-int a = 44;
+int a = 773;
 namespace editor
 {
 
 	struct {
 		bool newPos = false;
-		int line;
-		int column;
+		int line =0;
+		int column =0;
 		char fileName[MAX_PATH];
-		float mouseDelta;
+		float mouseDelta =0;
 
 		void Update()
 		{
@@ -44,7 +44,10 @@ namespace editor
 				return;
 
 			CComBSTR _fileName;
-			doc->get_FullName(&_fileName);
+			result = doc->get_FullName(&_fileName);
+			if (FAILED(result))
+				return;
+
 			_bstr_t wrapper(_fileName);
 			const char* newFileName = wrapper;
 
@@ -59,10 +62,18 @@ namespace editor
 				return;
 
 			EnvDTE::VirtualPoint* pActivePoint = nullptr;
-			HRESULT hr = selection->get_ActivePoint(&pActivePoint);
+			result = selection->get_ActivePoint(&pActivePoint);
+			if (FAILED(result))
+				return;
 
-			pActivePoint->get_Line(&newline);
-			pActivePoint->get_LineCharOffset(&newcolumn);
+			result = pActivePoint->get_Line(&newline);
+			if (FAILED(result))
+				return;
+
+			result = pActivePoint->get_LineCharOffset(&newcolumn);
+			if (FAILED(result))
+				return;
+
 
 			if (line != newline || column != newcolumn || strcmp(fileName, newFileName))
 			{
@@ -78,32 +89,140 @@ namespace editor
 
 		}
 
-		void InsertInSmallFile(const std::string& path, size_t pos, size_t pos_end, const std::string& text) {
-			// 1. Read the entire file into memory
-			std::ifstream in(path, std::ios::binary);
-			if (!in) return; // Handle file open error
+		void RestorePos()
+		{
+			HRESULT result;
+			CLSID clsid;
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			if (FAILED(result))
+				return;
 
-			std::string contents((std::istreambuf_iterator<char>(in)),
-				std::istreambuf_iterator<char>());
+			CComPtr<IUnknown> punk;
+			result = ::GetActiveObject(clsid, NULL, &punk);
+			if (FAILED(result))
+				return;
+
+			CComPtr<EnvDTE::_DTE> DTE;
+			DTE = punk;
+
+			CComPtr<EnvDTE::ItemOperations> item_ops;
+			result = DTE->get_ItemOperations(&item_ops);
+			if (FAILED(result))
+				return;
+
+			CComPtr<EnvDTE::Document> doc;
+			result = DTE->get_ActiveDocument(&doc);
+			if (FAILED(result))
+				return;
+
+			CComBSTR _fileName;
+			result = doc->get_FullName(&_fileName);
+			if (FAILED(result))
+				return;
+
+			_bstr_t wrapper(_fileName);
+			const char* newFileName = wrapper;
+
+			CComPtr<IDispatch> selection_dispatch;
+			result = doc->get_Selection(&selection_dispatch);
+			if (FAILED(result))
+				return;
+
+			CComPtr<EnvDTE::TextSelection> selection;
+			result = selection_dispatch->QueryInterface(&selection);
+			if (FAILED(result))
+				return;
+
+			selection->MoveToLineAndOffset(line, column, false);
+		}
+
+		/*void InsertInSmallFile(const std::string& path, size_t pos, size_t pos_end, const std::string& text) {
+			// 1. Open and get size
+			std::ifstream in(path, std::ios::binary | std::ios::ate);
+			if (!in) return;
+
+			size_t fileSize = static_cast<size_t>(in.tellg());
+			in.seekg(0, std::ios::beg);
+
+			// 2. Read entire original file
+			std::vector<char> original(fileSize);
+			if (fileSize > 0) {
+				in.read(original.data(), fileSize);
+			}
 			in.close();
 
-			// 2. Validate bounds
-			if (pos > contents.size()) pos = contents.size();
-			if (pos_end > contents.size()) pos_end = contents.size();
-			if (pos_end < pos) pos_end = pos; // Ensure range is valid
+			// 3. Clamp bounds
+			if (pos > fileSize) pos = fileSize;
+			if (pos_end > fileSize) pos_end = fileSize;
+			if (pos_end < pos) pos_end = pos;
 
-			// 3. Replace the range [pos, pos_end) with text
-			// This effectively: 
-			// - Keeps everything from 0 to pos
-			// - Inserts 'text'
-			// - Keeps everything from pos_end to the end
-			int s = pos;
-			int e = pos_end;
-			contents.replace(pos, pos_end - pos, text);
-			int a = 123;
-			// 4. Overwrite the file with the modified content
+			// 4. Calculate new size: [Prefix] + [New Text] + [Suffix]
+			size_t prefixSize = pos;
+			size_t suffixSize = fileSize - pos_end;
+			size_t newSize = prefixSize + text.size() + suffixSize;
+
+			// 5. Build the new buffer manually
+			std::vector<char> finalBuffer;
+			finalBuffer.reserve(newSize);
+
+			// Copy Prefix: [0 to pos)
+			finalBuffer.insert(finalBuffer.end(), original.begin(), original.begin() + prefixSize);
+
+			// Copy New Text
+			finalBuffer.insert(finalBuffer.end(), text.begin(), text.end());
+
+			// Copy Suffix: [pos_end to end)
+			finalBuffer.insert(finalBuffer.end(), original.begin() + pos_end, original.end());
+
+			// 6. Atomic-style overwrite
 			std::ofstream out(path, std::ios::binary | std::ios::trunc);
-			out << contents;
+			if (out && !finalBuffer.empty()) {
+				out.write(finalBuffer.data(), finalBuffer.size());
+			}
+		}*/
+
+		void InsertInSmallFile(const std::string& path, size_t pos, size_t pos_end, const std::string& text) {
+			// 1. Открываем файл и определяем размер одним системным вызовом
+			std::ifstream in(path, std::ios::binary | std::ios::ate);
+			if (!in) return;
+
+			const size_t fileSize = static_cast<size_t>(in.tellg());
+
+			// Валидация границ (clamping)
+			if (pos > fileSize) pos = fileSize;
+			if (pos_end > fileSize) pos_end = fileSize;
+			if (pos_end < pos) pos_end = pos;
+
+			const size_t suffixSize = fileSize - pos_end;
+			const size_t newSize = pos + text.size() + suffixSize;
+
+			// 2. Аллоцируем память ОДИН раз под итоговый размер
+			std::vector<char> buffer(newSize);
+
+			// 3. Читаем ПЕРВУЮ часть файла прямо в буфер
+			if (pos > 0) {
+				in.seekg(0, std::ios::beg);
+				in.read(buffer.data(), pos);
+			}
+
+			// 4. Копируем текст в середину буфера (из памяти в память)
+			if (!text.empty()) {
+				std::copy(text.begin(), text.end(), buffer.data() + pos);
+			}
+
+			// 5. Читаем ВТОРУЮ часть файла (суффикс) прямо в буфер
+			if (suffixSize > 0) {
+				in.seekg(pos_end, std::ios::beg);
+				in.read(buffer.data() + pos + text.size(), suffixSize);
+			}
+			in.close();
+
+			// 6. Записываем весь буфер одним куском
+			// Используем std::ofstream::write для максимальной скорости
+			std::ofstream out(path, std::ios::binary | std::ios::trunc);
+			if (out) {
+				out.write(buffer.data(), newSize);
+			}
 		}
 
 		char paramStr[100];
@@ -113,6 +232,8 @@ namespace editor
 
 		void UpdateParamStr()
 		{
+			strcpy(paramStr, "nan");
+
 			std::ifstream ifile(fileName);
 			std::string s;
 
@@ -136,12 +257,18 @@ namespace editor
 				lc++;
 			}
 
+			if (column >= s.length()) return;
+
 			if (s.length() < 1) return;
+
+			if (column -1 < 0) return;
 
 			int ofs = 0;
 
 			if (!std::isdigit(static_cast<unsigned char>(s[column - 1])) && s[column - 1] != '-')
 			{
+				if (column - 2 < 0) return;
+
 				if (column - 2 < 0)
 				{
 					strcpy(paramStr, "nan");
@@ -473,6 +600,8 @@ namespace editor
 
 	editorMode_ editorMode = editorMode_::graphics;
 
+
+
 	void ProcessContext()
 	{
 		if (ui::mousePos.x > 1 || ui::mousePos.x < 0 || ui::mousePos.y > 1 || ui::mousePos.x < 0)
@@ -534,30 +663,54 @@ namespace editor
 		}
 	}
 
+	float mouseY = 0;
+	int storedVal = 0;
+	bool stored = false;
+	bool needNewPos = true;
 
-	
 	void Process()
 	{
-		VsTextCurorPos.Update();
-		if (VsTextCurorPos.newPos)
+		ui::mousePos = ui::GetCusorPos();
+		paramsAreLoaded = true;
+		
+		if (!GetAsyncKeyState(VK_CONTROL))
 		{
-			OutputDebugString(VsTextCurorPos.fileName);
-			char n[10];
-			_itoa(VsTextCurorPos.line, n, 10);
-			OutputDebugString(" line:");
-			OutputDebugString(n);
-			_itoa(VsTextCurorPos.column, n, 10);
-			OutputDebugString(" column:");
-			OutputDebugString(n);
+			needNewPos = true;
+		}
+		else
+		{
+			if (needNewPos)
+			{
+				VsTextCurorPos.Update();
+				VsTextCurorPos.UpdateParamStr();
+				needNewPos = false;
+			}
 
-			OutputDebugString(" param:");
-			VsTextCurorPos.UpdateParamStr();
-			OutputDebugString(VsTextCurorPos.paramStr);
-			OutputDebugString("\n");
+			int a = 20382.249;
 
+			if (strlen(editor::VsTextCurorPos.paramStr) > 0 && strcmp(editor::VsTextCurorPos.paramStr, "nan"))
+			{
+				long val = strtol(editor::VsTextCurorPos.paramStr, NULL, 10);
+				val += editor::VsTextCurorPos.mouseDelta;
+				editor::VsTextCurorPos.mouseDelta = 0;
+				char modified[100];
+				_itoa(val, modified, 10);
+				bool lenChanged = false;
+				if (strlen(editor::VsTextCurorPos.paramStr) != strlen(modified)) lenChanged = true;
+
+				strcpy(editor::VsTextCurorPos.paramStr, modified);
+				editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, modified);
+
+				if (lenChanged)
+				{
+					VsTextCurorPos.UpdateParamStr();
+				}
+				//editor::VsTextCurorPos.RestorePos();
+				paramsAreLoaded = false;
+			}
 		}
 
-		paramsAreLoaded = true;
+				
 		paramEdit::top = 0;
 		paramEdit::bottom = 1;
 
@@ -566,7 +719,7 @@ namespace editor
 		showTimeFlag = false;
 		hilightedCmd = -1;
 
-		ui::mousePos = ui::GetCusorPos();
+
 
 		if (TimeLine::play) TimeLine::playMode();
 

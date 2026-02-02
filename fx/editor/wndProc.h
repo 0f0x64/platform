@@ -2,6 +2,37 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
+	/*case WM_CREATE:
+	{
+		RAWINPUTDEVICE rid;
+		rid.usUsagePage = 0x01;       // Generic Desktop Controls
+		rid.usUsage = 0x02;           // Mouse
+		rid.dwFlags = RIDEV_INPUTSINK; // Получать ввод даже в фоне
+		rid.hwndTarget = hWnd;
+
+		if (!RegisterRawInputDevices(&rid, 1, sizeof(rid))) {
+			// Ошибка регистрации (можно логировать)
+		}
+		break;
+	}
+
+	case WM_INPUT: {
+		UINT dwSize = sizeof(RAWINPUT);
+		static BYTE lpb[sizeof(RAWINPUT)];
+
+		GetRawInputData((HRAWINPUT)lParam, RID_INPUT, lpb, &dwSize, sizeof(RAWINPUTHEADER));
+		RAWINPUT* raw = (RAWINPUT*)lpb;
+
+		if (raw->header.dwType == RIM_TYPEMOUSE) {
+			// Проверяем, было ли это колесико
+			if (raw->data.mouse.usButtonFlags & RI_MOUSE_WHEEL) {
+				short wheelDelta = (short)raw->data.mouse.usButtonData;
+				// Вот теперь у вас есть значение прокрутки!
+				editor::VsTextCurorPos.mouseDelta = wheelDelta;
+			}
+		}
+		break;
+	}*/
 
 	case WM_SIZE:
 	{

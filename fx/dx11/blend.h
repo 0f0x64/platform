@@ -34,7 +34,7 @@ namespace Blend
 		bSDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
 		bSDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
 		bSDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-		bSDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		bSDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
 		bSDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 
 		//NO ALPHA

@@ -110,26 +110,50 @@ void UpdateFrame(double time)
 //int time_activate = 0;
 
 #if DebugMode
+#include <thread>
+#include <atomic>
+
+std::atomic<int> g_ExternalScrollDelta{ 0 };
+std::atomic<bool> g_Running{ true };
+
 HHOOK hMouseHook;
 
-// The Callback function that intercepts mouse events
-LRESULT CALLBACK GlobalMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
-	if (nCode == HC_ACTION) {
-		if (wParam == WM_MOUSEWHEEL) {
-			MSLLHOOKSTRUCT* pMouseStruct = (MSLLHOOKSTRUCT*)lParam;
-			// Extract the scroll delta (120 = one notch up, -120 = one notch down)
-			short wheelDelta = HIWORD(pMouseStruct->mouseData);
-			if (GetAsyncKeyState(VK_SHIFT))
-			{
-				editor::VsTextCurorPos.mouseDelta = wheelDelta;
-				char* endptr;
-				long val = strtol(editor::VsTextCurorPos.paramStr, &endptr, 10);
-				if (editor::VsTextCurorPos.paramStr != endptr) {
-					val += wheelDelta / 120;
-					char modified[100];
-					_itoa(val, modified, 10);
-					editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, modified);
+LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
+
+	if (nCode == HC_ACTION && wParam == WM_MOUSEWHEEL) {
+		// Приводим lParam к структуре данных мыши
+		MSLLHOOKSTRUCT* pMouse = reinterpret_cast<MSLLHOOKSTRUCT*>(lParam);
+
+		// Извлекаем значение прокрутки (Wheel Delta)
+		// Оно упаковано в HIWORD(mouseData). Делим на 120 (WHEEL_DELTA), чтобы получить кол-во "шагов"
+		short zDelta = HIWORD(pMouse->mouseData);
+
+		if (GetKeyState(VK_CONTROL) & 0x8000 || GetKeyState(VK_SHIFT) & 0x8000) {
+
+			int mul = 1;
+			if (GetKeyState(VK_SHIFT) & 0x8000) mul *= 10;
+
+			editor::VsTextCurorPos.mouseDelta = zDelta/120*mul;
+
+			HWND activeWnd = GetForegroundWindow();
+			DWORD processId;
+			GetWindowThreadProcessId(activeWnd, &processId);
+
+			HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processId);
+			if (hProcess) {
+				char processName[MAX_PATH];
+				DWORD size = MAX_PATH;
+				if (QueryFullProcessImageNameA(hProcess, 0, processName, &size)) {
+					if (std::string(processName).find("devenv.exe") != std::string::npos) {
+
+						// Здесь можно использовать zDelta для своей задачи
+						// Если zDelta > 0 — прокрутка вверх, если < 0 — вниз
+						//std::cout << "Intercepted VS Scroll! Delta: " << zDelta << std::endl;
+
+						return 1; // Блокируем стандартный скролл в VS
+					}
 				}
+				CloseHandle(hProcess);
 			}
 		}
 	}
@@ -148,14 +172,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
 	RegisterClassEx(&wcex);
 	hWnd = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_OVERLAPPEDWINDOW, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
-
-	hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, GlobalMouseProc, GetModuleHandle(NULL), 0);
-
-	if (!hMouseHook) {
-		//std::cerr << "Failed to install hook!" << std::endl;
-		return 1;
-	}
-
 #else
 	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
 	RegisterClassEx(&wcex);
@@ -170,6 +186,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	#if EditMode
 		editor::SetRenderWindowPosition();
 		editor::Init();
+
+		hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, GetModuleHandle(NULL), 0);
+
+		if (!hMouseHook) {
+			std::cerr << "Failed to install hook!" << std::endl;
+			return 1;
+		}
 	#else
 		ShowWindow(hWnd, SW_MAXIMIZE);
 	#endif	
@@ -226,8 +249,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	#if EditMode
-		editor::SaveAndExit();
 		UnhookWindowsHookEx(hMouseHook);
+		editor::SaveAndExit();
+
 	#endif
 
 	ExitProcess(0);

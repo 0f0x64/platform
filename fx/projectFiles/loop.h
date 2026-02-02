@@ -44,15 +44,15 @@ namespace Loop
 			BasicCam::setCamKey({
 				.camTime = 0,
 				.camType = keyType::slide,
-				.eye_x = 17098,
-				.eye_y = -13006,
-				.eye_z = 14039,
+				.eye_x = -2033,
+				.eye_y = -392,
+				.eye_z = 3154,
 				.at_x = 0,
-				.at_y = 0,
+				.at_y = 360,
 				.at_z = 0,
-				.up_x = 99,
-				.up_y = 219,
-				.up_z = 82,
+				.up_x = 0,
+				.up_y = 254,
+				.up_z = -19,
 				.angle = 100,
 				.sType = sliderType::follow,
 				.slide_x = 0,
@@ -145,7 +145,7 @@ namespace Loop
 		
 		cameraMan::run({});
 
-		//Object::Saggitarius({.quality = 1});
+		Object::Saggitarius({.quality = 1});
 		//Object::Zenith({.quality = 1});
 		//Object::Fish({.quality = 1});
 		//Object::Libra({.quality = 1});
@@ -154,7 +154,7 @@ namespace Loop
 		//Object::Twins({ .quality = 1 });
 		//Object::LeoBigStar({ .quality = 1 });
 		//Object::Capri({ .quality = 1 });
-		Object::Taurus({ .quality = 1 });
+		//Object::Taurus({ .quality = 1 });
 		//Object::Scorpio({ .quality = 1 });
 		//Object::Aries({ .quality = 1 });
 		//Object::Virgo({ .quality = 1 });
