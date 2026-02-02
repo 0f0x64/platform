@@ -3,7 +3,7 @@
 #import "libid:80cc9f66-e7d8-4ddd-85b6-d9e6cd0e93e2" version("8.0") lcid("0") raw_interfaces_only named_guids
 //----
 
-int a = 773;
+
 namespace editor
 {
 
@@ -16,6 +16,8 @@ namespace editor
 
 		void Update()
 		{
+			newPos = false;
+
 			long newline = 0;
 			long newcolumn = 0;
 
@@ -84,7 +86,7 @@ namespace editor
 			}
 			else
 			{
-				newPos = false;
+				
 			}
 
 		}
@@ -668,45 +670,171 @@ namespace editor
 	bool stored = false;
 	bool needNewPos = true;
 
+	bool controlParams = false;
+
+	float dTimer = 0;
+
+	int oldRange = 0;
+
+	int GetWindowWidth(HWND hwnd) {
+		RECT rect;
+		if (GetWindowRect(hwnd, &rect)) {
+			return rect.right - rect.left;
+		}
+		return -1;
+	}
+
+	int GetWindowHeight(HWND hwnd) {
+		RECT rect;
+		if (GetWindowRect(hwnd, &rect)) {
+			return rect.bottom - rect.top;
+		}
+		return -1;
+	}
+
+	void updateRange()
+	{
+		if (!controlParams) return;
+
+		HWND hSlider = GetDlgItem(g_hDlg, 1001);
+		int range = 100;
+		if (GetAsyncKeyState(VK_CONTROL))
+		{
+			range *= 10;
+		}
+		if (GetAsyncKeyState(VK_SHIFT))
+		{
+			range *= 10;
+		}
+
+		if (range != oldRange)
+		{
+			if (strlen(editor::VsTextCurorPos.paramStr) > 0 && strcmp(editor::VsTextCurorPos.paramStr, "nan"))
+			{
+				g_SliderValue = strtol(editor::VsTextCurorPos.paramStr, NULL, 10);
+
+				SendMessage(hSlider, TBM_SETRANGE, TRUE, MAKELPARAM(g_SliderValue - range, g_SliderValue + range));
+				SendMessage(hSlider, TBM_SETPOS, TRUE, g_SliderValue);
+				oldRange = range;
+
+				TCHAR bufMin[24], bufMax[24];
+				wsprintf(bufMin, TEXT("%d"), g_SliderValue - range);
+				wsprintf(bufMax, TEXT("%d"), g_SliderValue + range);
+
+				SetWindowText(GetDlgItem(g_hDlg, 1003), bufMin);
+				SetWindowText(GetDlgItem(g_hDlg, 1004), bufMax);
+
+			}
+		}
+	}
+
+	bool controlParamsOld = false;
+
 	void Process()
 	{
+		
+
 		ui::mousePos = ui::GetCusorPos();
 		paramsAreLoaded = true;
-		
-		if (!GetAsyncKeyState(VK_CONTROL))
+
+
+
+		if ((GetAsyncKeyState(VK_MBUTTON)||
+			 GetAsyncKeyState(VK_ESCAPE)) 
+			&& timer::frameBeginTime-dTimer >200 &&
+			(GetForegroundWindow() == vsHWND || 
+				GetForegroundWindow() == g_hDlg)
+				)
 		{
-			needNewPos = true;
+			controlParams = !controlParams;
+			dTimer = timer::frameBeginTime;
+			POINT p;
+
+			GetCursorPos(&p);
+			SetWindowPos(g_hDlg, NULL, p.x- GetWindowWidth(g_hDlg) /2, p.y - GetWindowHeight(g_hDlg)/2, 0, 0, SWP_NOSIZE);
+		}
+
+		if (controlParams)
+		{
+			//controlParams = true;
+			if (controlParamsOld != controlParams)
+			{
+				VsTextCurorPos.Update();
+				if (VsTextCurorPos.newPos)
+				{
+					VsTextCurorPos.UpdateParamStr();
+
+					if (strlen(editor::VsTextCurorPos.paramStr) > 0 && strcmp(editor::VsTextCurorPos.paramStr, "nan"))
+					{
+						controlParamsOld = controlParams;
+						needNewPos = false;
+						long val = strtol(editor::VsTextCurorPos.paramStr, NULL, 10);
+						g_SliderValue = val;
+
+						HWND hSlider = GetDlgItem(g_hDlg, 1001);
+						updateRange();
+						SendMessage(hSlider, TBM_SETPOS, TRUE, g_SliderValue);
+						SetDlgItemInt(g_hDlg, 1002, g_SliderValue, TRUE);
+						ShowWindow(g_hDlg, SW_SHOW);
+					}
+					else
+					{
+						controlParams = false;
+					}
+				}
+			}
 		}
 		else
 		{
-			if (needNewPos)
+			if (controlParamsOld != controlParams)
 			{
-				VsTextCurorPos.Update();
-				VsTextCurorPos.UpdateParamStr();
-				needNewPos = false;
+				ShowWindow(g_hDlg, SW_HIDE);
+				//SetFocus(vsHWND);
+				//SetActiveWindow(vsHWND);
+				SetForegroundWindow(vsHWND);
+				controlParamsOld = controlParams;
+				oldRange = 0;
+				//editor::VsTextCurorPos.RestorePos();
 			}
+		}
 
-			int a = 20382.249;
+		wheelMode = controlParams;
+
+		if (!controlParams)
+		{
+			needNewPos = true;
+		}
+		else 
+		{
+			HWND hSlider = GetDlgItem(g_hDlg, 1001);
+			updateRange();
 
 			if (strlen(editor::VsTextCurorPos.paramStr) > 0 && strcmp(editor::VsTextCurorPos.paramStr, "nan"))
 			{
 				long val = strtol(editor::VsTextCurorPos.paramStr, NULL, 10);
-				val += editor::VsTextCurorPos.mouseDelta;
-				editor::VsTextCurorPos.mouseDelta = 0;
-				char modified[100];
-				_itoa(val, modified, 10);
-				bool lenChanged = false;
-				if (strlen(editor::VsTextCurorPos.paramStr) != strlen(modified)) lenChanged = true;
 
-				strcpy(editor::VsTextCurorPos.paramStr, modified);
-				editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, modified);
-
-				if (lenChanged)
+				if (val != g_SliderValue)
 				{
-					VsTextCurorPos.UpdateParamStr();
+					val = g_SliderValue;
+
+					SetDlgItemInt(g_hDlg, 1002, g_SliderValue, TRUE);
+					//SendMessage(hSlider, TBM_SETPOS, TRUE, g_SliderValue);
+
+					char modified[100];
+					_itoa(val, modified, 10);
+					bool lenChanged = false;
+					if (strlen(editor::VsTextCurorPos.paramStr) != strlen(modified)) lenChanged = true;
+
+					strcpy(editor::VsTextCurorPos.paramStr, modified);
+					editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, modified);
+
+					if (lenChanged)
+					{
+						VsTextCurorPos.UpdateParamStr();
+					}
+					//editor::VsTextCurorPos.RestorePos();
+					paramsAreLoaded = false;
 				}
-				//editor::VsTextCurorPos.RestorePos();
-				paramsAreLoaded = false;
 			}
 		}
 

@@ -22,6 +22,20 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 #include "utils.h"
 
 #if EditMode
+
+#include <thread>
+#include <atomic>
+
+std::atomic<bool> wheelMode{ false };
+std::atomic<int> g_ExternalScrollDelta{ 0 };
+std::atomic<bool> g_Running{ true };
+
+int g_SliderValue = 0;
+static void UpdateRangeLabels(HWND hDlg);
+static void UpdateSliderValuePosition(HWND hDlg);
+
+HWND g_hDlg = NULL;
+
 	#include <iostream>
 	#include <string>
 	#include <filesystem>
@@ -107,18 +121,276 @@ void UpdateFrame(double time)
 
 }
 
+
+
+
 //int time_activate = 0;
 
 #if DebugMode
-#include <thread>
-#include <atomic>
 
-std::atomic<int> g_ExternalScrollDelta{ 0 };
-std::atomic<bool> g_Running{ true };
+// Global state
+// Цвета в стиле Visual Studio
+#define VS_BG_LIGHT    RGB(243, 243, 243)   // фон панелей (светлая тема)
+#define VS_TEXT_LIGHT  RGB(30, 30, 30)      // основной текст (светлая)
+#define VS_BG_DARK     RGB(37, 37, 38)     // фон панелей (тёмная тема, #252526)
+#define VS_TEXT_DARK   RGB(212, 212, 212)  // основной текст (тёмная, #D4D4D4)
+static HBRUSH s_hVsBgBrushLight = NULL;
+static HBRUSH s_hVsBgBrushDark = NULL;
+
+// Определяет, включена ли тёмная тема Windows (персонализация приложений)
+static BOOL IsVsDarkTheme(void) {
+	HKEY hKey = NULL;
+	if (RegOpenKeyExW(HKEY_CURRENT_USER,
+		L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+		0, KEY_READ, &hKey) != ERROR_SUCCESS)
+		return FALSE;
+	DWORD val = 1, size = sizeof(DWORD);
+	BOOL dark = (RegQueryValueExW(hKey, L"AppsUseLightTheme", NULL, NULL, (LPBYTE)&val, &size) == ERROR_SUCCESS && val == 0);
+	RegCloseKey(hKey);
+	return dark;
+}
+
+// Helper to align memory to DWORD (required for dialog templates)
+inline void AlignToDword(std::vector<BYTE>& v) {
+	while (v.size() % 4 != 0) v.push_back(0);
+}
+
+static void UpdateSliderValuePosition(HWND hDlg) {
+	HWND hSlider = GetDlgItem(hDlg, 1001);
+	HWND hText = GetDlgItem(hDlg, 1002);
+	if (!hSlider || !hText) return;
+
+	RECT dlgRect;
+	GetClientRect(hDlg, &dlgRect);
+	int dlgW = dlgRect.right - dlgRect.left;
+	int dlgH = dlgRect.bottom - dlgRect.top;
+
+	RECT thumbRect;
+	SendMessage(hSlider, TBM_GETTHUMBRECT, 0, (LPARAM)&thumbRect);
+
+	POINT ptLeft = { thumbRect.left, thumbRect.top };
+	POINT ptRight = { thumbRect.right, thumbRect.bottom };
+	MapWindowPoints(hSlider, hDlg, &ptLeft, 1);
+	MapWindowPoints(hSlider, hDlg, &ptRight, 1);
+
+	int thumbCenterX = (ptLeft.x + ptRight.x) / 2;
+	int thumbTop = (ptLeft.y < ptRight.y) ? ptLeft.y : ptRight.y;
+
+	RECT textRect;
+	GetWindowRect(hText, &textRect);
+	int textW = textRect.right - textRect.left;
+	int textH = textRect.bottom - textRect.top;
+
+	const int margin = 4;
+	int newX = thumbCenterX - textW / 2;
+	int newY = thumbTop - textH - margin;
+
+	// Ограничение по вертикали: не выше верха окна, не ниже низа
+	if (newY < 0) newY = 0;
+	if (newY + textH > dlgH) newY = dlgH - textH;
+	// Ограничение по горизонтали
+	if (newX < 0) newX = 0;
+	if (newX + textW > dlgW) newX = dlgW - textW;
+
+	SetWindowPos(hText, NULL, newX, newY, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+}
+
+// Dialog Procedure
+static void UpdateRangeLabels(HWND hDlg) {
+	HWND hSlider = GetDlgItem(hDlg, 1001);
+	if (!hSlider) return;
+
+	int rangeMin = (int)SendMessage(hSlider, TBM_GETRANGEMIN, 0, 0);
+	int rangeMax = (int)SendMessage(hSlider, TBM_GETRANGEMAX, 0, 0);
+	TCHAR bufMin[24], bufMax[24];
+	wsprintf(bufMin, TEXT("%d"), rangeMin);
+	wsprintf(bufMax, TEXT("%d"), rangeMax);
+
+	HWND hMinLabel = GetDlgItem(hDlg, 1003);
+	HWND hMaxLabel = GetDlgItem(hDlg, 1004);
+	if (hMinLabel) SetWindowText(hMinLabel, bufMin);
+	if (hMaxLabel) SetWindowText(hMaxLabel, bufMax);
+
+	RECT dlgRect, sliderRect, valueRect;
+	GetClientRect(hDlg, &dlgRect);
+	GetWindowRect(hSlider, &sliderRect);
+	MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&sliderRect, 2);
+	HWND hValue = GetDlgItem(hDlg, 1002);
+	if (hValue) {
+		GetWindowRect(hValue, &valueRect);
+	}
+	int dlgW = dlgRect.right - dlgRect.left;
+	int pad = 8;
+	const int labelW = 56;
+	int topY = sliderRect.top;
+	int labelH = (hValue && valueRect.bottom > valueRect.top) ? (valueRect.bottom - valueRect.top) : (sliderRect.bottom - sliderRect.top);
+	if (hMinLabel) SetWindowPos(hMinLabel, NULL, pad, topY, labelW, labelH, SWP_NOZORDER);
+	if (hMaxLabel) SetWindowPos(hMaxLabel, NULL, dlgW - pad - labelW, topY, labelW, labelH, SWP_NOZORDER);
+}
+
+INT_PTR CALLBACK SliderDlgProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+
+	if (!IsWindowVisible(hDlg)) {
+		// Разрешаем только критические системные сообщения
+		if (message != WM_SHOWWINDOW && message != WM_DESTROY && message != WM_INITDIALOG)
+			return FALSE;
+	}
+
+	switch (message) {
+	case WM_DESTROY:
+		if (s_hVsBgBrushLight) { DeleteObject(s_hVsBgBrushLight); s_hVsBgBrushLight = NULL; }
+		if (s_hVsBgBrushDark) { DeleteObject(s_hVsBgBrushDark);  s_hVsBgBrushDark = NULL; }
+		return FALSE;
+	case WM_CTLCOLORDLG:
+		return (INT_PTR)(IsVsDarkTheme() ? s_hVsBgBrushDark : s_hVsBgBrushLight);
+	case WM_CTLCOLORSTATIC: {
+		HDC hdc = (HDC)wParam;
+		BOOL dark = IsVsDarkTheme();
+		SetBkColor(hdc, dark ? VS_BG_DARK : VS_BG_LIGHT);
+		SetTextColor(hdc, dark ? VS_TEXT_DARK : VS_TEXT_LIGHT);
+		return (INT_PTR)(dark ? s_hVsBgBrushDark : s_hVsBgBrushLight);
+	}
+	case WM_CTLCOLORSCROLLBAR:
+		return (INT_PTR)(IsVsDarkTheme() ? s_hVsBgBrushDark : s_hVsBgBrushLight);
+	case WM_THEMECHANGED:
+		InvalidateRect(hDlg, NULL, TRUE);
+		return FALSE;
+	case WM_INITDIALOG: {
+		if (!s_hVsBgBrushLight) s_hVsBgBrushLight = CreateSolidBrush(VS_BG_LIGHT);
+		if (!s_hVsBgBrushDark)  s_hVsBgBrushDark = CreateSolidBrush(VS_BG_DARK);
+		HWND hSlider = GetDlgItem(hDlg, 1001);
+		HWND hText = GetDlgItem(hDlg, 1002);
+		SendMessage(hSlider, TBM_SETRANGE, TRUE, MAKELPARAM(-100, 100));
+		SendMessage(hSlider, TBM_SETPOS, TRUE, g_SliderValue);
+		SetDlgItemInt(hDlg, 1002, g_SliderValue, TRUE);
+
+		// Резервируем верхнюю полосу под значение, слайдер сдвигаем вниз
+		RECT dlgRect, sliderRect, textRect;
+		GetClientRect(hDlg, &dlgRect);
+		GetWindowRect(hSlider, &sliderRect);
+		GetWindowRect(hText, &textRect);
+		MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&sliderRect, 2);
+
+		int textH = textRect.bottom - textRect.top;
+		int topZone = textH + 8;  // зона под значение
+		int dlgW = dlgRect.right - dlgRect.left;
+		int sliderH = sliderRect.bottom - sliderRect.top;
+		int pad = 8;
+		const int labelW = 56;
+
+		// Подписи минимума/максимума (ID 1003, 1004) — создаём при отсутствии, шрифт как у поля значения (1002)
+		HFONT hValueFont = (HFONT)SendMessage(hText, WM_GETFONT, 0, 0);
+		if (!GetDlgItem(hDlg, 1003)) {
+			HWND hMin = CreateWindowEx(0, TEXT("Static"), TEXT(""),
+				WS_CHILD | WS_VISIBLE | SS_LEFT,
+				pad, topZone, labelW, textH, hDlg, (HMENU)(UINT_PTR)1003, NULL, NULL);
+			if (hValueFont) SendMessage(hMin, WM_SETFONT, (WPARAM)hValueFont, TRUE);
+		}
+		if (!GetDlgItem(hDlg, 1004)) {
+			HWND hMax = CreateWindowEx(0, TEXT("Static"), TEXT(""),
+				WS_CHILD | WS_VISIBLE | SS_RIGHT,
+				dlgW - pad - labelW, topZone, labelW, textH, hDlg, (HMENU)(UINT_PTR)1004, NULL, NULL);
+			if (hValueFont) SendMessage(hMax, WM_SETFONT, (WPARAM)hValueFont, TRUE);
+		}
+		// Уже существующие подписи — тоже задаём шрифт поля значения
+		if (hValueFont) {
+			if (HWND h = GetDlgItem(hDlg, 1003)) SendMessage(h, WM_SETFONT, (WPARAM)hValueFont, TRUE);
+			if (HWND h = GetDlgItem(hDlg, 1004)) SendMessage(h, WM_SETFONT, (WPARAM)hValueFont, TRUE);
+		}
+
+		// Слайдер: между подписями минимума и максимума, не перекрывая их
+		SetWindowPos(hSlider, NULL, pad + labelW, topZone, dlgW - pad * 2 - labelW * 2, sliderH, SWP_NOZORDER);
+
+		UpdateRangeLabels(hDlg);  // текст и позиция по текущему диапазону
+		UpdateSliderValuePosition(hDlg);
+		return TRUE;
+	}
+	case WM_HSCROLL: {
+		int newVal = (int)SendMessage((HWND)lParam, TBM_GETPOS, 0, 0);
+		g_SliderValue = newVal;
+		SetDlgItemInt(hDlg, 1002, g_SliderValue, TRUE);
+		UpdateRangeLabels(hDlg);   // обновить подписи при изменении диапазона
+		UpdateSliderValuePosition(hDlg);
+		return TRUE;
+	}
+	case WM_LBUTTONDOWN:
+		SendMessage(hDlg, WM_NCLBUTTONDOWN, HTCAPTION, 0);
+		return TRUE;
+	}
+	return FALSE;
+}
+
+
+void CreateSliderDialog(HINSTANCE hInst, HWND hParent) {
+	std::vector<BYTE> buffer;
+
+	// 1. Define Dialog Header
+	DLGTEMPLATE dlg;
+	dlg.style = WS_POPUP | WS_BORDER | DS_SETFONT | DS_CENTER;
+	dlg.dwExtendedStyle = 0;
+	dlg.cdit = 2; // 2 controls: Slider and Text
+	dlg.x = 0; dlg.y = 0; dlg.cx = 300; dlg.cy = 30;
+
+	buffer.resize(sizeof(DLGTEMPLATE));
+	memcpy(buffer.data(), &dlg, sizeof(DLGTEMPLATE));
+
+	// Append Menu (0), Class (0), Title (0)
+	for (int i = 0; i < 3; ++i) { buffer.push_back(0); buffer.push_back(0); }
+
+	// Шрифт в стиле Visual Studio — Segoe UI
+	short fontSize = 9;
+	buffer.insert(buffer.end(), (BYTE*)&fontSize, (BYTE*)&fontSize + 2);
+	const wchar_t* fontName = L"Segoe UI";
+	buffer.insert(buffer.end(), (BYTE*)fontName, (BYTE*)fontName + (wcslen(fontName) + 1) * 2);
+
+	// 2. Add Slider Control (Trackbar)
+	AlignToDword(buffer);
+	DLGITEMTEMPLATE item1;
+	item1.style = WS_CHILD | WS_VISIBLE | TBS_AUTOTICKS | WS_TABSTOP;
+	item1.dwExtendedStyle = 0;
+	item1.x = 5; item1.y = 7; item1.cx = dlg.cx - 40; item1.cy = 15;
+	item1.id = 1001;
+
+	size_t start = buffer.size();
+	buffer.resize(start + sizeof(DLGITEMTEMPLATE));
+	memcpy(&buffer[start], &item1, sizeof(DLGITEMTEMPLATE));
+
+	const wchar_t* sliderClass = L"msctls_trackbar32";
+	buffer.insert(buffer.end(), (BYTE*)sliderClass, (BYTE*)sliderClass + (wcslen(sliderClass) + 1) * 2);
+	buffer.push_back(0); buffer.push_back(0); // Title
+	buffer.push_back(0); buffer.push_back(0); // Creation Data
+
+	// 3. Add Static Text
+	AlignToDword(buffer);
+	DLGITEMTEMPLATE item2;
+	item2.style = WS_CHILD | WS_VISIBLE | SS_LEFT;
+	item2.dwExtendedStyle = 0;
+	item2.x = dlg.cx - 30; item2.y = 10; item2.cx = 25; item2.cy = 10;
+	item2.id = 1002;
+
+	start = buffer.size();
+	buffer.resize(start + sizeof(DLGITEMTEMPLATE));
+	memcpy(&buffer[start], &item2, sizeof(DLGITEMTEMPLATE));
+
+	const wchar_t* staticClass = L"Static";
+	buffer.insert(buffer.end(), (BYTE*)staticClass, (BYTE*)staticClass + (wcslen(staticClass) + 1) * 2);
+	buffer.push_back(0); buffer.push_back(0); // Title
+	buffer.push_back(0); buffer.push_back(0); // Creation Data
+
+	// Create the non-modal dialog
+	g_hDlg = CreateDialogIndirect(hInst, (LPDLGTEMPLATE)buffer.data(), hParent, SliderDlgProc);
+
+	if (g_hDlg) {
+		// HWND_TOPMOST ensures it stays above even non-active windows
+		SetWindowPos(g_hDlg, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+		//	ShowWindow(g_hDlg, SW_SHOW);
+	}
+	//ShowWindow(g_hDlg, SW_SHOW);
+}
 
 HHOOK hMouseHook;
 
-LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
+LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam) {
 
 	if (nCode == HC_ACTION && wParam == WM_MOUSEWHEEL) {
 		// Приводим lParam к структуре данных мыши
@@ -128,12 +400,14 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		// Оно упаковано в HIWORD(mouseData). Делим на 120 (WHEEL_DELTA), чтобы получить кол-во "шагов"
 		short zDelta = HIWORD(pMouse->mouseData);
 
-		if (GetKeyState(VK_CONTROL) & 0x8000 || GetKeyState(VK_SHIFT) & 0x8000) {
+		//if (GetKeyState(VK_CONTROL) & 0x8000 || GetKeyState(VK_SHIFT) & 0x8000) {
+		if (wheelMode) {
 
 			int mul = 1;
 			if (GetKeyState(VK_SHIFT) & 0x8000) mul *= 10;
+			if (GetKeyState(VK_CONTROL) & 0x8000) mul *= 10;
 
-			editor::VsTextCurorPos.mouseDelta = zDelta/120*mul;
+			//editor::VsTextCurorPos.mouseDelta = zDelta/120*mul;
 
 			HWND activeWnd = GetForegroundWindow();
 			DWORD processId;
@@ -150,6 +424,8 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 						// Если zDelta > 0 — прокрутка вверх, если < 0 — вниз
 						//std::cout << "Intercepted VS Scroll! Delta: " << zDelta << std::endl;
 
+						g_ExternalScrollDelta += mul*zDelta/120;
+
 						return 1; // Блокируем стандартный скролл в VS
 					}
 				}
@@ -159,6 +435,19 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 	}
 	return CallNextHookEx(hMouseHook, nCode, wParam, lParam);
 }
+
+void HookThread() {
+	HHOOK hHook = SetWindowsHookEx(WH_MOUSE_LL, MouseHookProc, GetModuleHandle(NULL), 0);
+
+	MSG msg;
+	while (g_Running && GetMessage(&msg, NULL, 0, 0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+
+	UnhookWindowsHookEx(hHook);
+}
+
 #endif
 
 
@@ -187,12 +476,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		editor::SetRenderWindowPosition();
 		editor::Init();
 
-		hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, GetModuleHandle(NULL), 0);
+		//std::thread hThread(HookThread);
+		/*hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, LowLevelMouseProc, GetModuleHandle(NULL), 0);
 
 		if (!hMouseHook) {
 			std::cerr << "Failed to install hook!" << std::endl;
 			return 1;
-		}
+		}*/
+		CreateSliderDialog(hInst, hWnd);
+
 	#else
 		ShowWindow(hWnd, SW_MAXIMIZE);
 	#endif	
@@ -206,7 +498,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	while (msg.message != WM_QUIT)
 	{
 		#if EditMode
-			
+		
+			//editor::VsTextCurorPos.mouseDelta = g_ExternalScrollDelta.exchange(0);
+
 			cmdParamDescBack = cmdParamDesc[currentCmd];
 
 			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -249,7 +543,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	#if EditMode
-		UnhookWindowsHookEx(hMouseHook);
+		//g_Running = false;
+		//PostThreadMessage(GetThreadId(hThread.native_handle()), WM_QUIT, 0, 0);
+		//hThread.join();
+		//UnhookWindowsHookEx(hMouseHook);
 		editor::SaveAndExit();
 
 	#endif
