@@ -7,6 +7,7 @@
 #endif
 
 #ifdef EDITOR
+	#define shaderCompileOnDemand true
 	#define forceAdapter true
 	#define adapterNum 0
 	#define EditMode true
@@ -17,6 +18,7 @@
 #endif
 
 #ifdef EDITOR_DEBUG
+	#define shaderCompileOnDemand true
 	#define forceAdapter true
 	#define adapterNum 0
 	#define EditMode true

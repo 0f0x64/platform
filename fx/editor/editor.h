@@ -8,29 +8,57 @@ namespace editor
 {
 
 	struct {
-		bool newPos = false;
-		int line =0;
-		int column =0;
+		long line =0;
+		long column =0;
 		char fileName[MAX_PATH];
-		float mouseDelta =0;
 
-		void Update()
+		char paramStr[1000];
+
+		long pStart = 0;
+		long pEnd = 0;
+
+		bool calcOffset()
 		{
-			newPos = false;
+			std::ifstream ifile(fileName);
+			std::string s;
 
-			long newline = 0;
-			long newcolumn = 0;
+			int lc = 1;
+			pStart = 0;
 
+			if (!ifile.is_open()) return false;
+
+			while (true)
+			{
+				if (!getline(ifile, s))
+				{
+					ifile.close();
+					return false;
+				}
+				if (lc < line) {
+					pStart += s.length() + 2;
+				}
+
+				if (lc == line) break;
+				lc++;
+			}
+
+			ifile.close();
+
+			return true;
+		}
+
+		bool Update()
+		{
 			HRESULT result;
 			CLSID clsid;
 			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
 			if (FAILED(result))
-				return;
+				return false;
 
 			CComPtr<IUnknown> punk;
 			result = ::GetActiveObject(clsid, NULL, &punk);
 			if (FAILED(result))
-				return;
+				return false;
 
 			CComPtr<EnvDTE::_DTE> DTE;
 			DTE = punk;
@@ -38,56 +66,170 @@ namespace editor
 			CComPtr<EnvDTE::ItemOperations> item_ops;
 			result = DTE->get_ItemOperations(&item_ops);
 			if (FAILED(result))
-				return;
+				return false;
 
 			CComPtr<EnvDTE::Document> doc;
 			result = DTE->get_ActiveDocument(&doc);
 			if (FAILED(result))
-				return;
+				return false;
 
 			CComBSTR _fileName;
 			result = doc->get_FullName(&_fileName);
 			if (FAILED(result))
-				return;
+				return false;
 
 			_bstr_t wrapper(_fileName);
-			const char* newFileName = wrapper;
+			strcpy(fileName, wrapper);
 
 			CComPtr<IDispatch> selection_dispatch;
 			result = doc->get_Selection(&selection_dispatch);
 			if (FAILED(result))
-				return;
+				return false;
 
 			CComPtr<EnvDTE::TextSelection> selection;
 			result = selection_dispatch->QueryInterface(&selection);
 			if (FAILED(result))
-				return;
+				return false;
 
 			EnvDTE::VirtualPoint* pActivePoint = nullptr;
 			result = selection->get_ActivePoint(&pActivePoint);
 			if (FAILED(result))
-				return;
+				return false;
 
-			result = pActivePoint->get_Line(&newline);
+			result = pActivePoint->get_Line(&line);
 			if (FAILED(result))
-				return;
+				return false;
 
-			result = pActivePoint->get_LineCharOffset(&newcolumn);
+			result = pActivePoint->get_LineCharOffset(&column);
 			if (FAILED(result))
-				return;
+				return false;
+
+			//get string under cursor
+			CComPtr<IDispatch> pDocDisp;
+			result = doc->Object(CComBSTR("TextDocument"), &pDocDisp);
+			if (FAILED(result))
+				return false;
+
+			CComQIPtr<EnvDTE::TextDocument> pTextDoc(pDocDisp);
+			long currentLine = 0;
+			result = selection->get_CurrentLine(&currentLine);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::EditPoint> pEditPoint;
+			result = pTextDoc->CreateEditPoint(NULL, &pEditPoint);
+			if (FAILED(result))
+				return false;
+
+			result = pEditPoint->MoveToLineAndOffset(currentLine, 1);
+			if (FAILED(result))
+				return false;
+
+			CComBSTR bstrLineText;
+			result = pEditPoint->GetLines(currentLine, currentLine + 1, &bstrLineText);
+			if (FAILED(result))
+				return false;
+
+			_bstr_t wrapper2(bstrLineText);
+			const char* str = wrapper2;
+			std::string s = str;
+			
+			//search num
+			strcpy(paramStr, "nan");
+
+			if (column > s.length() || s.length() < 1 || column - 1 < 0)
+			{
+				return false;
+			}
+
+			int ofs = 0;
+
+			if (!std::isdigit(static_cast<unsigned char>(s[column - 1])) && s[column - 1] != '-')
+			{
+				if (column - 2 < 0) return false;
+
+				if (column - 2 < 0)
+				{
+					return false;
+				}
+
+				if (column - 2 >= 0 && std::isdigit(static_cast<unsigned char>(s[column - 2])) && s[column - 1] != '-')
+				{
+					ofs = 1;
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+			//search start
+			int start = column - 1 - ofs;
+			while (true)
+			{
+				start--;
+				if (start < 0) return false;
+
+				if (start >= 0 && !std::isdigit(static_cast<unsigned char>(s[start])))
+				{
+					start++;
+					break;
+				}
+			}
+
+			//search for possible sign
+			int signPos = start;
+			while (true)
+			{
+				signPos--;
+				if (signPos < 0) break;
+
+				if (signPos >= 0)
+				{
+					if (s[signPos] == ' ')
+					{
+						continue;
+					}
+					else if (s[signPos] == '-')
+					{
+						break;
+					}
+				}
+			}
+
+			if (signPos >= 0) {
+				start = signPos;
+			}
 
 
-			if (line != newline || column != newcolumn || strcmp(fileName, newFileName))
+			//search end
+			int end = column - 1 - ofs;
+			while (true)
 			{
-				newPos = true;
-				strcpy(fileName, newFileName);
-				line = newline;
-				column = newcolumn;
+				end++;
+				if (end >= s.length())
+				{
+					end--;
+					break;
+				}
+
+				if (!std::isdigit(static_cast<unsigned char>(s[end])))
+				{
+					break;
+				}
 			}
-			else
-			{
-				
-			}
+
+			calcOffset();
+			pStart += start;
+			pEnd = pStart + (end - start);
+
+			size_t copied = s.copy(paramStr, end - start, start);
+			paramStr[copied] = '\0';
+
+			if (strlen(paramStr) <= 0 && !strcmp(paramStr, "nan")) return false;
+
+
+			return true;
 
 		}
 
@@ -138,51 +280,6 @@ namespace editor
 			selection->MoveToLineAndOffset(line, column, false);
 		}
 
-		/*void InsertInSmallFile(const std::string& path, size_t pos, size_t pos_end, const std::string& text) {
-			// 1. Open and get size
-			std::ifstream in(path, std::ios::binary | std::ios::ate);
-			if (!in) return;
-
-			size_t fileSize = static_cast<size_t>(in.tellg());
-			in.seekg(0, std::ios::beg);
-
-			// 2. Read entire original file
-			std::vector<char> original(fileSize);
-			if (fileSize > 0) {
-				in.read(original.data(), fileSize);
-			}
-			in.close();
-
-			// 3. Clamp bounds
-			if (pos > fileSize) pos = fileSize;
-			if (pos_end > fileSize) pos_end = fileSize;
-			if (pos_end < pos) pos_end = pos;
-
-			// 4. Calculate new size: [Prefix] + [New Text] + [Suffix]
-			size_t prefixSize = pos;
-			size_t suffixSize = fileSize - pos_end;
-			size_t newSize = prefixSize + text.size() + suffixSize;
-
-			// 5. Build the new buffer manually
-			std::vector<char> finalBuffer;
-			finalBuffer.reserve(newSize);
-
-			// Copy Prefix: [0 to pos)
-			finalBuffer.insert(finalBuffer.end(), original.begin(), original.begin() + prefixSize);
-
-			// Copy New Text
-			finalBuffer.insert(finalBuffer.end(), text.begin(), text.end());
-
-			// Copy Suffix: [pos_end to end)
-			finalBuffer.insert(finalBuffer.end(), original.begin() + pos_end, original.end());
-
-			// 6. Atomic-style overwrite
-			std::ofstream out(path, std::ios::binary | std::ios::trunc);
-			if (out && !finalBuffer.empty()) {
-				out.write(finalBuffer.data(), finalBuffer.size());
-			}
-		}*/
-
 		void InsertInSmallFile(const std::string& path, size_t pos, size_t pos_end, const std::string& text) {
 			// 1. Открываем файл и определяем размер одним системным вызовом
 			std::ifstream in(path, std::ios::binary | std::ios::ate);
@@ -227,132 +324,6 @@ namespace editor
 			}
 		}
 
-		char paramStr[100];
-
-		int pStart = 0;
-		int pEnd = 0;
-
-		void UpdateParamStr()
-		{
-			strcpy(paramStr, "nan");
-
-			std::ifstream ifile(fileName);
-			std::string s;
-
-			int lc = 1;
-			pStart = 0;
-
-			if (!ifile.is_open()) return;
-
-			while (true)
-			{
-				if (!getline(ifile, s))
-				{
-					ifile.close();
-					return;
-				}
-				if (lc < line) {
-					pStart += s.length()+2;
-				}
-
-				if (lc == line) break;
-				lc++;
-			}
-
-			if (column >= s.length()) return;
-
-			if (s.length() < 1) return;
-
-			if (column -1 < 0) return;
-
-			int ofs = 0;
-
-			if (!std::isdigit(static_cast<unsigned char>(s[column - 1])) && s[column - 1] != '-')
-			{
-				if (column - 2 < 0) return;
-
-				if (column - 2 < 0)
-				{
-					strcpy(paramStr, "nan");
-					return;
-				}
-
-				if (column - 2 >= 0 && std::isdigit(static_cast<unsigned char>(s[column - 2])) && s[column - 1] != '-')
-				{
-					ofs = 1;
-				}
-				else
-				{
-					strcpy(paramStr, "nan");
-					return;
-				}
-			}
-
-			//search start
-			int start = column - 1 - ofs;
-			while (true)
-			{
-				start--;
-				if (start < 0) return;
-
-				if (start >= 0 && !std::isdigit(static_cast<unsigned char>(s[start])))
-				{
-					start++;
-					break;
-				}
-			}
-
-			//search for possible sign
-			int signPos = start;
-			while (true)
-			{
-				signPos--;
-				if (signPos < 0) break;
-
-				if (signPos >= 0)
-				{
-					if (s[signPos] == ' ')
-					{
-						continue;
-					}
-					else if (s[signPos] == '-')
-					{
-						break;
-					}
-				}
-			}
-
-			if (signPos >= 0) {
-				start = signPos;
-			}
-
-
-			//search end
-			int end = column - 1 - ofs;
-			while (true)
-			{
-				end++;
-				if (end >= s.length())
-				{
-					end--;
-					break;
-				}
-
-				if (!std::isdigit(static_cast<unsigned char>(s[end])))
-				{
-					//end--;
-					break;
-				}
-			}
-
-			pStart += start;
-			pEnd = pStart + (end-start);
-
-			size_t copied = s.copy(paramStr, end - start, start);
-			paramStr[copied] = '\0';
-
-			ifile.close();
-		}
 
 	} VsTextCurorPos;
 
@@ -668,8 +639,7 @@ namespace editor
 	float mouseY = 0;
 	int storedVal = 0;
 	bool stored = false;
-	bool needNewPos = true;
-
+	
 	bool controlParams = false;
 
 	float dTimer = 0;
@@ -694,8 +664,6 @@ namespace editor
 
 	void updateRange()
 	{
-		if (!controlParams) return;
-
 		HWND hSlider = GetDlgItem(g_hDlg, 1001);
 		int range = 100;
 		if (GetAsyncKeyState(VK_CONTROL))
@@ -709,22 +677,16 @@ namespace editor
 
 		if (range != oldRange)
 		{
-			if (strlen(editor::VsTextCurorPos.paramStr) > 0 && strcmp(editor::VsTextCurorPos.paramStr, "nan"))
-			{
-				g_SliderValue = strtol(editor::VsTextCurorPos.paramStr, NULL, 10);
+			SendMessage(hSlider, TBM_SETRANGE, TRUE, MAKELPARAM(g_SliderValue - range, g_SliderValue + range));
+			SendMessage(hSlider, TBM_SETPOS, TRUE, g_SliderValue);
+			oldRange = range;
 
-				SendMessage(hSlider, TBM_SETRANGE, TRUE, MAKELPARAM(g_SliderValue - range, g_SliderValue + range));
-				SendMessage(hSlider, TBM_SETPOS, TRUE, g_SliderValue);
-				oldRange = range;
+			TCHAR bufMin[24], bufMax[24];
+			wsprintf(bufMin, TEXT("%d"), g_SliderValue - range);
+			wsprintf(bufMax, TEXT("%d"), g_SliderValue + range);
 
-				TCHAR bufMin[24], bufMax[24];
-				wsprintf(bufMin, TEXT("%d"), g_SliderValue - range);
-				wsprintf(bufMax, TEXT("%d"), g_SliderValue + range);
-
-				SetWindowText(GetDlgItem(g_hDlg, 1003), bufMin);
-				SetWindowText(GetDlgItem(g_hDlg, 1004), bufMax);
-
-			}
+			SetWindowText(GetDlgItem(g_hDlg, 1003), bufMin);
+			SetWindowText(GetDlgItem(g_hDlg, 1004), bufMax);
 		}
 	}
 
@@ -818,132 +780,139 @@ namespace editor
 		}
 	}
 
+	void SaveChanges()
+	{
+		if (controlParamsOld != controlParams)
+		{
+			char modified[100];
+			_itoa(g_SliderValue, modified, 10);
+
+			editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, modified);
+		}
+	}
+
+	void SaveChangesAndCloseSlider()
+	{
+		SaveChanges();
+
+		if (controlParamsOld != controlParams)
+		{
+			ShowWindow(g_hDlg, SW_HIDE);
+			SetForegroundWindow(vsHWND);
+			controlParamsOld = controlParams;
+			oldRange = 0;
+			//editor::VsTextCurorPos.RestorePos();
+		}
+	}
+
+	void OpenSlider()
+	{
+		if (controlParamsOld != controlParams)
+		{
+			if (VsTextCurorPos.Update())
+			{
+				calcCmdAndParamIndicies();
+
+				controlParamsOld = controlParams;
+				long val = strtol(editor::VsTextCurorPos.paramStr, NULL, 10);
+				g_SliderValue = val;
+
+				updateRange();
+				SendMessage(GetDlgItem(g_hDlg, 1001), TBM_SETPOS, TRUE, g_SliderValue);
+				SetDlgItemInt(g_hDlg, 1002, g_SliderValue, TRUE);
+				ShowWindow(g_hDlg, SW_SHOW);
+			}
+			else
+			{
+				controlParams = false;
+			}
+		}
+	}
+
 	void Process()
 	{
-		
-
 		ui::mousePos = ui::GetCusorPos();
 		paramsAreLoaded = true;
 
-
-
 		if ((GetAsyncKeyState(VK_MBUTTON)||
-			 GetAsyncKeyState(VK_ESCAPE)) 
-			&& timer::frameBeginTime-dTimer >200 &&
+			 GetAsyncKeyState(VK_ESCAPE)) && 
+			timer::frameBeginTime-dTimer >200 &&
 			(GetForegroundWindow() == vsHWND || 
-				GetForegroundWindow() == g_hDlg)
-				)
+			 GetForegroundWindow() == g_hDlg))
 		{
-			controlParams = !controlParams;
+			if (GetAsyncKeyState(VK_MBUTTON))
+			{
+				if (controlParams)
+				{
+
+					POINT pt;
+					GetCursorPos(&pt);
+					HWND hWndUnderCursor = WindowFromPoint(pt);
+
+					if (hWndUnderCursor == g_hDlg || IsChild(g_hDlg, hWndUnderCursor))
+					{
+						controlParams = false;
+					}
+					else
+					{
+						controlParamsOld = !controlParams;
+						SaveChangesAndCloseSlider();
+					}
+				}
+				else
+				{
+					controlParams = !controlParams;
+				}
+					
+					controlParamsOld = !controlParams;
+					for (int i = 0; i < 1; i++)
+					{
+						INPUT input = { 0 };
+						input.type = INPUT_MOUSE;
+						input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+						SendInput(1, &input, sizeof(INPUT));
+
+						input.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+						SendInput(1, &input, sizeof(INPUT));
+						Sleep(10);
+					}
+					oldRange = 0;
+			}
+			else
+			{
+				controlParams = !controlParams;
+			}
+
 			dTimer = timer::frameBeginTime;
 			POINT p;
-
 			GetCursorPos(&p);
+
 			SetWindowPos(g_hDlg, NULL, p.x- GetWindowWidth(g_hDlg) /2, p.y - GetWindowHeight(g_hDlg)/2, 0, 0, SWP_NOSIZE);
 		}
 
 		if (controlParams)
 		{
-			//controlParams = true;
-			if (controlParamsOld != controlParams)
-			{
-				VsTextCurorPos.Update();
-				if (VsTextCurorPos.newPos)
+			OpenSlider();
+
+			if (controlParams) {
+				HWND hSlider = GetDlgItem(g_hDlg, 1001);
+				updateRange();
+				UpdateSliderValuePosition(g_hDlg);
+
+				int val = g_SliderValue;
+				char modified[100];
+				_itoa(val, modified, 10);
+
+				if (cmdIndex >= 0 && pIndex >= 0)
 				{
-					VsTextCurorPos.UpdateParamStr();
-
-					if (strlen(editor::VsTextCurorPos.paramStr) > 0 && strcmp(editor::VsTextCurorPos.paramStr, "nan"))
-					{
-						calcCmdAndParamIndicies();
-						
-						controlParamsOld = controlParams;
-						needNewPos = false;
-						long val = strtol(editor::VsTextCurorPos.paramStr, NULL, 10);
-						g_SliderValue = val;
-
-						HWND hSlider = GetDlgItem(g_hDlg, 1001);
-						updateRange();
-						SendMessage(hSlider, TBM_SETPOS, TRUE, g_SliderValue);
-						SetDlgItemInt(g_hDlg, 1002, g_SliderValue, TRUE);
-						ShowWindow(g_hDlg, SW_SHOW);
-					}
-					else
-					{
-						controlParams = false;
-					}
+					cmdParamDesc[cmdIndex].param[pIndex].value = val;
+					strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, modified);
 				}
 			}
 		}
 		else
 		{
-			if (controlParamsOld != controlParams)
-			{
-				ShowWindow(g_hDlg, SW_HIDE);
-				//SetFocus(vsHWND);
-				//SetActiveWindow(vsHWND);
-				SetForegroundWindow(vsHWND);
-				controlParamsOld = controlParams;
-				oldRange = 0;
-				//editor::VsTextCurorPos.RestorePos();
-			}
-		}
-
-		wheelMode = controlParams;
-
-		if (!controlParams)
-		{
-			needNewPos = true;
-		}
-		else 
-		{
-			HWND hSlider = GetDlgItem(g_hDlg, 1001);
-			updateRange();
-
-			if (strlen(editor::VsTextCurorPos.paramStr) > 0 && strcmp(editor::VsTextCurorPos.paramStr, "nan"))
-			{
-				long val = strtol(editor::VsTextCurorPos.paramStr, NULL, 10);
-
-				if (val != g_SliderValue)
-				{
-					val = g_SliderValue;
-
-					SetDlgItemInt(g_hDlg, 1002, val, TRUE);
-					//SendMessage(hSlider, TBM_SETPOS, TRUE, g_SliderValue);
-
-					char modified[100];
-					_itoa(val, modified, 10);
-					bool lenChanged = false;
-					if (strlen(editor::VsTextCurorPos.paramStr) != strlen(modified)) lenChanged = true;
-
-					strcpy(editor::VsTextCurorPos.paramStr, modified);
-					editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, modified);
-
-					if (lenChanged)
-					{
-						VsTextCurorPos.UpdateParamStr();
-					}
-					//editor::VsTextCurorPos.RestorePos();
-					//paramsAreLoaded = false;
-
-					
-
-
-						if (cmdIndex >= 0 && pIndex >= 0)
-						{
-							cmdParamDesc[cmdIndex].param[pIndex].value = val;
-							strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, modified);
-						}
-
-						//char aa[10];
-						//_itoa(pIndex, aa, 10);
-						//OutputDebugString(aa);
-						//OutputDebugString("\n");
-
-						int a = 0;
-					
-
-				}
-			}
+			SaveChangesAndCloseSlider();
 		}
 
 				
@@ -986,7 +955,7 @@ namespace editor
 		//if (paramEdit::editContext)
 		if (editorMode == editorMode_::graphics)
 		{
-			paramEdit::ShowStack();
+			//paramEdit::ShowStack();
 		}
 
 		//if (isKeyDown(TIME_KEY) || showTimeFlag)

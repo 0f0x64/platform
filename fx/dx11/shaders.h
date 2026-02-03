@@ -279,11 +279,31 @@ namespace Shaders {
 
 	void vShader(unsigned int n)
 	{
+	#if DebugMode
+		if (!VS[n].pShader)
+		{
+			char fileName[255];
+			strcpy(fileName, "/vs/");
+			strcat(fileName, vsList[n]);
+			strcat(fileName, shaderExtension);
+			CreateVS(n, fileName);
+		}
+	#endif	
 		context->VSSetShader(VS[n].pShader, NULL, 0);
 	}
 
 	void pShader(unsigned int n)
 	{
+	#if DebugMode
+			if (!PS[n].pShader)
+			{
+				char fileName[255];
+				strcpy(fileName, "/ps/");
+				strcat(fileName, psList[n]);
+				strcat(fileName, shaderExtension);
+				CreatePS(n, fileName);
+			}
+	#endif
 		context->PSSetShader(PS[n].pShader, NULL, 0);
 	}
 

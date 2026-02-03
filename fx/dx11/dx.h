@@ -71,7 +71,9 @@ namespace dx11
 		Blend::Init();
 		ConstBuf::Init();
 		Sampler::Init();
+#if !shaderCompileOnDemand
 		Shaders::Init();
+#endif
 		Textures::Init();
 	}
 
