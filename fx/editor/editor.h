@@ -729,6 +729,94 @@ namespace editor
 	}
 
 	bool controlParamsOld = false;
+	int pIndex = -1;
+	int cmdIndex = -1;
+
+	void calcCmdAndParamIndicies()
+	{
+
+		pIndex = -1;
+		cmdIndex = -1;
+
+		int ln = -1;
+
+		for (int i = 0; i < cmdCounter; i++)
+		{
+			char* fn = cmdParamDesc[i].caller.fileName;
+			if (!lstrcmp(fn, VsTextCurorPos.fileName))
+			{
+				if (VsTextCurorPos.line >= cmdParamDesc[i].caller.line)
+				{
+					ln = max(ln, cmdParamDesc[i].caller.line);
+					cmdIndex = i;
+				}
+			}
+		}
+		if (ln > 0)
+		{
+			std::ifstream ifile(VsTextCurorPos.fileName);
+			std::string s;
+
+			int lc = 1;
+
+			if (!ifile.is_open()) return;
+
+			//find command start
+			while (true)
+			{
+				if (!getline(ifile, s))
+				{
+					ifile.close();
+					return;
+				}
+
+				if (lc == ln) break;
+				lc++;
+			}
+
+			//find 
+			std::string sp = s;
+			s.clear();
+
+			while (true)
+			{
+				size_t end = sp.find(";");
+				if (end != std::string::npos)
+				{
+					sp.erase(end);
+				}
+
+				if (lc == VsTextCurorPos.line)
+				{
+					sp.erase(min(VsTextCurorPos.column, sp.length()));
+					s += sp;
+					break;
+				}
+
+				s += sp;
+				s += "\n";
+
+				if (!getline(ifile, sp))
+				{
+					ifile.close();
+					return;
+				}
+
+				lc++;
+			}
+
+
+			size_t start = s.find(cmdParamDesc[cmdIndex].funcName);
+
+			ifile.close();
+
+			pIndex = 0;
+			for (int i = 0; i < s.length(); i++)
+			{
+				if (s[i] == ',') pIndex++;
+			}
+		}
+	}
 
 	void Process()
 	{
@@ -766,6 +854,8 @@ namespace editor
 
 					if (strlen(editor::VsTextCurorPos.paramStr) > 0 && strcmp(editor::VsTextCurorPos.paramStr, "nan"))
 					{
+						calcCmdAndParamIndicies();
+						
 						controlParamsOld = controlParams;
 						needNewPos = false;
 						long val = strtol(editor::VsTextCurorPos.paramStr, NULL, 10);
@@ -817,7 +907,7 @@ namespace editor
 				{
 					val = g_SliderValue;
 
-					SetDlgItemInt(g_hDlg, 1002, g_SliderValue, TRUE);
+					SetDlgItemInt(g_hDlg, 1002, val, TRUE);
 					//SendMessage(hSlider, TBM_SETPOS, TRUE, g_SliderValue);
 
 					char modified[100];
@@ -833,7 +923,25 @@ namespace editor
 						VsTextCurorPos.UpdateParamStr();
 					}
 					//editor::VsTextCurorPos.RestorePos();
-					paramsAreLoaded = false;
+					//paramsAreLoaded = false;
+
+					
+
+
+						if (cmdIndex >= 0 && pIndex >= 0)
+						{
+							cmdParamDesc[cmdIndex].param[pIndex].value = val;
+							strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, modified);
+						}
+
+						//char aa[10];
+						//_itoa(pIndex, aa, 10);
+						//OutputDebugString(aa);
+						//OutputDebugString("\n");
+
+						int a = 0;
+					
+
 				}
 			}
 		}

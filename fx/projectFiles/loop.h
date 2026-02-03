@@ -44,11 +44,11 @@ namespace Loop
 			BasicCam::setCamKey({
 				.camTime = 0,
 				.camType = keyType::slide,
-				.eye_x = 3814,
-				.eye_y = 952,
+				.eye_x = 2188,
+				.eye_y = 2940,
 				.eye_z = 3957,
 				.at_x = 0,
-				.at_y = 360,
+				.at_y = 6,
 				.at_z = 0,
 				.up_x = 0,
 				.up_y = 262,
@@ -66,11 +66,11 @@ namespace Loop
 			});
 
 			BasicCam::setCamKey({
-				.camTime = 1112,
+				.camTime = 1115,
 				.camType = keyType::slide,
-				.eye_x = -10667,
-				.eye_y = 14562,
-				.eye_z = 18241,
+				.eye_x = -10646,
+				.eye_y = 14546,
+				.eye_z = 18242,
 				.at_x = 0,
 				.at_y = 0,
 				.at_z = 0,
@@ -145,7 +145,7 @@ namespace Loop
 		
 		cameraMan::run({});
 
-		Object::Saggitarius({.quality = 1});
+		Object::Saggitarius({.quality = 2});
 		//Object::Zenith({.quality = 1});
 		//Object::Fish({.quality = 1});
 		//Object::Libra({.quality = 1});
