@@ -85,7 +85,7 @@ pos_color CalcParticles(uint qid,float4 grid)
                p.color*=15;
          }
     }
-    //p.pos.x+=-359;
+    p.pos.x+=0;
     //density compensation
     p.color/=min(pow(p.pos.w,1.1)*.21+.5,11);
     return p;

@@ -17,34 +17,57 @@ namespace editor
 		long pStart = 0;
 		long pEnd = 0;
 
-		bool calcOffset()
-		{
-			std::ifstream ifile(fileName);
-			std::string s;
+		long start=0;
+		long end = 0;
 
-			int lc = 1;
-			pStart = 0;
+		char* extractNumberAtC(const char* str, size_t pos) {
+			if (!str) return nullptr;
+			size_t n = strlen(str);
+			if (pos > n) return nullptr;
 
-			if (!ifile.is_open()) return false;
+			int start_ = (int)pos;
+			int end_ = (int)pos;
 
-			while (true)
-			{
-				if (!getline(ifile, s))
-				{
-					ifile.close();
-					return false;
-				}
-				if (lc < line) {
-					pStart += s.length() + 2;
-				}
-
-				if (lc == line) break;
-				lc++;
+			// 1. Если курсор на пробеле или знаке, ищем цифру вплотную
+			if (!std::isdigit((unsigned char)str[pos])) {
+				if (pos < n && std::isdigit((unsigned char)str[pos + 1])) { start_ = end_ = (int)pos + 1; }
+				else if (pos > 0 && std::isdigit((unsigned char)str[pos - 1])) { start_ = end_ = (int)pos - 1; }
+				else if (str[pos] != '-' && str[pos] != '+') return nullptr;
 			}
 
-			ifile.close();
+			// 2. Расширяемся вправо (собираем все цифры)
+			while (end_ + 1 < (int)n && std::isdigit((unsigned char)str[end_ + 1])) {
+				end_++;
+			}
 
-			return true;
+			// 3. Расширяемся влево (собираем все цифры)
+			while (start_ > 0 && std::isdigit((unsigned char)str[start_ - 1])) {
+				start_--;
+			}
+
+			// 4. Ищем знак перед числом (с учетом пробелов)
+			int signPos = start_ - 1;
+			while (signPos >= 0 && std::isspace((unsigned char)str[signPos])) {
+				signPos--;
+			}
+
+			if (signPos >= 0 && (str[signPos] == '-' || str[signPos] == '+')) {
+				start_ = signPos;
+			}
+
+			// 5. Сохраняем глобальные оффсеты
+			start = (size_t)start_;
+			end = (size_t)end_ + 1; // Конец диапазона (не включая символ)
+			size_t len = end - start;
+
+			// 6. Копируем результат
+			char* result = (char*)malloc(len + 1);
+			if (result) {
+				memcpy(result, str + start, len);
+				result[len] = '\0';
+			}
+
+			return result;
 		}
 
 		bool Update()
@@ -133,118 +156,68 @@ namespace editor
 			_bstr_t wrapper2(bstrLineText);
 			const char* str = wrapper2;
 			std::string s = str;
+
+			//calc offset
+			CComPtr<EnvDTE::EditPoint> startT;
+			result = pTextDoc->CreateEditPoint(NULL, &startT);
+			if (FAILED(result))
+				return false;
+
+			CComBSTR bstrTextBefore;
+			CComVariant varEndPoint(pActivePoint);
+			result = startT->GetText(varEndPoint, &bstrTextBefore);
+			if (FAILED(result))
+				return false;
+
+			int byteOffset = WideCharToMultiByte(CP_UTF8, 0, bstrTextBefore, -1, NULL, 0, NULL, NULL);
+			pStart = byteOffset-column;
 			
 			//search num
 			strcpy(paramStr, "nan");
 
-			if (column > s.length() || s.length() < 1 || column - 1 < 0)
-			{
+			char* number = extractNumberAtC(s.c_str(), column-1);
+			strcpy(paramStr, number);
+			free(number);
+
+			column = start+1;
+			selection->MoveToLineAndOffset(line, column, VARIANT_FALSE);
+
+		
+			/*EnvDTE::VirtualPoint* pActivePoint3 = nullptr;
+			result = selection->get_ActivePoint(&pActivePoint3);
+			if (FAILED(result))
 				return false;
-			}
 
-			int ofs = 0;
+			long column2;
+			result = pActivePoint->get_LineCharOffset(&column2);
+			if (FAILED(result))
+				return false;*/
 
-			if (!std::isdigit(static_cast<unsigned char>(s[column - 1])) && s[column - 1] != '-')
-			{
-				if (column - 2 < 0) return false;
-
-				if (column - 2 < 0)
-				{
-					return false;
-				}
-
-				if (column - 2 >= 0 && std::isdigit(static_cast<unsigned char>(s[column - 2])) && s[column - 1] != '-')
-				{
-					ofs = 1;
-				}
-				else
-				{
-					return false;
-				}
-			}
-
-			//search start
-			int start = column - 1 - ofs;
-			while (true)
-			{
-				start--;
-				if (start < 0) return false;
-
-				if (start >= 0 && !std::isdigit(static_cast<unsigned char>(s[start])))
-				{
-					start++;
-					break;
-				}
-			}
-
-			//search for possible sign
-			int signPos = start;
-			while (true)
-			{
-				signPos--;
-				if (signPos < 0) break;
-
-				if (signPos >= 0)
-				{
-					if (s[signPos] == ' ')
-					{
-						continue;
-					}
-					else if (s[signPos] == '-')
-					{
-						break;
-					}
-				}
-			}
-
-			if (signPos >= 0) {
-				start = signPos;
-			}
-
-
-			//search end
-			int end = column - 1 - ofs;
-			while (true)
-			{
-				end++;
-				if (end >= s.length())
-				{
-					end--;
-					break;
-				}
-
-				if (!std::isdigit(static_cast<unsigned char>(s[end])))
-				{
-					break;
-				}
-			}
-
-			calcOffset();
 			pStart += start;
 			pEnd = pStart + (end - start);
 
 			size_t copied = s.copy(paramStr, end - start, start);
 			paramStr[copied] = '\0';
 
-			if (strlen(paramStr) <= 0 && !strcmp(paramStr, "nan")) return false;
-
+			if (strlen(paramStr) <= 0 && !strcmp(paramStr, "nan")) 
+				return false;
 
 			return true;
 
 		}
 
-		void RestorePos()
+		bool ReplaceTextInVS()
 		{
 			HRESULT result;
 			CLSID clsid;
 			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
 			if (FAILED(result))
-				return;
+				return false;
 
 			CComPtr<IUnknown> punk;
 			result = ::GetActiveObject(clsid, NULL, &punk);
 			if (FAILED(result))
-				return;
+				return false;
 
 			CComPtr<EnvDTE::_DTE> DTE;
 			DTE = punk;
@@ -252,32 +225,47 @@ namespace editor
 			CComPtr<EnvDTE::ItemOperations> item_ops;
 			result = DTE->get_ItemOperations(&item_ops);
 			if (FAILED(result))
-				return;
+				return false;
 
 			CComPtr<EnvDTE::Document> doc;
 			result = DTE->get_ActiveDocument(&doc);
 			if (FAILED(result))
-				return;
-
-			CComBSTR _fileName;
-			result = doc->get_FullName(&_fileName);
-			if (FAILED(result))
-				return;
-
-			_bstr_t wrapper(_fileName);
-			const char* newFileName = wrapper;
+				return false;
 
 			CComPtr<IDispatch> selection_dispatch;
 			result = doc->get_Selection(&selection_dispatch);
 			if (FAILED(result))
-				return;
+				return false;
 
 			CComPtr<EnvDTE::TextSelection> selection;
 			result = selection_dispatch->QueryInterface(&selection);
 			if (FAILED(result))
-				return;
+				return false;
 
-			selection->MoveToLineAndOffset(line, column, false);
+			CComPtr<IDispatch> pDocDisp;
+			result = doc->Object(CComBSTR("TextDocument"), &pDocDisp);
+			if (FAILED(result))
+				return false;
+
+			CComQIPtr<EnvDTE::TextDocument> pTextDoc(pDocDisp);
+
+			CComPtr<EnvDTE::EditPoint> pEditStart;
+			pTextDoc->CreateEditPoint(NULL, &pEditStart);
+			pEditStart->MoveToLineAndOffset(line, start+1);
+
+			CComPtr<EnvDTE::EditPoint> pEditEnd;
+			pTextDoc->CreateEditPoint(NULL, &pEditEnd);
+			pEditEnd->MoveToLineAndOffset(line, end + 1);
+
+			// Заменяем текст между двумя точками
+			int val = g_SliderValue;
+			char modified[100];
+			_itoa(val, modified, 10);
+
+			CComBSTR bstrNewText(modified);
+			pEditStart->ReplaceText(CComVariant(pEditEnd), bstrNewText, (long)EnvDTE::vsEPReplaceTextOptions::vsEPReplaceTextKeepMarkers);
+
+			selection->MoveToLineAndOffset(line, start + 1, VARIANT_FALSE);
 		}
 
 		void InsertInSmallFile(const std::string& path, size_t pos, size_t pos_end, const std::string& text) {
@@ -705,12 +693,17 @@ namespace editor
 		for (int i = 0; i < cmdCounter; i++)
 		{
 			char* fn = cmdParamDesc[i].caller.fileName;
-			if (!lstrcmp(fn, VsTextCurorPos.fileName))
+			if (strcmp(fn, VsTextCurorPos.fileName) == 0)
 			{
 				if (VsTextCurorPos.line >= cmdParamDesc[i].caller.line)
 				{
+					if (ln <= cmdParamDesc[i].caller.line)
+					{
+						cmdIndex = i;
+						currentCmd = i;
+					}
 					ln = max(ln, cmdParamDesc[i].caller.line);
-					cmdIndex = i;
+
 				}
 			}
 		}
@@ -780,28 +773,87 @@ namespace editor
 		}
 	}
 
-	void SaveChanges()
+#include <filesystem>
+
+	namespace fs = std::filesystem;
+
+	void getPathParts(const std::string& fullPath, std::string& nameOnly, std::string& parentFolder) {
+		fs::path p(fullPath);
+
+		// 1. Имя файла без расширения (stem)
+		nameOnly = p.stem().string();
+
+		// 2. Название папки на один уровень выше
+		// p.parent_path() возвращает полный путь к папке, 
+		// .filename() извлекает только последнее имя в этом пути
+		parentFolder = p.parent_path().filename().string();
+	}
+
+	void recompileShader()
 	{
-		if (controlParamsOld != controlParams)
+		std::string name, folder;
+
+		getPathParts(VsTextCurorPos.fileName, name, folder);
+
+		std::string rPath = "\/" + folder + "\/" + name + dx11::Shaders::shaderExtension;
+
+		// detect vertex/pixel shader and slot
+		if (folder[0] == 'v')
+		{
+			int i = 0;
+			while (i < dx11::Shaders::vsCount)
+			{
+				if (!strcmp(dx11::Shaders::vsList[i], name.c_str()))
+				{
+					dx11::Shaders::CreateVS(i, rPath.c_str());
+					break;
+				}
+				i++;
+			}
+
+		}
+
+		if (folder[0] == 'p')
+		{
+			int i = 0;
+			while (i < dx11::Shaders::psCount)
+			{
+				if (!strcmp(dx11::Shaders::psList[i], name.c_str()))
+				{
+					dx11::Shaders::CreatePS(i, rPath.c_str());
+					break;
+				}
+				i++;
+			}
+
+		}
+	}
+
+	void SaveChanges(bool force = false)
+	{
+		if (controlParamsOld != controlParams || force)
 		{
 			char modified[100];
 			_itoa(g_SliderValue, modified, 10);
 
-			editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, modified);
+			//VsTextCurorPos.ReplaceTextInVS();
+
+			//editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, modified);
 		}
 	}
 
+
 	void SaveChangesAndCloseSlider()
 	{
-		SaveChanges();
-
 		if (controlParamsOld != controlParams)
 		{
+			VsTextCurorPos.Update();
+			VsTextCurorPos.ReplaceTextInVS();
+
 			ShowWindow(g_hDlg, SW_HIDE);
 			SetForegroundWindow(vsHWND);
 			controlParamsOld = controlParams;
 			oldRange = 0;
-			//editor::VsTextCurorPos.RestorePos();
 		}
 	}
 
@@ -811,8 +863,13 @@ namespace editor
 		{
 			if (VsTextCurorPos.Update())
 			{
-				calcCmdAndParamIndicies();
-
+				char* result = strstr(VsTextCurorPos.fileName, ".shader");
+				cmdIndex = -1;
+				pIndex = -1;
+				if (!result)
+				{
+					calcCmdAndParamIndicies();
+				}
 				controlParamsOld = controlParams;
 				long val = strtol(editor::VsTextCurorPos.paramStr, NULL, 10);
 				g_SliderValue = val;
@@ -828,6 +885,8 @@ namespace editor
 			}
 		}
 	}
+
+	int oldValue = 0;
 
 	void Process()
 	{
@@ -865,17 +924,6 @@ namespace editor
 				}
 					
 					controlParamsOld = !controlParams;
-					for (int i = 0; i < 1; i++)
-					{
-						INPUT input = { 0 };
-						input.type = INPUT_MOUSE;
-						input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-						SendInput(1, &input, sizeof(INPUT));
-
-						input.mi.dwFlags = MOUSEEVENTF_LEFTUP;
-						SendInput(1, &input, sizeof(INPUT));
-						Sleep(10);
-					}
 					oldRange = 0;
 			}
 			else
@@ -908,6 +956,17 @@ namespace editor
 					cmdParamDesc[cmdIndex].param[pIndex].value = val;
 					strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, modified);
 				}
+
+				char* s = strstr(VsTextCurorPos.fileName, dx11::Shaders::shaderExtension);
+
+				if (s && oldValue!=val)
+				{
+					VsTextCurorPos.Update();
+					VsTextCurorPos.ReplaceTextInVS();
+				}
+
+				oldValue = val;
+				
 			}
 		}
 		else

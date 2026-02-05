@@ -1,6 +1,10 @@
+namespace paramEdit {
+	void SaveToSource(int cmdIndex);
+}
+
+
 namespace ViewCam
 {
-
 
 	typedef struct  {
 		XMVECTOR Target;
@@ -372,6 +376,8 @@ namespace ViewCam
 						cmdParamDesc[currentCmd].param[10].value = (int)XMVectorGetZ(up);
 
 						cmdParamDesc[currentCmd].param[11].value = (int)Camera::viewCam.angle;
+
+						paramEdit::SaveToSource(currentCmd);
 
 					}
 

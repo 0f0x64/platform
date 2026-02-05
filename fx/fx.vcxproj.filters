@@ -351,5 +351,8 @@
     <None Include="projectFiles\shaders\lib\particleVS_main2.shader">
       <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
     </None>
+    <None Include="projectFiles\shaders\lib\girl_data.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -97,16 +97,32 @@ float3 pos;
     p += jitter/(pow(length(p),2)+.1)*172;
 
     float py = frac(iid/292100.-time.x/1000+hash(iid)/10);
-    float3 g=girl_vertex[iid%2921]/4.8;
+    float3 g=girl_vertex[iid%3990]/4.8;
+    float3 g_1=girl_vertex[iid%3990+(iid/3990)%3]/4.8;
+    g=lerp(g,g_1,.03);
+
     g.y+=noise(time.x/50)*12;
-    g+=hash33(g+hash(iid))*1.3;
+    g+=hash33(g+hash(iid))*.15;
     float margin = iid%2>(noise(g+time.x/10+222)*3+1);
     g.xyz+=margin*noise3(iid/292100.+g/3)*12*(py);
     g.xyz+=margin*noise3(g/3)*2;
     g.y+=margin*pow(frac(iid/292100.+time.x/20),1)*7;
 
+    float3 nn=g/4;
+    for (int i = 0; i < 8; i++) {
+        p_prev = nn;
+        float3 next = noise3(nn*8+22+a/b+(time.x/32)*0);
+        
+        nn -=next/(i+1)*(1-form);
+        //nn=rot3(nn,nn*3*(1-form));
+        nn=lerp(nn,rot3(nn,nn*1),(1-form));
+        nn+=(rot3(nn-nn/2,nn*.1)+nn/2)/51*form;
+        nn += next/(i+1)*form;
 
-    g=lerp(g,noise3(g/3)*133,sm2(sm2(form)) );
+
+    }
+
+    g=lerp(g,nn*33,sm2(sm2(form)) );
     //g*=2;
     float3 g2=normalize(hash3(iid))*84*hash(iid)+noise3(g/2)*25;
 
@@ -153,7 +169,7 @@ float3 pos;
     else
     {
         p1.pos = transform(pos,grid.zw,121.2);
-        p1.color*=.5*(1-saturate(pow(length(p)/21,.75)));
+        p1.color*=.15*(1-saturate(pow(length(p)/21,.75)));
         p1.sz=1.2;
        // p1.color=lerp(p1.color,1,form);
 
