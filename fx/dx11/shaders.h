@@ -126,6 +126,13 @@ namespace Shaders {
 		void Init()
 		{
 			vsCount = sizeof(vsList) / sizeof(const char*);
+			psCount = sizeof(psList) / sizeof(const char*);
+
+		#if shaderCompileOnDemand
+			firstRun = false;
+			return;
+		#endif	
+
 			int i = 0;
 			while (i < vsCount)
 			{
@@ -138,7 +145,6 @@ namespace Shaders {
 
 			}
 
-			psCount = sizeof(psList) / sizeof(const char*);
 			i = 0;
 			while (i < psCount)
 			{
