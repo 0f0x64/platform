@@ -239,8 +239,15 @@ namespace paramEdit {
 
 	}
 
+#include <unordered_map>
+#include <vector>
+
 	void reflect_f(auto* in, const std::source_location caller, const std::source_location currentFunc)//name and types without names
 	{
+
+
+
+
 		auto c = &cmdParamDesc[cmdCounter];
 
 		if (!paramsAreLoaded)  //variables -> reflected struct

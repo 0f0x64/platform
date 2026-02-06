@@ -293,8 +293,9 @@ namespace Object {
 				.skipper = in.skipper,
 				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
 				.mesh = {
-					//#include "girl.h"
-					#include "girl_rand.h"
+					#include "girl.h"
+					//#include "girl_rand.h"
+					//#include "girl_mini.h"
 				}
 			},
 		};

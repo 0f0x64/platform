@@ -139,6 +139,7 @@ namespace Loop
 			.op = blendop::add
 		});
 
+
 		DepthBuf::Mode({ depthmode::off });
 
 		Culling::Set({cullmode::back});

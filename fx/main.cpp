@@ -28,6 +28,7 @@ static void UpdateRangeLabels(HWND hDlg);
 static void UpdateSliderValuePosition(HWND hDlg);
 HWND g_hDlg = NULL;
 
+	
 	#include <iostream>
 	#include <string>
 	#include <filesystem>
