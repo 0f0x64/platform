@@ -239,18 +239,40 @@ namespace paramEdit {
 
 	}
 
-#include <unordered_map>
-#include <vector>
+	struct DataNode {
+		std::string callSite;
+		int index;
+	};
+
+	static std::unordered_map<std::string, int> registry;
+	static int next_index = 0;
 
 	void reflect_f(auto* in, const std::source_location caller, const std::source_location currentFunc)//name and types without names
 	{
 
+		std::string key = std::string(caller.file_name()) + ":" + std::to_string(caller.line());
 
+		auto it = registry.find(key);
 
+		if (it != registry.end()) {
+			cmdCounter = registry[key];
+			cmdParamDesc[cmdCounter].loaded = true;
+
+		}
+		else {
+			int new_index = next_index++;
+			registry[key] = new_index;
+			cmdCounter = new_index;
+			cmdParamDesc[cmdCounter].loaded = false;
+		}
+
+//		cmdCounter = registry[key];
 
 		auto c = &cmdParamDesc[cmdCounter];
 
-		if (!paramsAreLoaded)  //variables -> reflected struct
+		//if (true)
+		if (!c->loaded || !paramsAreLoaded)
+		//if (!paramsAreLoaded)  //variables -> reflected struct
 		{
 			FillCaller(caller);
 
@@ -319,7 +341,7 @@ namespace paramEdit {
 								c->stackLevel = cmdLevel;
 								c->uiDraw = &showStackItem;
 								cmdLevel++;
-								cmdCounter++;
+								//cmdCounter++;
 								return;
 							}
 
@@ -493,7 +515,7 @@ namespace paramEdit {
 								c->param[i].bypass = true;
 								//if (c->param[i]._min < 0)
 								{
-									switch (c->param[i].size)
+									/*switch (c->param[i].size)
 									{
 									case 1:
 										c->param[i].value = *(char*)((char*)in + c->param[i].offset);
@@ -505,7 +527,7 @@ namespace paramEdit {
 										c->param[i].value = *(int*)((char*)in + c->param[i].offset);
 										break;
 
-									}
+									}*/
 								}
 								/*
 								else
@@ -546,22 +568,24 @@ namespace paramEdit {
 		
 		
 		//variables <- reflected struct
+
 		{
 
-			for (int i = 0; i < c->pCount; i++)
+ 			for (int i = 0; i < c->pCount; i++)
 			{
 				//if (c->param[i]._min < 0)
+				if (!c->param[i].bypass)
 				{
 					switch (c->param[i].size)
 					{
 					case 1:
-						*(char*)((char*)in + c->param[i].offset) = c->param[i].value;
+						*(char*)((char*)in + c->param[i].offset) = (char)c->param[i].value;
 						break;
 					case 2:
-						*(short*)((char*)in + c->param[i].offset) = c->param[i].value;
+						*(short*)((char*)in + c->param[i].offset) = (short)c->param[i].value;
 						break;
 					case 4:
-						*(int*)((char*)in + c->param[i].offset) = c->param[i].value;
+						*(int*)((char*)in + c->param[i].offset) = (int)c->param[i].value;
 						break;
 
 					}
@@ -586,13 +610,15 @@ namespace paramEdit {
 
 				
 			}
+
+
 		}
 
 		c->stackLevel = cmdLevel;
 		c->uiDraw = &showStackItem;
 		cmdLevel++;
 
-		cmdCounter++;
+		//cmdCounter++;
 
 	}
 

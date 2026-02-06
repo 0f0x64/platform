@@ -33,6 +33,8 @@ struct ParamDesc {
 
 	int stackLevel = 0;
 
+	bool loaded = false;
+
 };
 
 ParamDesc cmdParamDesc[1000];

@@ -28,7 +28,9 @@ static void UpdateRangeLabels(HWND hDlg);
 static void UpdateSliderValuePosition(HWND hDlg);
 HWND g_hDlg = NULL;
 
-	
+	#include <unordered_map>
+	#include <vector>
+
 	#include <iostream>
 	#include <string>
 	#include <filesystem>

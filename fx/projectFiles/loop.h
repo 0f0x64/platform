@@ -44,10 +44,10 @@ namespace Loop
 			BasicCam::setCamKey({
 				.camTime = 0,
 				.camType = keyType::slide,
-				.eye_x = -869,
-				.eye_y = 13028,
-				.eye_z = 47289,
-				.at_x = 0,
+				.eye_x = 9930,
+				.eye_y = 222,
+				.eye_z = 71222,
+				.at_x = 756,
 				.at_y = 0,
 				.at_z = 0,
 				.up_x = 0,
@@ -70,7 +70,7 @@ namespace Loop
 				.camType = keyType::slide,
 				.eye_x = -5610,
 				.eye_y = -1158,
-				.eye_z = 9876,
+				.eye_z = -22856,
 				.at_x = 0,
 				.at_y = 0,
 				.at_z = 0,
@@ -146,16 +146,27 @@ namespace Loop
 		
 		cameraMan::run({});
 
-		//Object::Saggitarius({.quality = 1});
-		//Object::Zenith({.quality = 1});
-		//Object::Fish({.quality = 1});
+		int t = timer::timeCursor / 1000000;
+
+		switch (t)
+		{
+		case 0:
+			Object::Saggitarius({ .quality = 1 });
+			break;
+		case 1:
+			Object::Zenith({ .quality = 1 });
+			break;
+		case 2:
+			Object::Fish({ .quality = 1 });
+			break;
+		}
 		//Object::Libra({.quality = 1});
 		//Object::Aquarius({.quality = 1});
 		//Object::Crab({ .quality = 1 });
 		//Object::Twins({ .quality = 1 });
 		//Object::LeoBigStar({ .quality = 1 });
 		//Object::Capri({ .quality = 1 });
-		Object::Taurus({ .quality = 1 });
+		//Object::Taurus({ .quality = 1 });
 		//Object::Scorpio({ .quality = 1 });
 		//Object::Aries({ .quality = 1 });
 		//Object::Virgo({ .quality = 1 });
