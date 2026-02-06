@@ -44,15 +44,15 @@ namespace Loop
 			BasicCam::setCamKey({
 				.camTime = 0,
 				.camType = keyType::slide,
-				.eye_x = -361,
-				.eye_y = -1005,
-				.eye_z = 3137,
+				.eye_x = -869,
+				.eye_y = 13028,
+				.eye_z = 47289,
 				.at_x = 0,
 				.at_y = 0,
 				.at_z = 0,
-				.up_x = -8,
-				.up_y = 242,
-				.up_z = 76,
+				.up_x = 0,
+				.up_y = 254,
+				.up_z = -17,
 				.angle = 100,
 				.sType = sliderType::follow,
 				.slide_x = 0,
@@ -66,20 +66,20 @@ namespace Loop
 			});
 
 			BasicCam::setCamKey({
-				.camTime = 1115,
+				.camTime = 615,
 				.camType = keyType::slide,
-				.eye_x = -3439,
-				.eye_y = 2968,
-				.eye_z = 2011,
+				.eye_x = -5610,
+				.eye_y = -1158,
+				.eye_z = 9876,
 				.at_x = 0,
 				.at_y = 0,
 				.at_z = 0,
-				.up_x = 131,
-				.up_y = 204,
-				.up_z = -76,
+				.up_x = -7,
+				.up_y = 253,
+				.up_z = 24,
 				.angle = 100,
 				.sType = sliderType::follow,
-				.slide_x = 0,
+				.slide_x = -3,
 				.slide_y = 0,
 				.slide_z = 0,
 				.axisType = camAxis::global,
@@ -145,7 +145,7 @@ namespace Loop
 		
 		cameraMan::run({});
 
-		Object::Saggitarius({.quality = 2});
+		//Object::Saggitarius({.quality = 1});
 		//Object::Zenith({.quality = 1});
 		//Object::Fish({.quality = 1});
 		//Object::Libra({.quality = 1});
@@ -154,7 +154,7 @@ namespace Loop
 		//Object::Twins({ .quality = 1 });
 		//Object::LeoBigStar({ .quality = 1 });
 		//Object::Capri({ .quality = 1 });
-		//Object::Taurus({ .quality = 1 });
+		Object::Taurus({ .quality = 1 });
 		//Object::Scorpio({ .quality = 1 });
 		//Object::Aries({ .quality = 1 });
 		//Object::Virgo({ .quality = 1 });

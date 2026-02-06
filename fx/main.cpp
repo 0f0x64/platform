@@ -118,7 +118,7 @@ void UpdateFrame(double time)
 
 //int time_activate = 0;
 
-#if DebugMode
+#if EditMode
 
 // Global state
 // Цвета в стиле Visual Studio

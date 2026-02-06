@@ -285,7 +285,7 @@ namespace Shaders {
 
 	void vShader(unsigned int n)
 	{
-	#if DebugMode
+	#if EditMode
 		if (!VS[n].pShader)
 		{
 			char fileName[255];
@@ -300,7 +300,7 @@ namespace Shaders {
 
 	void pShader(unsigned int n)
 	{
-	#if DebugMode
+	#if EditMode
 			if (!PS[n].pShader)
 			{
 				char fileName[255];

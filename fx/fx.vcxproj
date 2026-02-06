@@ -390,6 +390,7 @@
     <ClInclude Include="generated\psList.h" />
     <ClInclude Include="generated\uiShaderMargin.h" />
     <ClInclude Include="generated\vsList.h" />
+    <ClInclude Include="girl.h" />
     <ClInclude Include="projectFiles\camera.h" />
     <ClInclude Include="projectFiles\cubemap.h" />
     <ClInclude Include="projectFiles\loop.h" />

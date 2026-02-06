@@ -484,6 +484,7 @@ int gY;
 int mode;
 int skipper;
 float4 base_color;
+float4 mesh[4000];
 } params;
 
 void set () {

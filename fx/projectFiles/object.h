@@ -291,10 +291,14 @@ namespace Object {
 				.gY = gY,
 				.mode = (int)in.mode,
 				.skipper = in.skipper,
-				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1)
+				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
+				.mesh = {
+					//#include "girl.h"
+					#include "girl_rand.h"
+				}
 			},
 		};
-
+		
 		vs::Tau.set();
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
