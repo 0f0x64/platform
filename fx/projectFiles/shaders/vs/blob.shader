@@ -83,10 +83,10 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
 
     if (mode==1)
     {
-        float s=hash(iid)*33+11;
+        float s=hash(iid)*23+11;
         //s*=1.5;
         p.pos=transform(pos,grid.zw,s);
-        p.color*=1.3;
+        p.color*=.93;
         p.sz=172;
     }
     else

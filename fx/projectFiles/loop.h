@@ -144,32 +144,383 @@ namespace Loop
 
 		Culling::Set({cullmode::back});
 		
-		cameraMan::run({});
+		//cameraMan::run({});
 
-		int t = timer::timeCursor / 1000000;
+		int Dur = 20;
+		int t = timer::timeCursor / SAMPLES_IN_FRAME /FRAMES_PER_SECOND/Dur;
 
 		switch (t)
 		{
 		case 0:
-			Object::Saggitarius({ .quality = 1 });
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = 57,
+				.eye_y = 1236,
+				.eye_z = -1975,
+				.at_x = 0,
+				.at_y = 0,
+				.at_z = 0,
+				.up_x = -3,
+				.up_y = 216,
+				.up_z = 135,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 0,
+				.slide_z = -110,
+				.axisType = camAxis::global,
+				.fly_x = -3,
+				.fly_y = 0,
+				.fly_z = 0,
+				.jitter = 0
+				});
+			BasicCam::processCam();
+
+
+			Object::Zenith({.quality = 1});
 			break;
 		case 1:
-			Object::Zenith({ .quality = 1 });
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = -1086,
+				.eye_y = -1198,
+				.eye_z = -499,
+				.at_x = 0,
+				.at_y = 0,
+				.at_z = 0,
+				.up_x = -163,
+				.up_y = 180,
+				.up_z = -75,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 70,
+				.slide_z = -60,
+				.axisType = camAxis::global,
+				.fly_x = -3,
+				.fly_y = 0,
+				.fly_z = 0,
+				.jitter = 0
+			});
+			BasicCam::processCam();
+			Object::Saggitarius({ .quality = 1 });
 			break;
 		case 2:
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = 4,
+				.eye_y = 3800,
+				.eye_z = 79,
+				.at_x = 0,
+				.at_y = 0,
+				.at_z = 0,
+				.up_x = 14,
+				.up_y = -5,
+				.up_z = 254,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 0,
+				.slide_z = 310,
+				.axisType = camAxis::global,
+				.fly_x = -3,
+				.fly_y = 0,
+				.fly_z = 0,
+				.jitter = 0
+			});
+			BasicCam::processCam();
+
+			Object::Crab({ .quality = 1 });
+			break;
+		case 3:
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = -1926,
+				.eye_y = -1960,
+				.eye_z = 3342,
+				.at_x = 0,
+				.at_y = 115,
+				.at_z = 0,
+				.up_x = -29,
+				.up_y = 248,
+				.up_z = 51,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 40,
+				.slide_z = 0,
+				.axisType = camAxis::global,
+				.fly_x = -3,
+				.fly_y = 1,
+				.fly_z = -2,
+				.jitter = 0
+			});
+			BasicCam::processCam();
+			Object::Aries({ .quality = 1 });
+			break;
+		case 4:
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = 2360,
+				.eye_y = -2052,
+				.eye_z = -402,
+				.at_x = 0,
+				.at_y = 0,
+				.at_z = 0,
+				.up_x = 163,
+				.up_y = 193,
+				.up_z = -27,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 0,
+				.slide_z = -211,
+				.axisType = camAxis::global,
+				.fly_x = -3,
+				.fly_y = 0,
+				.fly_z = 0,
+				.jitter = 0
+			});
+			BasicCam::processCam();
+			Object::Scorpio({ .quality = 1 });
+			break;
+		case 5:
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = 1015,
+				.eye_y = -2195,
+				.eye_z = 1015,
+				.at_x = 0,
+				.at_y = 0,
+				.at_z = 0,
+				.up_x = 150,
+				.up_y = 139,
+				.up_z = 150,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 0,
+				.slide_z = 250,
+				.axisType = camAxis::global,
+				.fly_x = -3,
+				.fly_y = 0,
+				.fly_z = 0,
+				.jitter = 0
+			});
+			BasicCam::processCam();
+			Object::LeoBigStar({ .quality = 1 });
+			break;
+		case 6:
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = -2462,
+				.eye_y = -4185,
+				.eye_z = 762,
+				.at_x = 0,
+				.at_y = 0,
+				.at_z = 0,
+				.up_x = -207,
+				.up_y = 133,
+				.up_z = 64,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 0,
+				.slide_z = -120,
+				.axisType = camAxis::global,
+				.fly_x = -3,
+				.fly_y = 0,
+				.fly_z = 0,
+				.jitter = 0
+			});
+			BasicCam::processCam();
+			Object::Virgo({ .quality = 1 });
+			break;
+		case 7:
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = 644,
+				.eye_y = 1711,
+				.eye_z = 940,
+				.at_x = 0,
+				.at_y = 0,
+				.at_z = 0,
+				.up_x = 119,
+				.up_y = -141,
+				.up_z = 175,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 0,
+				.slide_z = -50,
+				.axisType = camAxis::global,
+				.fly_x = 3,
+				.fly_y = 0,
+				.fly_z = 0,
+				.jitter = 0
+			});
+			BasicCam::processCam();
+			Object::Capri({ .quality = 1 });
+			break;
+		case 8:
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = 57,
+				.eye_y = -136,
+				.eye_z = -1975,
+				.at_x = 0,
+				.at_y = 222,
+				.at_z = 0,
+				.up_x = -3,
+				.up_y = 216,
+				.up_z = 135,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 0,
+				.slide_z = -416,
+				.axisType = camAxis::global,
+				.fly_x = -3,
+				.fly_y = 0,
+				.fly_z = 0,
+				.jitter = 0
+				});
+			BasicCam::processCam();
+			Object::Taurus({ .quality = 1 });
+			//
+			break;
+		case 9:
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = 22,
+				.eye_y = -958,
+				.eye_z = -2169,
+				.at_x = 0,
+				.at_y = 0,
+				.at_z = 0,
+				.up_x = 1,
+				.up_y = 233,
+				.up_z = -102,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 0,
+				.slide_z = 0,
+				.axisType = camAxis::global,
+				.fly_x = -3,
+				.fly_y = 0,
+				.fly_z = 0,
+				.jitter = 0
+			});
+			BasicCam::processCam();
+			Object::Libra({ .quality = 1 });
+			break;
+		case 10:
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = 622,
+				.eye_y = -1022,
+				.eye_z = -1822,
+				.at_x = 0,
+				.at_y = 0,
+				.at_z = 0,
+				.up_x = 38,
+				.up_y = 225,
+				.up_z = -113,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 0,
+				.slide_z = -40,
+				.axisType = camAxis::global,
+				.fly_x = -3,
+				.fly_y = 0,
+				.fly_z = 0,
+				.jitter = 0
+			});
+			BasicCam::processCam();
+			Object::Aquarius({ .quality = 1 });
+			break;
+		case 11:
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = -1357,
+				.eye_y = 1027,
+				.eye_z = -2163,
+				.at_x = 0,
+				.at_y = 0,
+				.at_z = 0,
+				.up_x = -50,
+				.up_y = -236,
+				.up_z = -80,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 0,
+				.slide_z = 0,
+				.axisType = camAxis::global,
+				.fly_x = 3,
+				.fly_y = 0,
+				.fly_z = 10,
+				.jitter = 0
+			});
+			BasicCam::processCam();
 			Object::Fish({ .quality = 1 });
 			break;
+		case 12:
+			BasicCam::camCounter = 0;
+			BasicCam::setCamKey({
+				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camType = keyType::set,
+				.eye_x = 57,
+				.eye_y = 1236,
+				.eye_z = -1975,
+				.at_x = 0,
+				.at_y = 0,
+				.at_z = 0,
+				.up_x = -3,
+				.up_y = 216,
+				.up_z = 135,
+				.angle = 100,
+				.sType = sliderType::follow,
+				.slide_x = 0,
+				.slide_y = 0,
+				.slide_z = 0,
+				.axisType = camAxis::global,
+				.fly_x = -3,
+				.fly_y = 0,
+				.fly_z = 10,
+				.jitter = 0
+				});
+			BasicCam::processCam();
+			Object::Twins({ .quality = 1 });
+			break;
 		}
-		//Object::Libra({.quality = 1});
-		//Object::Aquarius({.quality = 1});
-		//Object::Crab({ .quality = 1 });
-		//Object::Twins({ .quality = 1 });
-		//Object::LeoBigStar({ .quality = 1 });
-		//Object::Capri({ .quality = 1 });
-		//Object::Taurus({ .quality = 1 });
-		//Object::Scorpio({ .quality = 1 });
-		//Object::Aries({ .quality = 1 });
-		//Object::Virgo({ .quality = 1 });
+
 
 		Compose();
 

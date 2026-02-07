@@ -440,7 +440,7 @@ namespace paramEdit {
 
 
 				auto pStart = s.find("{") + 1;
-				std::string funcStr = s.substr(pStart, funcStr.size()-pStart);
+				std::string funcStr = s.substr(pStart, s.size()-pStart);
 				auto pEnd = funcStr.find("}");
 				if (std::string::npos == pEnd)
 				{
@@ -903,6 +903,8 @@ namespace paramEdit {
 	void CamKeys()
 	{
 		ui::Box::Setup();
+
+		
 
 		for (int i = startCmd; i < cmdCounter; i++)
 		{

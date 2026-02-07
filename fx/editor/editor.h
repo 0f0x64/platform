@@ -7,6 +7,11 @@
 namespace editor
 {
 
+	bool controlParamsOld = false;
+	int pIndex = -1;
+	int cmdIndex = -1;
+	void calcCmdAndParamIndicies();
+
 	struct {
 		long line =0;
 		long column =0;
@@ -176,8 +181,15 @@ namespace editor
 			strcpy(paramStr, "nan");
 
 			char* number = extractNumberAtC(s.c_str(), column-1);
-			strcpy(paramStr, number);
-			free(number);
+			if (number)
+			{
+				strcpy(paramStr, number);
+				free(number);
+			}
+			else
+			{
+				return false;
+			}
 
 			column = start+1;
 			selection->MoveToLineAndOffset(line, column, VARIANT_FALSE);
@@ -678,9 +690,7 @@ namespace editor
 		}
 	}
 
-	bool controlParamsOld = false;
-	int pIndex = -1;
-	int cmdIndex = -1;
+
 
 	void calcCmdAndParamIndicies()
 	{
@@ -690,21 +700,35 @@ namespace editor
 
 		int ln = -1;
 
-		for (int i = 0; i < cmdCounter; i++)
+		for (int i = 0; i < editor::paramEdit::registry.size(); i++)
 		{
 			char* fn = cmdParamDesc[i].caller.fileName;
 			if (strcmp(fn, VsTextCurorPos.fileName) == 0)
 			{
-				if (VsTextCurorPos.line >= cmdParamDesc[i].caller.line)
+				if (cmdParamDesc[i].caller.line <= VsTextCurorPos.line)
 				{
-					if (ln <= cmdParamDesc[i].caller.line)
+					if (cmdParamDesc[i].caller.line > ln)
+					{
+						ln = cmdParamDesc[i].caller.line;
+						cmdIndex = i;
+						currentCmd = i;
+
+					}
+					
+				}
+
+				
+
+				/*if (VsTextCurorPos.line >= cmdParamDesc[i].caller.line)
+				{
+					if (ln <= VsTextCurorPos.line)
 					{
 						cmdIndex = i;
 						currentCmd = i;
 					}
 					ln = max(ln, cmdParamDesc[i].caller.line);
 
-				}
+				}*/
 			}
 		}
 		if (ln > 0)

@@ -339,6 +339,22 @@ namespace ViewCam
 		float x = .5f - w / 2.f; float y = .9f + ui::style::text::height;
 
 			ui::style::Base();
+
+
+			if (ui::lbDown && isMouseOver(x, y, w, ui::style::box::height) && drag.isFree() && VsTextCurorPos.Update())
+			{
+				char* result = strstr(VsTextCurorPos.fileName, ".shader");
+				editor::cmdIndex = -1;
+				editor::pIndex = -1;
+				if (!result)
+				{
+					calcCmdAndParamIndicies();
+				}
+			}
+
+			if (editor::cmdIndex >= 0) currentCmd = editor::cmdIndex;
+
+
 			if (!strcmp(cmdParamDesc[currentCmd].funcName, "setCamKey"))
 			{
 				ui::style::box::g += captureTimer;

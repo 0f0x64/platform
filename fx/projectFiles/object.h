@@ -702,7 +702,7 @@ namespace Object {
 
 		Tree(pillars_cnt, 1, pMode::point);
 		Libra_spheres(256 * 256, 1, pMode::point);
-		InsideNebula({pillars_cnt,1,pMode::point,600,252,100});
+		InsideNebula({pillars_cnt,1,pMode::point,100,252,400});
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 		Galaxy({galaxy_cnt,14,pMode::point,254,220,41});
 
@@ -716,7 +716,7 @@ namespace Object {
 		RenderTarget::Clear({ 0,0,0,0 });
 
 		Tree(pillars_cnt, 1394 / 2, pMode::glow);
-		InsideNebula({pillars_cnt,1394,pMode::glow,600,252,100});
+		InsideNebula({pillars_cnt,1394,pMode::glow,100,202,400});
 		Libra_spheres(256 * 256, 143, pMode::glow);
 			OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
@@ -1019,8 +1019,8 @@ namespace Object {
 				//mid
 		RenderTarget::Set({ texture::pBufMid,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
-		Transporter({ pillars_cnt,194,pMode::glow,20,30,75 });
-		InsideNebula({ pillars_cnt , 134, pMode::glow ,40,16,10 });
+		Transporter({ pillars_cnt,194,pMode::glow,2,3,7 });
+		InsideNebula({ pillars_cnt , 134, pMode::glow ,10,26,40 });
 
 		//low
 		RenderTarget::Set({ texture::pBufLow,0 });

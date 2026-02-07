@@ -63,8 +63,14 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
 float4 _ColorHot = float4(1.0, 0.9, 0.7,1);
 float4 _ColorCold = float4( 0.1, 0.0, 0.4,1);
 
+float tm=(time.y-8*20*60);
+tm=max(tm,0);
+float tl = 20*60;
+tm/=tl;
+tm=1-tm;
+
 float form=smoothstep(0,1,smoothstep(0,1,.5+.5*sin(time.x/32)));
-form =smoothstep(0,1,saturate((time.y/3000)));
+form =sm2(tm);
 float3 pos;
     pos_color p1;
 
@@ -86,15 +92,15 @@ float3 pos;
         p_prev = p;
         float3 next = noise3(p*8+22+a/b);
 
-        p -=next/(i+1);
-        //p=rot3(p,p*3);
-        p+=(rot3(p-p/2,p*3)+p/2)/11;
-        p -= next/(i+1);
+//        p -=next/(i+1);
+  //      p=rot3(p,p*(1-form));
+    //    p+=(rot3(p-p/2,p*3)+p/2)/11;
+      //  p -= next/(i+1);
 
-//        p -=next/(i+1)*(1-form);
-  //      p=lerp(p,rot3(p,p*3),(1-form));
-    //    p+=(rot3(p-p/2,p*3)+p/2)/11*form;
-      //  p -= next/(i+1)*form;
+        p -=next/(i+1)*(1-form);
+        p=lerp(p,rot3(p,p*3),(1-form));
+        p+=(rot3(p-p/2,p*3)+p/2)/11*form;
+        p -= next/(i+1)*form;
 
 
     }
@@ -110,7 +116,7 @@ float3 pos;
 
     float3 jitter = (hash31((float)iid) - 0.5) * 0.02;
     p += jitter/(pow(length(p),2)+.1)*172;
-
+    float3 gp = p;
     float py = frac(iid/292100.-time.x/1000+hash(iid)/10);
 
     //int mln = 1504;
@@ -137,12 +143,12 @@ float3 pos;
     float3 nrml = cross((g_1-g+.1),(g_2-g+.1));
     nrml=normalize(nrml);
 
-    g=getRandomPointInTriangle(g,g_1,g_2,hash(iid/12.));
+    //g=getRandomPointInTriangle(g,g_1,g_2,hash(iid/12.));
     //g=lerp(g,g_1,(iid/2000000.));
     //g=getRandomPointInTriangle(g,g_1,g_2,iid%1234);
     float3 f_f=getRandomPointInTriangle(f_0,f_1,f_2,hash(iid/12.));
-    g=lerp(f_f,g,sign(iid%3));
-    g=lerp(f_0,g,sign(iid%14));
+    //g=lerp(f_f,g,sign(iid%3));
+    //g=lerp(f_0,g,sign(iid%14));
     //g=f_f;
 
     //g_1=g+normalize(g-g_1)*3*iid/(2000. * 1000.);
@@ -153,11 +159,12 @@ float3 pos;
    // g.y+=noise(time.x/50)*12;
    // g+=hash33(g+hash(iid))*.15;
     float margin = iid%2>(noise(g+time.x/10+222)*3+1);
- //   g.xyz+=margin*noise3(iid/292100.+g/3)*12*(py);
- //   g.xyz+=margin*noise3(g/3)*2;
- //   g.y+=margin*pow(frac(iid/292100.+time.x/20),1)*7;
+    margin/=4;
+   // g.xyz+=margin*noise3(iid/292100.+g/3)*12*(py);
+   // g.xyz+=margin*noise3(g/3)*2;
+   // g.y+=margin*pow(frac(iid/292100.+time.x/20),1)*7;
 
-    float3 nn=g/4;
+   /* float3 nn=g/4;
     for (int i = 0; i < 8; i++) {
         p_prev = nn;
         float3 next = noise3(nn*8+22+a/b+(time.x/32)*0);
@@ -169,19 +176,21 @@ float3 pos;
         nn += next/(i+1)*form;
 
 
-    }
+    }*/
 
-    //g=lerp(g,nn*33,sm2(sm2(form)) );
-    //g*=2;
+    //g=lerp(g,nn*33,sm2(sm2(tm)) );
+    //g*=8;
     float3 g2=normalize(hash3(iid))*84*hash(iid)+noise3(g/2)*25;
 
-    //p=lerp(g2,p,saturate(length(p)/112));
+    p=lerp(g2,p,saturate(length(p)/112));
     float girl = saturate(pow(length(p)/28,.75)-1.9);
-   // p=lerp(g2,p,saturate(pow(length(p)/18,.75)-2));
-    //p=lerp(g,p,saturate(pow(length(p)/13,.75)-2));
+    p=lerp(g2,p,saturate(pow(length(p)/18,.75)-2));
+    p=lerp(g,p,saturate(pow(length(p)/13,.75)-2));
 
     //p=g;
-    p=lerp(p,g*8,1-form);
+    //p=lerp(p,g*8,1-form);
+    
+    //g*=8;
     
 
     float3 nebulaColor = lerp(_ColorCold.rgb, _ColorHot.rgb, pow(heat, 3.0));
@@ -192,7 +201,15 @@ float3 pos;
     p1.color.rgb=lerp(.2*nebulaColor,.02*float3(1,2,3),1-girl);
         //p1.color = float4(nebulaColor, 1);
     pos=p;
+    float tf= sm2(sm2(saturate(tm)));
+    pos=lerp(pos,gp/2,1);
     
+    //pos=lerp(pos,(iid%13==0) ? pos : gp,tf);
+    //pos=(iid%5==0) ? pos : gp;
+    pos*=1+2*(1-form);
+
+    pos*=.024*3;
+    //pos*=tm;
 
      qid *= skipper;
      t=time.x*.004;
@@ -219,7 +236,7 @@ float3 pos;
     }
     else
     {
-        p1.pos = transform(pos,grid.zw,121.2);
+        p1.pos = transform(pos,grid.zw,21.2);
         p1.color*=.15*(1-saturate(pow(length(p)/21,.75)));
         p1.sz=1.2;
         p1.color*=0;

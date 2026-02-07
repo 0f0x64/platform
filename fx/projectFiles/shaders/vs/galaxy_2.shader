@@ -64,7 +64,8 @@ pos_color CalcParticles(uint qid,float4 grid)
         //pos+=noise3(qid*float3(1,2,3)*11.1)*2;
 
         pos_color p;
-        float3 col_g=lerp(base_color.rgb,base_color.bgr,pos.y/5+.5);
+        float col_i= pos.y/22+.5;
+        float3 col_g=lerp(base_color.rgb,base_color.bgr,col_i);
         p.color = float4(noise3_u(a*col_g+77+sin(pos2*11.4)),1)/50.+.00015;
 
         if (stars==0)
@@ -113,6 +114,7 @@ pos_color CalcParticles(uint qid,float4 grid)
         }else
         {
             p.color*=1+pow(2/length(pos),2);
+            
         }
 
         //if (stars!=0&&mode==1) p.color*=2.5;

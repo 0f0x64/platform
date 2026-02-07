@@ -156,9 +156,9 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
 
          if (iid%inStars==0)
          {
-              p.pos = transform_unisize(pos,grid.zw,25.5);
+              p.pos = transform_unisize(pos,grid.zw,5.5);
                p.sz=2;
-               p.color*=23;
+               p.color*=3;
          }
 
     }

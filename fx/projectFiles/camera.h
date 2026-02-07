@@ -37,7 +37,7 @@ namespace BasicCam
 			{
 				sCam = &Prev;
 				prevTime = in.camTime;
-				if (camCounter == 0) prevTime = 0;
+				//if (camCounter == 0) prevTime = 0;
 
 				currentCamType = in.camType;
 				slider = in.sType;
@@ -79,7 +79,7 @@ namespace BasicCam
 		at = XMVectorLerp(Prev.at, Next.at, a) / q;
 		up = XMVectorLerp(Prev.up, Next.up, a) / q;
 
-		float sTime = (timer::timeCursor - prevTime * SAMPLES_IN_FRAME)*.0001f;
+		float sTime = (timer::timeCursor - prevTime) * .00001;;
 
 		auto m = XMMatrixTranspose(XMMatrixLookAtLH(eye, at, up));
 		auto slide = XMVector3Transform(camSlide * sTime / q, m);
@@ -106,7 +106,7 @@ namespace BasicCam
 		}
 		
 		XMMATRIX fly;
-		sTime = (timer::timeCursor - prevTime * SAMPLES_IN_FRAME) * .00001f;
+		sTime = (timer::timeCursor - prevTime) * .00001;;
 		auto flyX = XMMatrixRotationAxis(axisX, DegreesToRadians(XMVectorGetX(camFly) * sTime));
 		auto flyY = XMMatrixRotationAxis(axisY, DegreesToRadians(XMVectorGetY(camFly) * sTime));
 		auto flyZ = XMMatrixRotationAxis(axisZ, DegreesToRadians(XMVectorGetZ(camFly) * sTime));
