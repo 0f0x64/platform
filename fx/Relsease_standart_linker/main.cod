@@ -244,7 +244,7 @@ PUBLIC	??_C@_0CNB@NMOHKIGI@?6?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shad@ ; `stri
 PUBLIC	?space@shadersData@Shaders@dx11@@3PBDB		; dx11::Shaders::shadersData::space
 PUBLIC	??_C@_0HAA@NPEMPPIC@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; `string'
 PUBLIC	?Tau@shadersData@Shaders@dx11@@3PBDB		; dx11::Shaders::shadersData::Tau
-PUBLIC	??_C@_0BHKF@PHCOGPNJ@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; `string'
+PUBLIC	??_C@_0BHKF@GGKIHKLG@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; `string'
 PUBLIC	?transporter@shadersData@Shaders@dx11@@3PBDB	; dx11::Shaders::shadersData::transporter
 PUBLIC	??_C@_0BAEI@OAEBFFHN@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; `string'
 PUBLIC	?tree@shadersData@Shaders@dx11@@3PBDB		; dx11::Shaders::shadersData::tree
@@ -3706,9 +3706,9 @@ CONST	SEGMENT
 	DB	'1.1)*.1+1.5,5)/4;', 0aH, '    return p;', 0aH, '}', 0aH, 0aH, '#'
 	DB	'include <../lib/particleVS_main2.shader>', 0aH, 00H ; `string'
 CONST	ENDS
-;	COMDAT ??_C@_0BHKF@PHCOGPNJ@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@
+;	COMDAT ??_C@_0BHKF@GGKIHKLG@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@
 CONST	SEGMENT
-??_C@_0BHKF@PHCOGPNJ@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ DB '#in'
+??_C@_0BHKF@GGKIHKLG@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ DB '#in'
 	DB	'clude <../lib/constBuf.shader>', 0aH, '#include <../lib/io.sh'
 	DB	'ader>', 0aH, '#include <../lib/constants.shader>', 0aH, '#inc'
 	DB	'lude <../lib/utils.shader>', 0aH, 0aH, 'cbuffer params : regi'
@@ -3738,8 +3738,8 @@ CONST	SEGMENT
 	DB	' g2;', 0aH, '}', 0aH, 0aH, 'pos_color CalcParticles(uint qid,'
 	DB	'uint iid,float4 grid)', 0aH, '{', 0aH, 0aH, 'float4 _ColorHot'
 	DB	' = float4(1.0, 0.9, 0.7,1);', 0aH, 'float4 _ColorCold = float'
-	DB	'4( 0.1, 0.0, 0.4,1);', 0aH, 0aH, 'float tm=(time.y-8*10*60);', 0aH
-	DB	'tm=max(tm,0);', 0aH, 'float tl = 10*60;', 0aH, 'tm/=tl;', 0aH
+	DB	'4( 0.1, 0.0, 0.4,1);', 0aH, 0aH, 'float tm=(time.y-8*20*60);', 0aH
+	DB	'tm=max(tm,0);', 0aH, 'float tl = 20*60;', 0aH, 'tm/=tl;', 0aH
 	DB	'tm=1-tm;', 0aH, 0aH, 'float form=smoothstep(0,1,smoothstep(0,'
 	DB	'1,.5+.5*sin(time.x/32)));', 0aH, 'form =sm2(tm);', 0aH, 'floa'
 	DB	't3 pos;', 0aH, '    pos_color p1;', 0aH, 0aH, '    uint inSta'
@@ -5301,7 +5301,7 @@ _DATA	SEGMENT
 ?scorpBall@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0PJB@DFFJMNHE@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::scorpBall
 ?simpleCube@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0CNB@NMOHKIGI@?6?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shad@ ; dx11::Shaders::shadersData::simpleCube
 ?space@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0HAA@NPEMPPIC@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::space
-?Tau@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0BHKF@PHCOGPNJ@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::Tau
+?Tau@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0BHKF@GGKIHKLG@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::Tau
 ?transporter@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0BAEI@OAEBFFHN@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::transporter
 ?tree@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0NDB@GPGGGAGO@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::tree
 ?Virgo@shadersData@Shaders@dx11@@3PBDB DD FLAT:??_C@_0BFLK@EMLDHGBJ@?$CDinclude?5?$DM?4?4?1lib?1constBuf?4shade@ ; dx11::Shaders::shadersData::Virgo
@@ -6467,6 +6467,7 @@ PUBLIC	?frameConst@Loop@@YAXXZ				; Loop::frameConst
 PUBLIC	?run@cameraMan@Loop@@YAXUrun_params@12@@Z	; Loop::cameraMan::run
 PUBLIC	?Compose@Loop@@YAXXZ				; Loop::Compose
 PUBLIC	?scene1@Loop@@YAXXZ				; Loop::scene1
+PUBLIC	?scene2@Loop@@YAXXZ				; Loop::scene2
 PUBLIC	?track__@Loop@@YAXXZ				; Loop::track__
 PUBLIC	?mainLoop@Loop@@YAXXZ				; Loop::mainLoop
 PUBLIC	?UpdateFrame@@YAXN@Z				; UpdateFrame
@@ -6497,7 +6498,6 @@ PUBLIC	__real@0000000000000000
 PUBLIC	__real@32cd365b
 PUBLIC	__real@348bdd11
 PUBLIC	__real@3638b88e
-PUBLIC	__real@3727c5ac
 PUBLIC	__real@37cfb4c2
 PUBLIC	__real@38d1b717
 PUBLIC	__real@39500bf1
@@ -6545,6 +6545,7 @@ PUBLIC	__real@3ecccccd
 PUBLIC	__real@3ed1eb85
 PUBLIC	__real@3ed70a3d
 PUBLIC	__real@3edc28f6
+PUBLIC	__real@3ee4f8b588e368f1
 PUBLIC	__real@3ee66666
 PUBLIC	__real@3eeb851f
 PUBLIC	__real@3ef0a3d7
@@ -6635,7 +6636,6 @@ PUBLIC	__real@3fb47ae1
 PUBLIC	__real@3fb5c28f
 PUBLIC	__real@3fb70a3d
 PUBLIC	__real@3fb851ec
-PUBLIC	__real@3fb999999999999a
 PUBLIC	__real@3fb9999a
 PUBLIC	__real@3fbae148
 PUBLIC	__real@3fbc28f6
@@ -6820,7 +6820,6 @@ PUBLIC	__real@405e147b
 PUBLIC	__real@405eb852
 PUBLIC	__real@405f5c29
 PUBLIC	__real@40600000
-PUBLIC	__real@4060800000000000
 PUBLIC	__real@4060a3d7
 PUBLIC	__real@406147ae
 PUBLIC	__real@4061eb85
@@ -6846,6 +6845,7 @@ PUBLIC	__real@40700000
 PUBLIC	__real@4070a3d7
 PUBLIC	__real@4071eb85
 PUBLIC	__real@40728f5c
+PUBLIC	__real@4072c00000000000
 PUBLIC	__real@40733333
 PUBLIC	__real@4073d70a
 PUBLIC	__real@40747ae1
@@ -14512,11 +14512,21 @@ PUBLIC	__real@c324147b
 PUBLIC	__real@c3243ae1
 PUBLIC	__real@c324570a
 PUBLIC	__real@c32463d7
+PUBLIC	__xmm@00000000000000000000000000000003
+PUBLIC	__xmm@000000000000000000000000fffffff3
 PUBLIC	__xmm@000000000000000000000000fffffffd
 PUBLIC	__xmm@00000000000000003f80000000000000
+PUBLIC	__xmm@0000000000000000fffffffd00000000
 PUBLIC	__xmm@00000000000000010000000100000003
+PUBLIC	__xmm@000000000000000200000000fffffffd
+PUBLIC	__xmm@000000000000000300000000fffffffd
+PUBLIC	__xmm@00000000000000030000000200000001
+PUBLIC	__xmm@000000000000000a0000000000000003
+PUBLIC	__xmm@000000000000000a00000000fffffffd
 PUBLIC	__xmm@000000003e24dd2f3de353f83dcccccd
 PUBLIC	__xmm@000000003f8000000000000000000000
+PUBLIC	__xmm@00000000fffffffdfffffffe00000003
+PUBLIC	__xmm@00000000fffffffe00000001fffffffd
 PUBLIC	__xmm@00000001000000000000000000000000
 PUBLIC	__xmm@00000001000000000000000100000000
 PUBLIC	__xmm@0000000200000001000000c2001e8480
@@ -14549,19 +14559,30 @@ PUBLIC	__xmm@000005dc0000000000000001000f4240
 PUBLIC	__xmm@3b8080813b8080813b8080813b808081
 PUBLIC	__xmm@3f800000000000000000000000000000
 PUBLIC	__xmm@80000000800000008000000080000000
+PUBLIC	__ymm@000000000000008a0000000000000000000000000000002900000bba0000001a
+PUBLIC	__ymm@00000000ffffff0200000000000000000000000000000000000013f70000000a
+PUBLIC	__ymm@00000000ffffff3f00000000000000000000000000000002fffffbb800000003
 PUBLIC	__ymm@0000000800000001000000080000000100000008000000010000000700000001
+PUBLIC	__ymm@0000000bffffff0a0000000000000000000000000000000c0000046000000031
+PUBLIC	__ymm@000000150000008b000000000000000000000000fffffefd00000e69ffffff56
+PUBLIC	__ymm@00000025000000a400000000000000000000000000000115fffff63d000000ef
+PUBLIC	__ymm@0000007200000000000000000000000000000000fffffc0f00000005fffffff8
+PUBLIC	__ymm@00000085ffffff31000000000000000000000000000002faffffefa7fffff662
 PUBLIC	__ymm@0000008b00000096000000000000000000000000000003f7fffff76d000003f7
 PUBLIC	__ymm@000000b4ffffff5d000000000000000000000000fffffe0dfffffb52fffffbc2
 PUBLIC	__ymm@000000c1000000a3000000000000000000000000fffffe6efffff7fc00000938
 PUBLIC	__ymm@000000d8fffffffd000000000000000000000000fffff849000004d400000039
+PUBLIC	__ymm@000000d8fffffffd00000000000000de00000000fffff849ffffff7800000039
 PUBLIC	__ymm@000000e100000026000000000000000000000000fffff8e2fffffc020000026e
-PUBLIC	__ymm@000000e500000066000000000000000000000000fffff9e9fffff84d00000ebe
 PUBLIC	__ymm@000000e900000001000000000000000000000000fffff787fffffc4200000016
-PUBLIC	__ymm@000000f20000003c000000000000000000000000fffff44afffffa1000000e06
+PUBLIC	__ymm@000000f8ffffffe300000000000000730000000000000d0efffff858fffff87a
 PUBLIC	__ymm@000000fdfffffff9000000000000000000000000ffffa6b8fffffb7affffea16
 PUBLIC	__ymm@000000fe000000000000000000000000000002f400011636000000de000026ca
-PUBLIC	__ymm@ffffff3f00000063000000000000000000000000000003e20000042a000002e3
+PUBLIC	__ymm@ffffff14ffffffce000000000000000000000000fffff78d00000403fffffab3
 PUBLIC	__ymm@ffffff7300000077000000000000000000000000000003ac000006af00000284
+PUBLIC	__ymm@ffffff76ffffff440000000000000000000000000000011efffffc600000020e
+PUBLIC	__ymm@ffffffb9000000f400002b660000000000000000ffffd4a30000000000000000
+PUBLIC	__ymm@ffffffe9000000e3000000000000000000000000000000430000065800000086
 PUBLIC	__ymm@fffffffb0000000e0000000000000000000000000000004f00000ed800000004
 EXTRN	??_U@YAPAXI@Z:PROC				; operator new[]
 EXTRN	_strstr:PROC
@@ -14649,6 +14670,27 @@ __ymm@fffffffb0000000e0000000000000000000000000000004f00000ed800000004 DB 04H
 	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 0eH, 00H, 00H
 	DB	00H, 0fbH, 0ffH, 0ffH, 0ffH
 CONST	ENDS
+;	COMDAT __ymm@ffffffe9000000e3000000000000000000000000000000430000065800000086
+CONST	SEGMENT
+__ymm@ffffffe9000000e3000000000000000000000000000000430000065800000086 DB 086H
+	DB	00H, 00H, 00H, 'X', 06H, 00H, 00H, 'C', 00H, 00H, 00H, 00H, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 0e3H, 00H, 00H
+	DB	00H, 0e9H, 0ffH, 0ffH, 0ffH
+CONST	ENDS
+;	COMDAT __ymm@ffffffb9000000f400002b660000000000000000ffffd4a30000000000000000
+CONST	SEGMENT
+__ymm@ffffffb9000000f400002b660000000000000000ffffd4a30000000000000000 DB 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 0a3H, 0d4H, 0ffH, 0ffH, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 'f+', 00H, 00H, 0f4H, 00H, 00H
+	DB	00H, 0b9H, 0ffH, 0ffH, 0ffH
+CONST	ENDS
+;	COMDAT __ymm@ffffff76ffffff440000000000000000000000000000011efffffc600000020e
+CONST	SEGMENT
+__ymm@ffffff76ffffff440000000000000000000000000000011efffffc600000020e DB 0eH
+	DB	02H, 00H, 00H, '`', 0fcH, 0ffH, 0ffH, 01eH, 01H, 00H, 00H, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 'D', 0ffH
+	DB	0ffH, 0ffH, 'v', 0ffH, 0ffH, 0ffH
+CONST	ENDS
 ;	COMDAT __ymm@ffffff7300000077000000000000000000000000000003ac000006af00000284
 CONST	SEGMENT
 __ymm@ffffff7300000077000000000000000000000000000003ac000006af00000284 DB 084H
@@ -14656,12 +14698,12 @@ __ymm@ffffff7300000077000000000000000000000000000003ac000006af00000284 DB 084H
 	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 'w', 00H, 00H
 	DB	00H, 's', 0ffH, 0ffH, 0ffH
 CONST	ENDS
-;	COMDAT __ymm@ffffff3f00000063000000000000000000000000000003e20000042a000002e3
+;	COMDAT __ymm@ffffff14ffffffce000000000000000000000000fffff78d00000403fffffab3
 CONST	SEGMENT
-__ymm@ffffff3f00000063000000000000000000000000000003e20000042a000002e3 DB 0e3H
-	DB	02H, 00H, 00H, '*', 04H, 00H, 00H, 0e2H, 03H, 00H, 00H, 00H, 00H
-	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 'c', 00H, 00H
-	DB	00H, '?', 0ffH, 0ffH, 0ffH
+__ymm@ffffff14ffffffce000000000000000000000000fffff78d00000403fffffab3 DB 0b3H
+	DB	0faH, 0ffH, 0ffH, 03H, 04H, 00H, 00H, 08dH, 0f7H, 0ffH, 0ffH, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 0ceH, 0ffH
+	DB	0ffH, 0ffH, 014H, 0ffH, 0ffH, 0ffH
 CONST	ENDS
 ;	COMDAT __ymm@000000fe000000000000000000000000000002f400011636000000de000026ca
 CONST	SEGMENT
@@ -14677,12 +14719,12 @@ __ymm@000000fdfffffff9000000000000000000000000ffffa6b8fffffb7affffea16 DB 016H
 	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 0f9H
 	DB	0ffH, 0ffH, 0ffH, 0fdH, 00H, 00H, 00H
 CONST	ENDS
-;	COMDAT __ymm@000000f20000003c000000000000000000000000fffff44afffffa1000000e06
+;	COMDAT __ymm@000000f8ffffffe300000000000000730000000000000d0efffff858fffff87a
 CONST	SEGMENT
-__ymm@000000f20000003c000000000000000000000000fffff44afffffa1000000e06 DB 06H
-	DB	0eH, 00H, 00H, 010H, 0faH, 0ffH, 0ffH, 'J', 0f4H, 0ffH, 0ffH, 00H
-	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, '<', 00H
-	DB	00H, 00H, 0f2H, 00H, 00H, 00H
+__ymm@000000f8ffffffe300000000000000730000000000000d0efffff858fffff87a DB 'z'
+	DB	0f8H, 0ffH, 0ffH, 'X', 0f8H, 0ffH, 0ffH, 0eH, 0dH, 00H, 00H, 00H
+	DB	00H, 00H, 00H, 's', 00H, 00H, 00H, 00H, 00H, 00H, 00H, 0e3H, 0ffH
+	DB	0ffH, 0ffH, 0f8H, 00H, 00H, 00H
 CONST	ENDS
 ;	COMDAT __ymm@000000e900000001000000000000000000000000fffff787fffffc4200000016
 CONST	SEGMENT
@@ -14691,19 +14733,19 @@ __ymm@000000e900000001000000000000000000000000fffff787fffffc4200000016 DB 016H
 	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 01H, 00H
 	DB	00H, 00H, 0e9H, 00H, 00H, 00H
 CONST	ENDS
-;	COMDAT __ymm@000000e500000066000000000000000000000000fffff9e9fffff84d00000ebe
-CONST	SEGMENT
-__ymm@000000e500000066000000000000000000000000fffff9e9fffff84d00000ebe DB 0beH
-	DB	0eH, 00H, 00H, 'M', 0f8H, 0ffH, 0ffH, 0e9H, 0f9H, 0ffH, 0ffH, 00H
-	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 'f', 00H
-	DB	00H, 00H, 0e5H, 00H, 00H, 00H
-CONST	ENDS
 ;	COMDAT __ymm@000000e100000026000000000000000000000000fffff8e2fffffc020000026e
 CONST	SEGMENT
 __ymm@000000e100000026000000000000000000000000fffff8e2fffffc020000026e DB 'n'
 	DB	02H, 00H, 00H, 02H, 0fcH, 0ffH, 0ffH, 0e2H, 0f8H, 0ffH, 0ffH, 00H
 	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, '&', 00H
 	DB	00H, 00H, 0e1H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __ymm@000000d8fffffffd00000000000000de00000000fffff849ffffff7800000039
+CONST	SEGMENT
+__ymm@000000d8fffffffd00000000000000de00000000fffff849ffffff7800000039 DB '9'
+	DB	00H, 00H, 00H, 'x', 0ffH, 0ffH, 0ffH, 'I', 0f8H, 0ffH, 0ffH, 00H
+	DB	00H, 00H, 00H, 0deH, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 0fdH, 0ffH
+	DB	0ffH, 0ffH, 0d8H, 00H, 00H, 00H
 CONST	ENDS
 ;	COMDAT __ymm@000000d8fffffffd000000000000000000000000fffff849000004d400000039
 CONST	SEGMENT
@@ -14733,12 +14775,68 @@ __ymm@0000008b00000096000000000000000000000000000003f7fffff76d000003f7 DB 0f7H
 	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 096H, 00H
 	DB	00H, 00H, 08bH, 00H, 00H, 00H
 CONST	ENDS
+;	COMDAT __ymm@00000085ffffff31000000000000000000000000000002faffffefa7fffff662
+CONST	SEGMENT
+__ymm@00000085ffffff31000000000000000000000000000002faffffefa7fffff662 DB 'b'
+	DB	0f6H, 0ffH, 0ffH, 0a7H, 0efH, 0ffH, 0ffH, 0faH, 02H, 00H, 00H, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, '1', 0ffH
+	DB	0ffH, 0ffH, 085H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __ymm@0000007200000000000000000000000000000000fffffc0f00000005fffffff8
+CONST	SEGMENT
+__ymm@0000007200000000000000000000000000000000fffffc0f00000005fffffff8 DB 0f8H
+	DB	0ffH, 0ffH, 0ffH, 05H, 00H, 00H, 00H, 0fH, 0fcH, 0ffH, 0ffH, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
+	DB	00H, 00H, 'r', 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __ymm@00000025000000a400000000000000000000000000000115fffff63d000000ef
+CONST	SEGMENT
+__ymm@00000025000000a400000000000000000000000000000115fffff63d000000ef DB 0efH
+	DB	00H, 00H, 00H, '=', 0f6H, 0ffH, 0ffH, 015H, 01H, 00H, 00H, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 0a4H, 00H
+	DB	00H, 00H, '%', 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __ymm@000000150000008b000000000000000000000000fffffefd00000e69ffffff56
+CONST	SEGMENT
+__ymm@000000150000008b000000000000000000000000fffffefd00000e69ffffff56 DB 'V'
+	DB	0ffH, 0ffH, 0ffH, 'i', 0eH, 00H, 00H, 0fdH, 0feH, 0ffH, 0ffH, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 08bH, 00H
+	DB	00H, 00H, 015H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __ymm@0000000bffffff0a0000000000000000000000000000000c0000046000000031
+CONST	SEGMENT
+__ymm@0000000bffffff0a0000000000000000000000000000000c0000046000000031 DB '1'
+	DB	00H, 00H, 00H, '`', 04H, 00H, 00H, 0cH, 00H, 00H, 00H, 00H, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 0aH, 0ffH, 0ffH
+	DB	0ffH, 0bH, 00H, 00H, 00H
+CONST	ENDS
 ;	COMDAT __ymm@0000000800000001000000080000000100000008000000010000000700000001
 CONST	SEGMENT
 __ymm@0000000800000001000000080000000100000008000000010000000700000001 DB 01H
 	DB	00H, 00H, 00H, 07H, 00H, 00H, 00H, 01H, 00H, 00H, 00H, 08H, 00H
 	DB	00H, 00H, 01H, 00H, 00H, 00H, 08H, 00H, 00H, 00H, 01H, 00H, 00H
 	DB	00H, 08H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __ymm@00000000ffffff3f00000000000000000000000000000002fffffbb800000003
+CONST	SEGMENT
+__ymm@00000000ffffff3f00000000000000000000000000000002fffffbb800000003 DB 03H
+	DB	00H, 00H, 00H, 0b8H, 0fbH, 0ffH, 0ffH, 02H, 00H, 00H, 00H, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, '?', 0ffH
+	DB	0ffH, 0ffH, 00H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __ymm@00000000ffffff0200000000000000000000000000000000000013f70000000a
+CONST	SEGMENT
+__ymm@00000000ffffff0200000000000000000000000000000000000013f70000000a DB 0aH
+	DB	00H, 00H, 00H, 0f7H, 013H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 02H, 0ffH, 0ffH
+	DB	0ffH, 00H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __ymm@000000000000008a0000000000000000000000000000002900000bba0000001a
+CONST	SEGMENT
+__ymm@000000000000008a0000000000000000000000000000002900000bba0000001a DB 01aH
+	DB	00H, 00H, 00H, 0baH, 0bH, 00H, 00H, ')', 00H, 00H, 00H, 00H, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 08aH, 00H, 00H
+	DB	00H, 00H, 00H, 00H, 00H
 CONST	ENDS
 ;	COMDAT __xmm@80000000800000008000000080000000
 CONST	SEGMENT
@@ -14900,6 +14998,16 @@ CONST	SEGMENT
 __xmm@00000001000000000000000000000000 DB 00H, 00H, 00H, 00H, 00H, 00H, 00H
 	DB	00H, 00H, 00H, 00H, 00H, 01H, 00H, 00H, 00H
 CONST	ENDS
+;	COMDAT __xmm@00000000fffffffe00000001fffffffd
+CONST	SEGMENT
+__xmm@00000000fffffffe00000001fffffffd DB 0fdH, 0ffH, 0ffH, 0ffH, 01H, 00H
+	DB	00H, 00H, 0feH, 0ffH, 0ffH, 0ffH, 00H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __xmm@00000000fffffffdfffffffe00000003
+CONST	SEGMENT
+__xmm@00000000fffffffdfffffffe00000003 DB 03H, 00H, 00H, 00H, 0feH, 0ffH, 0ffH
+	DB	0ffH, 0fdH, 0ffH, 0ffH, 0ffH, 00H, 00H, 00H, 00H
+CONST	ENDS
 ;	COMDAT __xmm@000000003f8000000000000000000000
 CONST	SEGMENT
 __xmm@000000003f8000000000000000000000 DB 00H, 00H, 00H, 00H, 00H, 00H, 00H
@@ -14910,10 +15018,40 @@ CONST	SEGMENT
 __xmm@000000003e24dd2f3de353f83dcccccd DB 0cdH, 0ccH, 0ccH, '=', 0f8H, 'S'
 	DB	0e3H, '=/', 0ddH, '$>', 00H, 00H, 00H, 00H
 CONST	ENDS
+;	COMDAT __xmm@000000000000000a00000000fffffffd
+CONST	SEGMENT
+__xmm@000000000000000a00000000fffffffd DB 0fdH, 0ffH, 0ffH, 0ffH, 00H, 00H
+	DB	00H, 00H, 0aH, 00H, 00H, 00H, 00H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __xmm@000000000000000a0000000000000003
+CONST	SEGMENT
+__xmm@000000000000000a0000000000000003 DB 03H, 00H, 00H, 00H, 00H, 00H, 00H
+	DB	00H, 0aH, 00H, 00H, 00H, 00H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __xmm@00000000000000030000000200000001
+CONST	SEGMENT
+__xmm@00000000000000030000000200000001 DB 01H, 00H, 00H, 00H, 02H, 00H, 00H
+	DB	00H, 03H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __xmm@000000000000000300000000fffffffd
+CONST	SEGMENT
+__xmm@000000000000000300000000fffffffd DB 0fdH, 0ffH, 0ffH, 0ffH, 00H, 00H
+	DB	00H, 00H, 03H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __xmm@000000000000000200000000fffffffd
+CONST	SEGMENT
+__xmm@000000000000000200000000fffffffd DB 0fdH, 0ffH, 0ffH, 0ffH, 00H, 00H
+	DB	00H, 00H, 02H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
+CONST	ENDS
 ;	COMDAT __xmm@00000000000000010000000100000003
 CONST	SEGMENT
 __xmm@00000000000000010000000100000003 DB 03H, 00H, 00H, 00H, 01H, 00H, 00H
 	DB	00H, 01H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __xmm@0000000000000000fffffffd00000000
+CONST	SEGMENT
+__xmm@0000000000000000fffffffd00000000 DB 00H, 00H, 00H, 00H, 0fdH, 0ffH, 0ffH
+	DB	0ffH, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
 CONST	ENDS
 ;	COMDAT __xmm@00000000000000003f80000000000000
 CONST	SEGMENT
@@ -14924,6 +15062,16 @@ CONST	ENDS
 CONST	SEGMENT
 __xmm@000000000000000000000000fffffffd DB 0fdH, 0ffH, 0ffH, 0ffH, 00H, 00H
 	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __xmm@000000000000000000000000fffffff3
+CONST	SEGMENT
+__xmm@000000000000000000000000fffffff3 DB 0f3H, 0ffH, 0ffH, 0ffH, 00H, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __xmm@00000000000000000000000000000003
+CONST	SEGMENT
+__xmm@00000000000000000000000000000003 DB 03H, 00H, 00H, 00H, 00H, 00H, 00H
+	DB	00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H, 00H
 CONST	ENDS
 ;	COMDAT __real@c32463d7
 CONST	SEGMENT
@@ -45589,6 +45737,10 @@ CONST	ENDS
 CONST	SEGMENT
 __real@40733333 DD 040733333r			; 3.8
 CONST	ENDS
+;	COMDAT __real@4072c00000000000
+CONST	SEGMENT
+__real@4072c00000000000 DQ 04072c00000000000r	; 300
+CONST	ENDS
 ;	COMDAT __real@40728f5c
 CONST	SEGMENT
 __real@40728f5c DD 040728f5cr			; 3.79
@@ -45688,10 +45840,6 @@ CONST	ENDS
 ;	COMDAT __real@4060a3d7
 CONST	SEGMENT
 __real@4060a3d7 DD 04060a3d7r			; 3.51
-CONST	ENDS
-;	COMDAT __real@4060800000000000
-CONST	SEGMENT
-__real@4060800000000000 DQ 04060800000000000r	; 132
 CONST	ENDS
 ;	COMDAT __real@40600000
 CONST	SEGMENT
@@ -46429,10 +46577,6 @@ CONST	ENDS
 CONST	SEGMENT
 __real@3fb9999a DD 03fb9999ar			; 1.45
 CONST	ENDS
-;	COMDAT __real@3fb999999999999a
-CONST	SEGMENT
-__real@3fb999999999999a DQ 03fb999999999999ar	; 0.1
-CONST	ENDS
 ;	COMDAT __real@3fb851ec
 CONST	SEGMENT
 __real@3fb851ec DD 03fb851ecr			; 1.44
@@ -46793,6 +46937,10 @@ CONST	ENDS
 CONST	SEGMENT
 __real@3ee66666 DD 03ee66666r			; 0.45
 CONST	ENDS
+;	COMDAT __real@3ee4f8b588e368f1
+CONST	SEGMENT
+__real@3ee4f8b588e368f1 DQ 03ee4f8b588e368f1r	; 1e-05
+CONST	ENDS
 ;	COMDAT __real@3edc28f6
 CONST	SEGMENT
 __real@3edc28f6 DD 03edc28f6r			; 0.43
@@ -46980,10 +47128,6 @@ CONST	ENDS
 ;	COMDAT __real@37cfb4c2
 CONST	SEGMENT
 __real@37cfb4c2 DD 037cfb4c2r			; 2.47605e-05
-CONST	ENDS
-;	COMDAT __real@3727c5ac
-CONST	SEGMENT
-__real@3727c5ac DD 03727c5acr			; 1e-05
 CONST	ENDS
 ;	COMDAT __real@3638b88e
 CONST	SEGMENT
@@ -47178,9 +47322,9 @@ tv71 = 8						; size = 8
   0004e	a3 00 00 00 00	 mov	 DWORD PTR ?timeCursor@timer@@3HA, eax ; timer::timeCursor
 ; File D:\!platform\fx\projectFiles\loop.h
 
-; 551  : 		scene1();
+; 958  : 		scene2();
 
-  00053	e8 00 00 00 00	 call	 ?scene1@Loop@@YAXXZ	; Loop::scene1
+  00053	e8 00 00 00 00	 call	 ?scene2@Loop@@YAXXZ	; Loop::scene2
 ; File D:\!platform\fx\main.cpp
 
 ; 108  : 		Draw::Present();
@@ -47267,10 +47411,10 @@ _TEXT	ENDS
 _TEXT	SEGMENT
 ?mainLoop@Loop@@YAXXZ PROC				; Loop::mainLoop, COMDAT
 
-; 550  : 		
-; 551  : 		scene1();
+; 957  : 		
+; 958  : 		scene2();
 
-  00000	e9 00 00 00 00	 jmp	 ?scene1@Loop@@YAXXZ	; Loop::scene1
+  00000	e9 00 00 00 00	 jmp	 ?scene2@Loop@@YAXXZ	; Loop::scene2
 ?mainLoop@Loop@@YAXXZ ENDP				; Loop::mainLoop
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -47285,13 +47429,13 @@ $T1 = -20						; size = 16
 $T2 = -4						; size = 1
 ?track__@Loop@@YAXXZ PROC				; Loop::track__, COMDAT
 
-; 530  : 	{
+; 937  : 	{
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
   00003	83 ec 14	 sub	 esp, 20			; 00000014H
 
-; 531  : 		if (!isPrecalc)
+; 938  : 		if (!isPrecalc)
 
   00006	80 3d 00 00 00
 	00 00		 cmp	 BYTE PTR ?isPrecalc@Loop@@3_NA, 0 ; Loop::isPrecalc
@@ -47299,21 +47443,21 @@ $T2 = -4						; size = 1
   0000e	57		 push	 edi
   0000f	75 05		 jne	 SHORT $LN2@track__
 
-; 532  : 		{
-; 533  : 			Precalc();
+; 939  : 		{
+; 940  : 			Precalc();
 
   00011	e8 00 00 00 00	 call	 ?Precalc@Loop@@YAXXZ	; Loop::Precalc
 $LN2@track__:
 
-; 534  : 		}
-; 535  : 
-; 536  : 		cmdCounter = precalcOfs;
+; 941  : 		}
+; 942  : 
+; 943  : 		cmdCounter = precalcOfs;
 
   00016	a1 00 00 00 00	 mov	 eax, DWORD PTR ?precalcOfs@@3HA ; precalcOfs
   0001b	a3 00 00 00 00	 mov	 DWORD PTR ?cmdCounter@@3HA, eax ; cmdCounter
 
-; 537  : 
-; 538  : 		frameConst();
+; 944  : 
+; 945  : 		frameConst();
 
   00020	e8 00 00 00 00	 call	 ?frameConst@Loop@@YAXXZ	; Loop::frameConst
 ; File D:\!platform\fx\gApi.h
@@ -47325,7 +47469,7 @@ $LN2@track__:
   00029	e8 00 00 00 00	 call	 ?RenderTarget@Textures@dx11@@YAXW4texture@@I@Z ; dx11::Textures::RenderTarget
 ; File D:\!platform\fx\projectFiles\loop.h
 
-; 541  : 		RenderTarget::Clear({ 11, 11, 11, 255 });
+; 948  : 		RenderTarget::Clear({ 11, 11, 11, 255 });
 
   0002e	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000ff0000000b0000000b0000000b
@@ -47346,21 +47490,1130 @@ $LN2@track__:
   0004b	e8 00 00 00 00	 call	 ?ClearDepth@Draw@dx11@@YAXXZ ; dx11::Draw::ClearDepth
 ; File D:\!platform\fx\projectFiles\loop.h
 
-; 543  : 		tracker::Track({});
+; 950  : 		tracker::Track({});
 
   00050	c6 45 fc 00	 mov	 BYTE PTR $T2[ebp], 0
   00054	ff 75 fc	 push	 DWORD PTR $T2[ebp]
   00057	e8 00 00 00 00	 call	 ?Track@tracker@@YAXUTrack_params@1@@Z ; tracker::Track
   0005c	83 c4 14	 add	 esp, 20			; 00000014H
 
-; 544  : 			
-; 545  : 	}
+; 951  : 			
+; 952  : 	}
 
   0005f	5f		 pop	 edi
   00060	5e		 pop	 esi
   00061	c9		 leave
   00062	c3		 ret	 0
 ?track__@Loop@@YAXXZ ENDP				; Loop::track__
+_TEXT	ENDS
+; Function compile flags: /Ogsp
+; File D:\!platform\fx\projectFiles\loop.h
+; File D:\!platform\fx\gApi.h
+; File D:\!platform\fx\projectFiles\loop.h
+; File D:\!platform\fx\gApi.h
+; File D:\!platform\fx\projectFiles\loop.h
+; File D:\!platform\fx\gApi.h
+; File D:\!platform\fx\projectFiles\loop.h
+;	COMDAT ?scene2@Loop@@YAXXZ
+_TEXT	SEGMENT
+$T1 = -79						; size = 75
+$T2 = -79						; size = 75
+$T3 = -79						; size = 75
+$T4 = -79						; size = 75
+$T5 = -79						; size = 75
+$T6 = -79						; size = 75
+$T7 = -79						; size = 75
+$T8 = -79						; size = 75
+$T9 = -79						; size = 75
+$T10 = -79						; size = 75
+$T11 = -79						; size = 75
+$T12 = -79						; size = 75
+$T13 = -79						; size = 75
+$T14 = -4						; size = 2
+?scene2@Loop@@YAXXZ PROC				; Loop::scene2, COMDAT
+
+; 530  : 	{
+
+  00000	55		 push	 ebp
+  00001	8b ec		 mov	 ebp, esp
+  00003	83 ec 50	 sub	 esp, 80			; 00000050H
+  00006	53		 push	 ebx
+
+; 531  : 		BasicCam::camPass = false;
+
+  00007	33 db		 xor	 ebx, ebx
+  00009	56		 push	 esi
+  0000a	57		 push	 edi
+  0000b	88 1d 00 00 00
+	00		 mov	 BYTE PTR ?camPass@BasicCam@@3_NA, bl ; BasicCam::camPass
+
+; 532  : 		BasicCam::camCounter = 0;
+
+  00011	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+
+; 533  : 
+; 534  : 		if (!isPrecalc)
+
+  00017	38 1d 00 00 00
+	00		 cmp	 BYTE PTR ?isPrecalc@Loop@@3_NA, bl ; Loop::isPrecalc
+  0001d	75 05		 jne	 SHORT $LN4@scene2
+
+; 535  : 		{
+; 536  : 			Precalc();
+
+  0001f	e8 00 00 00 00	 call	 ?Precalc@Loop@@YAXXZ	; Loop::Precalc
+$LN4@scene2:
+
+; 537  : 		}
+; 538  : 
+; 539  : 		cmdCounter = precalcOfs;
+
+  00024	a1 00 00 00 00	 mov	 eax, DWORD PTR ?precalcOfs@@3HA ; precalcOfs
+  00029	a3 00 00 00 00	 mov	 DWORD PTR ?cmdCounter@@3HA, eax ; cmdCounter
+
+; 540  : 
+; 541  : 		frameConst();
+
+  0002e	e8 00 00 00 00	 call	 ?frameConst@Loop@@YAXXZ	; Loop::frameConst
+; File D:\!platform\fx\gApi.h
+
+; 7    : 		InputAssembler::IA(in.topo);
+
+  00033	53		 push	 ebx
+  00034	e8 00 00 00 00	 call	 ?IA@InputAssembler@dx11@@YAXW4topology@@@Z ; dx11::InputAssembler::IA
+; File D:\!platform\fx\projectFiles\loop.h
+
+; 545  : 		BlendMode::Set({
+
+  00039	66 c7 45 fc 01
+	00		 mov	 WORD PTR $T14[ebp], 1
+  0003f	ff 75 fc	 push	 DWORD PTR $T14[ebp]
+  00042	e8 00 00 00 00	 call	 ?Set@BlendMode@@YAXUSet_params@1@@Z ; BlendMode::Set
+; File D:\!platform\fx\gApi.h
+
+; 55   : 		Depth::Depth(in.mode);
+
+  00047	53		 push	 ebx
+  00048	e8 00 00 00 00	 call	 ?Depth@0dx11@@YAXW4depthmode@@@Z ; dx11::Depth::Depth
+
+; 102  : 		Rasterizer::Cull(in.mode);
+
+  0004d	6a 02		 push	 2
+  0004f	e8 00 00 00 00	 call	 ?Cull@Rasterizer@dx11@@YAXW4cullmode@@@Z ; dx11::Rasterizer::Cull
+; File D:\!platform\fx\projectFiles\loop.h
+
+; 558  : 		int t = timer::timeCursor / SAMPLES_IN_FRAME / FRAMES_PER_SECOND / Dur;
+
+  00054	a1 00 00 00 00	 mov	 eax, DWORD PTR ?timeCursor@timer@@3HA ; timer::timeCursor
+  00059	b9 df 02 00 00	 mov	 ecx, 735		; 000002dfH
+  0005e	99		 cdq
+; File D:\!platform\fx\gApi.h
+
+; 102  : 		Rasterizer::Cull(in.mode);
+
+  0005f	83 c4 10	 add	 esp, 16			; 00000010H
+; File D:\!platform\fx\projectFiles\loop.h
+
+; 558  : 		int t = timer::timeCursor / SAMPLES_IN_FRAME / FRAMES_PER_SECOND / Dur;
+
+  00062	f7 f9		 idiv	 ecx
+  00064	b9 b0 04 00 00	 mov	 ecx, 1200		; 000004b0H
+  00069	99		 cdq
+  0006a	f7 f9		 idiv	 ecx
+
+; 559  : 
+; 560  : 		switch (t)
+
+  0006c	83 f8 0c	 cmp	 eax, 12			; 0000000cH
+  0006f	0f 87 04 06 00
+	00		 ja	 $LN2@scene2
+  00075	ff 24 85 00 00
+	00 00		 jmp	 DWORD PTR $LN25@scene2[eax*4]
+$LN5@scene2:
+
+; 561  : 		{
+; 562  : 		case 0:
+; 563  : 			BasicCam::camCounter = 0;
+; 564  : 			BasicCam::setCamKey({
+
+  0007c	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@00000000ffffff3f00000000000000000000000000000002fffffbb800000003
+  00084	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00087	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  0008d	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T1[ebp+5], ymm0
+  00092	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000200000000fffffffd
+  0009a	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T1[ebp+59], xmm0
+  0009f	6a 12		 push	 18			; 00000012H
+  000a1	59		 pop	 ecx
+  000a2	89 45 b1	 mov	 DWORD PTR $T1[ebp], eax
+  000a5	8d 75 b1	 lea	 esi, DWORD PTR $T1[ebp]
+  000a8	88 5d b5	 mov	 BYTE PTR $T1[ebp+4], bl
+  000ab	8b fc		 mov	 edi, esp
+  000ad	c7 45 d6 5b ff
+	ff ff		 mov	 DWORD PTR $T1[ebp+37], -165 ; ffffff5bH
+  000b4	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T1[ebp+41], 100 ; 00000064H
+  000bb	88 5d de	 mov	 BYTE PTR $T1[ebp+45], bl
+  000be	89 5d df	 mov	 DWORD PTR $T1[ebp+46], ebx
+  000c1	c7 45 e3 0a 00
+	00 00		 mov	 DWORD PTR $T1[ebp+50], 10 ; 0000000aH
+  000c8	c7 45 e7 e8 fe
+	ff ff		 mov	 DWORD PTR $T1[ebp+54], -280 ; fffffee8H
+  000cf	c6 45 eb 01	 mov	 BYTE PTR $T1[ebp+58], 1
+  000d3	f3 a5		 rep movsd
+  000d5	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  000db	66 a5		 movsw
+  000dd	a4		 movsb
+  000de	c5 f8 77	 vzeroupper
+  000e1	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 565  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 566  : 				.camType = keyType::set,
+; 567  : 				.eye_x = 3,
+; 568  : 				.eye_y = -1096,
+; 569  : 				.eye_z = 2,
+; 570  : 				.at_x = 0,
+; 571  : 				.at_y = 0,
+; 572  : 				.at_z = 0,
+; 573  : 				.up_x = -193,
+; 574  : 				.up_y = 0,
+; 575  : 				.up_z = -165,
+; 576  : 				.angle = 100,
+; 577  : 				.sType = sliderType::follow,
+; 578  : 				.slide_x = 0,
+; 579  : 				.slide_y = 10,
+; 580  : 				.slide_z = -280,
+; 581  : 				.axisType = camAxis::global,
+; 582  : 				.fly_x = -3,
+; 583  : 				.fly_y = 0,
+; 584  : 				.fly_z = 2,
+; 585  : 				.jitter = 0
+; 586  : 			});
+; 587  : 			BasicCam::processCam();
+
+  000e6	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 588  : 
+; 589  : 
+; 590  : 			Object::Zenith({ .quality = 1 });
+
+  000eb	6a 01		 push	 1
+  000ed	e8 00 00 00 00	 call	 ?Zenith@Object@@YAXUZenith_params@1@@Z ; Object::Zenith
+
+; 591  : 			break;
+
+  000f2	e9 7f 05 00 00	 jmp	 $LN28@scene2
+$LN6@scene2:
+
+; 592  : 		case 1:
+; 593  : 			BasicCam::camCounter = 0;
+; 594  : 			BasicCam::setCamKey({
+
+  000f7	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000000000008a0000000000000000000000000000002900000bba0000001a
+  000ff	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00102	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  00108	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T2[ebp+5], ymm0
+  0010d	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@0000000000000000fffffffd00000000
+  00115	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T2[ebp+59], xmm0
+  0011a	6a 12		 push	 18			; 00000012H
+  0011c	59		 pop	 ecx
+  0011d	89 45 b1	 mov	 DWORD PTR $T2[ebp], eax
+  00120	8d 75 b1	 lea	 esi, DWORD PTR $T2[ebp]
+  00123	88 5d b5	 mov	 BYTE PTR $T2[ebp+4], bl
+  00126	8b fc		 mov	 edi, esp
+  00128	c7 45 d6 d6 00
+	00 00		 mov	 DWORD PTR $T2[ebp+37], 214 ; 000000d6H
+  0012f	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T2[ebp+41], 100 ; 00000064H
+  00136	88 5d de	 mov	 BYTE PTR $T2[ebp+45], bl
+  00139	89 5d df	 mov	 DWORD PTR $T2[ebp+46], ebx
+  0013c	89 5d e3	 mov	 DWORD PTR $T2[ebp+50], ebx
+  0013f	c7 45 e7 a0 00
+	00 00		 mov	 DWORD PTR $T2[ebp+54], 160 ; 000000a0H
+  00146	c6 45 eb 01	 mov	 BYTE PTR $T2[ebp+58], 1
+  0014a	f3 a5		 rep movsd
+  0014c	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  00152	66 a5		 movsw
+  00154	a4		 movsb
+  00155	c5 f8 77	 vzeroupper
+  00158	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 595  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 596  : 				.camType = keyType::set,
+; 597  : 				.eye_x = 26,
+; 598  : 				.eye_y = 3002,
+; 599  : 				.eye_z = 41,
+; 600  : 				.at_x = 0,
+; 601  : 				.at_y = 0,
+; 602  : 				.at_z = 0,
+; 603  : 				.up_x = 138,
+; 604  : 				.up_y = 0,
+; 605  : 				.up_z = 214,
+; 606  : 				.angle = 100,
+; 607  : 				.sType = sliderType::follow,
+; 608  : 				.slide_x = 0,
+; 609  : 				.slide_y = 0,
+; 610  : 				.slide_z = 160,
+; 611  : 				.axisType = camAxis::global,
+; 612  : 				.fly_x = 0,
+; 613  : 				.fly_y = -3,
+; 614  : 				.fly_z = 0,
+; 615  : 				.jitter = 0
+; 616  : 			});
+; 617  : 			BasicCam::processCam();
+
+  0015d	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 618  : 			Object::Saggitarius({ .quality = 1 });
+
+  00162	6a 01		 push	 1
+  00164	e8 00 00 00 00	 call	 ?Saggitarius@Object@@YAXUSaggitarius_params@1@@Z ; Object::Saggitarius
+
+; 619  : 			break;
+
+  00169	e9 08 05 00 00	 jmp	 $LN28@scene2
+$LN7@scene2:
+
+; 620  : 		case 2:
+; 621  : 			BasicCam::camCounter = 0;
+; 622  : 			BasicCam::setCamKey({
+
+  0016e	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@fffffffb0000000e0000000000000000000000000000004f00000ed800000004
+  00176	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00179	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  0017f	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T3[ebp+5], ymm0
+  00184	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
+  0018c	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T3[ebp+59], xmm0
+  00191	6a 12		 push	 18			; 00000012H
+  00193	59		 pop	 ecx
+  00194	89 45 b1	 mov	 DWORD PTR $T3[ebp], eax
+  00197	8d 75 b1	 lea	 esi, DWORD PTR $T3[ebp]
+  0019a	88 5d b5	 mov	 BYTE PTR $T3[ebp+4], bl
+  0019d	8b fc		 mov	 edi, esp
+  0019f	c7 45 d6 fe 00
+	00 00		 mov	 DWORD PTR $T3[ebp+37], 254 ; 000000feH
+  001a6	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T3[ebp+41], 100 ; 00000064H
+  001ad	88 5d de	 mov	 BYTE PTR $T3[ebp+45], bl
+  001b0	89 5d df	 mov	 DWORD PTR $T3[ebp+46], ebx
+  001b3	89 5d e3	 mov	 DWORD PTR $T3[ebp+50], ebx
+  001b6	c7 45 e7 b5 01
+	00 00		 mov	 DWORD PTR $T3[ebp+54], 437 ; 000001b5H
+  001bd	c6 45 eb 01	 mov	 BYTE PTR $T3[ebp+58], 1
+  001c1	f3 a5		 rep movsd
+  001c3	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  001c9	66 a5		 movsw
+  001cb	a4		 movsb
+  001cc	c5 f8 77	 vzeroupper
+  001cf	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 623  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 624  : 				.camType = keyType::set,
+; 625  : 				.eye_x = 4,
+; 626  : 				.eye_y = 3800,
+; 627  : 				.eye_z = 79,
+; 628  : 				.at_x = 0,
+; 629  : 				.at_y = 0,
+; 630  : 				.at_z = 0,
+; 631  : 				.up_x = 14,
+; 632  : 				.up_y = -5,
+; 633  : 				.up_z = 254,
+; 634  : 				.angle = 100,
+; 635  : 				.sType = sliderType::follow,
+; 636  : 				.slide_x = 0,
+; 637  : 				.slide_y = 0,
+; 638  : 				.slide_z = 437,
+; 639  : 				.axisType = camAxis::global,
+; 640  : 				.fly_x = -3,
+; 641  : 				.fly_y = 0,
+; 642  : 				.fly_z = 0,
+; 643  : 				.jitter = 0
+; 644  : 			});
+; 645  : 			BasicCam::processCam();
+
+  001d4	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 646  : 
+; 647  : 			Object::Crab({ .quality = 1 });
+
+  001d9	6a 01		 push	 1
+  001db	e8 00 00 00 00	 call	 ?Crab@Object@@YAXUCrab_params@1@@Z ; Object::Crab
+
+; 648  : 			break;
+
+  001e0	e9 91 04 00 00	 jmp	 $LN28@scene2
+$LN8@scene2:
+
+; 649  : 		case 3:
+; 650  : 			BasicCam::camCounter = 0;
+; 651  : 			BasicCam::setCamKey({
+
+  001e5	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000150000008b000000000000000000000000fffffefd00000e69ffffff56
+  001ed	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  001f0	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  001f6	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T4[ebp+5], ymm0
+  001fb	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
+  001ff	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T4[ebp+59], xmm0
+  00204	6a 12		 push	 18			; 00000012H
+  00206	59		 pop	 ecx
+  00207	89 45 b1	 mov	 DWORD PTR $T4[ebp], eax
+  0020a	8d 75 b1	 lea	 esi, DWORD PTR $T4[ebp]
+  0020d	88 5d b5	 mov	 BYTE PTR $T4[ebp+4], bl
+  00210	8b fc		 mov	 edi, esp
+  00212	c7 45 d6 d4 00
+	00 00		 mov	 DWORD PTR $T4[ebp+37], 212 ; 000000d4H
+  00219	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T4[ebp+41], 100 ; 00000064H
+  00220	88 5d de	 mov	 BYTE PTR $T4[ebp+45], bl
+  00223	89 5d df	 mov	 DWORD PTR $T4[ebp+46], ebx
+  00226	89 5d e3	 mov	 DWORD PTR $T4[ebp+50], ebx
+  00229	c7 45 e7 b8 01
+	00 00		 mov	 DWORD PTR $T4[ebp+54], 440 ; 000001b8H
+  00230	c6 45 eb 01	 mov	 BYTE PTR $T4[ebp+58], 1
+  00234	f3 a5		 rep movsd
+  00236	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  0023c	66 a5		 movsw
+  0023e	a4		 movsb
+  0023f	c5 f8 77	 vzeroupper
+  00242	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 652  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 653  : 				.camType = keyType::set,
+; 654  : 				.eye_x = -170,
+; 655  : 				.eye_y = 3689,
+; 656  : 				.eye_z = -259,
+; 657  : 				.at_x = 0,
+; 658  : 				.at_y = 0,
+; 659  : 				.at_z = 0,
+; 660  : 				.up_x = 139,
+; 661  : 				.up_y = 21,
+; 662  : 				.up_z = 212,
+; 663  : 				.angle = 100,
+; 664  : 				.sType = sliderType::follow,
+; 665  : 				.slide_x = 0,
+; 666  : 				.slide_y = 0,
+; 667  : 				.slide_z = 440,
+; 668  : 				.axisType = camAxis::global,
+; 669  : 				.fly_x = 0,
+; 670  : 				.fly_y = 0,
+; 671  : 				.fly_z = 0,
+; 672  : 				.jitter = 0
+; 673  : 			});
+; 674  : 			BasicCam::processCam();
+
+  00247	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 675  : 			Object::Aries({ .quality = 1 });
+
+  0024c	6a 01		 push	 1
+  0024e	e8 00 00 00 00	 call	 ?Aries@Object@@YAXUAries_params@1@@Z ; Object::Aries
+
+; 676  : 			break;
+
+  00253	e9 1e 04 00 00	 jmp	 $LN28@scene2
+$LN9@scene2:
+
+; 677  : 		case 4:
+; 678  : 			BasicCam::camCounter = 0;
+; 679  : 			BasicCam::setCamKey({
+
+  00258	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@ffffff76ffffff440000000000000000000000000000011efffffc600000020e
+  00260	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00263	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  00269	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T5[ebp+5], ymm0
+  0026e	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
+  00276	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T5[ebp+59], xmm0
+  0027b	6a 12		 push	 18			; 00000012H
+  0027d	59		 pop	 ecx
+  0027e	89 45 b1	 mov	 DWORD PTR $T5[ebp], eax
+  00281	8d 75 b1	 lea	 esi, DWORD PTR $T5[ebp]
+  00284	88 5d b5	 mov	 BYTE PTR $T5[ebp+4], bl
+  00287	8b fc		 mov	 edi, esp
+  00289	c7 45 d6 9a ff
+	ff ff		 mov	 DWORD PTR $T5[ebp+37], -102 ; ffffff9aH
+  00290	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T5[ebp+41], 100 ; 00000064H
+  00297	88 5d de	 mov	 BYTE PTR $T5[ebp+45], bl
+  0029a	89 5d df	 mov	 DWORD PTR $T5[ebp+46], ebx
+  0029d	89 5d e3	 mov	 DWORD PTR $T5[ebp+50], ebx
+  002a0	c7 45 e7 01 fe
+	ff ff		 mov	 DWORD PTR $T5[ebp+54], -511 ; fffffe01H
+  002a7	c6 45 eb 01	 mov	 BYTE PTR $T5[ebp+58], 1
+  002ab	f3 a5		 rep movsd
+  002ad	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  002b3	66 a5		 movsw
+  002b5	a4		 movsb
+  002b6	c5 f8 77	 vzeroupper
+  002b9	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 680  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 681  : 				.camType = keyType::set,
+; 682  : 				.eye_x = 526,
+; 683  : 				.eye_y = -928,
+; 684  : 				.eye_z = 286,
+; 685  : 				.at_x = 0,
+; 686  : 				.at_y = 0,
+; 687  : 				.at_z = 0,
+; 688  : 				.up_x = -188,
+; 689  : 				.up_y = -138,
+; 690  : 				.up_z = -102,
+; 691  : 				.angle = 100,
+; 692  : 				.sType = sliderType::follow,
+; 693  : 				.slide_x = 0,
+; 694  : 				.slide_y = 0,
+; 695  : 				.slide_z = -511,
+; 696  : 				.axisType = camAxis::global,
+; 697  : 				.fly_x = -3,
+; 698  : 				.fly_y = 0,
+; 699  : 				.fly_z = 0,
+; 700  : 				.jitter = 0
+; 701  : 			});
+; 702  : 			BasicCam::processCam();
+
+  002be	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 703  : 			Object::Scorpio({ .quality = 1 });
+
+  002c3	6a 01		 push	 1
+  002c5	e8 00 00 00 00	 call	 ?Scorpio@Object@@YAXUScorpio_params@1@@Z ; Object::Scorpio
+
+; 704  : 			break;
+
+  002ca	e9 a7 03 00 00	 jmp	 $LN28@scene2
+$LN10@scene2:
+
+; 705  : 		case 5:
+; 706  : 			BasicCam::camCounter = 0;
+; 707  : 			BasicCam::setCamKey({
+
+  002cf	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@0000008b00000096000000000000000000000000000003f7fffff76d000003f7
+  002d7	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  002da	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  002e0	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T6[ebp+5], ymm0
+  002e5	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffff3
+  002ed	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T6[ebp+59], xmm0
+  002f2	6a 12		 push	 18			; 00000012H
+  002f4	59		 pop	 ecx
+  002f5	89 45 b1	 mov	 DWORD PTR $T6[ebp], eax
+  002f8	8d 75 b1	 lea	 esi, DWORD PTR $T6[ebp]
+  002fb	88 5d b5	 mov	 BYTE PTR $T6[ebp+4], bl
+  002fe	8b fc		 mov	 edi, esp
+  00300	c7 45 d6 96 00
+	00 00		 mov	 DWORD PTR $T6[ebp+37], 150 ; 00000096H
+  00307	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T6[ebp+41], 100 ; 00000064H
+  0030e	88 5d de	 mov	 BYTE PTR $T6[ebp+45], bl
+  00311	89 5d df	 mov	 DWORD PTR $T6[ebp+46], ebx
+  00314	89 5d e3	 mov	 DWORD PTR $T6[ebp+50], ebx
+  00317	c7 45 e7 3e fe
+	ff ff		 mov	 DWORD PTR $T6[ebp+54], -450 ; fffffe3eH
+  0031e	c6 45 eb 01	 mov	 BYTE PTR $T6[ebp+58], 1
+  00322	f3 a5		 rep movsd
+  00324	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  0032a	66 a5		 movsw
+  0032c	a4		 movsb
+  0032d	c5 f8 77	 vzeroupper
+  00330	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 708  : 				.camTime = t * SAMPLES_IN_FRAME * FRAMES_PER_SECOND * Dur,
+; 709  : 				.camType = keyType::set,
+; 710  : 				.eye_x = 1015,
+; 711  : 				.eye_y = -2195,
+; 712  : 				.eye_z = 1015,
+; 713  : 				.at_x = 0,
+; 714  : 				.at_y = 0,
+; 715  : 				.at_z = 0,
+; 716  : 				.up_x = 150,
+; 717  : 				.up_y = 139,
+; 718  : 				.up_z = 150,
+; 719  : 				.angle = 100,
+; 720  : 				.sType = sliderType::follow,
+; 721  : 				.slide_x = 0,
+; 722  : 				.slide_y = 0,
+; 723  : 				.slide_z = -450,
+; 724  : 				.axisType = camAxis::global,
+; 725  : 				.fly_x = -13,
+; 726  : 				.fly_y = 0,
+; 727  : 				.fly_z = 0,
+; 728  : 				.jitter = 0
+; 729  : 				});
+; 730  : 			BasicCam::processCam();
+
+  00335	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 731  : 			Object::LeoBigStar({ .quality = 1 });
+
+  0033a	6a 01		 push	 1
+  0033c	e8 00 00 00 00	 call	 ?LeoBigStar@Object@@YAXULeoBigStar_params@1@@Z ; Object::LeoBigStar
+
+; 732  : 			break;
+
+  00341	e9 30 03 00 00	 jmp	 $LN28@scene2
+$LN11@scene2:
+
+; 733  : 		case 6:
+; 734  : 			BasicCam::camCounter = 0;
+; 735  : 			BasicCam::setCamKey({
+
+  00346	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@ffffffb9000000f400002b660000000000000000ffffd4a30000000000000000
+  0034e	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00351	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  00357	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T7[ebp+5], ymm0
+  0035c	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
+  00360	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T7[ebp+59], xmm0
+  00365	6a 12		 push	 18			; 00000012H
+  00367	59		 pop	 ecx
+  00368	89 45 b1	 mov	 DWORD PTR $T7[ebp], eax
+  0036b	8d 75 b1	 lea	 esi, DWORD PTR $T7[ebp]
+  0036e	88 5d b5	 mov	 BYTE PTR $T7[ebp+4], bl
+  00371	8b fc		 mov	 edi, esp
+  00373	c7 45 d6 fb ff
+	ff ff		 mov	 DWORD PTR $T7[ebp+37], -5 ; fffffffbH
+  0037a	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T7[ebp+41], 100 ; 00000064H
+  00381	88 5d de	 mov	 BYTE PTR $T7[ebp+45], bl
+  00384	89 5d df	 mov	 DWORD PTR $T7[ebp+46], ebx
+  00387	89 5d e3	 mov	 DWORD PTR $T7[ebp+50], ebx
+  0038a	c7 45 e7 3e 08
+	00 00		 mov	 DWORD PTR $T7[ebp+54], 2110 ; 0000083eH
+  00391	c6 45 eb 01	 mov	 BYTE PTR $T7[ebp+58], 1
+  00395	f3 a5		 rep movsd
+  00397	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  0039d	66 a5		 movsw
+  0039f	a4		 movsb
+  003a0	c5 f8 77	 vzeroupper
+  003a3	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 736  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 737  : 				.camType = keyType::set,
+; 738  : 				.eye_x = 0,
+; 739  : 				.eye_y = 0,
+; 740  : 				.eye_z = -11101,
+; 741  : 				.at_x = 0,
+; 742  : 				.at_y = 0,
+; 743  : 				.at_z = 11110,
+; 744  : 				.up_x = 244,
+; 745  : 				.up_y = -71,
+; 746  : 				.up_z = -5,
+; 747  : 				.angle = 100,
+; 748  : 				.sType = sliderType::follow,
+; 749  : 				.slide_x = 0,
+; 750  : 				.slide_y = 0,
+; 751  : 				.slide_z = 2110,
+; 752  : 				.axisType = camAxis::global,
+; 753  : 				.fly_x = 0,
+; 754  : 				.fly_y = 0,
+; 755  : 				.fly_z = 0,
+; 756  : 				.jitter = 0
+; 757  : 			});
+; 758  : 			BasicCam::processCam();
+
+  003a8	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 759  : 			Object::Virgo({ .quality = 1 });
+
+  003ad	6a 01		 push	 1
+  003af	e8 00 00 00 00	 call	 ?Virgo@Object@@YAXUVirgo_params@1@@Z ; Object::Virgo
+
+; 760  : 			break;
+
+  003b4	e9 bd 02 00 00	 jmp	 $LN28@scene2
+$LN12@scene2:
+
+; 761  : 		case 7:
+; 762  : 			BasicCam::camCounter = 0;
+; 763  : 			BasicCam::setCamKey({
+
+  003b9	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@0000000bffffff0a0000000000000000000000000000000c0000046000000031
+  003c1	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  003c4	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  003ca	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T8[ebp+5], ymm0
+  003cf	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@00000000fffffffdfffffffe00000003
+  003d7	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T8[ebp+59], xmm0
+  003dc	6a 12		 push	 18			; 00000012H
+  003de	59		 pop	 ecx
+  003df	89 45 b1	 mov	 DWORD PTR $T8[ebp], eax
+  003e2	8d 75 b1	 lea	 esi, DWORD PTR $T8[ebp]
+  003e5	88 5d b5	 mov	 BYTE PTR $T8[ebp+4], bl
+  003e8	8b fc		 mov	 edi, esp
+  003ea	c7 45 d6 c0 ff
+	ff ff		 mov	 DWORD PTR $T8[ebp+37], -64 ; ffffffc0H
+  003f1	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T8[ebp+41], 100 ; 00000064H
+  003f8	88 5d de	 mov	 BYTE PTR $T8[ebp+45], bl
+  003fb	c7 45 df 16 00
+	00 00		 mov	 DWORD PTR $T8[ebp+46], 22 ; 00000016H
+  00402	c7 45 e3 0a 00
+	00 00		 mov	 DWORD PTR $T8[ebp+50], 10 ; 0000000aH
+  00409	c7 45 e7 f6 ff
+	ff ff		 mov	 DWORD PTR $T8[ebp+54], -10 ; fffffff6H
+  00410	88 5d eb	 mov	 BYTE PTR $T8[ebp+58], bl
+  00413	f3 a5		 rep movsd
+  00415	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  0041b	66 a5		 movsw
+  0041d	a4		 movsb
+  0041e	c5 f8 77	 vzeroupper
+  00421	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 764  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 765  : 				.camType = keyType::set,
+; 766  : 				.eye_x = 49,
+; 767  : 				.eye_y = 1120,
+; 768  : 				.eye_z = 12,
+; 769  : 				.at_x = 0,
+; 770  : 				.at_y = 0,
+; 771  : 				.at_z = 0,
+; 772  : 				.up_x = -246,
+; 773  : 				.up_y = 11,
+; 774  : 				.up_z = -64,
+; 775  : 				.angle = 100,
+; 776  : 				.sType = sliderType::follow,
+; 777  : 				.slide_x = 22,
+; 778  : 				.slide_y = 10,
+; 779  : 				.slide_z = -10,
+; 780  : 				.axisType = camAxis::local,
+; 781  : 				.fly_x = 3,
+; 782  : 				.fly_y = -2,
+; 783  : 				.fly_z = -3,
+; 784  : 				.jitter = 0
+; 785  : 			});
+; 786  : 			BasicCam::processCam();
+
+  00426	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 787  : 			Object::Capri({ .quality = 1 });
+
+  0042b	6a 01		 push	 1
+  0042d	e8 00 00 00 00	 call	 ?Capri@Object@@YAXUCapri_params@1@@Z ; Object::Capri
+
+; 788  : 			break;
+
+  00432	e9 3f 02 00 00	 jmp	 $LN28@scene2
+$LN13@scene2:
+
+; 789  : 		case 8:
+; 790  : 			BasicCam::camCounter = 0;
+; 791  : 			BasicCam::setCamKey({
+
+  00437	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@0000000bffffff0a0000000000000000000000000000000c0000046000000031
+  0043f	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00442	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  00448	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T9[ebp+5], ymm0
+  0044d	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
+  00455	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T9[ebp+59], xmm0
+  0045a	6a 12		 push	 18			; 00000012H
+  0045c	59		 pop	 ecx
+  0045d	89 45 b1	 mov	 DWORD PTR $T9[ebp], eax
+  00460	8d 75 b1	 lea	 esi, DWORD PTR $T9[ebp]
+  00463	88 5d b5	 mov	 BYTE PTR $T9[ebp+4], bl
+  00466	8b fc		 mov	 edi, esp
+  00468	c7 45 d6 c0 ff
+	ff ff		 mov	 DWORD PTR $T9[ebp+37], -64 ; ffffffc0H
+  0046f	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T9[ebp+41], 100 ; 00000064H
+  00476	88 5d de	 mov	 BYTE PTR $T9[ebp+45], bl
+  00479	89 5d df	 mov	 DWORD PTR $T9[ebp+46], ebx
+  0047c	89 5d e3	 mov	 DWORD PTR $T9[ebp+50], ebx
+  0047f	c7 45 e7 60 fe
+	ff ff		 mov	 DWORD PTR $T9[ebp+54], -416 ; fffffe60H
+  00486	c6 45 eb 01	 mov	 BYTE PTR $T9[ebp+58], 1
+  0048a	f3 a5		 rep movsd
+  0048c	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  00492	66 a5		 movsw
+  00494	a4		 movsb
+  00495	c5 f8 77	 vzeroupper
+  00498	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 792  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 793  : 				.camType = keyType::set,
+; 794  : 				.eye_x = 49,
+; 795  : 				.eye_y = 1120,
+; 796  : 				.eye_z = 12,
+; 797  : 				.at_x = 0,
+; 798  : 				.at_y = 0,
+; 799  : 				.at_z = 0,
+; 800  : 				.up_x = -246,
+; 801  : 				.up_y = 11,
+; 802  : 				.up_z = -64,
+; 803  : 				.angle = 100,
+; 804  : 				.sType = sliderType::follow,
+; 805  : 				.slide_x = 0,
+; 806  : 				.slide_y = 0,
+; 807  : 				.slide_z = -416,
+; 808  : 				.axisType = camAxis::global,
+; 809  : 				.fly_x = -3,
+; 810  : 				.fly_y = 0,
+; 811  : 				.fly_z = 0,
+; 812  : 				.jitter = 0
+; 813  : 			});
+; 814  : 			BasicCam::processCam();
+
+  0049d	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 815  : 			Object::Taurus({ .quality = 1 });
+
+  004a2	6a 01		 push	 1
+  004a4	e8 00 00 00 00	 call	 ?Taurus@Object@@YAXUTaurus_params@1@@Z ; Object::Taurus
+
+; 816  : 			//
+; 817  : 			break;
+
+  004a9	e9 c8 01 00 00	 jmp	 $LN28@scene2
+$LN14@scene2:
+
+; 818  : 		case 9:
+; 819  : 			BasicCam::camCounter = 0;
+; 820  : 			BasicCam::setCamKey({
+
+  004ae	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@ffffffe9000000e3000000000000000000000000000000430000065800000086
+  004b6	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  004b9	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  004bf	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T10[ebp+5], ymm0
+  004c4	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000300000000fffffffd
+  004cc	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T10[ebp+59], xmm0
+  004d1	6a 12		 push	 18			; 00000012H
+  004d3	59		 pop	 ecx
+  004d4	89 45 b1	 mov	 DWORD PTR $T10[ebp], eax
+  004d7	8d 75 b1	 lea	 esi, DWORD PTR $T10[ebp]
+  004da	88 5d b5	 mov	 BYTE PTR $T10[ebp+4], bl
+  004dd	8b fc		 mov	 edi, esp
+  004df	c7 45 d6 71 00
+	00 00		 mov	 DWORD PTR $T10[ebp+37], 113 ; 00000071H
+  004e6	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T10[ebp+41], 100 ; 00000064H
+  004ed	88 5d de	 mov	 BYTE PTR $T10[ebp+45], bl
+  004f0	89 5d df	 mov	 DWORD PTR $T10[ebp+46], ebx
+  004f3	c7 45 e3 66 fe
+	ff ff		 mov	 DWORD PTR $T10[ebp+50], -410 ; fffffe66H
+  004fa	89 5d e7	 mov	 DWORD PTR $T10[ebp+54], ebx
+  004fd	c6 45 eb 01	 mov	 BYTE PTR $T10[ebp+58], 1
+  00501	f3 a5		 rep movsd
+  00503	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  00509	66 a5		 movsw
+  0050b	a4		 movsb
+  0050c	c5 f8 77	 vzeroupper
+  0050f	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 821  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 822  : 				.camType = keyType::set,
+; 823  : 				.eye_x = 134,
+; 824  : 				.eye_y = 1624,
+; 825  : 				.eye_z = 67,
+; 826  : 				.at_x = 0,
+; 827  : 				.at_y = 0,
+; 828  : 				.at_z = 0,
+; 829  : 				.up_x = 227,
+; 830  : 				.up_y = -23,
+; 831  : 				.up_z = 113,
+; 832  : 				.angle = 100,
+; 833  : 				.sType = sliderType::follow,
+; 834  : 				.slide_x = 0,
+; 835  : 				.slide_y = -410,
+; 836  : 				.slide_z = 0,
+; 837  : 				.axisType = camAxis::global,
+; 838  : 				.fly_x = -3,
+; 839  : 				.fly_y = 0,
+; 840  : 				.fly_z = 3,
+; 841  : 				.jitter = 0
+; 842  : 			});
+; 843  : 			BasicCam::processCam();
+
+  00514	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 844  : 			Object::Libra({ .quality = 1 });
+
+  00519	6a 01		 push	 1
+  0051b	e8 00 00 00 00	 call	 ?Libra@Object@@YAXULibra_params@1@@Z ; Object::Libra
+
+; 845  : 			break;
+
+  00520	e9 51 01 00 00	 jmp	 $LN28@scene2
+$LN15@scene2:
+
+; 846  : 		case 10:
+; 847  : 			BasicCam::camCounter = 0;
+; 848  : 			BasicCam::setCamKey({
+
+  00525	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@00000025000000a400000000000000000000000000000115fffff63d000000ef
+  0052d	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00530	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  00536	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T11[ebp+5], ymm0
+  0053b	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
+  00543	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T11[ebp+59], xmm0
+  00548	6a 12		 push	 18			; 00000012H
+  0054a	59		 pop	 ecx
+  0054b	89 45 b1	 mov	 DWORD PTR $T11[ebp], eax
+  0054e	8d 75 b1	 lea	 esi, DWORD PTR $T11[ebp]
+  00551	88 5d b5	 mov	 BYTE PTR $T11[ebp+4], bl
+  00554	8b fc		 mov	 edi, esp
+  00556	c7 45 d6 be 00
+	00 00		 mov	 DWORD PTR $T11[ebp+37], 190 ; 000000beH
+  0055d	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T11[ebp+41], 100 ; 00000064H
+  00564	88 5d de	 mov	 BYTE PTR $T11[ebp+45], bl
+  00567	89 5d df	 mov	 DWORD PTR $T11[ebp+46], ebx
+  0056a	89 5d e3	 mov	 DWORD PTR $T11[ebp+50], ebx
+  0056d	c7 45 e7 74 ff
+	ff ff		 mov	 DWORD PTR $T11[ebp+54], -140 ; ffffff74H
+  00574	c6 45 eb 01	 mov	 BYTE PTR $T11[ebp+58], 1
+  00578	f3 a5		 rep movsd
+  0057a	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  00580	66 a5		 movsw
+  00582	a4		 movsb
+  00583	c5 f8 77	 vzeroupper
+  00586	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 849  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 850  : 				.camType = keyType::set,
+; 851  : 				.eye_x = 239,
+; 852  : 				.eye_y = -2499,
+; 853  : 				.eye_z = 277,
+; 854  : 				.at_x = 0,
+; 855  : 				.at_y = 0,
+; 856  : 				.at_z = 0,
+; 857  : 				.up_x = 164,
+; 858  : 				.up_y = 37,
+; 859  : 				.up_z = 190,
+; 860  : 				.angle = 100,
+; 861  : 				.sType = sliderType::follow,
+; 862  : 				.slide_x = 0,
+; 863  : 				.slide_y = 0,
+; 864  : 				.slide_z = -140,
+; 865  : 				.axisType = camAxis::global,
+; 866  : 				.fly_x = -3,
+; 867  : 				.fly_y = 0,
+; 868  : 				.fly_z = 0,
+; 869  : 				.jitter = 0
+; 870  : 			});
+; 871  : 			BasicCam::processCam();
+
+  0058b	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 872  : 			Object::Aquarius({ .quality = 1 });
+
+  00590	6a 01		 push	 1
+  00592	e8 00 00 00 00	 call	 ?Aquarius@Object@@YAXUAquarius_params@1@@Z ; Object::Aquarius
+
+; 873  : 			break;
+
+  00597	e9 da 00 00 00	 jmp	 $LN28@scene2
+$LN16@scene2:
+
+; 874  : 		case 11:
+; 875  : 			BasicCam::camCounter = 0;
+; 876  : 			BasicCam::setCamKey({
+
+  0059c	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@0000007200000000000000000000000000000000fffffc0f00000005fffffff8
+  005a4	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  005a7	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  005ad	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T12[ebp+5], ymm0
+  005b2	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@00000000000000030000000200000001
+  005ba	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T12[ebp+59], xmm0
+  005bf	6a 12		 push	 18			; 00000012H
+  005c1	59		 pop	 ecx
+  005c2	89 45 b1	 mov	 DWORD PTR $T12[ebp], eax
+  005c5	8d 75 b1	 lea	 esi, DWORD PTR $T12[ebp]
+  005c8	88 5d b5	 mov	 BYTE PTR $T12[ebp+4], bl
+  005cb	8b fc		 mov	 edi, esp
+  005cd	89 5d d6	 mov	 DWORD PTR $T12[ebp+37], ebx
+  005d0	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T12[ebp+41], 100 ; 00000064H
+  005d7	88 5d de	 mov	 BYTE PTR $T12[ebp+45], bl
+  005da	89 5d df	 mov	 DWORD PTR $T12[ebp+46], ebx
+  005dd	89 5d e3	 mov	 DWORD PTR $T12[ebp+50], ebx
+  005e0	89 5d e7	 mov	 DWORD PTR $T12[ebp+54], ebx
+  005e3	c6 45 eb 01	 mov	 BYTE PTR $T12[ebp+58], 1
+  005e7	f3 a5		 rep movsd
+  005e9	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  005ef	66 a5		 movsw
+  005f1	a4		 movsb
+  005f2	c5 f8 77	 vzeroupper
+  005f5	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 877  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 878  : 				.camType = keyType::set,
+; 879  : 				.eye_x = -8,
+; 880  : 				.eye_y = 5,
+; 881  : 				.eye_z = -1009,
+; 882  : 				.at_x = 0,
+; 883  : 				.at_y = 0,
+; 884  : 				.at_z = 0,
+; 885  : 				.up_x = 0,
+; 886  : 				.up_y = 114,
+; 887  : 				.up_z = 0,
+; 888  : 				.angle = 100,
+; 889  : 				.sType = sliderType::follow,
+; 890  : 				.slide_x = 0,
+; 891  : 				.slide_y = 0,
+; 892  : 				.slide_z = 0,
+; 893  : 				.axisType = camAxis::global,
+; 894  : 				.fly_x = 1,
+; 895  : 				.fly_y = 2,
+; 896  : 				.fly_z = 3,
+; 897  : 				.jitter = 0
+; 898  : 			});
+; 899  : 			BasicCam::processCam();
+
+  005fa	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 900  : 			Object::Fish({ .quality = 1 });
+
+  005ff	6a 01		 push	 1
+  00601	e8 00 00 00 00	 call	 ?Fish@Object@@YAXUFish_params@1@@Z ; Object::Fish
+
+; 901  : 			break;
+
+  00606	eb 6e		 jmp	 SHORT $LN28@scene2
+$LN17@scene2:
+
+; 902  : 		case 12:
+; 903  : 			BasicCam::camCounter = 0;
+; 904  : 			BasicCam::setCamKey({
+
+  00608	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@00000000ffffff0200000000000000000000000000000000000013f70000000a
+  00610	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00613	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  00619	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T13[ebp+5], ymm0
+  0061e	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
+  00622	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T13[ebp+59], xmm0
+  00627	6a 12		 push	 18			; 00000012H
+  00629	59		 pop	 ecx
+  0062a	89 45 b1	 mov	 DWORD PTR $T13[ebp], eax
+  0062d	8d 75 b1	 lea	 esi, DWORD PTR $T13[ebp]
+  00630	88 5d b5	 mov	 BYTE PTR $T13[ebp+4], bl
+  00633	8b fc		 mov	 edi, esp
+  00635	c7 45 d6 eb ff
+	ff ff		 mov	 DWORD PTR $T13[ebp+37], -21 ; ffffffebH
+  0063c	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T13[ebp+41], 100 ; 00000064H
+  00643	88 5d de	 mov	 BYTE PTR $T13[ebp+45], bl
+  00646	89 5d df	 mov	 DWORD PTR $T13[ebp+46], ebx
+  00649	89 5d e3	 mov	 DWORD PTR $T13[ebp+50], ebx
+  0064c	c7 45 e7 c6 02
+	00 00		 mov	 DWORD PTR $T13[ebp+54], 710 ; 000002c6H
+  00653	c6 45 eb 01	 mov	 BYTE PTR $T13[ebp+58], 1
+  00657	f3 a5		 rep movsd
+  00659	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  0065f	66 a5		 movsw
+  00661	a4		 movsb
+  00662	c5 f8 77	 vzeroupper
+  00665	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+
+; 905  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 906  : 				.camType = keyType::set,
+; 907  : 				.eye_x = 10,
+; 908  : 				.eye_y = 5111,
+; 909  : 				.eye_z = 0,
+; 910  : 				.at_x = 0,
+; 911  : 				.at_y = 0,
+; 912  : 				.at_z = 0,
+; 913  : 				.up_x = -254,
+; 914  : 				.up_y = 0,
+; 915  : 				.up_z = -21,
+; 916  : 				.angle = 100,
+; 917  : 				.sType = sliderType::follow,
+; 918  : 				.slide_x = 0,
+; 919  : 				.slide_y = 0,
+; 920  : 				.slide_z = 710,
+; 921  : 				.axisType = camAxis::global,
+; 922  : 				.fly_x = 0,
+; 923  : 				.fly_y = 0,
+; 924  : 				.fly_z = 0,
+; 925  : 				.jitter = 0
+; 926  : 			});
+; 927  : 			BasicCam::processCam();
+
+  0066a	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+
+; 928  : 			Object::Twins({ .quality = 1 });
+
+  0066f	6a 01		 push	 1
+  00671	e8 00 00 00 00	 call	 ?Twins@Object@@YAXUTwins_params@1@@Z ; Object::Twins
+$LN28@scene2:
+
+; 929  : 			break;
+; 930  : 		}
+; 931  : 
+; 932  : 
+; 933  : 		Compose();
+
+  00676	83 c4 50	 add	 esp, 80			; 00000050H
+$LN2@scene2:
+  00679	e8 00 00 00 00	 call	 ?Compose@Loop@@YAXXZ	; Loop::Compose
+
+; 934  : 
+; 935  : 	}
+
+  0067e	5f		 pop	 edi
+  0067f	5e		 pop	 esi
+  00680	5b		 pop	 ebx
+  00681	c9		 leave
+  00682	c3		 ret	 0
+  00683	90		 npad	 1
+$LN25@scene2:
+  00684	00 00 00 00	 DD	 $LN5@scene2
+  00688	00 00 00 00	 DD	 $LN6@scene2
+  0068c	00 00 00 00	 DD	 $LN7@scene2
+  00690	00 00 00 00	 DD	 $LN8@scene2
+  00694	00 00 00 00	 DD	 $LN9@scene2
+  00698	00 00 00 00	 DD	 $LN10@scene2
+  0069c	00 00 00 00	 DD	 $LN11@scene2
+  006a0	00 00 00 00	 DD	 $LN12@scene2
+  006a4	00 00 00 00	 DD	 $LN13@scene2
+  006a8	00 00 00 00	 DD	 $LN14@scene2
+  006ac	00 00 00 00	 DD	 $LN15@scene2
+  006b0	00 00 00 00	 DD	 $LN16@scene2
+  006b4	00 00 00 00	 DD	 $LN17@scene2
+?scene2@Loop@@YAXXZ ENDP				; Loop::scene2
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
 ; File D:\!platform\fx\projectFiles\loop.h
@@ -47459,7 +48712,7 @@ $LN4@scene1:
   0004f	e8 00 00 00 00	 call	 ?Cull@Rasterizer@dx11@@YAXW4cullmode@@@Z ; dx11::Rasterizer::Cull
 ; File D:\!platform\fx\projectFiles\loop.h
 
-; 149  : 		int t = timer::timeCursor / SAMPLES_IN_FRAME /FRAMES_PER_SECOND/10.;
+; 150  : 		int t = timer::timeCursor / SAMPLES_IN_FRAME /FRAMES_PER_SECOND/Dur;
 
   00054	a1 00 00 00 00	 mov	 eax, DWORD PTR ?timeCursor@timer@@3HA ; timer::timeCursor
   00059	b9 df 02 00 00	 mov	 ecx, 735		; 000002dfH
@@ -47471,997 +48724,1003 @@ $LN4@scene1:
   0005f	83 c4 10	 add	 esp, 16			; 00000010H
 ; File D:\!platform\fx\projectFiles\loop.h
 
-; 149  : 		int t = timer::timeCursor / SAMPLES_IN_FRAME /FRAMES_PER_SECOND/10.;
+; 150  : 		int t = timer::timeCursor / SAMPLES_IN_FRAME /FRAMES_PER_SECOND/Dur;
 
   00062	f7 f9		 idiv	 ecx
-  00064	6a 3c		 push	 60			; 0000003cH
-  00066	99		 cdq
-  00067	59		 pop	 ecx
-  00068	f7 f9		 idiv	 ecx
-  0006a	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
-  0006e	c5 fb 2a c0	 vcvtsi2sd xmm0, xmm0, eax
-  00072	c5 fb 59 05 00
-	00 00 00	 vmulsd	 xmm0, xmm0, QWORD PTR __real@3fb999999999999a
-  0007a	c5 fb 2c c0	 vcvttsd2si eax, xmm0
+  00064	b9 b0 04 00 00	 mov	 ecx, 1200		; 000004b0H
+  00069	99		 cdq
+  0006a	f7 f9		 idiv	 ecx
 
-; 150  : 
-; 151  : 		switch (t)
+; 151  : 
+; 152  : 		switch (t)
 
-  0007e	83 f8 0c	 cmp	 eax, 12			; 0000000cH
-  00081	0f 87 d1 05 00
+  0006c	83 f8 0c	 cmp	 eax, 12			; 0000000cH
+  0006f	0f 87 05 06 00
 	00		 ja	 $LN2@scene1
-  00087	ff 24 85 00 00
+  00075	ff 24 85 00 00
 	00 00		 jmp	 DWORD PTR $LN25@scene1[eax*4]
 $LN5@scene1:
 
-; 152  : 		{
-; 153  : 		case 0:
-; 154  : 			BasicCam::camCounter = 0;
-; 155  : 			BasicCam::setCamKey({
+; 153  : 		{
+; 154  : 		case 0:
+; 155  : 			BasicCam::camCounter = 0;
+; 156  : 			BasicCam::setCamKey({
 
-  0008e	c5 fe 6f 05 00
+  0007c	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000d8fffffffd000000000000000000000000fffff849000004d400000039
-  00096	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  00099	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  0009f	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T1[ebp+5], ymm0
-  000a4	c5 f9 6f 05 00
+  00084	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00087	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  0008d	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T1[ebp+5], ymm0
+  00092	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  000ac	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T1[ebp+59], xmm0
-  000b1	6a 12		 push	 18			; 00000012H
-  000b3	59		 pop	 ecx
-  000b4	89 45 b1	 mov	 DWORD PTR $T1[ebp], eax
-  000b7	8d 75 b1	 lea	 esi, DWORD PTR $T1[ebp]
-  000ba	88 5d b5	 mov	 BYTE PTR $T1[ebp+4], bl
-  000bd	8b fc		 mov	 edi, esp
-  000bf	c7 45 d6 87 00
+  0009a	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T1[ebp+59], xmm0
+  0009f	6a 12		 push	 18			; 00000012H
+  000a1	59		 pop	 ecx
+  000a2	89 45 b1	 mov	 DWORD PTR $T1[ebp], eax
+  000a5	8d 75 b1	 lea	 esi, DWORD PTR $T1[ebp]
+  000a8	88 5d b5	 mov	 BYTE PTR $T1[ebp+4], bl
+  000ab	8b fc		 mov	 edi, esp
+  000ad	c7 45 d6 87 00
 	00 00		 mov	 DWORD PTR $T1[ebp+37], 135 ; 00000087H
-  000c6	c7 45 da 64 00
+  000b4	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T1[ebp+41], 100 ; 00000064H
-  000cd	88 5d de	 mov	 BYTE PTR $T1[ebp+45], bl
-  000d0	89 5d df	 mov	 DWORD PTR $T1[ebp+46], ebx
-  000d3	89 5d e3	 mov	 DWORD PTR $T1[ebp+50], ebx
-  000d6	89 5d e7	 mov	 DWORD PTR $T1[ebp+54], ebx
-  000d9	c6 45 eb 01	 mov	 BYTE PTR $T1[ebp+58], 1
-  000dd	f3 a5		 rep movsd
-  000df	89 1d 00 00 00
+  000bb	88 5d de	 mov	 BYTE PTR $T1[ebp+45], bl
+  000be	89 5d df	 mov	 DWORD PTR $T1[ebp+46], ebx
+  000c1	89 5d e3	 mov	 DWORD PTR $T1[ebp+50], ebx
+  000c4	c7 45 e7 92 ff
+	ff ff		 mov	 DWORD PTR $T1[ebp+54], -110 ; ffffff92H
+  000cb	c6 45 eb 01	 mov	 BYTE PTR $T1[ebp+58], 1
+  000cf	f3 a5		 rep movsd
+  000d1	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  000e5	66 a5		 movsw
-  000e7	a4		 movsb
-  000e8	c5 f8 77	 vzeroupper
-  000eb	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  000d7	66 a5		 movsw
+  000d9	a4		 movsb
+  000da	c5 f8 77	 vzeroupper
+  000dd	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 156  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 157  : 				.camType = keyType::set,
-; 158  : 				.eye_x = 57,
-; 159  : 				.eye_y = 1236,
-; 160  : 				.eye_z = -1975,
-; 161  : 				.at_x = 0,
-; 162  : 				.at_y = 0,
-; 163  : 				.at_z = 0,
-; 164  : 				.up_x = -3,
-; 165  : 				.up_y = 216,
-; 166  : 				.up_z = 135,
-; 167  : 				.angle = 100,
-; 168  : 				.sType = sliderType::follow,
-; 169  : 				.slide_x = 0,
-; 170  : 				.slide_y = 0,
-; 171  : 				.slide_z = 0,
-; 172  : 				.axisType = camAxis::global,
-; 173  : 				.fly_x = -3,
-; 174  : 				.fly_y = 0,
-; 175  : 				.fly_z = 0,
-; 176  : 				.jitter = 0
-; 177  : 				});
-; 178  : 			BasicCam::processCam();
+; 157  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 158  : 				.camType = keyType::set,
+; 159  : 				.eye_x = 57,
+; 160  : 				.eye_y = 1236,
+; 161  : 				.eye_z = -1975,
+; 162  : 				.at_x = 0,
+; 163  : 				.at_y = 0,
+; 164  : 				.at_z = 0,
+; 165  : 				.up_x = -3,
+; 166  : 				.up_y = 216,
+; 167  : 				.up_z = 135,
+; 168  : 				.angle = 100,
+; 169  : 				.sType = sliderType::follow,
+; 170  : 				.slide_x = 0,
+; 171  : 				.slide_y = 0,
+; 172  : 				.slide_z = -110,
+; 173  : 				.axisType = camAxis::global,
+; 174  : 				.fly_x = -3,
+; 175  : 				.fly_y = 0,
+; 176  : 				.fly_z = 0,
+; 177  : 				.jitter = 0
+; 178  : 				});
+; 179  : 			BasicCam::processCam();
 
-  000f0	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  000e2	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 179  : 
 ; 180  : 
-; 181  : 			Object::Zenith({.quality = 1});
+; 181  : 
+; 182  : 			Object::Zenith({.quality = 1});
 
-  000f5	6a 01		 push	 1
-  000f7	e8 00 00 00 00	 call	 ?Zenith@Object@@YAXUZenith_params@1@@Z ; Object::Zenith
+  000e7	6a 01		 push	 1
+  000e9	e8 00 00 00 00	 call	 ?Zenith@Object@@YAXUZenith_params@1@@Z ; Object::Zenith
 
-; 182  : 			break;
+; 183  : 			break;
 
-  000fc	e9 54 05 00 00	 jmp	 $LN28@scene1
+  000ee	e9 84 05 00 00	 jmp	 $LN28@scene1
 $LN6@scene1:
 
-; 183  : 		case 1:
-; 184  : 			BasicCam::camCounter = 0;
-; 185  : 			BasicCam::setCamKey({
+; 184  : 		case 1:
+; 185  : 			BasicCam::camCounter = 0;
+; 186  : 			BasicCam::setCamKey({
 
-  00101	c5 fe 6f 05 00
+  000f3	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000b4ffffff5d000000000000000000000000fffffe0dfffffb52fffffbc2
-  00109	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  0010c	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  00112	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T2[ebp+5], ymm0
-  00117	c5 f9 6f 05 00
+  000fb	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  000fe	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  00104	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T2[ebp+5], ymm0
+  00109	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  0011f	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T2[ebp+59], xmm0
-  00124	6a 12		 push	 18			; 00000012H
-  00126	59		 pop	 ecx
-  00127	89 45 b1	 mov	 DWORD PTR $T2[ebp], eax
-  0012a	8d 75 b1	 lea	 esi, DWORD PTR $T2[ebp]
-  0012d	88 5d b5	 mov	 BYTE PTR $T2[ebp+4], bl
-  00130	8b fc		 mov	 edi, esp
-  00132	c7 45 d6 b5 ff
+  00111	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T2[ebp+59], xmm0
+  00116	6a 12		 push	 18			; 00000012H
+  00118	59		 pop	 ecx
+  00119	89 45 b1	 mov	 DWORD PTR $T2[ebp], eax
+  0011c	8d 75 b1	 lea	 esi, DWORD PTR $T2[ebp]
+  0011f	88 5d b5	 mov	 BYTE PTR $T2[ebp+4], bl
+  00122	8b fc		 mov	 edi, esp
+  00124	c7 45 d6 b5 ff
 	ff ff		 mov	 DWORD PTR $T2[ebp+37], -75 ; ffffffb5H
-  00139	c7 45 da 64 00
+  0012b	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T2[ebp+41], 100 ; 00000064H
-  00140	88 5d de	 mov	 BYTE PTR $T2[ebp+45], bl
-  00143	89 5d df	 mov	 DWORD PTR $T2[ebp+46], ebx
-  00146	89 5d e3	 mov	 DWORD PTR $T2[ebp+50], ebx
-  00149	89 5d e7	 mov	 DWORD PTR $T2[ebp+54], ebx
-  0014c	c6 45 eb 01	 mov	 BYTE PTR $T2[ebp+58], 1
-  00150	f3 a5		 rep movsd
-  00152	89 1d 00 00 00
+  00132	88 5d de	 mov	 BYTE PTR $T2[ebp+45], bl
+  00135	89 5d df	 mov	 DWORD PTR $T2[ebp+46], ebx
+  00138	c7 45 e3 46 00
+	00 00		 mov	 DWORD PTR $T2[ebp+50], 70 ; 00000046H
+  0013f	c7 45 e7 c4 ff
+	ff ff		 mov	 DWORD PTR $T2[ebp+54], -60 ; ffffffc4H
+  00146	c6 45 eb 01	 mov	 BYTE PTR $T2[ebp+58], 1
+  0014a	f3 a5		 rep movsd
+  0014c	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00158	66 a5		 movsw
-  0015a	a4		 movsb
-  0015b	c5 f8 77	 vzeroupper
-  0015e	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00152	66 a5		 movsw
+  00154	a4		 movsb
+  00155	c5 f8 77	 vzeroupper
+  00158	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 186  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 187  : 				.camType = keyType::set,
-; 188  : 				.eye_x = -1086,
-; 189  : 				.eye_y = -1198,
-; 190  : 				.eye_z = -499,
-; 191  : 				.at_x = 0,
-; 192  : 				.at_y = 0,
-; 193  : 				.at_z = 0,
-; 194  : 				.up_x = -163,
-; 195  : 				.up_y = 180,
-; 196  : 				.up_z = -75,
-; 197  : 				.angle = 100,
-; 198  : 				.sType = sliderType::follow,
-; 199  : 				.slide_x = 0,
-; 200  : 				.slide_y = 0,
-; 201  : 				.slide_z = 0,
-; 202  : 				.axisType = camAxis::global,
-; 203  : 				.fly_x = -3,
-; 204  : 				.fly_y = 0,
-; 205  : 				.fly_z = 0,
-; 206  : 				.jitter = 0
-; 207  : 			});
-; 208  : 			BasicCam::processCam();
+; 187  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 188  : 				.camType = keyType::set,
+; 189  : 				.eye_x = -1086,
+; 190  : 				.eye_y = -1198,
+; 191  : 				.eye_z = -499,
+; 192  : 				.at_x = 0,
+; 193  : 				.at_y = 0,
+; 194  : 				.at_z = 0,
+; 195  : 				.up_x = -163,
+; 196  : 				.up_y = 180,
+; 197  : 				.up_z = -75,
+; 198  : 				.angle = 100,
+; 199  : 				.sType = sliderType::follow,
+; 200  : 				.slide_x = 0,
+; 201  : 				.slide_y = 70,
+; 202  : 				.slide_z = -60,
+; 203  : 				.axisType = camAxis::global,
+; 204  : 				.fly_x = -3,
+; 205  : 				.fly_y = 0,
+; 206  : 				.fly_z = 0,
+; 207  : 				.jitter = 0
+; 208  : 			});
+; 209  : 			BasicCam::processCam();
 
-  00163	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0015d	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 209  : 			Object::Saggitarius({ .quality = 1 });
+; 210  : 			Object::Saggitarius({ .quality = 1 });
 
-  00168	6a 01		 push	 1
-  0016a	e8 00 00 00 00	 call	 ?Saggitarius@Object@@YAXUSaggitarius_params@1@@Z ; Object::Saggitarius
+  00162	6a 01		 push	 1
+  00164	e8 00 00 00 00	 call	 ?Saggitarius@Object@@YAXUSaggitarius_params@1@@Z ; Object::Saggitarius
 
-; 210  : 			break;
+; 211  : 			break;
 
-  0016f	e9 e1 04 00 00	 jmp	 $LN28@scene1
+  00169	e9 09 05 00 00	 jmp	 $LN28@scene1
 $LN7@scene1:
 
-; 211  : 		case 2:
-; 212  : 			BasicCam::camCounter = 0;
-; 213  : 			BasicCam::setCamKey({
+; 212  : 		case 2:
+; 213  : 			BasicCam::camCounter = 0;
+; 214  : 			BasicCam::setCamKey({
 
-  00174	c5 fe 6f 05 00
+  0016e	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@fffffffb0000000e0000000000000000000000000000004f00000ed800000004
-  0017c	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  0017f	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  00185	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T3[ebp+5], ymm0
-  0018a	c5 f9 6f 05 00
+  00176	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00179	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  0017f	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T3[ebp+5], ymm0
+  00184	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  00192	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T3[ebp+59], xmm0
-  00197	6a 12		 push	 18			; 00000012H
-  00199	59		 pop	 ecx
-  0019a	89 45 b1	 mov	 DWORD PTR $T3[ebp], eax
-  0019d	8d 75 b1	 lea	 esi, DWORD PTR $T3[ebp]
-  001a0	88 5d b5	 mov	 BYTE PTR $T3[ebp+4], bl
-  001a3	8b fc		 mov	 edi, esp
-  001a5	c7 45 d6 fe 00
+  0018c	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T3[ebp+59], xmm0
+  00191	6a 12		 push	 18			; 00000012H
+  00193	59		 pop	 ecx
+  00194	89 45 b1	 mov	 DWORD PTR $T3[ebp], eax
+  00197	8d 75 b1	 lea	 esi, DWORD PTR $T3[ebp]
+  0019a	88 5d b5	 mov	 BYTE PTR $T3[ebp+4], bl
+  0019d	8b fc		 mov	 edi, esp
+  0019f	c7 45 d6 fe 00
 	00 00		 mov	 DWORD PTR $T3[ebp+37], 254 ; 000000feH
-  001ac	c7 45 da 64 00
+  001a6	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T3[ebp+41], 100 ; 00000064H
-  001b3	88 5d de	 mov	 BYTE PTR $T3[ebp+45], bl
-  001b6	89 5d df	 mov	 DWORD PTR $T3[ebp+46], ebx
-  001b9	89 5d e3	 mov	 DWORD PTR $T3[ebp+50], ebx
-  001bc	89 5d e7	 mov	 DWORD PTR $T3[ebp+54], ebx
-  001bf	c6 45 eb 01	 mov	 BYTE PTR $T3[ebp+58], 1
-  001c3	f3 a5		 rep movsd
-  001c5	89 1d 00 00 00
+  001ad	88 5d de	 mov	 BYTE PTR $T3[ebp+45], bl
+  001b0	89 5d df	 mov	 DWORD PTR $T3[ebp+46], ebx
+  001b3	89 5d e3	 mov	 DWORD PTR $T3[ebp+50], ebx
+  001b6	c7 45 e7 36 01
+	00 00		 mov	 DWORD PTR $T3[ebp+54], 310 ; 00000136H
+  001bd	c6 45 eb 01	 mov	 BYTE PTR $T3[ebp+58], 1
+  001c1	f3 a5		 rep movsd
+  001c3	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  001cb	66 a5		 movsw
-  001cd	a4		 movsb
-  001ce	c5 f8 77	 vzeroupper
-  001d1	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  001c9	66 a5		 movsw
+  001cb	a4		 movsb
+  001cc	c5 f8 77	 vzeroupper
+  001cf	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 214  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 215  : 				.camType = keyType::set,
-; 216  : 				.eye_x = 4,
-; 217  : 				.eye_y = 3800,
-; 218  : 				.eye_z = 79,
-; 219  : 				.at_x = 0,
-; 220  : 				.at_y = 0,
-; 221  : 				.at_z = 0,
-; 222  : 				.up_x = 14,
-; 223  : 				.up_y = -5,
-; 224  : 				.up_z = 254,
-; 225  : 				.angle = 100,
-; 226  : 				.sType = sliderType::follow,
-; 227  : 				.slide_x = 0,
-; 228  : 				.slide_y = 0,
-; 229  : 				.slide_z = 0,
-; 230  : 				.axisType = camAxis::global,
-; 231  : 				.fly_x = -3,
-; 232  : 				.fly_y = 0,
-; 233  : 				.fly_z = 0,
-; 234  : 				.jitter = 0
-; 235  : 			});
-; 236  : 			BasicCam::processCam();
+; 215  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 216  : 				.camType = keyType::set,
+; 217  : 				.eye_x = 4,
+; 218  : 				.eye_y = 3800,
+; 219  : 				.eye_z = 79,
+; 220  : 				.at_x = 0,
+; 221  : 				.at_y = 0,
+; 222  : 				.at_z = 0,
+; 223  : 				.up_x = 14,
+; 224  : 				.up_y = -5,
+; 225  : 				.up_z = 254,
+; 226  : 				.angle = 100,
+; 227  : 				.sType = sliderType::follow,
+; 228  : 				.slide_x = 0,
+; 229  : 				.slide_y = 0,
+; 230  : 				.slide_z = 310,
+; 231  : 				.axisType = camAxis::global,
+; 232  : 				.fly_x = -3,
+; 233  : 				.fly_y = 0,
+; 234  : 				.fly_z = 0,
+; 235  : 				.jitter = 0
+; 236  : 			});
+; 237  : 			BasicCam::processCam();
 
-  001d6	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  001d4	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 237  : 
-; 238  : 			Object::Crab({ .quality = 1 });
+; 238  : 
+; 239  : 			Object::Crab({ .quality = 1 });
 
-  001db	6a 01		 push	 1
-  001dd	e8 00 00 00 00	 call	 ?Crab@Object@@YAXUCrab_params@1@@Z ; Object::Crab
+  001d9	6a 01		 push	 1
+  001db	e8 00 00 00 00	 call	 ?Crab@Object@@YAXUCrab_params@1@@Z ; Object::Crab
 
-; 239  : 			break;
+; 240  : 			break;
 
-  001e2	e9 6e 04 00 00	 jmp	 $LN28@scene1
+  001e0	e9 92 04 00 00	 jmp	 $LN28@scene1
 $LN8@scene1:
 
-; 240  : 		case 3:
-; 241  : 			BasicCam::camCounter = 0;
-; 242  : 			BasicCam::setCamKey({
+; 241  : 		case 3:
+; 242  : 			BasicCam::camCounter = 0;
+; 243  : 			BasicCam::setCamKey({
 
-  001e7	c5 fe 6f 05 00
-	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000f20000003c000000000000000000000000fffff44afffffa1000000e06
-  001ef	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  001f2	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  001f8	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T4[ebp+5], ymm0
-  001fd	c5 f9 6f 05 00
-	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  00205	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T4[ebp+59], xmm0
-  0020a	6a 12		 push	 18			; 00000012H
-  0020c	59		 pop	 ecx
-  0020d	89 45 b1	 mov	 DWORD PTR $T4[ebp], eax
-  00210	8d 75 b1	 lea	 esi, DWORD PTR $T4[ebp]
-  00213	88 5d b5	 mov	 BYTE PTR $T4[ebp+4], bl
-  00216	8b fc		 mov	 edi, esp
-  00218	c7 45 d6 ce ff
-	ff ff		 mov	 DWORD PTR $T4[ebp+37], -50 ; ffffffceH
-  0021f	c7 45 da 64 00
+  001e5	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000f8ffffffe300000000000000730000000000000d0efffff858fffff87a
+  001ed	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  001f0	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  001f6	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T4[ebp+5], ymm0
+  001fb	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@00000000fffffffe00000001fffffffd
+  00203	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T4[ebp+59], xmm0
+  00208	6a 12		 push	 18			; 00000012H
+  0020a	59		 pop	 ecx
+  0020b	89 45 b1	 mov	 DWORD PTR $T4[ebp], eax
+  0020e	8d 75 b1	 lea	 esi, DWORD PTR $T4[ebp]
+  00211	88 5d b5	 mov	 BYTE PTR $T4[ebp+4], bl
+  00214	8b fc		 mov	 edi, esp
+  00216	c7 45 d6 33 00
+	00 00		 mov	 DWORD PTR $T4[ebp+37], 51 ; 00000033H
+  0021d	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T4[ebp+41], 100 ; 00000064H
-  00226	88 5d de	 mov	 BYTE PTR $T4[ebp+45], bl
-  00229	89 5d df	 mov	 DWORD PTR $T4[ebp+46], ebx
-  0022c	89 5d e3	 mov	 DWORD PTR $T4[ebp+50], ebx
-  0022f	89 5d e7	 mov	 DWORD PTR $T4[ebp+54], ebx
-  00232	c6 45 eb 01	 mov	 BYTE PTR $T4[ebp+58], 1
-  00236	f3 a5		 rep movsd
-  00238	89 1d 00 00 00
+  00224	88 5d de	 mov	 BYTE PTR $T4[ebp+45], bl
+  00227	89 5d df	 mov	 DWORD PTR $T4[ebp+46], ebx
+  0022a	c7 45 e3 28 00
+	00 00		 mov	 DWORD PTR $T4[ebp+50], 40 ; 00000028H
+  00231	89 5d e7	 mov	 DWORD PTR $T4[ebp+54], ebx
+  00234	c6 45 eb 01	 mov	 BYTE PTR $T4[ebp+58], 1
+  00238	f3 a5		 rep movsd
+  0023a	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  0023e	66 a5		 movsw
-  00240	a4		 movsb
-  00241	c5 f8 77	 vzeroupper
-  00244	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00240	66 a5		 movsw
+  00242	a4		 movsb
+  00243	c5 f8 77	 vzeroupper
+  00246	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 243  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 244  : 				.camType = keyType::set,
-; 245  : 				.eye_x = 3590,
-; 246  : 				.eye_y = -1520,
-; 247  : 				.eye_z = -2998,
-; 248  : 				.at_x = 0,
-; 249  : 				.at_y = 0,
-; 250  : 				.at_z = 0,
-; 251  : 				.up_x = 60,
-; 252  : 				.up_y = 242,
-; 253  : 				.up_z = -50,
-; 254  : 				.angle = 100,
-; 255  : 				.sType = sliderType::follow,
-; 256  : 				.slide_x = 0,
-; 257  : 				.slide_y = 0,
-; 258  : 				.slide_z = 0,
-; 259  : 				.axisType = camAxis::global,
-; 260  : 				.fly_x = -3,
-; 261  : 				.fly_y = 0,
-; 262  : 				.fly_z = 0,
-; 263  : 				.jitter = 0
-; 264  : 			});
-; 265  : 			BasicCam::processCam();
+; 244  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 245  : 				.camType = keyType::set,
+; 246  : 				.eye_x = -1926,
+; 247  : 				.eye_y = -1960,
+; 248  : 				.eye_z = 3342,
+; 249  : 				.at_x = 0,
+; 250  : 				.at_y = 115,
+; 251  : 				.at_z = 0,
+; 252  : 				.up_x = -29,
+; 253  : 				.up_y = 248,
+; 254  : 				.up_z = 51,
+; 255  : 				.angle = 100,
+; 256  : 				.sType = sliderType::follow,
+; 257  : 				.slide_x = 0,
+; 258  : 				.slide_y = 40,
+; 259  : 				.slide_z = 0,
+; 260  : 				.axisType = camAxis::global,
+; 261  : 				.fly_x = -3,
+; 262  : 				.fly_y = 1,
+; 263  : 				.fly_z = -2,
+; 264  : 				.jitter = 0
+; 265  : 			});
+; 266  : 			BasicCam::processCam();
 
-  00249	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0024b	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 266  : 			Object::Aries({ .quality = 1 });
+; 267  : 			Object::Aries({ .quality = 1 });
 
-  0024e	6a 01		 push	 1
-  00250	e8 00 00 00 00	 call	 ?Aries@Object@@YAXUAries_params@1@@Z ; Object::Aries
+  00250	6a 01		 push	 1
+  00252	e8 00 00 00 00	 call	 ?Aries@Object@@YAXUAries_params@1@@Z ; Object::Aries
 
-; 267  : 			break;
+; 268  : 			break;
 
-  00255	e9 fb 03 00 00	 jmp	 $LN28@scene1
+  00257	e9 1b 04 00 00	 jmp	 $LN28@scene1
 $LN9@scene1:
 
-; 268  : 		case 4:
-; 269  : 			BasicCam::camCounter = 0;
-; 270  : 			BasicCam::setCamKey({
+; 269  : 		case 4:
+; 270  : 			BasicCam::camCounter = 0;
+; 271  : 			BasicCam::setCamKey({
 
-  0025a	c5 fe 6f 05 00
+  0025c	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000c1000000a3000000000000000000000000fffffe6efffff7fc00000938
-  00262	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  00265	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  0026b	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T5[ebp+5], ymm0
-  00270	c5 f9 6f 05 00
+  00264	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00267	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  0026d	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T5[ebp+5], ymm0
+  00272	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  00278	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T5[ebp+59], xmm0
-  0027d	6a 12		 push	 18			; 00000012H
-  0027f	59		 pop	 ecx
-  00280	89 45 b1	 mov	 DWORD PTR $T5[ebp], eax
-  00283	8d 75 b1	 lea	 esi, DWORD PTR $T5[ebp]
-  00286	88 5d b5	 mov	 BYTE PTR $T5[ebp+4], bl
-  00289	8b fc		 mov	 edi, esp
-  0028b	c7 45 d6 e5 ff
+  0027a	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T5[ebp+59], xmm0
+  0027f	6a 12		 push	 18			; 00000012H
+  00281	59		 pop	 ecx
+  00282	89 45 b1	 mov	 DWORD PTR $T5[ebp], eax
+  00285	8d 75 b1	 lea	 esi, DWORD PTR $T5[ebp]
+  00288	88 5d b5	 mov	 BYTE PTR $T5[ebp+4], bl
+  0028b	8b fc		 mov	 edi, esp
+  0028d	c7 45 d6 e5 ff
 	ff ff		 mov	 DWORD PTR $T5[ebp+37], -27 ; ffffffe5H
-  00292	c7 45 da 64 00
+  00294	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T5[ebp+41], 100 ; 00000064H
-  00299	88 5d de	 mov	 BYTE PTR $T5[ebp+45], bl
-  0029c	89 5d df	 mov	 DWORD PTR $T5[ebp+46], ebx
-  0029f	89 5d e3	 mov	 DWORD PTR $T5[ebp+50], ebx
-  002a2	89 5d e7	 mov	 DWORD PTR $T5[ebp+54], ebx
-  002a5	c6 45 eb 01	 mov	 BYTE PTR $T5[ebp+58], 1
-  002a9	f3 a5		 rep movsd
-  002ab	89 1d 00 00 00
+  0029b	88 5d de	 mov	 BYTE PTR $T5[ebp+45], bl
+  0029e	89 5d df	 mov	 DWORD PTR $T5[ebp+46], ebx
+  002a1	89 5d e3	 mov	 DWORD PTR $T5[ebp+50], ebx
+  002a4	c7 45 e7 2d ff
+	ff ff		 mov	 DWORD PTR $T5[ebp+54], -211 ; ffffff2dH
+  002ab	c6 45 eb 01	 mov	 BYTE PTR $T5[ebp+58], 1
+  002af	f3 a5		 rep movsd
+  002b1	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  002b1	66 a5		 movsw
-  002b3	a4		 movsb
-  002b4	c5 f8 77	 vzeroupper
-  002b7	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  002b7	66 a5		 movsw
+  002b9	a4		 movsb
+  002ba	c5 f8 77	 vzeroupper
+  002bd	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 271  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 272  : 				.camType = keyType::set,
-; 273  : 				.eye_x = 2360,
-; 274  : 				.eye_y = -2052,
-; 275  : 				.eye_z = -402,
-; 276  : 				.at_x = 0,
-; 277  : 				.at_y = 0,
-; 278  : 				.at_z = 0,
-; 279  : 				.up_x = 163,
-; 280  : 				.up_y = 193,
-; 281  : 				.up_z = -27,
-; 282  : 				.angle = 100,
-; 283  : 				.sType = sliderType::follow,
-; 284  : 				.slide_x = 0,
-; 285  : 				.slide_y = 0,
-; 286  : 				.slide_z = 0,
-; 287  : 				.axisType = camAxis::global,
-; 288  : 				.fly_x = -3,
-; 289  : 				.fly_y = 0,
-; 290  : 				.fly_z = 0,
-; 291  : 				.jitter = 0
-; 292  : 			});
-; 293  : 			BasicCam::processCam();
+; 272  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 273  : 				.camType = keyType::set,
+; 274  : 				.eye_x = 2360,
+; 275  : 				.eye_y = -2052,
+; 276  : 				.eye_z = -402,
+; 277  : 				.at_x = 0,
+; 278  : 				.at_y = 0,
+; 279  : 				.at_z = 0,
+; 280  : 				.up_x = 163,
+; 281  : 				.up_y = 193,
+; 282  : 				.up_z = -27,
+; 283  : 				.angle = 100,
+; 284  : 				.sType = sliderType::follow,
+; 285  : 				.slide_x = 0,
+; 286  : 				.slide_y = 0,
+; 287  : 				.slide_z = -211,
+; 288  : 				.axisType = camAxis::global,
+; 289  : 				.fly_x = -3,
+; 290  : 				.fly_y = 0,
+; 291  : 				.fly_z = 0,
+; 292  : 				.jitter = 0
+; 293  : 			});
+; 294  : 			BasicCam::processCam();
 
-  002bc	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  002c2	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 294  : 			Object::Scorpio({ .quality = 1 });
+; 295  : 			Object::Scorpio({ .quality = 1 });
 
-  002c1	6a 01		 push	 1
-  002c3	e8 00 00 00 00	 call	 ?Scorpio@Object@@YAXUScorpio_params@1@@Z ; Object::Scorpio
+  002c7	6a 01		 push	 1
+  002c9	e8 00 00 00 00	 call	 ?Scorpio@Object@@YAXUScorpio_params@1@@Z ; Object::Scorpio
 
-; 295  : 			break;
+; 296  : 			break;
 
-  002c8	e9 88 03 00 00	 jmp	 $LN28@scene1
+  002ce	e9 a4 03 00 00	 jmp	 $LN28@scene1
 $LN10@scene1:
 
-; 296  : 		case 5:
-; 297  : 			BasicCam::camCounter = 0;
-; 298  : 			BasicCam::setCamKey({
+; 297  : 		case 5:
+; 298  : 			BasicCam::camCounter = 0;
+; 299  : 			BasicCam::setCamKey({
 
-  002cd	c5 fe 6f 05 00
+  002d3	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@0000008b00000096000000000000000000000000000003f7fffff76d000003f7
-  002d5	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  002d8	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  002de	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T6[ebp+5], ymm0
-  002e3	c5 f9 6f 05 00
+  002db	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  002de	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  002e4	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T6[ebp+5], ymm0
+  002e9	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  002eb	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T6[ebp+59], xmm0
-  002f0	6a 12		 push	 18			; 00000012H
-  002f2	59		 pop	 ecx
-  002f3	89 45 b1	 mov	 DWORD PTR $T6[ebp], eax
-  002f6	8d 75 b1	 lea	 esi, DWORD PTR $T6[ebp]
-  002f9	88 5d b5	 mov	 BYTE PTR $T6[ebp+4], bl
-  002fc	8b fc		 mov	 edi, esp
-  002fe	c7 45 d6 96 00
+  002f1	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T6[ebp+59], xmm0
+  002f6	6a 12		 push	 18			; 00000012H
+  002f8	59		 pop	 ecx
+  002f9	89 45 b1	 mov	 DWORD PTR $T6[ebp], eax
+  002fc	8d 75 b1	 lea	 esi, DWORD PTR $T6[ebp]
+  002ff	88 5d b5	 mov	 BYTE PTR $T6[ebp+4], bl
+  00302	8b fc		 mov	 edi, esp
+  00304	c7 45 d6 96 00
 	00 00		 mov	 DWORD PTR $T6[ebp+37], 150 ; 00000096H
-  00305	c7 45 da 64 00
+  0030b	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T6[ebp+41], 100 ; 00000064H
-  0030c	88 5d de	 mov	 BYTE PTR $T6[ebp+45], bl
-  0030f	89 5d df	 mov	 DWORD PTR $T6[ebp+46], ebx
-  00312	89 5d e3	 mov	 DWORD PTR $T6[ebp+50], ebx
-  00315	89 5d e7	 mov	 DWORD PTR $T6[ebp+54], ebx
-  00318	c6 45 eb 01	 mov	 BYTE PTR $T6[ebp+58], 1
-  0031c	f3 a5		 rep movsd
-  0031e	89 1d 00 00 00
+  00312	88 5d de	 mov	 BYTE PTR $T6[ebp+45], bl
+  00315	89 5d df	 mov	 DWORD PTR $T6[ebp+46], ebx
+  00318	89 5d e3	 mov	 DWORD PTR $T6[ebp+50], ebx
+  0031b	c7 45 e7 fa 00
+	00 00		 mov	 DWORD PTR $T6[ebp+54], 250 ; 000000faH
+  00322	c6 45 eb 01	 mov	 BYTE PTR $T6[ebp+58], 1
+  00326	f3 a5		 rep movsd
+  00328	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00324	66 a5		 movsw
-  00326	a4		 movsb
-  00327	c5 f8 77	 vzeroupper
-  0032a	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  0032e	66 a5		 movsw
+  00330	a4		 movsb
+  00331	c5 f8 77	 vzeroupper
+  00334	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 299  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 300  : 				.camType = keyType::set,
-; 301  : 				.eye_x = 1015,
-; 302  : 				.eye_y = -2195,
-; 303  : 				.eye_z = 1015,
-; 304  : 				.at_x = 0,
-; 305  : 				.at_y = 0,
-; 306  : 				.at_z = 0,
-; 307  : 				.up_x = 150,
-; 308  : 				.up_y = 139,
-; 309  : 				.up_z = 150,
-; 310  : 				.angle = 100,
-; 311  : 				.sType = sliderType::follow,
-; 312  : 				.slide_x = 0,
-; 313  : 				.slide_y = 0,
-; 314  : 				.slide_z = 0,
-; 315  : 				.axisType = camAxis::global,
-; 316  : 				.fly_x = -3,
-; 317  : 				.fly_y = 0,
-; 318  : 				.fly_z = 0,
-; 319  : 				.jitter = 0
-; 320  : 			});
-; 321  : 			BasicCam::processCam();
+; 300  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 301  : 				.camType = keyType::set,
+; 302  : 				.eye_x = 1015,
+; 303  : 				.eye_y = -2195,
+; 304  : 				.eye_z = 1015,
+; 305  : 				.at_x = 0,
+; 306  : 				.at_y = 0,
+; 307  : 				.at_z = 0,
+; 308  : 				.up_x = 150,
+; 309  : 				.up_y = 139,
+; 310  : 				.up_z = 150,
+; 311  : 				.angle = 100,
+; 312  : 				.sType = sliderType::follow,
+; 313  : 				.slide_x = 0,
+; 314  : 				.slide_y = 0,
+; 315  : 				.slide_z = 250,
+; 316  : 				.axisType = camAxis::global,
+; 317  : 				.fly_x = -3,
+; 318  : 				.fly_y = 0,
+; 319  : 				.fly_z = 0,
+; 320  : 				.jitter = 0
+; 321  : 			});
+; 322  : 			BasicCam::processCam();
 
-  0032f	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00339	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 322  : 			Object::LeoBigStar({ .quality = 1 });
+; 323  : 			Object::LeoBigStar({ .quality = 1 });
 
-  00334	6a 01		 push	 1
-  00336	e8 00 00 00 00	 call	 ?LeoBigStar@Object@@YAXULeoBigStar_params@1@@Z ; Object::LeoBigStar
+  0033e	6a 01		 push	 1
+  00340	e8 00 00 00 00	 call	 ?LeoBigStar@Object@@YAXULeoBigStar_params@1@@Z ; Object::LeoBigStar
 
-; 323  : 			break;
+; 324  : 			break;
 
-  0033b	e9 15 03 00 00	 jmp	 $LN28@scene1
+  00345	e9 2d 03 00 00	 jmp	 $LN28@scene1
 $LN11@scene1:
 
-; 324  : 		case 6:
-; 325  : 			BasicCam::camCounter = 0;
-; 326  : 			BasicCam::setCamKey({
+; 325  : 		case 6:
+; 326  : 			BasicCam::camCounter = 0;
+; 327  : 			BasicCam::setCamKey({
 
-  00340	c5 fe 6f 05 00
-	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000e500000066000000000000000000000000fffff9e9fffff84d00000ebe
-  00348	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  0034b	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  00351	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T7[ebp+5], ymm0
-  00356	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
-  0035a	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T7[ebp+59], xmm0
-  0035f	6a 12		 push	 18			; 00000012H
-  00361	59		 pop	 ecx
-  00362	89 45 b1	 mov	 DWORD PTR $T7[ebp], eax
-  00365	8d 75 b1	 lea	 esi, DWORD PTR $T7[ebp]
-  00368	88 5d b5	 mov	 BYTE PTR $T7[ebp+4], bl
-  0036b	8b fc		 mov	 edi, esp
-  0036d	c7 45 d6 d6 ff
-	ff ff		 mov	 DWORD PTR $T7[ebp+37], -42 ; ffffffd6H
-  00374	c7 45 da 64 00
+  0034a	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@00000085ffffff31000000000000000000000000000002faffffefa7fffff662
+  00352	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00355	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  0035b	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T7[ebp+5], ymm0
+  00360	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
+  00368	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T7[ebp+59], xmm0
+  0036d	6a 12		 push	 18			; 00000012H
+  0036f	59		 pop	 ecx
+  00370	89 45 b1	 mov	 DWORD PTR $T7[ebp], eax
+  00373	8d 75 b1	 lea	 esi, DWORD PTR $T7[ebp]
+  00376	88 5d b5	 mov	 BYTE PTR $T7[ebp+4], bl
+  00379	8b fc		 mov	 edi, esp
+  0037b	c7 45 d6 40 00
+	00 00		 mov	 DWORD PTR $T7[ebp+37], 64 ; 00000040H
+  00382	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T7[ebp+41], 100 ; 00000064H
-  0037b	88 5d de	 mov	 BYTE PTR $T7[ebp+45], bl
-  0037e	89 5d df	 mov	 DWORD PTR $T7[ebp+46], ebx
-  00381	89 5d e3	 mov	 DWORD PTR $T7[ebp+50], ebx
-  00384	89 5d e7	 mov	 DWORD PTR $T7[ebp+54], ebx
-  00387	c6 45 eb 01	 mov	 BYTE PTR $T7[ebp+58], 1
-  0038b	f3 a5		 rep movsd
-  0038d	89 1d 00 00 00
+  00389	88 5d de	 mov	 BYTE PTR $T7[ebp+45], bl
+  0038c	89 5d df	 mov	 DWORD PTR $T7[ebp+46], ebx
+  0038f	89 5d e3	 mov	 DWORD PTR $T7[ebp+50], ebx
+  00392	c7 45 e7 88 ff
+	ff ff		 mov	 DWORD PTR $T7[ebp+54], -120 ; ffffff88H
+  00399	c6 45 eb 01	 mov	 BYTE PTR $T7[ebp+58], 1
+  0039d	f3 a5		 rep movsd
+  0039f	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00393	66 a5		 movsw
-  00395	a4		 movsb
-  00396	c5 f8 77	 vzeroupper
-  00399	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  003a5	66 a5		 movsw
+  003a7	a4		 movsb
+  003a8	c5 f8 77	 vzeroupper
+  003ab	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 327  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 328  : 				.camType = keyType::set,
-; 329  : 				.eye_x = 3774,
-; 330  : 				.eye_y = -1971,
-; 331  : 				.eye_z = -1559,
-; 332  : 				.at_x = 0,
-; 333  : 				.at_y = 0,
-; 334  : 				.at_z = 0,
-; 335  : 				.up_x = 102,
-; 336  : 				.up_y = 229,
-; 337  : 				.up_z = -42,
-; 338  : 				.angle = 100,
-; 339  : 				.sType = sliderType::follow,
-; 340  : 				.slide_x = 0,
-; 341  : 				.slide_y = 0,
-; 342  : 				.slide_z = 0,
-; 343  : 				.axisType = camAxis::global,
-; 344  : 				.fly_x = 0,
-; 345  : 				.fly_y = 0,
-; 346  : 				.fly_z = 0,
-; 347  : 				.jitter = 0
-; 348  : 			});
-; 349  : 			BasicCam::processCam();
+; 328  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 329  : 				.camType = keyType::set,
+; 330  : 				.eye_x = -2462,
+; 331  : 				.eye_y = -4185,
+; 332  : 				.eye_z = 762,
+; 333  : 				.at_x = 0,
+; 334  : 				.at_y = 0,
+; 335  : 				.at_z = 0,
+; 336  : 				.up_x = -207,
+; 337  : 				.up_y = 133,
+; 338  : 				.up_z = 64,
+; 339  : 				.angle = 100,
+; 340  : 				.sType = sliderType::follow,
+; 341  : 				.slide_x = 0,
+; 342  : 				.slide_y = 0,
+; 343  : 				.slide_z = -120,
+; 344  : 				.axisType = camAxis::global,
+; 345  : 				.fly_x = -3,
+; 346  : 				.fly_y = 0,
+; 347  : 				.fly_z = 0,
+; 348  : 				.jitter = 0
+; 349  : 			});
+; 350  : 			BasicCam::processCam();
 
-  0039e	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  003b0	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 350  : 			Object::Virgo({ .quality = 1 });
+; 351  : 			Object::Virgo({ .quality = 1 });
 
-  003a3	6a 01		 push	 1
-  003a5	e8 00 00 00 00	 call	 ?Virgo@Object@@YAXUVirgo_params@1@@Z ; Object::Virgo
+  003b5	6a 01		 push	 1
+  003b7	e8 00 00 00 00	 call	 ?Virgo@Object@@YAXUVirgo_params@1@@Z ; Object::Virgo
 
-; 351  : 			break;
+; 352  : 			break;
 
-  003aa	e9 a6 02 00 00	 jmp	 $LN28@scene1
+  003bc	e9 b6 02 00 00	 jmp	 $LN28@scene1
 $LN12@scene1:
 
-; 352  : 		case 7:
-; 353  : 			BasicCam::camCounter = 0;
-; 354  : 			BasicCam::setCamKey({
+; 353  : 		case 7:
+; 354  : 			BasicCam::camCounter = 0;
+; 355  : 			BasicCam::setCamKey({
 
-  003af	c5 fe 6f 05 00
+  003c1	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@ffffff7300000077000000000000000000000000000003ac000006af00000284
-  003b7	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  003ba	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  003c0	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T8[ebp+5], ymm0
-  003c5	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
-  003c9	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T8[ebp+59], xmm0
-  003ce	6a 12		 push	 18			; 00000012H
-  003d0	59		 pop	 ecx
-  003d1	89 45 b1	 mov	 DWORD PTR $T8[ebp], eax
-  003d4	8d 75 b1	 lea	 esi, DWORD PTR $T8[ebp]
-  003d7	88 5d b5	 mov	 BYTE PTR $T8[ebp+4], bl
-  003da	8b fc		 mov	 edi, esp
-  003dc	c7 45 d6 af 00
+  003c9	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  003cc	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  003d2	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T8[ebp+5], ymm0
+  003d7	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@00000000000000000000000000000003
+  003df	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T8[ebp+59], xmm0
+  003e4	6a 12		 push	 18			; 00000012H
+  003e6	59		 pop	 ecx
+  003e7	89 45 b1	 mov	 DWORD PTR $T8[ebp], eax
+  003ea	8d 75 b1	 lea	 esi, DWORD PTR $T8[ebp]
+  003ed	88 5d b5	 mov	 BYTE PTR $T8[ebp+4], bl
+  003f0	8b fc		 mov	 edi, esp
+  003f2	c7 45 d6 af 00
 	00 00		 mov	 DWORD PTR $T8[ebp+37], 175 ; 000000afH
-  003e3	c7 45 da 64 00
+  003f9	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T8[ebp+41], 100 ; 00000064H
-  003ea	88 5d de	 mov	 BYTE PTR $T8[ebp+45], bl
-  003ed	89 5d df	 mov	 DWORD PTR $T8[ebp+46], ebx
-  003f0	89 5d e3	 mov	 DWORD PTR $T8[ebp+50], ebx
-  003f3	89 5d e7	 mov	 DWORD PTR $T8[ebp+54], ebx
-  003f6	c6 45 eb 01	 mov	 BYTE PTR $T8[ebp+58], 1
-  003fa	f3 a5		 rep movsd
-  003fc	89 1d 00 00 00
+  00400	88 5d de	 mov	 BYTE PTR $T8[ebp+45], bl
+  00403	89 5d df	 mov	 DWORD PTR $T8[ebp+46], ebx
+  00406	89 5d e3	 mov	 DWORD PTR $T8[ebp+50], ebx
+  00409	c7 45 e7 ce ff
+	ff ff		 mov	 DWORD PTR $T8[ebp+54], -50 ; ffffffceH
+  00410	c6 45 eb 01	 mov	 BYTE PTR $T8[ebp+58], 1
+  00414	f3 a5		 rep movsd
+  00416	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00402	66 a5		 movsw
-  00404	a4		 movsb
-  00405	c5 f8 77	 vzeroupper
-  00408	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  0041c	66 a5		 movsw
+  0041e	a4		 movsb
+  0041f	c5 f8 77	 vzeroupper
+  00422	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 355  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 356  : 				.camType = keyType::set,
-; 357  : 				.eye_x = 644,
-; 358  : 				.eye_y = 1711,
-; 359  : 				.eye_z = 940,
-; 360  : 				.at_x = 0,
-; 361  : 				.at_y = 0,
-; 362  : 				.at_z = 0,
-; 363  : 				.up_x = 119,
-; 364  : 				.up_y = -141,
-; 365  : 				.up_z = 175,
-; 366  : 				.angle = 100,
-; 367  : 				.sType = sliderType::follow,
-; 368  : 				.slide_x = 0,
-; 369  : 				.slide_y = 0,
-; 370  : 				.slide_z = 0,
-; 371  : 				.axisType = camAxis::global,
-; 372  : 				.fly_x = 0,
-; 373  : 				.fly_y = 0,
-; 374  : 				.fly_z = 0,
-; 375  : 				.jitter = 0
-; 376  : 			});
-; 377  : 			BasicCam::processCam();
+; 356  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 357  : 				.camType = keyType::set,
+; 358  : 				.eye_x = 644,
+; 359  : 				.eye_y = 1711,
+; 360  : 				.eye_z = 940,
+; 361  : 				.at_x = 0,
+; 362  : 				.at_y = 0,
+; 363  : 				.at_z = 0,
+; 364  : 				.up_x = 119,
+; 365  : 				.up_y = -141,
+; 366  : 				.up_z = 175,
+; 367  : 				.angle = 100,
+; 368  : 				.sType = sliderType::follow,
+; 369  : 				.slide_x = 0,
+; 370  : 				.slide_y = 0,
+; 371  : 				.slide_z = -50,
+; 372  : 				.axisType = camAxis::global,
+; 373  : 				.fly_x = 3,
+; 374  : 				.fly_y = 0,
+; 375  : 				.fly_z = 0,
+; 376  : 				.jitter = 0
+; 377  : 			});
+; 378  : 			BasicCam::processCam();
 
-  0040d	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00427	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 378  : 			Object::Capri({ .quality = 1 });
+; 379  : 			Object::Capri({ .quality = 1 });
 
-  00412	6a 01		 push	 1
-  00414	e8 00 00 00 00	 call	 ?Capri@Object@@YAXUCapri_params@1@@Z ; Object::Capri
+  0042c	6a 01		 push	 1
+  0042e	e8 00 00 00 00	 call	 ?Capri@Object@@YAXUCapri_params@1@@Z ; Object::Capri
 
-; 379  : 			break;
+; 380  : 			break;
 
-  00419	e9 37 02 00 00	 jmp	 $LN28@scene1
+  00433	e9 3f 02 00 00	 jmp	 $LN28@scene1
 $LN13@scene1:
 
-; 380  : 		case 8:
-; 381  : 			BasicCam::camCounter = 0;
-; 382  : 			BasicCam::setCamKey({
+; 381  : 		case 8:
+; 382  : 			BasicCam::camCounter = 0;
+; 383  : 			BasicCam::setCamKey({
 
-  0041e	c5 fe 6f 05 00
-	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000d8fffffffd000000000000000000000000fffff849000004d400000039
-  00426	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  00429	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  0042f	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T9[ebp+5], ymm0
-  00434	c5 f9 6f 05 00
+  00438	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000d8fffffffd00000000000000de00000000fffff849ffffff7800000039
+  00440	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00443	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  00449	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T9[ebp+5], ymm0
+  0044e	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  0043c	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T9[ebp+59], xmm0
-  00441	6a 12		 push	 18			; 00000012H
-  00443	59		 pop	 ecx
-  00444	89 45 b1	 mov	 DWORD PTR $T9[ebp], eax
-  00447	8d 75 b1	 lea	 esi, DWORD PTR $T9[ebp]
-  0044a	88 5d b5	 mov	 BYTE PTR $T9[ebp+4], bl
-  0044d	8b fc		 mov	 edi, esp
-  0044f	c7 45 d6 87 00
+  00456	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T9[ebp+59], xmm0
+  0045b	6a 12		 push	 18			; 00000012H
+  0045d	59		 pop	 ecx
+  0045e	89 45 b1	 mov	 DWORD PTR $T9[ebp], eax
+  00461	8d 75 b1	 lea	 esi, DWORD PTR $T9[ebp]
+  00464	88 5d b5	 mov	 BYTE PTR $T9[ebp+4], bl
+  00467	8b fc		 mov	 edi, esp
+  00469	c7 45 d6 87 00
 	00 00		 mov	 DWORD PTR $T9[ebp+37], 135 ; 00000087H
-  00456	c7 45 da 64 00
+  00470	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T9[ebp+41], 100 ; 00000064H
-  0045d	88 5d de	 mov	 BYTE PTR $T9[ebp+45], bl
-  00460	89 5d df	 mov	 DWORD PTR $T9[ebp+46], ebx
-  00463	89 5d e3	 mov	 DWORD PTR $T9[ebp+50], ebx
-  00466	89 5d e7	 mov	 DWORD PTR $T9[ebp+54], ebx
-  00469	c6 45 eb 01	 mov	 BYTE PTR $T9[ebp+58], 1
-  0046d	f3 a5		 rep movsd
-  0046f	89 1d 00 00 00
+  00477	88 5d de	 mov	 BYTE PTR $T9[ebp+45], bl
+  0047a	89 5d df	 mov	 DWORD PTR $T9[ebp+46], ebx
+  0047d	89 5d e3	 mov	 DWORD PTR $T9[ebp+50], ebx
+  00480	c7 45 e7 60 fe
+	ff ff		 mov	 DWORD PTR $T9[ebp+54], -416 ; fffffe60H
+  00487	c6 45 eb 01	 mov	 BYTE PTR $T9[ebp+58], 1
+  0048b	f3 a5		 rep movsd
+  0048d	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00475	66 a5		 movsw
-  00477	a4		 movsb
-  00478	c5 f8 77	 vzeroupper
-  0047b	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00493	66 a5		 movsw
+  00495	a4		 movsb
+  00496	c5 f8 77	 vzeroupper
+  00499	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 383  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 384  : 				.camType = keyType::set,
-; 385  : 				.eye_x = 57,
-; 386  : 				.eye_y = 1236,
-; 387  : 				.eye_z = -1975,
-; 388  : 				.at_x = 0,
-; 389  : 				.at_y = 0,
-; 390  : 				.at_z = 0,
-; 391  : 				.up_x = -3,
-; 392  : 				.up_y = 216,
-; 393  : 				.up_z = 135,
-; 394  : 				.angle = 100,
-; 395  : 				.sType = sliderType::follow,
-; 396  : 				.slide_x = 0,
-; 397  : 				.slide_y = 0,
-; 398  : 				.slide_z = 0,
-; 399  : 				.axisType = camAxis::global,
-; 400  : 				.fly_x = -3,
-; 401  : 				.fly_y = 0,
-; 402  : 				.fly_z = 0,
-; 403  : 				.jitter = 0
-; 404  : 				});
-; 405  : 			BasicCam::processCam();
+; 384  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 385  : 				.camType = keyType::set,
+; 386  : 				.eye_x = 57,
+; 387  : 				.eye_y = -136,
+; 388  : 				.eye_z = -1975,
+; 389  : 				.at_x = 0,
+; 390  : 				.at_y = 222,
+; 391  : 				.at_z = 0,
+; 392  : 				.up_x = -3,
+; 393  : 				.up_y = 216,
+; 394  : 				.up_z = 135,
+; 395  : 				.angle = 100,
+; 396  : 				.sType = sliderType::follow,
+; 397  : 				.slide_x = 0,
+; 398  : 				.slide_y = 0,
+; 399  : 				.slide_z = -416,
+; 400  : 				.axisType = camAxis::global,
+; 401  : 				.fly_x = -3,
+; 402  : 				.fly_y = 0,
+; 403  : 				.fly_z = 0,
+; 404  : 				.jitter = 0
+; 405  : 				});
+; 406  : 			BasicCam::processCam();
 
-  00480	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0049e	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 406  : 			Object::Taurus({ .quality = 1 });
+; 407  : 			Object::Taurus({ .quality = 1 });
 
-  00485	6a 01		 push	 1
-  00487	e8 00 00 00 00	 call	 ?Taurus@Object@@YAXUTaurus_params@1@@Z ; Object::Taurus
+  004a3	6a 01		 push	 1
+  004a5	e8 00 00 00 00	 call	 ?Taurus@Object@@YAXUTaurus_params@1@@Z ; Object::Taurus
 
-; 407  : 			//
-; 408  : 			break;
+; 408  : 			//
+; 409  : 			break;
 
-  0048c	e9 c4 01 00 00	 jmp	 $LN28@scene1
+  004aa	e9 c8 01 00 00	 jmp	 $LN28@scene1
 $LN14@scene1:
 
-; 409  : 		case 9:
-; 410  : 			BasicCam::camCounter = 0;
-; 411  : 			BasicCam::setCamKey({
+; 410  : 		case 9:
+; 411  : 			BasicCam::camCounter = 0;
+; 412  : 			BasicCam::setCamKey({
 
-  00491	c5 fe 6f 05 00
+  004af	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000e900000001000000000000000000000000fffff787fffffc4200000016
-  00499	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  0049c	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  004a2	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T10[ebp+5], ymm0
-  004a7	c5 f9 6f 05 00
+  004b7	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  004ba	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  004c0	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T10[ebp+5], ymm0
+  004c5	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  004af	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T10[ebp+59], xmm0
-  004b4	6a 12		 push	 18			; 00000012H
-  004b6	59		 pop	 ecx
-  004b7	89 45 b1	 mov	 DWORD PTR $T10[ebp], eax
-  004ba	8d 75 b1	 lea	 esi, DWORD PTR $T10[ebp]
-  004bd	88 5d b5	 mov	 BYTE PTR $T10[ebp+4], bl
-  004c0	8b fc		 mov	 edi, esp
-  004c2	c7 45 d6 9a ff
+  004cd	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T10[ebp+59], xmm0
+  004d2	6a 12		 push	 18			; 00000012H
+  004d4	59		 pop	 ecx
+  004d5	89 45 b1	 mov	 DWORD PTR $T10[ebp], eax
+  004d8	8d 75 b1	 lea	 esi, DWORD PTR $T10[ebp]
+  004db	88 5d b5	 mov	 BYTE PTR $T10[ebp+4], bl
+  004de	8b fc		 mov	 edi, esp
+  004e0	c7 45 d6 9a ff
 	ff ff		 mov	 DWORD PTR $T10[ebp+37], -102 ; ffffff9aH
-  004c9	c7 45 da 64 00
+  004e7	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T10[ebp+41], 100 ; 00000064H
-  004d0	88 5d de	 mov	 BYTE PTR $T10[ebp+45], bl
-  004d3	89 5d df	 mov	 DWORD PTR $T10[ebp+46], ebx
-  004d6	89 5d e3	 mov	 DWORD PTR $T10[ebp+50], ebx
-  004d9	89 5d e7	 mov	 DWORD PTR $T10[ebp+54], ebx
-  004dc	c6 45 eb 01	 mov	 BYTE PTR $T10[ebp+58], 1
-  004e0	f3 a5		 rep movsd
-  004e2	89 1d 00 00 00
+  004ee	88 5d de	 mov	 BYTE PTR $T10[ebp+45], bl
+  004f1	89 5d df	 mov	 DWORD PTR $T10[ebp+46], ebx
+  004f4	89 5d e3	 mov	 DWORD PTR $T10[ebp+50], ebx
+  004f7	89 5d e7	 mov	 DWORD PTR $T10[ebp+54], ebx
+  004fa	c6 45 eb 01	 mov	 BYTE PTR $T10[ebp+58], 1
+  004fe	f3 a5		 rep movsd
+  00500	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  004e8	66 a5		 movsw
-  004ea	a4		 movsb
-  004eb	c5 f8 77	 vzeroupper
-  004ee	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00506	66 a5		 movsw
+  00508	a4		 movsb
+  00509	c5 f8 77	 vzeroupper
+  0050c	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 412  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 413  : 				.camType = keyType::set,
-; 414  : 				.eye_x = 22,
-; 415  : 				.eye_y = -958,
-; 416  : 				.eye_z = -2169,
-; 417  : 				.at_x = 0,
-; 418  : 				.at_y = 0,
-; 419  : 				.at_z = 0,
-; 420  : 				.up_x = 1,
-; 421  : 				.up_y = 233,
-; 422  : 				.up_z = -102,
-; 423  : 				.angle = 100,
-; 424  : 				.sType = sliderType::follow,
-; 425  : 				.slide_x = 0,
-; 426  : 				.slide_y = 0,
-; 427  : 				.slide_z = 0,
-; 428  : 				.axisType = camAxis::global,
-; 429  : 				.fly_x = -3,
-; 430  : 				.fly_y = 0,
-; 431  : 				.fly_z = 0,
-; 432  : 				.jitter = 0
-; 433  : 			});
-; 434  : 			BasicCam::processCam();
+; 413  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 414  : 				.camType = keyType::set,
+; 415  : 				.eye_x = 22,
+; 416  : 				.eye_y = -958,
+; 417  : 				.eye_z = -2169,
+; 418  : 				.at_x = 0,
+; 419  : 				.at_y = 0,
+; 420  : 				.at_z = 0,
+; 421  : 				.up_x = 1,
+; 422  : 				.up_y = 233,
+; 423  : 				.up_z = -102,
+; 424  : 				.angle = 100,
+; 425  : 				.sType = sliderType::follow,
+; 426  : 				.slide_x = 0,
+; 427  : 				.slide_y = 0,
+; 428  : 				.slide_z = 0,
+; 429  : 				.axisType = camAxis::global,
+; 430  : 				.fly_x = -3,
+; 431  : 				.fly_y = 0,
+; 432  : 				.fly_z = 0,
+; 433  : 				.jitter = 0
+; 434  : 			});
+; 435  : 			BasicCam::processCam();
 
-  004f3	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00511	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 435  : 			Object::Libra({ .quality = 1 });
+; 436  : 			Object::Libra({ .quality = 1 });
 
-  004f8	6a 01		 push	 1
-  004fa	e8 00 00 00 00	 call	 ?Libra@Object@@YAXULibra_params@1@@Z ; Object::Libra
+  00516	6a 01		 push	 1
+  00518	e8 00 00 00 00	 call	 ?Libra@Object@@YAXULibra_params@1@@Z ; Object::Libra
 
-; 436  : 			break;
+; 437  : 			break;
 
-  004ff	e9 51 01 00 00	 jmp	 $LN28@scene1
+  0051d	e9 55 01 00 00	 jmp	 $LN28@scene1
 $LN15@scene1:
 
-; 437  : 		case 10:
-; 438  : 			BasicCam::camCounter = 0;
-; 439  : 			BasicCam::setCamKey({
+; 438  : 		case 10:
+; 439  : 			BasicCam::camCounter = 0;
+; 440  : 			BasicCam::setCamKey({
 
-  00504	c5 fe 6f 05 00
+  00522	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000e100000026000000000000000000000000fffff8e2fffffc020000026e
-  0050c	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  0050f	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  00515	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T11[ebp+5], ymm0
-  0051a	c5 f9 6f 05 00
+  0052a	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  0052d	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  00533	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T11[ebp+5], ymm0
+  00538	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  00522	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T11[ebp+59], xmm0
-  00527	6a 12		 push	 18			; 00000012H
-  00529	59		 pop	 ecx
-  0052a	89 45 b1	 mov	 DWORD PTR $T11[ebp], eax
-  0052d	8d 75 b1	 lea	 esi, DWORD PTR $T11[ebp]
-  00530	88 5d b5	 mov	 BYTE PTR $T11[ebp+4], bl
-  00533	8b fc		 mov	 edi, esp
-  00535	c7 45 d6 8f ff
+  00540	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T11[ebp+59], xmm0
+  00545	6a 12		 push	 18			; 00000012H
+  00547	59		 pop	 ecx
+  00548	89 45 b1	 mov	 DWORD PTR $T11[ebp], eax
+  0054b	8d 75 b1	 lea	 esi, DWORD PTR $T11[ebp]
+  0054e	88 5d b5	 mov	 BYTE PTR $T11[ebp+4], bl
+  00551	8b fc		 mov	 edi, esp
+  00553	c7 45 d6 8f ff
 	ff ff		 mov	 DWORD PTR $T11[ebp+37], -113 ; ffffff8fH
-  0053c	c7 45 da 64 00
+  0055a	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T11[ebp+41], 100 ; 00000064H
-  00543	88 5d de	 mov	 BYTE PTR $T11[ebp+45], bl
-  00546	89 5d df	 mov	 DWORD PTR $T11[ebp+46], ebx
-  00549	89 5d e3	 mov	 DWORD PTR $T11[ebp+50], ebx
-  0054c	89 5d e7	 mov	 DWORD PTR $T11[ebp+54], ebx
-  0054f	c6 45 eb 01	 mov	 BYTE PTR $T11[ebp+58], 1
-  00553	f3 a5		 rep movsd
-  00555	89 1d 00 00 00
+  00561	88 5d de	 mov	 BYTE PTR $T11[ebp+45], bl
+  00564	89 5d df	 mov	 DWORD PTR $T11[ebp+46], ebx
+  00567	89 5d e3	 mov	 DWORD PTR $T11[ebp+50], ebx
+  0056a	c7 45 e7 d8 ff
+	ff ff		 mov	 DWORD PTR $T11[ebp+54], -40 ; ffffffd8H
+  00571	c6 45 eb 01	 mov	 BYTE PTR $T11[ebp+58], 1
+  00575	f3 a5		 rep movsd
+  00577	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  0055b	66 a5		 movsw
-  0055d	a4		 movsb
-  0055e	c5 f8 77	 vzeroupper
-  00561	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  0057d	66 a5		 movsw
+  0057f	a4		 movsb
+  00580	c5 f8 77	 vzeroupper
+  00583	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 440  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 441  : 				.camType = keyType::set,
-; 442  : 				.eye_x = 622,
-; 443  : 				.eye_y = -1022,
-; 444  : 				.eye_z = -1822,
-; 445  : 				.at_x = 0,
-; 446  : 				.at_y = 0,
-; 447  : 				.at_z = 0,
-; 448  : 				.up_x = 38,
-; 449  : 				.up_y = 225,
-; 450  : 				.up_z = -113,
-; 451  : 				.angle = 100,
-; 452  : 				.sType = sliderType::follow,
-; 453  : 				.slide_x = 0,
-; 454  : 				.slide_y = 0,
-; 455  : 				.slide_z = 0,
-; 456  : 				.axisType = camAxis::global,
-; 457  : 				.fly_x = -3,
-; 458  : 				.fly_y = 0,
-; 459  : 				.fly_z = 0,
-; 460  : 				.jitter = 0
-; 461  : 			});
-; 462  : 			BasicCam::processCam();
+; 441  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 442  : 				.camType = keyType::set,
+; 443  : 				.eye_x = 622,
+; 444  : 				.eye_y = -1022,
+; 445  : 				.eye_z = -1822,
+; 446  : 				.at_x = 0,
+; 447  : 				.at_y = 0,
+; 448  : 				.at_z = 0,
+; 449  : 				.up_x = 38,
+; 450  : 				.up_y = 225,
+; 451  : 				.up_z = -113,
+; 452  : 				.angle = 100,
+; 453  : 				.sType = sliderType::follow,
+; 454  : 				.slide_x = 0,
+; 455  : 				.slide_y = 0,
+; 456  : 				.slide_z = -40,
+; 457  : 				.axisType = camAxis::global,
+; 458  : 				.fly_x = -3,
+; 459  : 				.fly_y = 0,
+; 460  : 				.fly_z = 0,
+; 461  : 				.jitter = 0
+; 462  : 			});
+; 463  : 			BasicCam::processCam();
 
-  00566	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00588	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 463  : 			Object::Aquarius({ .quality = 1 });
+; 464  : 			Object::Aquarius({ .quality = 1 });
 
-  0056b	6a 01		 push	 1
-  0056d	e8 00 00 00 00	 call	 ?Aquarius@Object@@YAXUAquarius_params@1@@Z ; Object::Aquarius
+  0058d	6a 01		 push	 1
+  0058f	e8 00 00 00 00	 call	 ?Aquarius@Object@@YAXUAquarius_params@1@@Z ; Object::Aquarius
 
-; 464  : 			break;
+; 465  : 			break;
 
-  00572	e9 de 00 00 00	 jmp	 $LN28@scene1
+  00594	e9 de 00 00 00	 jmp	 $LN28@scene1
 $LN16@scene1:
 
-; 465  : 		case 11:
-; 466  : 			BasicCam::camCounter = 0;
-; 467  : 			BasicCam::setCamKey({
+; 466  : 		case 11:
+; 467  : 			BasicCam::camCounter = 0;
+; 468  : 			BasicCam::setCamKey({
 
-  00577	c5 fe 6f 05 00
-	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@ffffff3f00000063000000000000000000000000000003e20000042a000002e3
-  0057f	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  00582	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  00588	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T12[ebp+5], ymm0
-  0058d	c5 f9 6f 05 00
-	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  00595	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T12[ebp+59], xmm0
-  0059a	6a 12		 push	 18			; 00000012H
-  0059c	59		 pop	 ecx
-  0059d	89 45 b1	 mov	 DWORD PTR $T12[ebp], eax
-  005a0	8d 75 b1	 lea	 esi, DWORD PTR $T12[ebp]
-  005a3	88 5d b5	 mov	 BYTE PTR $T12[ebp+4], bl
-  005a6	8b fc		 mov	 edi, esp
-  005a8	c7 45 d6 85 00
-	00 00		 mov	 DWORD PTR $T12[ebp+37], 133 ; 00000085H
-  005af	c7 45 da 64 00
+  00599	c5 fe 6f 05 00
+	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@ffffff14ffffffce000000000000000000000000fffff78d00000403fffffab3
+  005a1	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  005a4	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  005aa	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T12[ebp+5], ymm0
+  005af	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000a0000000000000003
+  005b7	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T12[ebp+59], xmm0
+  005bc	6a 12		 push	 18			; 00000012H
+  005be	59		 pop	 ecx
+  005bf	89 45 b1	 mov	 DWORD PTR $T12[ebp], eax
+  005c2	8d 75 b1	 lea	 esi, DWORD PTR $T12[ebp]
+  005c5	88 5d b5	 mov	 BYTE PTR $T12[ebp+4], bl
+  005c8	8b fc		 mov	 edi, esp
+  005ca	c7 45 d6 b0 ff
+	ff ff		 mov	 DWORD PTR $T12[ebp+37], -80 ; ffffffb0H
+  005d1	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T12[ebp+41], 100 ; 00000064H
-  005b6	88 5d de	 mov	 BYTE PTR $T12[ebp+45], bl
-  005b9	89 5d df	 mov	 DWORD PTR $T12[ebp+46], ebx
-  005bc	89 5d e3	 mov	 DWORD PTR $T12[ebp+50], ebx
-  005bf	89 5d e7	 mov	 DWORD PTR $T12[ebp+54], ebx
-  005c2	c6 45 eb 01	 mov	 BYTE PTR $T12[ebp+58], 1
-  005c6	f3 a5		 rep movsd
-  005c8	89 1d 00 00 00
+  005d8	88 5d de	 mov	 BYTE PTR $T12[ebp+45], bl
+  005db	89 5d df	 mov	 DWORD PTR $T12[ebp+46], ebx
+  005de	89 5d e3	 mov	 DWORD PTR $T12[ebp+50], ebx
+  005e1	89 5d e7	 mov	 DWORD PTR $T12[ebp+54], ebx
+  005e4	c6 45 eb 01	 mov	 BYTE PTR $T12[ebp+58], 1
+  005e8	f3 a5		 rep movsd
+  005ea	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  005ce	66 a5		 movsw
-  005d0	a4		 movsb
-  005d1	c5 f8 77	 vzeroupper
-  005d4	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  005f0	66 a5		 movsw
+  005f2	a4		 movsb
+  005f3	c5 f8 77	 vzeroupper
+  005f6	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 468  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 469  : 				.camType = keyType::set,
-; 470  : 				.eye_x = 739,
-; 471  : 				.eye_y = 1066,
-; 472  : 				.eye_z = 994,
-; 473  : 				.at_x = 0,
-; 474  : 				.at_y = 0,
-; 475  : 				.at_z = 0,
-; 476  : 				.up_x = 99,
-; 477  : 				.up_y = -193,
-; 478  : 				.up_z = 133,
-; 479  : 				.angle = 100,
-; 480  : 				.sType = sliderType::follow,
-; 481  : 				.slide_x = 0,
-; 482  : 				.slide_y = 0,
-; 483  : 				.slide_z = 0,
-; 484  : 				.axisType = camAxis::global,
-; 485  : 				.fly_x = -3,
-; 486  : 				.fly_y = 0,
-; 487  : 				.fly_z = 0,
-; 488  : 				.jitter = 0
-; 489  : 			});
-; 490  : 			BasicCam::processCam();
+; 469  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 470  : 				.camType = keyType::set,
+; 471  : 				.eye_x = -1357,
+; 472  : 				.eye_y = 1027,
+; 473  : 				.eye_z = -2163,
+; 474  : 				.at_x = 0,
+; 475  : 				.at_y = 0,
+; 476  : 				.at_z = 0,
+; 477  : 				.up_x = -50,
+; 478  : 				.up_y = -236,
+; 479  : 				.up_z = -80,
+; 480  : 				.angle = 100,
+; 481  : 				.sType = sliderType::follow,
+; 482  : 				.slide_x = 0,
+; 483  : 				.slide_y = 0,
+; 484  : 				.slide_z = 0,
+; 485  : 				.axisType = camAxis::global,
+; 486  : 				.fly_x = 3,
+; 487  : 				.fly_y = 0,
+; 488  : 				.fly_z = 10,
+; 489  : 				.jitter = 0
+; 490  : 			});
+; 491  : 			BasicCam::processCam();
 
-  005d9	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  005fb	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 491  : 			Object::Fish({ .quality = 1 });
+; 492  : 			Object::Fish({ .quality = 1 });
 
-  005de	6a 01		 push	 1
-  005e0	e8 00 00 00 00	 call	 ?Fish@Object@@YAXUFish_params@1@@Z ; Object::Fish
+  00600	6a 01		 push	 1
+  00602	e8 00 00 00 00	 call	 ?Fish@Object@@YAXUFish_params@1@@Z ; Object::Fish
 
-; 492  : 			break;
+; 493  : 			break;
 
-  005e5	eb 6e		 jmp	 SHORT $LN28@scene1
+  00607	eb 6e		 jmp	 SHORT $LN28@scene1
 $LN17@scene1:
 
-; 493  : 		case 12:
-; 494  : 			BasicCam::camCounter = 0;
-; 495  : 			BasicCam::setCamKey({
+; 494  : 		case 12:
+; 495  : 			BasicCam::camCounter = 0;
+; 496  : 			BasicCam::setCamKey({
 
-  005e7	c5 fe 6f 05 00
+  00609	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000d8fffffffd000000000000000000000000fffff849000004d400000039
-  005ef	83 ec 4c	 sub	 esp, 76			; 0000004cH
-  005f2	69 c0 a8 ba 06
-	00		 imul	 eax, eax, 441000
-  005f8	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T13[ebp+5], ymm0
-  005fd	c5 f9 6f 05 00
-	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  00605	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T13[ebp+59], xmm0
-  0060a	6a 12		 push	 18			; 00000012H
-  0060c	59		 pop	 ecx
-  0060d	89 45 b1	 mov	 DWORD PTR $T13[ebp], eax
-  00610	8d 75 b1	 lea	 esi, DWORD PTR $T13[ebp]
-  00613	88 5d b5	 mov	 BYTE PTR $T13[ebp+4], bl
-  00616	8b fc		 mov	 edi, esp
-  00618	c7 45 d6 87 00
+  00611	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00614	69 c0 50 75 0d
+	00		 imul	 eax, eax, 882000
+  0061a	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T13[ebp+5], ymm0
+  0061f	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000a00000000fffffffd
+  00627	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T13[ebp+59], xmm0
+  0062c	6a 12		 push	 18			; 00000012H
+  0062e	59		 pop	 ecx
+  0062f	89 45 b1	 mov	 DWORD PTR $T13[ebp], eax
+  00632	8d 75 b1	 lea	 esi, DWORD PTR $T13[ebp]
+  00635	88 5d b5	 mov	 BYTE PTR $T13[ebp+4], bl
+  00638	8b fc		 mov	 edi, esp
+  0063a	c7 45 d6 87 00
 	00 00		 mov	 DWORD PTR $T13[ebp+37], 135 ; 00000087H
-  0061f	c7 45 da 64 00
+  00641	c7 45 da 64 00
 	00 00		 mov	 DWORD PTR $T13[ebp+41], 100 ; 00000064H
-  00626	88 5d de	 mov	 BYTE PTR $T13[ebp+45], bl
-  00629	89 5d df	 mov	 DWORD PTR $T13[ebp+46], ebx
-  0062c	89 5d e3	 mov	 DWORD PTR $T13[ebp+50], ebx
-  0062f	89 5d e7	 mov	 DWORD PTR $T13[ebp+54], ebx
-  00632	c6 45 eb 01	 mov	 BYTE PTR $T13[ebp+58], 1
-  00636	f3 a5		 rep movsd
-  00638	89 1d 00 00 00
+  00648	88 5d de	 mov	 BYTE PTR $T13[ebp+45], bl
+  0064b	89 5d df	 mov	 DWORD PTR $T13[ebp+46], ebx
+  0064e	89 5d e3	 mov	 DWORD PTR $T13[ebp+50], ebx
+  00651	89 5d e7	 mov	 DWORD PTR $T13[ebp+54], ebx
+  00654	c6 45 eb 01	 mov	 BYTE PTR $T13[ebp+58], 1
+  00658	f3 a5		 rep movsd
+  0065a	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  0063e	66 a5		 movsw
-  00640	a4		 movsb
-  00641	c5 f8 77	 vzeroupper
-  00644	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00660	66 a5		 movsw
+  00662	a4		 movsb
+  00663	c5 f8 77	 vzeroupper
+  00666	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
-; 496  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*10,
-; 497  : 				.camType = keyType::set,
-; 498  : 				.eye_x = 57,
-; 499  : 				.eye_y = 1236,
-; 500  : 				.eye_z = -1975,
-; 501  : 				.at_x = 0,
-; 502  : 				.at_y = 0,
-; 503  : 				.at_z = 0,
-; 504  : 				.up_x = -3,
-; 505  : 				.up_y = 216,
-; 506  : 				.up_z = 135,
-; 507  : 				.angle = 100,
-; 508  : 				.sType = sliderType::follow,
-; 509  : 				.slide_x = 0,
-; 510  : 				.slide_y = 0,
-; 511  : 				.slide_z = 0,
-; 512  : 				.axisType = camAxis::global,
-; 513  : 				.fly_x = -3,
-; 514  : 				.fly_y = 0,
-; 515  : 				.fly_z = 0,
-; 516  : 				.jitter = 0
-; 517  : 				});
-; 518  : 			BasicCam::processCam();
+; 497  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+; 498  : 				.camType = keyType::set,
+; 499  : 				.eye_x = 57,
+; 500  : 				.eye_y = 1236,
+; 501  : 				.eye_z = -1975,
+; 502  : 				.at_x = 0,
+; 503  : 				.at_y = 0,
+; 504  : 				.at_z = 0,
+; 505  : 				.up_x = -3,
+; 506  : 				.up_y = 216,
+; 507  : 				.up_z = 135,
+; 508  : 				.angle = 100,
+; 509  : 				.sType = sliderType::follow,
+; 510  : 				.slide_x = 0,
+; 511  : 				.slide_y = 0,
+; 512  : 				.slide_z = 0,
+; 513  : 				.axisType = camAxis::global,
+; 514  : 				.fly_x = -3,
+; 515  : 				.fly_y = 0,
+; 516  : 				.fly_z = 10,
+; 517  : 				.jitter = 0
+; 518  : 				});
+; 519  : 			BasicCam::processCam();
 
-  00649	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0066b	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
-; 519  : 			Object::Twins({ .quality = 1 });
+; 520  : 			Object::Twins({ .quality = 1 });
 
-  0064e	6a 01		 push	 1
-  00650	e8 00 00 00 00	 call	 ?Twins@Object@@YAXUTwins_params@1@@Z ; Object::Twins
+  00670	6a 01		 push	 1
+  00672	e8 00 00 00 00	 call	 ?Twins@Object@@YAXUTwins_params@1@@Z ; Object::Twins
 $LN28@scene1:
 
-; 520  : 			break;
-; 521  : 		}
-; 522  : 
+; 521  : 			break;
+; 522  : 		}
 ; 523  : 
-; 524  : 		Compose();
+; 524  : 
+; 525  : 		Compose();
 
-  00655	83 c4 50	 add	 esp, 80			; 00000050H
+  00677	83 c4 50	 add	 esp, 80			; 00000050H
 $LN2@scene1:
-  00658	e8 00 00 00 00	 call	 ?Compose@Loop@@YAXXZ	; Loop::Compose
+  0067a	e8 00 00 00 00	 call	 ?Compose@Loop@@YAXXZ	; Loop::Compose
 
-; 525  : 
-; 526  : 	}
+; 526  : 
+; 527  : 	}
 
-  0065d	5f		 pop	 edi
-  0065e	5e		 pop	 esi
-  0065f	5b		 pop	 ebx
-  00660	c9		 leave
-  00661	c3		 ret	 0
-  00662	66 90		 npad	 2
+  0067f	5f		 pop	 edi
+  00680	5e		 pop	 esi
+  00681	5b		 pop	 ebx
+  00682	c9		 leave
+  00683	c3		 ret	 0
 $LN25@scene1:
-  00664	00 00 00 00	 DD	 $LN5@scene1
-  00668	00 00 00 00	 DD	 $LN6@scene1
-  0066c	00 00 00 00	 DD	 $LN7@scene1
-  00670	00 00 00 00	 DD	 $LN8@scene1
-  00674	00 00 00 00	 DD	 $LN9@scene1
-  00678	00 00 00 00	 DD	 $LN10@scene1
-  0067c	00 00 00 00	 DD	 $LN11@scene1
-  00680	00 00 00 00	 DD	 $LN12@scene1
-  00684	00 00 00 00	 DD	 $LN13@scene1
-  00688	00 00 00 00	 DD	 $LN14@scene1
-  0068c	00 00 00 00	 DD	 $LN15@scene1
-  00690	00 00 00 00	 DD	 $LN16@scene1
-  00694	00 00 00 00	 DD	 $LN17@scene1
+  00684	00 00 00 00	 DD	 $LN5@scene1
+  00688	00 00 00 00	 DD	 $LN6@scene1
+  0068c	00 00 00 00	 DD	 $LN7@scene1
+  00690	00 00 00 00	 DD	 $LN8@scene1
+  00694	00 00 00 00	 DD	 $LN9@scene1
+  00698	00 00 00 00	 DD	 $LN10@scene1
+  0069c	00 00 00 00	 DD	 $LN11@scene1
+  006a0	00 00 00 00	 DD	 $LN12@scene1
+  006a4	00 00 00 00	 DD	 $LN13@scene1
+  006a8	00 00 00 00	 DD	 $LN14@scene1
+  006ac	00 00 00 00	 DD	 $LN15@scene1
+  006b0	00 00 00 00	 DD	 $LN16@scene1
+  006b4	00 00 00 00	 DD	 $LN17@scene1
 ?scene1@Loop@@YAXXZ ENDP				; Loop::scene1
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -115695,36 +116954,34 @@ _TEXT	ENDS
 ; File D:\!platform\fx\projectFiles\camera.h
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 ; File D:\!platform\fx\projectFiles\camera.h
-; File D:\!platform\fx\utils.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
-; File D:\!platform\fx\utils.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
-; File D:\!platform\fx\utils.h
-; File D:\!platform\fx\projectFiles\camera.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
-; File D:\!platform\fx\utils.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-; File D:\!platform\fx\projectFiles\camera.h
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
+; File D:\!platform\fx\projectFiles\camera.h
+; File D:\!platform\fx\utils.h
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
+; File D:\!platform\fx\projectFiles\camera.h
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+; File D:\!platform\fx\utils.h
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
+; File D:\!platform\fx\projectFiles\camera.h
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+; File D:\!platform\fx\utils.h
+; File D:\!platform\fx\projectFiles\camera.h
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+; File D:\!platform\fx\projectFiles\camera.h
+; File D:\!platform\fx\utils.h
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+; File D:\!platform\fx\projectFiles\camera.h
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+; File D:\!platform\fx\projectFiles\camera.h
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+; File D:\!platform\fx\projectFiles\camera.h
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+; File D:\!platform\fx\projectFiles\camera.h
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+; File D:\!platform\fx\projectFiles\camera.h
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
 ; File D:\!platform\fx\projectFiles\camera.h
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 ; File D:\!platform\fx\projectFiles\camera.h
@@ -115738,12 +116995,14 @@ _TEXT	ENDS
 ; File D:\!platform\fx\projectFiles\camera.h
 ;	COMDAT ?processCam@BasicCam@@YAXXZ
 _TEXT	SEGMENT
-_flyZ$ = -368						; size = 64
-_flyY$ = -304						; size = 64
-$T1 = -304						; size = 64
-$T2 = -240						; size = 16
-_up$1$ = -224						; size = 16
-tv1149 = -208						; size = 16
+_flyZ$ = -400						; size = 64
+_flyY$ = -336						; size = 64
+$T1 = -336						; size = 64
+tv1146 = -272						; size = 16
+$T2 = -256						; size = 16
+_up$1$ = -240						; size = 16
+tv1148 = -224						; size = 16
+_axisZ$1$ = -208					; size = 16
 $T3 = -192						; size = 64
 $T4 = -192						; size = 64
 $T5 = -192						; size = 64
@@ -115754,18 +117013,17 @@ $T8 = -112						; size = 16
 _up$2$ = -96						; size = 16
 $T9 = -96						; size = 16
 $T10 = -96						; size = 16
-_axisZ$1$ = -80						; size = 16
-_up_c$ = -76						; size = 12
+tv1145 = -80						; size = 16
+_at_c$ = -76						; size = 12
 _angle$1$ = -52						; size = 4
 _at$1$ = -48						; size = 16
 _eye_c$ = -44						; size = 12
 _eye$1$ = -32						; size = 16
 _axisY$1$ = -32						; size = 16
-_at_c$ = -28						; size = 12
-tv1066 = -8						; size = 4
-tv1073 = -4						; size = 4
-tv1078 = -4						; size = 4
-tv1083 = -4						; size = 4
+_up_c$ = -28						; size = 12
+tv1071 = -4						; size = 4
+tv1076 = -4						; size = 4
+tv1081 = -4						; size = 4
 ?processCam@BasicCam@@YAXXZ PROC			; BasicCam::processCam, COMDAT
 
 ; 70   : 	{
@@ -115780,8 +117038,8 @@ tv1083 = -4						; size = 4
   0000c	8b 6b 04	 mov	 ebp, DWORD PTR [ebx+4]
   0000f	89 6c 24 04	 mov	 DWORD PTR [esp+4], ebp
   00013	8b ec		 mov	 ebp, esp
-  00015	81 ec 78 01 00
-	00		 sub	 esp, 376		; 00000178H
+  00015	81 ec 98 01 00
+	00		 sub	 esp, 408		; 00000198H
 
 ; 71   : 		float q = intToFloatDenom;
 ; 72   : 		float a = 0;
@@ -115888,7 +117146,7 @@ $LN2@processCam:
 ; 3012 :     return _mm_div_ps(V1, V2);
 
   000ef	c5 f8 59 c3	 vmulps	 xmm0, xmm0, xmm3
-  000f3	c5 f8 29 85 20
+  000f3	c5 f8 29 85 10
 	ff ff ff	 vmovaps XMMWORD PTR _up$1$[ebp], xmm0
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
 
@@ -115921,598 +117179,585 @@ $LN2@processCam:
 ; 84   : 		auto m = XMMatrixTranspose(XMMatrixLookAtLH(eye, at, up));
 
   00116	e8 00 00 00 00	 call	 ?XMMatrixTranspose@DirectX@dx11@@YQ?AUXMMATRIX@12@U312@@Z ; dx11::DirectX::XMMatrixTranspose
-  0011b	69 05 00 00 00
-	00 df 02 00 00	 imul	 eax, DWORD PTR ?prevTime@BasicCam@@3HA, 735 ; BasicCam::prevTime
+  0011b	a1 00 00 00 00	 mov	 eax, DWORD PTR ?timeCursor@timer@@3HA ; timer::timeCursor
 
 ; 85   : 		auto slide = XMVector3Transform(camSlide * sTime / q, m);
 
-  00125	8d b5 d0 fe ff
+  00120	8d b5 b0 fe ff
 	ff		 lea	 esi, DWORD PTR $T1[ebp]
-  0012b	c5 f8 29 85 d0
-	fe ff ff	 vmovaps XMMWORD PTR $T1[ebp], xmm0
-  00133	6a 10		 push	 16			; 00000010H
-  00135	c5 f8 29 9d 00
-	ff ff ff	 vmovaps XMMWORD PTR $T1[ebp+48], xmm3
-  0013d	c5 f8 29 95 f0
-	fe ff ff	 vmovaps XMMWORD PTR $T1[ebp+32], xmm2
-  00145	c5 f8 29 8d e0
-	fe ff ff	 vmovaps XMMWORD PTR $T1[ebp+16], xmm1
-  0014d	59		 pop	 ecx
-  0014e	8d bd 40 ff ff
+  00126	2b 05 00 00 00
+	00		 sub	 eax, DWORD PTR ?prevTime@BasicCam@@3HA ; BasicCam::prevTime
+  0012c	8d bd 40 ff ff
 	ff		 lea	 edi, DWORD PTR $T3[ebp]
-  00154	f3 a5		 rep movsd
-  00156	8b 0d 00 00 00
-	00		 mov	 ecx, DWORD PTR ?timeCursor@timer@@3HA ; timer::timeCursor
-  0015c	c5 f8 10 8d 40
-	ff ff ff	 vmovups xmm1, XMMWORD PTR $T3[ebp]
-  00164	c5 f8 10 95 50
-	ff ff ff	 vmovups xmm2, XMMWORD PTR $T3[ebp+16]
-  0016c	c5 f8 10 9d 60
-	ff ff ff	 vmovups xmm3, XMMWORD PTR $T3[ebp+32]
-  00174	c5 f8 10 a5 70
-	ff ff ff	 vmovups xmm4, XMMWORD PTR $T3[ebp+48]
-  0017c	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
-  00180	2b c8		 sub	 ecx, eax
-  00182	c5 fa 2a c1	 vcvtsi2ss xmm0, xmm0, ecx
-  00186	c5 fa 11 45 f8	 vmovss	 DWORD PTR tv1066[ebp], xmm0
-  0018b	c5 fa 59 05 00
-	00 00 00	 vmulss	 xmm0, xmm0, DWORD PTR __real@38d1b717
+  00132	c5 f8 29 85 b0
+	fe ff ff	 vmovaps XMMWORD PTR $T1[ebp], xmm0
+  0013a	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
+  0013e	c5 fb 2a c0	 vcvtsi2sd xmm0, xmm0, eax
+  00142	c5 fb 59 05 00
+	00 00 00	 vmulsd	 xmm0, xmm0, QWORD PTR __real@3ee4f8b588e368f1
+  0014a	c5 fb 5a c0	 vcvtsd2ss xmm0, xmm0, xmm0
+  0014e	c5 f8 11 45 b0	 vmovups XMMWORD PTR tv1145[ebp], xmm0
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 3063 :     XMVECTOR vResult = _mm_set_ps1(ScaleFactor);
 
-  00193	c5 f8 c6 c0 00	 vshufps xmm0, xmm0, xmm0, 0
-
-; 3064 :     return _mm_mul_ps(vResult, V);
-
-  00198	c5 f8 59 05 00
-	00 00 00	 vmulps	 xmm0, xmm0, XMMWORD PTR ?camSlide@BasicCam@@3T__m128@dx11@@A ; BasicCam::camSlide
-
-; 3012 :     return _mm_div_ps(V1, V2);
-
-  001a0	c5 f8 59 05 00
-	00 00 00	 vmulps	 xmm0, xmm0, XMMWORD PTR __xmm@3b8080813b8080813b8080813b808081
+  00153	c5 f8 c6 c0 00	 vshufps xmm0, xmm0, xmm0, 0
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 85   : 		auto slide = XMVector3Transform(camSlide * sTime / q, m);
 
-  001a8	e8 00 00 00 00	 call	 ?XMVector3Transform@DirectX@dx11@@YQ?AT__m128@2@T32@UXMMATRIX@12@@Z ; dx11::DirectX::XMVector3Transform
+  00158	6a 10		 push	 16			; 00000010H
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
+
+; 3063 :     XMVECTOR vResult = _mm_set_ps1(ScaleFactor);
+
+  0015a	c5 f8 11 85 f0
+	fe ff ff	 vmovups XMMWORD PTR tv1146[ebp], xmm0
+
+; 3064 :     return _mm_mul_ps(vResult, V);
+
+  00162	c5 f8 59 05 00
+	00 00 00	 vmulps	 xmm0, xmm0, XMMWORD PTR ?camSlide@BasicCam@@3T__m128@dx11@@A ; BasicCam::camSlide
+
+; 3012 :     return _mm_div_ps(V1, V2);
+
+  0016a	c5 f8 59 05 00
+	00 00 00	 vmulps	 xmm0, xmm0, XMMWORD PTR __xmm@3b8080813b8080813b8080813b808081
+; File D:\!platform\fx\projectFiles\camera.h
+
+; 84   : 		auto m = XMMatrixTranspose(XMMatrixLookAtLH(eye, at, up));
+
+  00172	c5 f8 29 9d e0
+	fe ff ff	 vmovaps XMMWORD PTR $T1[ebp+48], xmm3
+  0017a	c5 f8 29 95 d0
+	fe ff ff	 vmovaps XMMWORD PTR $T1[ebp+32], xmm2
+  00182	c5 f8 29 8d c0
+	fe ff ff	 vmovaps XMMWORD PTR $T1[ebp+16], xmm1
+
+; 85   : 		auto slide = XMVector3Transform(camSlide * sTime / q, m);
+
+  0018a	59		 pop	 ecx
+  0018b	f3 a5		 rep movsd
+  0018d	c5 f8 10 8d 40
+	ff ff ff	 vmovups xmm1, XMMWORD PTR $T3[ebp]
+  00195	c5 f8 10 95 50
+	ff ff ff	 vmovups xmm2, XMMWORD PTR $T3[ebp+16]
+  0019d	c5 f8 10 9d 60
+	ff ff ff	 vmovups xmm3, XMMWORD PTR $T3[ebp+32]
+  001a5	c5 f8 10 a5 70
+	ff ff ff	 vmovups xmm4, XMMWORD PTR $T3[ebp+48]
+  001ad	e8 00 00 00 00	 call	 ?XMVector3Transform@DirectX@dx11@@YQ?AT__m128@2@T32@UXMMATRIX@12@@Z ; dx11::DirectX::XMVector3Transform
 
 ; 87   : 		if (slider == sliderType::follow || slider == sliderType::slide)
 
-  001ad	a0 00 00 00 00	 mov	 al, BYTE PTR ?slider@BasicCam@@3W4sliderType@@A ; BasicCam::slider
-  001b2	c5 f8 28 d0	 vmovaps xmm2, xmm0
-  001b6	84 c0		 test	 al, al
-  001b8	74 04		 je	 SHORT $LN4@processCam
-  001ba	3c 02		 cmp	 al, 2
-  001bc	75 07		 jne	 SHORT $LN139@processCam
+  001b2	a0 00 00 00 00	 mov	 al, BYTE PTR ?slider@BasicCam@@3W4sliderType@@A ; BasicCam::slider
+  001b7	c5 f8 28 d0	 vmovaps xmm2, xmm0
+  001bb	84 c0		 test	 al, al
+  001bd	74 04		 je	 SHORT $LN4@processCam
+  001bf	3c 02		 cmp	 al, 2
+  001c1	75 07		 jne	 SHORT $LN139@processCam
 $LN4@processCam:
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 2750 :     return _mm_add_ps(V1, V2);
 
-  001be	c5 e8 58 45 e0	 vaddps	 xmm0, xmm2, XMMWORD PTR _eye$1$[ebp]
+  001c3	c5 e8 58 45 e0	 vaddps	 xmm0, xmm2, XMMWORD PTR _eye$1$[ebp]
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 87   : 		if (slider == sliderType::follow || slider == sliderType::slide)
 
-  001c3	eb 05		 jmp	 SHORT $LN3@processCam
+  001c8	eb 05		 jmp	 SHORT $LN3@processCam
 $LN139@processCam:
-  001c5	c5 f8 28 45 e0	 vmovaps xmm0, XMMWORD PTR _eye$1$[ebp]
+  001ca	c5 f8 28 45 e0	 vmovaps xmm0, XMMWORD PTR _eye$1$[ebp]
 $LN3@processCam:
 
 ; 92   : 		if (slider == sliderType::pan || slider == sliderType::slide)
 
-  001ca	3c 01		 cmp	 al, 1
-  001cc	74 04		 je	 SHORT $LN6@processCam
-  001ce	3c 02		 cmp	 al, 2
-  001d0	75 0c		 jne	 SHORT $LN140@processCam
+  001cf	3c 01		 cmp	 al, 1
+  001d1	74 04		 je	 SHORT $LN6@processCam
+  001d3	3c 02		 cmp	 al, 2
+  001d5	75 0c		 jne	 SHORT $LN140@processCam
 $LN6@processCam:
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 2750 :     return _mm_add_ps(V1, V2);
 
-  001d2	c5 e8 58 4d d0	 vaddps	 xmm1, xmm2, XMMWORD PTR _at$1$[ebp]
-  001d7	c5 f8 29 4d d0	 vmovaps XMMWORD PTR _at$1$[ebp], xmm1
+  001d7	c5 e8 58 4d d0	 vaddps	 xmm1, xmm2, XMMWORD PTR _at$1$[ebp]
+  001dc	c5 f8 29 4d d0	 vmovaps XMMWORD PTR _at$1$[ebp], xmm1
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 92   : 		if (slider == sliderType::pan || slider == sliderType::slide)
 
-  001dc	eb 05		 jmp	 SHORT $LN5@processCam
+  001e1	eb 05		 jmp	 SHORT $LN5@processCam
 $LN140@processCam:
-  001de	c5 f8 28 4d d0	 vmovaps xmm1, XMMWORD PTR _at$1$[ebp]
+  001e3	c5 f8 28 4d d0	 vmovaps xmm1, XMMWORD PTR _at$1$[ebp]
 $LN5@processCam:
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 2869 :     return _mm_sub_ps(V1, V2);
 
-  001e3	c5 f8 5c c9	 vsubps	 xmm1, xmm0, xmm1
-  001e7	c5 f8 11 8d 30
-	ff ff ff	 vmovups XMMWORD PTR tv1149[ebp], xmm1
+  001e8	c5 f8 5c c9	 vsubps	 xmm1, xmm0, xmm1
+  001ec	c5 f8 11 8d 20
+	ff ff ff	 vmovups XMMWORD PTR tv1148[ebp], xmm1
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 97   : 		auto axisZ = eye - at;
 
-  001ef	c5 f8 28 c1	 vmovaps xmm0, xmm1
-  001f3	c5 f8 29 4d b0	 vmovaps XMMWORD PTR _axisZ$1$[ebp], xmm1
+  001f4	c5 f8 28 c1	 vmovaps xmm0, xmm1
+  001f8	c5 f8 29 8d 30
+	ff ff ff	 vmovaps XMMWORD PTR _axisZ$1$[ebp], xmm1
 
 ; 98   : 		auto axisY = up;
 
-  001f8	c5 f8 28 8d 20
+  00200	c5 f8 28 8d 10
 	ff ff ff	 vmovaps xmm1, XMMWORD PTR _up$1$[ebp]
-  00200	c5 f8 29 4d e0	 vmovaps XMMWORD PTR _axisY$1$[ebp], xmm1
+  00208	c5 f8 29 4d e0	 vmovaps XMMWORD PTR _axisY$1$[ebp], xmm1
 
 ; 99   : 		auto axisX = XMVector3Cross(axisZ, axisY);
 
-  00205	e8 00 00 00 00	 call	 ?XMVector3Cross@DirectX@dx11@@YQ?AT__m128@2@T32@0@Z ; dx11::DirectX::XMVector3Cross
+  0020d	e8 00 00 00 00	 call	 ?XMVector3Cross@DirectX@dx11@@YQ?AT__m128@2@T32@0@Z ; dx11::DirectX::XMVector3Cross
 
 ; 100  : 
 ; 101  : 		if (camAxisType == camAxis::global)
 
-  0020a	80 3d 00 00 00
+  00212	80 3d 00 00 00
 	00 01		 cmp	 BYTE PTR ?camAxisType@BasicCam@@3W4camAxis@@A, 1 ; BasicCam::camAxisType
-  00211	c5 f8 28 d0	 vmovaps xmm2, xmm0
-  00215	75 1e		 jne	 SHORT $LN7@processCam
+  00219	c5 f8 28 d0	 vmovaps xmm2, xmm0
+  0021d	75 21		 jne	 SHORT $LN7@processCam
 
 ; 102  : 		{
 ; 103  : 			axisZ = XMVectorSet(0,0,1,0);
 
-  00217	c5 f8 28 05 00
+  0021f	c5 f8 28 05 00
 	00 00 00	 vmovaps xmm0, XMMWORD PTR __xmm@000000003f8000000000000000000000
-  0021f	c5 f8 29 45 b0	 vmovaps XMMWORD PTR _axisZ$1$[ebp], xmm0
+  00227	c5 f8 29 85 30
+	ff ff ff	 vmovaps XMMWORD PTR _axisZ$1$[ebp], xmm0
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  00224	c5 f8 28 05 00
+  0022f	c5 f8 28 05 00
 	00 00 00	 vmovaps xmm0, XMMWORD PTR __xmm@00000000000000003f80000000000000
-  0022c	c5 f8 29 45 e0	 vmovaps XMMWORD PTR _axisY$1$[ebp], xmm0
+  00237	c5 f8 29 45 e0	 vmovaps XMMWORD PTR _axisY$1$[ebp], xmm0
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 105  : 			axisX = XMVectorSet(0,1,0,0);
 
-  00231	c5 f8 28 d0	 vmovaps xmm2, xmm0
+  0023c	c5 f8 28 d0	 vmovaps xmm2, xmm0
 $LN7@processCam:
 
 ; 106  : 		}
 ; 107  : 		
 ; 108  : 		XMMATRIX fly;
-; 109  : 		sTime = (timer::timeCursor - prevTime * SAMPLES_IN_FRAME) * .00001f;
+; 109  : 		sTime = (timer::timeCursor - prevTime) * .00001;;
 
-  00235	c5 fa 10 45 f8	 vmovss	 xmm0, DWORD PTR tv1066[ebp]
-  0023a	c5 fa 59 0d 00
-	00 00 00	 vmulss	 xmm1, xmm0, DWORD PTR __real@3727c5ac
-  00242	c5 f8 28 05 00
+  00240	c5 f8 28 05 00
 	00 00 00	 vmovaps xmm0, XMMWORD PTR ?camFly@BasicCam@@3T__m128@dx11@@A ; BasicCam::camFly
 
 ; 110  : 		auto flyX = XMMatrixRotationAxis(axisX, DegreesToRadians(XMVectorGetX(camFly) * sTime));
 
-  0024a	c5 fa 59 c9	 vmulss	 xmm1, xmm0, xmm1
+  00248	c5 fa 59 4d b0	 vmulss	 xmm1, xmm0, DWORD PTR tv1145[ebp]
 ; File D:\!platform\fx\utils.h
 
 ; 10   : 	return degrees * PI / 180.f;
 
-  0024e	c5 f2 59 05 00
+  0024d	c5 f2 59 05 00
 	00 00 00	 vmulss	 xmm0, xmm1, DWORD PTR __real@3c8efa36
-  00256	c5 fa 11 45 fc	 vmovss	 DWORD PTR tv1073[ebp], xmm0
+  00255	c5 fa 11 45 fc	 vmovss	 DWORD PTR tv1071[ebp], xmm0
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
 
 ; 1868 :     XMVECTOR Normal = XMVector3Normalize(Axis);
 
-  0025b	c5 f8 28 c2	 vmovaps xmm0, xmm2
-  0025f	e8 00 00 00 00	 call	 ?XMVector3Normalize@DirectX@dx11@@YQ?AT__m128@2@T32@@Z ; dx11::DirectX::XMVector3Normalize
+  0025a	c5 f8 28 c2	 vmovaps xmm0, xmm2
+  0025e	e8 00 00 00 00	 call	 ?XMVector3Normalize@DirectX@dx11@@YQ?AT__m128@2@T32@@Z ; dx11::DirectX::XMVector3Normalize
 
 ; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
 
-  00264	c5 fa 10 4d fc	 vmovss	 xmm1, DWORD PTR tv1073[ebp]
-  00269	e8 00 00 00 00	 call	 ?XMMatrixRotationNormal@DirectX@dx11@@YQ?AUXMMATRIX@12@T__m128@2@M@Z ; dx11::DirectX::XMMatrixRotationNormal
-  0026e	c5 f8 29 85 10
-	ff ff ff	 vmovaps XMMWORD PTR $T2[ebp], xmm0
+  00263	c5 fa 10 4d fc	 vmovss	 xmm1, DWORD PTR tv1071[ebp]
+  00268	e8 00 00 00 00	 call	 ?XMMatrixRotationNormal@DirectX@dx11@@YQ?AUXMMATRIX@12@T__m128@2@M@Z ; dx11::DirectX::XMMatrixRotationNormal
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
+
+; 417  :     XMVECTOR vTemp = XM_PERMUTE_PS(V, _MM_SHUFFLE(1, 1, 1, 1));
+
+  0026d	c5 fa 10 25 04
+	00 00 00	 vmovss	 xmm4, DWORD PTR ?camFly@BasicCam@@3T__m128@dx11@@A+4
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 111  : 		auto flyY = XMMatrixRotationAxis(axisY, DegreesToRadians(XMVectorGetY(camFly) * sTime));
 
-  00276	c5 fa 10 45 f8	 vmovss	 xmm0, DWORD PTR tv1066[ebp]
+  00275	c5 da 59 65 b0	 vmulss	 xmm4, xmm4, DWORD PTR tv1145[ebp]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
 
 ; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
 
-  0027b	c5 f8 29 4d 90	 vmovaps XMMWORD PTR $T8[ebp], xmm1
-; File D:\!platform\fx\projectFiles\camera.h
-
-; 111  : 		auto flyY = XMMatrixRotationAxis(axisY, DegreesToRadians(XMVectorGetY(camFly) * sTime));
-
-  00280	c5 fa 59 0d 00
-	00 00 00	 vmulss	 xmm1, xmm0, DWORD PTR __real@3727c5ac
-  00288	c5 f2 59 25 04
-	00 00 00	 vmulss	 xmm4, xmm1, DWORD PTR ?camFly@BasicCam@@3T__m128@dx11@@A+4
+  0027a	c5 f8 29 85 00
+	ff ff ff	 vmovaps XMMWORD PTR $T2[ebp], xmm0
 ; File D:\!platform\fx\utils.h
 
 ; 10   : 	return degrees * PI / 180.f;
 
-  00290	c5 da 59 05 00
+  00282	c5 da 59 05 00
 	00 00 00	 vmulss	 xmm0, xmm4, DWORD PTR __real@3c8efa36
-  00298	c5 fa 11 45 fc	 vmovss	 DWORD PTR tv1078[ebp], xmm0
+  0028a	c5 fa 11 45 fc	 vmovss	 DWORD PTR tv1076[ebp], xmm0
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
 
 ; 1868 :     XMVECTOR Normal = XMVector3Normalize(Axis);
 
-  0029d	c5 f8 28 45 e0	 vmovaps xmm0, XMMWORD PTR _axisY$1$[ebp]
+  0028f	c5 f8 28 45 e0	 vmovaps xmm0, XMMWORD PTR _axisY$1$[ebp]
 
 ; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
 
-  002a2	c5 f8 29 5d a0	 vmovaps XMMWORD PTR $T10[ebp], xmm3
-  002a7	c5 f8 29 55 80	 vmovaps XMMWORD PTR $T7[ebp], xmm2
+  00294	c5 f8 29 5d a0	 vmovaps XMMWORD PTR $T10[ebp], xmm3
+  00299	c5 f8 29 55 80	 vmovaps XMMWORD PTR $T7[ebp], xmm2
+  0029e	c5 f8 29 4d 90	 vmovaps XMMWORD PTR $T8[ebp], xmm1
 
 ; 1868 :     XMVECTOR Normal = XMVector3Normalize(Axis);
 
-  002ac	e8 00 00 00 00	 call	 ?XMVector3Normalize@DirectX@dx11@@YQ?AT__m128@2@T32@@Z ; dx11::DirectX::XMVector3Normalize
+  002a3	e8 00 00 00 00	 call	 ?XMVector3Normalize@DirectX@dx11@@YQ?AT__m128@2@T32@@Z ; dx11::DirectX::XMVector3Normalize
 
 ; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
 
-  002b1	c5 fa 10 4d fc	 vmovss	 xmm1, DWORD PTR tv1078[ebp]
-  002b6	e8 00 00 00 00	 call	 ?XMMatrixRotationNormal@DirectX@dx11@@YQ?AUXMMATRIX@12@T__m128@2@M@Z ; dx11::DirectX::XMMatrixRotationNormal
-  002bb	c5 f8 29 95 60
+  002a8	c5 fa 10 4d fc	 vmovss	 xmm1, DWORD PTR tv1076[ebp]
+  002ad	e8 00 00 00 00	 call	 ?XMMatrixRotationNormal@DirectX@dx11@@YQ?AUXMMATRIX@12@T__m128@2@M@Z ; dx11::DirectX::XMMatrixRotationNormal
+  002b2	c5 f8 29 8d 50
+	ff ff ff	 vmovaps XMMWORD PTR $T4[ebp+16], xmm1
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
+
+; 430  :     XMVECTOR vTemp = XM_PERMUTE_PS(V, _MM_SHUFFLE(2, 2, 2, 2));
+
+  002ba	c5 fa 10 0d 08
+	00 00 00	 vmovss	 xmm1, DWORD PTR ?camFly@BasicCam@@3T__m128@dx11@@A+8
+; File D:\!platform\fx\projectFiles\camera.h
+
+; 112  : 		auto flyZ = XMMatrixRotationAxis(axisZ, DegreesToRadians(XMVectorGetZ(camFly) * sTime));
+
+  002c2	c5 f2 59 4d b0	 vmulss	 xmm1, xmm1, DWORD PTR tv1145[ebp]
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+
+; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
+
+  002c7	c5 f8 29 85 40
+	ff ff ff	 vmovaps XMMWORD PTR $T4[ebp], xmm0
+; File D:\!platform\fx\utils.h
+
+; 10   : 	return degrees * PI / 180.f;
+
+  002cf	c5 f2 59 05 00
+	00 00 00	 vmulss	 xmm0, xmm1, DWORD PTR __real@3c8efa36
+; File D:\!platform\fx\projectFiles\camera.h
+
+; 111  : 		auto flyY = XMMatrixRotationAxis(axisY, DegreesToRadians(XMVectorGetY(camFly) * sTime));
+
+  002d7	6a 10		 push	 16			; 00000010H
+  002d9	59		 pop	 ecx
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
+
+; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
+
+  002da	c5 f8 29 9d 70
+	ff ff ff	 vmovaps XMMWORD PTR $T4[ebp+48], xmm3
+  002e2	c5 f8 29 95 60
 	ff ff ff	 vmovaps XMMWORD PTR $T4[ebp+32], xmm2
 ; File D:\!platform\fx\projectFiles\camera.h
 
-; 112  : 		auto flyZ = XMMatrixRotationAxis(axisZ, DegreesToRadians(XMVectorGetZ(camFly) * sTime));
-
-  002c3	c5 fa 10 55 f8	 vmovss	 xmm2, DWORD PTR tv1066[ebp]
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-
-; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
-
-  002c8	c5 f8 29 85 40
-	ff ff ff	 vmovaps XMMWORD PTR $T4[ebp], xmm0
-; File D:\!platform\fx\projectFiles\camera.h
-
-; 112  : 		auto flyZ = XMMatrixRotationAxis(axisZ, DegreesToRadians(XMVectorGetZ(camFly) * sTime));
-
-  002d0	c5 ea 59 05 00
-	00 00 00	 vmulss	 xmm0, xmm2, DWORD PTR __real@3727c5ac
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-
-; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
-
-  002d8	c5 f8 29 8d 50
-	ff ff ff	 vmovaps XMMWORD PTR $T4[ebp+16], xmm1
-; File D:\!platform\fx\projectFiles\camera.h
-
-; 112  : 		auto flyZ = XMMatrixRotationAxis(axisZ, DegreesToRadians(XMVectorGetZ(camFly) * sTime));
-
-  002e0	c5 fa 59 0d 08
-	00 00 00	 vmulss	 xmm1, xmm0, DWORD PTR ?camFly@BasicCam@@3T__m128@dx11@@A+8
-; File D:\!platform\fx\utils.h
-
-; 10   : 	return degrees * PI / 180.f;
-
-  002e8	c5 f2 59 05 00
-	00 00 00	 vmulss	 xmm0, xmm1, DWORD PTR __real@3c8efa36
-; File D:\!platform\fx\projectFiles\camera.h
-
 ; 111  : 		auto flyY = XMMatrixRotationAxis(axisY, DegreesToRadians(XMVectorGetY(camFly) * sTime));
 
-  002f0	6a 10		 push	 16			; 00000010H
-  002f2	59		 pop	 ecx
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
-
-; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
-
-  002f3	c5 f8 29 9d 70
-	ff ff ff	 vmovaps XMMWORD PTR $T4[ebp+48], xmm3
-; File D:\!platform\fx\projectFiles\camera.h
-
-; 111  : 		auto flyY = XMMatrixRotationAxis(axisY, DegreesToRadians(XMVectorGetY(camFly) * sTime));
-
-  002fb	8d b5 40 ff ff
+  002ea	8d b5 40 ff ff
 	ff		 lea	 esi, DWORD PTR $T4[ebp]
-  00301	8d bd d0 fe ff
+  002f0	8d bd b0 fe ff
 	ff		 lea	 edi, DWORD PTR _flyY$[ebp]
 ; File D:\!platform\fx\utils.h
 
 ; 10   : 	return degrees * PI / 180.f;
 
-  00307	c5 fa 11 45 fc	 vmovss	 DWORD PTR tv1083[ebp], xmm0
+  002f6	c5 fa 11 45 fc	 vmovss	 DWORD PTR tv1081[ebp], xmm0
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
 
 ; 1868 :     XMVECTOR Normal = XMVector3Normalize(Axis);
 
-  0030c	c5 f8 28 45 b0	 vmovaps xmm0, XMMWORD PTR _axisZ$1$[ebp]
+  002fb	c5 f8 28 85 30
+	ff ff ff	 vmovaps xmm0, XMMWORD PTR _axisZ$1$[ebp]
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 111  : 		auto flyY = XMMatrixRotationAxis(axisY, DegreesToRadians(XMVectorGetY(camFly) * sTime));
 
-  00311	f3 a5		 rep movsd
+  00303	f3 a5		 rep movsd
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
 
 ; 1868 :     XMVECTOR Normal = XMVector3Normalize(Axis);
 
-  00313	e8 00 00 00 00	 call	 ?XMVector3Normalize@DirectX@dx11@@YQ?AT__m128@2@T32@@Z ; dx11::DirectX::XMVector3Normalize
+  00305	e8 00 00 00 00	 call	 ?XMVector3Normalize@DirectX@dx11@@YQ?AT__m128@2@T32@@Z ; dx11::DirectX::XMVector3Normalize
 
 ; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
 
-  00318	c5 fa 10 4d fc	 vmovss	 xmm1, DWORD PTR tv1083[ebp]
-  0031d	e8 00 00 00 00	 call	 ?XMMatrixRotationNormal@DirectX@dx11@@YQ?AUXMMATRIX@12@T__m128@2@M@Z ; dx11::DirectX::XMMatrixRotationNormal
+  0030a	c5 fa 10 4d fc	 vmovss	 xmm1, DWORD PTR tv1081[ebp]
+  0030f	e8 00 00 00 00	 call	 ?XMMatrixRotationNormal@DirectX@dx11@@YQ?AUXMMATRIX@12@T__m128@2@M@Z ; dx11::DirectX::XMMatrixRotationNormal
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 112  : 		auto flyZ = XMMatrixRotationAxis(axisZ, DegreesToRadians(XMVectorGetZ(camFly) * sTime));
 
-  00322	6a 10		 push	 16			; 00000010H
+  00314	6a 10		 push	 16			; 00000010H
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
 
 ; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
 
-  00324	c5 f8 29 9d 70
+  00316	c5 f8 29 9d 70
 	ff ff ff	 vmovaps XMMWORD PTR $T5[ebp+48], xmm3
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 113  : 		fly = XMMatrixMultiply(XMMatrixMultiply( flyX,flyY),flyZ);
 
-  0032c	c5 f8 28 5d a0	 vmovaps xmm3, XMMWORD PTR $T10[ebp]
+  0031e	c5 f8 28 5d a0	 vmovaps xmm3, XMMWORD PTR $T10[ebp]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
 
 ; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
 
-  00331	c5 f8 29 95 60
+  00323	c5 f8 29 95 60
 	ff ff ff	 vmovaps XMMWORD PTR $T5[ebp+32], xmm2
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 113  : 		fly = XMMatrixMultiply(XMMatrixMultiply( flyX,flyY),flyZ);
 
-  00339	c5 f8 28 55 80	 vmovaps xmm2, XMMWORD PTR $T7[ebp]
+  0032b	c5 f8 28 55 80	 vmovaps xmm2, XMMWORD PTR $T7[ebp]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
 
 ; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
 
-  0033e	c5 f8 29 8d 50
+  00330	c5 f8 29 8d 50
 	ff ff ff	 vmovaps XMMWORD PTR $T5[ebp+16], xmm1
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 113  : 		fly = XMMatrixMultiply(XMMatrixMultiply( flyX,flyY),flyZ);
 
-  00346	c5 f8 28 4d 90	 vmovaps xmm1, XMMWORD PTR $T8[ebp]
+  00338	c5 f8 28 4d 90	 vmovaps xmm1, XMMWORD PTR $T8[ebp]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathMatrix.inl
 
 ; 1869 :     return XMMatrixRotationNormal(Normal, Angle);
 
-  0034b	c5 f8 29 85 40
+  0033d	c5 f8 29 85 40
 	ff ff ff	 vmovaps XMMWORD PTR $T5[ebp], xmm0
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 113  : 		fly = XMMatrixMultiply(XMMatrixMultiply( flyX,flyY),flyZ);
 
-  00353	c5 f8 28 85 10
+  00345	c5 f8 28 85 00
 	ff ff ff	 vmovaps xmm0, XMMWORD PTR $T2[ebp]
-  0035b	59		 pop	 ecx
-  0035c	8d b5 40 ff ff
+  0034d	59		 pop	 ecx
+  0034e	8d b5 40 ff ff
 	ff		 lea	 esi, DWORD PTR $T5[ebp]
-  00362	8d bd 90 fe ff
+  00354	8d bd 70 fe ff
 	ff		 lea	 edi, DWORD PTR _flyZ$[ebp]
-  00368	f3 a5		 rep movsd
-  0036a	8d 8d d0 fe ff
+  0035a	f3 a5		 rep movsd
+  0035c	8d 8d b0 fe ff
 	ff		 lea	 ecx, DWORD PTR _flyY$[ebp]
-  00370	e8 00 00 00 00	 call	 ?XMMatrixMultiply@DirectX@dx11@@YQ?AUXMMATRIX@12@U312@ABU312@@Z ; dx11::DirectX::XMMatrixMultiply
-  00375	8d 8d 90 fe ff
+  00362	e8 00 00 00 00	 call	 ?XMMatrixMultiply@DirectX@dx11@@YQ?AUXMMATRIX@12@U312@ABU312@@Z ; dx11::DirectX::XMMatrixMultiply
+  00367	8d 8d 70 fe ff
 	ff		 lea	 ecx, DWORD PTR _flyZ$[ebp]
-  0037b	e8 00 00 00 00	 call	 ?XMMatrixMultiply@DirectX@dx11@@YQ?AUXMMATRIX@12@U312@ABU312@@Z ; dx11::DirectX::XMMatrixMultiply
-  00380	c5 f8 28 fa	 vmovaps xmm7, xmm2
+  0036d	e8 00 00 00 00	 call	 ?XMMatrixMultiply@DirectX@dx11@@YQ?AUXMMATRIX@12@U312@ABU312@@Z ; dx11::DirectX::XMMatrixMultiply
+  00372	c5 f8 28 fa	 vmovaps xmm7, xmm2
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 14223:     XMVECTOR vResult = XM_PERMUTE_PS(V, _MM_SHUFFLE(3, 3, 3, 3)); // W
 
-  00384	c5 f8 10 95 30
-	ff ff ff	 vmovups xmm2, XMMWORD PTR tv1149[ebp]
-  0038c	c5 e8 c6 e2 ff	 vshufps xmm4, xmm2, xmm2, 255	; 000000ffH
+  00376	c5 f8 10 95 20
+	ff ff ff	 vmovups xmm2, XMMWORD PTR tv1148[ebp]
+  0037e	c5 e8 c6 e2 ff	 vshufps xmm4, xmm2, xmm2, 255	; 000000ffH
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 113  : 		fly = XMMatrixMultiply(XMMatrixMultiply( flyX,flyY),flyZ);
 
-  00391	c5 f8 28 f3	 vmovaps xmm6, xmm3
+  00383	c5 f8 28 f3	 vmovaps xmm6, xmm3
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 14224:     vResult = _mm_mul_ps(vResult, M.r[3]);
 
-  00395	c5 d8 59 ee	 vmulps	 xmm5, xmm4, xmm6
+  00387	c5 d8 59 ee	 vmulps	 xmm5, xmm4, xmm6
 
 ; 14225:     XMVECTOR vTemp = XM_PERMUTE_PS(V, _MM_SHUFFLE(2, 2, 2, 2)); // Z
 
-  00399	c5 e8 c6 e2 aa	 vshufps xmm4, xmm2, xmm2, 170	; 000000aaH
+  0038b	c5 e8 c6 e2 aa	 vshufps xmm4, xmm2, xmm2, 170	; 000000aaH
 
 ; 14226:     vResult = XM_FMADD_PS(vTemp, M.r[2], vResult);
 
-  0039e	c5 d8 59 e7	 vmulps	 xmm4, xmm4, xmm7
-  003a2	c5 d0 58 ec	 vaddps	 xmm5, xmm5, xmm4
+  00390	c5 d8 59 e7	 vmulps	 xmm4, xmm4, xmm7
+; File D:\!platform\fx\projectFiles\camera.h
+
+; 113  : 		fly = XMMatrixMultiply(XMMatrixMultiply( flyX,flyY),flyZ);
+
+  00394	c5 f8 29 45 80	 vmovaps XMMWORD PTR $T6[ebp], xmm0
+  00399	c5 f8 29 4d a0	 vmovaps XMMWORD PTR $T9[ebp], xmm1
+; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
+
+; 14226:     vResult = XM_FMADD_PS(vTemp, M.r[2], vResult);
+
+  0039e	c5 d0 58 ec	 vaddps	 xmm5, xmm5, xmm4
 
 ; 14227:     vTemp = XM_PERMUTE_PS(V, _MM_SHUFFLE(1, 1, 1, 1)); // Y
 
-  003a6	c5 e8 c6 e2 55	 vshufps xmm4, xmm2, xmm2, 85	; 00000055H
-; File D:\!platform\fx\projectFiles\camera.h
-
-; 113  : 		fly = XMMatrixMultiply(XMMatrixMultiply( flyX,flyY),flyZ);
-
-  003ab	c5 f8 29 45 80	 vmovaps XMMWORD PTR $T6[ebp], xmm0
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
+  003a2	c5 e8 c6 e2 55	 vshufps xmm4, xmm2, xmm2, 85	; 00000055H
 
 ; 14228:     vResult = XM_FMADD_PS(vTemp, M.r[1], vResult);
 
-  003b0	c5 d8 59 d9	 vmulps	 xmm3, xmm4, xmm1
-; File D:\!platform\fx\projectFiles\camera.h
-
-; 113  : 		fly = XMMatrixMultiply(XMMatrixMultiply( flyX,flyY),flyZ);
-
-  003b4	c5 f8 29 4d a0	 vmovaps XMMWORD PTR $T9[ebp], xmm1
-; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
+  003a7	c5 d8 59 d9	 vmulps	 xmm3, xmm4, xmm1
 
 ; 14229:     vTemp = XM_PERMUTE_PS(V, _MM_SHUFFLE(0, 0, 0, 0)); // X
 
-  003b9	c4 e2 79 18 8d
-	30 ff ff ff	 vbroadcastss xmm1, DWORD PTR tv1149[ebp]
+  003ab	c4 e2 79 18 8d
+	20 ff ff ff	 vbroadcastss xmm1, DWORD PTR tv1148[ebp]
 
 ; 14230:     vResult = XM_FMADD_PS(vTemp, M.r[0], vResult);
 
-  003c2	c5 f0 59 c0	 vmulps	 xmm0, xmm1, xmm0
-  003c6	c5 d0 58 d3	 vaddps	 xmm2, xmm5, xmm3
-  003ca	c5 e8 58 c0	 vaddps	 xmm0, xmm2, xmm0
+  003b4	c5 f0 59 c0	 vmulps	 xmm0, xmm1, xmm0
+  003b8	c5 d0 58 d3	 vaddps	 xmm2, xmm5, xmm3
+  003bc	c5 e8 58 c0	 vaddps	 xmm0, xmm2, xmm0
 
 ; 2750 :     return _mm_add_ps(V1, V2);
 
-  003ce	c5 f8 58 45 d0	 vaddps	 xmm0, xmm0, XMMWORD PTR _at$1$[ebp]
+  003c0	c5 f8 58 45 d0	 vaddps	 xmm0, xmm0, XMMWORD PTR _at$1$[ebp]
 
 ; 14223:     XMVECTOR vResult = XM_PERMUTE_PS(V, _MM_SHUFFLE(3, 3, 3, 3)); // W
 
-  003d3	c5 f8 28 95 20
+  003c5	c5 f8 28 95 10
 	ff ff ff	 vmovaps xmm2, XMMWORD PTR _up$1$[ebp]
 
 ; 2750 :     return _mm_add_ps(V1, V2);
 
-  003db	c5 f8 29 45 90	 vmovaps XMMWORD PTR _eye$2$[ebp], xmm0
+  003cd	c5 f8 29 45 90	 vmovaps XMMWORD PTR _eye$2$[ebp], xmm0
 
 ; 14223:     XMVECTOR vResult = XM_PERMUTE_PS(V, _MM_SHUFFLE(3, 3, 3, 3)); // W
 
-  003e0	c5 e8 c6 c2 ff	 vshufps xmm0, xmm2, xmm2, 255	; 000000ffH
+  003d2	c5 e8 c6 c2 ff	 vshufps xmm0, xmm2, xmm2, 255	; 000000ffH
 
 ; 14224:     vResult = _mm_mul_ps(vResult, M.r[3]);
 
-  003e5	c5 f8 59 ce	 vmulps	 xmm1, xmm0, xmm6
+  003d7	c5 f8 59 ce	 vmulps	 xmm1, xmm0, xmm6
 
 ; 14225:     XMVECTOR vTemp = XM_PERMUTE_PS(V, _MM_SHUFFLE(2, 2, 2, 2)); // Z
 
-  003e9	c5 e8 c6 c2 aa	 vshufps xmm0, xmm2, xmm2, 170	; 000000aaH
+  003db	c5 e8 c6 c2 aa	 vshufps xmm0, xmm2, xmm2, 170	; 000000aaH
 
 ; 14226:     vResult = XM_FMADD_PS(vTemp, M.r[2], vResult);
 
-  003ee	c5 f8 59 c7	 vmulps	 xmm0, xmm0, xmm7
-  003f2	c5 f0 58 c8	 vaddps	 xmm1, xmm1, xmm0
+  003e0	c5 f8 59 c7	 vmulps	 xmm0, xmm0, xmm7
+  003e4	c5 f0 58 c8	 vaddps	 xmm1, xmm1, xmm0
 
 ; 14227:     vTemp = XM_PERMUTE_PS(V, _MM_SHUFFLE(1, 1, 1, 1)); // Y
 
-  003f6	c5 e8 c6 c2 55	 vshufps xmm0, xmm2, xmm2, 85	; 00000055H
+  003e8	c5 e8 c6 c2 55	 vshufps xmm0, xmm2, xmm2, 85	; 00000055H
 
 ; 14228:     vResult = XM_FMADD_PS(vTemp, M.r[1], vResult);
 
-  003fb	c5 f8 59 45 a0	 vmulps	 xmm0, xmm0, XMMWORD PTR $T9[ebp]
-  00400	c5 f0 58 c8	 vaddps	 xmm1, xmm1, xmm0
+  003ed	c5 f8 59 45 a0	 vmulps	 xmm0, xmm0, XMMWORD PTR $T9[ebp]
+  003f2	c5 f0 58 c8	 vaddps	 xmm1, xmm1, xmm0
 
 ; 14229:     vTemp = XM_PERMUTE_PS(V, _MM_SHUFFLE(0, 0, 0, 0)); // X
 
-  00404	c5 e8 c6 c2 00	 vshufps xmm0, xmm2, xmm2, 0
+  003f6	c5 e8 c6 c2 00	 vshufps xmm0, xmm2, xmm2, 0
 
 ; 14230:     vResult = XM_FMADD_PS(vTemp, M.r[0], vResult);
 
-  00409	c5 f8 59 45 80	 vmulps	 xmm0, xmm0, XMMWORD PTR $T6[ebp]
-
-; 3064 :     return _mm_mul_ps(vResult, V);
-
-  0040e	c5 fa 10 55 f8	 vmovss	 xmm2, DWORD PTR tv1066[ebp]
-
-; 14230:     vResult = XM_FMADD_PS(vTemp, M.r[0], vResult);
-
-  00413	c5 f0 58 c0	 vaddps	 xmm0, xmm1, xmm0
-
-; 3064 :     return _mm_mul_ps(vResult, V);
-
-  00417	c5 ea 59 0d 00
-	00 00 00	 vmulss	 xmm1, xmm2, DWORD PTR __real@3727c5ac
-
-; 14230:     vResult = XM_FMADD_PS(vTemp, M.r[0], vResult);
-
-  0041f	c5 f8 29 45 a0	 vmovaps XMMWORD PTR _up$2$[ebp], xmm0
-  00424	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
+  003fb	c5 f8 59 45 80	 vmulps	 xmm0, xmm0, XMMWORD PTR $T6[ebp]
+  00400	c5 f0 58 c0	 vaddps	 xmm0, xmm1, xmm0
+  00404	c5 f8 29 45 a0	 vmovaps XMMWORD PTR _up$2$[ebp], xmm0
+  00409	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 118  : 		at += .0001f * camJitter * XMVectorSin((XMVectorSet(100, 111, 161,0) * (float)camJitter * sTime / 1000.f));
 
-  00428	c5 fa 2a 05 00
+  0040d	c5 fa 2a 05 00
 	00 00 00	 vcvtsi2ss xmm0, xmm0, DWORD PTR ?camJitter@BasicCam@@3HA ; BasicCam::camJitter
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
+; 3063 :     XMVECTOR vResult = _mm_set_ps1(ScaleFactor);
+
+  00415	c5 f8 c6 c0 00	 vshufps xmm0, xmm0, xmm0, 0
+
 ; 3064 :     return _mm_mul_ps(vResult, V);
 
-  00430	c5 fa 59 c1	 vmulss	 xmm0, xmm0, xmm1
-  00434	c5 f8 c6 c0 00	 vshufps xmm0, xmm0, xmm0, 0
+  0041a	c5 f8 59 85 f0
+	fe ff ff	 vmulps	 xmm0, xmm0, XMMWORD PTR tv1146[ebp]
 
 ; 3012 :     return _mm_div_ps(V1, V2);
 
-  00439	c5 f8 59 05 00
+  00422	c5 f8 59 05 00
 	00 00 00	 vmulps	 xmm0, xmm0, XMMWORD PTR __xmm@000000003e24dd2f3de353f83dcccccd
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 118  : 		at += .0001f * camJitter * XMVectorSin((XMVectorSet(100, 111, 161,0) * (float)camJitter * sTime / 1000.f));
 
-  00441	e8 00 00 00 00	 call	 ?XMVectorSin@DirectX@dx11@@YQ?AT__m128@2@T32@@Z ; dx11::DirectX::XMVectorSin
-  00446	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
-  0044a	c5 f2 2a 0d 00
+  0042a	e8 00 00 00 00	 call	 ?XMVectorSin@DirectX@dx11@@YQ?AT__m128@2@T32@@Z ; dx11::DirectX::XMVectorSin
+  0042f	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
+  00433	c5 f2 2a 0d 00
 	00 00 00	 vcvtsi2ss xmm1, xmm1, DWORD PTR ?camJitter@BasicCam@@3HA ; BasicCam::camJitter
-  00452	c5 f2 59 0d 00
+  0043b	c5 f2 59 0d 00
 	00 00 00	 vmulss	 xmm1, xmm1, DWORD PTR __real@38d1b717
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 3063 :     XMVECTOR vResult = _mm_set_ps1(ScaleFactor);
 
-  0045a	c5 f0 c6 c9 00	 vshufps xmm1, xmm1, xmm1, 0
+  00443	c5 f0 c6 c9 00	 vshufps xmm1, xmm1, xmm1, 0
 
 ; 3064 :     return _mm_mul_ps(vResult, V);
 
-  0045f	c5 f8 59 c1	 vmulps	 xmm0, xmm0, xmm1
+  00448	c5 f8 59 c1	 vmulps	 xmm0, xmm0, xmm1
 
 ; 2750 :     return _mm_add_ps(V1, V2);
 
-  00463	c5 f8 58 4d d0	 vaddps	 xmm1, xmm0, XMMWORD PTR _at$1$[ebp]
+  0044c	c5 f8 58 4d d0	 vaddps	 xmm1, xmm0, XMMWORD PTR _at$1$[ebp]
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 124  : 		Camera::Set(eye_c, at_c, up_c, angle);
 
-  00468	c5 fa 10 45 cc	 vmovss	 xmm0, DWORD PTR _angle$1$[ebp]
-  0046d	83 ec 10	 sub	 esp, 16			; 00000010H
-  00470	8d 75 b4	 lea	 esi, DWORD PTR _up_c$[ebp]
-  00473	c5 fa 11 4d e4	 vmovss	 DWORD PTR _at_c$[ebp], xmm1
-  00478	c4 e3 79 17 4d
-	e8 01		 vextractps DWORD PTR _at_c$[ebp+4], xmm1, 1
-  0047f	c4 e3 79 17 4d
-	ec 02		 vextractps DWORD PTR _at_c$[ebp+8], xmm1, 2
-  00486	c5 f8 28 4d a0	 vmovaps xmm1, XMMWORD PTR _up$2$[ebp]
-  0048b	c5 fa 11 44 24
+  00451	c5 fa 10 45 cc	 vmovss	 xmm0, DWORD PTR _angle$1$[ebp]
+  00456	83 ec 10	 sub	 esp, 16			; 00000010H
+  00459	8d 75 e4	 lea	 esi, DWORD PTR _up_c$[ebp]
+  0045c	c5 fa 11 4d b4	 vmovss	 DWORD PTR _at_c$[ebp], xmm1
+  00461	c4 e3 79 17 4d
+	b8 01		 vextractps DWORD PTR _at_c$[ebp+4], xmm1, 1
+  00468	c4 e3 79 17 4d
+	bc 02		 vextractps DWORD PTR _at_c$[ebp+8], xmm1, 2
+  0046f	c5 f8 28 4d a0	 vmovaps xmm1, XMMWORD PTR _up$2$[ebp]
+  00474	c5 fa 11 44 24
 	0c		 vmovss	 DWORD PTR [esp+12], xmm0
-  00491	8b fc		 mov	 edi, esp
-  00493	83 ec 0c	 sub	 esp, 12			; 0000000cH
-  00496	c5 f8 28 55 90	 vmovaps xmm2, XMMWORD PTR _eye$2$[ebp]
-  0049b	c5 fa 11 4d b4	 vmovss	 DWORD PTR _up_c$[ebp], xmm1
-  004a0	c4 e3 79 17 4d
-	b8 01		 vextractps DWORD PTR _up_c$[ebp+4], xmm1, 1
-  004a7	c4 e3 79 17 4d
-	bc 02		 vextractps DWORD PTR _up_c$[ebp+8], xmm1, 2
-  004ae	a5		 movsd
-  004af	c5 fa 11 55 d4	 vmovss	 DWORD PTR _eye_c$[ebp], xmm2
-  004b4	c4 e3 79 17 55
+  0047a	8b fc		 mov	 edi, esp
+  0047c	83 ec 0c	 sub	 esp, 12			; 0000000cH
+  0047f	c5 f8 28 55 90	 vmovaps xmm2, XMMWORD PTR _eye$2$[ebp]
+  00484	c5 fa 11 4d e4	 vmovss	 DWORD PTR _up_c$[ebp], xmm1
+  00489	c4 e3 79 17 4d
+	e8 01		 vextractps DWORD PTR _up_c$[ebp+4], xmm1, 1
+  00490	c4 e3 79 17 4d
+	ec 02		 vextractps DWORD PTR _up_c$[ebp+8], xmm1, 2
+  00497	a5		 movsd
+  00498	c5 fa 11 55 d4	 vmovss	 DWORD PTR _eye_c$[ebp], xmm2
+  0049d	c4 e3 79 17 55
 	d8 01		 vextractps DWORD PTR _eye_c$[ebp+4], xmm2, 1
-  004bb	c4 e3 79 17 55
+  004a4	c4 e3 79 17 55
 	dc 02		 vextractps DWORD PTR _eye_c$[ebp+8], xmm2, 2
-  004c2	a5		 movsd
-  004c3	a5		 movsd
-  004c4	8b fc		 mov	 edi, esp
-  004c6	8d 75 e4	 lea	 esi, DWORD PTR _at_c$[ebp]
-  004c9	83 ec 0c	 sub	 esp, 12			; 0000000cH
-  004cc	a5		 movsd
-  004cd	a5		 movsd
-  004ce	a5		 movsd
-  004cf	8b fc		 mov	 edi, esp
-  004d1	8d 75 d4	 lea	 esi, DWORD PTR _eye_c$[ebp]
-  004d4	a5		 movsd
-  004d5	a5		 movsd
-  004d6	a5		 movsd
-  004d7	e8 00 00 00 00	 call	 ?Set@Camera@dx11@@YAXUfloat3@@00M@Z ; dx11::Camera::Set
-  004dc	83 c4 28	 add	 esp, 40			; 00000028H
+  004ab	a5		 movsd
+  004ac	a5		 movsd
+  004ad	8b fc		 mov	 edi, esp
+  004af	8d 75 b4	 lea	 esi, DWORD PTR _at_c$[ebp]
+  004b2	83 ec 0c	 sub	 esp, 12			; 0000000cH
+  004b5	a5		 movsd
+  004b6	a5		 movsd
+  004b7	a5		 movsd
+  004b8	8b fc		 mov	 edi, esp
+  004ba	8d 75 d4	 lea	 esi, DWORD PTR _eye_c$[ebp]
+  004bd	a5		 movsd
+  004be	a5		 movsd
+  004bf	a5		 movsd
+  004c0	e8 00 00 00 00	 call	 ?Set@Camera@dx11@@YAXUfloat3@@00M@Z ; dx11::Camera::Set
+  004c5	83 c4 28	 add	 esp, 40			; 00000028H
 
 ; 125  : 	}
 
-  004df	5f		 pop	 edi
-  004e0	5e		 pop	 esi
-  004e1	8b e5		 mov	 esp, ebp
-  004e3	5d		 pop	 ebp
-  004e4	8b e3		 mov	 esp, ebx
-  004e6	5b		 pop	 ebx
-  004e7	c3		 ret	 0
+  004c8	5f		 pop	 edi
+  004c9	5e		 pop	 esi
+  004ca	8b e5		 mov	 esp, ebp
+  004cc	5d		 pop	 ebp
+  004cd	8b e3		 mov	 esp, ebx
+  004cf	5b		 pop	 ebx
+  004d0	c3		 ret	 0
 ?processCam@BasicCam@@YAXXZ ENDP			; BasicCam::processCam
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -116561,7 +117806,7 @@ _in$ = 8						; size = 75
 
   00003	80 3d 00 00 00
 	00 00		 cmp	 BYTE PTR ?camPass@BasicCam@@3_NA, 0 ; BasicCam::camPass
-  0000a	0f 85 94 01 00
+  0000a	0f 85 8a 01 00
 	00		 jne	 $LN2@setCamKey
 
 ; 31   : 
@@ -116603,262 +117848,253 @@ _in$ = 8						; size = 75
 
   0003b	89 0d 00 00 00
 	00		 mov	 DWORD PTR ?nextTime@BasicCam@@3HA, ecx ; BasicCam::nextTime
-  00041	e9 a7 00 00 00	 jmp	 $LN4@setCamKey
+  00041	e9 9d 00 00 00	 jmp	 $LN4@setCamKey
 $LN5@setCamKey:
 
-; 37   : 			{
-; 38   : 				sCam = &Prev;
-; 39   : 				prevTime = in.camTime;
-
-  00046	89 0d 00 00 00
-	00		 mov	 DWORD PTR ?prevTime@BasicCam@@3HA, ecx ; BasicCam::prevTime
-  0004c	be 00 00 00 00	 mov	 esi, OFFSET ?Prev@BasicCam@@3UcamData@dx11@@A ; BasicCam::Prev
-
-; 40   : 				if (camCounter == 0) prevTime = 0;
-
-  00051	85 d2		 test	 edx, edx
-  00053	75 06		 jne	 SHORT $LN6@setCamKey
-  00055	21 15 00 00 00
-	00		 and	 DWORD PTR ?prevTime@BasicCam@@3HA, edx ; BasicCam::prevTime
-$LN6@setCamKey:
-
+; 40   : 				//if (camCounter == 0) prevTime = 0;
 ; 41   : 
 ; 42   : 				currentCamType = in.camType;
 
-  0005b	8a 45 0c	 mov	 al, BYTE PTR _in$[ebp+4]
-  0005e	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
-  00062	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
+  00046	8a 45 0c	 mov	 al, BYTE PTR _in$[ebp+4]
+  00049	be 00 00 00 00	 mov	 esi, OFFSET ?Prev@BasicCam@@3UcamData@dx11@@A ; BasicCam::Prev
+  0004e	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
+  00052	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
 
 ; 47   : 				camSlide = XMVectorSet((float)in.slide_x, (float)in.slide_y, (float)in.slide_z,0);
 
-  00066	c5 f2 2a 4d 36	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+46]
+  00056	c5 f2 2a 4d 36	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+46]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  0006b	c4 e3 79 21 c1
+  0005b	c4 e3 79 21 c1
 	00		 vinsertps xmm0, xmm0, xmm1, 0
-  00071	c5 e8 57 d2	 vxorps	 xmm2, xmm2, xmm2
+  00061	c5 e8 57 d2	 vxorps	 xmm2, xmm2, xmm2
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 47   : 				camSlide = XMVectorSet((float)in.slide_x, (float)in.slide_y, (float)in.slide_z,0);
 
-  00075	c5 ea 2a 55 3a	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+50]
+  00065	c5 ea 2a 55 3a	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+50]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  0007a	c4 e3 79 21 c2
+  0006a	c4 e3 79 21 c2
 	10		 vinsertps xmm0, xmm0, xmm2, 16	; 00000010H
-  00080	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
+  00070	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 47   : 				camSlide = XMVectorSet((float)in.slide_x, (float)in.slide_y, (float)in.slide_z,0);
 
-  00084	c5 e2 2a 5d 3e	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+54]
+  00074	c5 e2 2a 5d 3e	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+54]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  00089	c4 e3 79 21 c3
+  00079	c4 e3 79 21 c3
 	20		 vinsertps xmm0, xmm0, xmm3, 32	; 00000020H
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 47   : 				camSlide = XMVectorSet((float)in.slide_x, (float)in.slide_y, (float)in.slide_z,0);
 
-  0008f	c5 f8 29 05 00
+  0007f	c5 f8 29 05 00
 	00 00 00	 vmovaps XMMWORD PTR ?camSlide@BasicCam@@3T__m128@dx11@@A, xmm0 ; BasicCam::camSlide
-  00097	a2 00 00 00 00	 mov	 BYTE PTR ?currentCamType@BasicCam@@3W4keyType@@A, al ; BasicCam::currentCamType
-  0009c	8a 45 35	 mov	 al, BYTE PTR _in$[ebp+45]
-  0009f	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
+  00087	a2 00 00 00 00	 mov	 BYTE PTR ?currentCamType@BasicCam@@3W4keyType@@A, al ; BasicCam::currentCamType
+  0008c	8a 45 35	 mov	 al, BYTE PTR _in$[ebp+45]
+  0008f	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
 
 ; 48   : 				camFly = XMVectorSet((float)in.fly_x, (float)in.fly_y, (float)in.fly_z,0);
 
-  000a3	c5 f2 2a 4d 43	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+59]
-  000a8	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
-  000ac	c5 e8 57 d2	 vxorps	 xmm2, xmm2, xmm2
-  000b0	c5 ea 2a 55 47	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+63]
+  00093	c5 f2 2a 4d 43	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+59]
+  00098	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
+  0009c	c5 e8 57 d2	 vxorps	 xmm2, xmm2, xmm2
+  000a0	c5 ea 2a 55 47	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+63]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  000b5	c4 e3 79 21 c1
+  000a5	c4 e3 79 21 c1
 	00		 vinsertps xmm0, xmm0, xmm1, 0
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 43   : 				slider = in.sType;
 
-  000bb	a2 00 00 00 00	 mov	 BYTE PTR ?slider@BasicCam@@3W4sliderType@@A, al ; BasicCam::slider
+  000ab	a2 00 00 00 00	 mov	 BYTE PTR ?slider@BasicCam@@3W4sliderType@@A, al ; BasicCam::slider
 
 ; 44   : 				camAxisType = in.axisType;
 
-  000c0	8a 45 42	 mov	 al, BYTE PTR _in$[ebp+58]
-  000c3	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
+  000b0	8a 45 42	 mov	 al, BYTE PTR _in$[ebp+58]
+  000b3	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
 
 ; 48   : 				camFly = XMVectorSet((float)in.fly_x, (float)in.fly_y, (float)in.fly_z,0);
 
-  000c7	c5 e2 2a 5d 4b	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+67]
+  000b7	c5 e2 2a 5d 4b	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+67]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  000cc	c4 e3 79 21 c2
+  000bc	c4 e3 79 21 c2
 	10		 vinsertps xmm0, xmm0, xmm2, 16	; 00000010H
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 44   : 				camAxisType = in.axisType;
 
-  000d2	a2 00 00 00 00	 mov	 BYTE PTR ?camAxisType@BasicCam@@3W4camAxis@@A, al ; BasicCam::camAxisType
+  000c2	a2 00 00 00 00	 mov	 BYTE PTR ?camAxisType@BasicCam@@3W4camAxis@@A, al ; BasicCam::camAxisType
 
 ; 45   : 				camJitter = in.jitter;
 
-  000d7	8b 45 4f	 mov	 eax, DWORD PTR _in$[ebp+71]
+  000c7	8b 45 4f	 mov	 eax, DWORD PTR _in$[ebp+71]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  000da	c4 e3 79 21 c3
+  000ca	c4 e3 79 21 c3
 	20		 vinsertps xmm0, xmm0, xmm3, 32	; 00000020H
 ; File D:\!platform\fx\projectFiles\camera.h
 
+; 39   : 				prevTime = in.camTime;
+
+  000d0	89 0d 00 00 00
+	00		 mov	 DWORD PTR ?prevTime@BasicCam@@3HA, ecx ; BasicCam::prevTime
+
 ; 45   : 				camJitter = in.jitter;
 
-  000e0	a3 00 00 00 00	 mov	 DWORD PTR ?camJitter@BasicCam@@3HA, eax ; BasicCam::camJitter
+  000d6	a3 00 00 00 00	 mov	 DWORD PTR ?camJitter@BasicCam@@3HA, eax ; BasicCam::camJitter
 
 ; 48   : 				camFly = XMVectorSet((float)in.fly_x, (float)in.fly_y, (float)in.fly_z,0);
 
-  000e5	c5 f8 29 05 00
+  000db	c5 f8 29 05 00
 	00 00 00	 vmovaps XMMWORD PTR ?camFly@BasicCam@@3T__m128@dx11@@A, xmm0 ; BasicCam::camFly
 $LN4@setCamKey:
 
 ; 58   : 			sCam->eye = XMVectorSet((float)in.eye_x, (float)in.eye_y, (float)in.eye_z,0);
 
-  000ed	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
-  000f1	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
-  000f5	c5 f2 2a 4d 0d	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+5]
+  000e3	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
+  000e7	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
+  000eb	c5 f2 2a 4d 0d	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+5]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  000fa	c4 e3 79 21 c1
+  000f0	c4 e3 79 21 c1
 	00		 vinsertps xmm0, xmm0, xmm1, 0
-  00100	c5 e8 57 d2	 vxorps	 xmm2, xmm2, xmm2
+  000f6	c5 e8 57 d2	 vxorps	 xmm2, xmm2, xmm2
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 58   : 			sCam->eye = XMVectorSet((float)in.eye_x, (float)in.eye_y, (float)in.eye_z,0);
 
-  00104	c5 ea 2a 55 11	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+9]
+  000fa	c5 ea 2a 55 11	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+9]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  00109	c4 e3 79 21 c2
+  000ff	c4 e3 79 21 c2
 	10		 vinsertps xmm0, xmm0, xmm2, 16	; 00000010H
-  0010f	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
+  00105	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 58   : 			sCam->eye = XMVectorSet((float)in.eye_x, (float)in.eye_y, (float)in.eye_z,0);
 
-  00113	c5 e2 2a 5d 15	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+13]
+  00109	c5 e2 2a 5d 15	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+13]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  00118	c4 e3 79 21 c3
+  0010e	c4 e3 79 21 c3
 	20		 vinsertps xmm0, xmm0, xmm3, 32	; 00000020H
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 58   : 			sCam->eye = XMVectorSet((float)in.eye_x, (float)in.eye_y, (float)in.eye_z,0);
 
-  0011e	c5 f8 11 06	 vmovups XMMWORD PTR [esi], xmm0
-  00122	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
-  00126	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
+  00114	c5 f8 11 06	 vmovups XMMWORD PTR [esi], xmm0
+  00118	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
+  0011c	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
 
 ; 59   : 			sCam->at = XMVectorSet((float)in.at_x, (float)in.at_y, (float)in.at_z,0);
 
-  0012a	c5 f2 2a 4d 19	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+17]
+  00120	c5 f2 2a 4d 19	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+17]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  0012f	c4 e3 79 21 c1
+  00125	c4 e3 79 21 c1
 	00		 vinsertps xmm0, xmm0, xmm1, 0
-  00135	c5 e8 57 d2	 vxorps	 xmm2, xmm2, xmm2
+  0012b	c5 e8 57 d2	 vxorps	 xmm2, xmm2, xmm2
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 59   : 			sCam->at = XMVectorSet((float)in.at_x, (float)in.at_y, (float)in.at_z,0);
 
-  00139	c5 ea 2a 55 1d	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+21]
+  0012f	c5 ea 2a 55 1d	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+21]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  0013e	c4 e3 79 21 c2
+  00134	c4 e3 79 21 c2
 	10		 vinsertps xmm0, xmm0, xmm2, 16	; 00000010H
-  00144	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
+  0013a	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 59   : 			sCam->at = XMVectorSet((float)in.at_x, (float)in.at_y, (float)in.at_z,0);
 
-  00148	c5 e2 2a 5d 21	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+25]
+  0013e	c5 e2 2a 5d 21	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+25]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  0014d	c4 e3 79 21 c3
+  00143	c4 e3 79 21 c3
 	20		 vinsertps xmm0, xmm0, xmm3, 32	; 00000020H
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 59   : 			sCam->at = XMVectorSet((float)in.at_x, (float)in.at_y, (float)in.at_z,0);
 
-  00153	c5 f8 11 46 10	 vmovups XMMWORD PTR [esi+16], xmm0
-  00158	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
-  0015c	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
+  00149	c5 f8 11 46 10	 vmovups XMMWORD PTR [esi+16], xmm0
+  0014e	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
+  00152	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
 
 ; 60   : 			sCam->up = XMVectorSet((float)in.up_x, (float)in.up_y, (float)in.up_z,0);
 
-  00160	c5 f2 2a 4d 25	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+29]
+  00156	c5 f2 2a 4d 25	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+29]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  00165	c4 e3 79 21 c1
+  0015b	c4 e3 79 21 c1
 	00		 vinsertps xmm0, xmm0, xmm1, 0
-  0016b	c5 e8 57 d2	 vxorps	 xmm2, xmm2, xmm2
+  00161	c5 e8 57 d2	 vxorps	 xmm2, xmm2, xmm2
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 60   : 			sCam->up = XMVectorSet((float)in.up_x, (float)in.up_y, (float)in.up_z,0);
 
-  0016f	c5 ea 2a 55 29	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+33]
-  00174	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
-  00178	c5 e2 2a 5d 2d	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+37]
+  00165	c5 ea 2a 55 29	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+33]
+  0016a	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
+  0016e	c5 e2 2a 5d 2d	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+37]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
 
-  0017d	c4 e3 79 21 c2
+  00173	c4 e3 79 21 c2
 	10		 vinsertps xmm0, xmm0, xmm2, 16	; 00000010H
-  00183	c4 e3 79 21 c3
+  00179	c4 e3 79 21 c3
 	20		 vinsertps xmm0, xmm0, xmm3, 32	; 00000020H
 ; File D:\!platform\fx\projectFiles\camera.h
 
 ; 60   : 			sCam->up = XMVectorSet((float)in.up_x, (float)in.up_y, (float)in.up_z,0);
 
-  00189	c5 f8 11 46 20	 vmovups XMMWORD PTR [esi+32], xmm0
-  0018e	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
+  0017f	c5 f8 11 46 20	 vmovups XMMWORD PTR [esi+32], xmm0
+  00184	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
 
 ; 61   : 			sCam->angle = (float)in.angle;
 
-  00192	c5 fa 2a 45 31	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebp+41]
+  00188	c5 fa 2a 45 31	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebp+41]
 
 ; 62   : 
 ; 63   : 			camCounter++;
 
-  00197	42		 inc	 edx
-  00198	c5 fa 11 46 30	 vmovss	 DWORD PTR [esi+48], xmm0
-  0019d	89 15 00 00 00
+  0018d	42		 inc	 edx
+  0018e	c5 fa 11 46 30	 vmovss	 DWORD PTR [esi+48], xmm0
+  00193	89 15 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, edx ; BasicCam::camCounter
-  001a3	5e		 pop	 esi
+  00199	5e		 pop	 esi
 $LN2@setCamKey:
 
 ; 64   : 		}
@@ -116866,8 +118102,8 @@ $LN2@setCamKey:
 ; 66   : 		reflect_close;
 ; 67   : 	}
 
-  001a4	5d		 pop	 ebp
-  001a5	c3		 ret	 0
+  0019a	5d		 pop	 ebp
+  0019b	c3		 ret	 0
 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ENDP	; BasicCam::setCamKey
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -124651,7 +125887,7 @@ $LN4@WinMain:
   00120	c5 fb 59 05 00
 	00 00 00	 vmulsd	 xmm0, xmm0, QWORD PTR __real@3f50624dd2f1a9fc
   00128	c5 f9 2f 05 00
-	00 00 00	 vcomisd xmm0, QWORD PTR __real@4060800000000000
+	00 00 00	 vcomisd xmm0, QWORD PTR __real@4072c00000000000
   00130	77 17		 ja	 SHORT $LN14@WinMain
 
 ; 511  : 			{
