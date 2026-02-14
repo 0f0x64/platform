@@ -67,20 +67,25 @@ float3 getRandomPointInTriangle(float3 g, float3 g1, float3 g2, float r, int iid
     float2 randoms;
     //randoms.x = r; 
     randoms.x = hash(r); 
-    randoms.y = hash(randoms.x); 
+    randoms.y = r/22;//hash(randoms.x); 
+    //randoms.y = hash(randoms.x); 
+    //randoms.y = lerp(r/22.,hash(randoms.x),smoothstep(0,1,saturate(s/151)));; 
     //randoms.y = lerp(randoms.y,randoms.x,pow(randoms.y,.24));
-    //randoms.y = lerp(randoms.y,randoms.x,smoothstep(0,1,saturate(s/11)));
-    randoms.y = lerp(randoms.y,randoms.x,pow(saturate(s/11),8));
+    //randoms.y = lerp(randoms.y,randoms.x,smoothstep(0,1,saturate(s/151)));
+    //randoms.y = lerp(randoms.y,randoms.x,pow(saturate(s/61),11));
     //randoms.y = randoms.x;
 
     float3 cp= (g+g1+g2)/3.;
-    //randoms  = rotZ(float3(randoms-.5,0),length(randoms-.5)*3+time.x/10.+(iid/4046)/300)+.5;
+    //randoms  = rotZ(float3(randoms-.5,0),time.x/10.)+.5;
 
     float sqrtR1 = sqrt(randoms.x);
     float u = 1.0f - sqrtR1;
     float v = randoms.y * sqrtR1;
     float3 result =  u * g + v * g1 + (1.0f - u - v) * g2;
-    result = rot3(result-cp,noise(iid/4046+time.x/1118.))+cp;
+    float3 rt = 5*rot3(result-cp,(noise(result/12.+(time.x/48.))*float3(4,5,3)))+cp;
+    result=lerp(result,rt,smoothstep(0,1,1-saturate(s/22)));
+    //result+=hash33(result);
+    //result = lerp(result,(g + g1 + g2) / 3.0f,0.5); 
     return result;
 }
 
@@ -148,10 +153,12 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     float s =CalculateTriangleArea(_p0,_p1,_p2);
     pos = getRandomPointInTriangle(_p0,_p1,_p2,iid/11231.,iid,s);
     float3 nrml = CalculateNormal(_p0,_p1,_p2);
-    //pos-=nrml*(hash(iid)-.5)*3;
+    pos+=nrml;
+
+    //pos=_p0+normalize(hash33(iid/1213.*float3(1,2,3)))*11;
     float f= hash(iid/1231.)+.1;
     //pos+=nrml*(f)*4*(hash33(pos)+.3);
-    //pos+=nrml*12;
+    //pos+=nrml*frac(time.x/13.+(iid/4046)/113.)*1;
     //pos-=nrml*noise(iid/123123.+time.x/23.)*2;
 
     float3 pt= mul((float3x3)view[0],float3(0,0,1));
@@ -159,22 +166,25 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 
     //if (dot(pt,nrml)>0) pos = _p0;
     //pos = lerp (pos,_p0,saturate(6*dot(pt,nrml)));
-    bool hF = iid%2==0;
+    bool hF = iid>1000000;
+    float3 l=0;
     if (hF)
     {
         //start hemisphere
-        float3 h=hash3(iid/1011.12)*PI;
-        h.z/=1.;
+        float fhash = 5421.;
+        float3 h=hash3(iid/fhash)*PI;
+        //h.z/=.5;
         h=SphericalToCartesian(h);
         h.y=abs(h.y);
         pos=normalize(h);
-        pos=rotX(pos,.4);
+        pos=rotX(pos,-.3);
         //grow
-        float3 l=normalize(pos+float3(0,-.15,-.75))*hash(iid/123.)*1.5;
+        l=normalize(pos+float3(0,-.15,-.75))*hash(iid/123.)*1.;
+        l*=hash(iid/fhash)+1;
         float l2 = hash(iid/131.);
         pos+=l;
         pos+=noise3(l*5)*l;
-        pos+=noise3(pos*7+time.x/34)/3*l;
+        pos+=noise3(pos*7+time.x/14)/3*l;
         
 
         //pos.y+=l2*3;
@@ -182,7 +192,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
         //pos.z/=1+l2;
         //pos.z-=l;
         //gravity
-        pos.y-=pow(length(l),3.2)*1;
+        pos.y-=pow(length(l),2.2)*.7;
         pos.z+=sin(-pos.y)*l/2;
         //pos.xz*=1+pow((-pos.y+1),.4);
 
@@ -210,9 +220,10 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
         //pos-=nrml*1;
         //pos-=nrml*1;
 
-        //pos.y-=124;
+        //pos.y-=1124;
     }
-    pos.y-=111;
+    
+    pos.y-=11;
     pos*=.1;
     pos=rotY(pos,time.y/72.);
     //p1.pos=float4(pos,1);
@@ -230,12 +241,21 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
             {
                 sz=6;
                 p1.color/=5;
+              //  p1.color*=(9+6*noise(pos*3))/8;
+              p1.color*=pow(length(l),2)*4;
             }
 
             p1.pos = transform_unisize(pos,grid.zw,sz);
             p1.sz=1.2;
             p1.color/=.2*p1.pos.w;
 
+    }
+
+    if (mode==2)
+    {
+        float4 posT = mul(float4(pos,1), view[0]);
+        posT = mul(posT, proj[0]);
+        p1.pos=posT;
     }
     
     /*else

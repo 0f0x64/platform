@@ -963,7 +963,7 @@ namespace Object {
 		DepthBuf::Clear({});
 		DepthBuf::Mode({ depthmode::on });
 
-		Culling::Set({ cullmode::front });
+		Culling::Set({ cullmode::off });
 		Grl({ 4046,1,pMode::point,100,252,1400,triMode::on });
 		
 		
