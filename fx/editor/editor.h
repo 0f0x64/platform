@@ -278,6 +278,8 @@ namespace editor
 			pEditStart->ReplaceText(CComVariant(pEditEnd), bstrNewText, (long)EnvDTE::vsEPReplaceTextOptions::vsEPReplaceTextKeepMarkers);
 
 			selection->MoveToLineAndOffset(line, start + 1, VARIANT_FALSE);
+
+			return true;
 		}
 
 		void InsertInSmallFile(const std::string& path, size_t pos, size_t pos_end, const std::string& text) {

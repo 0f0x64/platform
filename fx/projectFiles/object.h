@@ -98,6 +98,7 @@ namespace Object {
 	
 
 	enum class pMode { point,glow };
+	enum class triMode { on,off };
 	
 	void psModeSet(pMode mode)
 	{
@@ -292,17 +293,67 @@ namespace Object {
 				.mode = (int)in.mode,
 				.skipper = in.skipper,
 				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
-				.mesh = {
-					#include "girl.h"
+				//.mesh = {
+					//#include "girl.h"
 					//#include "girl_rand.h"
 					//#include "girl_mini.h"
-				}
+				//}
 			},
 		};
 		
 		vs::Tau.set();
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
+
+		reflect_close;
+	}
+
+	cmd(Grl, int count; int skipper; pMode mode; int r; int g; int b; triMode tMode; )
+	{
+		reflect;
+
+		int gX = sqrt(in.count / in.skipper);
+		int gY = sqrt(in.count / in.skipper);
+
+		psModeSet(in.mode);
+
+		vs::girl = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)in.mode,
+				.skipper = in.skipper,
+				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
+				.mesh = {
+				#include "girl_2000_vert.h"
+			}
+		},
+		};
+
+		if (in.tMode == triMode::on)
+		{
+			vs::girl.params.mode = 2;
+		}
+
+		float4 ind[] = {
+			#include "girl_2000_ind.h"
+		};
+
+		dx11::ConstBuf::Update(dx11::ConstBuf::buffer[(int)dx11::ConstBuf::cBuffer::extra],ind);
+		dx11::ConstBuf::Set(dx11::ConstBuf::cBuffer::extra, dx11::ConstBuf::target::vertex);
+
+		vs::girl.set();
+
+		if (in.tMode == triMode::on)
+		{
+			dx11::Shaders::resetShader(dx11::Shaders::basic);
+			Drawer::NullDrawerTri({ in.count, 1 });
+		}
+		else
+		{
+			Drawer::NullDrawer({ 1,(int)gX * (int)gY });
+		}
 
 		reflect_close;
 	}
@@ -881,6 +932,62 @@ namespace Object {
 		RenderTarget::Set({ texture::pBufMid,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 		Tau({ pillars_cnt,194,pMode::glow,100,252,1400 });
+
+		//low
+		RenderTarget::Set({ texture::pBufLow,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
+		OuterSpace(outerSpace_cnt, 64, pMode::glow);
+
+		reflect_close;
+	}
+
+	cmd(Girl, int quality;)
+	{
+		reflect;
+
+		int pillars_cnt = 2000 * 1000;
+		int outerSpace_cnt = 6853 / in.quality;
+		int galaxy_cnt = 182361 / in.quality;
+
+		//hi
+		RenderTarget::Set({ texture::pBuf,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		BlendMode::Set({
+			.mode = blendmode::off,
+			.op = blendop::add
+			});
+
+		DepthBuf::Clear({});
+		DepthBuf::Mode({ depthmode::on });
+
+		Culling::Set({ cullmode::front });
+		Grl({ 4046,1,pMode::point,100,252,1400,triMode::on });
+		
+		
+		Culling::Set({ cullmode::off });
+		DepthBuf::Mode({ depthmode::readonly });
+		BlendMode::Set({
+			.mode = blendmode::on,
+			.op = blendop::add
+			});
+		Grl({ pillars_cnt,1,pMode::point,100,252,1400,triMode::off });
+
+		Culling::Set({ cullmode::off });
+		DepthBuf::Mode({ depthmode::off });
+
+		//InsideNebula({ pillars_cnt / 2, 1, pMode::point ,1500,100,00 });
+		//Islands({ pillars_cnt / 2,1,pMode::point,130,112,10 });
+		//Waterfall({ pillars_cnt / 4,1,pMode::point,30,352,1100 });
+		OuterSpace(outerSpace_cnt, 1, pMode::point);
+		//		Galaxy({ galaxy_cnt,14,pMode::point,254,220,41 });
+
+				//mid
+		RenderTarget::Set({ texture::pBufMid,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+		//Grl({ pillars_cnt,194,pMode::glow,100,252,1400 });
 
 		//low
 		RenderTarget::Set({ texture::pBufLow,0 });

@@ -72,6 +72,13 @@ namespace Drawer {
 		reflect_close;
 	}
 
+	cmd(NullDrawerTri, int tricount; int instances;) {
+		reflect;
+
+		Draw::NullDrawerTri(in.tricount, in.instances);
+		reflect_close;
+	}
+
 
 }
 

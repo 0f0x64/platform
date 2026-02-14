@@ -2,9 +2,9 @@ void paramConstBufInit();
 
 namespace ConstBuf
 {
-	ID3D11Buffer* buffer[4];
+	ID3D11Buffer* buffer[5];
 	
-	enum class cBuffer { reserved, camera , frame, global };
+	enum class cBuffer { reserved, camera , frame, global, extra };
 
 	#define constCount 32
 
@@ -23,6 +23,11 @@ namespace ConstBuf
 
 	//b3
 	XMFLOAT4 global[constCount];//update once on start
+
+	//b4
+	XMFLOAT4 extra[4095];
+	
+
 
 	char* cBufPtr[] = { NULL, (char*)&camera ,(char*)&frame,(char*)&global};
 
@@ -52,6 +57,7 @@ namespace ConstBuf
 		Create(buffer[(int)cBuffer::camera], sizeof(camera));
 		Create(buffer[(int)cBuffer::frame], sizeof(frame));
 		Create(buffer[(int)cBuffer::global], sizeof(global));
+		Create(buffer[(int)cBuffer::extra], sizeof(extra));
 	}
 
 	void Update(cBuffer i)

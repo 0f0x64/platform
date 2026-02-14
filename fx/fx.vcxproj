@@ -260,7 +260,7 @@
       <AdditionalDependencies>d3d10.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;xaudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>$(TargetDir)../Reflector/platform.exe</Command>
+      <Command>$(TargetDir)../Reflector/platform.exe -minifier</Command>
     </PreBuildEvent>
     <FxCompile>
       <ObjectFileOutput>
@@ -409,7 +409,6 @@
   <ItemGroup>
     <None Include="projectFiles\shaders\lib\constants.shader" />
     <None Include="projectFiles\shaders\lib\constBuf.shader" />
-    <None Include="projectFiles\shaders\lib\girl_data.shader" />
     <None Include="projectFiles\shaders\lib\hand_data.shader" />
     <None Include="projectFiles\shaders\lib\io.shader" />
     <None Include="projectFiles\shaders\lib\particleVS_main.shader" />
@@ -434,6 +433,7 @@
     <None Include="projectFiles\shaders\vs\blob.shader" />
     <None Include="projectFiles\shaders\vs\capriStar.shader" />
     <None Include="projectFiles\shaders\vs\galaxy_2.shader" />
+    <None Include="projectFiles\shaders\vs\girl.shader" />
     <None Include="projectFiles\shaders\vs\leo.shader" />
     <None Include="projectFiles\shaders\vs\Nebula2.shader" />
     <None Include="projectFiles\shaders\vs\pearl.shader" />

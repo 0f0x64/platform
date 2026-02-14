@@ -313,6 +313,11 @@ namespace Shaders {
 		context->PSSetShader(PS[n].pShader, NULL, 0);
 	}
 
+	void resetShader(unsigned int n)
+	{
+		context->PSSetShader(NULL, NULL, 0);
+	}
+
 }
 
 
