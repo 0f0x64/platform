@@ -328,7 +328,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
         p1.pos=posT;
     }
     
-    p1.color.rgb*=float3(1,2,3)/1.6;
+    p1.color.rgb*=float3(1,2,3)/3.6;
 
     //pos.y-=55*sin(time.x/12.)*c;
 
