@@ -260,7 +260,7 @@
       <AdditionalDependencies>d3d10.lib;d3d11.lib;d3dcompiler.lib;dxguid.lib;winmm.lib;xaudio2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>$(TargetDir)../Reflector/platform.exe -minifier</Command>
+      <Command>$(TargetDir)../Reflector/platform.exe</Command>
     </PreBuildEvent>
     <FxCompile>
       <ObjectFileOutput>

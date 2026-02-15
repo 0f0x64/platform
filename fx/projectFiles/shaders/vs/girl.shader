@@ -69,7 +69,7 @@ float3 getRandomPointInTriangle(float3 g, float3 g1, float3 g2, float r, int iid
     randoms.x = hash(r); 
     randoms.y = r/22;//hash(randoms.x); 
     //randoms.y = hash(randoms.x); 
-    //randoms.y = lerp(r/22.,hash(randoms.x),smoothstep(0,1,saturate(s/151)));; 
+    //randoms.y = lerp(r/22.,hash(randoms.x),smoothstep(0,1,saturate(s/61)));; 
     //randoms.y = lerp(randoms.y,randoms.x,pow(randoms.y,.24));
     //randoms.y = lerp(randoms.y,randoms.x,smoothstep(0,1,saturate(s/151)));
     //randoms.y = lerp(randoms.y,randoms.x,pow(saturate(s/61),11));
@@ -82,8 +82,10 @@ float3 getRandomPointInTriangle(float3 g, float3 g1, float3 g2, float r, int iid
     float u = 1.0f - sqrtR1;
     float v = randoms.y * sqrtR1;
     float3 result =  u * g + v * g1 + (1.0f - u - v) * g2;
-    float3 rt = 5*rot3(result-cp,(noise(result/12.+(time.x/48.))*float3(4,5,3)))+cp;
+    float3 rt = 2*rot3(result-cp,(noise(result/12.+(time.x/18.))*float3(4,5,3)))+cp;
     result=lerp(result,rt,smoothstep(0,1,1-saturate(s/22)));
+    
+    
     //result+=hash33(result);
     //result = lerp(result,(g + g1 + g2) / 3.0f,0.5); 
     return result;
@@ -168,38 +170,61 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     //pos = lerp (pos,_p0,saturate(6*dot(pt,nrml)));
     bool hF = iid>1000000;
     float3 l=0;
+    float lf=0;
     if (hF)
     {
-        //start hemisphere
-        float fhash = 5421.;
-        float3 h=hash3(iid/fhash)*PI;
-        //h.z/=.5;
-        h=SphericalToCartesian(h);
+        float fhash = 721.;
+        float3 h=hash3(iid/(int)fhash)*PI;
         h.y=abs(h.y);
+        h=rotX(h,hash(iid/(int)fhash)/1.2);
         pos=normalize(h);
-        pos=rotX(pos,-.3);
         //grow
-        l=normalize(pos+float3(0,-.15,-.75))*hash(iid/123.)*1.;
-        l*=hash(iid/fhash)+1;
-        float l2 = hash(iid/131.);
+        lf =hash(iid/123.)*3.5;
+        l=normalize(pos+float3(0,-.0,-.0))*lf;
         pos+=l;
-        pos+=noise3(l*5)*l;
-        pos+=noise3(pos*7+time.x/14)/3*l;
-        
-
-        //pos.y+=l2*3;
-        //pos=rotX(pos,l2*2);
-        //pos.z/=1+l2;
-        //pos.z-=l;
         //gravity
         pos.y-=pow(length(l),2.2)*.7;
-        pos.z+=sin(-pos.y)*l/2;
+
+        float r=2.5;
+        float pf=smoothstep(0,1,length(pos.xz)/5);
+        pos=lerp(normalize(pos)*r*(pf*pf+1),pos,pf);
+
+        //face occluder
+        float a =atan2(pos.x,pos.y)/PI;
+        float b = saturate(abs(a));
+        pos=lerp(pos,rotY(pos,b*sign(-a)),saturate(pos.z/3));
+
+        //neck occluder
+        float3 hole=float3(0,-2.4,1);
+        pos-=normalize(hole-pos)*pow(2/distance(pos,hole),.5);
+
+        //
+        //waves
+        pos.z+=sin(-pos.y-time.x/12.)*lf/8;
+        //pos.z-=max(-pow(pos.y,2),0)/4;
         //pos.xz*=1+pow((-pos.y+1),.4);
 
-        pos*=12;
-        pos.x-=2;
-        pos.z+=4;
-        pos.y+=121;
+        //grow point
+        pos=lerp(pos*.9,pos,saturate(lf/2));
+
+        //noise
+        pos+=noise3(pos*lerp(5,1,saturate(lf))+time.x/12)*max(lf/4,0);
+
+        //neck occluder
+        hole=float3(0,-12.4,0);
+        pos-=2*normalize(hole-pos)*pow(5/distance(pos,hole),.95);
+
+        pos=lerp(hash33(iid/1123.)+float3(0,3.,0),pos,saturate(lf/1.2));
+
+        //divide forward and back
+        pos.z+=sign(pos.z+1.5)*max(-sin(pos.y/3+1)*4-2.6,0);
+
+        pos*=5.6;
+        pos.z*=1.2;
+        pos.x-=2.8;
+        pos.z+=3;
+        pos.y-=7;
+        pos.y+=124;
     }
 
 
@@ -220,16 +245,54 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
         //pos-=nrml*1;
         //pos-=nrml*1;
 
-        //pos.y-=1124;
+        //pos.y-=124;
     }
     
-    pos.y-=11;
+    //pos.y-=121;
     pos*=.1;
-    pos=rotY(pos,time.y/72.);
+
     //p1.pos=float4(pos,1);
     //pos.y-=11;
     //pos.z-=1;
     //pos = mesh[iid%2025].xyz*.1;
+
+    //if (mode==0) 
+
+    //hands
+    {
+    float3 pos2=pos;
+    pos2.x=abs(pos2.x);
+    float3 hole=float3(12,+2.4,-2);
+    float3 hole2=float3(4,+4.,-2);
+    float c=lerp(1,0,saturate(distance(pos2,hole)/8));
+    pos=lerp(pos,rotZ(pos-hole2,sin(time.x/6)/6)+hole2,c);
+    }
+
+    //head
+    {
+    float3 pos2=pos;
+    pos2.x=abs(pos2.x);
+    float3 hole=float3(0,12.4,0);
+    float3 hole2=float3(0,+12.4,0);
+    float c=lerp(1,0,saturate(distance(pos2,hole)/6));
+    pos=lerp(pos,rotY(pos-hole2,sin(time.x/22)/1)+hole2,c);
+    pos=lerp(pos,rotX(pos-hole2,sin(time.x/21)/3)+hole2,c);
+    }
+
+    //body
+    {
+    float3 pos2=pos;
+    pos2.x=abs(pos2.x);
+    float3 hole=float3(0,-2.4,0);
+    float3 hole2=float3(0,-2.4,0);
+    float c=lerp(1,0,saturate(distance(pos2,hole)/14));
+    pos=lerp(pos,rotY(pos-hole2,sin(time.x/16)/5)+hole2,c);
+    pos=lerp(pos,rotX(pos-hole2,sin(time.x/15)/7)+hole2,c);
+    }
+
+    pos.y+=sin(time.x/8);
+    pos.x+=sin(time.x/31);
+        pos=rotY(pos,time.y/172.);
 
     if (mode==0)    
     {
@@ -239,15 +302,22 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 
             if (hF)
             {
-                sz=6;
+                sz=clamp(5./(lf),1.2,5);
                 p1.color/=5;
               //  p1.color*=(9+6*noise(pos*3))/8;
-              p1.color*=pow(length(l),2)*4;
+              p1.color*=12;
+              
             }
+       
 
             p1.pos = transform_unisize(pos,grid.zw,sz);
             p1.sz=1.2;
             p1.color/=.2*p1.pos.w;
+
+            if (hF) {
+                p1.color*=1+lf;
+            p1.color/=.9*p1.pos.w;
+            }
 
     }
 
@@ -258,6 +328,10 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
         p1.pos=posT;
     }
     
+    p1.color.rgb*=float3(1,2,3)/1.6;
+
+    //pos.y-=55*sin(time.x/12.)*c;
+
     /*else
     {
         p1.pos = transform(pos,grid.zw,21.2);
