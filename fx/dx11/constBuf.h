@@ -48,6 +48,142 @@ namespace ConstBuf
 
 		HRESULT hr = device->CreateBuffer(&bd, NULL, &buf);
 		LogIfError("constant buffer fail\n");
+	
+	
+	}
+
+	//custom structured buffer
+	//todo reflect all CB and SB
+	
+
+	struct vertex  {
+		float4 position;
+	};
+
+	struct index  {
+		float4 index;
+	};
+
+	ID3D11Buffer* pSBuffer[2];
+	ID3D11ShaderResourceView* pSB_SRV[2];
+
+	void CreateSB(int slot,int size,int count, auto& data)
+	{
+		D3D11_SUBRESOURCE_DATA initData = {};
+		initData.pSysMem = data;
+
+		D3D11_BUFFER_DESC bufferDesc = {};
+		bufferDesc.ByteWidth = size*count ; 
+		bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+		bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE; // Для чтения в шейдере
+		bufferDesc.CPUAccessFlags = 0;
+		bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+		bufferDesc.StructureByteStride = size; // Обязательно для Structured Buffer
+
+		HRESULT hr = device->CreateBuffer(&bufferDesc, &initData, &pSBuffer[slot]);
+
+		// 2. Создаем Shader Resource View (SRV)
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Format = DXGI_FORMAT_UNKNOWN; // Всегда UNKNOWN для Structured Buffer
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+		srvDesc.Buffer.FirstElement = 0;
+		srvDesc.Buffer.NumElements = count;
+
+		HRESULT hr2 = device->CreateShaderResourceView(pSBuffer[slot], &srvDesc, &pSB_SRV[slot]);
+	}
+
+	void BindSB(int slot)
+	{
+		context->VSSetShaderResources(slot, 1, &pSB_SRV[slot]);
+	}
+
+	vertex* vArray;
+	//[] = {
+	//#include "../projectFiles/girl_mid_vert.h"
+	//};
+
+	index* iArray; 
+	//[] = {
+//		#include "../projectFiles/girl_mid_ind.h"
+	//};
+
+	uint32_t vertexCount = 0;
+	uint32_t triangleCount = 0;
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+#include <cstring>
+
+
+	bool LoadObjToPointers(const std::string& filename, vertex** outVertices, index** outIndices, uint32_t& vCount, uint32_t& iCount) 
+	{
+		std::vector<float4> temp_positions;
+		std::vector<vertex> final_vertices;
+		std::vector<index> final_triangles;
+
+		std::ifstream file(filename);
+		if (!file.is_open())
+		{
+			return false;
+		}
+
+		std::string line;
+		while (std::getline(file, line)) {
+			if (line.empty()) continue;
+			std::stringstream ss(line);
+			std::string prefix;
+			ss >> prefix;
+
+			if (prefix == "v") {
+				float4 p;
+				ss >> p.x >> p.y >> p.z;
+				p.w = 1.0f;
+				temp_positions.push_back(p);
+			}
+			else if (prefix == "f") {
+				index tri = {};
+				// We assume a triangulated OBJ (3 vertices per face)
+				for (int i = 0; i < 3; i++) {
+					std::string vStr;
+					ss >> vStr;
+
+					// Parse indices (v/vt/vn). We only care about 'v' (pIdx)
+					int pIdx = 0, uIdx = 0, nIdx = 0;
+					if (sscanf_s(vStr.c_str(), "%d/%d/%d", &pIdx, &uIdx, &nIdx) >= 1) {
+						vertex v;
+						v.position = temp_positions[pIdx - 1];
+
+						// Create a unique vertex for this face corner
+						uint32_t currentVIdx = (uint32_t)final_vertices.size();
+						final_vertices.push_back(v);
+
+						// Store index in the float4 fields
+						if (i == 0)      tri.index.x = (float)currentVIdx;
+						else if (i == 1) tri.index.y = (float)currentVIdx;
+						else if (i == 2) tri.index.z = (float)currentVIdx;
+					}
+				}
+				tri.index.w = 0.0f;
+				final_triangles.push_back(tri);
+			}
+		}
+
+		vCount = (uint32_t)final_vertices.size();
+		iCount = (uint32_t)final_triangles.size();
+
+		if (vCount == 0) return false;
+
+		// Allocate heap memory
+		*outVertices = new vertex[vCount];
+		*outIndices = new index[iCount];
+
+		std::memcpy(*outVertices, final_vertices.data(), sizeof(vertex) * vCount);
+		std::memcpy(*outIndices, final_triangles.data(), sizeof(index) * iCount);
+
+		return true;
 	}
 
 	void Init()
@@ -58,6 +194,12 @@ namespace ConstBuf
 		Create(buffer[(int)cBuffer::frame], sizeof(frame));
 		Create(buffer[(int)cBuffer::global], sizeof(global));
 		Create(buffer[(int)cBuffer::extra], sizeof(extra));
+
+
+		LoadObjToPointers("projectFiles//girl.obj", &vArray, &iArray, vertexCount, triangleCount);
+
+		CreateSB(0, sizeof(vertex), vertexCount, vArray);
+		CreateSB(1, sizeof(index), triangleCount, iArray);
 	}
 
 	void Update(cBuffer i)

@@ -11,13 +11,25 @@ cbuffer params : register(b0)
     int mode;
     int skipper;
     float4 base_color;
-    float4 mesh[4000];
+    float4 modelPos;
+    float4 triCount;
+    float4 brightness;
+    float4 tickness;
 }
 
-cbuffer par2 : register(b4)
-{
-    float4 meshInd[4095];
-}
+struct Vertex {
+    float4 pos;
+};
+
+// Our StructuredBuffer at t0
+StructuredBuffer<Vertex> vbf : register(t0);
+
+struct Index {
+    float4 i;
+};
+ 
+// Our StructuredBuffer at t0
+StructuredBuffer<Index> ibf : register(t1);
 
 float toRad(float a)
 {
@@ -68,7 +80,7 @@ float3 getRandomPointInTriangle(float3 g, float3 g1, float3 g2, float r, int iid
     //randoms.x = r; 
     randoms.x = hash(r); 
     randoms.y = r/22;//hash(randoms.x); 
-    //randoms.y = hash(randoms.x); 
+    randoms.y = hash(randoms.x); 
     //randoms.y = lerp(r/22.,hash(randoms.x),smoothstep(0,1,saturate(s/61)));; 
     //randoms.y = lerp(randoms.y,randoms.x,pow(randoms.y,.24));
     //randoms.y = lerp(randoms.y,randoms.x,smoothstep(0,1,saturate(s/151)));
@@ -83,7 +95,7 @@ float3 getRandomPointInTriangle(float3 g, float3 g1, float3 g2, float r, int iid
     float v = randoms.y * sqrtR1;
     float3 result =  u * g + v * g1 + (1.0f - u - v) * g2;
     float3 rt = 2*rot3(result-cp,(noise(result/12.+(time.x/18.))*float3(4,5,3)))+cp;
-    result=lerp(result,rt,smoothstep(0,1,1-saturate(s/22)));
+    //result=lerp(result,rt,smoothstep(0,1,1-saturate(s/22)));
     
     
     //result+=hash33(result);
@@ -146,16 +158,22 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     float3 pos;
     pos_color p1;
 
-    uint4 ind4 = meshInd[iid%4046];
+    //uint4 ind4 = meshInd[iid%4046];
+    uint4 ind4 = ibf[iid%(int)triCount.x].i;
     uint ind[] = {ind4.x,ind4.y,ind4.z};
-    float3 _p0 = mesh[ind[0]].xyz;
-    float3 _p1 = mesh[ind[1]].xyz;
-    float3 _p2 = mesh[ind[2]].xyz;
+//  float3 _p0 = mesh[ind[0]].xyz;
+//  float3 _p1 = mesh[ind[1]].xyz;
+//  float3 _p2 = mesh[ind[2]].xyz;
+
+    float3 _p0 = vbf[ind4.x].pos.xyz;
+    float3 _p1 = vbf[ind4.y].pos.xyz;
+    float3 _p2 = vbf[ind4.z].pos.xyz;
+
 
     float s =CalculateTriangleArea(_p0,_p1,_p2);
     pos = getRandomPointInTriangle(_p0,_p1,_p2,iid/11231.,iid,s);
     float3 nrml = CalculateNormal(_p0,_p1,_p2);
-    pos+=nrml;
+    pos+=nrml*tickness.xxx/100;
 
     //pos=_p0+normalize(hash33(iid/1213.*float3(1,2,3)))*11;
     float f= hash(iid/1231.)+.1;
@@ -171,9 +189,9 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     bool hF = iid>1000000;
     float3 l=0;
     float lf=0;
-    if (hF)
+    if (false)
     {
-        float fhash = 721.;
+        float fhash = 1721.;
         float3 h=hash3(iid/(int)fhash)*PI;
         h.y=abs(h.y);
         h=rotX(h,hash(iid/(int)fhash)/1.2);
@@ -231,16 +249,16 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 
     if (mode==2)    
     {
-        ind4 = meshInd[vid/3];
+        ind4 = ibf[vid/3].i;
         uint ind2[] = {ind4.x,ind4.y,ind4.z};
 
-        pos = mesh[ind2[vid%3]].xyz;
+        pos = vbf[ind2[vid%3]].pos.xyz;
         p1.color=1.15;
         p1.sz=1.2;
 
-        float3 _p0 = mesh[ind2[0]].xyz;
-        float3 _p1 = mesh[ind2[1]].xyz;
-        float3 _p2 = mesh[ind2[2]].xyz;
+    float3 _p0 = vbf[ind4.x].pos.xyz;
+    float3 _p1 = vbf[ind4.y].pos.xyz;
+    float3 _p2 = vbf[ind4.z].pos.xyz;
         float3 nrml = CalculateNormal(_p0,_p1,_p2);
         //pos-=nrml*1;
         //pos-=nrml*1;
@@ -248,7 +266,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
         //pos.y-=124;
     }
     
-    //pos.y-=121;
+    pos+=modelPos.xyz;
     pos*=.1;
 
     //p1.pos=float4(pos,1);
@@ -258,6 +276,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 
     //if (mode==0) 
 
+    /*
     //hands
     {
     float3 pos2=pos;
@@ -289,23 +308,24 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     pos=lerp(pos,rotY(pos-hole2,sin(time.x/16)/5)+hole2,c);
     pos=lerp(pos,rotX(pos-hole2,sin(time.x/15)/7)+hole2,c);
     }
+    */
 
-    pos.y+=sin(time.x/8);
-    pos.x+=sin(time.x/31);
-        pos=rotY(pos,time.y/172.);
+   // pos.y+=sin(time.x/8);
+    //pos.x+=sin(time.x/31);
+      //  pos=rotY(pos,time.y/272.);
 
     if (mode==0)    
     {
             p1.color=pow(s,.125)/4.;
 
-            float sz = 3.2;
+            float sz = 4.2;
 
             if (hF)
             {
-                sz=clamp(5./(lf),1.2,5);
+                sz=clamp(9./(lf),1.2,9);
                 p1.color/=5;
               //  p1.color*=(9+6*noise(pos*3))/8;
-              p1.color*=12;
+             // p1.color*=12;
               
             }
        
@@ -316,7 +336,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 
             if (hF) {
                 p1.color*=1+lf;
-            p1.color/=.9*p1.pos.w;
+            p1.color/=.29*p1.pos.w;
             }
 
     }
@@ -328,7 +348,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
         p1.pos=posT;
     }
     
-    p1.color.rgb*=float3(1,2,3)/3.6;
+    p1.color.rgb*=brightness.rrr/100.;
 
     //pos.y-=55*sin(time.x/12.)*c;
 

@@ -308,7 +308,7 @@ namespace Object {
 		reflect_close;
 	}
 
-	cmd(Grl, int count; int skipper; pMode mode; int r; int g; int b; triMode tMode; )
+	cmd(Grl, int count; int skipper; pMode mode; int r; int g; int b; triMode tMode; int xPos; int yPos; int zPos; int brightness; int tickness;)
 	{
 		reflect;
 
@@ -318,17 +318,19 @@ namespace Object {
 		psModeSet(in.mode);
 
 		vs::girl = {
-			.params = {
+			.params =
+			{
 				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
 				.gX = gX,
 				.gY = gY,
 				.mode = (int)in.mode,
 				.skipper = in.skipper,
 				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
-				.mesh = {
-				#include "girl_2000_vert.h"
-			}
-		},
+				.modelPos = float4(in.xPos,in.yPos,in.zPos,0),
+				.triCount = float4(dx11::ConstBuf::triangleCount,0,0,0),
+				.brightness = float4(in.brightness,0,0,0),
+				.tickness = float4(in.tickness,0,0,0),
+			},
 		};
 
 		if (in.tMode == triMode::on)
@@ -336,14 +338,11 @@ namespace Object {
 			vs::girl.params.mode = 2;
 		}
 
-		float4 ind[] = {
-			#include "girl_2000_ind.h"
-		};
-
-		dx11::ConstBuf::Update(dx11::ConstBuf::buffer[(int)dx11::ConstBuf::cBuffer::extra],ind);
-		dx11::ConstBuf::Set(dx11::ConstBuf::cBuffer::extra, dx11::ConstBuf::target::vertex);
-
 		vs::girl.set();
+
+		dx11::ConstBuf::BindSB(0);
+		dx11::ConstBuf::BindSB(1);
+
 
 		if (in.tMode == triMode::on)
 		{
@@ -943,13 +942,14 @@ namespace Object {
 		reflect_close;
 	}
 
-	cmd(Girl, int quality;)
+	cmd(Girl, int quality; int xPos; int yPos; int zPos; int brightness; int tickness;)
 	{
 		reflect;
 
 		int pillars_cnt = 2000 * 1000;
 		int outerSpace_cnt = 6853 / in.quality;
 		int galaxy_cnt = 182361 / in.quality;
+
 
 		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
@@ -964,7 +964,20 @@ namespace Object {
 		DepthBuf::Mode({ depthmode::on });
 
 		Culling::Set({ cullmode::off });
-		Grl({ 4046,1,pMode::point,100,252,1400,triMode::on });
+		Grl({ 
+			.count = (int)dx11::ConstBuf::triangleCount,
+			.skipper = 1,
+			.mode = pMode::point,
+			.r = 100,
+			.g = 252,
+			.b = 1400,
+			.tMode = triMode::on,
+			.xPos = in.xPos,
+			.yPos = in.yPos,
+			.zPos = in.zPos,
+			.brightness = in.brightness,
+			.tickness = in.tickness
+		});
 		
 		
 		Culling::Set({ cullmode::off });
@@ -973,7 +986,23 @@ namespace Object {
 			.mode = blendmode::on,
 			.op = blendop::add
 			});
-		Grl({ pillars_cnt,1,pMode::point,100,252,1400,triMode::off });
+		
+		//Grl({ pillars_cnt,1,pMode::point,100,252,1400,triMode::off });
+
+		Grl({
+			.count = pillars_cnt,
+			.skipper = 1,
+			.mode = pMode::point,
+			.r = 100,
+			.g = 252,
+			.b = 1400,
+			.tMode = triMode::off,
+			.xPos = in.xPos,
+			.yPos = in.yPos,
+			.zPos = in.zPos,
+			.brightness = in.brightness,
+			.tickness = in.tickness
+			});
 
 		Culling::Set({ cullmode::off });
 		DepthBuf::Mode({ depthmode::off });

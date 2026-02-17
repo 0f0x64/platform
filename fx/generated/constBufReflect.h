@@ -129,7 +129,10 @@ int gY;
 int mode;
 int skipper;
 float4 base_color;
-float4 mesh[4000];
+float4 modelPos;
+float4 triCount;
+float4 brightness;
+float4 tickness;
 } params;
 
 void set () {
