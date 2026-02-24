@@ -7,12 +7,12 @@ struct clip {
 	int8u overDub;
 	int8u swing;
 
-	int8u pitch[128];
-	int8u vol[128];
-	int8u variation[128];
-	int8u slide[128];
-	int8u retrigger[128];
-	int8u send[128];
+	char pitch[128];
+	char vol[128];
+	char variation[128];
+	char slide[128];
+	char retrigger[128];
+	char send[128];
 };
 
 struct channel

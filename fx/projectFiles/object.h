@@ -946,25 +946,38 @@ namespace Object {
 	{
 		reflect;
 
-		int pillars_cnt = 2000 * 1000;
-		int outerSpace_cnt = 6853 / in.quality;
-		int galaxy_cnt = 182361 / in.quality;
+		int pillars_cnt2 = 2000 * 1000;
 
+		int pillars_cnt = 3725470 / in.quality;
+		int outerSpace_cnt = 6853 / in.quality;
+		int neutronStar_cnt = 279620 / in.quality;
+		int galaxy_cnt = 182361 / in.quality;
 
 		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
+		DepthBuf::Clear({});
 
+
+
+		Pillars(pillars_cnt, 1, pMode::point);
+		OuterSpace(outerSpace_cnt, 1, pMode::point);
+		//NeutronStar(neutronStar_cnt, 1, pMode::point);
+
+		Galaxy({ galaxy_cnt, 14, pMode::point ,100,200,300 });
+
+		//RenderTarget::Set({ texture::pBuf,0 });
+		//RenderTarget::Clear({ 0,0,0,0 });
+
+		DepthBuf::Mode({ depthmode::on });
 		BlendMode::Set({
 			.mode = blendmode::off,
 			.op = blendop::add
 			});
 
-		DepthBuf::Clear({});
-		DepthBuf::Mode({ depthmode::on });
 
 		Culling::Set({ cullmode::off });
-		Grl({ 
+		Grl({
 			.count = (int)dx11::ConstBuf::triangleCount,
 			.skipper = 1,
 			.mode = pMode::point,
@@ -977,20 +990,19 @@ namespace Object {
 			.zPos = in.zPos,
 			.brightness = in.brightness,
 			.tickness = in.tickness
-		});
-		
-		
+			});
+
+
 		Culling::Set({ cullmode::off });
 		DepthBuf::Mode({ depthmode::readonly });
 		BlendMode::Set({
 			.mode = blendmode::on,
 			.op = blendop::add
 			});
-		
-		//Grl({ pillars_cnt,1,pMode::point,100,252,1400,triMode::off });
+
 
 		Grl({
-			.count = pillars_cnt,
+			.count = pillars_cnt2,
 			.skipper = 1,
 			.mode = pMode::point,
 			.r = 100,
@@ -1007,23 +1019,23 @@ namespace Object {
 		Culling::Set({ cullmode::off });
 		DepthBuf::Mode({ depthmode::off });
 
-		//InsideNebula({ pillars_cnt / 2, 1, pMode::point ,1500,100,00 });
-		//Islands({ pillars_cnt / 2,1,pMode::point,130,112,10 });
-		//Waterfall({ pillars_cnt / 4,1,pMode::point,30,352,1100 });
-		OuterSpace(outerSpace_cnt, 1, pMode::point);
-		//		Galaxy({ galaxy_cnt,14,pMode::point,254,220,41 });
-
-				//mid
+		//mid
 		RenderTarget::Set({ texture::pBufMid,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
-		//Grl({ pillars_cnt,194,pMode::glow,100,252,1400 });
+
+
+		Galaxy({ galaxy_cnt, 4, pMode::glow ,100,200,300 });
 
 		//low
 		RenderTarget::Set({ texture::pBufLow,0 });
 		RenderTarget::Clear({ 0,0,0,0 });
 
-		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
+		Pillars(pillars_cnt, 10394, pMode::glow);
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
+
+		//------------------
+		//hi
+		
 
 		reflect_close;
 	}

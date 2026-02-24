@@ -79,8 +79,8 @@ float3 getRandomPointInTriangle(float3 g, float3 g1, float3 g2, float r, int iid
     float2 randoms;
     //randoms.x = r; 
     randoms.x = hash(r); 
-    randoms.y = r/22;//hash(randoms.x); 
-    randoms.y = hash(randoms.x); 
+    randoms.y = r/12;//hash(randoms.x); 
+    //randoms.y = hash(randoms.x); 
     //randoms.y = lerp(r/22.,hash(randoms.x),smoothstep(0,1,saturate(s/61)));; 
     //randoms.y = lerp(randoms.y,randoms.x,pow(randoms.y,.24));
     //randoms.y = lerp(randoms.y,randoms.x,smoothstep(0,1,saturate(s/151)));
@@ -267,7 +267,8 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     }
     
     pos+=modelPos.xyz;
-    pos*=.1;
+    pos.y-=61;
+    pos*=.01;
 
     //p1.pos=float4(pos,1);
     //pos.y-=11;
@@ -332,7 +333,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 
             p1.pos = transform_unisize(pos,grid.zw,sz);
             p1.sz=1.2;
-            p1.color/=.2*p1.pos.w;
+            p1.color/=.2*p1.pos.w*3;
 
             if (hF) {
                 p1.color*=1+lf;
@@ -349,7 +350,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     }
     
     p1.color.rgb*=brightness.rrr/100.;
-
+    p1.color.rgb*=float3(1,2,3)/4;
     //pos.y-=55*sin(time.x/12.)*c;
 
     /*else

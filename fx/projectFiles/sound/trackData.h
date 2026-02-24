@@ -10,6 +10,7 @@ track = {
 			.solo = switcher::off,
 			.clipsCount = 2,
 			.clips {
+				//drums
 				clip {
 					.pos = 11,
 					.len = 10,
@@ -17,12 +18,15 @@ track = {
 					.bpmScale = 1,
 					.overDub = 0,
 					.swing = 0,
-					.pitch = { 4,3,1,2,1 },
-					.vol = { 2,1,0 },
-					.variation = { 0 },
-					.slide = { 0 },
-					.retrigger = { 0 },
-					.send = { 3,2,1,1 }
+									  // 0               16              32              48              64
+									  // 1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16
+									  // |...|...|...|...|...|...|...|...|...|...|...|...|...|...|...|...|
+					.pitch =			"dd c d e00000000",
+					.vol =				"0000000000000000",
+					.variation =		"0000000000000000",
+					.slide =			"0000000000000000",
+					.retrigger =		"00",
+					.send =				"1"
 				},
 				clip {
 					.pos = 0,
@@ -31,12 +35,7 @@ track = {
 					.bpmScale = 1,
 					.overDub = 0,
 					.swing = 0,
-					.pitch = { 4,111,1,112,1 },
-					.vol = { 3,1,1,0 },
-					.variation = { 2,1,1 },
-					.slide = { 0 },
-					.retrigger = { 0 },
-					.send = { 3,2,1,1 }
+
 				}
 			}
 		},
@@ -54,12 +53,7 @@ track = {
 					.bpmScale = 1,
 					.overDub = 0,
 					.swing = 0,
-					.pitch = { 3,1,2,1 },
-					.vol = { 2,1,0 },
-					.variation = { 2,1,1 },
-					.slide = { 0 },
-					.retrigger = { 0 },
-					.send = { 3,2,1,1 }
+
 				}
 			}
 		}
