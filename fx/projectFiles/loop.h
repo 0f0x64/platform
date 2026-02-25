@@ -1048,8 +1048,6 @@ namespace Loop
 				.brightness = 100,
 				.tickness = 0
 			});
-			//
-			
 
 
 		Compose();
