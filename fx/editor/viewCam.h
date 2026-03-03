@@ -341,7 +341,7 @@ namespace ViewCam
 			ui::style::Base();
 
 
-			if (ui::lbDown && isMouseOver(x, y, w, ui::style::box::height) && drag.isFree() && VsTextCurorPos.Update())
+			if (ui::lbDown && isMouseOver(x, y, w, ui::style::box::height) && drag.isFree() && VsTextCurorPos.Update(true))
 			{
 				char* result = strstr(VsTextCurorPos.fileName, ".shader");
 				editor::cmdIndex = -1;

@@ -11,7 +11,7 @@ cbuffer params : register(b0)
     int mode;
     int skipper;
     float4 base_color;
-    float4 mesh[4000];
+    float4 mesh[40];
 }
 
 float toRad(float a)
@@ -57,6 +57,7 @@ float3 getRandomPointInTriangle(float3 g, float3 g1, float3 g2, float r)
     return u * g + v * g1 + (1.0f - u - v) * g2;
 }
 
+//[
 pos_color CalcParticles(uint qid,uint iid,float4 grid)
 {
 
@@ -248,5 +249,6 @@ float3 pos;
     //p1.color/=min(pow(p1.pos.w,1.1)*.21+.5,11);
     return p1;
 }
+//]
 
 #include <../lib/particleVS_main2.shader>

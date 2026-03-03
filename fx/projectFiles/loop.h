@@ -969,9 +969,9 @@ namespace Loop
 			BasicCam::setCamKey({
 				.camTime = 0*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 				.camType = keyType::set,
-				.eye_x = -2622,
+				.eye_x = -1114,
 				.eye_y = -160,
-				.eye_z = -4141,
+				.eye_z = -4121,
 				.at_x = 0,
 				.at_y = -805,
 				.at_z = 0,
@@ -1042,10 +1042,10 @@ namespace Loop
 			BasicCam::processCam();
 			Object::Girl({
 				.quality = 1,
-				.xPos = 0,
-				.yPos = 0,
-				.zPos = 0,
-				.brightness = 100,
+				.xPos = -61,
+				.yPos = -317,
+				.zPos = 142,
+				.brightness = 35,
 				.tickness = 0
 			});
 

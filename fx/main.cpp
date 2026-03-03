@@ -23,11 +23,11 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 #if EditMode
 
-int g_SliderValue = 0;
+/*int g_SliderValue = 0;
 static void UpdateRangeLabels(HWND hDlg);
 static void UpdateSliderValuePosition(HWND hDlg);
 HWND g_hDlg = NULL;
-
+*/
 	#include <unordered_map>
 	#include <vector>
 
@@ -122,7 +122,7 @@ void UpdateFrame(double time)
 //int time_activate = 0;
 
 #if EditMode
-
+/*
 // Global state
 // ÷вета в стиле Visual Studio
 #define VS_BG_LIGHT    RGB(243, 243, 243)   // фон панелей (светла€ тема)
@@ -435,7 +435,7 @@ void CreateSliderDialog(HINSTANCE hInst, HWND hParent) {
 	}
 	//ShowWindow(g_hDlg, SW_SHOW);
 }
-
+*/
 #endif
 
 
@@ -463,7 +463,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	#if EditMode
 		editor::SetRenderWindowPosition();
 		editor::Init();
-		CreateSliderDialog(hInst, hWnd);
+		//CreateSliderDialog(hInst, hWnd);
 
 	#else
 		ShowWindow(hWnd, SW_MAXIMIZE);
@@ -493,7 +493,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 				
 			}
 
-			editor::WatchFiles();
+			//editor::WatchFiles();
 			editor::WatchForRecompilation();
 
 

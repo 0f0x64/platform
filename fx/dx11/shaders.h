@@ -257,6 +257,10 @@ namespace Shaders {
 				hr = device->CreateVertexShader(VS[n].pBlob->GetBufferPointer(), VS[n].pBlob->GetBufferSize(), NULL, &VS[n].pShader);
 				LogIfError("vs fail\n"); 
 			}
+			else
+			{
+				int a = 0;
+			}
 
 		}
 
@@ -276,6 +280,10 @@ namespace Shaders {
 				if (PS[n].pShader) PS[n].pShader->Release();
 				hr = device->CreatePixelShader(PS[n].pBlob->GetBufferPointer(), PS[n].pBlob->GetBufferSize(), NULL, &PS[n].pShader);
 				LogIfError("ps fail\n");
+			}
+			else
+			{
+				auto a = ptr;
 			}
 		}
 

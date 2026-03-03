@@ -308,6 +308,7 @@ namespace Object {
 		reflect_close;
 	}
 
+#if EditMode
 	cmd(Grl, int count; int skipper; pMode mode; int r; int g; int b; triMode tMode; int xPos; int yPos; int zPos; int brightness; int tickness;)
 	{
 		reflect;
@@ -356,7 +357,7 @@ namespace Object {
 
 		reflect_close;
 	}
-
+#endif
 	cmd(ScorpBall, int count; int skipper; pMode mode; int r; int g; int b;)
 	{
 		reflect;
@@ -975,7 +976,7 @@ namespace Object {
 			.op = blendop::add
 			});
 
-
+#if EditMode
 		Culling::Set({ cullmode::off });
 		Grl({
 			.count = (int)dx11::ConstBuf::triangleCount,
@@ -1016,6 +1017,7 @@ namespace Object {
 			.tickness = in.tickness
 			});
 
+#endif
 		Culling::Set({ cullmode::off });
 		DepthBuf::Mode({ depthmode::off });
 

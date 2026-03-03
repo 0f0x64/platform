@@ -25,6 +25,8 @@ namespace editor
 		long start=0;
 		long end = 0;
 
+		int slider = 0;
+
 		char* extractNumberAtC(const char* str, size_t pos) {
 			if (!str) return nullptr;
 			size_t n = strlen(str);
@@ -75,7 +77,80 @@ namespace editor
 			return result;
 		}
 
-		bool Update()
+		int GetParamIndex()
+		{
+			HRESULT result;
+			CLSID clsid;
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<IUnknown> punk;
+			result = ::GetActiveObject(clsid, NULL, &punk);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::_DTE> DTE;
+			DTE = punk;
+
+			CComPtr<EnvDTE::ItemOperations> item_ops;
+			result = DTE->get_ItemOperations(&item_ops);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::Document> doc;
+			result = DTE->get_ActiveDocument(&doc);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<IDispatch> pSelectionObj;
+			doc->get_Selection(&pSelectionObj);
+			CComPtr<EnvDTE::TextSelection> pSelection;
+			pSelectionObj->QueryInterface(&pSelection);
+
+			// 2. Создаем точку для навигации
+			CComPtr<EnvDTE::VirtualPoint> pVirtualPoint;
+			pSelection->get_ActivePoint(&pVirtualPoint);
+
+			// 2. Convert VirtualPoint to EditPoint to allow CharLeft/GetText operations
+			CComPtr<EnvDTE::EditPoint> pPoint;
+			pVirtualPoint->CreateEditPoint(&pPoint);
+
+			int commaCount = 0;
+			VARIANT_BOOL isAtStart = VARIANT_FALSE;
+
+			// 3. Двигаемся назад до начала документа или символа '{'
+			while (true) {
+				pPoint->get_AtStartOfDocument(&isAtStart);
+				if (isAtStart == VARIANT_TRUE) return -1;
+
+				// Сдвигаемся на 1 символ влево
+				pPoint->CharLeft(1);
+
+				// Получаем символ справа от точки (тот, который мы только что "перешагнули")
+				BSTR bstrChar = nullptr;
+				HRESULT hr = pPoint->GetText(CComVariant(1), &bstrChar);
+
+				if (SUCCEEDED(hr) && bstrChar) {
+					wchar_t c = bstrChar[0];
+					SysFreeString(bstrChar);
+
+					if (c == L'{') {
+						break; // Stop at the opening brace
+					}
+					if (c == L',') {
+						commaCount++;
+					}
+				}
+				else {
+					return -1;
+				}
+			}
+
+			return commaCount;
+		}
+
+		bool Update(bool forceToNumStart)
 		{
 			HRESULT result;
 			CLSID clsid;
@@ -192,7 +267,10 @@ namespace editor
 			}
 
 			column = start+1;
-			selection->MoveToLineAndOffset(line, column, VARIANT_FALSE);
+			if (forceToNumStart)
+			{
+				selection->MoveToLineAndOffset(line, column, VARIANT_FALSE);
+			}
 
 		
 			/*EnvDTE::VirtualPoint* pActivePoint3 = nullptr;
@@ -218,7 +296,7 @@ namespace editor
 
 		}
 
-		bool ReplaceTextInVS()
+		bool ReplaceTextInVS(bool forceToNumStart)
 		{
 			HRESULT result;
 			CLSID clsid;
@@ -270,16 +348,101 @@ namespace editor
 			pEditEnd->MoveToLineAndOffset(line, end + 1);
 
 			// Заменяем текст между двумя точками
-			int val = g_SliderValue;
+			int val = slider;
 			char modified[100];
 			_itoa(val, modified, 10);
 
 			CComBSTR bstrNewText(modified);
 			pEditStart->ReplaceText(CComVariant(pEditEnd), bstrNewText, (long)EnvDTE::vsEPReplaceTextOptions::vsEPReplaceTextKeepMarkers);
 
-			selection->MoveToLineAndOffset(line, start + 1, VARIANT_FALSE);
+			if (forceToNumStart)
+			{
+				selection->MoveToLineAndOffset(line, start + 1, VARIANT_FALSE);
+			}
 
 			return true;
+		}
+
+		bool haveChanges()
+		{
+
+			HRESULT result;
+			CLSID clsid;
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<IUnknown> punk;
+			result = ::GetActiveObject(clsid, NULL, &punk);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::_DTE> DTE;
+			DTE = punk;
+
+			CComPtr<EnvDTE::ItemOperations> item_ops;
+			result = DTE->get_ItemOperations(&item_ops);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::Document> doc;
+			result = DTE->get_ActiveDocument(&doc);
+			if (FAILED(result))
+				return false;
+
+			VARIANT_BOOL isSaved;
+			doc->get_Saved(&isSaved);
+
+			if (isSaved == VARIANT_FALSE) {
+
+				return true;
+			}
+
+			return false;
+
+		}
+
+		bool saveChanges()
+		{
+
+			HRESULT result;
+			CLSID clsid;
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<IUnknown> punk;
+			result = ::GetActiveObject(clsid, NULL, &punk);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::_DTE> DTE;
+			DTE = punk;
+
+			CComPtr<EnvDTE::ItemOperations> item_ops;
+			result = DTE->get_ItemOperations(&item_ops);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::Document> doc;
+			result = DTE->get_ActiveDocument(&doc);
+			if (FAILED(result))
+				return false;
+
+			VARIANT_BOOL isSaved;
+			doc->get_Saved(&isSaved);
+
+			if (isSaved == VARIANT_FALSE) {
+
+				CComBSTR emptyPath(L"");
+				EnvDTE::vsSaveStatus status;
+				doc->Save(emptyPath, &status);
+
+				return true;
+			}
+
+			return false;
+
 		}
 
 		void InsertInSmallFile(const std::string& path, size_t pos, size_t pos_end, const std::string& text) {
@@ -664,7 +827,7 @@ namespace editor
 		return -1;
 	}
 
-	void updateRange()
+	/*void updateRange()
 	{
 		HWND hSlider = GetDlgItem(g_hDlg, 1001);
 		int range = 100;
@@ -690,7 +853,7 @@ namespace editor
 			SetWindowText(GetDlgItem(g_hDlg, 1003), bufMin);
 			SetWindowText(GetDlgItem(g_hDlg, 1004), bufMax);
 		}
-	}
+	}*/
 
 
 
@@ -733,6 +896,9 @@ namespace editor
 				}*/
 			}
 		}
+
+		pIndex = VsTextCurorPos.GetParamIndex();
+		/*
 		if (ln > 0)
 		{
 			std::ifstream ifile(VsTextCurorPos.fileName);
@@ -797,6 +963,7 @@ namespace editor
 				if (s[i] == ',') pIndex++;
 			}
 		}
+		*/
 	}
 
 #include <filesystem>
@@ -855,7 +1022,7 @@ namespace editor
 		}
 	}
 
-	void SaveChanges(bool force = false)
+	/*void SaveChanges(bool force = false)
 	{
 		if (controlParamsOld != controlParams || force)
 		{
@@ -866,15 +1033,15 @@ namespace editor
 
 			//editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, modified);
 		}
-	}
+	}*/
 
 
-	void SaveChangesAndCloseSlider()
+	/*void SaveChangesAndCloseSlider()
 	{
 		if (controlParamsOld != controlParams)
 		{
-			VsTextCurorPos.Update();
-			VsTextCurorPos.ReplaceTextInVS();
+			VsTextCurorPos.Update(true);
+			VsTextCurorPos.ReplaceTextInVS(true);
 
 			ShowWindow(g_hDlg, SW_HIDE);
 			SetForegroundWindow(vsHWND);
@@ -887,7 +1054,7 @@ namespace editor
 	{
 		if (controlParamsOld != controlParams)
 		{
-			if (VsTextCurorPos.Update())
+			if (VsTextCurorPos.Update(true))
 			{
 				char* result = strstr(VsTextCurorPos.fileName, ".shader");
 				cmdIndex = -1;
@@ -910,15 +1077,123 @@ namespace editor
 				controlParams = false;
 			}
 		}
-	}
+	}*/
 
 	int oldValue = 0;
+	int newValue = 0;
+	int oldMouseY = 0;
+	int lastValue = 0;
+	bool click = false;
+	bool ctrlKey = false;
+	bool shiftKey = false;
+	bool isNum = false;
 
 	void Process()
 	{
 		ui::mousePos = ui::GetCusorPos();
 		paramsAreLoaded = true;
 
+		POINT pt;
+		GetCursorPos(&pt);
+
+		bool ctrl = GetAsyncKeyState(VK_CONTROL);
+		bool shift = GetAsyncKeyState(VK_SHIFT);
+
+		if (GetAsyncKeyState(VK_MBUTTON))
+		{
+			if (!click && WindowFromPoint(pt) == vsHWND)
+			{
+				click = true;
+				isNum = VsTextCurorPos.Update(false);
+				oldValue = atoi(VsTextCurorPos.paramStr);
+				oldMouseY = pt.y;
+				lastValue = oldValue;
+				VsTextCurorPos.slider = oldValue;
+
+				cmdIndex = -1;
+				pIndex = -1;
+
+				if (!strstr(VsTextCurorPos.fileName, dx11::Shaders::shaderExtension))
+				{
+					calcCmdAndParamIndicies();
+				}
+			}
+
+			if (click)
+			{
+				int scale = 1;
+				
+				if (ctrl != ctrlKey) {
+					oldValue = newValue;
+					oldMouseY = pt.y;
+					ctrlKey = ctrl;
+				}
+
+				if (shift != shiftKey) {
+					oldValue = newValue;
+					oldMouseY = pt.y;
+					shiftKey = shift;
+				}
+
+				if (ctrl) scale *= 100;
+				if (shift) scale *= 10;
+
+				newValue = oldValue - (pt.y - oldMouseY) * scale;
+
+				if (newValue != lastValue) {
+
+					VsTextCurorPos.slider = newValue;
+					int val = newValue;
+					char modified[100];
+					_itoa(val, modified, 10);
+
+					if (cmdIndex >= 0 && pIndex >= 0)
+					{
+						cmdParamDesc[cmdIndex].param[pIndex].value = val;
+						strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, modified);
+					}
+
+					VsTextCurorPos.Update(true);
+					VsTextCurorPos.ReplaceTextInVS(true);
+
+					if (strstr(VsTextCurorPos.fileName, dx11::Shaders::shaderExtension))
+					{
+						VsTextCurorPos.saveChanges();
+						recompileShader();
+					}
+
+					lastValue = newValue;
+				}
+			}
+		}
+		else
+		{
+			click = false;
+
+			if (VsTextCurorPos.saveChanges())
+			{
+				if (VsTextCurorPos.Update(false))
+				{
+					if (!strstr(VsTextCurorPos.fileName, dx11::Shaders::shaderExtension))
+					{
+						calcCmdAndParamIndicies();
+						if (cmdIndex >= 0 && pIndex >= 0)
+						{
+							cmdParamDesc[cmdIndex].param[pIndex].value = atoi(VsTextCurorPos.paramStr);
+							strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, VsTextCurorPos.paramStr);
+						}
+					}
+					else
+					{
+						recompileShader();
+					}
+				}
+			}
+
+		}
+
+		/*
+		
 		if ((GetAsyncKeyState(VK_MBUTTON)||
 			 GetAsyncKeyState(VK_ESCAPE)) && 
 			timer::frameBeginTime-dTimer >200 &&
@@ -999,7 +1274,7 @@ namespace editor
 		{
 			SaveChangesAndCloseSlider();
 		}
-
+		*/
 				
 		paramEdit::top = 0;
 		paramEdit::bottom = 1;
@@ -1076,7 +1351,7 @@ namespace editor
 
 		if (currentCmd_backup != currentCmd)
 		{
-			paramEdit::SaveToSource(currentCmd_backup);
+			//paramEdit::SaveToSource(currentCmd_backup);
 			//SetForegroundWindow(vsHWND);
 		}
 

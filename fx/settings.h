@@ -50,4 +50,4 @@
 #define shadersPath "../fx/projectFiles/shaders"
 #define userSpacePath "../fx/projectFiles"
 #define MAIN_DISPLAY_DENOMINATOR 2
-#define SRC_WATCH true
+#define SRC_WATCH false
