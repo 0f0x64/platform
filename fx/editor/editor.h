@@ -26,6 +26,8 @@ namespace editor
 		long end = 0;
 
 		int slider = 0;
+		enum class textType {number,enumList,other} typeUnderCursor;
+		char typeName[256];
 
 		char* extractNumberAtC(const char* str, size_t pos) {
 			if (!str) return nullptr;
@@ -75,6 +77,73 @@ namespace editor
 			}
 
 			return result;
+		}
+
+#include <cctype>
+#include <cstring>
+
+		bool is_id_char(char c) {
+			return std::isalnum(static_cast<unsigned char>(c)) || c == '_';
+		}
+
+		bool isEnum(const char* str, int pos) {
+
+			typeName[0] = '\0';
+
+			if (!str || pos < 0) return false;
+			int length = static_cast<int>(std::strlen(str));
+
+			// КОРРЕКЦИЯ: Если курсор стоит ПОСЛЕ слова, смещаемся на 1 символ влево, 
+			// чтобы "захватить" идентификатор.
+			int checkPos = pos;
+			if (checkPos >= length || (!is_id_char(str[checkPos]) && checkPos > 0)) {
+				if (is_id_char(str[checkPos - 1])) {
+					checkPos--;
+				}
+			}
+
+			// Если даже после коррекции мы не на букве/цифре — значит рядом нет слова
+			if (checkPos < 0 || !is_id_char(str[checkPos])) return false;
+
+			// 1. Определяем границы слова вокруг скорректированной позиции
+			int idxStart = checkPos;
+			while (idxStart >= 0 && is_id_char(str[idxStart])) idxStart--;
+			idxStart++;
+
+			int idxEnd = checkPos;
+			while (idxEnd < length && is_id_char(str[idxEnd])) idxEnd++;
+			//idxEnd--;
+
+			// Валидация: не начинается с цифры
+			if (std::isdigit(static_cast<unsigned char>(str[idxStart]))) return false;
+
+			// 2. Ищем "::" слева от idxStart
+			int i = idxStart - 1;
+			while (i >= 1 && std::isspace(static_cast<unsigned char>(str[i]))) i--;
+
+			if (i < 1 || str[i] != ':' || str[i - 1] != ':') return false;
+
+			// ... далее идет старый код поиска typeName и заполнения pStart/pEnd ...
+
+			// (Код поиска typeName остается таким же, как в предыдущем ответе)
+			int opPos = i - 1;
+			int typeEnd = opPos - 1;
+			while (typeEnd >= 0 && std::isspace(static_cast<unsigned char>(str[typeEnd]))) typeEnd--;
+			if (typeEnd < 0 || !is_id_char(str[typeEnd])) return false;
+
+			int typeStart = typeEnd;
+			while (typeStart >= 0 && is_id_char(str[typeStart])) typeStart--;
+			typeStart++;
+			if (std::isdigit(static_cast<unsigned char>(str[typeStart]))) return false;
+
+			int typeLen = typeEnd - typeStart + 1;
+			if (typeLen >= (int)sizeof(typeName)) typeLen = sizeof(typeName) - 1;
+			std::strncpy(typeName, str + typeStart, typeLen);
+			typeName[typeLen] = '\0';
+
+			start = idxStart;
+			end = idxEnd;
+			return true;
 		}
 
 		int GetParamIndex()
@@ -254,16 +323,26 @@ namespace editor
 			
 			//search num
 			strcpy(paramStr, "nan");
+			typeUnderCursor = textType::other;
 
 			char* number = extractNumberAtC(s.c_str(), column-1);
 			if (number)
 			{
 				strcpy(paramStr, number);
 				free(number);
+				typeUnderCursor = textType::number;
 			}
 			else
 			{
-				return false;
+				if (isEnum(s.c_str(), column - 1))
+				{ 
+					typeUnderCursor = textType::enumList;
+					return true;
+				}
+				else
+				{
+					return true;
+				}
 			}
 
 			column = start+1;
@@ -296,7 +375,7 @@ namespace editor
 
 		}
 
-		bool ReplaceTextInVS(bool forceToNumStart)
+		bool ReplaceTextInVS(const char* text,bool forceToNumStart)
 		{
 			HRESULT result;
 			CLSID clsid;
@@ -348,11 +427,12 @@ namespace editor
 			pEditEnd->MoveToLineAndOffset(line, end + 1);
 
 			// Заменяем текст между двумя точками
-			int val = slider;
+			/*int val = slider;
 			char modified[100];
-			_itoa(val, modified, 10);
+			_itoa(val, modified, 10);*/
 
-			CComBSTR bstrNewText(modified);
+			//CComBSTR bstrNewText(modified);
+			CComBSTR bstrNewText(text);
 			pEditStart->ReplaceText(CComVariant(pEditEnd), bstrNewText, (long)EnvDTE::vsEPReplaceTextOptions::vsEPReplaceTextKeepMarkers);
 
 			if (forceToNumStart)
@@ -443,50 +523,6 @@ namespace editor
 
 			return false;
 
-		}
-
-		void InsertInSmallFile(const std::string& path, size_t pos, size_t pos_end, const std::string& text) {
-			// 1. Открываем файл и определяем размер одним системным вызовом
-			std::ifstream in(path, std::ios::binary | std::ios::ate);
-			if (!in) return;
-
-			const size_t fileSize = static_cast<size_t>(in.tellg());
-
-			// Валидация границ (clamping)
-			if (pos > fileSize) pos = fileSize;
-			if (pos_end > fileSize) pos_end = fileSize;
-			if (pos_end < pos) pos_end = pos;
-
-			const size_t suffixSize = fileSize - pos_end;
-			const size_t newSize = pos + text.size() + suffixSize;
-
-			// 2. Аллоцируем память ОДИН раз под итоговый размер
-			std::vector<char> buffer(newSize);
-
-			// 3. Читаем ПЕРВУЮ часть файла прямо в буфер
-			if (pos > 0) {
-				in.seekg(0, std::ios::beg);
-				in.read(buffer.data(), pos);
-			}
-
-			// 4. Копируем текст в середину буфера (из памяти в память)
-			if (!text.empty()) {
-				std::copy(text.begin(), text.end(), buffer.data() + pos);
-			}
-
-			// 5. Читаем ВТОРУЮ часть файла (суффикс) прямо в буфер
-			if (suffixSize > 0) {
-				in.seekg(pos_end, std::ios::beg);
-				in.read(buffer.data() + pos + text.size(), suffixSize);
-			}
-			in.close();
-
-			// 6. Записываем весь буфер одним куском
-			// Используем std::ofstream::write для максимальной скорости
-			std::ofstream out(path, std::ios::binary | std::ios::trunc);
-			if (out) {
-				out.write(buffer.data(), newSize);
-			}
 		}
 
 
@@ -1088,6 +1124,46 @@ namespace editor
 	bool shiftKey = false;
 	bool isNum = false;
 
+#include <uxtheme.h>
+	enum PreferredAppMode { Default, AllowDark, ForceDark, ForceLight, Max };
+	typedef PreferredAppMode(WINAPI* PfnSetPreferredAppMode)(PreferredAppMode);
+	typedef void (WINAPI* PfnFlushMenuThemes)();
+
+	int showEnum(HWND hwnd, const std::vector<std::string>& enumMenu) {
+		if (enumMenu.empty()) return -1;
+
+		// 1. Dynamic link to the dark mode engine (Windows 10 1809+)
+		HMODULE hUxtheme = GetModuleHandleA("uxtheme.dll");
+		if (hUxtheme) {
+			auto SetPreferredAppMode = (PfnSetPreferredAppMode)GetProcAddress(hUxtheme, MAKEINTRESOURCEA(135));
+			auto FlushMenuThemes = (PfnFlushMenuThemes)GetProcAddress(hUxtheme, MAKEINTRESOURCEA(136));
+			if (SetPreferredAppMode && FlushMenuThemes) {
+				SetPreferredAppMode(AllowDark);
+				FlushMenuThemes();
+			}
+		}
+
+		// 2. Create the menu
+		HMENU hMenu = CreatePopupMenu();
+		for (size_t i = 0; i < enumMenu.size(); ++i) {
+			// Use MF_STRING. For true VS style, the OS handles the dark background 
+			// if the app's window theme is set to "Explorer" or "Dark"
+			AppendMenuA(hMenu, MF_STRING, (UINT_PTR)(i + 1), enumMenu[i].c_str());
+		}
+
+		// 3. Display at cursor
+		POINT pt;
+		GetCursorPos(&pt);
+
+		//SetForegroundWindow(hwnd);
+		int selectedId = TrackPopupMenu(hMenu,
+			TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD,
+			pt.x, pt.y, 0, hwnd, NULL);
+
+		DestroyMenu(hMenu);
+		return (selectedId > 0) ? (selectedId - 1) : -1;
+	}
+
 	void Process()
 	{
 		ui::mousePos = ui::GetCusorPos();
@@ -1103,19 +1179,108 @@ namespace editor
 		{
 			if (!click && WindowFromPoint(pt) == vsHWND)
 			{
-				click = true;
-				isNum = VsTextCurorPos.Update(false);
-				oldValue = atoi(VsTextCurorPos.paramStr);
-				oldMouseY = pt.y;
-				lastValue = oldValue;
-				VsTextCurorPos.slider = oldValue;
-
-				cmdIndex = -1;
-				pIndex = -1;
-
-				if (!strstr(VsTextCurorPos.fileName, dx11::Shaders::shaderExtension))
+				if (VsTextCurorPos.Update(false))
 				{
-					calcCmdAndParamIndicies();
+					switch (VsTextCurorPos.typeUnderCursor)
+					{
+						case VsTextCurorPos.textType::number:
+						{
+							click = true;
+
+							oldValue = atoi(VsTextCurorPos.paramStr);
+							oldMouseY = pt.y;
+							lastValue = oldValue;
+							VsTextCurorPos.slider = oldValue;
+
+							cmdIndex = -1;
+							pIndex = -1;
+
+							if (!strstr(VsTextCurorPos.fileName, dx11::Shaders::shaderExtension))
+							{
+								calcCmdAndParamIndicies();
+							}
+							break;
+						}
+
+						case VsTextCurorPos.textType::enumList:
+						{
+							cmdIndex = -1;
+							pIndex = -1;
+
+							if (!strstr(VsTextCurorPos.fileName, dx11::Shaders::shaderExtension))
+							{
+								calcCmdAndParamIndicies();
+								if (cmdIndex >= 0 && pIndex >= 0)
+								{
+									int tID = getTypeIndex(VsTextCurorPos.typeName);
+									int tCnt = getEnumCount(tID);
+									std::vector<std::string> enumMenu;
+									for (int i = 0; i < tCnt; i++)
+									{
+										enumMenu.push_back(getStrValue(tID, i));
+									}
+
+									int sel = showEnum(hWnd, enumMenu);
+									if (sel >= 0)
+									{
+										VsTextCurorPos.ReplaceTextInVS(enumMenu[sel].c_str(), true);
+									}
+
+								}
+
+							}
+							break;
+						}
+
+						case VsTextCurorPos.textType::other:
+						{
+							cmdIndex = -1;
+							pIndex = -1;
+
+							if (!strstr(VsTextCurorPos.fileName, dx11::Shaders::shaderExtension))
+							{
+								calcCmdAndParamIndicies();
+								if (cmdIndex >= 0 && pIndex >= 0)
+								{
+									char* shortName = cmdParamDesc[cmdIndex].funcName;
+									for (int i = 0; i < strlen(cmdParamDesc[cmdIndex].funcName); i++)
+									{
+										if (cmdParamDesc[cmdIndex].funcName[i] == ':') shortName = cmdParamDesc[cmdIndex].funcName + i + 1;
+									}
+
+									if (!strcmp(shortName, "setCamKey"))
+									{
+										std::vector<std::string> enumMenu = { "grab view camera","grab view camera with timestamp","grab timestamp only" };
+
+										int sel = showEnum(hWnd, enumMenu);
+										if (sel == 0)
+										{
+											float q = intToFloatDenom;
+											auto eye = ViewCam::currentCamera.ViewVec * q + ViewCam::currentCamera.Target * q;
+											cmdParamDesc[cmdIndex].param[2].value = (int)XMVectorGetX(eye);
+											cmdParamDesc[cmdIndex].param[3].value = (int)XMVectorGetY(eye);
+											cmdParamDesc[cmdIndex].param[4].value = (int)XMVectorGetZ(eye);
+											auto at = ViewCam::currentCamera.Target * q;
+											cmdParamDesc[cmdIndex].param[5].value = (int)XMVectorGetX(at);
+											cmdParamDesc[cmdIndex].param[6].value = (int)XMVectorGetY(at);
+											cmdParamDesc[cmdIndex].param[7].value = (int)XMVectorGetZ(at);
+											auto up = ViewCam::currentCamera.upVec * q;
+											cmdParamDesc[cmdIndex].param[8].value = (int)XMVectorGetX(up);
+											cmdParamDesc[cmdIndex].param[9].value = (int)XMVectorGetY(up);
+											cmdParamDesc[cmdIndex].param[10].value = (int)XMVectorGetZ(up);
+
+											cmdParamDesc[cmdIndex].param[11].value = (int)Camera::viewCam.angle;
+
+											paramEdit::SaveToSource(cmdIndex);
+										}
+									}
+
+								}
+
+							}
+							break;
+						}
+					}
 				}
 			}
 
@@ -1154,7 +1319,7 @@ namespace editor
 					}
 
 					VsTextCurorPos.Update(true);
-					VsTextCurorPos.ReplaceTextInVS(true);
+					VsTextCurorPos.ReplaceTextInVS(modified,true);
 
 					if (strstr(VsTextCurorPos.fileName, dx11::Shaders::shaderExtension))
 					{
@@ -1179,8 +1344,11 @@ namespace editor
 						calcCmdAndParamIndicies();
 						if (cmdIndex >= 0 && pIndex >= 0)
 						{
-							cmdParamDesc[cmdIndex].param[pIndex].value = atoi(VsTextCurorPos.paramStr);
-							strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, VsTextCurorPos.paramStr);
+							if (VsTextCurorPos.typeUnderCursor == VsTextCurorPos.textType::number)
+							{
+								cmdParamDesc[cmdIndex].param[pIndex].value = atoi(VsTextCurorPos.paramStr);
+								strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, VsTextCurorPos.paramStr);
+							}
 						}
 					}
 					else
@@ -1392,7 +1560,7 @@ namespace editor
 
 	void SaveAndExit()
 	{
-		editor::paramEdit::SaveToSource(currentCmd);
+		//editor::paramEdit::SaveToSource(currentCmd);
 
 		#if vsWindowManagement
 				auto rc = editor::primaryRC;

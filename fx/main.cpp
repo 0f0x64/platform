@@ -456,11 +456,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #endif
 	
 	ShowCursor(EditMode);
-	
+
 	dx11::Init();
 	
 
 	#if EditMode
+		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 		editor::SetRenderWindowPosition();
 		editor::Init();
 		//CreateSliderDialog(hInst, hWnd);
@@ -522,7 +523,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	#if EditMode
 		editor::SaveAndExit();
-
+		CoUninitialize();
 	#endif
 
 	ExitProcess(0);
