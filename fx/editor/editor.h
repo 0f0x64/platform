@@ -26,7 +26,7 @@ namespace editor
 		long end = 0;
 
 		int slider = 0;
-		enum class textType {number,enumList,other} typeUnderCursor;
+		enum class textType {nonEditable, number,enumList,functionCall} typeUnderCursor;
 		char typeName[256];
 
 		char* extractNumberAtC(const char* str, size_t pos) {
@@ -112,7 +112,7 @@ namespace editor
 
 			int idxEnd = checkPos;
 			while (idxEnd < length && is_id_char(str[idxEnd])) idxEnd++;
-			//idxEnd--;
+			//idxEnd--;//для корректного выделения фрагемета потом
 
 			// Валидация: не начинается с цифры
 			if (std::isdigit(static_cast<unsigned char>(str[idxStart]))) return false;
@@ -143,6 +143,84 @@ namespace editor
 
 			start = idxStart;
 			end = idxEnd;
+			return true;
+		}
+
+		char funcName[256];
+
+		bool isFunctionCall(const char* str, int pos) {
+
+			funcName[0] = '\0';
+
+			if (!str || pos < 0) return false;
+			int length = static_cast<int>(std::strlen(str));
+
+			// 1. Корректируем позицию, если курсор стоит сразу после слова или перед ({
+			int checkPos = pos;
+			if (checkPos >= length || (!is_id_char(str[checkPos]) && checkPos > 0)) {
+				if (is_id_char(str[checkPos - 1])) {
+					checkPos--;
+				}
+			}
+
+			if (checkPos < 0 || !is_id_char(str[checkPos])) return false;
+
+			// 2. Находим границы потенциального имени функции
+			int idxStart = checkPos;
+			while (idxStart >= 0 && is_id_char(str[idxStart])) idxStart--;
+			idxStart++;
+
+			int idxEnd = checkPos;
+			while (idxEnd < length && is_id_char(str[idxEnd])) idxEnd++;
+			idxEnd--;
+
+			if (idxStart > idxEnd || std::isdigit(static_cast<unsigned char>(str[idxStart]))) return false;
+
+			// 3. Проверка маркера СПРАВА: "({", пропуская пробелы
+			int right = idxEnd + 1;
+			while (right < length && std::isspace(static_cast<unsigned char>(str[right]))) right++;
+
+			if (right >= length - 1 || str[right] != '(' || str[right + 1] != '{') {
+				return false;
+			}
+
+			// 4. Проверка маркера СЛЕВА: пробел, "::", начало строки или оператор
+			int left = idxStart - 1;
+			bool leftValid = false;
+
+			if (left < 0) {
+				leftValid = true; // Начало строки - валидно
+			}
+			else {
+				// Пропускаем пробелы слева
+				while (left >= 0 && std::isspace(static_cast<unsigned char>(str[left]))) left--;
+
+				if (left < 0) {
+					leftValid = true;
+				}
+				else if (std::isspace(static_cast<unsigned char>(str[idxStart - 1]))) {
+					leftValid = true; // Был пробел
+				}
+				else if (left >= 1 && str[left] == ':' && str[left - 1] == ':') {
+					leftValid = true; // Был оператор ::
+				}
+				else if (std::ispunct(static_cast<unsigned char>(str[left]))) {
+					leftValid = true; // Любой знак пунктуации (напр. '=' или ';')
+				}
+			}
+
+			if (!leftValid) return false;
+
+			// 5. Экстракция имени в глобальную переменную
+			int nameLen = idxEnd - idxStart + 1;
+			if (nameLen >= (int)sizeof(funcName)) nameLen = sizeof(funcName) - 1;
+
+			std::strncpy(funcName, str + idxStart, nameLen);
+			funcName[nameLen] = '\0';
+
+			start = idxStart;
+			end = idxEnd;
+
 			return true;
 		}
 
@@ -323,7 +401,7 @@ namespace editor
 			
 			//search num
 			strcpy(paramStr, "nan");
-			typeUnderCursor = textType::other;
+			typeUnderCursor = textType::nonEditable;
 
 			char* number = extractNumberAtC(s.c_str(), column-1);
 			if (number)
@@ -332,17 +410,22 @@ namespace editor
 				free(number);
 				typeUnderCursor = textType::number;
 			}
-			else
+
+			if (isFunctionCall(s.c_str(), column - 1))
 			{
-				if (isEnum(s.c_str(), column - 1))
-				{ 
-					typeUnderCursor = textType::enumList;
-					return true;
-				}
-				else
-				{
-					return true;
-				}
+				typeUnderCursor = textType::functionCall;
+				return true;
+			}
+
+			if (isEnum(s.c_str(), column - 1))
+			{
+				typeUnderCursor = textType::enumList;
+				return true;
+			}
+
+			if (typeUnderCursor == textType::nonEditable)
+			{
+				return false;
 			}
 
 			column = start+1;
@@ -1132,7 +1215,7 @@ namespace editor
 	int showEnum(HWND hwnd, const std::vector<std::string>& enumMenu) {
 		if (enumMenu.empty()) return -1;
 
-		// 1. Dynamic link to the dark mode engine (Windows 10 1809+)
+		// Подключаем темную тему (код из предыдущего шага...)
 		HMODULE hUxtheme = GetModuleHandleA("uxtheme.dll");
 		if (hUxtheme) {
 			auto SetPreferredAppMode = (PfnSetPreferredAppMode)GetProcAddress(hUxtheme, MAKEINTRESOURCEA(135));
@@ -1143,25 +1226,59 @@ namespace editor
 			}
 		}
 
-		// 2. Create the menu
 		HMENU hMenu = CreatePopupMenu();
 		for (size_t i = 0; i < enumMenu.size(); ++i) {
-			// Use MF_STRING. For true VS style, the OS handles the dark background 
-			// if the app's window theme is set to "Explorer" or "Dark"
 			AppendMenuA(hMenu, MF_STRING, (UINT_PTR)(i + 1), enumMenu[i].c_str());
 		}
 
-		// 3. Display at cursor
 		POINT pt;
 		GetCursorPos(&pt);
 
-		//SetForegroundWindow(hwnd);
-		int selectedId = TrackPopupMenu(hMenu,
-			TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD,
-			pt.x, pt.y, 0, hwnd, NULL);
+		// ВАЖНО: Устанавливаем фокус на наше окно, чтобы оно ловило Esc
+		HWND hOwner = GetAncestor(hwnd, GA_ROOT);
+		SetForegroundWindow(hOwner);
+
+		// TPM_RETURNCMD: возвращает ID пункта или 0, если нажали Esc
+		UINT flags = TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD | TPM_NONOTIFY;
+		int selectedId = TrackPopupMenu(hMenu, flags, pt.x, pt.y, 0, hwnd, NULL);
+
+		// После закрытия меню посылаем "пустое" сообщение, чтобы очистить очередь (баг WinAPI)
+		PostMessage(hwnd, WM_NULL, 0, 0);
 
 		DestroyMenu(hMenu);
-		return (selectedId > 0) ? (selectedId - 1) : -1;
+		SetForegroundWindow(vsHWND);
+
+		// Если selectedId == 0, значит нажали Esc или кликнули мимо -> возвращаем -1
+		if (selectedId == 0) return -1;
+
+		return selectedId - 1;
+	}
+
+	namespace CamUI
+	{
+		void GrabTimeStamp(int cmdIndex)
+		{
+			cmdParamDesc[cmdIndex].param[0].value = timer::timeCursor/SAMPLES_IN_FRAME;
+		}
+
+		void GrabDirectionAndAngle(int cmdIndex)
+		{
+			float q = intToFloatDenom;
+			auto eye = ViewCam::currentCamera.ViewVec * q + ViewCam::currentCamera.Target * q;
+			cmdParamDesc[cmdIndex].param[2].value = (int)XMVectorGetX(eye);
+			cmdParamDesc[cmdIndex].param[3].value = (int)XMVectorGetY(eye);
+			cmdParamDesc[cmdIndex].param[4].value = (int)XMVectorGetZ(eye);
+			auto at = ViewCam::currentCamera.Target * q;
+			cmdParamDesc[cmdIndex].param[5].value = (int)XMVectorGetX(at);
+			cmdParamDesc[cmdIndex].param[6].value = (int)XMVectorGetY(at);
+			cmdParamDesc[cmdIndex].param[7].value = (int)XMVectorGetZ(at);
+			auto up = ViewCam::currentCamera.upVec * q;
+			cmdParamDesc[cmdIndex].param[8].value = (int)XMVectorGetX(up);
+			cmdParamDesc[cmdIndex].param[9].value = (int)XMVectorGetY(up);
+			cmdParamDesc[cmdIndex].param[10].value = (int)XMVectorGetZ(up);
+
+			cmdParamDesc[cmdIndex].param[11].value = (int)Camera::viewCam.angle;
+		}
 	}
 
 	void Process()
@@ -1232,7 +1349,7 @@ namespace editor
 							break;
 						}
 
-						case VsTextCurorPos.textType::other:
+						case VsTextCurorPos.textType::functionCall:
 						{
 							cmdIndex = -1;
 							pIndex = -1;
@@ -1255,24 +1372,23 @@ namespace editor
 										int sel = showEnum(hWnd, enumMenu);
 										if (sel == 0)
 										{
-											float q = intToFloatDenom;
-											auto eye = ViewCam::currentCamera.ViewVec * q + ViewCam::currentCamera.Target * q;
-											cmdParamDesc[cmdIndex].param[2].value = (int)XMVectorGetX(eye);
-											cmdParamDesc[cmdIndex].param[3].value = (int)XMVectorGetY(eye);
-											cmdParamDesc[cmdIndex].param[4].value = (int)XMVectorGetZ(eye);
-											auto at = ViewCam::currentCamera.Target * q;
-											cmdParamDesc[cmdIndex].param[5].value = (int)XMVectorGetX(at);
-											cmdParamDesc[cmdIndex].param[6].value = (int)XMVectorGetY(at);
-											cmdParamDesc[cmdIndex].param[7].value = (int)XMVectorGetZ(at);
-											auto up = ViewCam::currentCamera.upVec * q;
-											cmdParamDesc[cmdIndex].param[8].value = (int)XMVectorGetX(up);
-											cmdParamDesc[cmdIndex].param[9].value = (int)XMVectorGetY(up);
-											cmdParamDesc[cmdIndex].param[10].value = (int)XMVectorGetZ(up);
-
-											cmdParamDesc[cmdIndex].param[11].value = (int)Camera::viewCam.angle;
-
+											CamUI::GrabDirectionAndAngle(cmdIndex);
 											paramEdit::SaveToSource(cmdIndex);
 										}
+
+										if (sel == 1)
+										{
+											CamUI::GrabDirectionAndAngle(cmdIndex);
+											CamUI::GrabTimeStamp(cmdIndex);
+											paramEdit::SaveToSource(cmdIndex);
+										}
+										if (sel == 2)
+										{
+											CamUI::GrabTimeStamp(cmdIndex);
+											paramEdit::SaveToSource(cmdIndex);
+										}
+
+
 									}
 
 								}

@@ -7,13 +7,6 @@
 
 
 
-\\
-caller filename+string
-find in refTable
-if (!find) 
-    read params from file
-    add to refTable
-getParams
 
 https://developersarea.wordpress.com/2014/09/26/win32-file-watcher-api-to-monitor-directory-changes/
 
