@@ -92,7 +92,7 @@ namespace Object {
 			Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 		}
 
-		reflect_close;
+		
 	}
 
 	
@@ -165,7 +165,7 @@ namespace Object {
 
 		Drawer::NullDrawer({1,(int)gX*(int)gY});
 
-		reflect_close;
+		
 	}
 
 	cmd(Blob, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -192,7 +192,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+	
 	}
 
 	cmd(Pearl, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -219,7 +219,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+	
 	}
 
 	cmd(LeoStar, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -246,7 +246,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+	
 	}
 
 	cmd(CapStar, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -273,7 +273,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
 	cmd(Tau, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -305,7 +305,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
 #if EditMode
@@ -355,7 +355,7 @@ namespace Object {
 			Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 		}
 
-		reflect_close;
+		
 	}
 #endif
 	cmd(ScorpBall, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -382,7 +382,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
 	cmd(Nebula2, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -409,7 +409,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
 	cmd(vrg, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -436,7 +436,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
 	cmd(Rocks, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -463,7 +463,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
 	cmd(Transporter, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -490,7 +490,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
 	cmd(Islands, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -517,7 +517,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
 	cmd(Waterfall, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -544,7 +544,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
 	void DoubleStar(int count, int skipper, pMode mode)
@@ -706,7 +706,7 @@ namespace Object {
 		vs::galaxy_2.set();
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
-		reflect_close;
+		
 	}
 
 	cmd(Galaxy, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -736,7 +736,7 @@ namespace Object {
 		vs::galaxy.set();
 
 		Drawer::NullDrawer({1,(int)gX*(int)gY});
-		reflect_close;
+		
 	}
 
 	cmd(Libra, int quality;)
@@ -771,7 +771,7 @@ namespace Object {
 		Libra_spheres(256 * 256, 143, pMode::glow);
 			OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(Aquarius, int quality;)
@@ -804,7 +804,7 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(Crab, int quality;)
@@ -838,7 +838,7 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(LeoBigStar, int quality;)
@@ -872,7 +872,7 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(Capri, int quality;)
@@ -906,7 +906,7 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(Taurus, int quality;)
@@ -940,7 +940,7 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(Girl, int quality; int xPos; int yPos; int zPos; int brightness; int tickness;)
@@ -1039,7 +1039,7 @@ namespace Object {
 		//hi
 		
 
-		reflect_close;
+		
 	}
 
 	cmd(Scorpio, int quality;)
@@ -1079,7 +1079,7 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(Virgo, int quality;)
@@ -1109,7 +1109,7 @@ namespace Object {
 
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(Aries, int quality;)
@@ -1144,7 +1144,7 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(Twins, int quality;)
@@ -1179,7 +1179,7 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(Fish, int quality;)
@@ -1214,7 +1214,7 @@ namespace Object {
 		//InsideNebula({pillars_cnt / 2, 1394, pMode::glow, 100, 200, 600});
 			OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(Zenith, int quality;)
@@ -1245,7 +1245,7 @@ namespace Object {
 		InsideNebula({ pillars_cnt, 1394, pMode::glow ,100,200,600});
 	//	OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(Saggitarius, int quality;)
@@ -1283,7 +1283,7 @@ namespace Object {
 			//NeutronStar(1024 * 1024, 1, pMode::glow);
 			//Galaxy(182361, 4, pMode::glow);
 
-		reflect_close;
+		
 	}
 
 	cmd(CalcNormals, texture srcGeomerty; texture targetNrml;)
@@ -1312,7 +1312,7 @@ namespace Object {
 		Drawer::NullDrawer({ 1, 1 });
 		RenderTarget::GenerateMips({});
 
-		reflect_close;
+		
 
 	}
 
@@ -1334,7 +1334,7 @@ namespace Object {
 		//normals
 		CalcNormals({ in.targetGeo, in.targetNrml });
 
-		reflect_close;
+		
 	}
 
 }

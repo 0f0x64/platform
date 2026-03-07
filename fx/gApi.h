@@ -6,7 +6,6 @@ namespace InputAsm {
 
 		InputAssembler::IA(in.topo);
 
-		reflect_close;
 	}
 }
 
@@ -15,20 +14,20 @@ namespace RenderTarget {
 	cmd(Set, texture targetRT; int level;) {
 		reflect;
 		Textures::RenderTarget(in.targetRT, in.level);
-		reflect_close;
+
 	}
 
 	cmd(GenerateMips) {
 		reflect;
 		Textures::CreateMipMap();
-		reflect_close;
+
 	}
 
 	cmd(Clear, int r; int g; int b; int a;)
 	{
 		reflect;
 		Draw::Clear({ (float)in.r,(float)in.g, (float)in.b, (float)in.a });
-		reflect_close;
+
 	}
 }
 
@@ -38,13 +37,13 @@ namespace Copy {
 	{
 		reflect;
 		Textures::CopyColor(in.dst, in.src);
-		reflect_close;
+
 	}
 
 	cmd(Depth, texture dst; texture src;) {
 		reflect;
 		Textures::CopyDepth(in.dst, in.src);
-		reflect_close;
+
 	}
 }
 
@@ -53,13 +52,13 @@ namespace DepthBuf {
 	cmd(Mode, depthmode mode;) {
 		reflect;
 		Depth::Depth(in.mode);
-		reflect_close;
+
 	}
 
 	cmd(Clear) {
 		reflect;
 		Draw::ClearDepth();
-		reflect_close;
+
 	}
 }
 
@@ -69,14 +68,13 @@ namespace Drawer {
 		reflect;
 
 		Draw::NullDrawer(in.quadcount, in.instances);
-		reflect_close;
 	}
 
 	cmd(NullDrawerTri, int tricount; int instances;) {
 		reflect;
 
 		Draw::NullDrawerTri(in.tricount, in.instances);
-		reflect_close;
+
 	}
 
 
@@ -88,7 +86,7 @@ namespace Cam
 	{
 		reflect;
 		//		Camera::Camera(eye, at, up, angle);
-		reflect_close;
+
 	}
 }
 
@@ -97,7 +95,7 @@ namespace BlendMode {
 	cmd(Set, blendmode mode; blendop op;) {
 		reflect;
 		Blend::Set(in.mode, in.op);
-		reflect_close;
+
 	}
 }
 
@@ -107,7 +105,7 @@ namespace Culling {
 	{
 		reflect;
 		Rasterizer::Cull(in.mode);
-		reflect_close;
+
 	}
 }
 
@@ -117,7 +115,7 @@ namespace Scissors {
 	{
 		reflect;
 		Rasterizer::Scissors({ (float)in.x ,(float)in.y,(float)in.x1,(float)in.y1});
-		reflect_close;
+
 	}
 }
 

@@ -63,7 +63,7 @@ namespace BasicCam
 			camCounter++;
 		}
 
-		reflect_close;
+	
 	}
 
 	void processCam()

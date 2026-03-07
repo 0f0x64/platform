@@ -2,7 +2,6 @@ namespace paramEdit {
 	void SaveToSource(int cmdIndex);
 }
 
-
 namespace ViewCam
 {
 

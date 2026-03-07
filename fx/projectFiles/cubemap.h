@@ -13,7 +13,7 @@ namespace Cubemap {
 		ps::cubemapCreator.set();
 		Drawer::NullDrawer({ 1, 1 });
 		RenderTarget::GenerateMips({});
-		reflect_close;
+	
 	}
 
 	cmd(Show, texture envTexture;)
@@ -51,7 +51,7 @@ namespace Cubemap {
 
 		Drawer::NullDrawer({ gX * gY,1 });
 
-		reflect_close;
+	
 	}
 
 }

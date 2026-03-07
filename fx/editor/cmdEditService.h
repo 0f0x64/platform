@@ -31,19 +31,16 @@ struct ParamDesc {
 		int offset;
 	} param[255];
 
-	int stackLevel = 0;
-
 	bool loaded = false;
 
 };
 
 ParamDesc cmdParamDesc[1000];
-ParamDesc cmdParamDescBack;
 
 bool paramsAreLoaded = false;
-int cmdLevel = 0;
+
 int startCmd = 0;
-int curCmdLevel = 0;
+
 
 int currentCmd_backup = -1;
 int currentCmd = -1;//comes from ui
@@ -51,8 +48,6 @@ int hilightedCmd = -1;
 
 void AddToUI(const char* funcName)
 {
-	cmdParamDesc[cmdCounter].stackLevel = cmdLevel;
-
 	int x = strlen(funcName)-1;;
 	for (x; x > 0; x--) { if (funcName[x] == ':') { x++; break; } };
 

@@ -338,9 +338,7 @@ namespace paramEdit {
 							if (commaOfs == std::string::npos)//no params
 							{
 								c->pCount = 0;
-								c->stackLevel = cmdLevel;
 								c->uiDraw = &showStackItem;
-								cmdLevel++;
 								//cmdCounter++;
 								return;
 							}
@@ -614,9 +612,7 @@ namespace paramEdit {
 
 		}
 
-		c->stackLevel = cmdLevel;
 		c->uiDraw = &showStackItem;
-		cmdLevel++;
 
 		//cmdCounter++;
 
@@ -729,175 +725,7 @@ namespace paramEdit {
 		y += lead;
 	}
 
-	int searchParent(int start)
-	{
-		auto ccl = max(0,cmdParamDesc[start].stackLevel);
-
-		for (int j = start; j >= 0; j--)//search for prev level
-		{
-			if (cmdParamDesc[j].stackLevel < ccl || j == 0) {
-				return j;
-			}
-		}
-
-		return 0;
-	}
-
-	bool isContentInside(int pos)
-	{
-
-		auto ccl = max(0, cmdParamDesc[pos].stackLevel);
-
-		for (int j = pos + 1; j < cmdCounter; j++)
-		{
-			if (ccl < cmdParamDesc[j].stackLevel)
-			{
-				return true;
-			}
-
-			if (ccl >= cmdParamDesc[j].stackLevel)
-			{
-				return false;
-			}
-		}
-
-		return false;
-	}
-
-	void stepOut(int i)
-	{
-		curCmdLevel = max(cmdParamDesc[i].stackLevel, 0);
-		startCmd = searchParent(i);
-
-		for (int j = startCmd; j < i; j++)//displayed level cmd count for adjust pos
-		{
-			if (j == startCmd || curCmdLevel == cmdParamDesc[j].stackLevel) yPos -= lead;
-		}
-
-	}
-
-	void stepIn(int i)
-	{
-		if (!isContentInside(i)) return;
-
-		startCmd = i;
-		curCmdLevel = cmdParamDesc[i].stackLevel + 1;
-		yPos = prevY;
-	}
-
-	void showCommands()
-	{
-
-		for (int i = startCmd; i < cmdCounter; i++)
-		{
-			prevY = y;
-			if (i > startCmd && curCmdLevel > cmdParamDesc[i].stackLevel) break;
-			if (i > startCmd && curCmdLevel != cmdParamDesc[i].stackLevel) continue;
-
-			//draw
-			float sel = currentCmd == i ? 1.f : 0.f;
-			if (sel) selYpos = y;
-
-			if (cmdParamDesc[i].uiDraw)
-			{
-				cmdParamDesc[i].uiDraw(i, x, y, ui::Text::getTextLen(cmdParamDesc[i].funcName, ui::style::text::width) + insideX * 2.f, lead, sel);
-			}
-
-			//process clicks
-			if (mouseOverItem)
-			{
-				clickOnEmptyPlace = false; 
-
-				if (ui::dblClk && ui::lbDown)
-				{
-					if (i != startCmd) {
-						stepIn(i);
-					} else {
-						stepOut(i);
-					}
-
-					ui::dblClk = false;
-					break;
-				}
-
-				if (ui::lbDown && i != currentCmd && drag.isFree()) {
-					action = true;
-					currentCmd = i;
-					currentParam = -1;
-				}
-			}
-		}
-	}
-
-	void ObjHandlers()
-	{
-		if (uiContext != uiContext_::camera) return;
-
-		ui::Box::Setup();
-
-		hilightedCmd = currentCmd;
-
-		for (int i = startCmd; i < cmdCounter; i++)
-		{
-			auto cl = cmdParamDesc[i].stackLevel;
-			if (i > startCmd && curCmdLevel > cl) break;
-			if (i > startCmd && curCmdLevel != cl) continue;
-			//if (!isType(cmdParamDesc[i].funcName, "ShowObject")) continue;
-
-			for (int j = 0; j < cmdParamDesc[i].pCount; j++)
-			{
-				float _x = 0;
-				float _y = 0;
-				float _z = 0;
-
-				if (isType(cmdParamDesc[i].param[j].type, "pos_x"))
-				{
-					_x = (float)cmdParamDesc[i].param[j].value;
-					_y = (float)cmdParamDesc[i].param[j + 1].value;
-					_z = (float)cmdParamDesc[i].param[j + 2].value;
-				}
-
-				XMVECTOR p = XMVECTOR{ _x / intToFloatDenom, _y / intToFloatDenom, _z / intToFloatDenom, 1. };
-				
-				p = XMVector4Transform(p, XMMatrixTranspose(ConstBuf::camera.view[0]) * XMMatrixTranspose(ConstBuf::camera.proj[0]));
-
-				if (XMVectorGetZ(p) < 0) continue;
-
-				float px = .5f * XMVectorGetX(p) / XMVectorGetW(p) + .5f;
-				float py = -.5f * XMVectorGetY(p) / XMVectorGetW(p) + .5f;
-
-				float h = ui::style::text::height * .48f;
-				px -= h * dx11::aspect / 2.f;
-				py -= h / 2.f;
-
-				ui::style::box::outlineBrightness = 1.5;
-
-				ui::style::box::rounded = .5;
-				ui::style::box::edge = 1.;
-				ui::style::box::soft = 11.;
-
-				bool over = isMouseOver(px, py, h * dx11::aspect, h);
-
-				ui::style::box::r = ui::style::box::g = ui::style::box::b = over ? .7f : 0.f;
-
-				if (over)
-				{
-					hilightedCmd = i;
-				}
-
-				if (over && ui::lbDown && drag.isFree())
-				{
-					currentCmd = i;
-					currentParam = -1;
-					ViewCam::TransCam(_x / intToFloatDenom, _y / intToFloatDenom, _z / intToFloatDenom);
-					vScroll = true;
-				}
-
-				ui::Box::Draw(px, py, h * dx11::aspect, h);
-
-			}
-		}
-	}
+	
 
 
 	void CamKeys()
@@ -944,16 +772,7 @@ namespace paramEdit {
 					currentParam = -1;
 					storedParam = cmdParamDesc[i].param[j].value;
 					vScroll = true;
-
-					curCmdLevel = cmdParamDesc[currentCmd].stackLevel;
-
-					for (int j = currentCmd; j >= 0; j--)//search for prev level
-					{
-						if (cmdParamDesc[j].stackLevel < curCmdLevel || j == 0) {
-							startCmd = j; break;
-						}
-					}
-					 
+				 
 				}
 
 				if (currentCmd == i && drag.check(drag.context::timeKey))
@@ -1344,7 +1163,7 @@ void processSlider(std::string pName, float x, float y, float w, float h, auto& 
 		x = ui::style::text::width / 2.f;
 		y = yPos;
 		
-		showCommands();
+		//showCommands();
 
 		ui::style::Base();
 		x += tabLen;

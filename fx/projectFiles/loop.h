@@ -90,7 +90,7 @@ namespace Loop
 			});
 
 			BasicCam::processCam();
-			reflect_close;
+			
 		}
 	}
 
@@ -1017,15 +1017,15 @@ namespace Loop
 			BasicCam::setCamKey({
 				.camTime = 7199,
 				.camType = keyType::set,
-				.eye_x = -13,
-				.eye_y = -111,
-				.eye_z = 3313,
+				.eye_x = 0,
+				.eye_y = 0,
+				.eye_z = 3315,
 				.at_x = 0,
 				.at_y = 0,
 				.at_z = 0,
 				.up_x = 0,
-				.up_y = 254,
-				.up_z = 8,
+				.up_y = 255,
+				.up_z = 0,
 				.angle = 100,
 				.sType = sliderType::follow,
 				.slide_x = 0,
@@ -1042,9 +1042,9 @@ namespace Loop
 			BasicCam::processCam();
 			Object::Girl({
 				.quality = 1,
-				.xPos = -108,
-				.yPos = -178,
-				.zPos = 258,
+				.xPos = -61,
+				.yPos = -212,
+				.zPos = 332,
 				.brightness = 35,
 				.tickness = 0
 			});

@@ -267,7 +267,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     }
     
     pos+=modelPos.xyz;
-    pos.y-=-91;
+    pos.y-=110.029;
     pos*=.01;
 
     //p1.pos=float4(pos,1);
