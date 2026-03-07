@@ -1184,6 +1184,7 @@ namespace editor
 	}
 
 	std::string startTextValue;
+	bool mPressed = false;
 
 	void Process()
 	{
@@ -1229,25 +1230,33 @@ namespace editor
 							cmdIndex = -1;
 							pIndex = -1;
 
-							if (!strstr(VsEditor.fileName, dx11::Shaders::shaderExtension))
+							calcCmdAndParamIndicies();
+							if (cmdIndex >= 0 && pIndex >= 0 && !mPressed)
 							{
-								calcCmdAndParamIndicies();
-								if (cmdIndex >= 0 && pIndex >= 0)
+								mPressed = true;
+								int tID = getTypeIndex(VsEditor.typeName);
+								int tCnt = getEnumCount(tID);
+								std::vector<std::string> enumMenu;
+								for (int i = 0; i < tCnt; i++)
 								{
-									int tID = getTypeIndex(VsEditor.typeName);
-									int tCnt = getEnumCount(tID);
-									std::vector<std::string> enumMenu;
-									for (int i = 0; i < tCnt; i++)
-									{
-										enumMenu.push_back(getStrValue(tID, i));
-									}
+									enumMenu.push_back(getStrValue(tID, i));
+								}
 
-									int sel = showEnum(hWnd, enumMenu);
-									if (sel >= 0)
-									{
-										VsEditor.ReplaceTextInVS(enumMenu[sel].c_str(), true);
-									}
+								int sel = cmdParamDesc[cmdIndex].param[pIndex].value;
+								if (tCnt == 2)
+								{
+									sel = 1 - sel;
 
+								}
+								else
+								{
+									sel = showEnum(hWnd, enumMenu);
+								}
+
+								if (sel >= 0)
+								{
+									VsEditor.ReplaceTextInVS(enumMenu[sel].c_str(), true);
+									cmdParamDesc[cmdIndex].param[pIndex].value = sel;
 								}
 
 							}
@@ -1303,7 +1312,7 @@ namespace editor
 				if (ctrl) scale *= 100;
 				if (shift) scale *= 10;
 				
-				int delta = -(pt.y - oldMouseY) * scale/8;
+				int delta = -(pt.y - oldMouseY) * scale/2;
 
 				newValue = oldValue + delta;
 				std::string newValueStr;
@@ -1342,6 +1351,7 @@ namespace editor
 		else
 		{
 			click = false;
+			mPressed = false;
 
 			if (VsEditor.saveChanges())
 			{
