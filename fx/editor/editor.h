@@ -17,7 +17,7 @@ namespace editor
 	bool controlParamsOld = false;
 	int pIndex = -1;
 	int cmdIndex = -1;
-	void calcCmdAndParamIndicies();
+	bool calcCmdAndParamIndicies();
 
 	struct {
 		long line =0;
@@ -242,7 +242,7 @@ namespace editor
 		{
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
 			if (FAILED(result))
 				return false;
 
@@ -315,7 +315,7 @@ namespace editor
 		{
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
 			if (FAILED(result))
 				return false;
 
@@ -466,7 +466,7 @@ namespace editor
 		{
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
 			if (FAILED(result))
 				return false;
 
@@ -529,7 +529,7 @@ namespace editor
 
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
 			if (FAILED(result))
 				return false;
 
@@ -568,7 +568,7 @@ namespace editor
 
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
 			if (FAILED(result))
 				return false;
 
@@ -941,11 +941,17 @@ namespace editor
 		return -1;
 	}
 
-	void calcCmdAndParamIndicies()
+	bool fileIsShader()
 	{
+		return strstr(VsEditor.fileName, dx11::Shaders::shaderExtension);
+	}
 
+	bool calcCmdAndParamIndicies()
+	{
 		pIndex = -1;
 		cmdIndex = -1;
+
+		if (fileIsShader()) return false;
 
 		int ln = -1;
 
@@ -968,7 +974,16 @@ namespace editor
 			}
 		}
 
-		pIndex = VsEditor.GetParamIndex();
+		if (cmdIndex < 0) return false;
+
+		if (VsEditor.typeUnderCursor != VsEditor.textType::functionCall)
+		{
+			pIndex = VsEditor.GetParamIndex();
+		}
+
+		if (pIndex < 0) return false;
+
+		return true;
 		
 	}
 
@@ -1112,7 +1127,6 @@ namespace editor
 		{
 			std::vector<std::string> enumMenu = { "grab view camera","grab view camera with timestamp","grab timestamp only" };
 
-			int sel = showEnum(hWnd, enumMenu);
 			switch (showEnum(hWnd, enumMenu))
 			{
 			case 0:
@@ -1215,78 +1229,46 @@ namespace editor
 							lastValue = oldValue;
 							VsEditor.slider = oldValue;
 
-							cmdIndex = -1;
-							pIndex = -1;
+							calcCmdAndParamIndicies();
 
-							if (!strstr(VsEditor.fileName, dx11::Shaders::shaderExtension))
-							{
-								calcCmdAndParamIndicies();
-							}
+							if (cmdParamDesc[cmdIndex].param[pIndex].bypass) click = false;
+
 							break;
 						}
 
 						case VsEditor.textType::enumList:
 						{
-							cmdIndex = -1;
-							pIndex = -1;
+							if (!calcCmdAndParamIndicies() || mPressed) break;
 
-							calcCmdAndParamIndicies();
-							if (cmdIndex >= 0 && pIndex >= 0 && !mPressed)
+							mPressed = true;
+							int tID = getTypeIndex(VsEditor.typeName);
+							int tCnt = getEnumCount(tID);
+							std::vector<std::string> enumMenu;
+							for (int i = 0; i < tCnt; i++)
 							{
-								mPressed = true;
-								int tID = getTypeIndex(VsEditor.typeName);
-								int tCnt = getEnumCount(tID);
-								std::vector<std::string> enumMenu;
-								for (int i = 0; i < tCnt; i++)
-								{
-									enumMenu.push_back(getStrValue(tID, i));
-								}
-
-								int sel = cmdParamDesc[cmdIndex].param[pIndex].value;
-								if (tCnt == 2)
-								{
-									sel = 1 - sel;
-
-								}
-								else
-								{
-									sel = showEnum(hWnd, enumMenu);
-								}
-
-								if (sel >= 0)
-								{
-									VsEditor.ReplaceTextInVS(enumMenu[sel].c_str(), true);
-									cmdParamDesc[cmdIndex].param[pIndex].value = sel;
-								}
-
+								enumMenu.push_back(getStrValue(tID, i));
 							}
+
+							int sel = cmdParamDesc[cmdIndex].param[pIndex].value;
+							sel = tCnt == 2 ? 1 - sel : showEnum(hWnd, enumMenu);
+
+							if (sel >= 0)
+							{
+								VsEditor.ReplaceTextInVS(enumMenu[sel].c_str(), true);
+								cmdParamDesc[cmdIndex].param[pIndex].value = sel;
+							}
+
 							break;
 						}
 
 						case VsEditor.textType::functionCall:
 						{
-							cmdIndex = -1;
-							pIndex = -1;
-
-							if (!strstr(VsEditor.fileName, dx11::Shaders::shaderExtension))
+							calcCmdAndParamIndicies();
+							if (!strcmp(VsEditor.funcName, "setCamKey"))
 							{
-								calcCmdAndParamIndicies();
-								if (cmdIndex >= 0 && pIndex >= 0)
-								{
-									char* shortName = cmdParamDesc[cmdIndex].funcName;
-									for (int i = 0; i < strlen(cmdParamDesc[cmdIndex].funcName); i++)
-									{
-										if (cmdParamDesc[cmdIndex].funcName[i] == ':') shortName = cmdParamDesc[cmdIndex].funcName + i + 1;
-									}
-
-									if (!strcmp(shortName, "setCamKey"))
-									{
-										CamUI::ProcessCamKeyContextMenu();
-									}
-
-								}
-
+								CamUI::ProcessCamKeyContextMenu();
 							}
+							
 							break;
 						}
 					}
@@ -1321,11 +1303,22 @@ namespace editor
 
 					VsEditor.slider = newValue;
 
-					if (strstr(VsEditor.fileName, dx11::Shaders::shaderExtension) && VsEditor.pointBefore)
+					if (fileIsShader())
 					{
-						newValueStr = updateFractionalPart(startTextValue.c_str(), delta);
 						VsEditor.Update(true);
-						VsEditor.ReplaceTextInVS(newValueStr.c_str(), true);
+
+						if (VsEditor.pointBefore)
+						{
+							newValueStr = updateFractionalPart(startTextValue.c_str(), delta);
+							VsEditor.ReplaceTextInVS(newValueStr.c_str(), true);
+						}
+						else
+						{
+							char modified[100];
+							_itoa(newValue, modified, 10);
+							VsEditor.ReplaceTextInVS(modified, true);
+						}
+
 						VsEditor.saveChanges();
 						recompileShader();
 					}
@@ -1355,23 +1348,20 @@ namespace editor
 
 			if (VsEditor.saveChanges())
 			{
+				if (fileIsShader())
+				{
+					recompileShader();
+				}
+		
 				if (VsEditor.Update(false))
 				{
-					if (!strstr(VsEditor.fileName, dx11::Shaders::shaderExtension))
+					if (calcCmdAndParamIndicies())
 					{
-						calcCmdAndParamIndicies();
-						if (cmdIndex >= 0 && pIndex >= 0)
+						if (VsEditor.typeUnderCursor == VsEditor.textType::number)
 						{
-							if (VsEditor.typeUnderCursor == VsEditor.textType::number)
-							{
-								cmdParamDesc[cmdIndex].param[pIndex].value = atoi(VsEditor.paramStr);
-								strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, VsEditor.paramStr);
-							}
+							cmdParamDesc[cmdIndex].param[pIndex].value = atoi(VsEditor.paramStr);
+							strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, VsEditor.paramStr);
 						}
-					}
-					else
-					{
-						recompileShader();
 					}
 				}
 			}

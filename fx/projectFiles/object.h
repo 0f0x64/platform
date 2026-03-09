@@ -943,13 +943,64 @@ namespace Object {
 		
 	}
 
+#define CAT(a, b) a##b
+#define SEMI(x) x;
+
+	// 1. Многослойный расширитель для обхода ограничений рекурсии MSVC
+#define EXPAND(arg)      EXPAND1(EXPAND1(EXPAND1(EXPAND1(arg))))
+#define EXPAND1(arg)     EXPAND2(EXPAND2(EXPAND2(EXPAND2(arg))))
+#define EXPAND2(arg)     EXPAND3(EXPAND3(EXPAND3(EXPAND3(arg))))
+#define EXPAND3(arg)     EXPAND4(EXPAND4(EXPAND4(EXPAND4(arg))))
+#define EXPAND4(arg)     arg
+
+// 2. Вспомогательные макросы для итерации
+#define PARENS ()
+#define FOR_EACH_HELPER(action, x, ...) \
+    action(x) \
+    __VA_OPT__(FOR_EACH_AGAIN PARENS (action, __VA_ARGS__))
+
+#define FOR_EACH_AGAIN() FOR_EACH_HELPER
+
+// 3. Точка входа с принудительным расширением
+#define FOR_EACH(action, ...) \
+    __VA_OPT__(EXPAND(FOR_EACH_HELPER(action, __VA_ARGS__)))
+
+// 4. Финальный макрос cmd
+#define cmd2(name, ...) \
+    struct alignas(1) CAT(name,_params) { \
+        FOR_EACH(SEMI, __VA_ARGS__) \
+    }; \
+    void name(CAT(name,_params) in, const std::source_location caller = std::source_location::current())
+
+
+	struct Girl2_params {
+		int quality; int xPos;
+
+	}; 
+	
+	void Girl2(Girl2_params in, const std::source_location caller = std::source_location::current())
+	{
+
+	}
+	//	cmd2(Girl2, int quality, int xPos)
+	
+
+	
+
+	//cmd(Girl, int quality; int xPos; int yPos; int zPos; int brightness; int tickness;)
+	//struct alignas(1) Girl_params {
+		//int quality; int xPos; int yPos; int zPos; int brightness; int tickness;
+	//}; 
+	
+
+	//void Girl(Girl_params in, const std::source_location caller = std::source_location::current())
 	cmd(Girl, int quality; int xPos; int yPos; int zPos; int brightness; int tickness;)
 	{
 		reflect;
 
 		int pillars_cnt2 = 2000 * 1000;
 
-		int pillars_cnt = 3725470 / in.quality;
+		int pillars_cnt = 3725465 / in.quality;
 		int outerSpace_cnt = 6853 / in.quality;
 		int neutronStar_cnt = 279620 / in.quality;
 		int galaxy_cnt = 182361 / in.quality;
@@ -984,7 +1035,7 @@ namespace Object {
 			.mode = pMode::point,
 			.r = 100,
 			.g = 252,
-			.b = 1400,
+			.b = 1376,
 			.tMode = triMode::on,
 			.xPos = in.xPos,
 			.yPos = in.yPos,

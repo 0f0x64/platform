@@ -247,9 +247,8 @@ namespace paramEdit {
 	static std::unordered_map<std::string, int> registry;
 	static int next_index = 0;
 
-	void reflect_f(auto* in, const std::source_location caller, const std::source_location currentFunc)//name and types without names
+	void RegCmd(auto caller)
 	{
-
 		std::string key = std::string(caller.file_name()) + ":" + std::to_string(caller.line());
 
 		auto it = registry.find(key);
@@ -265,14 +264,16 @@ namespace paramEdit {
 			cmdCounter = new_index;
 			cmdParamDesc[cmdCounter].loaded = false;
 		}
+	}
 
-//		cmdCounter = registry[key];
+	void reflect_f(auto* in, const std::source_location caller, const std::source_location currentFunc)//name and types without names
+	{
+
+		RegCmd(caller);
 
 		auto c = &cmdParamDesc[cmdCounter];
 
-		//if (true)
 		if (!c->loaded || !paramsAreLoaded)
-		//if (!paramsAreLoaded)  //variables -> reflected struct
 		{
 			FillCaller(caller);
 
@@ -511,39 +512,6 @@ namespace paramEdit {
 						{
 							if (!isParam(pvalue)) {
 								c->param[i].bypass = true;
-								//if (c->param[i]._min < 0)
-								{
-									/*switch (c->param[i].size)
-									{
-									case 1:
-										c->param[i].value = *(char*)((char*)in + c->param[i].offset);
-										break;
-									case 2:
-										c->param[i].value = *(short*)((char*)in + c->param[i].offset);
-										break;
-									case 4:
-										c->param[i].value = *(int*)((char*)in + c->param[i].offset);
-										break;
-
-									}*/
-								}
-								/*
-								else
-								{
-									switch (c->param[i].size)
-									{
-									case 1:
-										c->param[i].value = *(unsigned char*)((char*)in + c->param[i].offset);
-										break;
-									case 2:
-										c->param[i].value = *(unsigned short*)((char*)in + c->param[i].offset);
-										break;
-									case 4:
-										c->param[i].value = *(unsigned int*)((char*)in + c->param[i].offset);
-										break;
-
-									}
-								}*/
 								strcpy(c->param[i].strValue, pvalue.c_str());
 							}
 							else
@@ -567,55 +535,25 @@ namespace paramEdit {
 		
 		//variables <- reflected struct
 
+ 		for (int i = 0; i < c->pCount; i++)
 		{
+			if (c->param[i].bypass) continue;
 
- 			for (int i = 0; i < c->pCount; i++)
+			switch (c->param[i].size)
 			{
-				//if (c->param[i]._min < 0)
-				if (!c->param[i].bypass)
-				{
-					switch (c->param[i].size)
-					{
-					case 1:
-						*(char*)((char*)in + c->param[i].offset) = (char)c->param[i].value;
-						break;
-					case 2:
-						*(short*)((char*)in + c->param[i].offset) = (short)c->param[i].value;
-						break;
-					case 4:
-						*(int*)((char*)in + c->param[i].offset) = (int)c->param[i].value;
-						break;
+			case 1:
+				*(char*)((char*)in + c->param[i].offset) = (char)c->param[i].value;
+				break;
+			case 2:
+				*(short*)((char*)in + c->param[i].offset) = (short)c->param[i].value;
+				break;
+			case 4:
+				*(int*)((char*)in + c->param[i].offset) = (int)c->param[i].value;
+				break;
 
-					}
-				}
-				/*else
-				{
-					switch (c->param[i].size)
-					{
-					case 1:
-						*(unsigned char*)((char*)in + c->param[i].offset) = c->param[i].value;
-						break;
-					case 2:
-						*(unsigned short*)((char*)in + c->param[i].offset) = c->param[i].value;
-						break;
-					case 4:
-						*(unsigned int*)((char*)in + c->param[i].offset) = c->param[i].value;
-						break;
-
-					}
-				}*/
-
-
-				
 			}
 
-
 		}
-
-		c->uiDraw = &showStackItem;
-
-		//cmdCounter++;
-
 	}
 
 	//-------------------

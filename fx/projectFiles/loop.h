@@ -993,15 +993,15 @@ namespace Loop
 			BasicCam::setCamKey({
 				.camTime = 2141,
 				.camType = keyType::set,
-				.eye_x = -104,
-				.eye_y = 2987,
-				.eye_z = 1432,
+				.eye_x = -949,
+				.eye_y = -2674,
+				.eye_z = -1712,
 				.at_x = 0,
 				.at_y = 0,
 				.at_z = 0,
-				.up_x = 16,
-				.up_y = 110,
-				.up_z = -229,
+				.up_x = -99,
+				.up_y = 150,
+				.up_z = -179,
 				.angle = 100,
 				.sType = sliderType::follow,
 				.slide_x = 0,
@@ -1015,7 +1015,7 @@ namespace Loop
 			});
 
 			BasicCam::setCamKey({
-				.camTime = 7199,
+				.camTime = 7203,
 				.camType = keyType::set,
 				.eye_x = 0,
 				.eye_y = 0,
@@ -1027,7 +1027,7 @@ namespace Loop
 				.up_y = 255,
 				.up_z = 0,
 				.angle = 100,
-				.sType = sliderType::follow,
+				.sType = sliderType::pan,
 				.slide_x = 0,
 				.slide_y = 0,
 				.slide_z = 0,
@@ -1042,10 +1042,10 @@ namespace Loop
 			BasicCam::processCam();
 			Object::Girl({
 				.quality = 1,
-				.xPos = -50,
-				.yPos = -32,
-				.zPos = 332,
-				.brightness = 40,
+				.xPos = 33,
+				.yPos = 36,
+				.zPos = 1,
+				.brightness = 79,
 				.tickness = 0
 			});
 
