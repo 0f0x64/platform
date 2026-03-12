@@ -47,9 +47,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		auto delta = GET_WHEEL_DELTA_WPARAM(wParam);
 
-		editor::paramEdit::Wheel(delta);
-
-		//if (editor::paramEdit::currentParam == -1)
 		if (uiContext == uiContext_::camera)
 		{
 			editor::ViewCam::Wheel(delta);

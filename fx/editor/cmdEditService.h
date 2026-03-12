@@ -11,6 +11,7 @@ struct ParamDesc {
 	struct {
 		char fileName[MAX_PATH];
 		int line;
+		int endLine;
 	} caller;
 
 	PVFN uiDraw = NULL;

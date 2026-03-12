@@ -428,6 +428,10 @@ namespace paramEdit {
 					c->single_line = false;
 				}
 
+				std::string fullStr = s;
+				c->caller.endLine = lc;
+				
+
 				auto s2 = s;
 				std::erase(s2, ' ');
 				std::erase(s2, '\t');
@@ -441,12 +445,14 @@ namespace paramEdit {
 				auto pStart = s.find("{") + 1;
 				std::string funcStr = s.substr(pStart, s.size()-pStart);
 				auto pEnd = funcStr.find("}");
+
 				if (std::string::npos == pEnd)
 				{
 					while (true)
 					{
 						char a;
 						ifileCaller.get(a);
+						if (a == '\n') c->caller.endLine++;
 						if (a == '}') break;
 						funcStr += a;
 						

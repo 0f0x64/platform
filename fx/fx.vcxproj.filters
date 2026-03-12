@@ -182,9 +182,6 @@
     <ClInclude Include="editor\trackerUI.h">
       <Filter>Source Files\editor</Filter>
     </ClInclude>
-    <ClInclude Include="editor\textEditor.h">
-      <Filter>Source Files\editor</Filter>
-    </ClInclude>
     <ClInclude Include="reflector.h">
       <Filter>Source Files</Filter>
     </ClInclude>

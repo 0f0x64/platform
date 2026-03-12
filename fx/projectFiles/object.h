@@ -1000,7 +1000,7 @@ namespace Object {
 
 		int pillars_cnt2 = 2000 * 1000;
 
-		int pillars_cnt = 3725465 / in.quality;
+		int pillars_cnt = 3725442 / in.quality;
 		int outerSpace_cnt = 6853 / in.quality;
 		int neutronStar_cnt = 279620 / in.quality;
 		int galaxy_cnt = 182361 / in.quality;

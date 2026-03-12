@@ -829,7 +829,6 @@ namespace editor
 
 	#include "timeLine.h"
 	#include "viewCam.h"
-	#include "textEditor.h"
 	#include "paramEdit.h"
 	#include "trackerUI.h"
 
@@ -948,6 +947,8 @@ namespace editor
 
 	bool calcCmdAndParamIndicies()
 	{
+		//TODO: add check isField (.name = val, format or ({,,,}) format)
+
 		pIndex = -1;
 		cmdIndex = -1;
 
@@ -960,11 +961,12 @@ namespace editor
 			char* fn = cmdParamDesc[i].caller.fileName;
 			if (strcmp(fn, VsEditor.fileName) == 0)
 			{
-				if (cmdParamDesc[i].caller.line <= VsEditor.line)
+				if (cmdParamDesc[i].caller.line <= VsEditor.line &&
+					cmdParamDesc[i].caller.endLine >= VsEditor.line)
 				{
-					if (cmdParamDesc[i].caller.line > ln)
+					//if (cmdParamDesc[i].caller.line > ln)
 					{
-						ln = cmdParamDesc[i].caller.line;
+						//ln = cmdParamDesc[i].caller.line;
 						cmdIndex = i;
 						currentCmd = i;
 
@@ -973,6 +975,8 @@ namespace editor
 				}
 			}
 		}
+
+
 
 		if (cmdIndex < 0) return false;
 
@@ -1229,7 +1233,7 @@ namespace editor
 							lastValue = oldValue;
 							VsEditor.slider = oldValue;
 
-							calcCmdAndParamIndicies();
+							if (!calcCmdAndParamIndicies() && !fileIsShader()) click = false;
 
 							if (cmdParamDesc[cmdIndex].param[pIndex].bypass) click = false;
 

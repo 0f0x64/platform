@@ -377,7 +377,6 @@
     <ClInclude Include="editor\hotReload.h" />
     <ClInclude Include="editor\paramEdit.h" />
     <ClInclude Include="editor\style.h" />
-    <ClInclude Include="editor\textEditor.h" />
     <ClInclude Include="editor\timeLine.h" />
     <ClInclude Include="editor\trackerUI.h" />
     <ClInclude Include="editor\uiDraw.h" />
