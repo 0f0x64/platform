@@ -1,18 +1,17 @@
-#pragma pack (push,1)
+const int clipLen = 128;
+const int clipsCount = 32;
+const int channelsCount = 32;
+
+enum class layerType { pitch, octave, velocity, positon, offset, variation, slide, retrigger };
+const int layersCount = 8;
+
 struct clip {
 	int16u pos;
 	int16u len;
 	int8u repeat;
 	int8u bpmScale;
-	int8u overDub;
-	int8u swing;
-
-	char pitch[128];
-	char vol[128];
-	char variation[128];
-	char slide[128];
-	char retrigger[128];
-	char send[128];
+	switcher overDub;
+	char layer[layersCount][clipLen];
 };
 
 struct channel
@@ -21,16 +20,13 @@ struct channel
 	int8s pan;
 	switcher mute;
 	switcher solo;
-	int8u  clipsCount;
-	clip clips[32];
+	clip clips[clipsCount];
 
 };
 
 struct _track {
 	int16u  masterBPM;
 	int8u  volume;
-	int8u  channelsCount;
-	channel channels[32];
-
+	channel channels[channelsCount];
 };
-#pragma pack (pop)
+

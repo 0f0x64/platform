@@ -1042,9 +1042,9 @@ namespace Loop
 			BasicCam::processCam();
 			Object::Girl({
 				.quality = 1,
-				.xPos = 2,
-				.yPos = 100,
-				.zPos = -35,
+				.xPos = 1,
+				.yPos = 94,
+				.zPos = 0,
 				.brightness = 84,
 				.tickness = 0
 			});

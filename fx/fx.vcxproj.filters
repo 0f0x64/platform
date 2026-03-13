@@ -191,9 +191,6 @@
     <ClInclude Include="generated\uiShaderMargin.h">
       <Filter>Source Files\generated</Filter>
     </ClInclude>
-    <ClInclude Include="projectFiles\sound\trackData.h">
-      <Filter>Source Files\sound</Filter>
-    </ClInclude>
     <ClInclude Include="projectFiles\sound\trackStruct.h">
       <Filter>Source Files\sound</Filter>
     </ClInclude>

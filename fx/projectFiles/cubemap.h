@@ -1,6 +1,6 @@
 namespace Cubemap {
 
-	cmd(Calc, texture target;)
+	cmd(Calc, texture target)
 	{
 		reflect;
 		BlendMode::Set({ blendmode::off, blendop::add });
@@ -16,7 +16,7 @@ namespace Cubemap {
 	
 	}
 
-	cmd(Show, texture envTexture;)
+	cmd(Show, texture envTexture)
 	{
 		reflect;
 

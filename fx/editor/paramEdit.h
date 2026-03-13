@@ -345,13 +345,13 @@ namespace paramEdit {
 							}
 
 							auto end = s.find(")");
-							end = s.rfind(";", end);
+							end = s.rfind(",", end);
 							pStr = s.substr(commaOfs + 1, end -1 - commaOfs);
 							std::erase(pStr, '\t');
 							std::erase(pStr, '\n');
 
 
-							const std::regex reg{ R"(;)" };
+							const std::regex reg{ R"(,)" };
 							auto tokens = regex_split(pStr, reg);
 
 							int param_ofs = 0;

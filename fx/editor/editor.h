@@ -624,8 +624,10 @@ namespace editor
 
 #if REFLECTION
 	#define reflect editor::paramEdit::reflect_f(&in, caller, std::source_location::current())
-	#define cmd(name, ...) struct alignas(1) CAT(name,_params) {__VA_ARGS__}; \
-	void name(CAT(name,_params) in ,const std::source_location caller = std::source_location::current())
+
+	#define cmd(name, ...) struct alignas(1) CAT(name,_params) { FOR_EACH(SEMI, __VA_ARGS__) }; \
+    void name(CAT(name,_params) in, const std::source_location caller = std::source_location::current())
+
 #endif
 
 bool resize = true;

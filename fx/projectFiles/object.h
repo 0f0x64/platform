@@ -1,13 +1,13 @@
 namespace Object {
 
 	cmd(Show, 
-		texture geometry;
-		texture normals;
-		int8u quality; 
-		int pos_x;
-		int pos_y;
-		int pos_z;
-		int glow;
+		texture geometry,
+		texture normals,
+		int8u quality,
+		int pos_x,
+		int pos_y,
+		int pos_z,
+		int glow
 		)
 	{
 		reflect;
@@ -141,7 +141,7 @@ namespace Object {
 		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 	}
 
-	cmd(InsideNebula, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(InsideNebula, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -168,7 +168,7 @@ namespace Object {
 		
 	}
 
-	cmd(Blob, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Blob, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -195,7 +195,7 @@ namespace Object {
 	
 	}
 
-	cmd(Pearl, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Pearl, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -222,7 +222,7 @@ namespace Object {
 	
 	}
 
-	cmd(LeoStar, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(LeoStar, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -249,7 +249,7 @@ namespace Object {
 	
 	}
 
-	cmd(CapStar, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(CapStar, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -276,7 +276,7 @@ namespace Object {
 		
 	}
 
-	cmd(Tau, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Tau, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -309,7 +309,7 @@ namespace Object {
 	}
 
 #if EditMode
-	cmd(Grl, int count; int skipper; pMode mode; int r; int g; int b; triMode tMode; int xPos; int yPos; int zPos; int brightness; int tickness;)
+	cmd(Grl, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness)
 	{
 		reflect;
 
@@ -358,7 +358,7 @@ namespace Object {
 		
 	}
 #endif
-	cmd(ScorpBall, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(ScorpBall, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -385,7 +385,7 @@ namespace Object {
 		
 	}
 
-	cmd(Nebula2, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Nebula2, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -412,7 +412,7 @@ namespace Object {
 		
 	}
 
-	cmd(vrg, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(vrg, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -439,7 +439,7 @@ namespace Object {
 		
 	}
 
-	cmd(Rocks, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Rocks, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -466,7 +466,7 @@ namespace Object {
 		
 	}
 
-	cmd(Transporter, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Transporter, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -520,7 +520,7 @@ namespace Object {
 		
 	}
 
-	cmd(Waterfall, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Waterfall, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -679,7 +679,7 @@ namespace Object {
 		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 	}
 
-	cmd(DoubleTwo, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(DoubleTwo, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 		float r = in.r / 100.f;
@@ -709,7 +709,7 @@ namespace Object {
 		
 	}
 
-	cmd(Galaxy, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Galaxy, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 		float r = in.r / 100.f;
@@ -739,7 +739,7 @@ namespace Object {
 		
 	}
 
-	cmd(Libra, int quality;)
+	cmd(Libra, int quality)
 	{
 		reflect;
 
@@ -774,7 +774,7 @@ namespace Object {
 		
 	}
 
-	cmd(Aquarius, int quality;)
+	cmd(Aquarius, int quality)
 	{
 		reflect;
 
@@ -807,7 +807,7 @@ namespace Object {
 		
 	}
 
-	cmd(Crab, int quality;)
+	cmd(Crab, int quality)
 	{
 		reflect;
 
@@ -841,7 +841,7 @@ namespace Object {
 		
 	}
 
-	cmd(LeoBigStar, int quality;)
+	cmd(LeoBigStar, int quality)
 	{
 		reflect;
 
@@ -875,7 +875,7 @@ namespace Object {
 		
 	}
 
-	cmd(Capri, int quality;)
+	cmd(Capri, int quality)
 	{
 		reflect;
 
@@ -909,7 +909,7 @@ namespace Object {
 		
 	}
 
-	cmd(Taurus, int quality;)
+	cmd(Taurus, int quality)
 	{
 		reflect;
 
@@ -943,58 +943,7 @@ namespace Object {
 		
 	}
 
-#define CAT(a, b) a##b
-#define SEMI(x) x;
-
-	// 1. Многослойный расширитель для обхода ограничений рекурсии MSVC
-#define EXPAND(arg)      EXPAND1(EXPAND1(EXPAND1(EXPAND1(arg))))
-#define EXPAND1(arg)     EXPAND2(EXPAND2(EXPAND2(EXPAND2(arg))))
-#define EXPAND2(arg)     EXPAND3(EXPAND3(EXPAND3(EXPAND3(arg))))
-#define EXPAND3(arg)     EXPAND4(EXPAND4(EXPAND4(EXPAND4(arg))))
-#define EXPAND4(arg)     arg
-
-// 2. Вспомогательные макросы для итерации
-#define PARENS ()
-#define FOR_EACH_HELPER(action, x, ...) \
-    action(x) \
-    __VA_OPT__(FOR_EACH_AGAIN PARENS (action, __VA_ARGS__))
-
-#define FOR_EACH_AGAIN() FOR_EACH_HELPER
-
-// 3. Точка входа с принудительным расширением
-#define FOR_EACH(action, ...) \
-    __VA_OPT__(EXPAND(FOR_EACH_HELPER(action, __VA_ARGS__)))
-
-// 4. Финальный макрос cmd
-#define cmd2(name, ...) \
-    struct alignas(1) CAT(name,_params) { \
-        FOR_EACH(SEMI, __VA_ARGS__) \
-    }; \
-    void name(CAT(name,_params) in, const std::source_location caller = std::source_location::current())
-
-
-	struct Girl2_params {
-		int quality; int xPos;
-
-	}; 
-	
-	void Girl2(Girl2_params in, const std::source_location caller = std::source_location::current())
-	{
-
-	}
-	//	cmd2(Girl2, int quality, int xPos)
-	
-
-	
-
-	//cmd(Girl, int quality; int xPos; int yPos; int zPos; int brightness; int tickness;)
-	//struct alignas(1) Girl_params {
-		//int quality; int xPos; int yPos; int zPos; int brightness; int tickness;
-	//}; 
-	
-
-	//void Girl(Girl_params in, const std::source_location caller = std::source_location::current())
-	cmd(Girl, int quality; int xPos; int yPos; int zPos; int brightness; int tickness;)
+	cmd(Girl, int quality, int xPos, int yPos, int zPos, int brightness, int tickness)
 	{
 		reflect;
 
@@ -1093,7 +1042,7 @@ namespace Object {
 		
 	}
 
-	cmd(Scorpio, int quality;)
+	cmd(Scorpio, int quality)
 	{
 		reflect;
 
@@ -1133,7 +1082,7 @@ namespace Object {
 		
 	}
 
-	cmd(Virgo, int quality;)
+	cmd(Virgo, int quality)
 	{
 		reflect;
 
@@ -1163,7 +1112,7 @@ namespace Object {
 		
 	}
 
-	cmd(Aries, int quality;)
+	cmd(Aries, int quality)
 	{
 		reflect;
 
@@ -1198,7 +1147,7 @@ namespace Object {
 		
 	}
 
-	cmd(Twins, int quality;)
+	cmd(Twins, int quality)
 	{
 		reflect;
 
@@ -1233,7 +1182,7 @@ namespace Object {
 		
 	}
 
-	cmd(Fish, int quality;)
+	cmd(Fish, int quality)
 	{
 		reflect;
 
@@ -1268,7 +1217,7 @@ namespace Object {
 		
 	}
 
-	cmd(Zenith, int quality;)
+	cmd(Zenith, int quality)
 	{
 		reflect;
 
@@ -1299,7 +1248,7 @@ namespace Object {
 		
 	}
 
-	cmd(Saggitarius, int quality;)
+	cmd(Saggitarius, int quality)
 	{
 		reflect;
 
@@ -1337,7 +1286,7 @@ namespace Object {
 		
 	}
 
-	cmd(CalcNormals, texture srcGeomerty; texture targetNrml;)
+	cmd(CalcNormals, texture srcGeomerty, texture targetNrml)
 	{
 		reflect;
 
@@ -1367,7 +1316,7 @@ namespace Object {
 
 	}
 
-	cmd(Calc, texture targetGeo; texture targetNrml;)
+	cmd(Calc, texture targetGeo, texture targetNrml)
 	{
 		reflect;
 
