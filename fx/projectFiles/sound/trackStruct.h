@@ -2,8 +2,6 @@ const int clipLen = 128;
 const int clipsCount = 32;
 const int channelsCount = 32;
 
-enum class layerType { pitch, octave, velocity, positon, offset, variation, slide, retrigger };
-const int layersCount = 8;
 
 struct clip {
 	int16u pos;

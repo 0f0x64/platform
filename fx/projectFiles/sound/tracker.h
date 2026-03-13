@@ -3,22 +3,12 @@ namespace tracker
 	int curChannel;
 	int curClip;
 
-	cmd(Layer, layerType ltype, char data[clipLen])
+	cmd(Layer, layer ltype, pStr data[clipLen])
 	{
 		reflect;
-		strcpy(track.channels[curChannel].clips[curClip].layer[(int)in.ltype], in.data);
-	}
-
-	cmd(Pitch,char data[clipLen])
-	{
-		reflect;
-		strcpy(track.channels[curChannel].clips[curClip].layer[(int)layerType::pitch], in.data);
-	}
-
-	cmd(Octave, char data[clipLen])
-	{
-		reflect;
-		strcpy(track.channels[curChannel].clips[curClip].layer[(int)layerType::octave], in.data);
+		memcpy(track.channels[curChannel].clips[curClip].layer[(int)in.ltype], in.data, clipLen);
+//		OutputDebugString((LPCSTR)in.data);
+//		OutputDebugString("\n");
 	}
 
 	cmd(Clip, 
@@ -39,6 +29,7 @@ namespace tracker
 			.bpmScale = in.bpmScale,
 			.overDub = in.overDub
 		};
+
 	}
 
 	cmd(Channel,
@@ -61,16 +52,15 @@ namespace tracker
 
 	}
 
-	cmd(Track, int16u masterBPM, int8u volume)
+	cmd(Master, int16u masterBPM, int8u volume)
 	{
 		reflect;
 		
 		curChannel = -1;
 
-		track = {
-			.masterBPM = in.masterBPM,
-			.volume = in.volume
-		};
+		track.masterBPM = in.masterBPM;
+		track.volume = in.volume;
+
 
 		#if EditMode
 			editor::TimeLine::bpm = track.masterBPM;
@@ -78,15 +68,17 @@ namespace tracker
 		
 	}
 	
-	void tr()
+	void Music()
 	{
-		Track({ .masterBPM = 120,.volume = 100 });
+		Master({ .masterBPM = 120,.volume = 100 });
 		Channel({ .vol = 100,.pan = 0,.mute = switcher::off, .solo = switcher::off });
 			Clip({.pos = 0,.len = 32,.repeat = 1,.bpmScale = 1,.overDub = switcher::off});
-				//		|0.......8.......16......24......|
-				//		|01234567012345670123456701234567|
-				Pitch({ "DDDCDEFGDDDCDEFGDDDCDEFGDDDCDEFG" });
-				Octave({"12121212121212121212121212121212" });
+							//		 1.......9.......17......25...... 
+							//		 123412341234
+							//		 |...|...|...|...|...|...|...|...
+				Layer({ layer::pitch,"ef" });
+				Layer({layer::octave,"1" });
+
 
 	}
 

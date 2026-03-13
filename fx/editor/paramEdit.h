@@ -345,7 +345,7 @@ namespace paramEdit {
 							}
 
 							auto end = s.find(")");
-							end = s.rfind(",", end);
+							//end = s.rfind(",", end);
 							pStr = s.substr(commaOfs + 1, end -1 - commaOfs);
 							std::erase(pStr, '\t');
 							std::erase(pStr, '\n');
@@ -365,14 +365,28 @@ namespace paramEdit {
 								c->param[j]._min = typeID == -1 ? INT_MIN : typeDesc[typeID]._min;
 								c->param[j]._max = typeID == -1 ? INT_MAX : typeDesc[typeID]._max;
 
-								auto br = nameStr.find("[");
 								int cnt = 1;
-								if (br != std::string::npos)
-								{
-									auto rbr = nameStr.find("]");
-									auto cs = nameStr.substr(br + 1, rbr - br);
-									cnt = std::stoi(cs);
 
+								if (typeStr == "pStr")
+								{
+
+									auto br = nameStr.find("[");
+									if (br != std::string::npos)
+									{
+										nameStr = nameStr.substr(0, br);
+									}
+								}
+								else
+								{
+									auto br = nameStr.find("[");
+
+									if (br != std::string::npos)
+									{
+										auto rbr = nameStr.find("]");
+										auto cs = nameStr.substr(br + 1, rbr - br-1);
+										cnt = std::stoi(cs);
+
+									}
 								}
 
 								for (int k=0;k<cnt;k++)
@@ -463,7 +477,7 @@ namespace paramEdit {
 					funcStr = funcStr.substr(0, pEnd);
 				}
 
-				std::erase(funcStr, ' ');
+				//std::erase(funcStr, ' ');
 				std::erase(funcStr, '\t');
 				std::erase(funcStr, '\n');
 
@@ -477,6 +491,18 @@ namespace paramEdit {
 				{
 					std::string pname;
 					std::string pvalue;
+
+					if (!strcmp(c->param[i].type, "pStr"))
+					{
+						auto start = pTokens[i].find('\"');
+						auto end = pTokens[i].rfind('\"');
+						std::string text = pTokens[i].substr(start + 1, end - start - 1);
+						strcpy(c->param[i].strValue, text.c_str());
+						continue;
+					}
+
+					std::erase(pTokens[i], ' ');
+
 					auto pId = i;
 					auto eqPos = pTokens[i].find('=');
 
@@ -541,24 +567,30 @@ namespace paramEdit {
 		
 		//variables <- reflected struct
 
- 		for (int i = 0; i < c->pCount; i++)
+		for (int i = 0; i < c->pCount; i++)
 		{
 			if (c->param[i].bypass) continue;
 
-			switch (c->param[i].size)
+			if (!strcmp(c->param[i].type, "pStr"))
 			{
-			case 1:
-				*(char*)((char*)in + c->param[i].offset) = (char)c->param[i].value;
-				break;
-			case 2:
-				*(short*)((char*)in + c->param[i].offset) = (short)c->param[i].value;
-				break;
-			case 4:
-				*(int*)((char*)in + c->param[i].offset) = (int)c->param[i].value;
-				break;
-
+				memcpy((char*)((char*)in + c->param[i].offset), (char*)c->param[i].strValue, strlen(c->param[i].strValue)+1);
 			}
+			else
+			{
+				switch (c->param[i].size)
+				{
+				case 1:
+					*(char*)((char*)in + c->param[i].offset) = (char)c->param[i].value;
+					break;
+				case 2:
+					*(short*)((char*)in + c->param[i].offset) = (short)c->param[i].value;
+					break;
+				case 4:
+					*(int*)((char*)in + c->param[i].offset) = (int)c->param[i].value;
+					break;
 
+				}
+			}
 		}
 	}
 

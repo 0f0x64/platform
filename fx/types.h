@@ -171,7 +171,9 @@ bool ta = texturesToEnumType();
 #define createType8s(name, _min, _max) typedef char name; bool name##_r = fillTypeTable(sizeof(char), #name, _min,_max);
 #define createType8u(name, _min, _max) typedef unsigned char name; bool name##_r = fillTypeTable(sizeof(unsigned char), #name, _min,_max);
 
-#define createTypeEnum(name, ...) enum class name:unsigned char { __VA_ARGS__}; bool name##_t = fillTypeTable(sizeof(int), #name, 0, 255, #__VA_ARGS__);
+#define createTypeEnum(name, ...) enum class name:unsigned char { __VA_ARGS__}; bool name##_t = fillTypeTable(sizeof(unsigned char), #name, 0, 255, #__VA_ARGS__);
+
+typedef unsigned char pStr; bool pStr_r = fillTypeTable(128, "pStr", 0, 0);
 
 #else
 
@@ -224,7 +226,9 @@ createTypeEnum(sliderType, follow, pan, slide);
 
 createTypeEnum(switcher, off, on);
 createTypeEnum(overdub, off, on);
-createTypeEnum(layers, pitch, variation, retrigger, slide, send0, send1, send2, send3);
+createTypeEnum(layer, pitch, octave, velocity, positon, offset, variation, slide, retrigger);
+const int layersCount = 8;
+
 
 #undef CreateTexture
 #define CreateTexture(name,type,format,width,height,mip,depth) name,

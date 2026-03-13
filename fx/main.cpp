@@ -52,7 +52,7 @@ using namespace dx11;
 #define reflect
 #define reflect_close
 
-#define cmd(name, ...) struct alignas(1) CAT(name,_params) { FOR_EACH(SEMI, __VA_ARGS__) }; \
+#define cmd(name, ...) _Pragma("pack(push, 1)") struct CAT(name,_params) { FOR_EACH(SEMI, __VA_ARGS__) }; _Pragma("pack(pop)") \
     void name(CAT(name,_params) in)
 
 #if EditMode

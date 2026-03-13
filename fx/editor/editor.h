@@ -34,8 +34,9 @@ namespace editor
 		long end = 0;
 
 		int slider = 0;
-		enum class textType {nonEditable, number,enumList,functionCall} typeUnderCursor;
+		enum class textType {nonEditable, number,enumList,functionCall, text} typeUnderCursor;
 		char typeName[256];
+		char textValue[256];
 
 		bool pointBefore = false;
 
@@ -102,6 +103,48 @@ namespace editor
 
 		bool is_id_char(char c) {
 			return std::isalnum(static_cast<unsigned char>(c)) || c == '_';
+		}
+
+		bool isText(const char* str, int pos) {
+			if (!str || pos < 0) return false;
+
+			int left = -1;
+			int right = -1;
+
+			// 1. Ищем ближайшую кавычку СЛЕВА от pos
+			for (int i = pos; i >= 0; --i) {
+				if (str[i] == '\"') {
+					left = i;
+					break;
+				}
+			}
+
+			// 2. Ищем ближайшую кавычку СПРАВА от pos
+			for (int i = pos; str[i] != '\0'; ++i) {
+				if (str[i] == '\"') {
+					right = i;
+					break;
+				}
+			}
+
+			// Проверяем, что мы действительно МЕЖДУ двумя кавычками
+			// (left < pos < right)
+			if (left != -1 && right != -1 && left < right && pos > left && pos < right) {
+				int length = right - left - 1;
+
+				// Защита от переполнения глобального буфера (255 символов + '\0')
+				if (length > 255) length = 255;
+
+				// Копируем текст из основной строки в глобальный буфер
+				memcpy(textValue, &str[left + 1], length);
+				textValue[length] = '\0'; // Закрываем строку нулем
+
+				return true;
+			}
+
+			// Если не в тексте, очищаем глобальный буфер (по желанию)
+			textValue[0] = '\0';
+			return false;
 		}
 
 		bool isEnum(const char* str, int pos) {
@@ -417,6 +460,12 @@ namespace editor
 			strcpy(paramStr, "nan");
 			typeUnderCursor = textType::nonEditable;
 
+			if (isText(s.c_str(), column - 1))
+			{
+				typeUnderCursor = textType::text;
+				return true;
+			}
+
 			char* number = extractNumberAtC(s.c_str(), column-1);
 			if (number)
 			{
@@ -625,7 +674,7 @@ namespace editor
 #if REFLECTION
 	#define reflect editor::paramEdit::reflect_f(&in, caller, std::source_location::current())
 
-	#define cmd(name, ...) struct alignas(1) CAT(name,_params) { FOR_EACH(SEMI, __VA_ARGS__) }; \
+	#define cmd(name, ...) _Pragma("pack(push, 1)") struct CAT(name,_params) { FOR_EACH(SEMI, __VA_ARGS__) }; _Pragma("pack(pop)") \
     void name(CAT(name,_params) in, const std::source_location caller = std::source_location::current())
 
 #endif
@@ -1368,6 +1417,11 @@ namespace editor
 							cmdParamDesc[cmdIndex].param[pIndex].value = atoi(VsEditor.paramStr);
 							strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, VsEditor.paramStr);
 						}
+						if (VsEditor.typeUnderCursor == VsEditor.textType::text)
+						{
+							strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, VsEditor.textValue);
+						}
+
 					}
 				}
 			}

@@ -1042,11 +1042,11 @@ namespace Loop
 			BasicCam::processCam();
 			Object::Girl({
 				.quality = 1,
-				.xPos = 1,
-				.yPos = 94,
+				.xPos = -25,
+				.yPos = 97,
 				.zPos = 0,
 				.brightness = 84,
-				.tickness = 0
+				.tickness = 2
 			});
 
 
@@ -1134,7 +1134,7 @@ namespace Loop
 		RenderTarget::Set({texture::mainRT,0});
 		RenderTarget::Clear({ 11, 11, 11, 255 });
 		DepthBuf::Clear({});
-		tracker::Track({});
+		tracker::Music();
 			
 	}
 
