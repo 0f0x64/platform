@@ -22,6 +22,10 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 #include "utils.h"
 
 #if EditMode
+
+	#include <unordered_map>
+	#include <vector>
+
 	#include <iostream>
 	#include <string>
 	#include <filesystem>
@@ -40,17 +44,16 @@ int cmdCounter = 0;//reset it in loop start point
 #include "dx11\dx.h"
 #include "Xaudio2.h"
 #include "projectFiles\sound\trackStruct.h"
-_track track;
+#include "projectFiles\sound\trackData.h"
 
 using namespace dx11;
-
-
 
 #define regDrawer(name)
 #define reflect
 #define reflect_close
-#define cmd(name, ...) __pragma (pack(push,1)) struct CAT(name,_params) {__VA_ARGS__}; __pragma (pack(pop))\
-	void name(CAT(name,_params) in)
+
+#define cmd(name, ...) _Pragma("pack(push, 1)") struct CAT(name,_params) { FOR_EACH(SEMI, __VA_ARGS__) }; _Pragma("pack(pop)") \
+    void name(CAT(name,_params) in)
 
 #if EditMode
 	#include "editor\editor.h"
@@ -107,23 +110,29 @@ void UpdateFrame(double time)
 
 }
 
-//int time_activate = 0;
-
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	hInst = (HINSTANCE)GetModuleHandle(0);
 	width = GetSystemMetrics(SM_CXSCREEN);
 	height = GetSystemMetrics(SM_CYSCREEN);
 	HBRUSH brush = CreateSolidBrush(RGB(0, 0, 0));
-	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL};
+#if EditMode
+	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
 	RegisterClassEx(&wcex);
 	hWnd = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_OVERLAPPEDWINDOW, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
+#else
+	WNDCLASSEX wcex = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0,0, hInst, NULL, LoadCursor(NULL, IDC_ARROW), brush, NULL, "fx", NULL };
+	RegisterClassEx(&wcex);
+	hWnd = CreateWindow(wcex.lpszClassName, wcex.lpszClassName, WS_POPUP | WS_VISIBLE, 0, 0, 0, 0, NULL, NULL, hInst, NULL);
+#endif
 	
 	ShowCursor(EditMode);
 
 	dx11::Init();
+	
 
 	#if EditMode
+		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 		editor::SetRenderWindowPosition();
 		editor::Init();
 	#else
@@ -139,9 +148,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	while (msg.message != WM_QUIT)
 	{
 		#if EditMode
-			
-			cmdParamDescBack = cmdParamDesc[currentCmd];
-
+		
 			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
 				if (msg.message == WM_QUIT)
@@ -151,16 +158,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
-				
 			}
 
-			editor::WatchFiles();
 			editor::WatchForRecompilation();
-
 
 		#else
 
-			PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
+			// Проверяем сообщения Windows
+			if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+				continue;
+			}
+
+			//PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
 			if (GetAsyncKeyState(VK_ESCAPE) || timer::frameBeginTime / 1000. > DEMO_DURATION)
 			{
 				break;
@@ -169,13 +180,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		#endif
 			
 		UpdateFrame(timer::GetCounter());
-
-
-
 	}
 
 	#if EditMode
 		editor::SaveAndExit();
+		CoUninitialize();
 	#endif
 
 	ExitProcess(0);
@@ -187,18 +196,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 #else
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
-	case WM_CLOSE:
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	switch (message) {
+	case WM_DESTROY:
 		PostQuitMessage(0);
-		break;
+		return 0;
+	case WM_KEYDOWN:
+		if (wParam == VK_ESCAPE) DestroyWindow(hWnd); // Выход по Esc
+		return 0;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
-
-	return 0;
 }
 
 #endif

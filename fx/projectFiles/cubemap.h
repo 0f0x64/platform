@@ -1,6 +1,6 @@
 namespace Cubemap {
 
-	cmd(Calc, texture target;)
+	cmd(Calc, texture target)
 	{
 		reflect;
 		BlendMode::Set({ blendmode::off, blendop::add });
@@ -13,10 +13,10 @@ namespace Cubemap {
 		ps::cubemapCreator.set();
 		Drawer::NullDrawer({ 1, 1 });
 		RenderTarget::GenerateMips({});
-		reflect_close;
+	
 	}
 
-	cmd(Show, texture envTexture;)
+	cmd(Show, texture envTexture)
 	{
 		reflect;
 
@@ -51,7 +51,7 @@ namespace Cubemap {
 
 		Drawer::NullDrawer({ gX * gY,1 });
 
-		reflect_close;
+	
 	}
 
 }

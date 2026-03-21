@@ -22,17 +22,17 @@ namespace dx11
 
 	#if DebugMode | EditMode
 
-		void Log(const char* message)
+		void Log(const char* message, const char* title = NULL)
 		{
 			#if EditMode
 				OutputDebugString(message);
 			#else	
-				MessageBox(hWnd, message, "", MB_OK);
+			MessageBox(hWnd, message, title , MB_OK);
 			#endif	
 		}
 
-		#define LogIfError(text)  if (FAILED(hr)) { Log("CreateTexture2D error\n"); return; } 
-		#define LogBlobIfError if (FAILED(hr)) { Log((char*)pErrorBlob->GetBufferPointer()); }
+		#define LogIfError(text)  if (FAILED(hr)) { Log(text); return; } 
+		#define LogBlobIfError if (FAILED(hr)) { char title[10];_itoa(n,title,10); Log((char*)pErrorBlob->GetBufferPointer(), title); }
 
 	#else
 		
@@ -92,7 +92,6 @@ namespace dx11
 		device->CreateRenderTargetView(Textures::Texture[0].pTexture, NULL, &Textures::Texture[0].RenderTargetView[0][0]);
 		Textures::Texture[0].pTexture->Release();
 		Textures::Texture[0].pDepth->Release();
-		
 		Textures::Create(0, Textures::tType::flat, Textures::tFormat::u8, XMFLOAT2((float)width, (float)height), false, true);
 		
 		Camera::viewCam.pInit();

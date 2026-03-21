@@ -1,0 +1,8 @@
+#include<../lib/constBuf.shader>
+#include<../lib/io.shader>
+#include<../lib/constants.shader>
+#include<../lib/utils.shader>
+cbuffer params:register(b0){float4x4 model;int gX;int gY;int mode;int skipper;};float toRad(float r){return r*PI/180.;}
+#include<../lib/hand_data.shader>
+static float3 ofs=float3(.25,-1.2,0);float3 pillar(uint m,uint b,float2 w,float f,float r,float z){float3 s=hand_vertex[b%428];s.x+=3450;s.z-=1330;s/=15;s+=normalize(hash3(b%1600))*.5;s.y-=7;f=hash(b/1e3);s+=noise3(f*351*float3(4,25,67))*1.7;s=rot3(s,noise3(s*1.5+float3(0,r,0))/6);s+=noise3(s)*.8;s=rot3(s,noise3(s.zyx*1.6+float3(0,-r,0))/12);f=length(s+ofs.xyz)/4.;f=1-saturate(f);f=smoothstep(0,1,smoothstep(0,1,smoothstep(0,1,f)));s+=ofs;s=rotX(s,toRad(-26));s=rotZ(s,-f*5-r*f*.005);s=rotZ(s,-r*sign(f)/3);s=lerp(s,s*float3(1,1,0),f);s=rotX(s,toRad(26));return s-ofs;}pos_color CalcParticles(uint s,uint f,float4 r){s*=skipper;float w=time.x*.07;uint z=10000;if(mode==1||f%z==0)w=0;uint l=7;float t=(sin(s%l*PI/180.*(360./l)*3)+2)/2;float3 i=pillar(s,f,r.xy,0,w,t),u=i;pos_color e;e.color=float4(noise3_u(float3(113,115,1)*221+177+sin(u*.48)),1)/30.+.0015;i=rotX(i,toRad(65));i.y-=.5;i.z+=1.2;if(mode==1)e.pos=transform(i,r.zw,22),e.color*=11,e.sz=172;else{e.color*=2;e.pos=transform_unisize(i,r.zw,1.5);e.sz=1;if(f%z==0)e.pos=transform_unisize(i,r.zw,51.5),e.sz=2,e.color*=15;else{float s=length(u.xyz+ofs.xyz)/4;if(s<.7&&f%1400==0)e.pos=transform_unisize(i,r.zw,51.5),e.sz=2,e.color*=15;}}t=length(u.xyz+ofs.xyz)/4;e.color*=saturate(pow(abs(length(u+ofs)-t-3),2));e.color+=saturate(1-t)*.1*lerp(float4(3,2,2,0),float4(0,0,4,0),t*2-.4);e.color*=.2;return e;}
+#include<../lib/particleVS_main2.shader>

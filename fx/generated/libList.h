@@ -1,3 +1,3 @@
-const char* libName [] = {"constants", "constBuf", "io", "utils", };
-const char* libPtr [] = {shadersData::constants, shadersData::constBuf, shadersData::io, shadersData::utils, };
-int libCount = 4;
+const char* libName [] = {"constants", "constBuf", "hand_data", "io", "particleVS_main", "particleVS_main2", "utils", };
+const char* libPtr [] = {shadersData::constants, shadersData::constBuf, shadersData::hand_data, shadersData::io, shadersData::particleVS_main, shadersData::particleVS_main2, shadersData::utils, };
+int libCount = 7;

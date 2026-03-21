@@ -1,6 +1,6 @@
 #include<../lib/constBuf.shader>
 #include<../lib/io.shader>
 #include<../lib/utils.shader>
-TextureCube env:register(t0);Texture2D normals:register(t1);TextureCube albedo:register(t2);SamplerState sam1:register(s0);cbuffer params:register(b0){float hilight;};float3 FresnelSchlick(float3 s,float3 f,float3 e){float t=dot(-e,f);return saturate(s+(1.-s)*pow(1.-saturate(t),5.));}float3 rotY(float3 s,float f){float3x3 e={cos(f),0,sin(f),0,1,0,-sin(f),0,cos(f)};return mul(s,e);}
+cbuffer params:register(b0){float hilight;};
 #define PI 3.1415926535897932384626433832795
-float4 PS(VS_OUTPUT s,bool e:SV_IsFrontFace):SV_Target{float2 f=s.uv;float3 n=(float3(1,1,1),sin(f.x*158)*sin(f.y*2));n=saturate(n)*float3(1,.5,.2);float t=.71,z=0.;float3 v=.04,r=normals.SampleLevel(sam1,s.uv,6).xyz;r+=normals.SampleLevel(sam1,s.uv,0).xyz*.01;r=normalize(r);float3 m=s.vpos.xyz;m=normalize(mul(view[0],float4(m,1)));m=normalize(m);float3 l=reflect(m,r),T=env.SampleLevel(sam1,l,t*10),b=env.SampleLevel(sam1,-r,9.5)/3;l=lerp(n,0,z);v=lerp(v,v*n,z);l=FresnelSchlick(v,m,-r);l*=lerp(saturate(1-t),1,z);T*=l;l=saturate(1.-l);l=n*l*b+T;mul(r,view[0]);T=mul(r,view[0]);t=dot(normalize(s.vpos.xyz),normalize(T));l+=saturate(10-35*t)*sin(t*127+time.x)*4*hilight;l.xyz=pow(ACESFilm(l.xyz),1/2.2);return float4(l,1);}
+float4 PS(VS_OUTPUT_PARTICLE l,bool P:SV_IsFrontFace):SV_Target{float3 h=saturate(1.-2.*length(l.uv-.5));float2 e=2*(l.uv-.5),b=abs(e);float f=2./((length(e.xy-e.yx)+length(e.xy+e.yx))/2)+2./(b.x+b.y);f*=saturate(1-max(b.x,b.y));return length(l.size)<=1.1?float4(15*l.color.xyz/9.,1):float4(f*l.color.xyz/9.,1);}

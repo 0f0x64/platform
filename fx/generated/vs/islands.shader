@@ -1,0 +1,6 @@
+#include<../lib/constBuf.shader>
+#include<../lib/io.shader>
+#include<../lib/constants.shader>
+#include<../lib/utils.shader>
+cbuffer params:register(b0){float4x4 model;int gX;int gY;int mode;int skipper;float4 base_color;};float toRad(float r){return r*PI/180.;}float3 pillar(uint m,uint b,float2 g,float r,float f,float p){float3 s=float3(hash(b/2e2),hash(b/140.),hash(b/120.))-.5;s=normalize(s)*2;s+=s*noise3(s);s*=4;r=hash(b/1e3);s+=noise3(r*351*float3(4,25,67))*1.7;s=rot3(s,noise3(s*.8+float3(0,f,0))/6);s+=noise3(s)*.8;s=rot3(s,noise3(s.zyx*1.6+float3(0,-f,0))/12);float3 z=s;s=lerp(s,normalize(s)*18+s/32,saturate(length(s/12)));int e=6;s.y=min(s.y,0);s.x+=hash(b%e)*24-12;s.z+=hash(b%e)*25-12;s.x-=1;s.z+=1;s=s/2.5/(-sin(b%e+1)+2);s.y-=sin(b%e+33)*16;s.y-=12*frac((b%13==0)*time.x*hash(b)*.0251);s.y-=sin(time.x/10+sin(b%e+33));return s/3;}pos_color CalcParticles(uint s,uint b,float4 f){s*=skipper;float r=time.x*.4;uint e=10000;if(mode==1||b%e==0)r=0;float3 m=pillar(s,b,f.xy,0,r,0),n=m;pos_color i;i.color=float4(noise3_u(111+float3(113,11,111)*221+177+sin(n*.48)),1)/110.+.0015;i.color*=base_color;if(mode==1){float s=hash(b)*33+11;i.pos=transform(m,f.zw,s);i.color*=.6;i.sz=172;}else{i.pos=transform_unisize(m,f.zw,1.75);i.sz=1;i.color*=1.2;if(b%e==0)i.pos=transform_unisize(m,f.zw,151.5),i.sz=2,i.color*=13;}return i;}
+#include<../lib/particleVS_main2.shader>

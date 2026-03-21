@@ -24,7 +24,7 @@ namespace Camera
 		XMMATRIX proj;
 
 		bool overRide = true;
-		float angle = 60.f;
+		float angle = 100.f;
 
 		void Init()
 		{

@@ -182,9 +182,6 @@
     <ClInclude Include="editor\trackerUI.h">
       <Filter>Source Files\editor</Filter>
     </ClInclude>
-    <ClInclude Include="editor\textEditor.h">
-      <Filter>Source Files\editor</Filter>
-    </ClInclude>
     <ClInclude Include="reflector.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -194,11 +191,14 @@
     <ClInclude Include="generated\uiShaderMargin.h">
       <Filter>Source Files\generated</Filter>
     </ClInclude>
+    <ClInclude Include="projectFiles\sound\trackStruct.h">
+      <Filter>Source Files\sound</Filter>
+    </ClInclude>
     <ClInclude Include="projectFiles\sound\trackData.h">
       <Filter>Source Files\sound</Filter>
     </ClInclude>
-    <ClInclude Include="projectFiles\sound\trackStruct.h">
-      <Filter>Source Files\sound</Filter>
+    <ClInclude Include="generated\trackParser.h">
+      <Filter>Source Files\generated</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -269,6 +269,90 @@
     </None>
     <None Include="projectFiles\shaders\ps\cat.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\output.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\basicLow.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\galaxy.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\neitron_star.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\pillars.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\space.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\particleVS_main.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\pillarsHand.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\hand_data.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\insideNebula.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\fish.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\tree.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\libra_sph.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\blob.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\islands.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\waterfall.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\pearl.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\transporter.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\leo.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\capriStar.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\Tau.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\galaxy_2.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\scorpBall.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\rocks.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\Nebula2.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\Virgo.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\lib\particleVS_main2.shader">
+      <Filter>Source Files\projectFiles\shadersSource\lib</Filter>
+    </None>
+    <None Include="projectFiles\shaders\vs\girl.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
   </ItemGroup>
 </Project>

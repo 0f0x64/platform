@@ -23,12 +23,19 @@ namespace Shaders {
 		ID3D11VertexShader* pShader;
 		ID3DBlob* pBlob;
 		ID3D11Buffer* params;
+	#if EditMode
+		HRESULT compileStatus;
+	#endif
 	} VertexShader;
 
 	typedef struct {
 		ID3D11PixelShader* pShader;
 		ID3DBlob* pBlob;
 		ID3D11Buffer* params;
+	#if EditMode
+		HRESULT compileStatus;
+	#endif
+
 	} PixelShader;
 
 	VertexShader VS[255];
@@ -41,7 +48,7 @@ namespace Shaders {
 		bool firstRun = true;
 		const char* shaderExtension = ".shader";
 
-		void CompilerLog(LPCWSTR source, HRESULT hr, const char* message)
+		void CompilerLog(LPCWSTR source, HRESULT hr, const char* message, bool logOnlyifErrors = false)
 		{
 		#if DebugMode
 			if (FAILED(hr))
@@ -51,6 +58,8 @@ namespace Shaders {
 			}
 			else
 			{
+				if (logOnlyifErrors) return;
+
 				char shaderName[1024];
 				WideCharToMultiByte(CP_ACP, NULL, source, -1, shaderName, sizeof(shaderName), NULL, NULL);
 
@@ -93,12 +102,13 @@ namespace Shaders {
 			return shaderPathW;
 		}
 
-		void CreateVS(int i, const char* name)
+		void CreateVS(int i, const char* name, bool logOnlyifErrors =  false)
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name,i,stype::vertex);
 
 			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", VertexShaderModel, NULL, NULL, &VS[i].pBlob, &pErrorBlob);
-			CompilerLog(source, hr, "vertex shader compiled: ");
+			CompilerLog(source, hr, "vertex shader compiled: ", hr == VS[i].compileStatus ? logOnlyifErrors : false);
+			VS[i].compileStatus = hr;
 
 			if (hr == S_OK)
 			{
@@ -108,12 +118,13 @@ namespace Shaders {
 
 		}
 
-		void CreatePS(int i, const char* name)
+		void CreatePS(int i, const char* name, bool logOnlyifErrors = false)
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name, i, stype::pixel);
 
 			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS", PixelShaderModel, NULL, NULL, &PS[i].pBlob, &pErrorBlob);
-			CompilerLog(source, hr, "pixel shader compiled: ");
+			CompilerLog(source, hr, "pixel shader compiled: ", hr == PS[i].compileStatus ? logOnlyifErrors : false);
+			PS[i].compileStatus = hr;
 
 			if (hr == S_OK)
 			{
@@ -126,6 +137,13 @@ namespace Shaders {
 		void Init()
 		{
 			vsCount = sizeof(vsList) / sizeof(const char*);
+			psCount = sizeof(psList) / sizeof(const char*);
+
+		#if shaderCompileOnDemand
+			firstRun = false;
+			return;
+		#endif	
+
 			int i = 0;
 			while (i < vsCount)
 			{
@@ -138,7 +156,6 @@ namespace Shaders {
 
 			}
 
-			psCount = sizeof(psList) / sizeof(const char*);
 			i = 0;
 			while (i < psCount)
 			{
@@ -167,7 +184,7 @@ namespace Shaders {
 
 		char* processIncludes(const char* shaderText)
 		{
-			if (!outText) outText = new char[64000];
+			if (!outText) outText = new char[640000];
 			strcpy(outText, shaderText);
 			char* inc = outText;
 
@@ -198,6 +215,43 @@ namespace Shaders {
 			return outText;
 		}
 
+		/*
+		#include <windows.h>
+		#include <cstring>
+
+		bool CopyToClipboardANSI(const char* text) {
+			if (text == nullptr) return false;
+
+			// 1. Calculate length and allocate global memory
+			size_t len = strlen(text) + 1;
+			HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len);
+			if (!hMem) return false;
+
+			// 2. Lock memory and copy the C-string
+			void* pLock = GlobalLock(hMem);
+			if (pLock) {
+				memcpy(pLock, text, len);
+				GlobalUnlock(hMem);
+			}
+			else {
+				GlobalFree(hMem);
+				return false;
+			}
+
+			// 3. Open clipboard and set data
+			if (OpenClipboard(NULL)) {
+				EmptyClipboard();
+				if (SetClipboardData(CF_TEXT, hMem) == NULL) {
+					GlobalFree(hMem); // Free only if SetClipboardData fails
+				}
+				CloseClipboard();
+				return true;
+			}
+
+			GlobalFree(hMem);
+			return false;
+		}*/
+
 		void CreateVS(int n, const char* shaderText)
 		{
 			HRESULT hr;
@@ -206,13 +260,17 @@ namespace Shaders {
 			auto ptr = processIncludes(shaderText);
 			hr = D3DCompile(ptr, strlen(ptr), NULL, NULL, NULL, "VS", VertexShaderModel, NULL, NULL, &VS[n].pBlob, &pErrorBlob);
 
-			LogBlobIfError;
+			LogBlobIfError
 
 			if (hr == S_OK)
 			{
 				if (VS[n].pShader) VS[n].pShader->Release();
 				hr = device->CreateVertexShader(VS[n].pBlob->GetBufferPointer(), VS[n].pBlob->GetBufferSize(), NULL, &VS[n].pShader);
 				LogIfError("vs fail\n"); 
+			}
+			else
+			{
+				int a = 0;
 			}
 
 		}
@@ -234,6 +292,10 @@ namespace Shaders {
 				hr = device->CreatePixelShader(PS[n].pBlob->GetBufferPointer(), PS[n].pBlob->GetBufferSize(), NULL, &PS[n].pShader);
 				LogIfError("ps fail\n");
 			}
+			else
+			{
+				auto a = ptr;
+			}
 		}
 
 		#include "..\generated\processedShadersCompile.h"
@@ -242,12 +304,37 @@ namespace Shaders {
 
 	void vShader(unsigned int n)
 	{
+	#if EditMode
+		if (!VS[n].pShader)
+		{
+			char fileName[255];
+			strcpy(fileName, "/vs/");
+			strcat(fileName, vsList[n]);
+			strcat(fileName, shaderExtension);
+			CreateVS(n, fileName);
+		}
+	#endif	
 		context->VSSetShader(VS[n].pShader, NULL, 0);
 	}
 
 	void pShader(unsigned int n)
 	{
+	#if EditMode
+			if (!PS[n].pShader)
+			{
+				char fileName[255];
+				strcpy(fileName, "/ps/");
+				strcat(fileName, psList[n]);
+				strcat(fileName, shaderExtension);
+				CreatePS(n, fileName);
+			}
+	#endif
 		context->PSSetShader(PS[n].pShader, NULL, 0);
+	}
+
+	void resetShader(unsigned int n)
+	{
+		context->PSSetShader(NULL, NULL, 0);
 	}
 
 }

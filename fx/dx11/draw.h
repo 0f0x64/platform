@@ -16,6 +16,11 @@ namespace Draw
 		context->DrawInstanced(quadCount * 6, instances, 0, 0);
 	}
 
+	void NullDrawerTri(int triCount, unsigned int instances = 1)
+	{
+		context->DrawInstanced(triCount * 3, instances, 0, 0);
+	}
+
 	void Present()
 	{
 		Textures::UnbindAll();

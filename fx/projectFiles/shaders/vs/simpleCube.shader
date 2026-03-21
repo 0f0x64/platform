@@ -11,14 +11,7 @@ cbuffer params : register(b0)
 }
 
 
-float3 rotY(float3 p, float a)
-{
-    float3x3 r;
-    r[0] = float3(cos(a), 0, sin(a));
-    r[1] = float3(0, 1, 0);
-    r[2] = float3(-sin(a), 0, cos(a));
-    return mul(p, r);
-}
+
 
 VS_OUTPUT VS(uint vID : SV_VertexID)
 {
