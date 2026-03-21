@@ -1043,7 +1043,7 @@ namespace Loop
 			Object::Girl({
 				.quality = 1,
 				.xPos = -25,
-				.yPos = 97,
+				.yPos = 203,
 				.zPos = 0,
 				.brightness = 84,
 				.tickness = 2
@@ -1120,7 +1120,7 @@ namespace Loop
 
 	}
 
-	void track__()
+	void ProcessTrack()
 	{
 		if (!isPrecalc)
 		{
@@ -1143,7 +1143,7 @@ namespace Loop
 	{
 		
 		scene3();
-		//track__();
+		//ProcessTrack();
 
 	}
 

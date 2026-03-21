@@ -1254,6 +1254,7 @@ namespace editor
 
 	std::string startTextValue;
 	bool mPressed = false;
+	bool timeAlwaysOn = true;
 
 	void Process()
 	{
@@ -1460,10 +1461,11 @@ namespace editor
 		Rasterizer::Cull(cullmode::off);
 		Depth::Depth(depthmode::off);
 
-		if (isKeyDown(TIME_KEY))
+		if (isKeyDown(TIME_KEY)|| timeAlwaysOn)
 		{
 			TimeLine::ProcessInput();
 			TimeLine::Draw();
+			paramEdit::showTrack();
 		}
 
 		paramEdit::CamKeys();

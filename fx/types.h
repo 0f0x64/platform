@@ -177,6 +177,8 @@ typedef unsigned char pStr; bool pStr_r = fillTypeTable(128, "pStr", 0, 0);
 
 #else
 
+typedef unsigned char pStr;
+
 #define createType32s(name, _min, _max) typedef int name;
 #define createType32u(name, _min, _max) typedef unsigned int name;
 #define createType16s(name, _min, _max) typedef short name;
@@ -227,7 +229,7 @@ createTypeEnum(sliderType, follow, pan, slide);
 createTypeEnum(switcher, off, on);
 createTypeEnum(overdub, off, on);
 createTypeEnum(layer, pitch, octave, velocity, positon, offset, variation, slide, retrigger);
-const int layersCount = 8;
+const int maxLayersCount = 8;
 
 
 #undef CreateTexture

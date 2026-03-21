@@ -27,6 +27,7 @@ PUBLIC	?g_XMATanEstCoefficients1@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::Direct
 PUBLIC	?g_XMTanEstCoefficients@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::DirectX::g_XMTanEstCoefficients
 PUBLIC	?g_XMArcEstCoefficients@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::DirectX::g_XMArcEstCoefficients
 PUBLIC	?g_XMPiConstants0@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::DirectX::g_XMPiConstants0
+PUBLIC	?track@@3U_track@@A				; track
 PUBLIC	?g_XMIdentityR0@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::DirectX::g_XMIdentityR0
 PUBLIC	?g_XMIdentityR1@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::DirectX::g_XMIdentityR1
 PUBLIC	?g_XMIdentityR2@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::DirectX::g_XMIdentityR2
@@ -34,7 +35,6 @@ PUBLIC	?g_XMIdentityR3@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::DirectX::g_XMIde
 PUBLIC	?g_XMNegIdentityR0@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::DirectX::g_XMNegIdentityR0
 PUBLIC	?g_XMNegIdentityR1@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::DirectX::g_XMNegIdentityR1
 PUBLIC	?g_XMNegIdentityR2@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::DirectX::g_XMNegIdentityR2
-PUBLIC	?track@@3U_track@@A				; track
 PUBLIC	?g_XMNegIdentityR3@DirectX@dx11@@3UXMVECTORF32@12@B ; dx11::DirectX::g_XMNegIdentityR3
 PUBLIC	?g_XMNegativeZero@DirectX@dx11@@3UXMVECTORU32@12@B ; dx11::DirectX::g_XMNegativeZero
 PUBLIC	?g_XMNegate3@DirectX@dx11@@3UXMVECTORU32@12@B	; dx11::DirectX::g_XMNegate3
@@ -177,6 +177,8 @@ PUBLIC	?timeCursor@timer@@3HA				; timer::timeCursor
 PUBLIC	?cmdCounter@@3HA				; cmdCounter
 PUBLIC	?curChannel@tracker@@3HA			; tracker::curChannel
 PUBLIC	?curClip@tracker@@3HA				; tracker::curClip
+PUBLIC	?curLayer@tracker@@3HA				; tracker::curLayer
+PUBLIC	?t@tracker@@3U_track@@A				; tracker::t
 PUBLIC	?precalcOfs@@3HA				; precalcOfs
 PUBLIC	?isPrecalc@Loop@@3_NA				; Loop::isPrecalc
 PUBLIC	?device@dx11@@3PAUID3D11Device@1@A		; dx11::device
@@ -307,8 +309,10 @@ PUBLIC	_IID_IXAudio2
 _BSS	SEGMENT
 ?hInst@@3PAUHINSTANCE__@@A DD 01H DUP (?)		; hInst
 ?hWnd@@3PAUHWND__@@A DD 01H DUP (?)			; hWnd
-?track@@3U_track@@A DB 0102084H DUP (?)			; track
+?track@@3U_track@@A DB 0103108H DUP (?)			; track
 ?camCounter@BasicCam@@3HA DD 01H DUP (?)		; BasicCam::camCounter
+	ALIGN	8
+
 ?Prev@BasicCam@@3UcamData@dx11@@A DB 040H DUP (?)	; BasicCam::Prev
 ?Next@BasicCam@@3UcamData@dx11@@A DB 040H DUP (?)	; BasicCam::Next
 ?camPass@BasicCam@@3_NA DB 01H DUP (?)			; BasicCam::camPass
@@ -336,6 +340,7 @@ _BSS	SEGMENT
 ?cmdCounter@@3HA DD 01H DUP (?)				; cmdCounter
 ?curChannel@tracker@@3HA DD 01H DUP (?)			; tracker::curChannel
 ?curClip@tracker@@3HA DD 01H DUP (?)			; tracker::curClip
+?curLayer@tracker@@3HA DD 01H DUP (?)			; tracker::curLayer
 ?precalcOfs@@3HA DD 01H DUP (?)				; precalcOfs
 ?isPrecalc@Loop@@3_NA DB 01H DUP (?)			; Loop::isPrecalc
 	ALIGN	4
@@ -1790,7 +1795,30 @@ CONST	SEGMENT
 CONST	ENDS
 _DATA	SEGMENT
 ?slider@BasicCam@@3W4sliderType@@A DB 02H		; BasicCam::slider
-	ORG $+3
+	ORG $+7
+?t@tracker@@3U_track@@A DW 078H				; tracker::t
+	DB	064H
+	ORG $+1
+	DB	064H
+	DB	00H
+	DB	00H
+	DB	00H
+	DW	00H
+	DW	0fH
+	DB	01H
+	DB	01H
+	DB	00H
+	DB	'asd', 00H
+	ORG $+124
+	DB	'123', 00H
+	ORG $+124
+	ORG $+1
+	ORG $+768
+	DD	00H
+	ORG $+32116
+	DD	00H
+	ORG $+1027960
+	DD	00H
 ?cBufPtr@ConstBuf@dx11@@3PAPADA DD 00H			; dx11::ConstBuf::cBufPtr
 	DD	FLAT:?camera@ConstBuf@dx11@@3U<unnamed-type-camera>@12@A
 	DD	FLAT:?frame@ConstBuf@dx11@@3U<unnamed-type-frame>@12@A
@@ -2976,12 +3004,10 @@ PUBLIC	?Saggitarius@Object@@YAXUSaggitarius_params@1@@Z ; Object::Saggitarius
 PUBLIC	?CalcNormals@Object@@YAXUCalcNormals_params@1@@Z ; Object::CalcNormals
 PUBLIC	?Calc@Object@@YAXUCalc_params@1@@Z		; Object::Calc
 PUBLIC	?Layer@tracker@@YAXULayer_params@1@@Z		; tracker::Layer
-PUBLIC	?Pitch@tracker@@YAXUPitch_params@1@@Z		; tracker::Pitch
-PUBLIC	?Octave@tracker@@YAXUOctave_params@1@@Z		; tracker::Octave
 PUBLIC	?Clip@tracker@@YAXUClip_params@1@@Z		; tracker::Clip
 PUBLIC	?Channel@tracker@@YAXUChannel_params@1@@Z	; tracker::Channel
-PUBLIC	?Track@tracker@@YAXUTrack_params@1@@Z		; tracker::Track
-PUBLIC	?tr@tracker@@YAXXZ				; tracker::tr
+PUBLIC	?Master@tracker@@YAXUMaster_params@1@@Z		; tracker::Master
+PUBLIC	?Music@tracker@@YAXXZ				; tracker::Music
 PUBLIC	?Precalc@Loop@@YAXXZ				; Loop::Precalc
 PUBLIC	?frameConst@Loop@@YAXXZ				; Loop::frameConst
 PUBLIC	?run@cameraMan@Loop@@YAXUrun_params@12@@Z	; Loop::cameraMan::run
@@ -3014,8 +3040,7 @@ PUBLIC	??_C@_02PJBJHKHI@VS@				; `string'
 PUBLIC	??_C@_08PANOCOBM@vs?5fail?6@			; `string'
 PUBLIC	??_C@_02PNJEAGMK@PS@				; `string'
 PUBLIC	??_C@_08IDMEFHJG@ps?5fail?6@			; `string'
-PUBLIC	??_C@_0CB@MDNPLLLN@DDDCDEFGDDDCDEFGDDDCDEFGDDDCDEF@ ; `string'
-PUBLIC	??_C@_0CB@DALNHIDC@1212121212121212121212121212121@ ; `string'
+PUBLIC	??_C@_0BA@OGLKGGCK@cdefgcdefgcdefg@		; `string'
 PUBLIC	??_C@_02KLACGCIB@fx@				; `string'
 PUBLIC	__real@00000000
 PUBLIC	__real@0000000000000000
@@ -3073,6 +3098,7 @@ PUBLIC	__xmm@000000000000000300000000fffffffd
 PUBLIC	__xmm@00000000000000030000000200000001
 PUBLIC	__xmm@000000000000000a0000000000000003
 PUBLIC	__xmm@000000000000000a00000000fffffffd
+PUBLIC	__xmm@0000000000000061ffffffe700000001
 PUBLIC	__xmm@000000003e24dd2f3de353f83dcccccd
 PUBLIC	__xmm@000000003f8000000000000000000000
 PUBLIC	__xmm@00000000fffffffdfffffffe00000003
@@ -3086,7 +3112,6 @@ PUBLIC	__xmm@00000014000000010000005e001e8480
 PUBLIC	__xmm@0000001400000001000000c2001e8480
 PUBLIC	__xmm@0000001e00000000000000010007a120
 PUBLIC	__xmm@00000028000000140000000100000002
-PUBLIC	__xmm@00000034000000600000004400000001
 PUBLIC	__xmm@000000640000000000000001000f4240
 PUBLIC	__xmm@000000640000000000000001001e8480
 PUBLIC	__xmm@0000006400000001000000c2001e8480
@@ -3194,6 +3219,8 @@ _BSS	SEGMENT
 ?pillarsHand@vs@dx11@@3U<unnamed-type-pillarsHand>@12@A DB 050H DUP (?) ; dx11::vs::pillarsHand
 ?rocks@vs@dx11@@3U<unnamed-type-rocks>@12@A DB 060H DUP (?) ; dx11::vs::rocks
 ?scorpBall@vs@dx11@@3U<unnamed-type-scorpBall>@12@A DB 060H DUP (?) ; dx11::vs::scorpBall
+	ALIGN	8
+
 ?simpleCube@vs@dx11@@3U<unnamed-type-simpleCube>@12@A DQ 01H DUP (?) ; dx11::vs::simpleCube
 ?space@vs@dx11@@3U<unnamed-type-space>@12@A DB 050H DUP (?) ; dx11::vs::space
 ?Tau@vs@dx11@@3U<unnamed-type-Tau>@12@A DB 02e0H DUP (?) ; dx11::vs::Tau
@@ -3526,11 +3553,6 @@ CONST	SEGMENT
 __xmm@000000640000000000000001000f4240 DB '@B', 0fH, 00H, 01H, 00H, 00H, 00H
 	DB	00H, 00H, 00H, 00H, 'd', 00H, 00H, 00H
 CONST	ENDS
-;	COMDAT __xmm@00000034000000600000004400000001
-CONST	SEGMENT
-__xmm@00000034000000600000004400000001 DB 01H, 00H, 00H, 00H, 'D', 00H, 00H
-	DB	00H, '`', 00H, 00H, 00H, '4', 00H, 00H, 00H
-CONST	ENDS
 ;	COMDAT __xmm@00000028000000140000000100000002
 CONST	SEGMENT
 __xmm@00000028000000140000000100000002 DB 02H, 00H, 00H, 00H, 01H, 00H, 00H
@@ -3595,6 +3617,11 @@ CONST	ENDS
 CONST	SEGMENT
 __xmm@000000003e24dd2f3de353f83dcccccd DB 0cdH, 0ccH, 0ccH, '=', 0f8H, 'S'
 	DB	0e3H, '=/', 0ddH, '$>', 00H, 00H, 00H, 00H
+CONST	ENDS
+;	COMDAT __xmm@0000000000000061ffffffe700000001
+CONST	SEGMENT
+__xmm@0000000000000061ffffffe700000001 DB 01H, 00H, 00H, 00H, 0e7H, 0ffH, 0ffH
+	DB	0ffH, 'a', 00H, 00H, 00H, 00H, 00H, 00H, 00H
 CONST	ENDS
 ;	COMDAT __xmm@000000000000000a00000000fffffffd
 CONST	SEGMENT
@@ -3836,15 +3863,9 @@ CONST	ENDS
 CONST	SEGMENT
 ??_C@_02KLACGCIB@fx@ DB 'fx', 00H			; `string'
 CONST	ENDS
-;	COMDAT ??_C@_0CB@DALNHIDC@1212121212121212121212121212121@
+;	COMDAT ??_C@_0BA@OGLKGGCK@cdefgcdefgcdefg@
 CONST	SEGMENT
-??_C@_0CB@DALNHIDC@1212121212121212121212121212121@ DB '12121212121212121'
-	DB	'212121212121212', 00H			; `string'
-CONST	ENDS
-;	COMDAT ??_C@_0CB@MDNPLLLN@DDDCDEFGDDDCDEFGDDDCDEFGDDDCDEF@
-CONST	SEGMENT
-??_C@_0CB@MDNPLLLN@DDDCDEFGDDDCDEFGDDDCDEFGDDDCDEF@ DB 'DDDCDEFGDDDCDEFGD'
-	DB	'DDCDEFGDDDCDEFG', 00H			; `string'
+??_C@_0BA@OGLKGGCK@cdefgcdefgcdefg@ DB 'cdefgcdefgcdefg', 00H ; `string'
 CONST	ENDS
 ;	COMDAT ??_C@_08IDMEFHJG@ps?5fail?6@
 CONST	SEGMENT
@@ -4175,26 +4196,25 @@ $LN2@track__:
   00044	a5		 movsd
   00045	a5		 movsd
   00046	e8 00 00 00 00	 call	 ?Clear@RenderTarget@@YAXUClear_params@1@@Z ; RenderTarget::Clear
+  0004b	83 c4 10	 add	 esp, 16			; 00000010H
 ; File D:\!platform\fx\gApi.h
 
 ; 60   : 		Draw::ClearDepth();
 
-  0004b	e8 00 00 00 00	 call	 ?ClearDepth@Draw@dx11@@YAXXZ ; dx11::Draw::ClearDepth
+  0004e	e8 00 00 00 00	 call	 ?ClearDepth@Draw@dx11@@YAXXZ ; dx11::Draw::ClearDepth
 ; File D:\!platform\fx\projectFiles\loop.h
 
-; 1137 : 		tracker::Track({});
+; 1137 : 		tracker::Music();
 
-  00050	6a 00		 push	 0
-  00052	e8 00 00 00 00	 call	 ?Track@tracker@@YAXUTrack_params@1@@Z ; tracker::Track
-  00057	83 c4 14	 add	 esp, 20			; 00000014H
+  00053	e8 00 00 00 00	 call	 ?Music@tracker@@YAXXZ	; tracker::Music
 
 ; 1138 : 			
 ; 1139 : 	}
 
-  0005a	5f		 pop	 edi
-  0005b	5e		 pop	 esi
-  0005c	c9		 leave
-  0005d	c3		 ret	 0
+  00058	5f		 pop	 edi
+  00059	5e		 pop	 esi
+  0005a	c9		 leave
+  0005b	c3		 ret	 0
 ?track__@Loop@@YAXXZ ENDP				; Loop::track__
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -4205,7 +4225,7 @@ _TEXT	ENDS
 ; File D:\!platform\fx\projectFiles\loop.h
 ;	COMDAT ?scene4@Loop@@YAXXZ
 _TEXT	SEGMENT
-$T1 = -88						; size = 84
+$T1 = -79						; size = 75
 $T2 = -4						; size = 2
 ?scene4@Loop@@YAXXZ PROC				; Loop::scene4, COMDAT
 
@@ -4213,7 +4233,7 @@ $T2 = -4						; size = 2
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
-  00003	83 ec 58	 sub	 esp, 88			; 00000058H
+  00003	83 ec 50	 sub	 esp, 80			; 00000050H
   00006	53		 push	 ebx
 
 ; 1059 : 		BasicCam::camPass = false;
@@ -4289,41 +4309,43 @@ $LN2@scene4:
 ; 1089 : 			BasicCam::camCounter = 0;
 ; 1090 : 			BasicCam::setCamKey({
 
-  00059	8d 75 a8	 lea	 esi, DWORD PTR $T1[ebp]
+  00059	8d 75 b1	 lea	 esi, DWORD PTR $T1[ebp]
   0005c	99		 cdq
   0005d	b9 df 02 00 00	 mov	 ecx, 735		; 000002dfH
   00062	f7 f9		 idiv	 ecx
   00064	b9 b0 04 00 00	 mov	 ecx, 1200		; 000004b0H
-  00069	88 5d ac	 mov	 BYTE PTR $T1[ebp+4], bl
+  00069	88 5d b5	 mov	 BYTE PTR $T1[ebp+4], bl
   0006c	99		 cdq
-  0006d	83 ec 44	 sub	 esp, 68			; 00000044H
+  0006d	83 ec 3c	 sub	 esp, 60			; 0000003cH
   00070	f7 f9		 idiv	 ecx
   00072	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@00000000ffffff0200000000000000000000000000000000000013f70000000a
-  0007a	69 c0 50 75 0d
+  0007a	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T1[ebp+5], ymm0
+  0007f	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00080	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T1[ebp+8], ymm0
-  00085	6a 15		 push	 21			; 00000015H
+  00085	6a 12		 push	 18			; 00000012H
   00087	59		 pop	 ecx
   00088	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
-  0008c	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T1[ebp+68], xmm0
-  00091	8b fc		 mov	 edi, esp
-  00093	89 45 a8	 mov	 DWORD PTR $T1[ebp], eax
-  00096	c7 45 d0 eb ff
-	ff ff		 mov	 DWORD PTR $T1[ebp+40], -21 ; ffffffebH
-  0009d	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T1[ebp+44], 100 ; 00000064H
-  000a4	88 5d d8	 mov	 BYTE PTR $T1[ebp+48], bl
-  000a7	89 5d dc	 mov	 DWORD PTR $T1[ebp+52], ebx
-  000aa	89 5d e0	 mov	 DWORD PTR $T1[ebp+56], ebx
-  000ad	c7 45 e4 c6 02
-	00 00		 mov	 DWORD PTR $T1[ebp+60], 710 ; 000002c6H
-  000b4	c6 45 e8 01	 mov	 BYTE PTR $T1[ebp+64], 1
-  000b8	89 1d 00 00 00
+  0008c	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T1[ebp+59], xmm0
+  00091	89 45 b1	 mov	 DWORD PTR $T1[ebp], eax
+  00094	8b fc		 mov	 edi, esp
+  00096	c7 45 d6 eb ff
+	ff ff		 mov	 DWORD PTR $T1[ebp+37], -21 ; ffffffebH
+  0009d	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T1[ebp+41], 100 ; 00000064H
+  000a4	88 5d de	 mov	 BYTE PTR $T1[ebp+45], bl
+  000a7	89 5d df	 mov	 DWORD PTR $T1[ebp+46], ebx
+  000aa	89 5d e3	 mov	 DWORD PTR $T1[ebp+50], ebx
+  000ad	c7 45 e7 c6 02
+	00 00		 mov	 DWORD PTR $T1[ebp+54], 710 ; 000002c6H
+  000b4	c6 45 eb 01	 mov	 BYTE PTR $T1[ebp+58], 1
+  000b8	f3 a5		 rep movsd
+  000ba	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  000be	f3 a5		 rep movsd
-  000c0	c5 f8 77	 vzeroupper
-  000c3	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  000c0	66 a5		 movsw
+  000c2	a4		 movsb
+  000c3	c5 f8 77	 vzeroupper
+  000c6	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 1091 : 				.camTime = t * SAMPLES_IN_FRAME * FRAMES_PER_SECOND * Dur,
 ; 1092 : 				.camType = keyType::set,
@@ -4349,13 +4371,13 @@ $LN2@scene4:
 ; 1112 : 				});
 ; 1113 : 			BasicCam::processCam();
 
-  000c8	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  000cb	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 1114 : 			Object::Twins({ .quality = 1 });
 
-  000cd	6a 01		 push	 1
-  000cf	e8 00 00 00 00	 call	 ?Twins@Object@@YAXUTwins_params@1@@Z ; Object::Twins
-  000d4	83 c4 58	 add	 esp, 88			; 00000058H
+  000d0	6a 01		 push	 1
+  000d2	e8 00 00 00 00	 call	 ?Twins@Object@@YAXUTwins_params@1@@Z ; Object::Twins
+  000d7	83 c4 50	 add	 esp, 80			; 00000050H
 
 ; 1115 : 			//break;
 ; 1116 : 		
@@ -4363,16 +4385,16 @@ $LN2@scene4:
 ; 1118 : 
 ; 1119 : 		Compose();
 
-  000d7	e8 00 00 00 00	 call	 ?Compose@Loop@@YAXXZ	; Loop::Compose
+  000da	e8 00 00 00 00	 call	 ?Compose@Loop@@YAXXZ	; Loop::Compose
 
 ; 1120 : 
 ; 1121 : 	}
 
-  000dc	5f		 pop	 edi
-  000dd	5e		 pop	 esi
-  000de	5b		 pop	 ebx
-  000df	c9		 leave
-  000e0	c3		 ret	 0
+  000df	5f		 pop	 edi
+  000e0	5e		 pop	 esi
+  000e1	5b		 pop	 ebx
+  000e2	c9		 leave
+  000e3	c3		 ret	 0
 ?scene4@Loop@@YAXXZ ENDP				; Loop::scene4
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -4383,9 +4405,9 @@ _TEXT	ENDS
 ; File D:\!platform\fx\projectFiles\loop.h
 ;	COMDAT ?scene3@Loop@@YAXXZ
 _TEXT	SEGMENT
-$T1 = -112						; size = 84
-$T2 = -112						; size = 84
-$T3 = -112						; size = 84
+$T1 = -103						; size = 75
+$T2 = -103						; size = 75
+$T3 = -103						; size = 75
 $T4 = -28						; size = 24
 $T5 = -4						; size = 2
 ?scene3@Loop@@YAXXZ PROC				; Loop::scene3, COMDAT
@@ -4394,7 +4416,7 @@ $T5 = -4						; size = 2
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
-  00003	83 ec 70	 sub	 esp, 112		; 00000070H
+  00003	83 ec 68	 sub	 esp, 104		; 00000068H
   00006	53		 push	 ebx
 
 ; 939  : 		BasicCam::camPass = false;
@@ -4466,33 +4488,35 @@ $LN2@scene3:
   00054	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000b9fffffff400000000000000000000000000000967fffff75cffffff56
   0005c	6a 64		 push	 100			; 00000064H
-  0005e	89 5d 90	 mov	 DWORD PTR $T1[ebp], ebx
-  00061	8d 75 90	 lea	 esi, DWORD PTR $T1[ebp]
-  00064	88 5d 94	 mov	 BYTE PTR $T1[ebp+4], bl
+  0005e	89 5d 99	 mov	 DWORD PTR $T1[ebp], ebx
+  00061	8d 75 99	 lea	 esi, DWORD PTR $T1[ebp]
+  00064	88 5d 9d	 mov	 BYTE PTR $T1[ebp+4], bl
   00067	33 c0		 xor	 eax, eax
   00069	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
   0006f	5b		 pop	 ebx
-  00070	83 ec 44	 sub	 esp, 68			; 00000044H
-  00073	c7 45 b8 ae 00
-	00 00		 mov	 DWORD PTR $T1[ebp+40], 174 ; 000000aeH
-  0007a	c5 fe 7f 45 98	 vmovdqu YMMWORD PTR $T1[ebp+8], ymm0
+  00070	83 ec 3c	 sub	 esp, 60			; 0000003cH
+  00073	c7 45 be ae 00
+	00 00		 mov	 DWORD PTR $T1[ebp+37], 174 ; 000000aeH
+  0007a	c5 fe 7f 45 9e	 vmovdqu YMMWORD PTR $T1[ebp+5], ymm0
   0007f	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@00000000000000000000000affffffee
-  00087	c5 fa 7f 45 d4	 vmovdqu XMMWORD PTR $T1[ebp+68], xmm0
-  0008c	6a 15		 push	 21			; 00000015H
+  00087	c5 fa 7f 45 d4	 vmovdqu XMMWORD PTR $T1[ebp+59], xmm0
+  0008c	6a 12		 push	 18			; 00000012H
   0008e	59		 pop	 ecx
-  0008f	8b fc		 mov	 edi, esp
-  00091	89 5d bc	 mov	 DWORD PTR $T1[ebp+44], ebx
-  00094	88 45 c0	 mov	 BYTE PTR $T1[ebp+48], al
-  00097	89 45 c4	 mov	 DWORD PTR $T1[ebp+52], eax
-  0009a	c7 45 c8 92 ff
-	ff ff		 mov	 DWORD PTR $T1[ebp+56], -110 ; ffffff92H
-  000a1	89 45 cc	 mov	 DWORD PTR $T1[ebp+60], eax
-  000a4	88 45 d0	 mov	 BYTE PTR $T1[ebp+64], al
+  0008f	89 5d c2	 mov	 DWORD PTR $T1[ebp+41], ebx
+  00092	8b fc		 mov	 edi, esp
+  00094	88 45 c6	 mov	 BYTE PTR $T1[ebp+45], al
+  00097	89 45 c7	 mov	 DWORD PTR $T1[ebp+46], eax
+  0009a	c7 45 cb 92 ff
+	ff ff		 mov	 DWORD PTR $T1[ebp+50], -110 ; ffffff92H
+  000a1	89 45 cf	 mov	 DWORD PTR $T1[ebp+54], eax
+  000a4	88 45 d3	 mov	 BYTE PTR $T1[ebp+58], al
   000a7	f3 a5		 rep movsd
-  000a9	c5 f8 77	 vzeroupper
-  000ac	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  000a9	66 a5		 movsw
+  000ab	a4		 movsb
+  000ac	c5 f8 77	 vzeroupper
+  000af	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 970  : 				.camTime = 0*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 971  : 				.camType = keyType::set,
@@ -4519,30 +4543,32 @@ $LN2@scene3:
 ; 992  : 
 ; 993  : 			BasicCam::setCamKey({
 
-  000b1	c5 fe 6f 05 00
+  000b4	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@00000096ffffff9d000000000000000000000000fffff950fffff58efffffc4b
-  000b9	33 c0		 xor	 eax, eax
-  000bb	c7 45 90 5d 08
+  000bc	c5 fe 7f 45 9e	 vmovdqu YMMWORD PTR $T2[ebp+5], ymm0
+  000c1	33 c0		 xor	 eax, eax
+  000c3	c7 45 99 5d 08
 	00 00		 mov	 DWORD PTR $T2[ebp], 2141 ; 0000085dH
-  000c2	c5 fe 7f 45 98	 vmovdqu YMMWORD PTR $T2[ebp+8], ymm0
-  000c7	6a 15		 push	 21			; 00000015H
-  000c9	59		 pop	 ecx
-  000ca	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
-  000ce	c5 fa 7f 45 d4	 vmovdqu XMMWORD PTR $T2[ebp+68], xmm0
-  000d3	8d 75 90	 lea	 esi, DWORD PTR $T2[ebp]
-  000d6	88 45 94	 mov	 BYTE PTR $T2[ebp+4], al
-  000d9	8b fc		 mov	 edi, esp
-  000db	c7 45 b8 4d ff
-	ff ff		 mov	 DWORD PTR $T2[ebp+40], -179 ; ffffff4dH
-  000e2	89 5d bc	 mov	 DWORD PTR $T2[ebp+44], ebx
-  000e5	88 45 c0	 mov	 BYTE PTR $T2[ebp+48], al
-  000e8	89 45 c4	 mov	 DWORD PTR $T2[ebp+52], eax
-  000eb	89 45 c8	 mov	 DWORD PTR $T2[ebp+56], eax
-  000ee	89 45 cc	 mov	 DWORD PTR $T2[ebp+60], eax
-  000f1	c6 45 d0 01	 mov	 BYTE PTR $T2[ebp+64], 1
-  000f5	f3 a5		 rep movsd
-  000f7	c5 f8 77	 vzeroupper
-  000fa	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  000ca	6a 12		 push	 18			; 00000012H
+  000cc	59		 pop	 ecx
+  000cd	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
+  000d1	c5 fa 7f 45 d4	 vmovdqu XMMWORD PTR $T2[ebp+59], xmm0
+  000d6	88 45 9d	 mov	 BYTE PTR $T2[ebp+4], al
+  000d9	8d 75 99	 lea	 esi, DWORD PTR $T2[ebp]
+  000dc	c7 45 be 4d ff
+	ff ff		 mov	 DWORD PTR $T2[ebp+37], -179 ; ffffff4dH
+  000e3	8b fc		 mov	 edi, esp
+  000e5	89 5d c2	 mov	 DWORD PTR $T2[ebp+41], ebx
+  000e8	88 45 c6	 mov	 BYTE PTR $T2[ebp+45], al
+  000eb	89 45 c7	 mov	 DWORD PTR $T2[ebp+46], eax
+  000ee	89 45 cb	 mov	 DWORD PTR $T2[ebp+50], eax
+  000f1	89 45 cf	 mov	 DWORD PTR $T2[ebp+54], eax
+  000f4	c6 45 d3 01	 mov	 BYTE PTR $T2[ebp+58], 1
+  000f8	f3 a5		 rep movsd
+  000fa	66 a5		 movsw
+  000fc	a4		 movsb
+  000fd	c5 f8 77	 vzeroupper
+  00100	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 994  : 				.camTime = 2141,
 ; 995  : 				.camType = keyType::set,
@@ -4569,30 +4595,32 @@ $LN2@scene3:
 ; 1016 : 
 ; 1017 : 			BasicCam::setCamKey({
 
-  000ff	c5 fe 6f 05 00
+  00105	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000ff0000000000000000000000000000000000000cf90000000500000000
-  00107	33 c0		 xor	 eax, eax
-  00109	c7 45 90 23 1c
+  0010d	33 c0		 xor	 eax, eax
+  0010f	c7 45 99 23 1c
 	00 00		 mov	 DWORD PTR $T3[ebp], 7203 ; 00001c23H
-  00110	c5 fe 7f 45 98	 vmovdqu YMMWORD PTR $T3[ebp+8], ymm0
-  00115	c5 f9 6f 05 00
+  00116	6a 12		 push	 18			; 00000012H
+  00118	c5 fe 7f 45 9e	 vmovdqu YMMWORD PTR $T3[ebp+5], ymm0
+  0011d	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@00000000000000000000000affffffee
-  0011d	6a 15		 push	 21			; 00000015H
-  0011f	59		 pop	 ecx
-  00120	c5 fa 7f 45 d4	 vmovdqu XMMWORD PTR $T3[ebp+68], xmm0
-  00125	8d 75 90	 lea	 esi, DWORD PTR $T3[ebp]
-  00128	88 45 94	 mov	 BYTE PTR $T3[ebp+4], al
-  0012b	8b fc		 mov	 edi, esp
-  0012d	89 45 b8	 mov	 DWORD PTR $T3[ebp+40], eax
-  00130	89 5d bc	 mov	 DWORD PTR $T3[ebp+44], ebx
-  00133	88 45 c0	 mov	 BYTE PTR $T3[ebp+48], al
-  00136	89 45 c4	 mov	 DWORD PTR $T3[ebp+52], eax
-  00139	89 45 c8	 mov	 DWORD PTR $T3[ebp+56], eax
-  0013c	89 45 cc	 mov	 DWORD PTR $T3[ebp+60], eax
-  0013f	88 45 d0	 mov	 BYTE PTR $T3[ebp+64], al
-  00142	f3 a5		 rep movsd
-  00144	c5 f8 77	 vzeroupper
-  00147	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00125	59		 pop	 ecx
+  00126	8d 75 99	 lea	 esi, DWORD PTR $T3[ebp]
+  00129	88 45 9d	 mov	 BYTE PTR $T3[ebp+4], al
+  0012c	8b fc		 mov	 edi, esp
+  0012e	89 45 be	 mov	 DWORD PTR $T3[ebp+37], eax
+  00131	89 5d c2	 mov	 DWORD PTR $T3[ebp+41], ebx
+  00134	88 45 c6	 mov	 BYTE PTR $T3[ebp+45], al
+  00137	89 45 c7	 mov	 DWORD PTR $T3[ebp+46], eax
+  0013a	89 45 cb	 mov	 DWORD PTR $T3[ebp+50], eax
+  0013d	89 45 cf	 mov	 DWORD PTR $T3[ebp+54], eax
+  00140	88 45 d3	 mov	 BYTE PTR $T3[ebp+58], al
+  00143	c5 fa 7f 45 d4	 vmovdqu XMMWORD PTR $T3[ebp+59], xmm0
+  00148	f3 a5		 rep movsd
+  0014a	66 a5		 movsw
+  0014c	a4		 movsb
+  0014d	c5 f8 77	 vzeroupper
+  00150	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 1018 : 				.camTime = 7203,
 ; 1019 : 				.camType = keyType::set,
@@ -4620,47 +4648,47 @@ $LN2@scene3:
 ; 1041 : 
 ; 1042 : 			BasicCam::processCam();
 
-  0014c	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00155	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 1043 : 			Object::Girl({
 
-  00151	c5 f9 6f 05 00
-	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@00000034000000600000004400000001
-  00159	83 c4 3c	 add	 esp, 60			; 0000003cH
-  0015c	c7 45 f4 54 00
+  0015a	c5 f9 6f 05 00
+	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@0000000000000061ffffffe700000001
+  00162	83 c4 34	 add	 esp, 52			; 00000034H
+  00165	c7 45 f4 54 00
 	00 00		 mov	 DWORD PTR $T4[ebp+16], 84 ; 00000054H
-  00163	33 c0		 xor	 eax, eax
-  00165	8d 75 e4	 lea	 esi, DWORD PTR $T4[ebp]
-  00168	c5 fa 7f 45 e4	 vmovdqu XMMWORD PTR $T4[ebp], xmm0
-  0016d	89 45 f8	 mov	 DWORD PTR $T4[ebp+20], eax
-  00170	6a 06		 push	 6
-  00172	59		 pop	 ecx
-  00173	8b fc		 mov	 edi, esp
-  00175	f3 a5		 rep movsd
-  00177	e8 00 00 00 00	 call	 ?Girl@Object@@YAXUGirl_params@1@@Z ; Object::Girl
-  0017c	83 c4 18	 add	 esp, 24			; 00000018H
+  0016c	c5 fa 7f 45 e4	 vmovdqu XMMWORD PTR $T4[ebp], xmm0
+  00171	8d 75 e4	 lea	 esi, DWORD PTR $T4[ebp]
+  00174	c7 45 f8 02 00
+	00 00		 mov	 DWORD PTR $T4[ebp+20], 2
+  0017b	6a 06		 push	 6
+  0017d	59		 pop	 ecx
+  0017e	8b fc		 mov	 edi, esp
+  00180	f3 a5		 rep movsd
+  00182	e8 00 00 00 00	 call	 ?Girl@Object@@YAXUGirl_params@1@@Z ; Object::Girl
+  00187	83 c4 18	 add	 esp, 24			; 00000018H
 
 ; 1044 : 				.quality = 1,
-; 1045 : 				.xPos = 68,
-; 1046 : 				.yPos = 96,
-; 1047 : 				.zPos = 52,
+; 1045 : 				.xPos = -25,
+; 1046 : 				.yPos = 97,
+; 1047 : 				.zPos = 0,
 ; 1048 : 				.brightness = 84,
-; 1049 : 				.tickness = 0
+; 1049 : 				.tickness = 2
 ; 1050 : 			});
 ; 1051 : 
 ; 1052 : 
 ; 1053 : 		Compose();
 
-  0017f	e8 00 00 00 00	 call	 ?Compose@Loop@@YAXXZ	; Loop::Compose
+  0018a	e8 00 00 00 00	 call	 ?Compose@Loop@@YAXXZ	; Loop::Compose
 
 ; 1054 : 
 ; 1055 : 	}
 
-  00184	5f		 pop	 edi
-  00185	5e		 pop	 esi
-  00186	5b		 pop	 ebx
-  00187	c9		 leave
-  00188	c3		 ret	 0
+  0018f	5f		 pop	 edi
+  00190	5e		 pop	 esi
+  00191	5b		 pop	 ebx
+  00192	c9		 leave
+  00193	c3		 ret	 0
 ?scene3@Loop@@YAXXZ ENDP				; Loop::scene3
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -4673,19 +4701,19 @@ _TEXT	ENDS
 ; File D:\!platform\fx\projectFiles\loop.h
 ;	COMDAT ?scene2@Loop@@YAXXZ
 _TEXT	SEGMENT
-$T1 = -88						; size = 84
-$T2 = -88						; size = 84
-$T3 = -88						; size = 84
-$T4 = -88						; size = 84
-$T5 = -88						; size = 84
-$T6 = -88						; size = 84
-$T7 = -88						; size = 84
-$T8 = -88						; size = 84
-$T9 = -88						; size = 84
-$T10 = -88						; size = 84
-$T11 = -88						; size = 84
-$T12 = -88						; size = 84
-$T13 = -88						; size = 84
+$T1 = -79						; size = 75
+$T2 = -79						; size = 75
+$T3 = -79						; size = 75
+$T4 = -79						; size = 75
+$T5 = -79						; size = 75
+$T6 = -79						; size = 75
+$T7 = -79						; size = 75
+$T8 = -79						; size = 75
+$T9 = -79						; size = 75
+$T10 = -79						; size = 75
+$T11 = -79						; size = 75
+$T12 = -79						; size = 75
+$T13 = -79						; size = 75
 $T14 = -4						; size = 2
 ?scene2@Loop@@YAXXZ PROC				; Loop::scene2, COMDAT
 
@@ -4693,7 +4721,7 @@ $T14 = -4						; size = 2
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
-  00003	83 ec 58	 sub	 esp, 88			; 00000058H
+  00003	83 ec 50	 sub	 esp, 80			; 00000050H
   00006	53		 push	 ebx
 
 ; 531  : 		BasicCam::camPass = false;
@@ -4783,7 +4811,7 @@ $LN4@scene2:
 ; 560  : 		switch (t)
 
   0006c	83 f8 0c	 cmp	 eax, 12			; 0000000cH
-  0006f	0f 87 dd 05 00
+  0006f	0f 87 04 06 00
 	00		 ja	 $LN2@scene2
   00075	ff 24 85 00 00
 	00 00		 jmp	 DWORD PTR $LN25@scene2[eax*4]
@@ -4796,35 +4824,37 @@ $LN5@scene2:
 
   0007c	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@00000000ffffff3f00000000000000000000000000000002fffffbb800000003
-  00084	83 ec 54	 sub	 esp, 84			; 00000054H
+  00084	83 ec 4c	 sub	 esp, 76			; 0000004cH
   00087	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  0008d	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T1[ebp+8], ymm0
+  0008d	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T1[ebp+5], ymm0
   00092	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000200000000fffffffd
-  0009a	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T1[ebp+68], xmm0
-  0009f	6a 15		 push	 21			; 00000015H
+  0009a	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T1[ebp+59], xmm0
+  0009f	6a 12		 push	 18			; 00000012H
   000a1	59		 pop	 ecx
-  000a2	8d 75 a8	 lea	 esi, DWORD PTR $T1[ebp]
-  000a5	89 45 a8	 mov	 DWORD PTR $T1[ebp], eax
-  000a8	8b fc		 mov	 edi, esp
-  000aa	88 5d ac	 mov	 BYTE PTR $T1[ebp+4], bl
-  000ad	c7 45 d0 5b ff
-	ff ff		 mov	 DWORD PTR $T1[ebp+40], -165 ; ffffff5bH
-  000b4	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T1[ebp+44], 100 ; 00000064H
-  000bb	88 5d d8	 mov	 BYTE PTR $T1[ebp+48], bl
-  000be	89 5d dc	 mov	 DWORD PTR $T1[ebp+52], ebx
-  000c1	c7 45 e0 0a 00
-	00 00		 mov	 DWORD PTR $T1[ebp+56], 10 ; 0000000aH
-  000c8	c7 45 e4 e8 fe
-	ff ff		 mov	 DWORD PTR $T1[ebp+60], -280 ; fffffee8H
-  000cf	c6 45 e8 01	 mov	 BYTE PTR $T1[ebp+64], 1
-  000d3	89 1d 00 00 00
+  000a2	89 45 b1	 mov	 DWORD PTR $T1[ebp], eax
+  000a5	8d 75 b1	 lea	 esi, DWORD PTR $T1[ebp]
+  000a8	88 5d b5	 mov	 BYTE PTR $T1[ebp+4], bl
+  000ab	8b fc		 mov	 edi, esp
+  000ad	c7 45 d6 5b ff
+	ff ff		 mov	 DWORD PTR $T1[ebp+37], -165 ; ffffff5bH
+  000b4	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T1[ebp+41], 100 ; 00000064H
+  000bb	88 5d de	 mov	 BYTE PTR $T1[ebp+45], bl
+  000be	89 5d df	 mov	 DWORD PTR $T1[ebp+46], ebx
+  000c1	c7 45 e3 0a 00
+	00 00		 mov	 DWORD PTR $T1[ebp+50], 10 ; 0000000aH
+  000c8	c7 45 e7 e8 fe
+	ff ff		 mov	 DWORD PTR $T1[ebp+54], -280 ; fffffee8H
+  000cf	c6 45 eb 01	 mov	 BYTE PTR $T1[ebp+58], 1
+  000d3	f3 a5		 rep movsd
+  000d5	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  000d9	f3 a5		 rep movsd
-  000db	c5 f8 77	 vzeroupper
-  000de	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  000db	66 a5		 movsw
+  000dd	a4		 movsb
+  000de	c5 f8 77	 vzeroupper
+  000e1	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 565  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 566  : 				.camType = keyType::set,
@@ -4850,54 +4880,56 @@ $LN5@scene2:
 ; 586  : 			});
 ; 587  : 			BasicCam::processCam();
 
-  000e3	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  000e6	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 588  : 
 ; 589  : 
 ; 590  : 			Object::Zenith({.quality = 1});
 
-  000e8	6a 01		 push	 1
-  000ea	e8 00 00 00 00	 call	 ?Zenith@Object@@YAXUZenith_params@1@@Z ; Object::Zenith
+  000eb	6a 01		 push	 1
+  000ed	e8 00 00 00 00	 call	 ?Zenith@Object@@YAXUZenith_params@1@@Z ; Object::Zenith
 
 ; 591  : 			break;
 
-  000ef	e9 5b 05 00 00	 jmp	 $LN28@scene2
+  000f2	e9 7f 05 00 00	 jmp	 $LN28@scene2
 $LN6@scene2:
 
 ; 592  : 		case 1:
 ; 593  : 			BasicCam::camCounter = 0;
 ; 594  : 			BasicCam::setCamKey({
 
-  000f4	c5 fe 6f 05 00
+  000f7	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000000000008a0000000000000000000000000000002900000bba0000001a
-  000fc	83 ec 54	 sub	 esp, 84			; 00000054H
-  000ff	69 c0 50 75 0d
+  000ff	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00102	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00105	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T2[ebp+8], ymm0
-  0010a	c5 f9 6f 05 00
+  00108	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T2[ebp+5], ymm0
+  0010d	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@0000000000000000fffffffd00000000
-  00112	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T2[ebp+68], xmm0
-  00117	6a 15		 push	 21			; 00000015H
-  00119	59		 pop	 ecx
-  0011a	8d 75 a8	 lea	 esi, DWORD PTR $T2[ebp]
-  0011d	89 45 a8	 mov	 DWORD PTR $T2[ebp], eax
-  00120	8b fc		 mov	 edi, esp
-  00122	88 5d ac	 mov	 BYTE PTR $T2[ebp+4], bl
-  00125	c7 45 d0 d6 00
-	00 00		 mov	 DWORD PTR $T2[ebp+40], 214 ; 000000d6H
-  0012c	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T2[ebp+44], 100 ; 00000064H
-  00133	88 5d d8	 mov	 BYTE PTR $T2[ebp+48], bl
-  00136	89 5d dc	 mov	 DWORD PTR $T2[ebp+52], ebx
-  00139	89 5d e0	 mov	 DWORD PTR $T2[ebp+56], ebx
-  0013c	c7 45 e4 a0 00
-	00 00		 mov	 DWORD PTR $T2[ebp+60], 160 ; 000000a0H
-  00143	c6 45 e8 01	 mov	 BYTE PTR $T2[ebp+64], 1
-  00147	89 1d 00 00 00
+  00115	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T2[ebp+59], xmm0
+  0011a	6a 12		 push	 18			; 00000012H
+  0011c	59		 pop	 ecx
+  0011d	89 45 b1	 mov	 DWORD PTR $T2[ebp], eax
+  00120	8d 75 b1	 lea	 esi, DWORD PTR $T2[ebp]
+  00123	88 5d b5	 mov	 BYTE PTR $T2[ebp+4], bl
+  00126	8b fc		 mov	 edi, esp
+  00128	c7 45 d6 d6 00
+	00 00		 mov	 DWORD PTR $T2[ebp+37], 214 ; 000000d6H
+  0012f	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T2[ebp+41], 100 ; 00000064H
+  00136	88 5d de	 mov	 BYTE PTR $T2[ebp+45], bl
+  00139	89 5d df	 mov	 DWORD PTR $T2[ebp+46], ebx
+  0013c	89 5d e3	 mov	 DWORD PTR $T2[ebp+50], ebx
+  0013f	c7 45 e7 a0 00
+	00 00		 mov	 DWORD PTR $T2[ebp+54], 160 ; 000000a0H
+  00146	c6 45 eb 01	 mov	 BYTE PTR $T2[ebp+58], 1
+  0014a	f3 a5		 rep movsd
+  0014c	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  0014d	f3 a5		 rep movsd
-  0014f	c5 f8 77	 vzeroupper
-  00152	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00152	66 a5		 movsw
+  00154	a4		 movsb
+  00155	c5 f8 77	 vzeroupper
+  00158	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 595  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 596  : 				.camType = keyType::set,
@@ -4923,52 +4955,54 @@ $LN6@scene2:
 ; 616  : 			});
 ; 617  : 			BasicCam::processCam();
 
-  00157	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0015d	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 618  : 			Object::Saggitarius({ .quality = 1 });
 
-  0015c	6a 01		 push	 1
-  0015e	e8 00 00 00 00	 call	 ?Saggitarius@Object@@YAXUSaggitarius_params@1@@Z ; Object::Saggitarius
+  00162	6a 01		 push	 1
+  00164	e8 00 00 00 00	 call	 ?Saggitarius@Object@@YAXUSaggitarius_params@1@@Z ; Object::Saggitarius
 
 ; 619  : 			break;
 
-  00163	e9 e7 04 00 00	 jmp	 $LN28@scene2
+  00169	e9 08 05 00 00	 jmp	 $LN28@scene2
 $LN7@scene2:
 
 ; 620  : 		case 2:
 ; 621  : 			BasicCam::camCounter = 0;
 ; 622  : 			BasicCam::setCamKey({
 
-  00168	c5 fe 6f 05 00
+  0016e	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@fffffffb0000000e0000000000000000000000000000004f00000ed800000004
-  00170	83 ec 54	 sub	 esp, 84			; 00000054H
-  00173	69 c0 50 75 0d
+  00176	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00179	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00179	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T3[ebp+8], ymm0
-  0017e	c5 f9 6f 05 00
+  0017f	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T3[ebp+5], ymm0
+  00184	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  00186	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T3[ebp+68], xmm0
-  0018b	6a 15		 push	 21			; 00000015H
-  0018d	59		 pop	 ecx
-  0018e	8d 75 a8	 lea	 esi, DWORD PTR $T3[ebp]
-  00191	89 45 a8	 mov	 DWORD PTR $T3[ebp], eax
-  00194	8b fc		 mov	 edi, esp
-  00196	88 5d ac	 mov	 BYTE PTR $T3[ebp+4], bl
-  00199	c7 45 d0 fe 00
-	00 00		 mov	 DWORD PTR $T3[ebp+40], 254 ; 000000feH
-  001a0	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T3[ebp+44], 100 ; 00000064H
-  001a7	88 5d d8	 mov	 BYTE PTR $T3[ebp+48], bl
-  001aa	89 5d dc	 mov	 DWORD PTR $T3[ebp+52], ebx
-  001ad	89 5d e0	 mov	 DWORD PTR $T3[ebp+56], ebx
-  001b0	c7 45 e4 b5 01
-	00 00		 mov	 DWORD PTR $T3[ebp+60], 437 ; 000001b5H
-  001b7	c6 45 e8 01	 mov	 BYTE PTR $T3[ebp+64], 1
-  001bb	89 1d 00 00 00
-	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  0018c	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T3[ebp+59], xmm0
+  00191	6a 12		 push	 18			; 00000012H
+  00193	59		 pop	 ecx
+  00194	89 45 b1	 mov	 DWORD PTR $T3[ebp], eax
+  00197	8d 75 b1	 lea	 esi, DWORD PTR $T3[ebp]
+  0019a	88 5d b5	 mov	 BYTE PTR $T3[ebp+4], bl
+  0019d	8b fc		 mov	 edi, esp
+  0019f	c7 45 d6 fe 00
+	00 00		 mov	 DWORD PTR $T3[ebp+37], 254 ; 000000feH
+  001a6	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T3[ebp+41], 100 ; 00000064H
+  001ad	88 5d de	 mov	 BYTE PTR $T3[ebp+45], bl
+  001b0	89 5d df	 mov	 DWORD PTR $T3[ebp+46], ebx
+  001b3	89 5d e3	 mov	 DWORD PTR $T3[ebp+50], ebx
+  001b6	c7 45 e7 b5 01
+	00 00		 mov	 DWORD PTR $T3[ebp+54], 437 ; 000001b5H
+  001bd	c6 45 eb 01	 mov	 BYTE PTR $T3[ebp+58], 1
   001c1	f3 a5		 rep movsd
-  001c3	c5 f8 77	 vzeroupper
-  001c6	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  001c3	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  001c9	66 a5		 movsw
+  001cb	a4		 movsb
+  001cc	c5 f8 77	 vzeroupper
+  001cf	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 623  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 624  : 				.camType = keyType::set,
@@ -4994,52 +5028,54 @@ $LN7@scene2:
 ; 644  : 			});
 ; 645  : 			BasicCam::processCam();
 
-  001cb	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  001d4	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 646  : 
 ; 647  : 			Object::Crab({ .quality = 1 });
 
-  001d0	6a 01		 push	 1
-  001d2	e8 00 00 00 00	 call	 ?Crab@Object@@YAXUCrab_params@1@@Z ; Object::Crab
+  001d9	6a 01		 push	 1
+  001db	e8 00 00 00 00	 call	 ?Crab@Object@@YAXUCrab_params@1@@Z ; Object::Crab
 
 ; 648  : 			break;
 
-  001d7	e9 73 04 00 00	 jmp	 $LN28@scene2
+  001e0	e9 91 04 00 00	 jmp	 $LN28@scene2
 $LN8@scene2:
 
 ; 649  : 		case 3:
 ; 650  : 			BasicCam::camCounter = 0;
 ; 651  : 			BasicCam::setCamKey({
 
-  001dc	c5 fe 6f 05 00
+  001e5	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000150000008b000000000000000000000000fffffefd00000e69ffffff56
-  001e4	83 ec 54	 sub	 esp, 84			; 00000054H
-  001e7	69 c0 50 75 0d
+  001ed	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  001f0	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  001ed	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T4[ebp+8], ymm0
-  001f2	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
-  001f6	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T4[ebp+68], xmm0
-  001fb	6a 15		 push	 21			; 00000015H
-  001fd	59		 pop	 ecx
-  001fe	8d 75 a8	 lea	 esi, DWORD PTR $T4[ebp]
-  00201	89 45 a8	 mov	 DWORD PTR $T4[ebp], eax
-  00204	8b fc		 mov	 edi, esp
-  00206	88 5d ac	 mov	 BYTE PTR $T4[ebp+4], bl
-  00209	c7 45 d0 d4 00
-	00 00		 mov	 DWORD PTR $T4[ebp+40], 212 ; 000000d4H
-  00210	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T4[ebp+44], 100 ; 00000064H
-  00217	88 5d d8	 mov	 BYTE PTR $T4[ebp+48], bl
-  0021a	89 5d dc	 mov	 DWORD PTR $T4[ebp+52], ebx
-  0021d	89 5d e0	 mov	 DWORD PTR $T4[ebp+56], ebx
-  00220	c7 45 e4 b8 01
-	00 00		 mov	 DWORD PTR $T4[ebp+60], 440 ; 000001b8H
-  00227	c6 45 e8 01	 mov	 BYTE PTR $T4[ebp+64], 1
-  0022b	89 1d 00 00 00
+  001f6	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T4[ebp+5], ymm0
+  001fb	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
+  001ff	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T4[ebp+59], xmm0
+  00204	6a 12		 push	 18			; 00000012H
+  00206	59		 pop	 ecx
+  00207	89 45 b1	 mov	 DWORD PTR $T4[ebp], eax
+  0020a	8d 75 b1	 lea	 esi, DWORD PTR $T4[ebp]
+  0020d	88 5d b5	 mov	 BYTE PTR $T4[ebp+4], bl
+  00210	8b fc		 mov	 edi, esp
+  00212	c7 45 d6 d4 00
+	00 00		 mov	 DWORD PTR $T4[ebp+37], 212 ; 000000d4H
+  00219	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T4[ebp+41], 100 ; 00000064H
+  00220	88 5d de	 mov	 BYTE PTR $T4[ebp+45], bl
+  00223	89 5d df	 mov	 DWORD PTR $T4[ebp+46], ebx
+  00226	89 5d e3	 mov	 DWORD PTR $T4[ebp+50], ebx
+  00229	c7 45 e7 b8 01
+	00 00		 mov	 DWORD PTR $T4[ebp+54], 440 ; 000001b8H
+  00230	c6 45 eb 01	 mov	 BYTE PTR $T4[ebp+58], 1
+  00234	f3 a5		 rep movsd
+  00236	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00231	f3 a5		 rep movsd
-  00233	c5 f8 77	 vzeroupper
-  00236	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  0023c	66 a5		 movsw
+  0023e	a4		 movsb
+  0023f	c5 f8 77	 vzeroupper
+  00242	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 652  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 653  : 				.camType = keyType::set,
@@ -5065,52 +5101,54 @@ $LN8@scene2:
 ; 673  : 			});
 ; 674  : 			BasicCam::processCam();
 
-  0023b	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00247	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 675  : 			Object::Aries({ .quality = 1 });
 
-  00240	6a 01		 push	 1
-  00242	e8 00 00 00 00	 call	 ?Aries@Object@@YAXUAries_params@1@@Z ; Object::Aries
+  0024c	6a 01		 push	 1
+  0024e	e8 00 00 00 00	 call	 ?Aries@Object@@YAXUAries_params@1@@Z ; Object::Aries
 
 ; 676  : 			break;
 
-  00247	e9 03 04 00 00	 jmp	 $LN28@scene2
+  00253	e9 1e 04 00 00	 jmp	 $LN28@scene2
 $LN9@scene2:
 
 ; 677  : 		case 4:
 ; 678  : 			BasicCam::camCounter = 0;
 ; 679  : 			BasicCam::setCamKey({
 
-  0024c	c5 fe 6f 05 00
+  00258	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@ffffff76ffffff440000000000000000000000000000011efffffc600000020e
-  00254	83 ec 54	 sub	 esp, 84			; 00000054H
-  00257	69 c0 50 75 0d
+  00260	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00263	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  0025d	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T5[ebp+8], ymm0
-  00262	c5 f9 6f 05 00
+  00269	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T5[ebp+5], ymm0
+  0026e	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  0026a	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T5[ebp+68], xmm0
-  0026f	6a 15		 push	 21			; 00000015H
-  00271	59		 pop	 ecx
-  00272	8d 75 a8	 lea	 esi, DWORD PTR $T5[ebp]
-  00275	89 45 a8	 mov	 DWORD PTR $T5[ebp], eax
-  00278	8b fc		 mov	 edi, esp
-  0027a	88 5d ac	 mov	 BYTE PTR $T5[ebp+4], bl
-  0027d	c7 45 d0 9a ff
-	ff ff		 mov	 DWORD PTR $T5[ebp+40], -102 ; ffffff9aH
-  00284	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T5[ebp+44], 100 ; 00000064H
-  0028b	88 5d d8	 mov	 BYTE PTR $T5[ebp+48], bl
-  0028e	89 5d dc	 mov	 DWORD PTR $T5[ebp+52], ebx
-  00291	89 5d e0	 mov	 DWORD PTR $T5[ebp+56], ebx
-  00294	c7 45 e4 01 fe
-	ff ff		 mov	 DWORD PTR $T5[ebp+60], -511 ; fffffe01H
-  0029b	c6 45 e8 01	 mov	 BYTE PTR $T5[ebp+64], 1
-  0029f	89 1d 00 00 00
+  00276	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T5[ebp+59], xmm0
+  0027b	6a 12		 push	 18			; 00000012H
+  0027d	59		 pop	 ecx
+  0027e	89 45 b1	 mov	 DWORD PTR $T5[ebp], eax
+  00281	8d 75 b1	 lea	 esi, DWORD PTR $T5[ebp]
+  00284	88 5d b5	 mov	 BYTE PTR $T5[ebp+4], bl
+  00287	8b fc		 mov	 edi, esp
+  00289	c7 45 d6 9a ff
+	ff ff		 mov	 DWORD PTR $T5[ebp+37], -102 ; ffffff9aH
+  00290	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T5[ebp+41], 100 ; 00000064H
+  00297	88 5d de	 mov	 BYTE PTR $T5[ebp+45], bl
+  0029a	89 5d df	 mov	 DWORD PTR $T5[ebp+46], ebx
+  0029d	89 5d e3	 mov	 DWORD PTR $T5[ebp+50], ebx
+  002a0	c7 45 e7 01 fe
+	ff ff		 mov	 DWORD PTR $T5[ebp+54], -511 ; fffffe01H
+  002a7	c6 45 eb 01	 mov	 BYTE PTR $T5[ebp+58], 1
+  002ab	f3 a5		 rep movsd
+  002ad	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  002a5	f3 a5		 rep movsd
-  002a7	c5 f8 77	 vzeroupper
-  002aa	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  002b3	66 a5		 movsw
+  002b5	a4		 movsb
+  002b6	c5 f8 77	 vzeroupper
+  002b9	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 680  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 681  : 				.camType = keyType::set,
@@ -5136,52 +5174,54 @@ $LN9@scene2:
 ; 701  : 			});
 ; 702  : 			BasicCam::processCam();
 
-  002af	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  002be	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 703  : 			Object::Scorpio({ .quality = 1 });
 
-  002b4	6a 01		 push	 1
-  002b6	e8 00 00 00 00	 call	 ?Scorpio@Object@@YAXUScorpio_params@1@@Z ; Object::Scorpio
+  002c3	6a 01		 push	 1
+  002c5	e8 00 00 00 00	 call	 ?Scorpio@Object@@YAXUScorpio_params@1@@Z ; Object::Scorpio
 
 ; 704  : 			break;
 
-  002bb	e9 8f 03 00 00	 jmp	 $LN28@scene2
+  002ca	e9 a7 03 00 00	 jmp	 $LN28@scene2
 $LN10@scene2:
 
 ; 705  : 		case 5:
 ; 706  : 			BasicCam::camCounter = 0;
 ; 707  : 			BasicCam::setCamKey({
 
-  002c0	c5 fe 6f 05 00
+  002cf	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@0000008b00000096000000000000000000000000000003f7fffff76d000003f7
-  002c8	83 ec 54	 sub	 esp, 84			; 00000054H
-  002cb	69 c0 50 75 0d
+  002d7	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  002da	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  002d1	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T6[ebp+8], ymm0
-  002d6	c5 f9 6f 05 00
+  002e0	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T6[ebp+5], ymm0
+  002e5	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffff3
-  002de	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T6[ebp+68], xmm0
-  002e3	6a 15		 push	 21			; 00000015H
-  002e5	59		 pop	 ecx
-  002e6	8d 75 a8	 lea	 esi, DWORD PTR $T6[ebp]
-  002e9	89 45 a8	 mov	 DWORD PTR $T6[ebp], eax
-  002ec	8b fc		 mov	 edi, esp
-  002ee	88 5d ac	 mov	 BYTE PTR $T6[ebp+4], bl
-  002f1	c7 45 d0 96 00
-	00 00		 mov	 DWORD PTR $T6[ebp+40], 150 ; 00000096H
-  002f8	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T6[ebp+44], 100 ; 00000064H
-  002ff	88 5d d8	 mov	 BYTE PTR $T6[ebp+48], bl
-  00302	89 5d dc	 mov	 DWORD PTR $T6[ebp+52], ebx
-  00305	89 5d e0	 mov	 DWORD PTR $T6[ebp+56], ebx
-  00308	c7 45 e4 3e fe
-	ff ff		 mov	 DWORD PTR $T6[ebp+60], -450 ; fffffe3eH
-  0030f	c6 45 e8 01	 mov	 BYTE PTR $T6[ebp+64], 1
-  00313	89 1d 00 00 00
+  002ed	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T6[ebp+59], xmm0
+  002f2	6a 12		 push	 18			; 00000012H
+  002f4	59		 pop	 ecx
+  002f5	89 45 b1	 mov	 DWORD PTR $T6[ebp], eax
+  002f8	8d 75 b1	 lea	 esi, DWORD PTR $T6[ebp]
+  002fb	88 5d b5	 mov	 BYTE PTR $T6[ebp+4], bl
+  002fe	8b fc		 mov	 edi, esp
+  00300	c7 45 d6 96 00
+	00 00		 mov	 DWORD PTR $T6[ebp+37], 150 ; 00000096H
+  00307	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T6[ebp+41], 100 ; 00000064H
+  0030e	88 5d de	 mov	 BYTE PTR $T6[ebp+45], bl
+  00311	89 5d df	 mov	 DWORD PTR $T6[ebp+46], ebx
+  00314	89 5d e3	 mov	 DWORD PTR $T6[ebp+50], ebx
+  00317	c7 45 e7 3e fe
+	ff ff		 mov	 DWORD PTR $T6[ebp+54], -450 ; fffffe3eH
+  0031e	c6 45 eb 01	 mov	 BYTE PTR $T6[ebp+58], 1
+  00322	f3 a5		 rep movsd
+  00324	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00319	f3 a5		 rep movsd
-  0031b	c5 f8 77	 vzeroupper
-  0031e	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  0032a	66 a5		 movsw
+  0032c	a4		 movsb
+  0032d	c5 f8 77	 vzeroupper
+  00330	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 708  : 				.camTime = t * SAMPLES_IN_FRAME * FRAMES_PER_SECOND * Dur,
 ; 709  : 				.camType = keyType::set,
@@ -5207,51 +5247,53 @@ $LN10@scene2:
 ; 729  : 				});
 ; 730  : 			BasicCam::processCam();
 
-  00323	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00335	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 731  : 			Object::LeoBigStar({ .quality = 1 });
 
-  00328	6a 01		 push	 1
-  0032a	e8 00 00 00 00	 call	 ?LeoBigStar@Object@@YAXULeoBigStar_params@1@@Z ; Object::LeoBigStar
+  0033a	6a 01		 push	 1
+  0033c	e8 00 00 00 00	 call	 ?LeoBigStar@Object@@YAXULeoBigStar_params@1@@Z ; Object::LeoBigStar
 
 ; 732  : 			break;
 
-  0032f	e9 1b 03 00 00	 jmp	 $LN28@scene2
+  00341	e9 30 03 00 00	 jmp	 $LN28@scene2
 $LN11@scene2:
 
 ; 733  : 		case 6:
 ; 734  : 			BasicCam::camCounter = 0;
 ; 735  : 			BasicCam::setCamKey({
 
-  00334	c5 fe 6f 05 00
+  00346	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@ffffffb9000000f400002b660000000000000000ffffd4a30000000000000000
-  0033c	83 ec 54	 sub	 esp, 84			; 00000054H
-  0033f	69 c0 50 75 0d
+  0034e	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00351	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00345	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T7[ebp+8], ymm0
-  0034a	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
-  0034e	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T7[ebp+68], xmm0
-  00353	6a 15		 push	 21			; 00000015H
-  00355	59		 pop	 ecx
-  00356	8d 75 a8	 lea	 esi, DWORD PTR $T7[ebp]
-  00359	89 45 a8	 mov	 DWORD PTR $T7[ebp], eax
-  0035c	8b fc		 mov	 edi, esp
-  0035e	88 5d ac	 mov	 BYTE PTR $T7[ebp+4], bl
-  00361	c7 45 d0 fb ff
-	ff ff		 mov	 DWORD PTR $T7[ebp+40], -5 ; fffffffbH
-  00368	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T7[ebp+44], 100 ; 00000064H
-  0036f	88 5d d8	 mov	 BYTE PTR $T7[ebp+48], bl
-  00372	89 5d dc	 mov	 DWORD PTR $T7[ebp+52], ebx
-  00375	89 5d e0	 mov	 DWORD PTR $T7[ebp+56], ebx
-  00378	c7 45 e4 3e 08
-	00 00		 mov	 DWORD PTR $T7[ebp+60], 2110 ; 0000083eH
-  0037f	c6 45 e8 01	 mov	 BYTE PTR $T7[ebp+64], 1
-  00383	89 1d 00 00 00
+  00357	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T7[ebp+5], ymm0
+  0035c	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
+  00360	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T7[ebp+59], xmm0
+  00365	6a 12		 push	 18			; 00000012H
+  00367	59		 pop	 ecx
+  00368	89 45 b1	 mov	 DWORD PTR $T7[ebp], eax
+  0036b	8d 75 b1	 lea	 esi, DWORD PTR $T7[ebp]
+  0036e	88 5d b5	 mov	 BYTE PTR $T7[ebp+4], bl
+  00371	8b fc		 mov	 edi, esp
+  00373	c7 45 d6 fb ff
+	ff ff		 mov	 DWORD PTR $T7[ebp+37], -5 ; fffffffbH
+  0037a	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T7[ebp+41], 100 ; 00000064H
+  00381	88 5d de	 mov	 BYTE PTR $T7[ebp+45], bl
+  00384	89 5d df	 mov	 DWORD PTR $T7[ebp+46], ebx
+  00387	89 5d e3	 mov	 DWORD PTR $T7[ebp+50], ebx
+  0038a	c7 45 e7 3e 08
+	00 00		 mov	 DWORD PTR $T7[ebp+54], 2110 ; 0000083eH
+  00391	c6 45 eb 01	 mov	 BYTE PTR $T7[ebp+58], 1
+  00395	f3 a5		 rep movsd
+  00397	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00389	f3 a5		 rep movsd
-  0038b	c5 f8 77	 vzeroupper
-  0038e	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  0039d	66 a5		 movsw
+  0039f	a4		 movsb
+  003a0	c5 f8 77	 vzeroupper
+  003a3	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 736  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 737  : 				.camType = keyType::set,
@@ -5277,54 +5319,56 @@ $LN11@scene2:
 ; 757  : 			});
 ; 758  : 			BasicCam::processCam();
 
-  00393	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  003a8	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 759  : 			Object::Virgo({ .quality = 1 });
 
-  00398	6a 01		 push	 1
-  0039a	e8 00 00 00 00	 call	 ?Virgo@Object@@YAXUVirgo_params@1@@Z ; Object::Virgo
+  003ad	6a 01		 push	 1
+  003af	e8 00 00 00 00	 call	 ?Virgo@Object@@YAXUVirgo_params@1@@Z ; Object::Virgo
 
 ; 760  : 			break;
 
-  0039f	e9 ab 02 00 00	 jmp	 $LN28@scene2
+  003b4	e9 bd 02 00 00	 jmp	 $LN28@scene2
 $LN12@scene2:
 
 ; 761  : 		case 7:
 ; 762  : 			BasicCam::camCounter = 0;
 ; 763  : 			BasicCam::setCamKey({
 
-  003a4	c5 fe 6f 05 00
+  003b9	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@0000000bffffff0a0000000000000000000000000000000c0000046000000031
-  003ac	83 ec 54	 sub	 esp, 84			; 00000054H
-  003af	69 c0 50 75 0d
+  003c1	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  003c4	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  003b5	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T8[ebp+8], ymm0
-  003ba	c5 f9 6f 05 00
+  003ca	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T8[ebp+5], ymm0
+  003cf	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@00000000fffffffdfffffffe00000003
-  003c2	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T8[ebp+68], xmm0
-  003c7	6a 15		 push	 21			; 00000015H
-  003c9	59		 pop	 ecx
-  003ca	8d 75 a8	 lea	 esi, DWORD PTR $T8[ebp]
-  003cd	89 45 a8	 mov	 DWORD PTR $T8[ebp], eax
-  003d0	8b fc		 mov	 edi, esp
-  003d2	88 5d ac	 mov	 BYTE PTR $T8[ebp+4], bl
-  003d5	c7 45 d0 c0 ff
-	ff ff		 mov	 DWORD PTR $T8[ebp+40], -64 ; ffffffc0H
-  003dc	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T8[ebp+44], 100 ; 00000064H
-  003e3	88 5d d8	 mov	 BYTE PTR $T8[ebp+48], bl
-  003e6	c7 45 dc 16 00
-	00 00		 mov	 DWORD PTR $T8[ebp+52], 22 ; 00000016H
-  003ed	c7 45 e0 0a 00
-	00 00		 mov	 DWORD PTR $T8[ebp+56], 10 ; 0000000aH
-  003f4	c7 45 e4 f6 ff
-	ff ff		 mov	 DWORD PTR $T8[ebp+60], -10 ; fffffff6H
-  003fb	88 5d e8	 mov	 BYTE PTR $T8[ebp+64], bl
-  003fe	89 1d 00 00 00
+  003d7	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T8[ebp+59], xmm0
+  003dc	6a 12		 push	 18			; 00000012H
+  003de	59		 pop	 ecx
+  003df	89 45 b1	 mov	 DWORD PTR $T8[ebp], eax
+  003e2	8d 75 b1	 lea	 esi, DWORD PTR $T8[ebp]
+  003e5	88 5d b5	 mov	 BYTE PTR $T8[ebp+4], bl
+  003e8	8b fc		 mov	 edi, esp
+  003ea	c7 45 d6 c0 ff
+	ff ff		 mov	 DWORD PTR $T8[ebp+37], -64 ; ffffffc0H
+  003f1	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T8[ebp+41], 100 ; 00000064H
+  003f8	88 5d de	 mov	 BYTE PTR $T8[ebp+45], bl
+  003fb	c7 45 df 16 00
+	00 00		 mov	 DWORD PTR $T8[ebp+46], 22 ; 00000016H
+  00402	c7 45 e3 0a 00
+	00 00		 mov	 DWORD PTR $T8[ebp+50], 10 ; 0000000aH
+  00409	c7 45 e7 f6 ff
+	ff ff		 mov	 DWORD PTR $T8[ebp+54], -10 ; fffffff6H
+  00410	88 5d eb	 mov	 BYTE PTR $T8[ebp+58], bl
+  00413	f3 a5		 rep movsd
+  00415	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00404	f3 a5		 rep movsd
-  00406	c5 f8 77	 vzeroupper
-  00409	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  0041b	66 a5		 movsw
+  0041d	a4		 movsb
+  0041e	c5 f8 77	 vzeroupper
+  00421	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 764  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 765  : 				.camType = keyType::set,
@@ -5350,52 +5394,54 @@ $LN12@scene2:
 ; 785  : 			});
 ; 786  : 			BasicCam::processCam();
 
-  0040e	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00426	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 787  : 			Object::Capri({ .quality = 1 });
 
-  00413	6a 01		 push	 1
-  00415	e8 00 00 00 00	 call	 ?Capri@Object@@YAXUCapri_params@1@@Z ; Object::Capri
+  0042b	6a 01		 push	 1
+  0042d	e8 00 00 00 00	 call	 ?Capri@Object@@YAXUCapri_params@1@@Z ; Object::Capri
 
 ; 788  : 			break;
 
-  0041a	e9 30 02 00 00	 jmp	 $LN28@scene2
+  00432	e9 3f 02 00 00	 jmp	 $LN28@scene2
 $LN13@scene2:
 
 ; 789  : 		case 8:
 ; 790  : 			BasicCam::camCounter = 0;
 ; 791  : 			BasicCam::setCamKey({
 
-  0041f	c5 fe 6f 05 00
+  00437	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@0000000bffffff0a0000000000000000000000000000000c0000046000000031
-  00427	83 ec 54	 sub	 esp, 84			; 00000054H
-  0042a	69 c0 50 75 0d
+  0043f	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00442	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00430	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T9[ebp+8], ymm0
-  00435	c5 f9 6f 05 00
+  00448	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T9[ebp+5], ymm0
+  0044d	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  0043d	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T9[ebp+68], xmm0
-  00442	6a 15		 push	 21			; 00000015H
-  00444	59		 pop	 ecx
-  00445	8d 75 a8	 lea	 esi, DWORD PTR $T9[ebp]
-  00448	89 45 a8	 mov	 DWORD PTR $T9[ebp], eax
-  0044b	8b fc		 mov	 edi, esp
-  0044d	88 5d ac	 mov	 BYTE PTR $T9[ebp+4], bl
-  00450	c7 45 d0 c0 ff
-	ff ff		 mov	 DWORD PTR $T9[ebp+40], -64 ; ffffffc0H
-  00457	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T9[ebp+44], 100 ; 00000064H
-  0045e	88 5d d8	 mov	 BYTE PTR $T9[ebp+48], bl
-  00461	89 5d dc	 mov	 DWORD PTR $T9[ebp+52], ebx
-  00464	89 5d e0	 mov	 DWORD PTR $T9[ebp+56], ebx
-  00467	c7 45 e4 60 fe
-	ff ff		 mov	 DWORD PTR $T9[ebp+60], -416 ; fffffe60H
-  0046e	c6 45 e8 01	 mov	 BYTE PTR $T9[ebp+64], 1
-  00472	89 1d 00 00 00
+  00455	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T9[ebp+59], xmm0
+  0045a	6a 12		 push	 18			; 00000012H
+  0045c	59		 pop	 ecx
+  0045d	89 45 b1	 mov	 DWORD PTR $T9[ebp], eax
+  00460	8d 75 b1	 lea	 esi, DWORD PTR $T9[ebp]
+  00463	88 5d b5	 mov	 BYTE PTR $T9[ebp+4], bl
+  00466	8b fc		 mov	 edi, esp
+  00468	c7 45 d6 c0 ff
+	ff ff		 mov	 DWORD PTR $T9[ebp+37], -64 ; ffffffc0H
+  0046f	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T9[ebp+41], 100 ; 00000064H
+  00476	88 5d de	 mov	 BYTE PTR $T9[ebp+45], bl
+  00479	89 5d df	 mov	 DWORD PTR $T9[ebp+46], ebx
+  0047c	89 5d e3	 mov	 DWORD PTR $T9[ebp+50], ebx
+  0047f	c7 45 e7 60 fe
+	ff ff		 mov	 DWORD PTR $T9[ebp+54], -416 ; fffffe60H
+  00486	c6 45 eb 01	 mov	 BYTE PTR $T9[ebp+58], 1
+  0048a	f3 a5		 rep movsd
+  0048c	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00478	f3 a5		 rep movsd
-  0047a	c5 f8 77	 vzeroupper
-  0047d	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00492	66 a5		 movsw
+  00494	a4		 movsb
+  00495	c5 f8 77	 vzeroupper
+  00498	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 792  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 793  : 				.camType = keyType::set,
@@ -5421,53 +5467,55 @@ $LN13@scene2:
 ; 813  : 			});
 ; 814  : 			BasicCam::processCam();
 
-  00482	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0049d	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 815  : 			Object::Taurus({ .quality = 1 });
 
-  00487	6a 01		 push	 1
-  00489	e8 00 00 00 00	 call	 ?Taurus@Object@@YAXUTaurus_params@1@@Z ; Object::Taurus
+  004a2	6a 01		 push	 1
+  004a4	e8 00 00 00 00	 call	 ?Taurus@Object@@YAXUTaurus_params@1@@Z ; Object::Taurus
 
 ; 816  : 			//
 ; 817  : 			break;
 
-  0048e	e9 bc 01 00 00	 jmp	 $LN28@scene2
+  004a9	e9 c8 01 00 00	 jmp	 $LN28@scene2
 $LN14@scene2:
 
 ; 818  : 		case 9:
 ; 819  : 			BasicCam::camCounter = 0;
 ; 820  : 			BasicCam::setCamKey({
 
-  00493	c5 fe 6f 05 00
+  004ae	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@ffffffe9000000e3000000000000000000000000000000430000065800000086
-  0049b	83 ec 54	 sub	 esp, 84			; 00000054H
-  0049e	69 c0 50 75 0d
+  004b6	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  004b9	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  004a4	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T10[ebp+8], ymm0
-  004a9	c5 f9 6f 05 00
+  004bf	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T10[ebp+5], ymm0
+  004c4	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000300000000fffffffd
-  004b1	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T10[ebp+68], xmm0
-  004b6	6a 15		 push	 21			; 00000015H
-  004b8	59		 pop	 ecx
-  004b9	8d 75 a8	 lea	 esi, DWORD PTR $T10[ebp]
-  004bc	89 45 a8	 mov	 DWORD PTR $T10[ebp], eax
-  004bf	8b fc		 mov	 edi, esp
-  004c1	88 5d ac	 mov	 BYTE PTR $T10[ebp+4], bl
-  004c4	c7 45 d0 71 00
-	00 00		 mov	 DWORD PTR $T10[ebp+40], 113 ; 00000071H
-  004cb	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T10[ebp+44], 100 ; 00000064H
-  004d2	88 5d d8	 mov	 BYTE PTR $T10[ebp+48], bl
-  004d5	89 5d dc	 mov	 DWORD PTR $T10[ebp+52], ebx
-  004d8	c7 45 e0 66 fe
-	ff ff		 mov	 DWORD PTR $T10[ebp+56], -410 ; fffffe66H
-  004df	89 5d e4	 mov	 DWORD PTR $T10[ebp+60], ebx
-  004e2	c6 45 e8 01	 mov	 BYTE PTR $T10[ebp+64], 1
-  004e6	89 1d 00 00 00
+  004cc	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T10[ebp+59], xmm0
+  004d1	6a 12		 push	 18			; 00000012H
+  004d3	59		 pop	 ecx
+  004d4	89 45 b1	 mov	 DWORD PTR $T10[ebp], eax
+  004d7	8d 75 b1	 lea	 esi, DWORD PTR $T10[ebp]
+  004da	88 5d b5	 mov	 BYTE PTR $T10[ebp+4], bl
+  004dd	8b fc		 mov	 edi, esp
+  004df	c7 45 d6 71 00
+	00 00		 mov	 DWORD PTR $T10[ebp+37], 113 ; 00000071H
+  004e6	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T10[ebp+41], 100 ; 00000064H
+  004ed	88 5d de	 mov	 BYTE PTR $T10[ebp+45], bl
+  004f0	89 5d df	 mov	 DWORD PTR $T10[ebp+46], ebx
+  004f3	c7 45 e3 66 fe
+	ff ff		 mov	 DWORD PTR $T10[ebp+50], -410 ; fffffe66H
+  004fa	89 5d e7	 mov	 DWORD PTR $T10[ebp+54], ebx
+  004fd	c6 45 eb 01	 mov	 BYTE PTR $T10[ebp+58], 1
+  00501	f3 a5		 rep movsd
+  00503	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  004ec	f3 a5		 rep movsd
-  004ee	c5 f8 77	 vzeroupper
-  004f1	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00509	66 a5		 movsw
+  0050b	a4		 movsb
+  0050c	c5 f8 77	 vzeroupper
+  0050f	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 821  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 822  : 				.camType = keyType::set,
@@ -5493,52 +5541,54 @@ $LN14@scene2:
 ; 842  : 			});
 ; 843  : 			BasicCam::processCam();
 
-  004f6	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00514	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 844  : 			Object::Libra({ .quality = 1 });
 
-  004fb	6a 01		 push	 1
-  004fd	e8 00 00 00 00	 call	 ?Libra@Object@@YAXULibra_params@1@@Z ; Object::Libra
+  00519	6a 01		 push	 1
+  0051b	e8 00 00 00 00	 call	 ?Libra@Object@@YAXULibra_params@1@@Z ; Object::Libra
 
 ; 845  : 			break;
 
-  00502	e9 48 01 00 00	 jmp	 $LN28@scene2
+  00520	e9 51 01 00 00	 jmp	 $LN28@scene2
 $LN15@scene2:
 
 ; 846  : 		case 10:
 ; 847  : 			BasicCam::camCounter = 0;
 ; 848  : 			BasicCam::setCamKey({
 
-  00507	c5 fe 6f 05 00
+  00525	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@00000025000000a400000000000000000000000000000115fffff63d000000ef
-  0050f	83 ec 54	 sub	 esp, 84			; 00000054H
-  00512	69 c0 50 75 0d
+  0052d	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00530	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00518	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T11[ebp+8], ymm0
-  0051d	c5 f9 6f 05 00
+  00536	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T11[ebp+5], ymm0
+  0053b	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  00525	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T11[ebp+68], xmm0
-  0052a	6a 15		 push	 21			; 00000015H
-  0052c	59		 pop	 ecx
-  0052d	8d 75 a8	 lea	 esi, DWORD PTR $T11[ebp]
-  00530	89 45 a8	 mov	 DWORD PTR $T11[ebp], eax
-  00533	8b fc		 mov	 edi, esp
-  00535	88 5d ac	 mov	 BYTE PTR $T11[ebp+4], bl
-  00538	c7 45 d0 be 00
-	00 00		 mov	 DWORD PTR $T11[ebp+40], 190 ; 000000beH
-  0053f	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T11[ebp+44], 100 ; 00000064H
-  00546	88 5d d8	 mov	 BYTE PTR $T11[ebp+48], bl
-  00549	89 5d dc	 mov	 DWORD PTR $T11[ebp+52], ebx
-  0054c	89 5d e0	 mov	 DWORD PTR $T11[ebp+56], ebx
-  0054f	c7 45 e4 74 ff
-	ff ff		 mov	 DWORD PTR $T11[ebp+60], -140 ; ffffff74H
-  00556	c6 45 e8 01	 mov	 BYTE PTR $T11[ebp+64], 1
-  0055a	89 1d 00 00 00
+  00543	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T11[ebp+59], xmm0
+  00548	6a 12		 push	 18			; 00000012H
+  0054a	59		 pop	 ecx
+  0054b	89 45 b1	 mov	 DWORD PTR $T11[ebp], eax
+  0054e	8d 75 b1	 lea	 esi, DWORD PTR $T11[ebp]
+  00551	88 5d b5	 mov	 BYTE PTR $T11[ebp+4], bl
+  00554	8b fc		 mov	 edi, esp
+  00556	c7 45 d6 be 00
+	00 00		 mov	 DWORD PTR $T11[ebp+37], 190 ; 000000beH
+  0055d	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T11[ebp+41], 100 ; 00000064H
+  00564	88 5d de	 mov	 BYTE PTR $T11[ebp+45], bl
+  00567	89 5d df	 mov	 DWORD PTR $T11[ebp+46], ebx
+  0056a	89 5d e3	 mov	 DWORD PTR $T11[ebp+50], ebx
+  0056d	c7 45 e7 74 ff
+	ff ff		 mov	 DWORD PTR $T11[ebp+54], -140 ; ffffff74H
+  00574	c6 45 eb 01	 mov	 BYTE PTR $T11[ebp+58], 1
+  00578	f3 a5		 rep movsd
+  0057a	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00560	f3 a5		 rep movsd
-  00562	c5 f8 77	 vzeroupper
-  00565	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00580	66 a5		 movsw
+  00582	a4		 movsb
+  00583	c5 f8 77	 vzeroupper
+  00586	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 849  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 850  : 				.camType = keyType::set,
@@ -5564,50 +5614,52 @@ $LN15@scene2:
 ; 870  : 			});
 ; 871  : 			BasicCam::processCam();
 
-  0056a	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0058b	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 872  : 			Object::Aquarius({ .quality = 1 });
 
-  0056f	6a 01		 push	 1
-  00571	e8 00 00 00 00	 call	 ?Aquarius@Object@@YAXUAquarius_params@1@@Z ; Object::Aquarius
+  00590	6a 01		 push	 1
+  00592	e8 00 00 00 00	 call	 ?Aquarius@Object@@YAXUAquarius_params@1@@Z ; Object::Aquarius
 
 ; 873  : 			break;
 
-  00576	e9 d4 00 00 00	 jmp	 $LN28@scene2
+  00597	e9 da 00 00 00	 jmp	 $LN28@scene2
 $LN16@scene2:
 
 ; 874  : 		case 11:
 ; 875  : 			BasicCam::camCounter = 0;
 ; 876  : 			BasicCam::setCamKey({
 
-  0057b	c5 fe 6f 05 00
+  0059c	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@0000007200000000000000000000000000000000fffffc0f00000005fffffff8
-  00583	83 ec 54	 sub	 esp, 84			; 00000054H
-  00586	69 c0 50 75 0d
+  005a4	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  005a7	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  0058c	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T12[ebp+8], ymm0
-  00591	c5 f9 6f 05 00
+  005ad	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T12[ebp+5], ymm0
+  005b2	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@00000000000000030000000200000001
-  00599	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T12[ebp+68], xmm0
-  0059e	6a 15		 push	 21			; 00000015H
-  005a0	59		 pop	 ecx
-  005a1	8d 75 a8	 lea	 esi, DWORD PTR $T12[ebp]
-  005a4	89 45 a8	 mov	 DWORD PTR $T12[ebp], eax
-  005a7	8b fc		 mov	 edi, esp
-  005a9	88 5d ac	 mov	 BYTE PTR $T12[ebp+4], bl
-  005ac	89 5d d0	 mov	 DWORD PTR $T12[ebp+40], ebx
-  005af	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T12[ebp+44], 100 ; 00000064H
-  005b6	88 5d d8	 mov	 BYTE PTR $T12[ebp+48], bl
-  005b9	89 5d dc	 mov	 DWORD PTR $T12[ebp+52], ebx
-  005bc	89 5d e0	 mov	 DWORD PTR $T12[ebp+56], ebx
-  005bf	89 5d e4	 mov	 DWORD PTR $T12[ebp+60], ebx
-  005c2	c6 45 e8 01	 mov	 BYTE PTR $T12[ebp+64], 1
-  005c6	89 1d 00 00 00
+  005ba	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T12[ebp+59], xmm0
+  005bf	6a 12		 push	 18			; 00000012H
+  005c1	59		 pop	 ecx
+  005c2	89 45 b1	 mov	 DWORD PTR $T12[ebp], eax
+  005c5	8d 75 b1	 lea	 esi, DWORD PTR $T12[ebp]
+  005c8	88 5d b5	 mov	 BYTE PTR $T12[ebp+4], bl
+  005cb	8b fc		 mov	 edi, esp
+  005cd	89 5d d6	 mov	 DWORD PTR $T12[ebp+37], ebx
+  005d0	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T12[ebp+41], 100 ; 00000064H
+  005d7	88 5d de	 mov	 BYTE PTR $T12[ebp+45], bl
+  005da	89 5d df	 mov	 DWORD PTR $T12[ebp+46], ebx
+  005dd	89 5d e3	 mov	 DWORD PTR $T12[ebp+50], ebx
+  005e0	89 5d e7	 mov	 DWORD PTR $T12[ebp+54], ebx
+  005e3	c6 45 eb 01	 mov	 BYTE PTR $T12[ebp+58], 1
+  005e7	f3 a5		 rep movsd
+  005e9	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  005cc	f3 a5		 rep movsd
-  005ce	c5 f8 77	 vzeroupper
-  005d1	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  005ef	66 a5		 movsw
+  005f1	a4		 movsb
+  005f2	c5 f8 77	 vzeroupper
+  005f5	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 877  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 878  : 				.camType = keyType::set,
@@ -5633,51 +5685,53 @@ $LN16@scene2:
 ; 898  : 			});
 ; 899  : 			BasicCam::processCam();
 
-  005d6	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  005fa	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 900  : 			Object::Fish({ .quality = 1 });
 
-  005db	6a 01		 push	 1
-  005dd	e8 00 00 00 00	 call	 ?Fish@Object@@YAXUFish_params@1@@Z ; Object::Fish
+  005ff	6a 01		 push	 1
+  00601	e8 00 00 00 00	 call	 ?Fish@Object@@YAXUFish_params@1@@Z ; Object::Fish
 
 ; 901  : 			break;
 
-  005e2	eb 6b		 jmp	 SHORT $LN28@scene2
+  00606	eb 6e		 jmp	 SHORT $LN28@scene2
 $LN17@scene2:
 
 ; 902  : 		case 12:
 ; 903  : 			BasicCam::camCounter = 0;
 ; 904  : 			BasicCam::setCamKey({
 
-  005e4	c5 fe 6f 05 00
+  00608	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@00000000ffffff0200000000000000000000000000000000000013f70000000a
-  005ec	83 ec 54	 sub	 esp, 84			; 00000054H
-  005ef	69 c0 50 75 0d
+  00610	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00613	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  005f5	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T13[ebp+8], ymm0
-  005fa	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
-  005fe	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T13[ebp+68], xmm0
-  00603	6a 15		 push	 21			; 00000015H
-  00605	59		 pop	 ecx
-  00606	8d 75 a8	 lea	 esi, DWORD PTR $T13[ebp]
-  00609	89 45 a8	 mov	 DWORD PTR $T13[ebp], eax
-  0060c	8b fc		 mov	 edi, esp
-  0060e	88 5d ac	 mov	 BYTE PTR $T13[ebp+4], bl
-  00611	c7 45 d0 eb ff
-	ff ff		 mov	 DWORD PTR $T13[ebp+40], -21 ; ffffffebH
-  00618	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T13[ebp+44], 100 ; 00000064H
-  0061f	88 5d d8	 mov	 BYTE PTR $T13[ebp+48], bl
-  00622	89 5d dc	 mov	 DWORD PTR $T13[ebp+52], ebx
-  00625	89 5d e0	 mov	 DWORD PTR $T13[ebp+56], ebx
-  00628	c7 45 e4 c6 02
-	00 00		 mov	 DWORD PTR $T13[ebp+60], 710 ; 000002c6H
-  0062f	c6 45 e8 01	 mov	 BYTE PTR $T13[ebp+64], 1
-  00633	89 1d 00 00 00
+  00619	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T13[ebp+5], ymm0
+  0061e	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
+  00622	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T13[ebp+59], xmm0
+  00627	6a 12		 push	 18			; 00000012H
+  00629	59		 pop	 ecx
+  0062a	89 45 b1	 mov	 DWORD PTR $T13[ebp], eax
+  0062d	8d 75 b1	 lea	 esi, DWORD PTR $T13[ebp]
+  00630	88 5d b5	 mov	 BYTE PTR $T13[ebp+4], bl
+  00633	8b fc		 mov	 edi, esp
+  00635	c7 45 d6 eb ff
+	ff ff		 mov	 DWORD PTR $T13[ebp+37], -21 ; ffffffebH
+  0063c	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T13[ebp+41], 100 ; 00000064H
+  00643	88 5d de	 mov	 BYTE PTR $T13[ebp+45], bl
+  00646	89 5d df	 mov	 DWORD PTR $T13[ebp+46], ebx
+  00649	89 5d e3	 mov	 DWORD PTR $T13[ebp+50], ebx
+  0064c	c7 45 e7 c6 02
+	00 00		 mov	 DWORD PTR $T13[ebp+54], 710 ; 000002c6H
+  00653	c6 45 eb 01	 mov	 BYTE PTR $T13[ebp+58], 1
+  00657	f3 a5		 rep movsd
+  00659	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00639	f3 a5		 rep movsd
-  0063b	c5 f8 77	 vzeroupper
-  0063e	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  0065f	66 a5		 movsw
+  00661	a4		 movsb
+  00662	c5 f8 77	 vzeroupper
+  00665	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 905  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 906  : 				.camType = keyType::set,
@@ -5703,12 +5757,12 @@ $LN17@scene2:
 ; 926  : 			});
 ; 927  : 			BasicCam::processCam();
 
-  00643	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0066a	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 928  : 			Object::Twins({ .quality = 1 });
 
-  00648	6a 01		 push	 1
-  0064a	e8 00 00 00 00	 call	 ?Twins@Object@@YAXUTwins_params@1@@Z ; Object::Twins
+  0066f	6a 01		 push	 1
+  00671	e8 00 00 00 00	 call	 ?Twins@Object@@YAXUTwins_params@1@@Z ; Object::Twins
 $LN28@scene2:
 
 ; 929  : 			break;
@@ -5717,32 +5771,33 @@ $LN28@scene2:
 ; 932  : 
 ; 933  : 		Compose();
 
-  0064f	83 c4 58	 add	 esp, 88			; 00000058H
+  00676	83 c4 50	 add	 esp, 80			; 00000050H
 $LN2@scene2:
-  00652	e8 00 00 00 00	 call	 ?Compose@Loop@@YAXXZ	; Loop::Compose
+  00679	e8 00 00 00 00	 call	 ?Compose@Loop@@YAXXZ	; Loop::Compose
 
 ; 934  : 
 ; 935  : 	}
 
-  00657	5f		 pop	 edi
-  00658	5e		 pop	 esi
-  00659	5b		 pop	 ebx
-  0065a	c9		 leave
-  0065b	c3		 ret	 0
+  0067e	5f		 pop	 edi
+  0067f	5e		 pop	 esi
+  00680	5b		 pop	 ebx
+  00681	c9		 leave
+  00682	c3		 ret	 0
+  00683	90		 npad	 1
 $LN25@scene2:
-  0065c	00 00 00 00	 DD	 $LN5@scene2
-  00660	00 00 00 00	 DD	 $LN6@scene2
-  00664	00 00 00 00	 DD	 $LN7@scene2
-  00668	00 00 00 00	 DD	 $LN8@scene2
-  0066c	00 00 00 00	 DD	 $LN9@scene2
-  00670	00 00 00 00	 DD	 $LN10@scene2
-  00674	00 00 00 00	 DD	 $LN11@scene2
-  00678	00 00 00 00	 DD	 $LN12@scene2
-  0067c	00 00 00 00	 DD	 $LN13@scene2
-  00680	00 00 00 00	 DD	 $LN14@scene2
-  00684	00 00 00 00	 DD	 $LN15@scene2
-  00688	00 00 00 00	 DD	 $LN16@scene2
-  0068c	00 00 00 00	 DD	 $LN17@scene2
+  00684	00 00 00 00	 DD	 $LN5@scene2
+  00688	00 00 00 00	 DD	 $LN6@scene2
+  0068c	00 00 00 00	 DD	 $LN7@scene2
+  00690	00 00 00 00	 DD	 $LN8@scene2
+  00694	00 00 00 00	 DD	 $LN9@scene2
+  00698	00 00 00 00	 DD	 $LN10@scene2
+  0069c	00 00 00 00	 DD	 $LN11@scene2
+  006a0	00 00 00 00	 DD	 $LN12@scene2
+  006a4	00 00 00 00	 DD	 $LN13@scene2
+  006a8	00 00 00 00	 DD	 $LN14@scene2
+  006ac	00 00 00 00	 DD	 $LN15@scene2
+  006b0	00 00 00 00	 DD	 $LN16@scene2
+  006b4	00 00 00 00	 DD	 $LN17@scene2
 ?scene2@Loop@@YAXXZ ENDP				; Loop::scene2
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -5755,19 +5810,19 @@ _TEXT	ENDS
 ; File D:\!platform\fx\projectFiles\loop.h
 ;	COMDAT ?scene1@Loop@@YAXXZ
 _TEXT	SEGMENT
-$T1 = -88						; size = 84
-$T2 = -88						; size = 84
-$T3 = -88						; size = 84
-$T4 = -88						; size = 84
-$T5 = -88						; size = 84
-$T6 = -88						; size = 84
-$T7 = -88						; size = 84
-$T8 = -88						; size = 84
-$T9 = -88						; size = 84
-$T10 = -88						; size = 84
-$T11 = -88						; size = 84
-$T12 = -88						; size = 84
-$T13 = -88						; size = 84
+$T1 = -79						; size = 75
+$T2 = -79						; size = 75
+$T3 = -79						; size = 75
+$T4 = -79						; size = 75
+$T5 = -79						; size = 75
+$T6 = -79						; size = 75
+$T7 = -79						; size = 75
+$T8 = -79						; size = 75
+$T9 = -79						; size = 75
+$T10 = -79						; size = 75
+$T11 = -79						; size = 75
+$T12 = -79						; size = 75
+$T13 = -79						; size = 75
 $T14 = -4						; size = 2
 ?scene1@Loop@@YAXXZ PROC				; Loop::scene1, COMDAT
 
@@ -5775,7 +5830,7 @@ $T14 = -4						; size = 2
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
-  00003	83 ec 58	 sub	 esp, 88			; 00000058H
+  00003	83 ec 50	 sub	 esp, 80			; 00000050H
   00006	53		 push	 ebx
 
 ; 123  : 		BasicCam::camPass = false;
@@ -5865,7 +5920,7 @@ $LN4@scene1:
 ; 152  : 		switch (t)
 
   0006c	83 f8 0c	 cmp	 eax, 12			; 0000000cH
-  0006f	0f 87 de 05 00
+  0006f	0f 87 05 06 00
 	00		 ja	 $LN2@scene1
   00075	ff 24 85 00 00
 	00 00		 jmp	 DWORD PTR $LN25@scene1[eax*4]
@@ -5878,34 +5933,36 @@ $LN5@scene1:
 
   0007c	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000d8fffffffd000000000000000000000000fffff849000004d400000039
-  00084	83 ec 54	 sub	 esp, 84			; 00000054H
+  00084	83 ec 4c	 sub	 esp, 76			; 0000004cH
   00087	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  0008d	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T1[ebp+8], ymm0
+  0008d	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T1[ebp+5], ymm0
   00092	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  0009a	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T1[ebp+68], xmm0
-  0009f	6a 15		 push	 21			; 00000015H
+  0009a	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T1[ebp+59], xmm0
+  0009f	6a 12		 push	 18			; 00000012H
   000a1	59		 pop	 ecx
-  000a2	8d 75 a8	 lea	 esi, DWORD PTR $T1[ebp]
-  000a5	89 45 a8	 mov	 DWORD PTR $T1[ebp], eax
-  000a8	8b fc		 mov	 edi, esp
-  000aa	88 5d ac	 mov	 BYTE PTR $T1[ebp+4], bl
-  000ad	c7 45 d0 87 00
-	00 00		 mov	 DWORD PTR $T1[ebp+40], 135 ; 00000087H
-  000b4	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T1[ebp+44], 100 ; 00000064H
-  000bb	88 5d d8	 mov	 BYTE PTR $T1[ebp+48], bl
-  000be	89 5d dc	 mov	 DWORD PTR $T1[ebp+52], ebx
-  000c1	89 5d e0	 mov	 DWORD PTR $T1[ebp+56], ebx
-  000c4	c7 45 e4 92 ff
-	ff ff		 mov	 DWORD PTR $T1[ebp+60], -110 ; ffffff92H
-  000cb	c6 45 e8 01	 mov	 BYTE PTR $T1[ebp+64], 1
-  000cf	89 1d 00 00 00
+  000a2	89 45 b1	 mov	 DWORD PTR $T1[ebp], eax
+  000a5	8d 75 b1	 lea	 esi, DWORD PTR $T1[ebp]
+  000a8	88 5d b5	 mov	 BYTE PTR $T1[ebp+4], bl
+  000ab	8b fc		 mov	 edi, esp
+  000ad	c7 45 d6 87 00
+	00 00		 mov	 DWORD PTR $T1[ebp+37], 135 ; 00000087H
+  000b4	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T1[ebp+41], 100 ; 00000064H
+  000bb	88 5d de	 mov	 BYTE PTR $T1[ebp+45], bl
+  000be	89 5d df	 mov	 DWORD PTR $T1[ebp+46], ebx
+  000c1	89 5d e3	 mov	 DWORD PTR $T1[ebp+50], ebx
+  000c4	c7 45 e7 92 ff
+	ff ff		 mov	 DWORD PTR $T1[ebp+54], -110 ; ffffff92H
+  000cb	c6 45 eb 01	 mov	 BYTE PTR $T1[ebp+58], 1
+  000cf	f3 a5		 rep movsd
+  000d1	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  000d5	f3 a5		 rep movsd
-  000d7	c5 f8 77	 vzeroupper
-  000da	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  000d7	66 a5		 movsw
+  000d9	a4		 movsb
+  000da	c5 f8 77	 vzeroupper
+  000dd	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 157  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 158  : 				.camType = keyType::set,
@@ -5931,55 +5988,57 @@ $LN5@scene1:
 ; 178  : 				});
 ; 179  : 			BasicCam::processCam();
 
-  000df	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  000e2	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 180  : 
 ; 181  : 
 ; 182  : 			Object::Zenith({.quality = 1});
 
-  000e4	6a 01		 push	 1
-  000e6	e8 00 00 00 00	 call	 ?Zenith@Object@@YAXUZenith_params@1@@Z ; Object::Zenith
+  000e7	6a 01		 push	 1
+  000e9	e8 00 00 00 00	 call	 ?Zenith@Object@@YAXUZenith_params@1@@Z ; Object::Zenith
 
 ; 183  : 			break;
 
-  000eb	e9 60 05 00 00	 jmp	 $LN28@scene1
+  000ee	e9 84 05 00 00	 jmp	 $LN28@scene1
 $LN6@scene1:
 
 ; 184  : 		case 1:
 ; 185  : 			BasicCam::camCounter = 0;
 ; 186  : 			BasicCam::setCamKey({
 
-  000f0	c5 fe 6f 05 00
+  000f3	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000b4ffffff5d000000000000000000000000fffffe0dfffffb52fffffbc2
-  000f8	83 ec 54	 sub	 esp, 84			; 00000054H
-  000fb	69 c0 50 75 0d
+  000fb	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  000fe	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00101	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T2[ebp+8], ymm0
-  00106	c5 f9 6f 05 00
+  00104	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T2[ebp+5], ymm0
+  00109	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  0010e	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T2[ebp+68], xmm0
-  00113	6a 15		 push	 21			; 00000015H
-  00115	59		 pop	 ecx
-  00116	8d 75 a8	 lea	 esi, DWORD PTR $T2[ebp]
-  00119	89 45 a8	 mov	 DWORD PTR $T2[ebp], eax
-  0011c	8b fc		 mov	 edi, esp
-  0011e	88 5d ac	 mov	 BYTE PTR $T2[ebp+4], bl
-  00121	c7 45 d0 b5 ff
-	ff ff		 mov	 DWORD PTR $T2[ebp+40], -75 ; ffffffb5H
-  00128	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T2[ebp+44], 100 ; 00000064H
-  0012f	88 5d d8	 mov	 BYTE PTR $T2[ebp+48], bl
-  00132	89 5d dc	 mov	 DWORD PTR $T2[ebp+52], ebx
-  00135	c7 45 e0 46 00
-	00 00		 mov	 DWORD PTR $T2[ebp+56], 70 ; 00000046H
-  0013c	c7 45 e4 c4 ff
-	ff ff		 mov	 DWORD PTR $T2[ebp+60], -60 ; ffffffc4H
-  00143	c6 45 e8 01	 mov	 BYTE PTR $T2[ebp+64], 1
-  00147	89 1d 00 00 00
+  00111	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T2[ebp+59], xmm0
+  00116	6a 12		 push	 18			; 00000012H
+  00118	59		 pop	 ecx
+  00119	89 45 b1	 mov	 DWORD PTR $T2[ebp], eax
+  0011c	8d 75 b1	 lea	 esi, DWORD PTR $T2[ebp]
+  0011f	88 5d b5	 mov	 BYTE PTR $T2[ebp+4], bl
+  00122	8b fc		 mov	 edi, esp
+  00124	c7 45 d6 b5 ff
+	ff ff		 mov	 DWORD PTR $T2[ebp+37], -75 ; ffffffb5H
+  0012b	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T2[ebp+41], 100 ; 00000064H
+  00132	88 5d de	 mov	 BYTE PTR $T2[ebp+45], bl
+  00135	89 5d df	 mov	 DWORD PTR $T2[ebp+46], ebx
+  00138	c7 45 e3 46 00
+	00 00		 mov	 DWORD PTR $T2[ebp+50], 70 ; 00000046H
+  0013f	c7 45 e7 c4 ff
+	ff ff		 mov	 DWORD PTR $T2[ebp+54], -60 ; ffffffc4H
+  00146	c6 45 eb 01	 mov	 BYTE PTR $T2[ebp+58], 1
+  0014a	f3 a5		 rep movsd
+  0014c	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  0014d	f3 a5		 rep movsd
-  0014f	c5 f8 77	 vzeroupper
-  00152	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00152	66 a5		 movsw
+  00154	a4		 movsb
+  00155	c5 f8 77	 vzeroupper
+  00158	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 187  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 188  : 				.camType = keyType::set,
@@ -6005,52 +6064,54 @@ $LN6@scene1:
 ; 208  : 			});
 ; 209  : 			BasicCam::processCam();
 
-  00157	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0015d	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 210  : 			Object::Saggitarius({ .quality = 1 });
 
-  0015c	6a 01		 push	 1
-  0015e	e8 00 00 00 00	 call	 ?Saggitarius@Object@@YAXUSaggitarius_params@1@@Z ; Object::Saggitarius
+  00162	6a 01		 push	 1
+  00164	e8 00 00 00 00	 call	 ?Saggitarius@Object@@YAXUSaggitarius_params@1@@Z ; Object::Saggitarius
 
 ; 211  : 			break;
 
-  00163	e9 e8 04 00 00	 jmp	 $LN28@scene1
+  00169	e9 09 05 00 00	 jmp	 $LN28@scene1
 $LN7@scene1:
 
 ; 212  : 		case 2:
 ; 213  : 			BasicCam::camCounter = 0;
 ; 214  : 			BasicCam::setCamKey({
 
-  00168	c5 fe 6f 05 00
+  0016e	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@fffffffb0000000e0000000000000000000000000000004f00000ed800000004
-  00170	83 ec 54	 sub	 esp, 84			; 00000054H
-  00173	69 c0 50 75 0d
+  00176	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00179	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00179	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T3[ebp+8], ymm0
-  0017e	c5 f9 6f 05 00
+  0017f	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T3[ebp+5], ymm0
+  00184	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  00186	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T3[ebp+68], xmm0
-  0018b	6a 15		 push	 21			; 00000015H
-  0018d	59		 pop	 ecx
-  0018e	8d 75 a8	 lea	 esi, DWORD PTR $T3[ebp]
-  00191	89 45 a8	 mov	 DWORD PTR $T3[ebp], eax
-  00194	8b fc		 mov	 edi, esp
-  00196	88 5d ac	 mov	 BYTE PTR $T3[ebp+4], bl
-  00199	c7 45 d0 fe 00
-	00 00		 mov	 DWORD PTR $T3[ebp+40], 254 ; 000000feH
-  001a0	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T3[ebp+44], 100 ; 00000064H
-  001a7	88 5d d8	 mov	 BYTE PTR $T3[ebp+48], bl
-  001aa	89 5d dc	 mov	 DWORD PTR $T3[ebp+52], ebx
-  001ad	89 5d e0	 mov	 DWORD PTR $T3[ebp+56], ebx
-  001b0	c7 45 e4 36 01
-	00 00		 mov	 DWORD PTR $T3[ebp+60], 310 ; 00000136H
-  001b7	c6 45 e8 01	 mov	 BYTE PTR $T3[ebp+64], 1
-  001bb	89 1d 00 00 00
-	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  0018c	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T3[ebp+59], xmm0
+  00191	6a 12		 push	 18			; 00000012H
+  00193	59		 pop	 ecx
+  00194	89 45 b1	 mov	 DWORD PTR $T3[ebp], eax
+  00197	8d 75 b1	 lea	 esi, DWORD PTR $T3[ebp]
+  0019a	88 5d b5	 mov	 BYTE PTR $T3[ebp+4], bl
+  0019d	8b fc		 mov	 edi, esp
+  0019f	c7 45 d6 fe 00
+	00 00		 mov	 DWORD PTR $T3[ebp+37], 254 ; 000000feH
+  001a6	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T3[ebp+41], 100 ; 00000064H
+  001ad	88 5d de	 mov	 BYTE PTR $T3[ebp+45], bl
+  001b0	89 5d df	 mov	 DWORD PTR $T3[ebp+46], ebx
+  001b3	89 5d e3	 mov	 DWORD PTR $T3[ebp+50], ebx
+  001b6	c7 45 e7 36 01
+	00 00		 mov	 DWORD PTR $T3[ebp+54], 310 ; 00000136H
+  001bd	c6 45 eb 01	 mov	 BYTE PTR $T3[ebp+58], 1
   001c1	f3 a5		 rep movsd
-  001c3	c5 f8 77	 vzeroupper
-  001c6	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  001c3	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
+  001c9	66 a5		 movsw
+  001cb	a4		 movsb
+  001cc	c5 f8 77	 vzeroupper
+  001cf	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 215  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 216  : 				.camType = keyType::set,
@@ -6076,53 +6137,55 @@ $LN7@scene1:
 ; 236  : 			});
 ; 237  : 			BasicCam::processCam();
 
-  001cb	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  001d4	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 238  : 
 ; 239  : 			Object::Crab({ .quality = 1 });
 
-  001d0	6a 01		 push	 1
-  001d2	e8 00 00 00 00	 call	 ?Crab@Object@@YAXUCrab_params@1@@Z ; Object::Crab
+  001d9	6a 01		 push	 1
+  001db	e8 00 00 00 00	 call	 ?Crab@Object@@YAXUCrab_params@1@@Z ; Object::Crab
 
 ; 240  : 			break;
 
-  001d7	e9 74 04 00 00	 jmp	 $LN28@scene1
+  001e0	e9 92 04 00 00	 jmp	 $LN28@scene1
 $LN8@scene1:
 
 ; 241  : 		case 3:
 ; 242  : 			BasicCam::camCounter = 0;
 ; 243  : 			BasicCam::setCamKey({
 
-  001dc	c5 fe 6f 05 00
+  001e5	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000f8ffffffe300000000000000730000000000000d0efffff858fffff87a
-  001e4	83 ec 54	 sub	 esp, 84			; 00000054H
-  001e7	69 c0 50 75 0d
+  001ed	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  001f0	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  001ed	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T4[ebp+8], ymm0
-  001f2	c5 f9 6f 05 00
+  001f6	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T4[ebp+5], ymm0
+  001fb	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@00000000fffffffe00000001fffffffd
-  001fa	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T4[ebp+68], xmm0
-  001ff	6a 15		 push	 21			; 00000015H
-  00201	59		 pop	 ecx
-  00202	8d 75 a8	 lea	 esi, DWORD PTR $T4[ebp]
-  00205	89 45 a8	 mov	 DWORD PTR $T4[ebp], eax
-  00208	8b fc		 mov	 edi, esp
-  0020a	88 5d ac	 mov	 BYTE PTR $T4[ebp+4], bl
-  0020d	c7 45 d0 33 00
-	00 00		 mov	 DWORD PTR $T4[ebp+40], 51 ; 00000033H
-  00214	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T4[ebp+44], 100 ; 00000064H
-  0021b	88 5d d8	 mov	 BYTE PTR $T4[ebp+48], bl
-  0021e	89 5d dc	 mov	 DWORD PTR $T4[ebp+52], ebx
-  00221	c7 45 e0 28 00
-	00 00		 mov	 DWORD PTR $T4[ebp+56], 40 ; 00000028H
-  00228	89 5d e4	 mov	 DWORD PTR $T4[ebp+60], ebx
-  0022b	c6 45 e8 01	 mov	 BYTE PTR $T4[ebp+64], 1
-  0022f	89 1d 00 00 00
+  00203	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T4[ebp+59], xmm0
+  00208	6a 12		 push	 18			; 00000012H
+  0020a	59		 pop	 ecx
+  0020b	89 45 b1	 mov	 DWORD PTR $T4[ebp], eax
+  0020e	8d 75 b1	 lea	 esi, DWORD PTR $T4[ebp]
+  00211	88 5d b5	 mov	 BYTE PTR $T4[ebp+4], bl
+  00214	8b fc		 mov	 edi, esp
+  00216	c7 45 d6 33 00
+	00 00		 mov	 DWORD PTR $T4[ebp+37], 51 ; 00000033H
+  0021d	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T4[ebp+41], 100 ; 00000064H
+  00224	88 5d de	 mov	 BYTE PTR $T4[ebp+45], bl
+  00227	89 5d df	 mov	 DWORD PTR $T4[ebp+46], ebx
+  0022a	c7 45 e3 28 00
+	00 00		 mov	 DWORD PTR $T4[ebp+50], 40 ; 00000028H
+  00231	89 5d e7	 mov	 DWORD PTR $T4[ebp+54], ebx
+  00234	c6 45 eb 01	 mov	 BYTE PTR $T4[ebp+58], 1
+  00238	f3 a5		 rep movsd
+  0023a	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00235	f3 a5		 rep movsd
-  00237	c5 f8 77	 vzeroupper
-  0023a	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00240	66 a5		 movsw
+  00242	a4		 movsb
+  00243	c5 f8 77	 vzeroupper
+  00246	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 244  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 245  : 				.camType = keyType::set,
@@ -6148,52 +6211,54 @@ $LN8@scene1:
 ; 265  : 			});
 ; 266  : 			BasicCam::processCam();
 
-  0023f	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0024b	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 267  : 			Object::Aries({ .quality = 1 });
 
-  00244	6a 01		 push	 1
-  00246	e8 00 00 00 00	 call	 ?Aries@Object@@YAXUAries_params@1@@Z ; Object::Aries
+  00250	6a 01		 push	 1
+  00252	e8 00 00 00 00	 call	 ?Aries@Object@@YAXUAries_params@1@@Z ; Object::Aries
 
 ; 268  : 			break;
 
-  0024b	e9 00 04 00 00	 jmp	 $LN28@scene1
+  00257	e9 1b 04 00 00	 jmp	 $LN28@scene1
 $LN9@scene1:
 
 ; 269  : 		case 4:
 ; 270  : 			BasicCam::camCounter = 0;
 ; 271  : 			BasicCam::setCamKey({
 
-  00250	c5 fe 6f 05 00
+  0025c	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000c1000000a3000000000000000000000000fffffe6efffff7fc00000938
-  00258	83 ec 54	 sub	 esp, 84			; 00000054H
-  0025b	69 c0 50 75 0d
+  00264	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00267	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00261	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T5[ebp+8], ymm0
-  00266	c5 f9 6f 05 00
+  0026d	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T5[ebp+5], ymm0
+  00272	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  0026e	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T5[ebp+68], xmm0
-  00273	6a 15		 push	 21			; 00000015H
-  00275	59		 pop	 ecx
-  00276	8d 75 a8	 lea	 esi, DWORD PTR $T5[ebp]
-  00279	89 45 a8	 mov	 DWORD PTR $T5[ebp], eax
-  0027c	8b fc		 mov	 edi, esp
-  0027e	88 5d ac	 mov	 BYTE PTR $T5[ebp+4], bl
-  00281	c7 45 d0 e5 ff
-	ff ff		 mov	 DWORD PTR $T5[ebp+40], -27 ; ffffffe5H
-  00288	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T5[ebp+44], 100 ; 00000064H
-  0028f	88 5d d8	 mov	 BYTE PTR $T5[ebp+48], bl
-  00292	89 5d dc	 mov	 DWORD PTR $T5[ebp+52], ebx
-  00295	89 5d e0	 mov	 DWORD PTR $T5[ebp+56], ebx
-  00298	c7 45 e4 2d ff
-	ff ff		 mov	 DWORD PTR $T5[ebp+60], -211 ; ffffff2dH
-  0029f	c6 45 e8 01	 mov	 BYTE PTR $T5[ebp+64], 1
-  002a3	89 1d 00 00 00
+  0027a	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T5[ebp+59], xmm0
+  0027f	6a 12		 push	 18			; 00000012H
+  00281	59		 pop	 ecx
+  00282	89 45 b1	 mov	 DWORD PTR $T5[ebp], eax
+  00285	8d 75 b1	 lea	 esi, DWORD PTR $T5[ebp]
+  00288	88 5d b5	 mov	 BYTE PTR $T5[ebp+4], bl
+  0028b	8b fc		 mov	 edi, esp
+  0028d	c7 45 d6 e5 ff
+	ff ff		 mov	 DWORD PTR $T5[ebp+37], -27 ; ffffffe5H
+  00294	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T5[ebp+41], 100 ; 00000064H
+  0029b	88 5d de	 mov	 BYTE PTR $T5[ebp+45], bl
+  0029e	89 5d df	 mov	 DWORD PTR $T5[ebp+46], ebx
+  002a1	89 5d e3	 mov	 DWORD PTR $T5[ebp+50], ebx
+  002a4	c7 45 e7 2d ff
+	ff ff		 mov	 DWORD PTR $T5[ebp+54], -211 ; ffffff2dH
+  002ab	c6 45 eb 01	 mov	 BYTE PTR $T5[ebp+58], 1
+  002af	f3 a5		 rep movsd
+  002b1	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  002a9	f3 a5		 rep movsd
-  002ab	c5 f8 77	 vzeroupper
-  002ae	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  002b7	66 a5		 movsw
+  002b9	a4		 movsb
+  002ba	c5 f8 77	 vzeroupper
+  002bd	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 272  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 273  : 				.camType = keyType::set,
@@ -6219,52 +6284,54 @@ $LN9@scene1:
 ; 293  : 			});
 ; 294  : 			BasicCam::processCam();
 
-  002b3	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  002c2	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 295  : 			Object::Scorpio({ .quality = 1 });
 
-  002b8	6a 01		 push	 1
-  002ba	e8 00 00 00 00	 call	 ?Scorpio@Object@@YAXUScorpio_params@1@@Z ; Object::Scorpio
+  002c7	6a 01		 push	 1
+  002c9	e8 00 00 00 00	 call	 ?Scorpio@Object@@YAXUScorpio_params@1@@Z ; Object::Scorpio
 
 ; 296  : 			break;
 
-  002bf	e9 8c 03 00 00	 jmp	 $LN28@scene1
+  002ce	e9 a4 03 00 00	 jmp	 $LN28@scene1
 $LN10@scene1:
 
 ; 297  : 		case 5:
 ; 298  : 			BasicCam::camCounter = 0;
 ; 299  : 			BasicCam::setCamKey({
 
-  002c4	c5 fe 6f 05 00
+  002d3	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@0000008b00000096000000000000000000000000000003f7fffff76d000003f7
-  002cc	83 ec 54	 sub	 esp, 84			; 00000054H
-  002cf	69 c0 50 75 0d
+  002db	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  002de	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  002d5	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T6[ebp+8], ymm0
-  002da	c5 f9 6f 05 00
+  002e4	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T6[ebp+5], ymm0
+  002e9	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  002e2	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T6[ebp+68], xmm0
-  002e7	6a 15		 push	 21			; 00000015H
-  002e9	59		 pop	 ecx
-  002ea	8d 75 a8	 lea	 esi, DWORD PTR $T6[ebp]
-  002ed	89 45 a8	 mov	 DWORD PTR $T6[ebp], eax
-  002f0	8b fc		 mov	 edi, esp
-  002f2	88 5d ac	 mov	 BYTE PTR $T6[ebp+4], bl
-  002f5	c7 45 d0 96 00
-	00 00		 mov	 DWORD PTR $T6[ebp+40], 150 ; 00000096H
-  002fc	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T6[ebp+44], 100 ; 00000064H
-  00303	88 5d d8	 mov	 BYTE PTR $T6[ebp+48], bl
-  00306	89 5d dc	 mov	 DWORD PTR $T6[ebp+52], ebx
-  00309	89 5d e0	 mov	 DWORD PTR $T6[ebp+56], ebx
-  0030c	c7 45 e4 fa 00
-	00 00		 mov	 DWORD PTR $T6[ebp+60], 250 ; 000000faH
-  00313	c6 45 e8 01	 mov	 BYTE PTR $T6[ebp+64], 1
-  00317	89 1d 00 00 00
+  002f1	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T6[ebp+59], xmm0
+  002f6	6a 12		 push	 18			; 00000012H
+  002f8	59		 pop	 ecx
+  002f9	89 45 b1	 mov	 DWORD PTR $T6[ebp], eax
+  002fc	8d 75 b1	 lea	 esi, DWORD PTR $T6[ebp]
+  002ff	88 5d b5	 mov	 BYTE PTR $T6[ebp+4], bl
+  00302	8b fc		 mov	 edi, esp
+  00304	c7 45 d6 96 00
+	00 00		 mov	 DWORD PTR $T6[ebp+37], 150 ; 00000096H
+  0030b	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T6[ebp+41], 100 ; 00000064H
+  00312	88 5d de	 mov	 BYTE PTR $T6[ebp+45], bl
+  00315	89 5d df	 mov	 DWORD PTR $T6[ebp+46], ebx
+  00318	89 5d e3	 mov	 DWORD PTR $T6[ebp+50], ebx
+  0031b	c7 45 e7 fa 00
+	00 00		 mov	 DWORD PTR $T6[ebp+54], 250 ; 000000faH
+  00322	c6 45 eb 01	 mov	 BYTE PTR $T6[ebp+58], 1
+  00326	f3 a5		 rep movsd
+  00328	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  0031d	f3 a5		 rep movsd
-  0031f	c5 f8 77	 vzeroupper
-  00322	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  0032e	66 a5		 movsw
+  00330	a4		 movsb
+  00331	c5 f8 77	 vzeroupper
+  00334	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 300  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 301  : 				.camType = keyType::set,
@@ -6290,52 +6357,54 @@ $LN10@scene1:
 ; 321  : 			});
 ; 322  : 			BasicCam::processCam();
 
-  00327	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00339	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 323  : 			Object::LeoBigStar({ .quality = 1 });
 
-  0032c	6a 01		 push	 1
-  0032e	e8 00 00 00 00	 call	 ?LeoBigStar@Object@@YAXULeoBigStar_params@1@@Z ; Object::LeoBigStar
+  0033e	6a 01		 push	 1
+  00340	e8 00 00 00 00	 call	 ?LeoBigStar@Object@@YAXULeoBigStar_params@1@@Z ; Object::LeoBigStar
 
 ; 324  : 			break;
 
-  00333	e9 18 03 00 00	 jmp	 $LN28@scene1
+  00345	e9 2d 03 00 00	 jmp	 $LN28@scene1
 $LN11@scene1:
 
 ; 325  : 		case 6:
 ; 326  : 			BasicCam::camCounter = 0;
 ; 327  : 			BasicCam::setCamKey({
 
-  00338	c5 fe 6f 05 00
+  0034a	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@00000085ffffff31000000000000000000000000000002faffffefa7fffff662
-  00340	83 ec 54	 sub	 esp, 84			; 00000054H
-  00343	69 c0 50 75 0d
+  00352	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00355	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00349	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T7[ebp+8], ymm0
-  0034e	c5 f9 6f 05 00
+  0035b	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T7[ebp+5], ymm0
+  00360	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  00356	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T7[ebp+68], xmm0
-  0035b	6a 15		 push	 21			; 00000015H
-  0035d	59		 pop	 ecx
-  0035e	8d 75 a8	 lea	 esi, DWORD PTR $T7[ebp]
-  00361	89 45 a8	 mov	 DWORD PTR $T7[ebp], eax
-  00364	8b fc		 mov	 edi, esp
-  00366	88 5d ac	 mov	 BYTE PTR $T7[ebp+4], bl
-  00369	c7 45 d0 40 00
-	00 00		 mov	 DWORD PTR $T7[ebp+40], 64 ; 00000040H
-  00370	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T7[ebp+44], 100 ; 00000064H
-  00377	88 5d d8	 mov	 BYTE PTR $T7[ebp+48], bl
-  0037a	89 5d dc	 mov	 DWORD PTR $T7[ebp+52], ebx
-  0037d	89 5d e0	 mov	 DWORD PTR $T7[ebp+56], ebx
-  00380	c7 45 e4 88 ff
-	ff ff		 mov	 DWORD PTR $T7[ebp+60], -120 ; ffffff88H
-  00387	c6 45 e8 01	 mov	 BYTE PTR $T7[ebp+64], 1
-  0038b	89 1d 00 00 00
+  00368	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T7[ebp+59], xmm0
+  0036d	6a 12		 push	 18			; 00000012H
+  0036f	59		 pop	 ecx
+  00370	89 45 b1	 mov	 DWORD PTR $T7[ebp], eax
+  00373	8d 75 b1	 lea	 esi, DWORD PTR $T7[ebp]
+  00376	88 5d b5	 mov	 BYTE PTR $T7[ebp+4], bl
+  00379	8b fc		 mov	 edi, esp
+  0037b	c7 45 d6 40 00
+	00 00		 mov	 DWORD PTR $T7[ebp+37], 64 ; 00000040H
+  00382	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T7[ebp+41], 100 ; 00000064H
+  00389	88 5d de	 mov	 BYTE PTR $T7[ebp+45], bl
+  0038c	89 5d df	 mov	 DWORD PTR $T7[ebp+46], ebx
+  0038f	89 5d e3	 mov	 DWORD PTR $T7[ebp+50], ebx
+  00392	c7 45 e7 88 ff
+	ff ff		 mov	 DWORD PTR $T7[ebp+54], -120 ; ffffff88H
+  00399	c6 45 eb 01	 mov	 BYTE PTR $T7[ebp+58], 1
+  0039d	f3 a5		 rep movsd
+  0039f	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00391	f3 a5		 rep movsd
-  00393	c5 f8 77	 vzeroupper
-  00396	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  003a5	66 a5		 movsw
+  003a7	a4		 movsb
+  003a8	c5 f8 77	 vzeroupper
+  003ab	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 328  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 329  : 				.camType = keyType::set,
@@ -6361,52 +6430,54 @@ $LN11@scene1:
 ; 349  : 			});
 ; 350  : 			BasicCam::processCam();
 
-  0039b	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  003b0	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 351  : 			Object::Virgo({ .quality = 1 });
 
-  003a0	6a 01		 push	 1
-  003a2	e8 00 00 00 00	 call	 ?Virgo@Object@@YAXUVirgo_params@1@@Z ; Object::Virgo
+  003b5	6a 01		 push	 1
+  003b7	e8 00 00 00 00	 call	 ?Virgo@Object@@YAXUVirgo_params@1@@Z ; Object::Virgo
 
 ; 352  : 			break;
 
-  003a7	e9 a4 02 00 00	 jmp	 $LN28@scene1
+  003bc	e9 b6 02 00 00	 jmp	 $LN28@scene1
 $LN12@scene1:
 
 ; 353  : 		case 7:
 ; 354  : 			BasicCam::camCounter = 0;
 ; 355  : 			BasicCam::setCamKey({
 
-  003ac	c5 fe 6f 05 00
+  003c1	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@ffffff7300000077000000000000000000000000000003ac000006af00000284
-  003b4	83 ec 54	 sub	 esp, 84			; 00000054H
-  003b7	69 c0 50 75 0d
+  003c9	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  003cc	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  003bd	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T8[ebp+8], ymm0
-  003c2	c5 f9 6f 05 00
+  003d2	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T8[ebp+5], ymm0
+  003d7	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@00000000000000000000000000000003
-  003ca	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T8[ebp+68], xmm0
-  003cf	6a 15		 push	 21			; 00000015H
-  003d1	59		 pop	 ecx
-  003d2	8d 75 a8	 lea	 esi, DWORD PTR $T8[ebp]
-  003d5	89 45 a8	 mov	 DWORD PTR $T8[ebp], eax
-  003d8	8b fc		 mov	 edi, esp
-  003da	88 5d ac	 mov	 BYTE PTR $T8[ebp+4], bl
-  003dd	c7 45 d0 af 00
-	00 00		 mov	 DWORD PTR $T8[ebp+40], 175 ; 000000afH
-  003e4	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T8[ebp+44], 100 ; 00000064H
-  003eb	88 5d d8	 mov	 BYTE PTR $T8[ebp+48], bl
-  003ee	89 5d dc	 mov	 DWORD PTR $T8[ebp+52], ebx
-  003f1	89 5d e0	 mov	 DWORD PTR $T8[ebp+56], ebx
-  003f4	c7 45 e4 ce ff
-	ff ff		 mov	 DWORD PTR $T8[ebp+60], -50 ; ffffffceH
-  003fb	c6 45 e8 01	 mov	 BYTE PTR $T8[ebp+64], 1
-  003ff	89 1d 00 00 00
+  003df	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T8[ebp+59], xmm0
+  003e4	6a 12		 push	 18			; 00000012H
+  003e6	59		 pop	 ecx
+  003e7	89 45 b1	 mov	 DWORD PTR $T8[ebp], eax
+  003ea	8d 75 b1	 lea	 esi, DWORD PTR $T8[ebp]
+  003ed	88 5d b5	 mov	 BYTE PTR $T8[ebp+4], bl
+  003f0	8b fc		 mov	 edi, esp
+  003f2	c7 45 d6 af 00
+	00 00		 mov	 DWORD PTR $T8[ebp+37], 175 ; 000000afH
+  003f9	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T8[ebp+41], 100 ; 00000064H
+  00400	88 5d de	 mov	 BYTE PTR $T8[ebp+45], bl
+  00403	89 5d df	 mov	 DWORD PTR $T8[ebp+46], ebx
+  00406	89 5d e3	 mov	 DWORD PTR $T8[ebp+50], ebx
+  00409	c7 45 e7 ce ff
+	ff ff		 mov	 DWORD PTR $T8[ebp+54], -50 ; ffffffceH
+  00410	c6 45 eb 01	 mov	 BYTE PTR $T8[ebp+58], 1
+  00414	f3 a5		 rep movsd
+  00416	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00405	f3 a5		 rep movsd
-  00407	c5 f8 77	 vzeroupper
-  0040a	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  0041c	66 a5		 movsw
+  0041e	a4		 movsb
+  0041f	c5 f8 77	 vzeroupper
+  00422	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 356  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 357  : 				.camType = keyType::set,
@@ -6432,52 +6503,54 @@ $LN12@scene1:
 ; 377  : 			});
 ; 378  : 			BasicCam::processCam();
 
-  0040f	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00427	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 379  : 			Object::Capri({ .quality = 1 });
 
-  00414	6a 01		 push	 1
-  00416	e8 00 00 00 00	 call	 ?Capri@Object@@YAXUCapri_params@1@@Z ; Object::Capri
+  0042c	6a 01		 push	 1
+  0042e	e8 00 00 00 00	 call	 ?Capri@Object@@YAXUCapri_params@1@@Z ; Object::Capri
 
 ; 380  : 			break;
 
-  0041b	e9 30 02 00 00	 jmp	 $LN28@scene1
+  00433	e9 3f 02 00 00	 jmp	 $LN28@scene1
 $LN13@scene1:
 
 ; 381  : 		case 8:
 ; 382  : 			BasicCam::camCounter = 0;
 ; 383  : 			BasicCam::setCamKey({
 
-  00420	c5 fe 6f 05 00
+  00438	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000d8fffffffd00000000000000de00000000fffff849ffffff7800000039
-  00428	83 ec 54	 sub	 esp, 84			; 00000054H
-  0042b	69 c0 50 75 0d
+  00440	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00443	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00431	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T9[ebp+8], ymm0
-  00436	c5 f9 6f 05 00
+  00449	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T9[ebp+5], ymm0
+  0044e	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  0043e	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T9[ebp+68], xmm0
-  00443	6a 15		 push	 21			; 00000015H
-  00445	59		 pop	 ecx
-  00446	8d 75 a8	 lea	 esi, DWORD PTR $T9[ebp]
-  00449	89 45 a8	 mov	 DWORD PTR $T9[ebp], eax
-  0044c	8b fc		 mov	 edi, esp
-  0044e	88 5d ac	 mov	 BYTE PTR $T9[ebp+4], bl
-  00451	c7 45 d0 87 00
-	00 00		 mov	 DWORD PTR $T9[ebp+40], 135 ; 00000087H
-  00458	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T9[ebp+44], 100 ; 00000064H
-  0045f	88 5d d8	 mov	 BYTE PTR $T9[ebp+48], bl
-  00462	89 5d dc	 mov	 DWORD PTR $T9[ebp+52], ebx
-  00465	89 5d e0	 mov	 DWORD PTR $T9[ebp+56], ebx
-  00468	c7 45 e4 60 fe
-	ff ff		 mov	 DWORD PTR $T9[ebp+60], -416 ; fffffe60H
-  0046f	c6 45 e8 01	 mov	 BYTE PTR $T9[ebp+64], 1
-  00473	89 1d 00 00 00
+  00456	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T9[ebp+59], xmm0
+  0045b	6a 12		 push	 18			; 00000012H
+  0045d	59		 pop	 ecx
+  0045e	89 45 b1	 mov	 DWORD PTR $T9[ebp], eax
+  00461	8d 75 b1	 lea	 esi, DWORD PTR $T9[ebp]
+  00464	88 5d b5	 mov	 BYTE PTR $T9[ebp+4], bl
+  00467	8b fc		 mov	 edi, esp
+  00469	c7 45 d6 87 00
+	00 00		 mov	 DWORD PTR $T9[ebp+37], 135 ; 00000087H
+  00470	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T9[ebp+41], 100 ; 00000064H
+  00477	88 5d de	 mov	 BYTE PTR $T9[ebp+45], bl
+  0047a	89 5d df	 mov	 DWORD PTR $T9[ebp+46], ebx
+  0047d	89 5d e3	 mov	 DWORD PTR $T9[ebp+50], ebx
+  00480	c7 45 e7 60 fe
+	ff ff		 mov	 DWORD PTR $T9[ebp+54], -416 ; fffffe60H
+  00487	c6 45 eb 01	 mov	 BYTE PTR $T9[ebp+58], 1
+  0048b	f3 a5		 rep movsd
+  0048d	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  00479	f3 a5		 rep movsd
-  0047b	c5 f8 77	 vzeroupper
-  0047e	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00493	66 a5		 movsw
+  00495	a4		 movsb
+  00496	c5 f8 77	 vzeroupper
+  00499	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 384  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 385  : 				.camType = keyType::set,
@@ -6503,52 +6576,54 @@ $LN13@scene1:
 ; 405  : 				});
 ; 406  : 			BasicCam::processCam();
 
-  00483	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0049e	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 407  : 			Object::Taurus({ .quality = 1 });
 
-  00488	6a 01		 push	 1
-  0048a	e8 00 00 00 00	 call	 ?Taurus@Object@@YAXUTaurus_params@1@@Z ; Object::Taurus
+  004a3	6a 01		 push	 1
+  004a5	e8 00 00 00 00	 call	 ?Taurus@Object@@YAXUTaurus_params@1@@Z ; Object::Taurus
 
 ; 408  : 			//
 ; 409  : 			break;
 
-  0048f	e9 bc 01 00 00	 jmp	 $LN28@scene1
+  004aa	e9 c8 01 00 00	 jmp	 $LN28@scene1
 $LN14@scene1:
 
 ; 410  : 		case 9:
 ; 411  : 			BasicCam::camCounter = 0;
 ; 412  : 			BasicCam::setCamKey({
 
-  00494	c5 fe 6f 05 00
+  004af	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000e900000001000000000000000000000000fffff787fffffc4200000016
-  0049c	83 ec 54	 sub	 esp, 84			; 00000054H
-  0049f	69 c0 50 75 0d
+  004b7	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  004ba	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  004a5	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T10[ebp+8], ymm0
-  004aa	c5 f9 6f 05 00
+  004c0	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T10[ebp+5], ymm0
+  004c5	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  004b2	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T10[ebp+68], xmm0
-  004b7	6a 15		 push	 21			; 00000015H
-  004b9	59		 pop	 ecx
-  004ba	8d 75 a8	 lea	 esi, DWORD PTR $T10[ebp]
-  004bd	89 45 a8	 mov	 DWORD PTR $T10[ebp], eax
-  004c0	8b fc		 mov	 edi, esp
-  004c2	88 5d ac	 mov	 BYTE PTR $T10[ebp+4], bl
-  004c5	c7 45 d0 9a ff
-	ff ff		 mov	 DWORD PTR $T10[ebp+40], -102 ; ffffff9aH
-  004cc	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T10[ebp+44], 100 ; 00000064H
-  004d3	88 5d d8	 mov	 BYTE PTR $T10[ebp+48], bl
-  004d6	89 5d dc	 mov	 DWORD PTR $T10[ebp+52], ebx
-  004d9	89 5d e0	 mov	 DWORD PTR $T10[ebp+56], ebx
-  004dc	89 5d e4	 mov	 DWORD PTR $T10[ebp+60], ebx
-  004df	c6 45 e8 01	 mov	 BYTE PTR $T10[ebp+64], 1
-  004e3	89 1d 00 00 00
+  004cd	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T10[ebp+59], xmm0
+  004d2	6a 12		 push	 18			; 00000012H
+  004d4	59		 pop	 ecx
+  004d5	89 45 b1	 mov	 DWORD PTR $T10[ebp], eax
+  004d8	8d 75 b1	 lea	 esi, DWORD PTR $T10[ebp]
+  004db	88 5d b5	 mov	 BYTE PTR $T10[ebp+4], bl
+  004de	8b fc		 mov	 edi, esp
+  004e0	c7 45 d6 9a ff
+	ff ff		 mov	 DWORD PTR $T10[ebp+37], -102 ; ffffff9aH
+  004e7	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T10[ebp+41], 100 ; 00000064H
+  004ee	88 5d de	 mov	 BYTE PTR $T10[ebp+45], bl
+  004f1	89 5d df	 mov	 DWORD PTR $T10[ebp+46], ebx
+  004f4	89 5d e3	 mov	 DWORD PTR $T10[ebp+50], ebx
+  004f7	89 5d e7	 mov	 DWORD PTR $T10[ebp+54], ebx
+  004fa	c6 45 eb 01	 mov	 BYTE PTR $T10[ebp+58], 1
+  004fe	f3 a5		 rep movsd
+  00500	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  004e9	f3 a5		 rep movsd
-  004eb	c5 f8 77	 vzeroupper
-  004ee	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00506	66 a5		 movsw
+  00508	a4		 movsb
+  00509	c5 f8 77	 vzeroupper
+  0050c	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 413  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 414  : 				.camType = keyType::set,
@@ -6574,52 +6649,54 @@ $LN14@scene1:
 ; 434  : 			});
 ; 435  : 			BasicCam::processCam();
 
-  004f3	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00511	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 436  : 			Object::Libra({ .quality = 1 });
 
-  004f8	6a 01		 push	 1
-  004fa	e8 00 00 00 00	 call	 ?Libra@Object@@YAXULibra_params@1@@Z ; Object::Libra
+  00516	6a 01		 push	 1
+  00518	e8 00 00 00 00	 call	 ?Libra@Object@@YAXULibra_params@1@@Z ; Object::Libra
 
 ; 437  : 			break;
 
-  004ff	e9 4c 01 00 00	 jmp	 $LN28@scene1
+  0051d	e9 55 01 00 00	 jmp	 $LN28@scene1
 $LN15@scene1:
 
 ; 438  : 		case 10:
 ; 439  : 			BasicCam::camCounter = 0;
 ; 440  : 			BasicCam::setCamKey({
 
-  00504	c5 fe 6f 05 00
+  00522	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000e100000026000000000000000000000000fffff8e2fffffc020000026e
-  0050c	83 ec 54	 sub	 esp, 84			; 00000054H
-  0050f	69 c0 50 75 0d
+  0052a	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  0052d	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00515	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T11[ebp+8], ymm0
-  0051a	c5 f9 6f 05 00
+  00533	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T11[ebp+5], ymm0
+  00538	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000000000000fffffffd
-  00522	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T11[ebp+68], xmm0
-  00527	6a 15		 push	 21			; 00000015H
-  00529	59		 pop	 ecx
-  0052a	8d 75 a8	 lea	 esi, DWORD PTR $T11[ebp]
-  0052d	89 45 a8	 mov	 DWORD PTR $T11[ebp], eax
-  00530	8b fc		 mov	 edi, esp
-  00532	88 5d ac	 mov	 BYTE PTR $T11[ebp+4], bl
-  00535	c7 45 d0 8f ff
-	ff ff		 mov	 DWORD PTR $T11[ebp+40], -113 ; ffffff8fH
-  0053c	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T11[ebp+44], 100 ; 00000064H
-  00543	88 5d d8	 mov	 BYTE PTR $T11[ebp+48], bl
-  00546	89 5d dc	 mov	 DWORD PTR $T11[ebp+52], ebx
-  00549	89 5d e0	 mov	 DWORD PTR $T11[ebp+56], ebx
-  0054c	c7 45 e4 d8 ff
-	ff ff		 mov	 DWORD PTR $T11[ebp+60], -40 ; ffffffd8H
-  00553	c6 45 e8 01	 mov	 BYTE PTR $T11[ebp+64], 1
-  00557	89 1d 00 00 00
+  00540	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T11[ebp+59], xmm0
+  00545	6a 12		 push	 18			; 00000012H
+  00547	59		 pop	 ecx
+  00548	89 45 b1	 mov	 DWORD PTR $T11[ebp], eax
+  0054b	8d 75 b1	 lea	 esi, DWORD PTR $T11[ebp]
+  0054e	88 5d b5	 mov	 BYTE PTR $T11[ebp+4], bl
+  00551	8b fc		 mov	 edi, esp
+  00553	c7 45 d6 8f ff
+	ff ff		 mov	 DWORD PTR $T11[ebp+37], -113 ; ffffff8fH
+  0055a	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T11[ebp+41], 100 ; 00000064H
+  00561	88 5d de	 mov	 BYTE PTR $T11[ebp+45], bl
+  00564	89 5d df	 mov	 DWORD PTR $T11[ebp+46], ebx
+  00567	89 5d e3	 mov	 DWORD PTR $T11[ebp+50], ebx
+  0056a	c7 45 e7 d8 ff
+	ff ff		 mov	 DWORD PTR $T11[ebp+54], -40 ; ffffffd8H
+  00571	c6 45 eb 01	 mov	 BYTE PTR $T11[ebp+58], 1
+  00575	f3 a5		 rep movsd
+  00577	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  0055d	f3 a5		 rep movsd
-  0055f	c5 f8 77	 vzeroupper
-  00562	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  0057d	66 a5		 movsw
+  0057f	a4		 movsb
+  00580	c5 f8 77	 vzeroupper
+  00583	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 441  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 442  : 				.camType = keyType::set,
@@ -6645,51 +6722,53 @@ $LN15@scene1:
 ; 462  : 			});
 ; 463  : 			BasicCam::processCam();
 
-  00567	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  00588	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 464  : 			Object::Aquarius({ .quality = 1 });
 
-  0056c	6a 01		 push	 1
-  0056e	e8 00 00 00 00	 call	 ?Aquarius@Object@@YAXUAquarius_params@1@@Z ; Object::Aquarius
+  0058d	6a 01		 push	 1
+  0058f	e8 00 00 00 00	 call	 ?Aquarius@Object@@YAXUAquarius_params@1@@Z ; Object::Aquarius
 
 ; 465  : 			break;
 
-  00573	e9 d8 00 00 00	 jmp	 $LN28@scene1
+  00594	e9 de 00 00 00	 jmp	 $LN28@scene1
 $LN16@scene1:
 
 ; 466  : 		case 11:
 ; 467  : 			BasicCam::camCounter = 0;
 ; 468  : 			BasicCam::setCamKey({
 
-  00578	c5 fe 6f 05 00
+  00599	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@ffffff14ffffffce000000000000000000000000fffff78d00000403fffffab3
-  00580	83 ec 54	 sub	 esp, 84			; 00000054H
-  00583	69 c0 50 75 0d
+  005a1	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  005a4	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  00589	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T12[ebp+8], ymm0
-  0058e	c5 f9 6f 05 00
+  005aa	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T12[ebp+5], ymm0
+  005af	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000a0000000000000003
-  00596	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T12[ebp+68], xmm0
-  0059b	6a 15		 push	 21			; 00000015H
-  0059d	59		 pop	 ecx
-  0059e	8d 75 a8	 lea	 esi, DWORD PTR $T12[ebp]
-  005a1	89 45 a8	 mov	 DWORD PTR $T12[ebp], eax
-  005a4	8b fc		 mov	 edi, esp
-  005a6	88 5d ac	 mov	 BYTE PTR $T12[ebp+4], bl
-  005a9	c7 45 d0 b0 ff
-	ff ff		 mov	 DWORD PTR $T12[ebp+40], -80 ; ffffffb0H
-  005b0	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T12[ebp+44], 100 ; 00000064H
-  005b7	88 5d d8	 mov	 BYTE PTR $T12[ebp+48], bl
-  005ba	89 5d dc	 mov	 DWORD PTR $T12[ebp+52], ebx
-  005bd	89 5d e0	 mov	 DWORD PTR $T12[ebp+56], ebx
-  005c0	89 5d e4	 mov	 DWORD PTR $T12[ebp+60], ebx
-  005c3	c6 45 e8 01	 mov	 BYTE PTR $T12[ebp+64], 1
-  005c7	89 1d 00 00 00
+  005b7	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T12[ebp+59], xmm0
+  005bc	6a 12		 push	 18			; 00000012H
+  005be	59		 pop	 ecx
+  005bf	89 45 b1	 mov	 DWORD PTR $T12[ebp], eax
+  005c2	8d 75 b1	 lea	 esi, DWORD PTR $T12[ebp]
+  005c5	88 5d b5	 mov	 BYTE PTR $T12[ebp+4], bl
+  005c8	8b fc		 mov	 edi, esp
+  005ca	c7 45 d6 b0 ff
+	ff ff		 mov	 DWORD PTR $T12[ebp+37], -80 ; ffffffb0H
+  005d1	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T12[ebp+41], 100 ; 00000064H
+  005d8	88 5d de	 mov	 BYTE PTR $T12[ebp+45], bl
+  005db	89 5d df	 mov	 DWORD PTR $T12[ebp+46], ebx
+  005de	89 5d e3	 mov	 DWORD PTR $T12[ebp+50], ebx
+  005e1	89 5d e7	 mov	 DWORD PTR $T12[ebp+54], ebx
+  005e4	c6 45 eb 01	 mov	 BYTE PTR $T12[ebp+58], 1
+  005e8	f3 a5		 rep movsd
+  005ea	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  005cd	f3 a5		 rep movsd
-  005cf	c5 f8 77	 vzeroupper
-  005d2	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  005f0	66 a5		 movsw
+  005f2	a4		 movsb
+  005f3	c5 f8 77	 vzeroupper
+  005f6	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 469  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 470  : 				.camType = keyType::set,
@@ -6715,51 +6794,53 @@ $LN16@scene1:
 ; 490  : 			});
 ; 491  : 			BasicCam::processCam();
 
-  005d7	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  005fb	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 492  : 			Object::Fish({ .quality = 1 });
 
-  005dc	6a 01		 push	 1
-  005de	e8 00 00 00 00	 call	 ?Fish@Object@@YAXUFish_params@1@@Z ; Object::Fish
+  00600	6a 01		 push	 1
+  00602	e8 00 00 00 00	 call	 ?Fish@Object@@YAXUFish_params@1@@Z ; Object::Fish
 
 ; 493  : 			break;
 
-  005e3	eb 6b		 jmp	 SHORT $LN28@scene1
+  00607	eb 6e		 jmp	 SHORT $LN28@scene1
 $LN17@scene1:
 
 ; 494  : 		case 12:
 ; 495  : 			BasicCam::camCounter = 0;
 ; 496  : 			BasicCam::setCamKey({
 
-  005e5	c5 fe 6f 05 00
+  00609	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000d8fffffffd000000000000000000000000fffff849000004d400000039
-  005ed	83 ec 54	 sub	 esp, 84			; 00000054H
-  005f0	69 c0 50 75 0d
+  00611	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00614	69 c0 50 75 0d
 	00		 imul	 eax, eax, 882000
-  005f6	c5 fe 7f 45 b0	 vmovdqu YMMWORD PTR $T13[ebp+8], ymm0
-  005fb	c5 f9 6f 05 00
+  0061a	c5 fe 7f 45 b6	 vmovdqu YMMWORD PTR $T13[ebp+5], ymm0
+  0061f	c5 f9 6f 05 00
 	00 00 00	 vmovdqa xmm0, XMMWORD PTR __xmm@000000000000000a00000000fffffffd
-  00603	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T13[ebp+68], xmm0
-  00608	6a 15		 push	 21			; 00000015H
-  0060a	59		 pop	 ecx
-  0060b	8d 75 a8	 lea	 esi, DWORD PTR $T13[ebp]
-  0060e	89 45 a8	 mov	 DWORD PTR $T13[ebp], eax
-  00611	8b fc		 mov	 edi, esp
-  00613	88 5d ac	 mov	 BYTE PTR $T13[ebp+4], bl
-  00616	c7 45 d0 87 00
-	00 00		 mov	 DWORD PTR $T13[ebp+40], 135 ; 00000087H
-  0061d	c7 45 d4 64 00
-	00 00		 mov	 DWORD PTR $T13[ebp+44], 100 ; 00000064H
-  00624	88 5d d8	 mov	 BYTE PTR $T13[ebp+48], bl
-  00627	89 5d dc	 mov	 DWORD PTR $T13[ebp+52], ebx
-  0062a	89 5d e0	 mov	 DWORD PTR $T13[ebp+56], ebx
-  0062d	89 5d e4	 mov	 DWORD PTR $T13[ebp+60], ebx
-  00630	c6 45 e8 01	 mov	 BYTE PTR $T13[ebp+64], 1
-  00634	89 1d 00 00 00
+  00627	c5 fa 7f 45 ec	 vmovdqu XMMWORD PTR $T13[ebp+59], xmm0
+  0062c	6a 12		 push	 18			; 00000012H
+  0062e	59		 pop	 ecx
+  0062f	89 45 b1	 mov	 DWORD PTR $T13[ebp], eax
+  00632	8d 75 b1	 lea	 esi, DWORD PTR $T13[ebp]
+  00635	88 5d b5	 mov	 BYTE PTR $T13[ebp+4], bl
+  00638	8b fc		 mov	 edi, esp
+  0063a	c7 45 d6 87 00
+	00 00		 mov	 DWORD PTR $T13[ebp+37], 135 ; 00000087H
+  00641	c7 45 da 64 00
+	00 00		 mov	 DWORD PTR $T13[ebp+41], 100 ; 00000064H
+  00648	88 5d de	 mov	 BYTE PTR $T13[ebp+45], bl
+  0064b	89 5d df	 mov	 DWORD PTR $T13[ebp+46], ebx
+  0064e	89 5d e3	 mov	 DWORD PTR $T13[ebp+50], ebx
+  00651	89 5d e7	 mov	 DWORD PTR $T13[ebp+54], ebx
+  00654	c6 45 eb 01	 mov	 BYTE PTR $T13[ebp+58], 1
+  00658	f3 a5		 rep movsd
+  0065a	89 1d 00 00 00
 	00		 mov	 DWORD PTR ?camCounter@BasicCam@@3HA, ebx ; BasicCam::camCounter
-  0063a	f3 a5		 rep movsd
-  0063c	c5 f8 77	 vzeroupper
-  0063f	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00660	66 a5		 movsw
+  00662	a4		 movsb
+  00663	c5 f8 77	 vzeroupper
+  00666	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 497  : 				.camTime = t*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 ; 498  : 				.camType = keyType::set,
@@ -6785,12 +6866,12 @@ $LN17@scene1:
 ; 518  : 				});
 ; 519  : 			BasicCam::processCam();
 
-  00644	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  0066b	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 520  : 			Object::Twins({ .quality = 1 });
 
-  00649	6a 01		 push	 1
-  0064b	e8 00 00 00 00	 call	 ?Twins@Object@@YAXUTwins_params@1@@Z ; Object::Twins
+  00670	6a 01		 push	 1
+  00672	e8 00 00 00 00	 call	 ?Twins@Object@@YAXUTwins_params@1@@Z ; Object::Twins
 $LN28@scene1:
 
 ; 521  : 			break;
@@ -6799,33 +6880,32 @@ $LN28@scene1:
 ; 524  : 
 ; 525  : 		Compose();
 
-  00650	83 c4 58	 add	 esp, 88			; 00000058H
+  00677	83 c4 50	 add	 esp, 80			; 00000050H
 $LN2@scene1:
-  00653	e8 00 00 00 00	 call	 ?Compose@Loop@@YAXXZ	; Loop::Compose
+  0067a	e8 00 00 00 00	 call	 ?Compose@Loop@@YAXXZ	; Loop::Compose
 
 ; 526  : 
 ; 527  : 	}
 
-  00658	5f		 pop	 edi
-  00659	5e		 pop	 esi
-  0065a	5b		 pop	 ebx
-  0065b	c9		 leave
-  0065c	c3		 ret	 0
-  0065d	0f 1f 00	 npad	 3
+  0067f	5f		 pop	 edi
+  00680	5e		 pop	 esi
+  00681	5b		 pop	 ebx
+  00682	c9		 leave
+  00683	c3		 ret	 0
 $LN25@scene1:
-  00660	00 00 00 00	 DD	 $LN5@scene1
-  00664	00 00 00 00	 DD	 $LN6@scene1
-  00668	00 00 00 00	 DD	 $LN7@scene1
-  0066c	00 00 00 00	 DD	 $LN8@scene1
-  00670	00 00 00 00	 DD	 $LN9@scene1
-  00674	00 00 00 00	 DD	 $LN10@scene1
-  00678	00 00 00 00	 DD	 $LN11@scene1
-  0067c	00 00 00 00	 DD	 $LN12@scene1
-  00680	00 00 00 00	 DD	 $LN13@scene1
-  00684	00 00 00 00	 DD	 $LN14@scene1
-  00688	00 00 00 00	 DD	 $LN15@scene1
-  0068c	00 00 00 00	 DD	 $LN16@scene1
-  00690	00 00 00 00	 DD	 $LN17@scene1
+  00684	00 00 00 00	 DD	 $LN5@scene1
+  00688	00 00 00 00	 DD	 $LN6@scene1
+  0068c	00 00 00 00	 DD	 $LN7@scene1
+  00690	00 00 00 00	 DD	 $LN8@scene1
+  00694	00 00 00 00	 DD	 $LN9@scene1
+  00698	00 00 00 00	 DD	 $LN10@scene1
+  0069c	00 00 00 00	 DD	 $LN11@scene1
+  006a0	00 00 00 00	 DD	 $LN12@scene1
+  006a4	00 00 00 00	 DD	 $LN13@scene1
+  006a8	00 00 00 00	 DD	 $LN14@scene1
+  006ac	00 00 00 00	 DD	 $LN15@scene1
+  006b0	00 00 00 00	 DD	 $LN16@scene1
+  006b4	00 00 00 00	 DD	 $LN17@scene1
 ?scene1@Loop@@YAXXZ ENDP				; Loop::scene1
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -6916,8 +6996,8 @@ _TEXT	ENDS
 ; File D:\!platform\fx\projectFiles\loop.h
 ;	COMDAT ?run@cameraMan@Loop@@YAXUrun_params@12@@Z
 _TEXT	SEGMENT
-$T1 = -84						; size = 84
-$T2 = -84						; size = 84
+$T1 = -75						; size = 75
+$T2 = -75						; size = 75
 _in$ = 8						; size = 1
 ?run@cameraMan@Loop@@YAXUrun_params@12@@Z PROC		; Loop::cameraMan::run, COMDAT
 
@@ -6925,7 +7005,7 @@ _in$ = 8						; size = 1
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
-  00003	83 ec 54	 sub	 esp, 84			; 00000054H
+  00003	83 ec 4c	 sub	 esp, 76			; 0000004cH
 
 ; 43   : 			reflect;
 ; 44   : 			BasicCam::setCamKey({
@@ -6937,28 +7017,30 @@ _in$ = 8						; size = 1
   00010	57		 push	 edi
   00011	6a 64		 push	 100			; 00000064H
   00013	5b		 pop	 ebx
-  00014	83 ec 54	 sub	 esp, 84			; 00000054H
-  00017	c6 45 b0 01	 mov	 BYTE PTR $T1[ebp+4], 1
-  0001b	33 c0		 xor	 eax, eax
-  0001d	c7 45 d4 ef ff
-	ff ff		 mov	 DWORD PTR $T1[ebp+40], -17 ; ffffffefH
-  00024	c5 fe 7f 45 b4	 vmovdqu YMMWORD PTR $T1[ebp+8], ymm0
+  00014	83 ec 4c	 sub	 esp, 76			; 0000004cH
+  00017	c6 45 b9 01	 mov	 BYTE PTR $T1[ebp+4], 1
+  0001b	c5 fe 7f 45 ba	 vmovdqu YMMWORD PTR $T1[ebp+5], ymm0
+  00020	33 c0		 xor	 eax, eax
+  00022	c7 45 da ef ff
+	ff ff		 mov	 DWORD PTR $T1[ebp+37], -17 ; ffffffefH
   00029	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
-  0002d	6a 15		 push	 21			; 00000015H
+  0002d	6a 12		 push	 18			; 00000012H
   0002f	59		 pop	 ecx
-  00030	c5 fa 7f 45 f0	 vmovdqu XMMWORD PTR $T1[ebp+68], xmm0
-  00035	8d 75 ac	 lea	 esi, DWORD PTR $T1[ebp]
-  00038	89 45 ac	 mov	 DWORD PTR $T1[ebp], eax
-  0003b	8b fc		 mov	 edi, esp
-  0003d	89 5d d8	 mov	 DWORD PTR $T1[ebp+44], ebx
-  00040	88 45 dc	 mov	 BYTE PTR $T1[ebp+48], al
-  00043	89 45 e0	 mov	 DWORD PTR $T1[ebp+52], eax
-  00046	89 45 e4	 mov	 DWORD PTR $T1[ebp+56], eax
-  00049	89 45 e8	 mov	 DWORD PTR $T1[ebp+60], eax
-  0004c	c6 45 ec 01	 mov	 BYTE PTR $T1[ebp+64], 1
+  00030	c5 fa 7f 45 f0	 vmovdqu XMMWORD PTR $T1[ebp+59], xmm0
+  00035	89 45 b5	 mov	 DWORD PTR $T1[ebp], eax
+  00038	8d 75 b5	 lea	 esi, DWORD PTR $T1[ebp]
+  0003b	89 5d de	 mov	 DWORD PTR $T1[ebp+41], ebx
+  0003e	8b fc		 mov	 edi, esp
+  00040	88 45 e2	 mov	 BYTE PTR $T1[ebp+45], al
+  00043	89 45 e3	 mov	 DWORD PTR $T1[ebp+46], eax
+  00046	89 45 e7	 mov	 DWORD PTR $T1[ebp+50], eax
+  00049	89 45 eb	 mov	 DWORD PTR $T1[ebp+54], eax
+  0004c	c6 45 ef 01	 mov	 BYTE PTR $T1[ebp+58], 1
   00050	f3 a5		 rep movsd
-  00052	c5 f8 77	 vzeroupper
-  00055	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  00052	66 a5		 movsw
+  00054	a4		 movsb
+  00055	c5 f8 77	 vzeroupper
+  00058	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
 
 ; 45   : 				.camTime = 0,
 ; 46   : 				.camType = keyType::slide,
@@ -6985,32 +7067,34 @@ _in$ = 8						; size = 1
 ; 67   : 
 ; 68   : 			BasicCam::setCamKey({
 
-  0005a	c5 fe 6f 05 00
+  0005d	c5 fe 6f 05 00
 	00 00 00	 vmovdqu ymm0, YMMWORD PTR __ymm@000000fdfffffff9000000000000000000000000ffffa6b8fffffb7affffea16
-  00062	c5 fe 7f 45 b4	 vmovdqu YMMWORD PTR $T2[ebp+8], ymm0
-  00067	6a 15		 push	 21			; 00000015H
-  00069	33 c0		 xor	 eax, eax
-  0006b	c7 45 ac 67 02
+  00065	c5 fe 7f 45 ba	 vmovdqu YMMWORD PTR $T2[ebp+5], ymm0
+  0006a	6a 12		 push	 18			; 00000012H
+  0006c	33 c0		 xor	 eax, eax
+  0006e	c7 45 b5 67 02
 	00 00		 mov	 DWORD PTR $T2[ebp], 615	; 00000267H
-  00072	59		 pop	 ecx
-  00073	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
-  00077	c5 fa 7f 45 f0	 vmovdqu XMMWORD PTR $T2[ebp+68], xmm0
-  0007c	8d 75 ac	 lea	 esi, DWORD PTR $T2[ebp]
-  0007f	c6 45 b0 01	 mov	 BYTE PTR $T2[ebp+4], 1
-  00083	8b fc		 mov	 edi, esp
-  00085	c7 45 d4 18 00
-	00 00		 mov	 DWORD PTR $T2[ebp+40], 24 ; 00000018H
-  0008c	89 5d d8	 mov	 DWORD PTR $T2[ebp+44], ebx
-  0008f	88 45 dc	 mov	 BYTE PTR $T2[ebp+48], al
-  00092	c7 45 e0 fd ff
-	ff ff		 mov	 DWORD PTR $T2[ebp+52], -3 ; fffffffdH
-  00099	89 45 e4	 mov	 DWORD PTR $T2[ebp+56], eax
-  0009c	89 45 e8	 mov	 DWORD PTR $T2[ebp+60], eax
-  0009f	c6 45 ec 01	 mov	 BYTE PTR $T2[ebp+64], 1
-  000a3	f3 a5		 rep movsd
-  000a5	c5 f8 77	 vzeroupper
-  000a8	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
-  000ad	83 c4 54	 add	 esp, 84			; 00000054H
+  00075	59		 pop	 ecx
+  00076	c5 f9 ef c0	 vpxor	 xmm0, xmm0, xmm0
+  0007a	c5 fa 7f 45 f0	 vmovdqu XMMWORD PTR $T2[ebp+59], xmm0
+  0007f	c6 45 b9 01	 mov	 BYTE PTR $T2[ebp+4], 1
+  00083	8d 75 b5	 lea	 esi, DWORD PTR $T2[ebp]
+  00086	c7 45 da 18 00
+	00 00		 mov	 DWORD PTR $T2[ebp+37], 24 ; 00000018H
+  0008d	8b fc		 mov	 edi, esp
+  0008f	89 5d de	 mov	 DWORD PTR $T2[ebp+41], ebx
+  00092	88 45 e2	 mov	 BYTE PTR $T2[ebp+45], al
+  00095	c7 45 e3 fd ff
+	ff ff		 mov	 DWORD PTR $T2[ebp+46], -3 ; fffffffdH
+  0009c	89 45 e7	 mov	 DWORD PTR $T2[ebp+50], eax
+  0009f	89 45 eb	 mov	 DWORD PTR $T2[ebp+54], eax
+  000a2	c6 45 ef 01	 mov	 BYTE PTR $T2[ebp+58], 1
+  000a6	f3 a5		 rep movsd
+  000a8	66 a5		 movsw
+  000aa	a4		 movsb
+  000ab	c5 f8 77	 vzeroupper
+  000ae	e8 00 00 00 00	 call	 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z ; BasicCam::setCamKey
+  000b3	83 c4 4c	 add	 esp, 76			; 0000004cH
 
 ; 69   : 				.camTime = 615,
 ; 70   : 				.camType = keyType::slide,
@@ -7037,16 +7121,16 @@ _in$ = 8						; size = 1
 ; 91   : 
 ; 92   : 			BasicCam::processCam();
 
-  000b0	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
+  000b6	e8 00 00 00 00	 call	 ?processCam@BasicCam@@YAXXZ ; BasicCam::processCam
 
 ; 93   : 			
 ; 94   : 		}
 
-  000b5	5f		 pop	 edi
-  000b6	5e		 pop	 esi
-  000b7	5b		 pop	 ebx
-  000b8	c9		 leave
-  000b9	c3		 ret	 0
+  000bb	5f		 pop	 edi
+  000bc	5e		 pop	 esi
+  000bd	5b		 pop	 ebx
+  000be	c9		 leave
+  000bf	c3		 ret	 0
 ?run@cameraMan@Loop@@YAXUrun_params@12@@Z ENDP		; Loop::cameraMan::run
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -7179,191 +7263,208 @@ $LL4@Precalc:
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
 ; File D:\!platform\fx\projectFiles\sound\tracker.h
-;	COMDAT ?tr@tracker@@YAXXZ
+;	COMDAT ?Music@tracker@@YAXXZ
 _TEXT	SEGMENT
-$T1 = -136						; size = 128
-$T2 = -136						; size = 128
-$T3 = -8						; size = 8
+$T1 = -136						; size = 129
+$T2 = -136						; size = 129
+$T3 = -7						; size = 7
 $T4 = -4						; size = 4
-$T5 = -4						; size = 4
-?tr@tracker@@YAXXZ PROC					; tracker::tr, COMDAT
+?Music@tracker@@YAXXZ PROC				; tracker::Music, COMDAT
 
-; 82   : 	{
+; 114  : 	{
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
   00003	81 ec 88 00 00
 	00		 sub	 esp, 136		; 00000088H
-  00009	53		 push	 ebx
-  0000a	56		 push	 esi
-  0000b	57		 push	 edi
 
-; 83   : 		Track({ .masterBPM = 120,.volume = 100 });
+; 71   : 		curChannel = -1;
 
-  0000c	6a 78		 push	 120			; 00000078H
-  0000e	58		 pop	 eax
-  0000f	66 89 45 fc	 mov	 WORD PTR $T4[ebp], ax
-  00013	c6 45 fe 64	 mov	 BYTE PTR $T4[ebp+2], 100 ; 00000064H
-  00017	ff 75 fc	 push	 DWORD PTR $T4[ebp]
-  0001a	e8 00 00 00 00	 call	 ?Track@tracker@@YAXUTrack_params@1@@Z ; tracker::Track
+  00009	83 0d 00 00 00
+	00 ff		 or	 DWORD PTR ?curChannel@tracker@@3HA, -1 ; tracker::curChannel
 
-; 84   : 		Channel({ .vol = 100,.pan = 0,.mute = switcher::off, .solo = switcher::off });
+; 114  : 	{
 
-  0001f	c7 45 fc 64 00
-	00 00		 mov	 DWORD PTR $T5[ebp], 100	; 00000064H
-  00026	ff 75 fc	 push	 DWORD PTR $T5[ebp]
-  00029	e8 00 00 00 00	 call	 ?Channel@tracker@@YAXUChannel_params@1@@Z ; tracker::Channel
+  00010	53		 push	 ebx
+  00011	56		 push	 esi
+  00012	57		 push	 edi
 
-; 85   : 			Clip({.pos = 0,.len = 32,.repeat = 1,.bpmScale = 1,.overDub = switcher::off});
+; 73   : 		track.masterBPM = in.masterBPM;
 
-  0002e	33 c0		 xor	 eax, eax
-  00030	66 c7 45 fc 01
+  00013	6a 78		 push	 120			; 00000078H
+  00015	58		 pop	 eax
+
+; 115  : 		Master({ .masterBPM = 120,.volume = 100 });
+; 116  : 		Channel({ .vol = 100,.pan = 0,.mute = switcher::off, .solo = switcher::off });
+
+  00016	c7 45 fc 64 00
+	00 00		 mov	 DWORD PTR $T4[ebp], 100	; 00000064H
+  0001d	33 db		 xor	 ebx, ebx
+  0001f	ff 75 fc	 push	 DWORD PTR $T4[ebp]
+
+; 73   : 		track.masterBPM = in.masterBPM;
+
+  00022	66 a3 00 00 00
+	00		 mov	 WORD PTR ?track@@3U_track@@A, ax
+
+; 74   : 		track.volume = in.volume;
+
+  00028	c6 05 02 00 00
+	00 64		 mov	 BYTE PTR ?track@@3U_track@@A+2, 100 ; 00000064H
+
+; 115  : 		Master({ .masterBPM = 120,.volume = 100 });
+; 116  : 		Channel({ .vol = 100,.pan = 0,.mute = switcher::off, .solo = switcher::off });
+
+  0002f	e8 00 00 00 00	 call	 ?Channel@tracker@@YAXUChannel_params@1@@Z ; tracker::Channel
+
+; 117  : 		Clip({ .pos = 0,.len = 16,.repeat = 1,.bpmScale = 1,.overDub = switcher::off });
+
+  00034	33 c0		 xor	 eax, eax
+  00036	66 c7 45 fd 01
 	01		 mov	 WORD PTR $T3[ebp+4], 257 ; 00000101H
-  00036	6a 20		 push	 32			; 00000020H
-  00038	5b		 pop	 ebx
-  00039	88 45 fe	 mov	 BYTE PTR $T3[ebp+6], al
-  0003c	ff 75 fc	 push	 DWORD PTR $T3[ebp+4]
-  0003f	66 89 45 f8	 mov	 WORD PTR $T3[ebp], ax
-  00043	66 89 5d fa	 mov	 WORD PTR $T3[ebp+2], bx
-  00047	ff 75 f8	 push	 DWORD PTR $T3[ebp]
-  0004a	e8 00 00 00 00	 call	 ?Clip@tracker@@YAXUClip_params@1@@Z ; tracker::Clip
+  0003c	66 89 45 f9	 mov	 WORD PTR $T3[ebp], ax
+  00040	8d 75 f9	 lea	 esi, DWORD PTR $T3[ebp]
+  00043	6a 10		 push	 16			; 00000010H
+  00045	58		 pop	 eax
+  00046	51		 push	 ecx
+  00047	8b fc		 mov	 edi, esp
+  00049	66 89 45 fb	 mov	 WORD PTR $T3[ebp+2], ax
+  0004d	88 5d ff	 mov	 BYTE PTR $T3[ebp+6], bl
+  00050	a5		 movsd
+  00051	66 a5		 movsw
+  00053	a4		 movsb
+  00054	e8 00 00 00 00	 call	 ?Clip@tracker@@YAXUClip_params@1@@Z ; tracker::Clip
 
-; 86   : 				//		|0.......8.......16......24......|
-; 87   : 				//		|01234567012345670123456701234567|
-; 88   : 				Pitch({ "DDDCDEFGDDDCDEFGDDDCDEFGDDDCDEFG" });
+; 118  : 		//		 1.......9.......17......25...... 
+; 119  : 		//		 123412341234
+; 120  : 		//		 |...|...|...|...|...|...|...|...
+; 121  : 		Layer({ layer::pitch,"cdefgcdefgcdefg" });
 
-  0004f	6a 08		 push	 8
-  00051	59		 pop	 ecx
-  00052	be 00 00 00 00	 mov	 esi, OFFSET ??_C@_0CB@MDNPLLLN@DDDCDEFGDDDCDEFGDDDCDEFGDDDCDEF@
-  00057	8d bd 78 ff ff
-	ff		 lea	 edi, DWORD PTR $T1[ebp]
-  0005d	f3 a5		 rep movsd
-  0005f	6a 5f		 push	 95			; 0000005fH
-  00061	8d 45 99	 lea	 eax, DWORD PTR $T1[ebp+33]
-  00064	6a 00		 push	 0
-  00066	50		 push	 eax
-  00067	a4		 movsb
-  00068	e8 00 00 00 00	 call	 _memset
-  0006d	83 ec 64	 sub	 esp, 100		; 00000064H
-  00070	8d b5 78 ff ff
+  00059	88 9d 78 ff ff
+	ff		 mov	 BYTE PTR $T1[ebp], bl
+  0005f	8d bd 79 ff ff
+	ff		 lea	 edi, DWORD PTR $T1[ebp+1]
+  00065	be 00 00 00 00	 mov	 esi, OFFSET ??_C@_0BA@OGLKGGCK@cdefgcdefgcdefg@
+  0006a	8d 45 89	 lea	 eax, DWORD PTR $T1[ebp+17]
+  0006d	6a 70		 push	 112			; 00000070H
+  0006f	53		 push	 ebx
+  00070	50		 push	 eax
+  00071	a5		 movsd
+  00072	a5		 movsd
+  00073	a5		 movsd
+  00074	a5		 movsd
+  00075	e8 00 00 00 00	 call	 _memset
+  0007a	83 ec 70	 sub	 esp, 112		; 00000070H
+  0007d	8d b5 78 ff ff
 	ff		 lea	 esi, DWORD PTR $T1[ebp]
-  00076	8b cb		 mov	 ecx, ebx
-  00078	8b fc		 mov	 edi, esp
-  0007a	f3 a5		 rep movsd
-  0007c	e8 00 00 00 00	 call	 ?Pitch@tracker@@YAXUPitch_params@1@@Z ; tracker::Pitch
+  00083	6a 20		 push	 32			; 00000020H
+  00085	59		 pop	 ecx
+  00086	8b fc		 mov	 edi, esp
+  00088	f3 a5		 rep movsd
+  0008a	a4		 movsb
+  0008b	e8 00 00 00 00	 call	 ?Layer@tracker@@YAXULayer_params@1@@Z ; tracker::Layer
 
-; 89   : 				Octave({"12121212121212121212121212121212" });
+; 122  : 		Layer({ layer::octave,"1" });
 
-  00081	6a 08		 push	 8
-  00083	59		 pop	 ecx
-  00084	be 00 00 00 00	 mov	 esi, OFFSET ??_C@_0CB@DALNHIDC@1212121212121212121212121212121@
-  00089	8d bd 78 ff ff
-	ff		 lea	 edi, DWORD PTR $T2[ebp]
-  0008f	f3 a5		 rep movsd
-  00091	6a 5f		 push	 95			; 0000005fH
-  00093	8d 45 99	 lea	 eax, DWORD PTR $T2[ebp+33]
-  00096	6a 00		 push	 0
-  00098	50		 push	 eax
-  00099	a4		 movsb
-  0009a	e8 00 00 00 00	 call	 _memset
-  0009f	83 c4 0c	 add	 esp, 12			; 0000000cH
-  000a2	8d b5 78 ff ff
+  00090	6a 31		 push	 49			; 00000031H
+  00092	58		 pop	 eax
+  00093	6a 7e		 push	 126			; 0000007eH
+  00095	66 89 85 79 ff
+	ff ff		 mov	 WORD PTR $T2[ebp+1], ax
+  0009c	8d 85 7b ff ff
+	ff		 lea	 eax, DWORD PTR $T2[ebp+3]
+  000a2	53		 push	 ebx
+  000a3	50		 push	 eax
+  000a4	c6 85 78 ff ff
+	ff 01		 mov	 BYTE PTR $T2[ebp], 1
+  000ab	e8 00 00 00 00	 call	 _memset
+  000b0	83 c4 0c	 add	 esp, 12			; 0000000cH
+  000b3	8d b5 78 ff ff
 	ff		 lea	 esi, DWORD PTR $T2[ebp]
-  000a8	8b cb		 mov	 ecx, ebx
-  000aa	8b fc		 mov	 edi, esp
-  000ac	f3 a5		 rep movsd
-  000ae	e8 00 00 00 00	 call	 ?Octave@tracker@@YAXUOctave_params@1@@Z ; tracker::Octave
-  000b3	81 c4 80 00 00
-	00		 add	 esp, 128		; 00000080H
+  000b9	6a 20		 push	 32			; 00000020H
+  000bb	59		 pop	 ecx
+  000bc	8b fc		 mov	 edi, esp
+  000be	f3 a5		 rep movsd
+  000c0	a4		 movsb
+  000c1	e8 00 00 00 00	 call	 ?Layer@tracker@@YAXULayer_params@1@@Z ; tracker::Layer
+  000c6	81 c4 84 00 00
+	00		 add	 esp, 132		; 00000084H
 
-; 90   : 
-; 91   : 	}
+; 123  : 
+; 124  : 
+; 125  : 		
+; 126  : 	}
 
-  000b9	5f		 pop	 edi
-  000ba	5e		 pop	 esi
-  000bb	5b		 pop	 ebx
-  000bc	c9		 leave
-  000bd	c3		 ret	 0
-?tr@tracker@@YAXXZ ENDP					; tracker::tr
+  000cc	5f		 pop	 edi
+  000cd	5e		 pop	 esi
+  000ce	5b		 pop	 ebx
+  000cf	c9		 leave
+  000d0	c3		 ret	 0
+?Music@tracker@@YAXXZ ENDP				; tracker::Music
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
 ; File D:\!platform\fx\projectFiles\sound\tracker.h
-;	COMDAT ?Track@tracker@@YAXUTrack_params@1@@Z
+;	COMDAT ?Master@tracker@@YAXUMaster_params@1@@Z
 _TEXT	SEGMENT
-$T1 = -1056900						; size = 1056900
-_in$ = 8						; size = 4
-?Track@tracker@@YAXUTrack_params@1@@Z PROC		; tracker::Track, COMDAT
+_in$ = 8						; size = 3
+?Master@tracker@@YAXUMaster_params@1@@Z PROC		; tracker::Master, COMDAT
 
-; 65   : 	{
+; 68   : 	{
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
-  00003	b8 84 20 10 00	 mov	 eax, 1056900		; 00102084H
-  00008	e8 00 00 00 00	 call	 __chkstk
 
-; 66   : 		reflect;
-; 67   : 		
-; 68   : 		curChannel = -1;
-; 69   : 
-; 70   : 		track = {
+; 69   : 		reflect;
+; 70   : 		
+; 71   : 		curChannel = -1;
+; 72   : 
+; 73   : 		track.masterBPM = in.masterBPM;
 
-  0000d	8b 45 08	 mov	 eax, DWORD PTR _in$[ebp]
-  00010	83 0d 00 00 00
+  00003	66 8b 45 08	 mov	 ax, WORD PTR _in$[ebp]
+  00007	83 0d 00 00 00
 	00 ff		 or	 DWORD PTR ?curChannel@tracker@@3HA, -1 ; tracker::curChannel
-  00017	66 89 85 7c df
-	ef ff		 mov	 WORD PTR $T1[ebp], ax
-  0001e	c1 e8 10	 shr	 eax, 16			; 00000010H
-  00021	68 80 20 10 00	 push	 1056896			; 00102080H
-  00026	88 85 7e df ef
-	ff		 mov	 BYTE PTR $T1[ebp+2], al
-  0002c	8d 85 80 df ef
-	ff		 lea	 eax, DWORD PTR $T1[ebp+4]
-  00032	6a 00		 push	 0
-  00034	50		 push	 eax
-  00035	e8 00 00 00 00	 call	 _memset
-  0003a	68 84 20 10 00	 push	 1056900			; 00102084H
-  0003f	8d 85 7c df ef
-	ff		 lea	 eax, DWORD PTR $T1[ebp]
-  00045	50		 push	 eax
-  00046	68 00 00 00 00	 push	 OFFSET ?track@@3U_track@@A ; track
-  0004b	e8 00 00 00 00	 call	 _memcpy
-  00050	83 c4 18	 add	 esp, 24			; 00000018H
+  0000e	66 a3 00 00 00
+	00		 mov	 WORD PTR ?track@@3U_track@@A, ax
 
-; 71   : 			.masterBPM = in.masterBPM,
-; 72   : 			.volume = in.volume
-; 73   : 		};
-; 74   : 
-; 75   : 		#if EditMode
-; 76   : 			editor::TimeLine::bpm = track.masterBPM;
-; 77   : 		#endif
-; 78   : 		
-; 79   : 	}
+; 74   : 		track.volume = in.volume;
 
-  00053	c9		 leave
-  00054	c3		 ret	 0
-?Track@tracker@@YAXUTrack_params@1@@Z ENDP		; tracker::Track
+  00014	8a 45 0a	 mov	 al, BYTE PTR _in$[ebp+2]
+  00017	a2 02 00 00 00	 mov	 BYTE PTR ?track@@3U_track@@A+2, al
+
+; 75   : 
+; 76   : 
+; 77   : 		#if EditMode
+; 78   : 			editor::TimeLine::bpm = track.masterBPM;
+; 79   : 		#endif
+; 80   : 
+; 81   : 		
+; 82   : 	}
+
+  0001c	5d		 pop	 ebp
+  0001d	c3		 ret	 0
+?Master@tracker@@YAXUMaster_params@1@@Z ENDP		; tracker::Master
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
 ; File D:\!platform\fx\projectFiles\sound\tracker.h
 ;	COMDAT ?Channel@tracker@@YAXUChannel_params@1@@Z
 _TEXT	SEGMENT
-$T1 = -33028						; size = 33028
+$T1 = -33160						; size = 33160
 _in$ = 8						; size = 4
 ?Channel@tracker@@YAXUChannel_params@1@@Z PROC		; tracker::Channel, COMDAT
 
-; 49   : 	{
+; 50   : 	{
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
-  00003	b8 04 81 00 00	 mov	 eax, 33028		; 00008104H
+  00003	b8 88 81 00 00	 mov	 eax, 33160		; 00008188H
   00008	e8 00 00 00 00	 call	 __chkstk
 
-; 50   : 		reflect;
-; 51   : 		
-; 52   : 		curClip = -1;
-; 53   : 		curChannel++;
-; 54   : 
-; 55   : 		track.channels[curChannel] = {
+; 51   : 		reflect;
+; 52   : 		
+; 53   : 		curClip = -1;
+; 54   : 		curChannel++;
+; 55   : 
+; 56   : 		track.channels[curChannel] = {
 
   0000d	8b 45 08	 mov	 eax, DWORD PTR _in$[ebp]
   00010	8b c8		 mov	 ecx, eax
@@ -7373,243 +7474,205 @@ _in$ = 8						; size = 4
   0001c	56		 push	 esi
   0001d	8b 35 00 00 00
 	00		 mov	 esi, DWORD PTR ?curChannel@tracker@@3HA ; tracker::curChannel
-  00023	88 8d fd 7e ff
+  00023	88 8d 79 7e ff
 	ff		 mov	 BYTE PTR $T1[ebp+1], cl
   00029	46		 inc	 esi
   0002a	8b c8		 mov	 ecx, eax
-  0002c	88 85 fc 7e ff
+  0002c	88 85 78 7e ff
 	ff		 mov	 BYTE PTR $T1[ebp], al
   00032	c1 e8 18	 shr	 eax, 24			; 00000018H
-  00035	68 00 81 00 00	 push	 33024			; 00008100H
-  0003a	88 85 ff 7e ff
+  00035	68 80 81 00 00	 push	 33152			; 00008180H
+  0003a	88 85 7b 7e ff
 	ff		 mov	 BYTE PTR $T1[ebp+3], al
-  00040	8d 85 00 7f ff
+  00040	8d 85 7c 7e ff
 	ff		 lea	 eax, DWORD PTR $T1[ebp+4]
   00046	c1 e9 10	 shr	 ecx, 16			; 00000010H
   00049	6a 00		 push	 0
   0004b	50		 push	 eax
   0004c	89 35 00 00 00
 	00		 mov	 DWORD PTR ?curChannel@tracker@@3HA, esi ; tracker::curChannel
-  00052	88 8d fe 7e ff
+  00052	88 8d 7a 7e ff
 	ff		 mov	 BYTE PTR $T1[ebp+2], cl
   00058	e8 00 00 00 00	 call	 _memset
-  0005d	68 04 81 00 00	 push	 33028			; 00008104H
-  00062	8d 85 fc 7e ff
+  0005d	83 65 fc 00	 and	 DWORD PTR $T1[ebp+33156], 0
+  00061	8d 85 78 7e ff
 	ff		 lea	 eax, DWORD PTR $T1[ebp]
-  00068	50		 push	 eax
-  00069	69 c6 04 81 00
-	00		 imul	 eax, esi, 33028
-  0006f	05 04 00 00 00	 add	 eax, OFFSET ?track@@3U_track@@A+4
-  00074	50		 push	 eax
-  00075	e8 00 00 00 00	 call	 _memcpy
-  0007a	83 c4 18	 add	 esp, 24			; 00000018H
-  0007d	5e		 pop	 esi
+  00067	68 88 81 00 00	 push	 33160			; 00008188H
+  0006c	50		 push	 eax
+  0006d	69 c6 88 81 00
+	00		 imul	 eax, esi, 33160
+  00073	05 04 00 00 00	 add	 eax, OFFSET ?track@@3U_track@@A+4
+  00078	50		 push	 eax
+  00079	e8 00 00 00 00	 call	 _memcpy
+  0007e	83 c4 18	 add	 esp, 24			; 00000018H
+  00081	8d 46 01	 lea	 eax, DWORD PTR [esi+1]
 
-; 56   : 			.vol = in.vol,
-; 57   : 			.pan = in.pan,
-; 58   : 			.mute = in.mute,
-; 59   : 			.solo = in.solo
-; 60   : 		};
-; 61   : 
-; 62   : 	}
+; 57   : 			.vol = in.vol,
+; 58   : 			.pan = in.pan,
+; 59   : 			.mute = in.mute,
+; 60   : 			.solo = in.solo
+; 61   : 		};
+; 62   : 
+; 63   : 		track.channelsCount = curChannel + 1;
 
-  0007e	c9		 leave
-  0007f	c3		 ret	 0
+  00084	a3 04 31 10 00	 mov	 DWORD PTR ?track@@3U_track@@A+1061124, eax
+  00089	5e		 pop	 esi
+
+; 64   : 
+; 65   : 	}
+
+  0008a	c9		 leave
+  0008b	c3		 ret	 0
 ?Channel@tracker@@YAXUChannel_params@1@@Z ENDP		; tracker::Channel
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
 ; File D:\!platform\fx\projectFiles\sound\tracker.h
 ;	COMDAT ?Clip@tracker@@YAXUClip_params@1@@Z
 _TEXT	SEGMENT
-$T1 = -1032						; size = 1032
-_in$ = 8						; size = 8
+$T1 = -1036						; size = 1036
+_in$ = 8						; size = 7
 ?Clip@tracker@@YAXUClip_params@1@@Z PROC		; tracker::Clip, COMDAT
 
-; 30   : 	{
+; 27   : 	{
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
-  00003	81 ec 08 04 00
-	00		 sub	 esp, 1032		; 00000408H
+  00003	81 ec 0c 04 00
+	00		 sub	 esp, 1036		; 0000040cH
 
-; 31   : 		reflect;
+; 28   : 		reflect;
+; 29   : 
+; 30   : 		curClip++;
+; 31   : 		curLayer = -1;
 ; 32   : 
-; 33   : 		curClip++;
-; 34   : 
-; 35   : 		track.channels[curChannel].clips[curClip] = {
+; 33   : 		track.channels[curChannel].clips[curClip] = {
 
   00009	8b 45 08	 mov	 eax, DWORD PTR _in$[ebp]
-  0000c	8b 4d 0c	 mov	 ecx, DWORD PTR _in$[ebp+4]
-  0000f	66 89 85 f8 fb
+  0000c	83 0d 00 00 00
+	00 ff		 or	 DWORD PTR ?curLayer@tracker@@3HA, -1 ; tracker::curLayer
+  00013	66 89 85 f4 fb
 	ff ff		 mov	 WORD PTR $T1[ebp], ax
-  00016	c1 e8 10	 shr	 eax, 16			; 00000010H
-  00019	56		 push	 esi
-  0001a	8b 35 00 00 00
-	00		 mov	 esi, DWORD PTR ?curClip@tracker@@3HA ; tracker::curClip
-  00020	66 89 85 fa fb
+  0001a	c1 e8 10	 shr	 eax, 16			; 00000010H
+  0001d	66 89 85 f6 fb
 	ff ff		 mov	 WORD PTR $T1[ebp+2], ax
-  00027	46		 inc	 esi
-  00028	8b c1		 mov	 eax, ecx
-  0002a	88 8d fc fb ff
-	ff		 mov	 BYTE PTR $T1[ebp+4], cl
-  00030	57		 push	 edi
-  00031	c1 e8 08	 shr	 eax, 8
-  00034	68 00 04 00 00	 push	 1024			; 00000400H
-  00039	88 85 fd fb ff
+  00024	66 8b 45 0c	 mov	 ax, WORD PTR _in$[ebp+4]
+  00028	53		 push	 ebx
+  00029	8b 1d 00 00 00
+	00		 mov	 ebx, DWORD PTR ?curClip@tracker@@3HA ; tracker::curClip
+  0002f	88 85 f8 fb ff
+	ff		 mov	 BYTE PTR $T1[ebp+4], al
+  00035	43		 inc	 ebx
+  00036	0f b7 c0	 movzx	 eax, ax
+  00039	56		 push	 esi
+  0003a	c1 e8 08	 shr	 eax, 8
+  0003d	57		 push	 edi
+  0003e	88 85 f9 fb ff
 	ff		 mov	 BYTE PTR $T1[ebp+5], al
-  0003f	8d 85 ff fb ff
+  00044	8a 45 0e	 mov	 al, BYTE PTR _in$[ebp+6]
+  00047	68 00 04 00 00	 push	 1024			; 00000400H
+  0004c	88 85 fa fb ff
+	ff		 mov	 BYTE PTR $T1[ebp+6], al
+  00052	8d 85 fb fb ff
 	ff		 lea	 eax, DWORD PTR $T1[ebp+7]
-  00045	c1 e9 10	 shr	 ecx, 16			; 00000010H
-  00048	6a 00		 push	 0
-  0004a	50		 push	 eax
-  0004b	89 35 00 00 00
-	00		 mov	 DWORD PTR ?curClip@tracker@@3HA, esi ; tracker::curClip
-  00051	88 8d fe fb ff
-	ff		 mov	 BYTE PTR $T1[ebp+6], cl
-  00057	e8 00 00 00 00	 call	 _memset
-  0005c	69 05 00 00 00
-	00 04 81 00 00	 imul	 eax, DWORD PTR ?curChannel@tracker@@3HA, 33028 ; tracker::curChannel
-  00066	83 c4 0c	 add	 esp, 12			; 0000000cH
-  00069	69 ce 08 04 00
-	00		 imul	 ecx, esi, 1032
-  0006f	8d b5 f8 fb ff
+  00058	6a 00		 push	 0
+  0005a	50		 push	 eax
+  0005b	89 1d 00 00 00
+	00		 mov	 DWORD PTR ?curClip@tracker@@3HA, ebx ; tracker::curClip
+  00061	e8 00 00 00 00	 call	 _memset
+  00066	69 15 00 00 00
+	00 88 81 00 00	 imul	 edx, DWORD PTR ?curChannel@tracker@@3HA, 33160 ; tracker::curChannel
+  00070	8d b5 f4 fb ff
 	ff		 lea	 esi, DWORD PTR $T1[ebp]
-  00075	c6 45 ff 00	 mov	 BYTE PTR $T1[ebp+1031], 0
-  00079	8d b8 08 00 00
-	00		 lea	 edi, DWORD PTR ?track@@3U_track@@A[eax+8]
-  0007f	03 f9		 add	 edi, ecx
-  00081	b9 02 01 00 00	 mov	 ecx, 258		; 00000102H
-  00086	f3 a5		 rep movsd
-  00088	5f		 pop	 edi
-  00089	5e		 pop	 esi
+  00076	83 65 fc 00	 and	 DWORD PTR $T1[ebp+1032], 0
+  0007a	83 c4 0c	 add	 esp, 12			; 0000000cH
+  0007d	69 c3 0c 04 00
+	00		 imul	 eax, ebx, 1036
+  00083	b9 03 01 00 00	 mov	 ecx, 259		; 00000103H
+  00088	c6 45 fb 00	 mov	 BYTE PTR $T1[ebp+1031], 0
+  0008c	8d ba 08 00 00
+	00		 lea	 edi, DWORD PTR ?track@@3U_track@@A[edx+8]
+  00092	03 f8		 add	 edi, eax
+  00094	8d 43 01	 lea	 eax, DWORD PTR [ebx+1]
+  00097	f3 a5		 rep movsd
 
-; 36   : 			.pos = in.pos,
-; 37   : 			.len = in.len,
-; 38   : 			.repeat = in.repeat,
-; 39   : 			.bpmScale = in.bpmScale,
-; 40   : 			.overDub = in.overDub
-; 41   : 		};
-; 42   : 	}
+; 34   : 			.pos = in.pos,
+; 35   : 			.len = in.len,
+; 36   : 			.repeat = in.repeat,
+; 37   : 			.bpmScale = in.bpmScale,
+; 38   : 			.overDub = in.overDub
+; 39   : 		};
+; 40   : 
+; 41   : 		track.channels[curChannel].clipsCount = curClip + 1;
 
-  0008a	c9		 leave
-  0008b	c3		 ret	 0
+  00099	5f		 pop	 edi
+  0009a	5e		 pop	 esi
+  0009b	89 82 88 81 00
+	00		 mov	 DWORD PTR ?track@@3U_track@@A[edx+33160], eax
+  000a1	5b		 pop	 ebx
+
+; 42   : 
+; 43   : 	}
+
+  000a2	c9		 leave
+  000a3	c3		 ret	 0
 ?Clip@tracker@@YAXUClip_params@1@@Z ENDP		; tracker::Clip
-_TEXT	ENDS
-; Function compile flags: /Ogsp
-; File D:\!platform\fx\projectFiles\sound\tracker.h
-;	COMDAT ?Octave@tracker@@YAXUOctave_params@1@@Z
-_TEXT	SEGMENT
-_in$ = 8						; size = 128
-?Octave@tracker@@YAXUOctave_params@1@@Z PROC		; tracker::Octave, COMDAT
-
-; 19   : 	{
-
-  00000	55		 push	 ebp
-  00001	8b ec		 mov	 ebp, esp
-
-; 20   : 		reflect;
-; 21   : 		strcpy(track.channels[curChannel].clips[curClip].layer[(int)layerType::octave], in.data);
-
-  00003	69 05 00 00 00
-	00 04 81 00 00	 imul	 eax, DWORD PTR ?curChannel@tracker@@3HA, 33028 ; tracker::curChannel
-  0000d	8d 55 08	 lea	 edx, DWORD PTR _in$[ebp]
-  00010	69 0d 00 00 00
-	00 08 04 00 00	 imul	 ecx, DWORD PTR ?curClip@tracker@@3HA, 1032 ; tracker::curClip
-  0001a	03 c8		 add	 ecx, eax
-  0001c	8b c2		 mov	 eax, edx
-  0001e	2b c8		 sub	 ecx, eax
-  00020	81 c1 8f 00 00
-	00		 add	 ecx, OFFSET ?track@@3U_track@@A+143
-$LL3@Octave:
-  00026	8a 02		 mov	 al, BYTE PTR [edx]
-  00028	88 04 11	 mov	 BYTE PTR [ecx+edx], al
-  0002b	42		 inc	 edx
-  0002c	84 c0		 test	 al, al
-  0002e	75 f6		 jne	 SHORT $LL3@Octave
-
-; 22   : 	}
-
-  00030	5d		 pop	 ebp
-  00031	c3		 ret	 0
-?Octave@tracker@@YAXUOctave_params@1@@Z ENDP		; tracker::Octave
-_TEXT	ENDS
-; Function compile flags: /Ogsp
-; File D:\!platform\fx\projectFiles\sound\tracker.h
-;	COMDAT ?Pitch@tracker@@YAXUPitch_params@1@@Z
-_TEXT	SEGMENT
-_in$ = 8						; size = 128
-?Pitch@tracker@@YAXUPitch_params@1@@Z PROC		; tracker::Pitch, COMDAT
-
-; 13   : 	{
-
-  00000	55		 push	 ebp
-  00001	8b ec		 mov	 ebp, esp
-
-; 14   : 		reflect;
-; 15   : 		strcpy(track.channels[curChannel].clips[curClip].layer[(int)layerType::pitch], in.data);
-
-  00003	69 05 00 00 00
-	00 04 81 00 00	 imul	 eax, DWORD PTR ?curChannel@tracker@@3HA, 33028 ; tracker::curChannel
-  0000d	8d 55 08	 lea	 edx, DWORD PTR _in$[ebp]
-  00010	69 0d 00 00 00
-	00 08 04 00 00	 imul	 ecx, DWORD PTR ?curClip@tracker@@3HA, 1032 ; tracker::curClip
-  0001a	03 c8		 add	 ecx, eax
-  0001c	8b c2		 mov	 eax, edx
-  0001e	2b c8		 sub	 ecx, eax
-  00020	81 c1 0f 00 00
-	00		 add	 ecx, OFFSET ?track@@3U_track@@A+15
-$LL3@Pitch:
-  00026	8a 02		 mov	 al, BYTE PTR [edx]
-  00028	88 04 11	 mov	 BYTE PTR [ecx+edx], al
-  0002b	42		 inc	 edx
-  0002c	84 c0		 test	 al, al
-  0002e	75 f6		 jne	 SHORT $LL3@Pitch
-
-; 16   : 	}
-
-  00030	5d		 pop	 ebp
-  00031	c3		 ret	 0
-?Pitch@tracker@@YAXUPitch_params@1@@Z ENDP		; tracker::Pitch
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
 ; File D:\!platform\fx\projectFiles\sound\tracker.h
 ;	COMDAT ?Layer@tracker@@YAXULayer_params@1@@Z
 _TEXT	SEGMENT
-_in$ = 8						; size = 132
+_in$ = 8						; size = 129
 ?Layer@tracker@@YAXULayer_params@1@@Z PROC		; tracker::Layer, COMDAT
 
-; 7    : 	{
+; 8    : 	{
 
   00000	55		 push	 ebp
   00001	8b ec		 mov	 ebp, esp
 
-; 8    : 		reflect;
-; 9    : 		strcpy(track.channels[curChannel].clips[curClip].layer[(int)in.ltype], in.data);
+; 9    : 		reflect;
+; 10   : 
+; 11   : 		curLayer++;
+; 12   : 
+; 13   : 		memcpy(track.channels[curChannel].clips[curClip].layer[(int)in.ltype], in.data, maxClipLen);
 
-  00003	69 05 00 00 00
-	00 04 81 00 00	 imul	 eax, DWORD PTR ?curChannel@tracker@@3HA, 33028 ; tracker::curChannel
-  0000d	8d 55 0c	 lea	 edx, DWORD PTR _in$[ebp+4]
-  00010	69 0d 00 00 00
-	00 08 04 00 00	 imul	 ecx, DWORD PTR ?curClip@tracker@@3HA, 1032 ; tracker::curClip
-  0001a	03 c8		 add	 ecx, eax
-  0001c	8b 45 08	 mov	 eax, DWORD PTR _in$[ebp]
-  0001f	c1 e0 07	 shl	 eax, 7
-  00022	03 c8		 add	 ecx, eax
-  00024	8b c2		 mov	 eax, edx
-  00026	2b c8		 sub	 ecx, eax
-  00028	81 c1 0f 00 00
-	00		 add	 ecx, OFFSET ?track@@3U_track@@A+15
-$LL3@Layer:
-  0002e	8a 02		 mov	 al, BYTE PTR [edx]
-  00030	88 04 11	 mov	 BYTE PTR [ecx+edx], al
-  00033	42		 inc	 edx
-  00034	84 c0		 test	 al, al
-  00036	75 f6		 jne	 SHORT $LL3@Layer
+  00003	69 15 00 00 00
+	00 88 81 00 00	 imul	 edx, DWORD PTR ?curChannel@tracker@@3HA, 33160 ; tracker::curChannel
+  0000d	0f b6 45 08	 movzx	 eax, BYTE PTR _in$[ebp]
+  00011	ff 05 00 00 00
+	00		 inc	 DWORD PTR ?curLayer@tracker@@3HA ; tracker::curLayer
+  00017	53		 push	 ebx
+  00018	69 1d 00 00 00
+	00 0c 04 00 00	 imul	 ebx, DWORD PTR ?curClip@tracker@@3HA, 1036 ; tracker::curClip
+  00022	56		 push	 esi
+  00023	57		 push	 edi
+  00024	c1 e0 07	 shl	 eax, 7
+  00027	8d 75 09	 lea	 esi, DWORD PTR _in$[ebp+1]
+  0002a	6a 20		 push	 32			; 00000020H
+  0002c	03 c2		 add	 eax, edx
+  0002e	59		 pop	 ecx
+  0002f	8d bb 0f 00 00
+	00		 lea	 edi, DWORD PTR ?track@@3U_track@@A[ebx+15]
+  00035	03 f8		 add	 edi, eax
+  00037	a1 00 00 00 00	 mov	 eax, DWORD PTR ?curLayer@tracker@@3HA ; tracker::curLayer
+  0003c	f3 a5		 rep movsd
 
-; 10   : 	}
+; 14   : //		OutputDebugString((LPCSTR)in.data);
+; 15   : //		OutputDebugString("\n");
+; 16   : 
+; 17   : 		track.channels[curChannel].clips[curClip].layersCount = curLayer + 1;
 
-  00038	5d		 pop	 ebp
-  00039	c3		 ret	 0
+  0003e	5f		 pop	 edi
+  0003f	40		 inc	 eax
+  00040	5e		 pop	 esi
+  00041	89 84 1a 10 04
+	00 00		 mov	 DWORD PTR ?track@@3U_track@@A[edx+ebx+1040], eax
+  00048	5b		 pop	 ebx
+
+; 18   : 
+; 19   : 	}
+
+  00049	5d		 pop	 ebp
+  0004a	c3		 ret	 0
 ?Layer@tracker@@YAXULayer_params@1@@Z ENDP		; tracker::Layer
 _TEXT	ENDS
 ; Function compile flags: /Ogsp
@@ -14006,7 +14069,7 @@ _TEXT	SEGMENT
 $T1 = -112						; size = 96
 _gX$1$ = -8						; size = 4
 $T2 = -4						; size = 4
-_in$ = 8						; size = 20
+_in$ = 8						; size = 19
 ?Show@Object@@YAXUShow_params@1@@Z PROC			; Object::Show, COMDAT
 
 ; 12   : 	{
@@ -14069,13 +14132,13 @@ _in$ = 8						; size = 20
 	01 00 00	 vmulss	 xmm0, xmm1, DWORD PTR ?Texture@Textures@dx11@@3PAU<unnamed-type-Texture>@12@A[esi+476]
   00077	c5 fa 2c f0	 vcvttss2si esi, xmm0
   0007b	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
-  0007f	c5 fa 2a 43 14	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebx+12]
+  0007f	c5 fa 2a 43 13	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebx+11]
   00084	c5 fa 59 d3	 vmulss	 xmm2, xmm0, xmm3
   00088	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
-  0008c	c5 fa 2a 43 10	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebx+8]
+  0008c	c5 fa 2a 43 0f	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebx+7]
   00091	c5 fa 59 cb	 vmulss	 xmm1, xmm0, xmm3
   00095	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
-  00099	c5 fa 2a 43 0c	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebx+4]
+  00099	c5 fa 2a 43 0b	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebx+3]
   0009e	c5 fa 59 c3	 vmulss	 xmm0, xmm0, xmm3
   000a2	89 7d f8	 mov	 DWORD PTR _gX$1$[ebp], edi
   000a5	89 75 fc	 mov	 DWORD PTR $T2[ebp], esi
@@ -14095,7 +14158,7 @@ _in$ = 8						; size = 20
   000da	89 75 d4	 mov	 DWORD PTR $T1[ebp+68], esi
   000dd	8d 75 90	 lea	 esi, DWORD PTR $T1[ebp]
   000e0	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
-  000e4	c5 fa 2a 43 18	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebx+16]
+  000e4	c5 fa 2a 43 17	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebx+15]
   000e9	c5 fa 11 45 d8	 vmovss	 DWORD PTR $T1[ebp+72], xmm0
   000ee	66 c7 45 e2 00
 	01		 mov	 WORD PTR $T1[ebp+82], 256 ; 00000100H
@@ -14222,7 +14285,7 @@ _in$ = 8						; size = 20
 ; 74   : 
 ; 75   : 		if (in.glow == 1)
 
-  00197	39 73 18	 cmp	 DWORD PTR _in$[ebx+16], esi
+  00197	39 73 17	 cmp	 DWORD PTR _in$[ebx+15], esi
   0019a	75 0c		 jne	 SHORT $LN2@Show
 
 ; 76   : 		{
@@ -14252,7 +14315,7 @@ $LN3@Show:
 
   001b2	8b 45 fc	 mov	 eax, DWORD PTR $T2[ebp]
   001b5	0f af 45 f8	 imul	 eax, DWORD PTR _gX$1$[ebp]
-  001b9	39 7b 18	 cmp	 DWORD PTR _in$[ebx+16], edi
+  001b9	39 7b 17	 cmp	 DWORD PTR _in$[ebx+15], edi
   001bc	75 08		 jne	 SHORT $LN4@Show
 
 ; 87   : 		{
@@ -15405,7 +15468,7 @@ _TEXT	ENDS
 ; File D:\!platform\fx\projectFiles\camera.h
 ;	COMDAT ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z
 _TEXT	SEGMENT
-_in$ = 8						; size = 84
+_in$ = 8						; size = 75
 ?setCamKey@BasicCam@@YAXUsetCamKey_params@1@@Z PROC	; BasicCam::setCamKey, COMDAT
 
 ; 27   : 	{
@@ -15475,7 +15538,7 @@ $LN5@setCamKey:
 
 ; 47   : 				camSlide = XMVectorSet((float)in.slide_x, (float)in.slide_y, (float)in.slide_z,0);
 
-  00056	c5 f2 2a 4d 3c	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+52]
+  00056	c5 f2 2a 4d 36	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+46]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15487,7 +15550,7 @@ $LN5@setCamKey:
 
 ; 47   : 				camSlide = XMVectorSet((float)in.slide_x, (float)in.slide_y, (float)in.slide_z,0);
 
-  00065	c5 ea 2a 55 40	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+56]
+  00065	c5 ea 2a 55 3a	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+50]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15499,7 +15562,7 @@ $LN5@setCamKey:
 
 ; 47   : 				camSlide = XMVectorSet((float)in.slide_x, (float)in.slide_y, (float)in.slide_z,0);
 
-  00074	c5 e2 2a 5d 44	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+60]
+  00074	c5 e2 2a 5d 3e	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+54]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15513,15 +15576,15 @@ $LN5@setCamKey:
   0007f	c5 f8 29 05 00
 	00 00 00	 vmovaps XMMWORD PTR ?camSlide@BasicCam@@3T__m128@dx11@@A, xmm0 ; BasicCam::camSlide
   00087	a2 00 00 00 00	 mov	 BYTE PTR ?currentCamType@BasicCam@@3W4keyType@@A, al ; BasicCam::currentCamType
-  0008c	8a 45 38	 mov	 al, BYTE PTR _in$[ebp+48]
+  0008c	8a 45 35	 mov	 al, BYTE PTR _in$[ebp+45]
   0008f	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
 
 ; 48   : 				camFly = XMVectorSet((float)in.fly_x, (float)in.fly_y, (float)in.fly_z,0);
 
-  00093	c5 f2 2a 4d 4c	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+68]
+  00093	c5 f2 2a 4d 43	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+59]
   00098	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
   0009c	c5 e8 57 d2	 vxorps	 xmm2, xmm2, xmm2
-  000a0	c5 ea 2a 55 50	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+72]
+  000a0	c5 ea 2a 55 47	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+63]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15536,12 +15599,12 @@ $LN5@setCamKey:
 
 ; 44   : 				camAxisType = in.axisType;
 
-  000b0	8a 45 48	 mov	 al, BYTE PTR _in$[ebp+64]
+  000b0	8a 45 42	 mov	 al, BYTE PTR _in$[ebp+58]
   000b3	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
 
 ; 48   : 				camFly = XMVectorSet((float)in.fly_x, (float)in.fly_y, (float)in.fly_z,0);
 
-  000b7	c5 e2 2a 5d 54	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+76]
+  000b7	c5 e2 2a 5d 4b	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+67]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15556,7 +15619,7 @@ $LN5@setCamKey:
 
 ; 45   : 				camJitter = in.jitter;
 
-  000c7	8b 45 58	 mov	 eax, DWORD PTR _in$[ebp+80]
+  000c7	8b 45 4f	 mov	 eax, DWORD PTR _in$[ebp+71]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15584,7 +15647,7 @@ $LN4@setCamKey:
 
   000e3	c5 f8 57 c0	 vxorps	 xmm0, xmm0, xmm0
   000e7	c5 f0 57 c9	 vxorps	 xmm1, xmm1, xmm1
-  000eb	c5 f2 2a 4d 10	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+8]
+  000eb	c5 f2 2a 4d 0d	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+5]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15596,7 +15659,7 @@ $LN4@setCamKey:
 
 ; 58   : 			sCam->eye = XMVectorSet((float)in.eye_x, (float)in.eye_y, (float)in.eye_z,0);
 
-  000fa	c5 ea 2a 55 14	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+12]
+  000fa	c5 ea 2a 55 11	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+9]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15608,7 +15671,7 @@ $LN4@setCamKey:
 
 ; 58   : 			sCam->eye = XMVectorSet((float)in.eye_x, (float)in.eye_y, (float)in.eye_z,0);
 
-  00109	c5 e2 2a 5d 18	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+16]
+  00109	c5 e2 2a 5d 15	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+13]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15625,7 +15688,7 @@ $LN4@setCamKey:
 
 ; 59   : 			sCam->at = XMVectorSet((float)in.at_x, (float)in.at_y, (float)in.at_z,0);
 
-  00120	c5 f2 2a 4d 1c	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+20]
+  00120	c5 f2 2a 4d 19	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+17]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15637,7 +15700,7 @@ $LN4@setCamKey:
 
 ; 59   : 			sCam->at = XMVectorSet((float)in.at_x, (float)in.at_y, (float)in.at_z,0);
 
-  0012f	c5 ea 2a 55 20	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+24]
+  0012f	c5 ea 2a 55 1d	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+21]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15649,7 +15712,7 @@ $LN4@setCamKey:
 
 ; 59   : 			sCam->at = XMVectorSet((float)in.at_x, (float)in.at_y, (float)in.at_z,0);
 
-  0013e	c5 e2 2a 5d 24	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+28]
+  0013e	c5 e2 2a 5d 21	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+25]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15666,7 +15729,7 @@ $LN4@setCamKey:
 
 ; 60   : 			sCam->up = XMVectorSet((float)in.up_x, (float)in.up_y, (float)in.up_z,0);
 
-  00156	c5 f2 2a 4d 28	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+32]
+  00156	c5 f2 2a 4d 25	 vcvtsi2ss xmm1, xmm1, DWORD PTR _in$[ebp+29]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15678,9 +15741,9 @@ $LN4@setCamKey:
 
 ; 60   : 			sCam->up = XMVectorSet((float)in.up_x, (float)in.up_y, (float)in.up_z,0);
 
-  00165	c5 ea 2a 55 2c	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+36]
+  00165	c5 ea 2a 55 29	 vcvtsi2ss xmm2, xmm2, DWORD PTR _in$[ebp+33]
   0016a	c5 e0 57 db	 vxorps	 xmm3, xmm3, xmm3
-  0016e	c5 e2 2a 5d 30	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+40]
+  0016e	c5 e2 2a 5d 2d	 vcvtsi2ss xmm3, xmm3, DWORD PTR _in$[ebp+37]
 ; File C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\um\DirectXMathVector.inl
 
 ; 80   :     return _mm_set_ps(w, z, y, x);
@@ -15698,7 +15761,7 @@ $LN4@setCamKey:
 
 ; 61   : 			sCam->angle = (float)in.angle;
 
-  00188	c5 fa 2a 45 34	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebp+44]
+  00188	c5 fa 2a 45 31	 vcvtsi2ss xmm0, xmm0, DWORD PTR _in$[ebp+41]
 
 ; 62   : 
 ; 63   : 			camCounter++;
@@ -16037,7 +16100,7 @@ _TEXT	ENDS
 ; File D:\!platform\fx\gApi.h
 ;	COMDAT ?Set@RenderTarget@@YAXUSet_params@1@@Z
 _TEXT	SEGMENT
-_in$ = 8						; size = 8
+_in$ = 8						; size = 5
 ?Set@RenderTarget@@YAXUSet_params@1@@Z PROC		; RenderTarget::Set, COMDAT
 
 ; 14   : 	cmd(Set, texture targetRT, int level) {
@@ -16048,7 +16111,7 @@ _in$ = 8						; size = 8
 ; 15   : 		reflect;
 ; 16   : 		Textures::RenderTarget(in.targetRT, in.level);
 
-  00003	ff 75 0c	 push	 DWORD PTR _in$[ebp+4]
+  00003	ff 75 09	 push	 DWORD PTR _in$[ebp+1]
   00006	ff 75 08	 push	 DWORD PTR _in$[ebp]
   00009	e8 00 00 00 00	 call	 ?RenderTarget@Textures@dx11@@YAXW4texture@@I@Z ; dx11::Textures::RenderTarget
   0000e	59		 pop	 ecx
