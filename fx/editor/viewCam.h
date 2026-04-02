@@ -5,7 +5,7 @@ namespace paramEdit {
 namespace ViewCam
 {
 
-	typedef struct  {
+	typedef struct {
 		XMVECTOR Target;
 		XMVECTOR ViewVec;
 		XMVECTOR upVec;
@@ -82,6 +82,131 @@ namespace ViewCam
 		flyToCam = 0.f;
 
 	}
+
+	struct
+	{
+		float deltaX = 0;
+		float deltaY = 0;
+		float deltaZ = 0;
+		float angleX = 0;
+		float angleY = 0;
+		float angleZ = 0;
+
+		float accel = .01;
+		float deAccel = .8;
+
+		void SlowDown()
+		{
+			deltaX *= deAccel;
+			deltaY *= deAccel;
+			deltaZ *= deAccel;
+			angleX *= deAccel;
+			angleY *= deAccel;
+			angleZ *= deAccel;
+		}
+
+		void processLR()
+		{
+			XMVECTOR right = XMVector3Cross(currentCamera.upVec, XMVector3Normalize(currentCamera.ViewVec));
+			currentCamera.Target += deltaX * right;
+
+			auto eye = currentCamera.Target + currentCamera.ViewVec;
+			XMVECTOR quat = XMQuaternionRotationAxis(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), angleY);
+			currentCamera.ViewVec = XMVector3Rotate(currentCamera.ViewVec, quat);
+			currentCamera.Target = XMVectorAdd(eye, -currentCamera.ViewVec);
+		}
+
+		void processFB()
+		{
+			currentCamera.Target += deltaZ * XMVector3Normalize(currentCamera.ViewVec);
+
+			auto eye = currentCamera.Target + currentCamera.ViewVec;
+			XMVECTOR quat = XMQuaternionRotationAxis(XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), angleX);
+			currentCamera.ViewVec = XMVector3Rotate(currentCamera.ViewVec, quat);
+			currentCamera.upVec = XMVector3Rotate(currentCamera.upVec, quat);
+			currentCamera.Target = XMVectorAdd(eye, -currentCamera.ViewVec);
+		}
+
+		void Left()
+		{
+			processLR();
+
+			if (GetAsyncKeyState('A'))
+			{
+				if (GetAsyncKeyState(VK_SHIFT))
+				{
+					angleY -= accel;
+				}
+				else
+				{
+					deltaX += accel;
+				}
+			}
+		}
+
+		void Right()
+		{
+			processLR();
+
+			if (GetAsyncKeyState('D'))
+			{
+				if (GetAsyncKeyState(VK_SHIFT))
+				{
+					angleY += accel;
+				}
+				else
+				{
+					deltaX -= accel;
+				}
+			}
+		}
+
+		void Forward()
+		{
+			processFB();
+
+			if (GetAsyncKeyState('W'))
+			{
+				if (GetAsyncKeyState(VK_SHIFT))
+				{
+					angleX += accel;
+				}
+				else
+				{
+					deltaZ -= accel;
+				}
+			}
+		}
+
+		void Backward()
+		{
+			processFB();
+
+			if (GetAsyncKeyState('S'))
+			{
+				if (GetAsyncKeyState(VK_SHIFT))
+				{
+					angleX -= accel;
+				}
+				else
+				{
+					deltaZ += accel;
+				}
+			}
+		}
+
+		void RotClockWise()
+		{
+
+		}
+
+
+		void RotCounterClockWise()
+		{
+
+		}
+	} Move;
+
 
 	void AxisCamYaw(float xz)
 	{

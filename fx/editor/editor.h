@@ -14,6 +14,8 @@
 namespace editor
 {
 
+	int wheel = 0;
+
 	bool controlParamsOld = false;
 	int pIndex = -1;
 	int cmdIndex = -1;
@@ -1131,20 +1133,22 @@ namespace editor
 
 		POINT pt;
 		GetCursorPos(&pt);
+		int menuOffset = 0;
 
+		HWND prevHWND = GetForegroundWindow();
 		// ВАЖНО: Устанавливаем фокус на наше окно, чтобы оно ловило Esc
 		HWND hOwner = GetAncestor(hwnd, GA_ROOT);
-		SetForegroundWindow(hOwner);
+		SetForegroundWindow(hwnd);
 
 		// TPM_RETURNCMD: возвращает ID пункта или 0, если нажали Esc
 		UINT flags = TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD | TPM_NONOTIFY;
-		int selectedId = TrackPopupMenu(hMenu, flags, pt.x, pt.y, 0, hwnd, NULL);
+		int selectedId = TrackPopupMenu(hMenu, flags, pt.x+menuOffset, pt.y, 0, hwnd, NULL);
 
 		// После закрытия меню посылаем "пустое" сообщение, чтобы очистить очередь (баг WinAPI)
 		PostMessage(hwnd, WM_NULL, 0, 0);
 
 		DestroyMenu(hMenu);
-		SetForegroundWindow(vsHWND);
+		SetForegroundWindow(prevHWND);
 
 		// Если selectedId == 0, значит нажали Esc или кликнули мимо -> возвращаем -1
 		if (selectedId == 0) return -1;
@@ -1178,11 +1182,11 @@ namespace editor
 			cmdParamDesc[cmdIndex].param[11].value = (int)Camera::viewCam.angle;
 		}
 
-		void ProcessCamKeyContextMenu()
+		void ProcessCamKeyContextMenu(HWND hwnd)
 		{
 			std::vector<std::string> enumMenu = { "grab view camera","grab view camera with timestamp","grab timestamp only" };
 
-			switch (showEnum(hWnd, enumMenu))
+			switch (showEnum(hwnd, enumMenu))
 			{
 			case 0:
 				CamUI::GrabDirectionAndAngle(cmdIndex);
@@ -1256,8 +1260,56 @@ namespace editor
 	bool mPressed = false;
 	bool timeAlwaysOn = true;
 
+	bool capture = false;
+
+	HWND Shield = NULL;
+
+	LRESULT CALLBACK ShieldWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+	{
+		switch (message)
+		{
+			case WM_MOUSEWHEEL:
+			{
+				auto delta = GET_WHEEL_DELTA_WPARAM(wParam);
+				editor::wheel = delta / 120;
+			}
+
+			default:
+				return DefWindowProc(hWnd, message, wParam, lParam);
+		}
+
+		return 0;
+	}
+
+	void CreateTransparentShield() 
+	{
+		HINSTANCE hInst = GetModuleHandle(NULL);
+		WNDCLASSEX wc = { sizeof(WNDCLASSEX) };
+		wc.lpfnWndProc = ShieldWndProc; // Для щита достаточно стандартной процедуры
+		wc.hInstance = hInst;
+		wc.lpszClassName = "ShieldClass";
+		RegisterClassEx(&wc);
+
+		// WS_EX_LAYERED — позволяет прозрачность
+		// WS_EX_TOOLWINDOW — скрывает из панели задач
+		// WS_EX_TOPMOST — всегда поверх Visual Studio
+		Shield = CreateWindowEx(
+			 WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
+			"ShieldClass", "",
+			WS_POPUP,
+			0, 0, 1, 1, // Размер может быть 1x1, если оно под курсором
+			NULL, NULL, hInst, NULL
+		);
+
+		// Устанавливаем полную прозрачность (0)
+		// LWA_ALPHA делает окно невидимым, но оно всё еще ловит сообщения
+		SetLayeredWindowAttributes(Shield, 0, 0, LWA_ALPHA);
+	}
+
 	void Process()
 	{
+		if (!Shield) CreateTransparentShield();
+
 		ui::mousePos = ui::GetCusorPos();
 		paramsAreLoaded = true;
 
@@ -1266,10 +1318,69 @@ namespace editor
 
 		bool ctrl = GetAsyncKeyState(VK_CONTROL);
 		bool shift = GetAsyncKeyState(VK_SHIFT);
+		bool alt = GetAsyncKeyState(VK_MENU);
+		bool lwin = GetAsyncKeyState(VK_LWIN);
+		bool modifyKey = alt;
 
-		if (GetAsyncKeyState(VK_MBUTTON))
+
+		
+		if (modifyKey && !capture && WindowFromPoint(pt) == vsHWND)
 		{
-			if (!click && WindowFromPoint(pt) == vsHWND)
+			if (VsEditor.Update(false) && VsEditor.typeUnderCursor == VsEditor.textType::number)
+			{
+				WINDOWPLACEMENT wp;
+				GetWindowPlacement(vsHWND, &wp);
+				SetWindowPlacement(Shield, &wp);
+				ShowWindow(Shield, SW_SHOW);
+				SetFocus(Shield);
+				capture = true;
+			}
+		}
+
+		if (!modifyKey && capture)
+		{
+			ShowWindow(Shield, SW_HIDE);
+			SetForegroundWindow(vsHWND);
+			capture = false;
+		}
+
+		if (capture && editor::wheel != 0)
+		{
+			if (VsEditor.Update(false))
+			{
+				if (VsEditor.typeUnderCursor == VsEditor.textType::number)
+				{
+					char modified[100];
+					newValue = atoi(VsEditor.paramStr) + editor::wheel;
+					_itoa(newValue, modified, 10);
+
+					if (calcCmdAndParamIndicies())
+					{
+						if (!cmdParamDesc[cmdIndex].param[pIndex].bypass)
+						{
+							cmdParamDesc[cmdIndex].param[pIndex].value = newValue;
+							strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, modified);
+							VsEditor.Update(true);
+							VsEditor.ReplaceTextInVS(modified, true);
+						}
+					}
+
+					if (fileIsShader())
+					{
+						VsEditor.Update(true);
+						VsEditor.ReplaceTextInVS(modified, true);
+						VsEditor.saveChanges();
+						recompileShader();
+					}
+
+					editor::wheel = 0;
+				}
+			}
+		}
+
+		if ((GetAsyncKeyState(VK_LBUTTON) && modifyKey) || GetAsyncKeyState(VK_MBUTTON))
+		{
+			if (!click && (WindowFromPoint(pt) == vsHWND|| WindowFromPoint(pt) == Shield))
 			{
 				if (VsEditor.Update(false))
 				{
@@ -1294,6 +1405,7 @@ namespace editor
 
 						case VsEditor.textType::enumList:
 						{
+							if (!GetAsyncKeyState(VK_MBUTTON)) break;
 							if (!calcCmdAndParamIndicies() || mPressed) break;
 
 							mPressed = true;
@@ -1306,7 +1418,7 @@ namespace editor
 							}
 
 							int sel = cmdParamDesc[cmdIndex].param[pIndex].value;
-							sel = tCnt == 2 ? 1 - sel : showEnum(hWnd, enumMenu);
+							sel = tCnt == 2 ? 1 - sel : showEnum(Shield, enumMenu);
 
 							if (sel >= 0)
 							{
@@ -1319,10 +1431,11 @@ namespace editor
 
 						case VsEditor.textType::functionCall:
 						{
+							if (!GetAsyncKeyState(VK_MBUTTON)) break;
 							calcCmdAndParamIndicies();
 							if (!strcmp(VsEditor.funcName, "setCamKey"))
 							{
-								CamUI::ProcessCamKeyContextMenu();
+								CamUI::ProcessCamKeyContextMenu(Shield);
 							}
 							
 							break;
@@ -1402,7 +1515,7 @@ namespace editor
 			click = false;
 			mPressed = false;
 
-			if (VsEditor.saveChanges())
+			if (!capture && VsEditor.saveChanges())
 			{
 				if (fileIsShader())
 				{
@@ -1452,7 +1565,10 @@ namespace editor
 		ui::LeftDown = isKeyDown(VK_LEFT);
 		ui::RightDown = isKeyDown(VK_RIGHT);
 
-		if (!ui::lbDown)
+		bool myWindow = GetForegroundWindow() == hWnd;
+		
+
+		if (!ui::lbDown && myWindow)
 		{
 			drag.setFree();
 		}
@@ -1461,9 +1577,13 @@ namespace editor
 		Rasterizer::Cull(cullmode::off);
 		Depth::Depth(depthmode::off);
 
-		if (isKeyDown(TIME_KEY)|| timeAlwaysOn)
+		if ((isKeyDown(TIME_KEY) || timeAlwaysOn) && myWindow)
 		{
 			TimeLine::ProcessInput();
+		}
+
+		if ((isKeyDown(TIME_KEY) || timeAlwaysOn))
+		{
 			TimeLine::Draw();
 			paramEdit::showTrack();
 		}
@@ -1477,6 +1597,16 @@ namespace editor
 		{
 			ViewCam::Draw();
 		} 
+
+		if (!isKeyDown(CAM_KEY) && myWindow)
+		{
+			ViewCam::Move.SlowDown();
+						
+			ViewCam::Move.Left(); 
+			ViewCam::Move.Right();
+			ViewCam::Move.Backward();
+			ViewCam::Move.Forward();
+		}
 		
 		Rasterizer::Scissors({ 0,0,(float)dx11::width,(float)dx11::height });
 		ui::Box::Setup();

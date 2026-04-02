@@ -74,6 +74,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_KEYDOWN:
 	{
+		auto isCtrlPressed = GetAsyncKeyState(VK_CONTROL);
+		auto isAltPressed = GetAsyncKeyState(VK_MENU);
+
 		switch (wParam)
 		{
 			case VK_SPACE:
@@ -83,20 +86,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				editor::ViewCam::ToggleViewMode();
 				break;
 			case 'A':
-				editor::ViewCam::AxisCamYaw(-90);
+				if (isCtrlPressed) editor::ViewCam::AxisCamYaw(-90);
 				break;
 			case 'D':
-				editor::ViewCam::AxisCamYaw(90);
+				if (isCtrlPressed) editor::ViewCam::AxisCamYaw(90);
 				break;
 			case 'S':
-				editor::ViewCam::AxisCamPitch(0);
+				if (isCtrlPressed) editor::ViewCam::AxisCamPitch(0);
 				break;
 			case 'X':
-				editor::ViewCam::AxisCamPitch(90);
+				if (isCtrlPressed) editor::ViewCam::AxisCamPitch(90);
 				break;
 			case 'W':
-				editor::ViewCam::AxisCamPitch(-90);
-				break;
+				if (isCtrlPressed) editor::ViewCam::AxisCamPitch(-90);
+ 				break;
 			case VK_LEFT:
 				editor::paramEdit::cursorPos--;
 				break;

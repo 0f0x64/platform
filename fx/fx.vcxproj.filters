@@ -200,6 +200,9 @@
     <ClInclude Include="generated\trackParser.h">
       <Filter>Source Files\generated</Filter>
     </ClInclude>
+    <ClInclude Include="projectFiles\sound\helper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">
@@ -353,6 +356,9 @@
     </None>
     <None Include="projectFiles\shaders\vs\girl.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\sound\drumloop.pattern">
+      <Filter>Source Files\sound</Filter>
     </None>
   </ItemGroup>
 </Project>

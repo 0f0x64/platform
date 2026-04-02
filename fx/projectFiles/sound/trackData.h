@@ -23,14 +23,7 @@ static track Track =
 					.bpmScaleNumerator = 1,
 					.bpmScaleDenominator = 8,
 					.overDub = switcher::off,
-					.pitch =	"cdefgab",
-					.octave =	"1111111",
-					.velocity = "9888988",
-					.positon =	"0000000",
-					.variation ="0000000",
-					.offset =	"0000000",
-					.slide =	"0000000",
-					.retrigger ="0000000"
+					.pattern = "drumloop"
 					},
 				},
 		},

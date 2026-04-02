@@ -25,18 +25,23 @@ struct track {
 			int8u bpmScaleNumerator;
 			int8u bpmScaleDenominator;
 			switcher overDub;
-			char pitch[maxClipLen];
-			char octave[maxClipLen];
-			char velocity[maxClipLen];
-			char positon[maxClipLen];
-			char variation[maxClipLen];
-			char offset[maxClipLen];
-			char slide[maxClipLen];
-			char retrigger[maxClipLen];
+			char pattern[maxClipLen];
+			int8u patternID;
 
 		} clip[maxClipsCount];
 
 	} channel[maxChannelsCount];
+
+	struct {
+		char pitch[maxClipLen];
+		char octave[maxClipLen];
+		char velocity[maxClipLen];
+		char position[maxClipLen];
+		char take[maxClipLen];
+		char offset[maxClipLen];
+		char slide[maxClipLen];
+		char retrigger[maxClipLen];
+	} pattern[100];
 	
 };
 

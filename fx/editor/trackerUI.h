@@ -110,6 +110,136 @@ namespace paramEdit
 		return table[note] * oct;
 	}
 
+
+#include <fstream>
+#include <string>
+#include <cstdlib>
+
+	static const int NOTE_OFFSETS[] = { 9, 11, 0, 2, 4, 5, 7 };
+
+	// Вспомогательная функция для безопасного копирования "слова" в char[]
+	void safe_copy(char* dest, const std::string& str, size_t& i) {
+		size_t start = i;
+		while (i < str.size() && !std::isspace((unsigned char)str[i])) {
+			i++;
+		}
+		size_t len = i - start;
+		if (len >= maxClipLen) len = maxClipLen - 1;
+		std::strncpy(dest, str.c_str() + start, len);
+		dest[len] = '\0';
+	}
+
+	void parseNoteLine(const std::string& line, int patternID, int posInPattern) {
+
+		Track.pattern[patternID].pitch[posInPattern] = -1;
+
+		if (line.empty()) {
+			return;
+		}
+
+		size_t i = 0;
+
+		while (i < line.size()) {
+			// Пропуск пробелов и табов
+			if (std::isspace((unsigned char)line[i])) {
+				i++;
+				continue;
+			}
+
+			char current = line[i];
+
+			// 1. Определение ноты (c, d, e, f, g, a, b)
+			char cL = std::tolower(current);
+
+			if (cL >= 'a' && cL <= 'g') {
+
+				char note = NOTE_OFFSETS[cL - 'a'];
+
+				size_t start = i;
+				i++;
+				// Проверка на знак альтерации (#, b)
+				if (i < line.size() && (line[i] == '#'))
+				{
+					note++;
+					i++;
+				}
+
+				Track.pattern[patternID].pitch[posInPattern] = note;
+
+				//size_t len = i - start;
+				//std::strncpy(Track.pattern[patternID].pitch, line.c_str() + start, len);
+				//Track.pattern[patternID].pitch[len] = 0;
+				continue;
+			}
+
+			// 2. Определение октавы (если это цифра без префикса)
+			//if (std::isdigit(current)) {
+				//safe_copy(Track.pattern[patternID].octave, line, i);
+				//continue;
+			//}
+
+			// 3. Определение модификаторов по первой букве
+			i++; // Пропускаем букву-префикс
+			/*switch (current) {
+			case 'v': safe_copy(Track.pattern[patternID].velocity, line, i); break;
+			case 'p': safe_copy(Track.pattern[patternID].position, line, i); break;
+			case 'i': safe_copy(Track.pattern[patternID].take, line, i);     break;
+			case 'f': safe_copy(Track.pattern[patternID].offset, line, i);   break;
+			case 's': safe_copy(Track.pattern[patternID].slide, line, i);    break;
+			case 'r': safe_copy(Track.pattern[patternID].retrigger, line, i); break;
+			default:
+				// Если встретили неизвестный символ, просто пропускаем до пробела
+				while (i < line.size() && !std::isspace((unsigned char)line[i])) i++;
+				break;
+			}*/
+		}
+	}
+
+	void CompilePattern(char* name, int id)
+	{
+		std::string n = name;
+		const std::string& filePath = "..\\fx\\projectFiles\\sound\\" + n + ".pattern";
+
+		std::ifstream file(filePath);
+		if (!file.is_open()) return;
+
+		std::string line;
+		int noteID = 0;
+
+		int oct = 0;
+		int pos = 0;
+
+		while (std::getline(file, line)) {
+	
+			parseNoteLine(line, id, pos);
+			pos++;
+
+
+		}
+
+		file.close();
+
+		auto a = Track.pattern[id].pitch;
+	}
+
+	void CompilePatterns() {
+
+		int pID = 0;
+
+		for (int i = 0; i < Track.channelsCount; i++)
+		{
+			for (int j = 0; j < Track.channel[i].clipsCount; j++)
+			{
+				char* name = Track.channel[i].clip[j].pattern;
+
+				CompilePattern(name, pID);
+
+				Track.channel[i].clip[j].patternID = pID;
+				pID++;
+			}
+		}
+	}
+
 	void showTrack()
 	{
 		float baseH = .05;
@@ -131,6 +261,8 @@ namespace paramEdit
 		Blend::Set(blendmode::alpha);
 		InputAssembler::IA(topology::triList);
 
+		CompilePatterns();
+		/*
 		for (int i = 0; i < Track.channelsCount; i++)
 		{
 			for (int j = 0; j < Track.channel[i].clipsCount; j++)
@@ -149,13 +281,15 @@ namespace paramEdit
 				float totalNotesRange = 8 * 12;
 				float noteHeight = areaHeight / totalNotesRange;
 
-				for (int k = 0; k < strlen(Track.channel[i].clip[j].pitch); k++)
+				auto notes = Track.pattern[Track.channel[i].clip[j].patternID];
+
+				for (int k = 0; k < strlen(notes.pitch); k++)
 				{
 					float x = clipX + noteScreenLen * k;
 					int octIndex = 0;
-					if (strlen(Track.channel[i].clip[j].octave)>0) octIndex = min(k, strlen(Track.channel[i].clip[j].octave-1));
-					char oct = Track.channel[i].clip[j].octave[octIndex];
-					unsigned char note = getNoteFromChar(Track.channel[i].clip[j].pitch[k], oct);
+					if (strlen(notes.octave)>0) octIndex = min(k, strlen(notes.octave-1));
+					char oct = notes.octave[octIndex];
+					unsigned char note = getNoteFromChar(notes.pitch[k], oct);
 
 					float y = areaHeight - .1- noteHeight * note ;
 
@@ -179,6 +313,7 @@ namespace paramEdit
 				}
 			}
 		}
+		*/
 	}
 
 }
