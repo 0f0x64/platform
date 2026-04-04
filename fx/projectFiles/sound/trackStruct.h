@@ -33,11 +33,11 @@ struct track {
 	} channel[maxChannelsCount];
 
 	struct {
-		char pitch[maxClipLen];
+		char note[maxClipLen];
 		char octave[maxClipLen];
 		char velocity[maxClipLen];
 		char position[maxClipLen];
-		char take[maxClipLen];
+		char articulation[maxClipLen];
 		char offset[maxClipLen];
 		char slide[maxClipLen];
 		char retrigger[maxClipLen];

@@ -283,6 +283,32 @@ namespace editor
 			return true;
 		}
 
+		bool GetActiveDoc(CComPtr<EnvDTE::Document> &doc)
+		{
+			HRESULT result;
+			CLSID clsid;
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<IUnknown> punk;
+			result = ::GetActiveObject(clsid, NULL, &punk);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::_DTE> DTE;
+			DTE = punk;
+
+			CComPtr<EnvDTE::ItemOperations> item_ops;
+			result = DTE->get_ItemOperations(&item_ops);
+			if (FAILED(result))
+				return false;
+
+			result = DTE->get_ActiveDocument(&doc);
+			if (FAILED(result))
+				return false;
+		}
+
 		int GetParamIndex()
 		{
 			HRESULT result;
@@ -1306,9 +1332,17 @@ namespace editor
 		SetLayeredWindowAttributes(Shield, 0, 0, LWA_ALPHA);
 	}
 
+
+	void PatternEditor()
+	{
+
+	}
+
 	void Process()
 	{
 		if (!Shield) CreateTransparentShield();
+
+		PatternEditor();
 
 		ui::mousePos = ui::GetCusorPos();
 		paramsAreLoaded = true;

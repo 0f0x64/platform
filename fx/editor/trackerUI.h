@@ -131,7 +131,7 @@ namespace paramEdit
 
 	void parseNoteLine(const std::string& line, int patternID, int posInPattern) {
 
-		Track.pattern[patternID].pitch[posInPattern] = -1;
+		Track.pattern[patternID].note[posInPattern] = -1;
 
 		if (line.empty()) {
 			return;
@@ -164,7 +164,7 @@ namespace paramEdit
 					i++;
 				}
 
-				Track.pattern[patternID].pitch[posInPattern] = note;
+				Track.pattern[patternID].note[posInPattern] = note;
 
 				//size_t len = i - start;
 				//std::strncpy(Track.pattern[patternID].pitch, line.c_str() + start, len);
@@ -209,17 +209,15 @@ namespace paramEdit
 		int oct = 0;
 		int pos = 0;
 
-		while (std::getline(file, line)) {
-	
+		while (std::getline(file, line)) 
+		{
 			parseNoteLine(line, id, pos);
 			pos++;
-
-
 		}
 
 		file.close();
 
-		auto a = Track.pattern[id].pitch;
+		auto a = Track.pattern[id].note;
 	}
 
 	void CompilePatterns() {
@@ -261,7 +259,7 @@ namespace paramEdit
 		Blend::Set(blendmode::alpha);
 		InputAssembler::IA(topology::triList);
 
-		CompilePatterns();
+		//CompilePatterns();
 		/*
 		for (int i = 0; i < Track.channelsCount; i++)
 		{
