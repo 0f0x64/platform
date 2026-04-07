@@ -1,20 +1,32 @@
-d#1 v9 o0 v0
+kick    snare   hat
 
-d2  v1 o2 v2
+loop1      
+.....
+.....
+.....           loop3
+.....        
+.....
+.....   loop2
+.....
+.....
+.....
+.....
+loop2
 
-d2  v9 o0 v1
 
-c2  v2 o2 v2
 
-d#1 v9 o0 v
 
-d2  v1 o2 v2
 
-d2  v9 o0 v1
 
-c2  v2 o2 v2
 
-/
+
+
+
+
+
+
+
+
 
 
 

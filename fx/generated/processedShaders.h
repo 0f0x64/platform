@@ -917,7 +917,7 @@ const char* girl =
 "    }\n"
 "    \n"
 "    pos+=modelPos.xyz;\n"
-"    pos.y-=197.164;\n"
+"    pos.y-=451.164;\n"
 "    pos*=.01;\n"
 "\n"
 "    //p1.pos=float4(pos,1);\n"

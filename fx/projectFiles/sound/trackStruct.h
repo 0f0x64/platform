@@ -1,4 +1,4 @@
-const int maxClipLen = 128;
+const int maxClipLen = 128*4;
 const int maxClipsCount = 32;
 const int maxChannelsCount = 32;
 
@@ -34,13 +34,14 @@ struct track {
 
 	struct {
 		char note[maxClipLen];
-		char octave[maxClipLen];
-		char velocity[maxClipLen];
-		char position[maxClipLen];
-		char articulation[maxClipLen];
-		char offset[maxClipLen];
-		char slide[maxClipLen];
-		char retrigger[maxClipLen];
+		struct {
+			char velocity[maxClipLen];
+			char position[maxClipLen];
+			char articulation[maxClipLen];
+			char offset[maxClipLen];
+			char slide[maxClipLen];
+			char retrigger[maxClipLen];
+		} params;
 	} pattern[100];
 	
 };
