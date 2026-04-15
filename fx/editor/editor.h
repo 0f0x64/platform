@@ -1346,101 +1346,185 @@ namespace editor
 		long anchorLine = 0;
 		long cursorCol = 0;
 		CComPtr<EnvDTE::UndoContext> pUndo;
+		std::wstring activeDocPath;
 
 		void EnterDrumMode() {
-			CComPtr<EnvDTE::Document> pDoc;
-			VsEditor.DTE->get_ActiveDocument(&pDoc);
 
-			CComPtr<EnvDTE::TextSelection> pSel;
-			CComPtr<IDispatch> pSelDisp;
-			pDoc->get_Selection(&pSelDisp);
-			pSelDisp->QueryInterface(&pSel);
+			HRESULT result;
+			CComPtr<EnvDTE::Document> doc;
+			if (!VsEditor.GetActiveDoc(doc)) 
+			{
+				return;
+			}
 
-			// 1. Запоминаем позицию основного текста
-			pSel->get_CurrentLine(&anchorLine);
-			pSel->get_CurrentColumn(&cursorCol);
+			CComBSTR bstrPath;
+			doc->get_FullName(&bstrPath);
+			activeDocPath = bstrPath.m_str;
 
-			// 2. Открываем транзакцию Undo через CComBSTR
-			VsEditor.DTE->get_UndoContext(&pUndo);
-			pUndo->Open(CComBSTR(L"DrumTrackMode"), VARIANT_FALSE);
+			CComPtr<IDispatch> selection_dispatch;
+			result = doc->get_Selection(&selection_dispatch);
+			if (FAILED(result))
+			{
+				return;
+			}
+				
 
-			// 3. Получаем доступ к текстовому документу
-			CComPtr<EnvDTE::TextDocument> pTextDoc;
-			pDoc->Object(CComBSTR(L"TextDocument"), (IDispatch**)&pTextDoc);
+			CComPtr<EnvDTE::TextSelection> selection;
+			result = selection_dispatch->QueryInterface(&selection);
+			if (FAILED(result))
+			{
+				return;
+			}
 
-			CComPtr<EnvDTE::EditPoint> pEdit;
-			pTextDoc->CreateEditPoint(NULL, &pEdit);
+			CComPtr<IDispatch> pDocDisp;
+			result = doc->Object(CComBSTR("TextDocument"), &pDocDisp);
+			if (FAILED(result))
+			{
+				return;
+			}
 
-			// Переходим в конец текущей строки и вставляем новую под ней
-			pEdit->MoveToLineAndOffset(anchorLine, 1);
-			pEdit->EndOfLine();
+			CComQIPtr<EnvDTE::TextDocument> pTextDoc(pDocDisp);
+			long currentLine = 0;
+			long currentColumn = 0;
+			result = selection->get_CurrentLine(&anchorLine);
+			result = selection->get_CurrentColumn(&cursorCol);
+			if (FAILED(result))
+			{
+				return;
+			}
+
+			CComPtr<EnvDTE::EditPoint> pEditPoint;
+			result = pTextDoc->CreateEditPoint(NULL, &pEditPoint);
+			if (FAILED(result))
+			{
+				return;
+			}
+
+			result = pEditPoint->MoveToLineAndOffset(anchorLine, 1);
+			if (FAILED(result))
+			{
+				return;
+			}
+
+			pEditPoint->EndOfLine();
 
 			// Формируем строку-курсор (пробелы до нужной колонки + символ ^)
 			std::wstring shadowLine = L"\n";
 			for (int i = 1; i < cursorCol; ++i) shadowLine += L" ";
 			shadowLine += L"^";
 
-			pEdit->Insert(CComBSTR(shadowLine.c_str()));
+			pEditPoint->Insert(CComBSTR(shadowLine.c_str())); 
+
 		}
 
 		void MoveVisualCursor(int delta) {
-			CComPtr<EnvDTE::Document> pDoc;
-			VsEditor.DTE->get_ActiveDocument(&pDoc);
-			CComPtr<EnvDTE::TextDocument> pTextDoc;
-			pDoc->Object(CComBSTR(L"TextDocument"), (IDispatch**)&pTextDoc);
+			HRESULT result;
+			CComPtr<EnvDTE::Document> doc;
+			if (!VsEditor.GetActiveDoc(doc))
+			{
+				return;
+			}
 
-			CComPtr<EnvDTE::EditPoint> pEdit;
-			pTextDoc->CreateEditPoint(NULL, &pEdit);
+			CComPtr<IDispatch> selection_dispatch;
+			result = doc->get_Selection(&selection_dispatch);
+			if (FAILED(result))
+			{
+				return;
+			}
+
+
+			CComPtr<EnvDTE::TextSelection> selection;
+			result = selection_dispatch->QueryInterface(&selection);
+			if (FAILED(result))
+			{
+				return;
+			}
+
+			CComPtr<IDispatch> pDocDisp;
+			result = doc->Object(CComBSTR("TextDocument"), &pDocDisp);
+			if (FAILED(result))
+			{
+				return;
+			}
+
+			CComQIPtr<EnvDTE::TextDocument> pTextDoc(pDocDisp);
+
+			CComPtr<EnvDTE::EditPoint> pEditPoint;
+			result = pTextDoc->CreateEditPoint(NULL, &pEditPoint);
+
 
 			// 1. Стираем старый '^' (заменяем на пробел)
-			pEdit->MoveToLineAndOffset(anchorLine + 1, cursorCol);
+			pEditPoint->MoveToLineAndOffset(anchorLine + 1, cursorCol);
 
 			CComPtr<EnvDTE::EditPoint> pEnd;
-			pEdit->CreateEditPoint(&pEnd);
+			pEditPoint->CreateEditPoint(&pEnd);
 			pEnd->MoveToLineAndOffset(anchorLine + 1, cursorCol + 1);
 
 			// Упаковываем pEnd в VARIANT
 			CComVariant vEnd(pEnd);
-			pEdit->ReplaceText(vEnd, CComBSTR(L" "), 0);
+			pEditPoint->ReplaceText(vEnd, CComBSTR(L" "), 0);
 
 			// 2. Обновляем координату
 			cursorCol += delta;
 			if (cursorCol < 1) cursorCol = 1;
 
 			// 3. Рисуем новый '^'
-			pEdit->MoveToLineAndOffset(anchorLine + 1, cursorCol);
+			pEditPoint->MoveToLineAndOffset(anchorLine + 1, cursorCol);
 
 			// Пересоздаем или перемещаем pEnd для новой позиции
 			pEnd->MoveToLineAndOffset(anchorLine + 1, cursorCol + 1);
 
 			CComVariant vEndNew(pEnd);
-			pEdit->ReplaceText(vEndNew, CComBSTR(L"^"), 0);
+			pEditPoint->ReplaceText(vEndNew, CComBSTR(L"^"), 0);
 		}
 
 		void ExitDrumMode() {
-			CComPtr<EnvDTE::Document> pDoc;
-			VsEditor.DTE->get_ActiveDocument(&pDoc);
-			CComPtr<EnvDTE::TextDocument> pTextDoc;
-			pDoc->Object(CComBSTR(L"TextDocument"), (IDispatch**)&pTextDoc);
+			HRESULT result;
+			CComPtr<EnvDTE::Document> doc;
+			if (activeDocPath.empty()) return;
 
-			CComPtr<EnvDTE::EditPoint> pStart;
-			pTextDoc->CreateEditPoint(NULL, &pStart);
+			CComPtr<EnvDTE::Document> pTargetDoc;
+			CComBSTR bstrTarget(activeDocPath.c_str());
 
-			// Переходим на начало вспомогательной строки
-			pStart->MoveToLineAndOffset(anchorLine + 1, 1);
+			// Ищем документ в коллекции открытых документов по пути
+			CComPtr<EnvDTE::Documents> pDocs;
+			VsEditor.DTE->get_Documents(&pDocs);
+			pDocs->Item(CComVariant(bstrTarget), &doc);
 
-			CComPtr<EnvDTE::EditPoint> pEnd;
-			pStart->CreateEditPoint(&pEnd);
-			pEnd->LineDown(1); // Опускаемся на одну строку вниз, чтобы захватить весь текст с переносом
+			if (doc) {
 
-			// Ошибочное место исправляем здесь:
-			CComVariant vEnd(pEnd);
-			pStart->Delete(vEnd);
+				CComPtr<IDispatch> pDocDisp;
+				result = doc->Object(CComBSTR("TextDocument"), &pDocDisp);
+				if (FAILED(result))
+				{
+					return;
+				}
 
-			// Закрываем транзакцию
-			if (pUndo) {
-				pUndo->Close();
-				pUndo.Release(); // Освобождаем контекст
+				CComQIPtr<EnvDTE::TextDocument> pTextDoc(pDocDisp);
+
+				CComPtr<EnvDTE::EditPoint> pEditPoint;
+				result = pTextDoc->CreateEditPoint(NULL, &pEditPoint);
+				if (FAILED(result))
+				{
+					return;
+				}
+
+				// Переходим на начало вспомогательной строки
+				pEditPoint->MoveToLineAndOffset(anchorLine + 1, 1);
+
+				CComPtr<EnvDTE::EditPoint> pEnd;
+				pEditPoint->CreateEditPoint(&pEnd);
+				pEnd->LineDown(1); // Опускаемся на одну строку вниз, чтобы захватить весь текст с переносом
+
+				// Ошибочное место исправляем здесь:
+				CComVariant vEnd(pEnd);
+				pEditPoint->Delete(vEnd);
+
+				// Закрываем транзакцию
+				if (pUndo) {
+					pUndo->Close();
+					pUndo.Release(); // Освобождаем контекст
+				}
 			}
 		}
 	} trackerUI;
@@ -1524,7 +1608,7 @@ namespace editor
 		// WS_EX_TOOLWINDOW — скрывает из панели задач
 		// WS_EX_TOPMOST — всегда поверх Visual Studio
 		TrackerShield = CreateWindowEx(
-			WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_TRANSPARENT,
+			WS_EX_TOOLWINDOW | WS_EX_TOPMOST,
 			"TrackerShieldClass", "",
 			WS_POPUP,
 			0, 0, 1, 1, // Размер может быть 1x1, если оно под курсором
@@ -1533,7 +1617,7 @@ namespace editor
 
 		// Устанавливаем полную прозрачность (0)
 		// LWA_ALPHA делает окно невидимым, но оно всё еще ловит сообщения
-		SetLayeredWindowAttributes(TrackerShield, 0, 1, LWA_ALPHA);
+		SetLayeredWindowAttributes(TrackerShield, 0, 0, LWA_ALPHA);
 	}
 
 	bool IsExtension(const char* filePath, const char* ext) {
@@ -1542,7 +1626,7 @@ namespace editor
 	}
 
 	bool isFileName(const char* path, const char* name) {
-		const char* last_slash = strrchr(path, '/');
+		const char* last_slash = strrchr(path, '\\');
 		return strcmp(last_slash ? last_slash + 1 : path, name) == 0;
 	}
 
@@ -1571,15 +1655,18 @@ namespace editor
 
 		if (!isFileName(VsEditor.fileName, "trackData.h"))
 		{
+			if (FileIsPattern) trackerUI.ExitDrumMode();
 			//if (lastFileIsPattern) VsEditor.SetOvertypeMode(false);
 			FileIsPattern = false;
 			ShowWindow(TrackerShield, SW_HIDE);
-			trackerUI.ExitDrumMode();
+			
 			return;
 		}
 
 		if (!FileIsPattern)
 		{
+			trackerUI.EnterDrumMode();
+
 			CComPtr<EnvDTE::Window> activeWin;
 			VsEditor.DTE->get_ActiveWindow(&activeWin);
 
@@ -1588,7 +1675,7 @@ namespace editor
 				// Устанавливаем Шилд точно поверх текстового поля
 				::SetWindowPos(TrackerShield, HWND_TOPMOST,
 					rc.left, rc.top, rc.width, rc.height,
-					SWP_NOACTIVATE|SWP_SHOWWINDOW);
+					SWP_SHOWWINDOW);
 			}
 
 			WINDOWPLACEMENT wp;
@@ -1597,10 +1684,10 @@ namespace editor
 
 			//ShowWindow(TrackerShield, SW_SHOW);
 			//UpdateWindow(TrackerShield);
-			///SetFocus(TrackerShield);
+			//SetFocus(TrackerShield);
 			FileIsPattern = true;
 
-			trackerUI.EnterDrumMode();
+			
 
 		}
 

@@ -1,5 +1,3 @@
-.len=16 .maj=4
-
  row  note  vol  len  pos  var  ofs  sld  ret 
 
 •000| d-1 | 21 | 22 | 33 | 44 | 55 | 66 | 77 | 71 |    |•
