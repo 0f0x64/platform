@@ -1,36 +1,42 @@
-#pragma pack (push,1)
-struct clip {
-	int16u pos;
-	int16u len;
-	int8u repeat;
-	int8u bpmScale;
-	int8u overDub;
-	int8u swing;
+const int maxClipLen = 128;
+const int maxClipsCount = 32;
+const int maxChannelsCount = 32;
 
-	char pitch[128];
-	char vol[128];
-	char variation[128];
-	char slide[128];
-	char retrigger[128];
-	char send[128];
-};
+struct track {
 
-struct channel
-{
-	int8u vol;
-	int8s pan;
-	switcher mute;
-	switcher solo;
-	int8u  clipsCount;
-	clip clips[32];
-
-};
-
-struct _track {
+	int channelsCount;
 	int16u  masterBPM;
+	int8u  timeNumerator;
+	int8u  timeDenominator;
 	int8u  volume;
-	int8u  channelsCount;
-	channel channels[32];
 
+	struct
+	{
+		int clipsCount;
+		int8u vol;
+		int8s pan;
+		switcher mute;
+		switcher solo;
+		
+		struct {
+			int16u pos;
+			int16u len;
+			int8u repeat;
+			int8u bpmScaleNumerator;
+			int8u bpmScaleDenominator;
+			switcher overDub;
+			char pitch[maxClipLen];
+			char octave[maxClipLen];
+			char velocity[maxClipLen];
+			char positon[maxClipLen];
+			char variation[maxClipLen];
+			char offset[maxClipLen];
+			char slide[maxClipLen];
+			char retrigger[maxClipLen];
+
+		} clip[maxClipsCount];
+
+	} channel[maxChannelsCount];
+	
 };
-#pragma pack (pop)
+

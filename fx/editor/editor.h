@@ -2,6 +2,13 @@
 #include <atlbase.h>
 #import "libid:80cc9f66-e7d8-4ddd-85b6-d9e6cd0e93e2" version("8.0") lcid("0") raw_interfaces_only named_guids
 //----
+#include <cctype>
+#include <cstring>
+#include <filesystem>
+#include <libloaderapi.h>
+#include <shlwapi.h>
+#include <uxtheme.h>
+#pragma comment(lib, "Shlwapi.lib")
 
 
 namespace editor
@@ -10,13 +17,14 @@ namespace editor
 	bool controlParamsOld = false;
 	int pIndex = -1;
 	int cmdIndex = -1;
-	void calcCmdAndParamIndicies();
+	bool calcCmdAndParamIndicies();
 
 	struct {
 		long line =0;
 		long column =0;
 		char fileName[MAX_PATH];
 
+		char funcName[256];
 		char paramStr[1000];
 
 		long pStart = 0;
@@ -25,7 +33,17 @@ namespace editor
 		long start=0;
 		long end = 0;
 
+		int slider = 0;
+		enum class textType {nonEditable, number,enumList,functionCall, text} typeUnderCursor;
+		char typeName[256];
+		char textValue[256];
+
+		bool pointBefore = false;
+
 		char* extractNumberAtC(const char* str, size_t pos) {
+
+			pointBefore = false;
+
 			if (!str) return nullptr;
 			size_t n = strlen(str);
 			if (pos > n) return nullptr;
@@ -72,14 +90,275 @@ namespace editor
 				result[len] = '\0';
 			}
 
+			if (start > 0)
+			{
+				if (str[start-1] == '.') pointBefore = true;
+			}
+			
+
 			return result;
 		}
 
-		bool Update()
+
+
+		bool is_id_char(char c) {
+			return std::isalnum(static_cast<unsigned char>(c)) || c == '_';
+		}
+
+		bool isText(const char* str, int pos) {
+			if (!str || pos < 0) return false;
+
+			int left = -1;
+			int right = -1;
+
+			// 1. Ищем ближайшую кавычку СЛЕВА от pos
+			for (int i = pos; i >= 0; --i) {
+				if (str[i] == '\"') {
+					left = i;
+					break;
+				}
+			}
+
+			// 2. Ищем ближайшую кавычку СПРАВА от pos
+			for (int i = pos; str[i] != '\0'; ++i) {
+				if (str[i] == '\"') {
+					right = i;
+					break;
+				}
+			}
+
+			// Проверяем, что мы действительно МЕЖДУ двумя кавычками
+			// (left < pos < right)
+			if (left != -1 && right != -1 && left < right && pos > left && pos < right) {
+				int length = right - left - 1;
+
+				// Защита от переполнения глобального буфера (255 символов + '\0')
+				if (length > 255) length = 255;
+
+				// Копируем текст из основной строки в глобальный буфер
+				memcpy(textValue, &str[left + 1], length);
+				textValue[length] = '\0'; // Закрываем строку нулем
+
+				return true;
+			}
+
+			// Если не в тексте, очищаем глобальный буфер (по желанию)
+			textValue[0] = '\0';
+			return false;
+		}
+
+		bool isEnum(const char* str, int pos) {
+
+			typeName[0] = '\0';
+
+			if (!str || pos < 0) return false;
+			int length = static_cast<int>(std::strlen(str));
+
+			// КОРРЕКЦИЯ: Если курсор стоит ПОСЛЕ слова, смещаемся на 1 символ влево, 
+			// чтобы "захватить" идентификатор.
+			int checkPos = pos;
+			if (checkPos >= length || (!is_id_char(str[checkPos]) && checkPos > 0)) {
+				if (is_id_char(str[checkPos - 1])) {
+					checkPos--;
+				}
+			}
+
+			// Если даже после коррекции мы не на букве/цифре — значит рядом нет слова
+			if (checkPos < 0 || !is_id_char(str[checkPos])) return false;
+
+			// 1. Определяем границы слова вокруг скорректированной позиции
+			int idxStart = checkPos;
+			while (idxStart >= 0 && is_id_char(str[idxStart])) idxStart--;
+			idxStart++;
+
+			int idxEnd = checkPos;
+			while (idxEnd < length && is_id_char(str[idxEnd])) idxEnd++;
+
+			// Валидация: не начинается с цифры
+			if (std::isdigit(static_cast<unsigned char>(str[idxStart]))) return false;
+
+			// 2. Ищем "::" слева от idxStart
+			int i = idxStart - 1;
+			while (i >= 1 && std::isspace(static_cast<unsigned char>(str[i]))) i--;
+
+			if (i < 1 || str[i] != ':' || str[i - 1] != ':') return false;
+
+			int opPos = i - 1;
+			int typeEnd = opPos - 1;
+			while (typeEnd >= 0 && std::isspace(static_cast<unsigned char>(str[typeEnd]))) typeEnd--;
+			if (typeEnd < 0 || !is_id_char(str[typeEnd])) return false;
+
+			int typeStart = typeEnd;
+			while (typeStart >= 0 && is_id_char(str[typeStart])) typeStart--;
+			typeStart++;
+			if (std::isdigit(static_cast<unsigned char>(str[typeStart]))) return false;
+
+			int typeLen = typeEnd - typeStart + 1;
+			if (typeLen >= (int)sizeof(typeName)) typeLen = sizeof(typeName) - 1;
+			std::strncpy(typeName, str + typeStart, typeLen);
+			typeName[typeLen] = '\0';
+
+			start = idxStart;
+			end = idxEnd;
+			return true;
+		}
+
+
+
+		bool isFunctionCall(const char* str, int pos) {
+
+			funcName[0] = '\0';
+
+			if (!str || pos < 0) return false;
+			int length = static_cast<int>(std::strlen(str));
+
+			// 1. Корректируем позицию, если курсор стоит сразу после слова или перед ({
+			int checkPos = pos;
+			if (checkPos >= length || (!is_id_char(str[checkPos]) && checkPos > 0)) {
+				if (is_id_char(str[checkPos - 1])) {
+					checkPos--;
+				}
+			}
+
+			if (checkPos < 0 || !is_id_char(str[checkPos])) return false;
+
+			// 2. Находим границы потенциального имени функции
+			int idxStart = checkPos;
+			while (idxStart >= 0 && is_id_char(str[idxStart])) idxStart--;
+			idxStart++;
+
+			int idxEnd = checkPos;
+			while (idxEnd < length && is_id_char(str[idxEnd])) idxEnd++;
+			idxEnd--;
+
+			if (idxStart > idxEnd || std::isdigit(static_cast<unsigned char>(str[idxStart]))) return false;
+
+			// 3. Проверка маркера СПРАВА: "({", пропуская пробелы
+			int right = idxEnd + 1;
+			while (right < length && std::isspace(static_cast<unsigned char>(str[right]))) right++;
+
+			if (right >= length - 1 || str[right] != '(' || str[right + 1] != '{') {
+				return false;
+			}
+
+			// 4. Проверка маркера СЛЕВА: пробел, "::", начало строки или оператор
+			int left = idxStart - 1;
+			bool leftValid = false;
+
+			if (left < 0) {
+				leftValid = true; // Начало строки - валидно
+			}
+			else {
+				// Пропускаем пробелы слева
+				while (left >= 0 && std::isspace(static_cast<unsigned char>(str[left]))) left--;
+
+				if (left < 0) {
+					leftValid = true;
+				}
+				else if (std::isspace(static_cast<unsigned char>(str[idxStart - 1]))) {
+					leftValid = true; // Был пробел
+				}
+				else if (left >= 1 && str[left] == ':' && str[left - 1] == ':') {
+					leftValid = true; // Был оператор ::
+				}
+				else if (std::ispunct(static_cast<unsigned char>(str[left]))) {
+					leftValid = true; // Любой знак пунктуации (напр. '=' или ';')
+				}
+			}
+
+			if (!leftValid) return false;
+
+			// 5. Экстракция имени в глобальную переменную
+			int nameLen = idxEnd - idxStart + 1;
+			if (nameLen >= (int)sizeof(funcName)) nameLen = sizeof(funcName) - 1;
+
+			std::strncpy(funcName, str + idxStart, nameLen);
+			funcName[nameLen] = '\0';
+
+			start = idxStart;
+			end = idxEnd;
+
+			return true;
+		}
+
+		int GetParamIndex()
 		{
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<IUnknown> punk;
+			result = ::GetActiveObject(clsid, NULL, &punk);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::_DTE> DTE;
+			DTE = punk;
+
+			CComPtr<EnvDTE::ItemOperations> item_ops;
+			result = DTE->get_ItemOperations(&item_ops);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::Document> doc;
+			result = DTE->get_ActiveDocument(&doc);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<IDispatch> pSelectionObj;
+			doc->get_Selection(&pSelectionObj);
+			CComPtr<EnvDTE::TextSelection> pSelection;
+			pSelectionObj->QueryInterface(&pSelection);
+
+			// 2. Создаем точку для навигации
+			CComPtr<EnvDTE::VirtualPoint> pVirtualPoint;
+			pSelection->get_ActivePoint(&pVirtualPoint);
+
+			// 2. Convert VirtualPoint to EditPoint to allow CharLeft/GetText operations
+			CComPtr<EnvDTE::EditPoint> pPoint;
+			pVirtualPoint->CreateEditPoint(&pPoint);
+
+			int commaCount = 0;
+			VARIANT_BOOL isAtStart = VARIANT_FALSE;
+
+			// 3. Двигаемся назад до начала документа или символа '{'
+			while (true) {
+				pPoint->get_AtStartOfDocument(&isAtStart);
+				if (isAtStart == VARIANT_TRUE) return -1;
+
+				// Сдвигаемся на 1 символ влево
+				pPoint->CharLeft(1);
+
+				// Получаем символ справа от точки (тот, который мы только что "перешагнули")
+				BSTR bstrChar = nullptr;
+				HRESULT hr = pPoint->GetText(CComVariant(1), &bstrChar);
+
+				if (SUCCEEDED(hr) && bstrChar) {
+					wchar_t c = bstrChar[0];
+					SysFreeString(bstrChar);
+
+					if (c == L'{') {
+						break; // Stop at the opening brace
+					}
+					if (c == L',') {
+						commaCount++;
+					}
+				}
+				else {
+					return -1;
+				}
+			}
+
+			return commaCount;
+		}
+
+		bool Update(bool forceToNumStart)
+		{
+			HRESULT result;
+			CLSID clsid;
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
 			if (FAILED(result))
 				return false;
 
@@ -179,31 +458,45 @@ namespace editor
 			
 			//search num
 			strcpy(paramStr, "nan");
+			typeUnderCursor = textType::nonEditable;
+
+			if (isText(s.c_str(), column - 1))
+			{
+				typeUnderCursor = textType::text;
+				return true;
+			}
 
 			char* number = extractNumberAtC(s.c_str(), column-1);
 			if (number)
 			{
 				strcpy(paramStr, number);
 				free(number);
+				typeUnderCursor = textType::number;
 			}
-			else
+
+			if (isFunctionCall(s.c_str(), column - 1))
+			{
+				typeUnderCursor = textType::functionCall;
+				return true;
+			}
+
+			if (isEnum(s.c_str(), column - 1))
+			{
+				typeUnderCursor = textType::enumList;
+				return true;
+			}
+
+			if (typeUnderCursor == textType::nonEditable)
 			{
 				return false;
 			}
 
 			column = start+1;
-			selection->MoveToLineAndOffset(line, column, VARIANT_FALSE);
 
-		
-			/*EnvDTE::VirtualPoint* pActivePoint3 = nullptr;
-			result = selection->get_ActivePoint(&pActivePoint3);
-			if (FAILED(result))
-				return false;
-
-			long column2;
-			result = pActivePoint->get_LineCharOffset(&column2);
-			if (FAILED(result))
-				return false;*/
+			if (forceToNumStart)
+			{
+				selection->MoveToLineAndOffset(line, column, VARIANT_FALSE);
+			}
 
 			pStart += start;
 			pEnd = pStart + (end - start);
@@ -218,11 +511,11 @@ namespace editor
 
 		}
 
-		bool ReplaceTextInVS()
+		bool ReplaceTextInVS(const char* text,bool forceToNumStart)
 		{
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
 			if (FAILED(result))
 				return false;
 
@@ -269,65 +562,101 @@ namespace editor
 			pTextDoc->CreateEditPoint(NULL, &pEditEnd);
 			pEditEnd->MoveToLineAndOffset(line, end + 1);
 
-			// Заменяем текст между двумя точками
-			int val = g_SliderValue;
-			char modified[100];
-			_itoa(val, modified, 10);
-
-			CComBSTR bstrNewText(modified);
+			CComBSTR bstrNewText(text);
 			pEditStart->ReplaceText(CComVariant(pEditEnd), bstrNewText, (long)EnvDTE::vsEPReplaceTextOptions::vsEPReplaceTextKeepMarkers);
 
-			selection->MoveToLineAndOffset(line, start + 1, VARIANT_FALSE);
+			if (forceToNumStart)
+			{
+				selection->MoveToLineAndOffset(line, start + 1, VARIANT_FALSE);
+			}
 
 			return true;
 		}
 
-		void InsertInSmallFile(const std::string& path, size_t pos, size_t pos_end, const std::string& text) {
-			// 1. Открываем файл и определяем размер одним системным вызовом
-			std::ifstream in(path, std::ios::binary | std::ios::ate);
-			if (!in) return;
+		bool haveChanges()
+		{
 
-			const size_t fileSize = static_cast<size_t>(in.tellg());
+			HRESULT result;
+			CLSID clsid;
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
+			if (FAILED(result))
+				return false;
 
-			// Валидация границ (clamping)
-			if (pos > fileSize) pos = fileSize;
-			if (pos_end > fileSize) pos_end = fileSize;
-			if (pos_end < pos) pos_end = pos;
+			CComPtr<IUnknown> punk;
+			result = ::GetActiveObject(clsid, NULL, &punk);
+			if (FAILED(result))
+				return false;
 
-			const size_t suffixSize = fileSize - pos_end;
-			const size_t newSize = pos + text.size() + suffixSize;
+			CComPtr<EnvDTE::_DTE> DTE;
+			DTE = punk;
 
-			// 2. Аллоцируем память ОДИН раз под итоговый размер
-			std::vector<char> buffer(newSize);
+			CComPtr<EnvDTE::ItemOperations> item_ops;
+			result = DTE->get_ItemOperations(&item_ops);
+			if (FAILED(result))
+				return false;
 
-			// 3. Читаем ПЕРВУЮ часть файла прямо в буфер
-			if (pos > 0) {
-				in.seekg(0, std::ios::beg);
-				in.read(buffer.data(), pos);
+			CComPtr<EnvDTE::Document> doc;
+			result = DTE->get_ActiveDocument(&doc);
+			if (FAILED(result))
+				return false;
+
+			VARIANT_BOOL isSaved;
+			doc->get_Saved(&isSaved);
+
+			if (isSaved == VARIANT_FALSE) {
+
+				return true;
 			}
 
-			// 4. Копируем текст в середину буфера (из памяти в память)
-			if (!text.empty()) {
-				std::copy(text.begin(), text.end(), buffer.data() + pos);
+			return false;
+
+		}
+
+		bool saveChanges()
+		{
+
+			HRESULT result;
+			CLSID clsid;
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<IUnknown> punk;
+			result = ::GetActiveObject(clsid, NULL, &punk);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::_DTE> DTE;
+			DTE = punk;
+
+			CComPtr<EnvDTE::ItemOperations> item_ops;
+			result = DTE->get_ItemOperations(&item_ops);
+			if (FAILED(result))
+				return false;
+
+			CComPtr<EnvDTE::Document> doc;
+			result = DTE->get_ActiveDocument(&doc);
+			if (FAILED(result))
+				return false;
+
+			VARIANT_BOOL isSaved;
+			doc->get_Saved(&isSaved);
+
+			if (isSaved == VARIANT_FALSE) {
+
+				CComBSTR emptyPath(L"");
+				EnvDTE::vsSaveStatus status;
+				doc->Save(emptyPath, &status);
+
+				return true;
 			}
 
-			// 5. Читаем ВТОРУЮ часть файла (суффикс) прямо в буфер
-			if (suffixSize > 0) {
-				in.seekg(pos_end, std::ios::beg);
-				in.read(buffer.data() + pos + text.size(), suffixSize);
-			}
-			in.close();
+			return false;
 
-			// 6. Записываем весь буфер одним куском
-			// Используем std::ofstream::write для максимальной скорости
-			std::ofstream out(path, std::ios::binary | std::ios::trunc);
-			if (out) {
-				out.write(buffer.data(), newSize);
-			}
 		}
 
 
-	} VsTextCurorPos;
+	} VsEditor;
 
 }
 
@@ -344,9 +673,10 @@ namespace editor
 
 #if REFLECTION
 	#define reflect editor::paramEdit::reflect_f(&in, caller, std::source_location::current())
-	#define reflect_close cmdLevel--
-	#define cmd(name, ...) struct alignas(1) CAT(name,_params) {__VA_ARGS__}; \
-	void name(CAT(name,_params) in ,const std::source_location caller = std::source_location::current())
+
+	#define cmd(name, ...) _Pragma("pack(push, 1)") struct CAT(name,_params) { FOR_EACH(SEMI, __VA_ARGS__) }; _Pragma("pack(pop)") \
+    void name(CAT(name,_params) in, const std::source_location caller = std::source_location::current())
+
 #endif
 
 bool resize = true;
@@ -454,9 +784,6 @@ uiContext_ uiContext = uiContext_::stack;
 
 namespace editor
 {
-	#include <libloaderapi.h>
-	#include <shlwapi.h>
-	#pragma comment(lib, "Shlwapi.lib")
 
 	char name[MAX_PATH];
 	void SelfLocate()
@@ -553,7 +880,6 @@ namespace editor
 
 	#include "timeLine.h"
 	#include "viewCam.h"
-	#include "textEditor.h"
 	#include "paramEdit.h"
 	#include "trackerUI.h"
 
@@ -562,7 +888,8 @@ namespace editor
 		SelfLocate();
 		ui::Init();
 		ViewCam::Init();
-		TimeLine::screenLeft = .151*1920./dx11::width;
+		//TimeLine::screenLeft = .151*1920./dx11::width;
+		TimeLine::screenLeft = 0;
 		TimeLine::zoomOut = (int)(TimeLine::timelineLen / (TimeLine::screenRight - TimeLine::screenLeft));
 		TimeLine::pos = -TimeLine::ScreenToTime(TimeLine::screenLeft);
 	}
@@ -664,142 +991,56 @@ namespace editor
 		return -1;
 	}
 
-	void updateRange()
+	bool fileIsShader()
 	{
-		HWND hSlider = GetDlgItem(g_hDlg, 1001);
-		int range = 100;
-		if (GetAsyncKeyState(VK_CONTROL))
-		{
-			range *= 10;
-		}
-		if (GetAsyncKeyState(VK_SHIFT))
-		{
-			range *= 10;
-		}
-
-		if (range != oldRange)
-		{
-			SendMessage(hSlider, TBM_SETRANGE, TRUE, MAKELPARAM(g_SliderValue - range, g_SliderValue + range));
-			SendMessage(hSlider, TBM_SETPOS, TRUE, g_SliderValue);
-			oldRange = range;
-
-			TCHAR bufMin[24], bufMax[24];
-			wsprintf(bufMin, TEXT("%d"), g_SliderValue - range);
-			wsprintf(bufMax, TEXT("%d"), g_SliderValue + range);
-
-			SetWindowText(GetDlgItem(g_hDlg, 1003), bufMin);
-			SetWindowText(GetDlgItem(g_hDlg, 1004), bufMax);
-		}
+		return strstr(VsEditor.fileName, dx11::Shaders::shaderExtension);
 	}
 
-
-
-	void calcCmdAndParamIndicies()
+	bool calcCmdAndParamIndicies()
 	{
+		//TODO: add check isField (.name = val, format or ({,,,}) format)
 
 		pIndex = -1;
 		cmdIndex = -1;
+
+		if (fileIsShader()) return false;
 
 		int ln = -1;
 
 		for (int i = 0; i < editor::paramEdit::registry.size(); i++)
 		{
 			char* fn = cmdParamDesc[i].caller.fileName;
-			if (strcmp(fn, VsTextCurorPos.fileName) == 0)
+			if (strcmp(fn, VsEditor.fileName) == 0)
 			{
-				if (cmdParamDesc[i].caller.line <= VsTextCurorPos.line)
+				if (cmdParamDesc[i].caller.line <= VsEditor.line &&
+					cmdParamDesc[i].caller.endLine >= VsEditor.line)
 				{
-					if (cmdParamDesc[i].caller.line > ln)
+					//if (cmdParamDesc[i].caller.line > ln)
 					{
-						ln = cmdParamDesc[i].caller.line;
+						//ln = cmdParamDesc[i].caller.line;
 						cmdIndex = i;
 						currentCmd = i;
 
 					}
-					
+		
 				}
-
-				
-
-				/*if (VsTextCurorPos.line >= cmdParamDesc[i].caller.line)
-				{
-					if (ln <= VsTextCurorPos.line)
-					{
-						cmdIndex = i;
-						currentCmd = i;
-					}
-					ln = max(ln, cmdParamDesc[i].caller.line);
-
-				}*/
 			}
 		}
-		if (ln > 0)
+
+
+
+		if (cmdIndex < 0) return false;
+
+		if (VsEditor.typeUnderCursor != VsEditor.textType::functionCall)
 		{
-			std::ifstream ifile(VsTextCurorPos.fileName);
-			std::string s;
-
-			int lc = 1;
-
-			if (!ifile.is_open()) return;
-
-			//find command start
-			while (true)
-			{
-				if (!getline(ifile, s))
-				{
-					ifile.close();
-					return;
-				}
-
-				if (lc == ln) break;
-				lc++;
-			}
-
-			//find 
-			std::string sp = s;
-			s.clear();
-
-			while (true)
-			{
-				size_t end = sp.find(";");
-				if (end != std::string::npos)
-				{
-					sp.erase(end);
-				}
-
-				if (lc == VsTextCurorPos.line)
-				{
-					sp.erase(min(VsTextCurorPos.column, sp.length()));
-					s += sp;
-					break;
-				}
-
-				s += sp;
-				s += "\n";
-
-				if (!getline(ifile, sp))
-				{
-					ifile.close();
-					return;
-				}
-
-				lc++;
-			}
-
-
-			size_t start = s.find(cmdParamDesc[cmdIndex].funcName);
-
-			ifile.close();
-
-			pIndex = 0;
-			for (int i = 0; i < s.length(); i++)
-			{
-				if (s[i] == ',') pIndex++;
-			}
+			pIndex = VsEditor.GetParamIndex();
 		}
-	}
 
-#include <filesystem>
+		if (pIndex < 0) return false;
+
+		return true;
+		
+	}
 
 	namespace fs = std::filesystem;
 
@@ -819,7 +1060,7 @@ namespace editor
 	{
 		std::string name, folder;
 
-		getPathParts(VsTextCurorPos.fileName, name, folder);
+		getPathParts(VsEditor.fileName, name, folder);
 
 		std::string rPath = "\/" + folder + "\/" + name + dx11::Shaders::shaderExtension;
 
@@ -831,7 +1072,7 @@ namespace editor
 			{
 				if (!strcmp(dx11::Shaders::vsList[i], name.c_str()))
 				{
-					dx11::Shaders::CreateVS(i, rPath.c_str());
+					dx11::Shaders::CreateVS(i, rPath.c_str(),true);
 					break;
 				}
 				i++;
@@ -846,7 +1087,7 @@ namespace editor
 			{
 				if (!strcmp(dx11::Shaders::psList[i], name.c_str()))
 				{
-					dx11::Shaders::CreatePS(i, rPath.c_str());
+					dx11::Shaders::CreatePS(i, rPath.c_str(),true);
 					break;
 				}
 				i++;
@@ -855,151 +1096,338 @@ namespace editor
 		}
 	}
 
-	void SaveChanges(bool force = false)
-	{
-		if (controlParamsOld != controlParams || force)
-		{
-			char modified[100];
-			_itoa(g_SliderValue, modified, 10);
-
-			//VsTextCurorPos.ReplaceTextInVS();
-
-			//editor::VsTextCurorPos.InsertInSmallFile(editor::VsTextCurorPos.fileName, editor::VsTextCurorPos.pStart, editor::VsTextCurorPos.pEnd, modified);
-		}
-	}
-
-
-	void SaveChangesAndCloseSlider()
-	{
-		if (controlParamsOld != controlParams)
-		{
-			VsTextCurorPos.Update();
-			VsTextCurorPos.ReplaceTextInVS();
-
-			ShowWindow(g_hDlg, SW_HIDE);
-			SetForegroundWindow(vsHWND);
-			controlParamsOld = controlParams;
-			oldRange = 0;
-		}
-	}
-
-	void OpenSlider()
-	{
-		if (controlParamsOld != controlParams)
-		{
-			if (VsTextCurorPos.Update())
-			{
-				char* result = strstr(VsTextCurorPos.fileName, ".shader");
-				cmdIndex = -1;
-				pIndex = -1;
-				if (!result)
-				{
-					calcCmdAndParamIndicies();
-				}
-				controlParamsOld = controlParams;
-				long val = strtol(editor::VsTextCurorPos.paramStr, NULL, 10);
-				g_SliderValue = val;
-
-				updateRange();
-				SendMessage(GetDlgItem(g_hDlg, 1001), TBM_SETPOS, TRUE, g_SliderValue);
-				SetDlgItemInt(g_hDlg, 1002, g_SliderValue, TRUE);
-				ShowWindow(g_hDlg, SW_SHOW);
-			}
-			else
-			{
-				controlParams = false;
-			}
-		}
-	}
-
 	int oldValue = 0;
+	int newValue = 0;
+	int oldMouseY = 0;
+	int lastValue = 0;
+	bool click = false;
+	bool ctrlKey = false;
+	bool shiftKey = false;
+	bool isNum = false;
+
+
+	enum PreferredAppMode { Default, AllowDark, ForceDark, ForceLight, Max };
+	typedef PreferredAppMode(WINAPI* PfnSetPreferredAppMode)(PreferredAppMode);
+	typedef void (WINAPI* PfnFlushMenuThemes)();
+
+	int showEnum(HWND hwnd, const std::vector<std::string>& enumMenu) {
+		if (enumMenu.empty()) return -1;
+
+		// Подключаем темную тему
+		HMODULE hUxtheme = GetModuleHandleA("uxtheme.dll");
+		if (hUxtheme) {
+			auto SetPreferredAppMode = (PfnSetPreferredAppMode)GetProcAddress(hUxtheme, MAKEINTRESOURCEA(135));
+			auto FlushMenuThemes = (PfnFlushMenuThemes)GetProcAddress(hUxtheme, MAKEINTRESOURCEA(136));
+			if (SetPreferredAppMode && FlushMenuThemes) {
+				SetPreferredAppMode(AllowDark);
+				FlushMenuThemes();
+			}
+		}
+
+		HMENU hMenu = CreatePopupMenu();
+		for (size_t i = 0; i < enumMenu.size(); ++i) {
+			AppendMenuA(hMenu, MF_STRING, (UINT_PTR)(i + 1), enumMenu[i].c_str());
+		}
+
+		POINT pt;
+		GetCursorPos(&pt);
+
+		// ВАЖНО: Устанавливаем фокус на наше окно, чтобы оно ловило Esc
+		HWND hOwner = GetAncestor(hwnd, GA_ROOT);
+		SetForegroundWindow(hOwner);
+
+		// TPM_RETURNCMD: возвращает ID пункта или 0, если нажали Esc
+		UINT flags = TPM_LEFTALIGN | TPM_TOPALIGN | TPM_RETURNCMD | TPM_NONOTIFY;
+		int selectedId = TrackPopupMenu(hMenu, flags, pt.x, pt.y, 0, hwnd, NULL);
+
+		// После закрытия меню посылаем "пустое" сообщение, чтобы очистить очередь (баг WinAPI)
+		PostMessage(hwnd, WM_NULL, 0, 0);
+
+		DestroyMenu(hMenu);
+		SetForegroundWindow(vsHWND);
+
+		// Если selectedId == 0, значит нажали Esc или кликнули мимо -> возвращаем -1
+		if (selectedId == 0) return -1;
+
+		return selectedId - 1;
+	}
+
+	namespace CamUI
+	{
+		void GrabTimeStamp(int cmdIndex)
+		{
+			cmdParamDesc[cmdIndex].param[0].value = timer::timeCursor/SAMPLES_IN_FRAME;
+		}
+
+		void GrabDirectionAndAngle(int cmdIndex)
+		{
+			float q = intToFloatDenom;
+			auto eye = ViewCam::currentCamera.ViewVec * q + ViewCam::currentCamera.Target * q;
+			cmdParamDesc[cmdIndex].param[2].value = (int)XMVectorGetX(eye);
+			cmdParamDesc[cmdIndex].param[3].value = (int)XMVectorGetY(eye);
+			cmdParamDesc[cmdIndex].param[4].value = (int)XMVectorGetZ(eye);
+			auto at = ViewCam::currentCamera.Target * q;
+			cmdParamDesc[cmdIndex].param[5].value = (int)XMVectorGetX(at);
+			cmdParamDesc[cmdIndex].param[6].value = (int)XMVectorGetY(at);
+			cmdParamDesc[cmdIndex].param[7].value = (int)XMVectorGetZ(at);
+			auto up = ViewCam::currentCamera.upVec * q;
+			cmdParamDesc[cmdIndex].param[8].value = (int)XMVectorGetX(up);
+			cmdParamDesc[cmdIndex].param[9].value = (int)XMVectorGetY(up);
+			cmdParamDesc[cmdIndex].param[10].value = (int)XMVectorGetZ(up);
+
+			cmdParamDesc[cmdIndex].param[11].value = (int)Camera::viewCam.angle;
+		}
+
+		void ProcessCamKeyContextMenu()
+		{
+			std::vector<std::string> enumMenu = { "grab view camera","grab view camera with timestamp","grab timestamp only" };
+
+			switch (showEnum(hWnd, enumMenu))
+			{
+			case 0:
+				CamUI::GrabDirectionAndAngle(cmdIndex);
+				paramEdit::SaveToSource(cmdIndex);
+				break;
+			case 1:
+				CamUI::GrabDirectionAndAngle(cmdIndex);
+				CamUI::GrabTimeStamp(cmdIndex);
+				paramEdit::SaveToSource(cmdIndex);
+				break;
+
+			case 2:
+				CamUI::GrabTimeStamp(cmdIndex);
+				paramEdit::SaveToSource(cmdIndex);
+				break;
+
+			}
+		}
+	}
+
+	long long getMaxFractionValue(const char* fractionStr) {
+		if (!fractionStr) return 0;
+
+		size_t length = std::strlen(fractionStr);
+		if (length == 0) return 0;
+
+		// Вычисляем 10^length - 1
+		// Например: length=2 -> 100 - 1 = 99
+		// length=3 -> 1000 - 1 = 999
+		long long maxVal = 1;
+		for (size_t i = 0; i < length; ++i) {
+			maxVal *= 10;
+		}
+
+		return maxVal - 1;
+	}
+
+	std::string updateFractionalPart(const char* paramStr, int delta) {
+		if (!paramStr || paramStr[0] == '\0') return "";
+
+		std::string original(paramStr);
+		size_t length = original.length();
+
+		// 1. Вычисляем верхний предел (насыщение)
+		// Для 3 символов это 1000 - 1 = 999
+		long long limit = 1;
+		for (size_t i = 0; i < length; ++i) limit *= 10;
+		long long max_val = limit - 1;
+
+		// 2. Преобразуем текущую строку в число
+		long long value = std::stoll(original);
+
+		// 3. Применяем дельту с насыщением
+		value += delta;
+
+		if (value > max_val) value = max_val; // Упор в верхнюю границу (99...9)
+		if (value < 0) value = 0;             // Упор в нижнюю границу (00...0)
+
+		// 4. Форматируем обратно в строку
+		std::string result = std::to_string(value);
+
+		// 5. Дополняем ведущими нулями до исходной длины
+		if (result.length() < length) {
+			result.insert(0, length - result.length(), '0');
+		}
+
+		return result;
+	}
+
+	std::string startTextValue;
+	bool mPressed = false;
+	bool timeAlwaysOn = true;
 
 	void Process()
 	{
 		ui::mousePos = ui::GetCusorPos();
 		paramsAreLoaded = true;
 
-		if ((GetAsyncKeyState(VK_MBUTTON)||
-			 GetAsyncKeyState(VK_ESCAPE)) && 
-			timer::frameBeginTime-dTimer >200 &&
-			(GetForegroundWindow() == vsHWND || 
-			 GetForegroundWindow() == g_hDlg))
+		POINT pt;
+		GetCursorPos(&pt);
+
+		bool ctrl = GetAsyncKeyState(VK_CONTROL);
+		bool shift = GetAsyncKeyState(VK_SHIFT);
+
+		if (GetAsyncKeyState(VK_MBUTTON))
 		{
-			if (GetAsyncKeyState(VK_MBUTTON))
+			if (!click && WindowFromPoint(pt) == vsHWND)
 			{
-				if (controlParams)
+				if (VsEditor.Update(false))
 				{
-
-					POINT pt;
-					GetCursorPos(&pt);
-					HWND hWndUnderCursor = WindowFromPoint(pt);
-
-					if (hWndUnderCursor == g_hDlg || IsChild(g_hDlg, hWndUnderCursor))
+					switch (VsEditor.typeUnderCursor)
 					{
-						controlParams = false;
+						case VsEditor.textType::number:
+						{
+							click = true;
+
+							oldValue = atoi(VsEditor.paramStr);
+							startTextValue = std::string(VsEditor.paramStr);
+							oldMouseY = pt.y;
+							lastValue = oldValue;
+							VsEditor.slider = oldValue;
+
+							if (!calcCmdAndParamIndicies() && !fileIsShader()) click = false;
+
+							if (cmdParamDesc[cmdIndex].param[pIndex].bypass) click = false;
+
+							break;
+						}
+
+						case VsEditor.textType::enumList:
+						{
+							if (!calcCmdAndParamIndicies() || mPressed) break;
+
+							mPressed = true;
+							int tID = getTypeIndex(VsEditor.typeName);
+							int tCnt = getEnumCount(tID);
+							std::vector<std::string> enumMenu;
+							for (int i = 0; i < tCnt; i++)
+							{
+								enumMenu.push_back(getStrValue(tID, i));
+							}
+
+							int sel = cmdParamDesc[cmdIndex].param[pIndex].value;
+							sel = tCnt == 2 ? 1 - sel : showEnum(hWnd, enumMenu);
+
+							if (sel >= 0)
+							{
+								VsEditor.ReplaceTextInVS(enumMenu[sel].c_str(), true);
+								cmdParamDesc[cmdIndex].param[pIndex].value = sel;
+							}
+
+							break;
+						}
+
+						case VsEditor.textType::functionCall:
+						{
+							calcCmdAndParamIndicies();
+							if (!strcmp(VsEditor.funcName, "setCamKey"))
+							{
+								CamUI::ProcessCamKeyContextMenu();
+							}
+							
+							break;
+						}
+					}
+				}
+			}
+
+			if (click)
+			{
+				int scale = 1;
+				
+				if (ctrl != ctrlKey) {
+					oldValue = newValue;
+					oldMouseY = pt.y;
+					ctrlKey = ctrl;
+				}
+
+				if (shift != shiftKey) {
+					oldValue = newValue;
+					oldMouseY = pt.y;
+					shiftKey = shift;
+				}
+
+				if (ctrl) scale *= 100;
+				if (shift) scale *= 10;
+				
+				int delta = -(pt.y - oldMouseY) * scale/2;
+
+				newValue = oldValue + delta;
+				std::string newValueStr;
+
+				if (newValue != lastValue) {
+
+					VsEditor.slider = newValue;
+
+					if (fileIsShader())
+					{
+						VsEditor.Update(true);
+
+						if (VsEditor.pointBefore)
+						{
+							newValueStr = updateFractionalPart(startTextValue.c_str(), delta);
+							VsEditor.ReplaceTextInVS(newValueStr.c_str(), true);
+						}
+						else
+						{
+							char modified[100];
+							_itoa(newValue, modified, 10);
+							VsEditor.ReplaceTextInVS(modified, true);
+						}
+
+						VsEditor.saveChanges();
+						recompileShader();
 					}
 					else
 					{
-						controlParamsOld = !controlParams;
-						SaveChangesAndCloseSlider();
+						char modified[100];
+						_itoa(newValue, modified, 10);
+
+						if (cmdIndex >= 0 && pIndex >= 0)
+						{
+							cmdParamDesc[cmdIndex].param[pIndex].value = newValue;
+							strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, modified);
+						}
+
+						VsEditor.Update(true);
+						VsEditor.ReplaceTextInVS(modified, true);
 					}
+
+					lastValue = newValue;
 				}
-				else
-				{
-					controlParams = !controlParams;
-				}
-					
-					controlParamsOld = !controlParams;
-					oldRange = 0;
-			}
-			else
-			{
-				controlParams = !controlParams;
-			}
-
-			dTimer = timer::frameBeginTime;
-			POINT p;
-			GetCursorPos(&p);
-
-			SetWindowPos(g_hDlg, NULL, p.x- GetWindowWidth(g_hDlg) /2, p.y - GetWindowHeight(g_hDlg)/2, 0, 0, SWP_NOSIZE);
-		}
-
-		if (controlParams)
-		{
-			OpenSlider();
-
-			if (controlParams) {
-				HWND hSlider = GetDlgItem(g_hDlg, 1001);
-				updateRange();
-				UpdateSliderValuePosition(g_hDlg);
-
-				int val = g_SliderValue;
-				char modified[100];
-				_itoa(val, modified, 10);
-
-				if (cmdIndex >= 0 && pIndex >= 0)
-				{
-					cmdParamDesc[cmdIndex].param[pIndex].value = val;
-					strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, modified);
-				}
-
-				char* s = strstr(VsTextCurorPos.fileName, dx11::Shaders::shaderExtension);
-
-				if (s && oldValue!=val)
-				{
-					VsTextCurorPos.Update();
-					VsTextCurorPos.ReplaceTextInVS();
-				}
-
-				oldValue = val;
-				
 			}
 		}
 		else
 		{
-			SaveChangesAndCloseSlider();
-		}
+			click = false;
+			mPressed = false;
 
+			if (VsEditor.saveChanges())
+			{
+				if (fileIsShader())
+				{
+					recompileShader();
+				}
+		
+				if (VsEditor.Update(false))
+				{
+					if (calcCmdAndParamIndicies())
+					{
+						if (VsEditor.typeUnderCursor == VsEditor.textType::number)
+						{
+							cmdParamDesc[cmdIndex].param[pIndex].value = atoi(VsEditor.paramStr);
+							strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, VsEditor.paramStr);
+						}
+						if (VsEditor.typeUnderCursor == VsEditor.textType::text)
+						{
+							strcpy(cmdParamDesc[cmdIndex].param[pIndex].strValue, VsEditor.textValue);
+						}
+
+					}
+				}
+			}
+
+		}
 				
 		paramEdit::top = 0;
 		paramEdit::bottom = 1;
@@ -1008,8 +1436,6 @@ namespace editor
 
 		showTimeFlag = false;
 		hilightedCmd = -1;
-
-
 
 		if (TimeLine::play) TimeLine::playMode();
 
@@ -1026,7 +1452,6 @@ namespace editor
 		ui::LeftDown = isKeyDown(VK_LEFT);
 		ui::RightDown = isKeyDown(VK_RIGHT);
 
-
 		if (!ui::lbDown)
 		{
 			drag.setFree();
@@ -1036,89 +1461,32 @@ namespace editor
 		Rasterizer::Cull(cullmode::off);
 		Depth::Depth(depthmode::off);
 
-
-		//if (paramEdit::editContext)
-		if (editorMode == editorMode_::graphics)
-		{
-			//paramEdit::ShowStack();
-		}
-
-		//if (isKeyDown(TIME_KEY) || showTimeFlag)
-
+		if (isKeyDown(TIME_KEY)|| timeAlwaysOn)
 		{
 			TimeLine::ProcessInput();
 			TimeLine::Draw();
-		}
-
-		if (editorMode == editorMode_::graphics)
-		{
-			paramEdit::CamKeys();
-		}
-
-		if (editorMode == editorMode_::music)
-		{
 			paramEdit::showTrack();
 		}
+
+		paramEdit::CamKeys();
 
 		ViewCam::setup();
 		ViewCam::setCamMat();
 
-		//if (Camera::viewCam.overRide)
-		if (editorMode == editorMode_::graphics)
+		if (isKeyDown(CAM_KEY)|| ViewCam::flyToCam < 1.f)
 		{
-			if (isKeyDown(CAM_KEY)|| ViewCam::flyToCam < 1.f)
-			{
-				paramEdit::ObjHandlers();
-				ViewCam::Draw();
-			} 
-		}
-
-
-		if (currentCmd_backup != currentCmd)
-		{
-			paramEdit::SaveToSource(currentCmd_backup);
-			//SetForegroundWindow(vsHWND);
-		}
-
-		//ViewCam::setCamMat();
-		//ui::Text::Draw(str, tx, ty, th, th);
-
-		//common ui
-		char modeText[22];
-		switch (editorMode)
-		{
-		case editorMode_::graphics:
-			strcpy(modeText,"graphics");
-			break;
-		case editorMode_::music:
-			strcpy(modeText, "music");
-			break;
-		}
+			ViewCam::Draw();
+		} 
 		
 		Rasterizer::Scissors({ 0,0,(float)dx11::width,(float)dx11::height });
 		ui::Box::Setup();
 		ui::style::Base();
 		ui::style::button::hAlign = ui::style::align_h::center;
 		ui::style::button::zoom = true;
-
-		if (paramEdit::ButtonPressed(modeText, 0, 0, ui::style::box::width/1.5f, ui::style::box::height/1.2f) && drag.isFree())
-		{
-			editorMode = (editorMode_)((int)editorMode+1);
-			editorMode = (editorMode_)((int)editorMode%editorMode_count);
-			
-			drag.set(drag.context::commonUIButtons);
-			
-			currentCmd = -1;
-			paramEdit::currentParam = -1;
-		}
-		
-
 	}
 
 	void SaveAndExit()
 	{
-		editor::paramEdit::SaveToSource(currentCmd);
-
 		#if vsWindowManagement
 				auto rc = editor::primaryRC;
 				//SetWindowPos(editor::vsHWND, HWND_TOP, rc.right, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_SHOWWINDOW);
@@ -1145,8 +1513,6 @@ namespace editor
 			paramsAreLoaded = false;
 			precalc = false;
 		}
-
-		cmdLevel = 0;
 	}
 
 }

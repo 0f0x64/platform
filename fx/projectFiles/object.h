@@ -1,13 +1,13 @@
 namespace Object {
 
 	cmd(Show, 
-		texture geometry;
-		texture normals;
-		int8u quality; 
-		int pos_x;
-		int pos_y;
-		int pos_z;
-		int glow;
+		texture geometry,
+		texture normals,
+		int8u quality,
+		int pos_x,
+		int pos_y,
+		int pos_z,
+		int glow
 		)
 	{
 		reflect;
@@ -92,7 +92,7 @@ namespace Object {
 			Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 		}
 
-		reflect_close;
+		
 	}
 
 	
@@ -141,7 +141,7 @@ namespace Object {
 		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 	}
 
-	cmd(InsideNebula, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(InsideNebula, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -165,10 +165,10 @@ namespace Object {
 
 		Drawer::NullDrawer({1,(int)gX*(int)gY});
 
-		reflect_close;
+		
 	}
 
-	cmd(Blob, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Blob, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -192,10 +192,10 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+	
 	}
 
-	cmd(Pearl, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Pearl, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -219,10 +219,10 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+	
 	}
 
-	cmd(LeoStar, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(LeoStar, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -246,10 +246,10 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+	
 	}
 
-	cmd(CapStar, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(CapStar, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -273,10 +273,10 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
-	cmd(Tau, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Tau, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -305,10 +305,11 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
-	cmd(Grl, int count; int skipper; pMode mode; int r; int g; int b; triMode tMode; int xPos; int yPos; int zPos; int brightness; int tickness;)
+#if EditMode
+	cmd(Grl, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness)
 	{
 		reflect;
 
@@ -354,10 +355,10 @@ namespace Object {
 			Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 		}
 
-		reflect_close;
+		
 	}
-
-	cmd(ScorpBall, int count; int skipper; pMode mode; int r; int g; int b;)
+#endif
+	cmd(ScorpBall, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -381,10 +382,10 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
-	cmd(Nebula2, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Nebula2, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -408,10 +409,10 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
-	cmd(vrg, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(vrg, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -435,10 +436,10 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
-	cmd(Rocks, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Rocks, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -462,10 +463,10 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
-	cmd(Transporter, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Transporter, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -489,7 +490,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
 	cmd(Islands, int count; int skipper; pMode mode; int r; int g; int b;)
@@ -516,10 +517,10 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
-	cmd(Waterfall, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Waterfall, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 
@@ -543,7 +544,7 @@ namespace Object {
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
-		reflect_close;
+		
 	}
 
 	void DoubleStar(int count, int skipper, pMode mode)
@@ -678,7 +679,7 @@ namespace Object {
 		Drawer::NullDrawer({ 1, (int)gX * (int)gY });
 	}
 
-	cmd(DoubleTwo, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(DoubleTwo, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 		float r = in.r / 100.f;
@@ -705,10 +706,10 @@ namespace Object {
 		vs::galaxy_2.set();
 
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
-		reflect_close;
+		
 	}
 
-	cmd(Galaxy, int count; int skipper; pMode mode; int r; int g; int b;)
+	cmd(Galaxy, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
 		float r = in.r / 100.f;
@@ -735,10 +736,10 @@ namespace Object {
 		vs::galaxy.set();
 
 		Drawer::NullDrawer({1,(int)gX*(int)gY});
-		reflect_close;
+		
 	}
 
-	cmd(Libra, int quality;)
+	cmd(Libra, int quality)
 	{
 		reflect;
 
@@ -770,10 +771,10 @@ namespace Object {
 		Libra_spheres(256 * 256, 143, pMode::glow);
 			OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(Aquarius, int quality;)
+	cmd(Aquarius, int quality)
 	{
 		reflect;
 
@@ -803,10 +804,10 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(Crab, int quality;)
+	cmd(Crab, int quality)
 	{
 		reflect;
 
@@ -837,10 +838,10 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(LeoBigStar, int quality;)
+	cmd(LeoBigStar, int quality)
 	{
 		reflect;
 
@@ -871,10 +872,10 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(Capri, int quality;)
+	cmd(Capri, int quality)
 	{
 		reflect;
 
@@ -905,10 +906,10 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(Taurus, int quality;)
+	cmd(Taurus, int quality)
 	{
 		reflect;
 
@@ -939,16 +940,16 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(Girl, int quality; int xPos; int yPos; int zPos; int brightness; int tickness;)
+	cmd(Girl, int quality, int xPos, int yPos, int zPos, int brightness, int tickness)
 	{
 		reflect;
 
 		int pillars_cnt2 = 2000 * 1000;
 
-		int pillars_cnt = 3725470 / in.quality;
+		int pillars_cnt = 3725442 / in.quality;
 		int outerSpace_cnt = 6853 / in.quality;
 		int neutronStar_cnt = 279620 / in.quality;
 		int galaxy_cnt = 182361 / in.quality;
@@ -975,7 +976,7 @@ namespace Object {
 			.op = blendop::add
 			});
 
-
+#if EditMode
 		Culling::Set({ cullmode::off });
 		Grl({
 			.count = (int)dx11::ConstBuf::triangleCount,
@@ -983,7 +984,7 @@ namespace Object {
 			.mode = pMode::point,
 			.r = 100,
 			.g = 252,
-			.b = 1400,
+			.b = 1376,
 			.tMode = triMode::on,
 			.xPos = in.xPos,
 			.yPos = in.yPos,
@@ -1016,6 +1017,7 @@ namespace Object {
 			.tickness = in.tickness
 			});
 
+#endif
 		Culling::Set({ cullmode::off });
 		DepthBuf::Mode({ depthmode::off });
 
@@ -1037,10 +1039,10 @@ namespace Object {
 		//hi
 		
 
-		reflect_close;
+		
 	}
 
-	cmd(Scorpio, int quality;)
+	cmd(Scorpio, int quality)
 	{
 		reflect;
 
@@ -1077,10 +1079,10 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(Virgo, int quality;)
+	cmd(Virgo, int quality)
 	{
 		reflect;
 
@@ -1107,10 +1109,10 @@ namespace Object {
 
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(Aries, int quality;)
+	cmd(Aries, int quality)
 	{
 		reflect;
 
@@ -1142,10 +1144,10 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(Twins, int quality;)
+	cmd(Twins, int quality)
 	{
 		reflect;
 
@@ -1177,10 +1179,10 @@ namespace Object {
 		//Blob({ pillars_cnt,1394,pMode::glow,100,252,600 });
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(Fish, int quality;)
+	cmd(Fish, int quality)
 	{
 		reflect;
 
@@ -1212,10 +1214,10 @@ namespace Object {
 		//InsideNebula({pillars_cnt / 2, 1394, pMode::glow, 100, 200, 600});
 			OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(Zenith, int quality;)
+	cmd(Zenith, int quality)
 	{
 		reflect;
 
@@ -1243,10 +1245,10 @@ namespace Object {
 		InsideNebula({ pillars_cnt, 1394, pMode::glow ,100,200,600});
 	//	OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(Saggitarius, int quality;)
+	cmd(Saggitarius, int quality)
 	{
 		reflect;
 
@@ -1281,10 +1283,10 @@ namespace Object {
 			//NeutronStar(1024 * 1024, 1, pMode::glow);
 			//Galaxy(182361, 4, pMode::glow);
 
-		reflect_close;
+		
 	}
 
-	cmd(CalcNormals, texture srcGeomerty; texture targetNrml;)
+	cmd(CalcNormals, texture srcGeomerty, texture targetNrml)
 	{
 		reflect;
 
@@ -1310,11 +1312,11 @@ namespace Object {
 		Drawer::NullDrawer({ 1, 1 });
 		RenderTarget::GenerateMips({});
 
-		reflect_close;
+		
 
 	}
 
-	cmd(Calc, texture targetGeo; texture targetNrml;)
+	cmd(Calc, texture targetGeo, texture targetNrml)
 	{
 		reflect;
 
@@ -1332,7 +1334,7 @@ namespace Object {
 		//normals
 		CalcNormals({ in.targetGeo, in.targetNrml });
 
-		reflect_close;
+		
 	}
 
 }

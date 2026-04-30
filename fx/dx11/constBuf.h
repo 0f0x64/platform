@@ -55,7 +55,7 @@ namespace ConstBuf
 	//custom structured buffer
 	//todo reflect all CB and SB
 	
-
+#if EditMode
 	struct vertex  {
 		float4 position;
 	};
@@ -185,6 +185,7 @@ namespace ConstBuf
 
 		return true;
 	}
+#endif
 
 	void Init()
 	{
@@ -195,11 +196,12 @@ namespace ConstBuf
 		Create(buffer[(int)cBuffer::global], sizeof(global));
 		Create(buffer[(int)cBuffer::extra], sizeof(extra));
 
-
+#if EditMode
 		LoadObjToPointers("projectFiles//girl.obj", &vArray, &iArray, vertexCount, triangleCount);
 
 		CreateSB(0, sizeof(vertex), vertexCount, vArray);
 		CreateSB(1, sizeof(index), triangleCount, iArray);
+#endif
 	}
 
 	void Update(cBuffer i)

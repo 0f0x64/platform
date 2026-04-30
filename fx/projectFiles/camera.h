@@ -14,16 +14,16 @@ namespace BasicCam
 	XMVECTOR camSlide;
 	XMVECTOR camFly;
 
-	cmd(setCamKey, timestamp camTime; keyType camType;
-					int eye_x; int eye_y; int eye_z;
-					int at_x; int at_y; int at_z;
-					int up_x; int up_y; int up_z;
-					int angle;
-					sliderType sType;
-					int slide_x; int slide_y; int slide_z;
-					camAxis axisType;
-					int fly_x; int fly_y; int fly_z;
-					int jitter;)
+	cmd(setCamKey, timestamp camTime, keyType camType,
+					int eye_x, int eye_y, int eye_z,
+					int at_x, int at_y, int at_z,
+					int up_x, int up_y, int up_z,
+					int angle,
+					sliderType sType,
+					int slide_x, int slide_y, int slide_z,
+					camAxis axisType,
+					int fly_x, int fly_y, int fly_z,
+					int jitter)
 	{
 		reflect;
 
@@ -63,7 +63,7 @@ namespace BasicCam
 			camCounter++;
 		}
 
-		reflect_close;
+	
 	}
 
 	void processCam()

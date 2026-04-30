@@ -1,3 +1,24 @@
+d1
+
+d2
+
+d1
+
+c2
+................
+
+
+
+
+
+таймлайн
+
+трекер
+
+рефлексия шейдеров - допилить
+
+
+
 //-------0               16              32              48              64
 //-------1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16
 //-------1234123412341234123412341234123412341234123412341234123412341234
@@ -7,13 +28,6 @@
 
 
 
-\\
-caller filename+string
-find in refTable
-if (!find) 
-    read params from file
-    add to refTable
-getParams
 
 https://developersarea.wordpress.com/2014/09/26/win32-file-watcher-api-to-monitor-directory-changes/
 

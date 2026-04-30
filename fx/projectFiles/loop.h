@@ -90,7 +90,7 @@ namespace Loop
 			});
 
 			BasicCam::processCam();
-			reflect_close;
+			
 		}
 	}
 
@@ -1120,7 +1120,7 @@ namespace Loop
 
 	}
 
-	void track__()
+	void ProcessTrack()
 	{
 		if (!isPrecalc)
 		{
@@ -1134,7 +1134,7 @@ namespace Loop
 		RenderTarget::Set({texture::mainRT,0});
 		RenderTarget::Clear({ 11, 11, 11, 255 });
 		DepthBuf::Clear({});
-		tracker::Track({});
+		tracker::Music();
 			
 	}
 

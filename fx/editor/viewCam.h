@@ -2,7 +2,6 @@ namespace paramEdit {
 	void SaveToSource(int cmdIndex);
 }
 
-
 namespace ViewCam
 {
 
@@ -332,117 +331,7 @@ namespace ViewCam
 
 		DrawAxis();
 
-		bool boxSelected = false;
-		char cbutton[] = "capture  viewCam";
-		ui::Box::Setup();
-		float w = ui::Text::getTextLen(cbutton, ui::style::text::width) + ui::style::text::width * 2;
-		float x = .5f - w / 2.f; float y = .9f + ui::style::text::height;
-
-			ui::style::Base();
-
-
-			if (ui::lbDown && isMouseOver(x, y, w, ui::style::box::height) && drag.isFree() && VsTextCurorPos.Update())
-			{
-				char* result = strstr(VsTextCurorPos.fileName, ".shader");
-				editor::cmdIndex = -1;
-				editor::pIndex = -1;
-				if (!result)
-				{
-					calcCmdAndParamIndicies();
-				}
-			}
-
-			if (editor::cmdIndex >= 0) currentCmd = editor::cmdIndex;
-
-
-			if (!strcmp(cmdParamDesc[currentCmd].funcName, "setCamKey"))
-			{
-				ui::style::box::g += captureTimer;
-			}
-			else
-			{
-				ui::style::box::r += captureTimer;
-			}
-
-			if (isMouseOver(x, y, w, ui::style::box::height) && drag.isFree())
-			{
-				ui::style::box::outlineBrightness = 1.f;
-				if (ui::lbDown)
-				{
-					char* shortName = cmdParamDesc[currentCmd].funcName;
-					for (int i = 0; i < strlen(cmdParamDesc[currentCmd].funcName); i++)
-					{
-						if (cmdParamDesc[currentCmd].funcName[i] == ':') shortName = cmdParamDesc[currentCmd].funcName + i + 1;
-					}
-
-					if (!strcmp(shortName, "setCamKey"))
-					{
-						float q = intToFloatDenom;
-						auto eye = currentCamera.ViewVec*q + currentCamera.Target*q;
-						cmdParamDesc[currentCmd].param[2].value = (int)XMVectorGetX(eye);
-						cmdParamDesc[currentCmd].param[3].value = (int)XMVectorGetY(eye);
-						cmdParamDesc[currentCmd].param[4].value = (int)XMVectorGetZ(eye);
-						auto at = currentCamera.Target*q;			 
-						cmdParamDesc[currentCmd].param[5].value = (int)XMVectorGetX(at);
-						cmdParamDesc[currentCmd].param[6].value = (int)XMVectorGetY(at);
-						cmdParamDesc[currentCmd].param[7].value = (int)XMVectorGetZ(at);
-						auto up = currentCamera.upVec*q;			 
-						cmdParamDesc[currentCmd].param[8].value = (int)XMVectorGetX(up);
-						cmdParamDesc[currentCmd].param[9].value = (int)XMVectorGetY(up);
-						cmdParamDesc[currentCmd].param[10].value = (int)XMVectorGetZ(up);
-
-						cmdParamDesc[currentCmd].param[11].value = (int)Camera::viewCam.angle;
-
-						paramEdit::SaveToSource(currentCmd);
-
-					}
-
-					boxSelected = true;
-					captureTimer = 1;
-				}
-			}
-			ui::Box::Draw(x, y, w);
-
-			char cbutton2[100];
-			strcpy (cbutton2, !Camera::viewCam.overRide ? "switch  to  free  camera  [esc]" : "switch  to  keyed  camera  [esc]");
-			float w2 = ui::Text::getTextLen(cbutton2, ui::style::text::width) + ui::style::text::width * 2;
-			float x2 = .5f - w2 / 2.f; float y2 = .025f;
-
-			ui::style::Base();
-			ui::style::box::r += switcherTimer;
-			ui::style::box::g += switcherTimer;
-			ui::style::box::b += switcherTimer;
-
-			if (isMouseOver(x2, y2, w2, ui::style::box::height) && drag.isFree())
-			{
-				ui::style::box::outlineBrightness = 1.f;
-				if (ui::lbDown && switcherTimer == 0.)
-				{
-					editor::ViewCam::ToggleViewMode();
-					switcherTimer = 1;
-					boxSelected = true;
-				}
-			}
-			ui::Box::Draw(x2, y2, w2);
-
-			switcherTimer = clamp(switcherTimer - .1f,0.f,1.f);
-			captureTimer = clamp(captureTimer - .1f, 0.f, 1.f);
-
-
-		ui::Text::Setup();
-		ui::Text::Draw(cbutton, x+ ui::style::text::width, y+ ui::style::text::height/8.f);
-		ui::Text::Draw(cbutton2, x2 + ui::style::text::width, y2 + ui::style::text::height / 8.f);
-
-
-		char str[32];
-		char str2[123] = "angle:";
-		_itoa((int)Camera::viewCam.angle, str,10);
-		strcat(str2, str);
-		w = ui::Text::getTextLen(str2, ui::style::text::width);
-		ui::Text::Draw(str2, .5f-w/2.f, .9f);
-
-
-		if (!boxSelected&& ui::lbDown)
+		if (ui::lbDown)
 		{
 			drag.set(drag.context::cameraView);
 		}

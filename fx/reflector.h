@@ -479,6 +479,124 @@ void catToFile(const std::filesystem::path& sandbox, ofstream& ofile, std::vecto
 	}
 }
 
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
+struct Field { std::string name; bool is_char; };
+struct Level { std::vector<Field> fields; };
+
+void genTrackParser() {
+
+	std::ifstream file("..\\fx\\projectFiles\\sound\\trackStruct.h");
+
+	// Открываем файл для записи результата
+	std::ofstream out("..\\fx\\generated\\trackParser.h", std::ios::trunc);
+	if (!out.is_open()) {
+		std::cerr << "Error: Could not create output file!" << std::endl;
+		return;
+	}
+
+	std::vector<Level> hierarchy;
+	hierarchy.push_back({}); // Root (_track)
+
+	std::string word;
+	while (file >> word) {
+		// 1. Управление вложенностью
+		if (word == "struct") {
+			file >> word;
+			if (word == "{") {
+				hierarchy.push_back({});
+				continue;
+			}
+			// Если после struct идет имя, а потом {, тоже проваливаемся
+			std::string next; file >> next;
+			if (next == "{") hierarchy.push_back({});
+			continue;
+		}
+		if (word == "{") { hierarchy.push_back({}); continue; }
+		if (word == "}") {
+			if (hierarchy.size() > 1) hierarchy.pop_back();
+			// Читаем имя массива после }, например "channels[32];"
+			if (file >> word) {
+				size_t br = word.find('[');
+				if (br != std::string::npos && !hierarchy.empty()) {
+					hierarchy.back().fields.push_back({ word.substr(0, br), false });
+				}
+			}
+			continue;
+		}
+
+		// 2. Игнорируем модификаторы
+		if (word == "const" || word == "static" || word == "unsigned" || word == "volatile") continue;
+
+		// 3. ПАРА: Тип + Имя
+		std::string type = word;
+		std::string name;
+		if (!(file >> name)) break;
+
+		// Если "имя" оказалось символом начала/конца, это не поле
+		if (name == "{" || name == "}") continue;
+
+		size_t pos = name.find_first_of("[;");
+		std::string clean = (pos == std::string::npos) ? name : name.substr(0, pos);
+
+		// Фильтр: не пустое, не число, не Count, и не ключевое слово
+		if (!clean.empty() && !std::isdigit(clean[0]) && clean.find("Count") == std::string::npos) {
+			if (clean != "struct" && clean != "const") {
+				hierarchy.back().fields.push_back({ clean, (type == "char") });
+			}
+		}
+	}
+
+	// --- Генерация ---
+	out << "#pragma once\n#include <string>\n#include <cstring>\n#include <cstdlib>\n#include <iostream>\n\n";
+	out << "inline bool parse_generated(std::istream& in, _track& t) {\n"
+		<< "    memset(&t, 0, sizeof(_track));\n"
+		<< "    std::string line; int i_ch = -1, i_cl = -1; bool found = false;\n"
+		<< "    while (std::getline(in, line)) {\n"
+		<< "        if (line.find('.') == std::string::npos) continue;\n"
+		<< "        found = true;\n";
+
+	for (size_t i = 0; i < hierarchy.size(); ++i) {
+		std::string path = "t";
+		if (i == 1) path = "t.channels[i_ch]";
+		if (i == 2) path = "t.channels[i_ch].clips[i_cl]";
+
+		for (auto& f : hierarchy[i].fields) {
+			out << "        if (line.find(\"." << f.name << "\") != std::string::npos) {\n";
+			if (f.name == "channels") {
+				out << "            if (++i_ch >= 32) return false;\n            i_cl = -1; t.channelsCount = i_ch + 1;\n";
+			}
+			else if (f.name == "clips") {
+				out << "            if (i_ch < 0 || ++i_cl >= 32) return false;\n            t.channels[i_ch].clipsCount = i_cl + 1;\n";
+			}
+			else if (f.is_char) {
+				out << "            size_t s = line.find('\"'), e = line.rfind('\"');\n"
+					<< "            if (s != std::string::npos && e != std::string::npos && s < e) {\n"
+					<< "                size_t len = (e-s-1 > 127) ? 127 : e-s-1;\n"
+					<< "                memcpy(" << path << "." << f.name << ", line.c_str()+s+1, len);\n"
+					<< "                " << path << "." << f.name << "[len] = '\\0';\n"
+					<< "            }\n";
+			}
+			else {
+				out << "            size_t eq = line.find('='); if (eq != std::string::npos) {\n"
+					<< "                const char* v = line.c_str() + eq + 1;\n"
+					<< "                while (*v == ' ' || *v == '\\t') v++;\n"
+					<< "                if (line.find(\"off\") != std::string::npos) " << path << "." << f.name << " = 0;\n"
+					<< "                else if (line.find(\"on\") != std::string::npos) " << path << "." << f.name << " = 1;\n"
+					<< "                else " << path << "." << f.name << " = std::atoi(v);\n"
+					<< "            }\n";
+			}
+			out << "            continue;\n        }\n";
+		}
+	}
+	out << "    }\n    return found;\n}\n";
+
+	out.close();
+}
+
 int main(int argc, char* argv[])
 {
 	for (int i{}; i < argc; ++i)
@@ -627,6 +745,12 @@ int main(int argc, char* argv[])
 
 	Log("\n---competed!\n\n");
 
+	//Log("---generating track parser\n");
+	//genTrackParser();
+	//Log("---competed!\n\n");
+
 	//getchar();
 
 }
+
+

@@ -23,12 +23,19 @@ namespace Shaders {
 		ID3D11VertexShader* pShader;
 		ID3DBlob* pBlob;
 		ID3D11Buffer* params;
+	#if EditMode
+		HRESULT compileStatus;
+	#endif
 	} VertexShader;
 
 	typedef struct {
 		ID3D11PixelShader* pShader;
 		ID3DBlob* pBlob;
 		ID3D11Buffer* params;
+	#if EditMode
+		HRESULT compileStatus;
+	#endif
+
 	} PixelShader;
 
 	VertexShader VS[255];
@@ -41,7 +48,7 @@ namespace Shaders {
 		bool firstRun = true;
 		const char* shaderExtension = ".shader";
 
-		void CompilerLog(LPCWSTR source, HRESULT hr, const char* message)
+		void CompilerLog(LPCWSTR source, HRESULT hr, const char* message, bool logOnlyifErrors = false)
 		{
 		#if DebugMode
 			if (FAILED(hr))
@@ -51,6 +58,8 @@ namespace Shaders {
 			}
 			else
 			{
+				if (logOnlyifErrors) return;
+
 				char shaderName[1024];
 				WideCharToMultiByte(CP_ACP, NULL, source, -1, shaderName, sizeof(shaderName), NULL, NULL);
 
@@ -93,12 +102,13 @@ namespace Shaders {
 			return shaderPathW;
 		}
 
-		void CreateVS(int i, const char* name)
+		void CreateVS(int i, const char* name, bool logOnlyifErrors =  false)
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name,i,stype::vertex);
 
 			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "VS", VertexShaderModel, NULL, NULL, &VS[i].pBlob, &pErrorBlob);
-			CompilerLog(source, hr, "vertex shader compiled: ");
+			CompilerLog(source, hr, "vertex shader compiled: ", hr == VS[i].compileStatus ? logOnlyifErrors : false);
+			VS[i].compileStatus = hr;
 
 			if (hr == S_OK)
 			{
@@ -108,12 +118,13 @@ namespace Shaders {
 
 		}
 
-		void CreatePS(int i, const char* name)
+		void CreatePS(int i, const char* name, bool logOnlyifErrors = false)
 		{
 			LPCWSTR source = nameToPatchLPCWSTR(name, i, stype::pixel);
 
 			HRESULT hr = D3DCompileFromFile(source, NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "PS", PixelShaderModel, NULL, NULL, &PS[i].pBlob, &pErrorBlob);
-			CompilerLog(source, hr, "pixel shader compiled: ");
+			CompilerLog(source, hr, "pixel shader compiled: ", hr == PS[i].compileStatus ? logOnlyifErrors : false);
+			PS[i].compileStatus = hr;
 
 			if (hr == S_OK)
 			{
@@ -257,6 +268,10 @@ namespace Shaders {
 				hr = device->CreateVertexShader(VS[n].pBlob->GetBufferPointer(), VS[n].pBlob->GetBufferSize(), NULL, &VS[n].pShader);
 				LogIfError("vs fail\n"); 
 			}
+			else
+			{
+				int a = 0;
+			}
 
 		}
 
@@ -276,6 +291,10 @@ namespace Shaders {
 				if (PS[n].pShader) PS[n].pShader->Release();
 				hr = device->CreatePixelShader(PS[n].pBlob->GetBufferPointer(), PS[n].pBlob->GetBufferSize(), NULL, &PS[n].pShader);
 				LogIfError("ps fail\n");
+			}
+			else
+			{
+				auto a = ptr;
 			}
 		}
 
