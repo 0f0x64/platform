@@ -135,8 +135,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 		editor::SetRenderWindowPosition();
 		editor::Init();
-		CreateSliderDialog(hInst, hWnd);
-
 	#else
 		ShowWindow(hWnd, SW_MAXIMIZE);
 	#endif	

@@ -34,7 +34,6 @@ struct ParamDesc {
 
 	bool loaded = false;
 
-	bool loaded = false;
 
 };
 
