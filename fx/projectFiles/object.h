@@ -313,8 +313,22 @@ namespace Object {
 	{
 		reflect;
 
+
+		XMVECTOR worldPos = XMVectorSet(in.xPos/100., in.yPos / 100., in.zPos / 100., 1.0f);
+		XMVECTOR viewSpacePos = XMVector4Transform(worldPos, XMMatrixTranspose(ConstBuf::camera.view[0]));
+		float depth = XMVectorGetX(XMVector3Length(viewSpacePos));
+		float depthFactor = clamp(depth, 0.f, 80.f)/80.;
+		depthFactor = smoothstep(0, 1, depthFactor)*80+1;
+
+		int cnt = in.count / in.skipper;
+
+		cnt = (float)cnt / (pow(depthFactor,2.));
+
 		int gX = sqrt(in.count / in.skipper);
 		int gY = sqrt(in.count / in.skipper);
+
+		int gXLod = sqrt(cnt);
+		int gYLod = sqrt(cnt);
 
 		psModeSet(in.mode);
 
@@ -322,12 +336,12 @@ namespace Object {
 			.params =
 			{
 				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
-				.gX = gX,
-				.gY = gY,
+				.gX = gXLod,
+				.gY = gYLod,
 				.mode = (int)in.mode,
 				.skipper = in.skipper,
 				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
-				.modelPos = float4(in.xPos,in.yPos,in.zPos,0),
+				.modelPos = float4(in.xPos / 100.,in.yPos / 100.,in.zPos / 100.,0),
 				.triCount = float4(dx11::ConstBuf::triangleCount,0,0,0),
 				.brightness = float4(in.brightness,0,0,0),
 				.tickness = float4(in.tickness,0,0,0),
@@ -337,6 +351,8 @@ namespace Object {
 		if (in.tMode == triMode::on)
 		{
 			vs::girl.params.mode = 2;
+			vs::girl.params.gX = gX;
+			vs::girl.params.gY = gY;
 		}
 
 		vs::girl.set();
@@ -352,7 +368,7 @@ namespace Object {
 		}
 		else
 		{
-			Drawer::NullDrawer({ 1,(int)gX * (int)gY });
+			Drawer::NullDrawer({ 1,(int)gXLod * (int)gYLod });
 		}
 
 		
@@ -943,6 +959,7 @@ namespace Object {
 		
 	}
 
+	
 	cmd(Girl, int quality, int xPos, int yPos, int zPos, int brightness, int tickness)
 	{
 		reflect;
@@ -1001,7 +1018,7 @@ namespace Object {
 			.op = blendop::add
 			});
 
-
+		
 		Grl({
 			.count = pillars_cnt2,
 			.skipper = 1,

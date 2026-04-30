@@ -1043,7 +1043,7 @@ namespace Loop
 			Object::Girl({
 				.quality = 1,
 				.xPos = 0,
-				.yPos = 37,
+				.yPos = -109,
 				.zPos = 0,
 				.brightness = 100,
 				.tickness = 0

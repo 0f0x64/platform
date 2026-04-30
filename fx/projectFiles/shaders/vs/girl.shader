@@ -267,8 +267,8 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     }
     
     pos+=modelPos.xyz;
-    pos.y-=161.167;
-    pos*=.01;
+    //pos.y-=161.167;
+    //pos*=.01;
 
     //p1.pos=float4(pos,1);
     //pos.y-=11;
@@ -333,11 +333,11 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 
             p1.pos = transform_unisize(pos,grid.zw,sz);
             p1.sz=1.2;
-            p1.color/=.2*p1.pos.w*3;
+            //p1.color/=.2*p1.pos.w*3;
 
             if (hF) {
                 p1.color*=1+lf;
-            p1.color/=.29*p1.pos.w;
+            //p1.color/=.29*p1.pos.w;
             }
 
     }
@@ -365,6 +365,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 
     //density compensation
     //p1.color/=min(pow(p1.pos.w,1.1)*.21+.5,11);
+    //p1.color=1;
     return p1;
 }
 

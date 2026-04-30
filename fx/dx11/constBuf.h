@@ -155,6 +155,9 @@ namespace ConstBuf
 					if (sscanf_s(vStr.c_str(), "%d/%d/%d", &pIdx, &uIdx, &nIdx) >= 1) {
 						vertex v;
 						v.position = temp_positions[pIdx - 1];
+						v.position.x /= 100;
+						v.position.y /= 100;
+						v.position.z /= 100;
 
 						// Create a unique vertex for this face corner
 						uint32_t currentVIdx = (uint32_t)final_vertices.size();
