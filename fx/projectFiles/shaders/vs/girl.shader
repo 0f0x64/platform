@@ -77,9 +77,9 @@ float3 getRandomPointInTriangle(float3 g, float3 g1, float3 g2, float r, int iid
     
 
     float2 randoms;
-    //randoms.x = r; 
+    randoms.x = r/122; 
     randoms.x = hash(r); 
-    randoms.y = r/12;//hash(randoms.x); 
+    randoms.y = hash(randoms.x); 
     //randoms.y = hash(randoms.x); 
     //randoms.y = lerp(r/22.,hash(randoms.x),smoothstep(0,1,saturate(s/61)));; 
     //randoms.y = lerp(randoms.y,randoms.x,pow(randoms.y,.24));
@@ -94,11 +94,13 @@ float3 getRandomPointInTriangle(float3 g, float3 g1, float3 g2, float r, int iid
     float u = 1.0f - sqrtR1;
     float v = randoms.y * sqrtR1;
     float3 result =  u * g + v * g1 + (1.0f - u - v) * g2;
-    float3 rt = 2*rot3(result-cp,(noise(result/12.+(time.x/18.))*float3(4,5,3)))+cp;
+    float3 rt = 2*rot3(result-cp,(noise(result*22.+(time.x/18.))*float3(4,5,3)))+cp;
+    //rt=lerp(rt,result,saturate(20*sin(length(cp)*112+time.x/3)));
+    //rt=result;
     //result=lerp(result,rt,smoothstep(0,1,1-saturate(s/22)));
     
     
-    //result+=hash33(result);
+    //result+=hash33(result)/22.;
     //result = lerp(result,(g + g1 + g2) / 3.0f,0.5); 
     return result;
 }
@@ -170,11 +172,14 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     float3 _p2 = vbf[ind4.z].pos.xyz;
 
 
-    float s =CalculateTriangleArea(_p0,_p1,_p2);
-    pos = getRandomPointInTriangle(_p0,_p1,_p2,iid/11231.,iid,s);
-    float3 nrml = CalculateNormal(_p0,_p1,_p2);
-    pos+=nrml*tickness.xxx/100;
 
+
+    float s =CalculateTriangleArea(_p0,_p1,_p2);
+    pos = getRandomPointInTriangle(_p0,_p1,_p2,iid/1131.,iid,s);
+    float3 nrml = CalculateNormal(_p0,_p1,_p2);
+    //pos+=nrml*tickness.xxx/100;
+    pos+=nrml*noise(nrml*pos.x*12+time.x/13)*.031;
+    pos+=nrml*(1-abs(sin(abs(pos.x)*52-time.x/4)))*.01;
     //pos=_p0+normalize(hash33(iid/1213.*float3(1,2,3)))*11;
     float f= hash(iid/1231.)+.1;
     //pos+=nrml*(f)*4*(hash33(pos)+.3);
@@ -264,11 +269,14 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
         //pos-=nrml*1;
 
         //pos.y-=124;
+        p1.color=float4(0,0,0,0);
     }
     
     pos+=modelPos.xyz;
-    pos.y-=61;
-    pos*=.01;
+   // pos+=abs(sin(abs(pos.x)*30.-time.x*.1))*.07;
+    //pos.y-=61;
+    //pos*=.5;
+
 
     //p1.pos=float4(pos,1);
     //pos.y-=11;
@@ -340,6 +348,23 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
             p1.color/=.29*p1.pos.w;
             }
 
+            
+            p1.color.xyz*=sin((dot(pos.xyz,nrml.xyz))+22)*2.5+1.5;
+            p1.color.xyz*=sin(abs(pos.xyz)*12+22)*.5+1;
+            //p1.color.xyz*=sin(1/(dot(pos.xyz,nrml.xyz))+22)*2.5+1.5;
+
+            float3 tp = float3(abs(pos.x),pos.y*3-abs(pos.x)*1.5,pos.z);
+            float3 sel = float3(.34,.4,.5);
+            float3 sel2 = float3(.1,.4,.5);
+          
+            float  col_i = saturate(pow(saturate(.025/length(tp-sel)),7)*11122);
+            float  col_i2 = saturate(pow(saturate(.025/length(tp-sel2)),7)*111122);
+            float4 eyes = 1;
+            eyes = col_i*(.5+.5*sin(atan(normalize(tp.xy-sel2.xy))*24.+time.x)).xxxx*10;
+            eyes = col_i*(.5+col_i2*1111.5*sin(col_i2)+col_i2)*12;
+            p1.color= lerp(p1.color,eyes,saturate(col_i));
+
+            //p1.pos.xyz-=nrml*(1.5-abs(sin(length(pos)*32-time.x/4)))*.0025;
     }
 
     if (mode==2)

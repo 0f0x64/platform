@@ -196,7 +196,7 @@ namespace ConstBuf
 		Create(buffer[(int)cBuffer::extra], sizeof(extra));
 
 
-		LoadObjToPointers("projectFiles//girl.obj", &vArray, &iArray, vertexCount, triangleCount);
+		LoadObjToPointers("projectFiles//twins.obj", &vArray, &iArray, vertexCount, triangleCount);
 
 		CreateSB(0, sizeof(vertex), vertexCount, vArray);
 		CreateSB(1, sizeof(index), triangleCount, iArray);

@@ -1040,12 +1040,12 @@ namespace Loop
 
 
 			BasicCam::processCam();
-			Object::Girl({
+			Object::TwZ({
 				.quality = 1,
 				.xPos = 0,
 				.yPos = 0,
 				.zPos = 0,
-				.brightness = 100,
+				.brightness = 30,
 				.tickness = 0
 			});
 
