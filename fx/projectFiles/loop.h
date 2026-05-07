@@ -969,83 +969,34 @@ namespace Loop
 			BasicCam::setCamKey({
 				.camTime = 0*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
 				.camType = keyType::set,
-				.eye_x = -2622,
-				.eye_y = -160,
-				.eye_z = -4141,
+				.eye_x = 43,
+				.eye_y = -52,
+				.eye_z = 1000,
 				.at_x = 0,
-				.at_y = -805,
+				.at_y = 0,
 				.at_z = 0,
-				.up_x = -4,
-				.up_y = 254,
-				.up_z = -7,
+				.up_x = 0,
+				.up_y = 100,
+				.up_z = 0,
 				.angle = 100,
 				.sType = sliderType::follow,
 				.slide_x = 0,
-				.slide_y = -110,
-				.slide_z = 0,
-				.axisType = camAxis::global,
-				.fly_x = -18,
-				.fly_y = 10,
-				.fly_z = 0,
-				.jitter = 0
-			});
-
-			BasicCam::setCamKey({
-				.camTime = 1522,
-				.camType = keyType::set,
-				.eye_x = -362,
-				.eye_y = 2940,
-				.eye_z = 4949,
-				.at_x = 0,
-				.at_y = 1696,
-				.at_z = 0,
-				.up_x = 20,
-				.up_y = 120,
-				.up_z = -223,
-				.angle = 51,
-				.sType = sliderType::follow,
-				.slide_x = 0,
 				.slide_y = 0,
 				.slide_z = 0,
 				.axisType = camAxis::global,
 				.fly_x = -18,
-				.fly_y = 10,
+				.fly_y = 0,
 				.fly_z = 0,
 				.jitter = 0
 			});
-
-			BasicCam::setCamKey({
-				.camTime = 3000,
-				.camType = keyType::set,
-				.eye_x = 1644,
-				.eye_y = 5206,
-				.eye_z = -1023,
-				.at_x = 0,
-				.at_y = 1769,
-				.at_z = 0,
-				.up_x = -195,
-				.up_y = 102,
-				.up_z = 128,
-				.angle = 64,
-				.sType = sliderType::follow,
-				.slide_x = 0,
-				.slide_y = 0,
-				.slide_z = 0,
-				.axisType = camAxis::global,
-				.fly_x = -18,
-				.fly_y = 10,
-				.fly_z = 0,
-				.jitter = 0
-			});
-
 
 			BasicCam::processCam();
 			Object::Girl({
 				.quality = 1,
 				.xPos = 0,
-				.yPos = 37,
+				.yPos = -8,
 				.zPos = 0,
-				.brightness = 100,
+				.brightness = 2,
 				.tickness = 0
 			});
 
