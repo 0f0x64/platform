@@ -994,9 +994,9 @@ namespace Loop
 			Object::Girl({
 				.quality = 1,
 				.xPos = 0,
-				.yPos = -8,
+				.yPos = 0,
 				.zPos = 0,
-				.brightness = 2,
+				.brightness = 91,
 				.tickness = 0
 			});
 

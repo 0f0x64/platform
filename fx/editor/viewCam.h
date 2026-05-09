@@ -287,7 +287,7 @@ namespace ViewCam
 		isSetup = true;
 
 		targetCamera.Target = XMVECTOR{ 0,0,0,1 };
-		targetCamera.ViewVec = XMVECTOR{ 0,0,13,1 };
+		targetCamera.ViewVec = XMVECTOR{ 0,0,5,1 };
 		targetCamera.upVec = XMVECTOR{ 0,1,0,1 };
 
 		currentCamera = targetCamera;

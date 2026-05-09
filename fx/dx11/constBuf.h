@@ -69,6 +69,11 @@ namespace ConstBuf
 
 	void CreateSB(int slot,int size,int count, auto& data)
 	{
+
+		if (pSBuffer[slot]) { pSBuffer[slot]->Release(); pSBuffer[slot] = nullptr; }
+		if (pSB_SRV[slot]) { pSB_SRV[slot]->Release(); pSB_SRV[slot] = nullptr; }
+
+
 		D3D11_SUBRESOURCE_DATA initData = {};
 		initData.pSysMem = data;
 
@@ -177,6 +182,17 @@ namespace ConstBuf
 		if (vCount == 0) return false;
 
 		// Allocate heap memory
+		if (*outVertices)
+		{
+			delete[] *outVertices;
+			*outVertices = nullptr;
+		}
+		if (*outIndices)
+		{
+			delete[] *outIndices;
+			*outIndices = nullptr;
+		}
+
 		*outVertices = new vertex[vCount];
 		*outIndices = new index[iCount];
 
@@ -185,6 +201,55 @@ namespace ConstBuf
 
 		return true;
 	}
+
+	void LoadObj(const char* name)
+	{
+		if (LoadObjToPointers(name, &vArray, &iArray, vertexCount, triangleCount))
+		{
+			float xMax = 0;
+			float xMin = 0;
+			float yMax = 0;
+			float yMin = 0;
+			float zMax = 0;
+			float zMin = 0;
+
+			for (int i = 0; i < vertexCount; i++)
+			{
+				xMax = max(xMax, vArray[i].position.x);
+				xMin = min(xMin, vArray[i].position.x);
+
+				yMax = max(yMax, vArray[i].position.y);
+				yMin = min(yMin, vArray[i].position.y);
+
+				zMax = max(zMax, vArray[i].position.z);
+				zMin = min(zMin, vArray[i].position.z);
+
+			}
+			float xCenter = (xMax + xMin) / 2.;
+			float yCenter = (yMax + yMin) / 2.;
+			float zCenter = (zMax + zMin) / 2.;
+			float xSize = (yMax - yMin);
+			float ySize = (yMax - yMin);
+			float zSize = (zMax - zMin);
+
+			for (int i = 0; i < vertexCount; i++)
+			{
+				vArray[i].position.x -= xCenter;
+				vArray[i].position.y -= yCenter;
+				vArray[i].position.z -= zCenter;
+
+				vArray[i].position.x *= 4/ySize;
+				vArray[i].position.y *= 4/ySize;
+				vArray[i].position.z *= 4/ySize;
+
+			}
+
+
+			CreateSB(0, sizeof(vertex), vertexCount, vArray);
+			CreateSB(1, sizeof(index), triangleCount, iArray);
+		}
+	}
+
 #endif
 
 	void Init()

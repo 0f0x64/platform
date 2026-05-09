@@ -347,7 +347,8 @@ namespace Object {
 
 		if (in.tMode == triMode::on)
 		{
-			dx11::Shaders::resetShader(dx11::Shaders::basic);
+			//dx11::Shaders::resetShader(dx11::Shaders::basic);
+			//dx11::Shaders::resetShader(dx11::Shaders::basic);
 			Drawer::NullDrawerTri({ in.count, 1 });
 		}
 		else
@@ -982,9 +983,9 @@ namespace Object {
 			.count = (int)dx11::ConstBuf::triangleCount,
 			.skipper = 1,
 			.mode = pMode::point,
-			.r = 100,
-			.g = 252,
-			.b = 1376,
+			.r = 0,
+			.g = 0,
+			.b = 0,
 			.tMode = triMode::on,
 			.xPos = in.xPos,
 			.yPos = in.yPos,

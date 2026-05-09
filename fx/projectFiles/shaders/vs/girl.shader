@@ -267,8 +267,8 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     }
     
     pos+=modelPos.xyz;
-    pos.y+=1.9;
-    pos/=17;
+    //pos.y+=1.9;
+    //pos/=5;
     //pos*=10.5; 
 
     //p1.pos=float4(pos,1);
@@ -353,6 +353,11 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     p1.color.rgb*=brightness.rrr/100.;
     p1.color.rgb*=float3(1,2,3)/4;
     //pos.y-=55*sin(time.x/12.)*c;
+
+    if (mode==2)
+    {
+        p1.color.rgb=0;
+    }
 
     /*else
     {

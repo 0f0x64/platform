@@ -22,7 +22,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 #include "utils.h"
 
 #if EditMode
-
+bool loadFlag=false;
 	#include <unordered_map>
 	#include <vector>
 
@@ -180,6 +180,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		#endif
 			
 		UpdateFrame(timer::GetCounter());
+
+		if (loadFlag)
+		{
+			while (true)
+			{
+				if (!GetAsyncKeyState(VK_LBUTTON)) break;
+			}
+
+			editor::OpenLegacyDialog();
+
+			//SetForegroundWindow(hWnd);
+
+			loadFlag = false;
+		}
 	}
 
 	#if EditMode

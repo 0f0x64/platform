@@ -1256,6 +1256,37 @@ namespace editor
 	bool mPressed = false;
 	bool timeAlwaysOn = true;
 
+	//namespace ConstBuf {
+		//void LoadObj(const char* name);
+	//}
+
+	void OpenLegacyDialog() {
+
+		OPENFILENAME ofn;       // Common dialog box structure
+		TCHAR szFile[260] = { 0 }; // Buffer for file name
+
+		// Initialize OPENFILENAME
+		ZeroMemory(&ofn, sizeof(ofn));
+		ofn.lStructSize = sizeof(ofn);
+		ofn.hwndOwner = NULL;
+		ofn.lpstrFile = szFile;
+		ofn.nMaxFile = sizeof(szFile);
+		ofn.lpstrFilter = "Wavefront OBJ (*.obj)\0*.obj\0All Files (*.*)\0*.*\0";
+		ofn.nFilterIndex = 1;
+		ofn.lpstrFileTitle = NULL;
+		ofn.nMaxFileTitle = 0;
+		ofn.lpstrInitialDir = NULL;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+		// Display the Open dialog box
+		if (GetOpenFileName(&ofn) == TRUE) {
+			
+			ConstBuf::LoadObj(ofn.lpstrFile);
+
+			//std::wcout << L"Selected file: " << ofn.lpstrFile << std::endl;
+		}
+	}
+
 	void Process()
 	{
 		ui::mousePos = ui::GetCusorPos();
@@ -1478,6 +1509,15 @@ namespace editor
 			ViewCam::Draw();
 		} 
 		
+		if (paramEdit::ButtonPressed("Load Model", 0, 0, ui::style::box::width, ui::style::box::height))
+		{
+			loadFlag = true;
+		}
+		else
+		{
+			loadFlag = false;
+		}
+
 		Rasterizer::Scissors({ 0,0,(float)dx11::width,(float)dx11::height });
 		ui::Box::Setup();
 		ui::style::Base();
