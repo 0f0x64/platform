@@ -267,6 +267,9 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     }
     
     pos+=modelPos.xyz;
+
+    if (vbf[ind4.x].pos.w == 13) pos.xz+=nrml*noise(pos.y*32+time.x/12)/4;
+
     //pos.y+=1.9;
     //pos/=5;
     //pos*=10.5; 

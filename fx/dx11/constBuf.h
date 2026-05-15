@@ -133,6 +133,7 @@ namespace ConstBuf
 #define CGLTF_IMPLEMENTATION
 #include "cgltf.h"
 
+
 	bool LoadObjToPointersGLTF(const std::string& filename, vertex** outVertices, index** outIndices, uint32_t& vCount, uint32_t& iCount) 
 	{
 		cgltf_options options = {0};
@@ -151,6 +152,7 @@ namespace ConstBuf
 
 			for (size_t i = 0; i < data->meshes_count; ++i) {
 				cgltf_mesh* mesh = &data->meshes[i];
+
 				for (size_t j = 0; j < mesh->primitives_count; ++j) {
 					cgltf_primitive* prim = &mesh->primitives[j];
 
@@ -199,6 +201,8 @@ namespace ConstBuf
 					cgltf_primitive* prim = &mesh->primitives[j];
 					size_t prim_vertex_count = 0;
 
+
+
 					// --- Чтение вершин (Позиции) ---
 					for (size_t k = 0; k < prim->attributes_count; ++k) {
 						if (prim->attributes[k].type == cgltf_attribute_type_position) {
@@ -214,7 +218,7 @@ namespace ConstBuf
 										position_element[0],
 										position_element[1],
 										position_element[2],
-										1.0f
+										(float)i
 									};
 								}
 								else {
