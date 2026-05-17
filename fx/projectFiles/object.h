@@ -343,7 +343,7 @@ namespace Object {
 
 		dx11::ConstBuf::BindSB(0);
 		dx11::ConstBuf::BindSB(1);
-
+		dx11::Rasterizer::Cull(cullmode::off);
 
 		if (in.tMode == triMode::on)
 		{
