@@ -133,6 +133,7 @@ float4 modelPos;
 float4 triCount;
 float4 brightness;
 float4 tickness;
+float4 modelCenterScale;
 } params;
 
 void set () {

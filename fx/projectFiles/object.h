@@ -318,21 +318,17 @@ namespace Object {
 
 		psModeSet(in.mode);
 
-		vs::girl = {
-			.params =
-			{
-				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
-				.gX = gX,
-				.gY = gY,
-				.mode = (int)in.mode,
-				.skipper = in.skipper,
-				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
-				.modelPos = float4(in.xPos,in.yPos,in.zPos,0),
-				.triCount = float4(dx11::ConstBuf::triangleCount,0,0,0),
-				.brightness = float4(in.brightness,0,0,0),
-				.tickness = float4(in.tickness,0,0,0),
-			},
-		};
+		vs::girl.params.model = XMMatrixTranspose(XMMatrixTranslation(0, 0, 0));
+		vs::girl.params.gX = gX;
+		vs::girl.params.gY = gY;
+		vs::girl.params.mode = (int)in.mode;
+		vs::girl.params.skipper = in.skipper;
+		vs::girl.params.base_color = float4(in.r / 100., in.g / 100., in.b / 100., 1);
+		vs::girl.params.modelPos = float4(in.xPos, in.yPos, in.zPos, 0);
+		vs::girl.params.triCount = float4(dx11::ConstBuf::triangleCount, 0, 0, 0);
+		vs::girl.params.brightness = float4(in.brightness, 0, 0, 0);
+		vs::girl.params.tickness = float4(in.tickness, 0, 0, 0);
+		vs::girl.params.modelCenterScale = float4(dx11::ConstBuf::gltfAnim::scene.modelCenterScale.x, dx11::ConstBuf::gltfAnim::scene.modelCenterScale.y, dx11::ConstBuf::gltfAnim::scene.modelCenterScale.z, dx11::ConstBuf::gltfAnim::scene.modelCenterScale.w);
 
 		if (in.tMode == triMode::on)
 		{
@@ -340,6 +336,9 @@ namespace Object {
 		}
 
 		vs::girl.set();
+
+		dx11::ConstBuf::gltfAnim::Update(1.0f / FRAMES_PER_SECOND);
+		dx11::ConstBuf::gltfAnim::BindBones(dx11::context);
 
 		dx11::ConstBuf::BindSB(0);
 		dx11::ConstBuf::BindSB(1);
@@ -993,8 +992,6 @@ namespace Object {
 			.brightness = in.brightness,
 			.tickness = in.tickness
 			});
-
-
 		Culling::Set({ cullmode::off });
 		DepthBuf::Mode({ depthmode::readonly });
 		BlendMode::Set({
@@ -1017,7 +1014,6 @@ namespace Object {
 			.brightness = in.brightness,
 			.tickness = in.tickness
 			});
-
 #endif
 		Culling::Set({ cullmode::off });
 		DepthBuf::Mode({ depthmode::off });

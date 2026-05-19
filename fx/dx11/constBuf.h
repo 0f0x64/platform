@@ -58,6 +58,8 @@ namespace ConstBuf
 #if EditMode
 	struct vertex  {
 		float4 position;
+		XMUINT4 joints;
+		XMFLOAT4 weights;
 	};
 
 	struct index  {
@@ -132,6 +134,7 @@ namespace ConstBuf
 
 #define CGLTF_IMPLEMENTATION
 #include "cgltf.h"
+#include "gltfAnimation.h"
 
 
 	bool LoadObjToPointersGLTF(const std::string& filename, vertex** outVertices, index** outIndices, uint32_t& vCount, uint32_t& iCount) 
@@ -146,6 +149,9 @@ namespace ConstBuf
 			if (result != cgltf_result_success) {
 				return false;
 			}
+
+			gltfAnim::ReadSkeleton(data);
+			gltfAnim::ReadAnimations(data);
 
 			vCount = 0;
 			iCount = 0;
@@ -165,7 +171,15 @@ namespace ConstBuf
 					}
 					// Считаем индексы
 					if (prim->indices) {
-						iCount += prim->indices->count;
+						iCount += (uint32_t)(prim->indices->count / 3);
+					}
+					else {
+						for (size_t k = 0; k < prim->attributes_count; ++k) {
+							if (prim->attributes[k].type == cgltf_attribute_type_position) {
+								iCount += (uint32_t)(prim->attributes[k].data->count / 3);
+								break;
+							}
+						}
 					}
 				}
 			}
@@ -210,6 +224,7 @@ namespace ConstBuf
 							prim_vertex_count = acc->count;
 
 							for (size_t v = 0; v < prim_vertex_count; ++v) {
+								gltfAnim::FillSkinDefaults((*outVertices)[vertexOffset + v]);
 								float position_element[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 								// Безопасная функция cgltf сама учитывает stride, offset, sparse данные и тип компонента
@@ -230,6 +245,43 @@ namespace ConstBuf
 						}
 					}
 
+					// --- Skinning data ---
+					for (size_t k = 0; k < prim->attributes_count; ++k) {
+						cgltf_attribute* attr = &prim->attributes[k];
+						if (attr->type == cgltf_attribute_type_joints) {
+							cgltf_accessor* acc = attr->data;
+							for (size_t v = 0; v < acc->count && v < prim_vertex_count; ++v) {
+								cgltf_uint joints[4] = {0, 0, 0, 0};
+								if (cgltf_accessor_read_uint(acc, v, joints, 4)) {
+									XMUINT4 mapped(0, 0, 0, 0);
+									for (int c = 0; c < 4; ++c) {
+										uint32_t jointIndex = joints[c];
+										if (data->skins_count > 0 && jointIndex < data->skins[0].joints_count) {
+											jointIndex = gltfAnim::NodeIndex(data, data->skins[0].joints[jointIndex]);
+										}
+										if (c == 0) mapped.x = jointIndex; else if (c == 1) mapped.y = jointIndex; else if (c == 2) mapped.z = jointIndex; else mapped.w = jointIndex;
+									}
+									(*outVertices)[vertexOffset + v].joints = mapped;
+								}
+							}
+						}
+						else if (attr->type == cgltf_attribute_type_weights) {
+							cgltf_accessor* acc = attr->data;
+							for (size_t v = 0; v < acc->count && v < prim_vertex_count; ++v) {
+								float weights[4] = {1.0f, 0.0f, 0.0f, 0.0f};
+								if (cgltf_accessor_read_float(acc, v, weights, 4)) {
+									float sum = weights[0] + weights[1] + weights[2] + weights[3];
+									if (sum > 0.000001f) {
+										weights[0] /= sum;
+										weights[1] /= sum;
+										weights[2] /= sum;
+										weights[3] /= sum;
+									}
+									(*outVertices)[vertexOffset + v].weights = XMFLOAT4(weights[0], weights[1], weights[2], weights[3]);
+								}
+							}
+						}
+					}
 					// --- Чтение индексов ---
 					if (prim->indices) {
 						cgltf_accessor* acc = prim->indices;
@@ -267,6 +319,17 @@ namespace ConstBuf
 						}
 						indexOffset += acc->count;
 					}
+					else if (prim_vertex_count >= 3) {
+						for (size_t tri = 0; tri < prim_vertex_count / 3; ++tri) {
+							(*outIndices)[indexOffset / 3 + tri].index = float4{
+								(float)(vertexOffset + tri * 3 + 0),
+								(float)(vertexOffset + tri * 3 + 1),
+								(float)(vertexOffset + tri * 3 + 2),
+								0.0f
+							};
+						}
+						indexOffset += (prim_vertex_count / 3) * 3;
+					}
 
 					// Сдвигаем глобальный офсет вершин для следующего примитива
 					vertexOffset += prim_vertex_count;
@@ -278,7 +341,7 @@ namespace ConstBuf
 
 			cgltf_free(data);
 		}
-		return true;
+		return result == cgltf_result_success && vCount > 0 && iCount > 0;
 	}
 
 
@@ -365,50 +428,94 @@ namespace ConstBuf
 	{
 		if (LoadObjToPointersGLTF(name, &vArray, &iArray, vertexCount, triangleCount))
 		{
-			float xMax = 0;
-			float xMin = 0;
-			float yMax = 0;
-			float yMin = 0;
-			float zMax = 0;
-			float zMin = 0;
-
-			for (int i = 0; i < vertexCount; i++)
+			gltfAnim::scene.modelPath = name ? name : "";
+			gltfAnim::scene.animationPath.clear();
+			gltfAnim::scene.status = "Model loaded";
+			if (vertexCount > 0)
 			{
-				xMax = max(xMax, vArray[i].position.x);
-				xMin = min(xMin, vArray[i].position.x);
+				float xMax = vArray[0].position.x;
+				float xMin = vArray[0].position.x;
+				float yMax = vArray[0].position.y;
+				float yMin = vArray[0].position.y;
+				float zMax = vArray[0].position.z;
+				float zMin = vArray[0].position.z;
 
-				yMax = max(yMax, vArray[i].position.y);
-				yMin = min(yMin, vArray[i].position.y);
+				for (int i = 1; i < vertexCount; i++)
+				{
+					xMax = max(xMax, vArray[i].position.x);
+					xMin = min(xMin, vArray[i].position.x);
+					yMax = max(yMax, vArray[i].position.y);
+					yMin = min(yMin, vArray[i].position.y);
+					zMax = max(zMax, vArray[i].position.z);
+					zMin = min(zMin, vArray[i].position.z);
+				}
 
-				zMax = max(zMax, vArray[i].position.z);
-				zMin = min(zMin, vArray[i].position.z);
+				float xCenter = (xMax + xMin) / 2.0f;
+				float yCenter = (yMax + yMin) / 2.0f;
+				float zCenter = (zMax + zMin) / 2.0f;
+				float xSize = xMax - xMin;
+				float ySize = yMax - yMin;
+				float zSize = zMax - zMin;
+				float maxSize = max(max(xSize, ySize), zSize);
+				float scale = maxSize > 0.00001f ? (4.0f / maxSize) : 1.0f;
 
+				gltfAnim::scene.modelCenterScale = XMFLOAT4(xCenter, yCenter, zCenter, scale);
 			}
-			float xCenter = (xMax + xMin) / 2.;
-			float yCenter = (yMax + yMin) / 2.;
-			float zCenter = (zMax + zMin) / 2.;
-			float xSize = (yMax - yMin);
-			float ySize = (yMax - yMin);
-			float zSize = (zMax - zMin);
-
-			for (int i = 0; i < vertexCount; i++)
-			{
-				vArray[i].position.x -= xCenter;
-				vArray[i].position.y -= yCenter;
-				vArray[i].position.z -= zCenter;
-
-				vArray[i].position.x *= 4/ySize;
-				vArray[i].position.y *= 4/ySize;
-				vArray[i].position.z *= 4/ySize;
-
-			}
-
 
 			CreateSB(0, sizeof(vertex), vertexCount, vArray);
 			CreateSB(1, sizeof(index), triangleCount, iArray);
 		}
+			else
+		{
+			gltfAnim::scene.status = "Model load failed";
+		}
 	}
 
+	bool LoadAnimations(const char* name, bool replaceExisting = true)
+	{
+		cgltf_options options = { 0 };
+		cgltf_data* data = NULL;
+		cgltf_result result = cgltf_parse_file(&options, name, &data);
+		if (result != cgltf_result_success)
+		{
+			return false;
+		}
+
+		result = cgltf_load_buffers(&options, data, name);
+		if (result != cgltf_result_success)
+		{
+			cgltf_free(data);
+			return false;
+		}
+		bool loaded = gltfAnim::ReadAnimations(data, replaceExisting, true);
+		gltfAnim::scene.animationPath = name ? name : "";
+		gltfAnim::scene.status = loaded ? "Animation loaded" : "Animation skeleton incompatible";
+		cgltf_free(data);
+		return loaded;
+	}
+
+	bool LoadAnimations(const std::vector<std::string>& names)
+	{
+		bool loadedAny = false;
+		for (size_t i = 0; i < names.size(); ++i)
+		{
+			loadedAny = LoadAnimations(names[i].c_str(), i == 0) || loadedAny;
+		}
+
+		if (loadedAny)
+		{
+			if (names.size() == 1)
+			{
+				gltfAnim::scene.animationPath = names[0];
+			}
+			else
+			{
+				gltfAnim::scene.animationPath = std::to_string(names.size()) + " animation files";
+			}
+			gltfAnim::scene.status = "Animations loaded";
+		}
+		return loadedAny;
+	}
 #endif
 
 	void Init()
@@ -419,6 +526,7 @@ namespace ConstBuf
 		Create(buffer[(int)cBuffer::frame], sizeof(frame));
 		Create(buffer[(int)cBuffer::global], sizeof(global));
 		Create(buffer[(int)cBuffer::extra], sizeof(extra));
+		gltfAnim::CreateBoneBuffer(device);
 
 #if EditMode
 		//LoadObjToPointersGLTF("projectFiles//twins.glb", &vArray, &iArray, vertexCount, triangleCount);
