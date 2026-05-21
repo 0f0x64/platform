@@ -1348,10 +1348,10 @@ namespace editor
 		CComPtr<EnvDTE::UndoContext> pUndo;
 		std::wstring activeDocPath;
 
-		void EnterDrumMode() {
+		bool EnterDrumMode() {
 
 			HRESULT result;
-			CComPtr<EnvDTE::Document> doc;
+/*			CComPtr<EnvDTE::Document> doc;
 			if (!VsEditor.GetActiveDoc(doc)) 
 			{
 				return;
@@ -1399,21 +1399,82 @@ namespace editor
 			{
 				return;
 			}
+			*/
+			CComPtr<EnvDTE::Document> doc;
+			if (!VsEditor.GetActiveDoc(doc)) return false;
 
-			result = pEditPoint->MoveToLineAndOffset(anchorLine, 1);
-			if (FAILED(result))
+			if (!editor::VsEditor.StoreFileName(doc, VsEditor.fileName)) return false;
+
+			CComPtr<IDispatch> selection_dispatch;
+			result = doc->get_Selection(&selection_dispatch);
+			if (FAILED(result))	return false;
+
+			CComPtr<EnvDTE::TextSelection> selection;
+			result = selection_dispatch->QueryInterface(&selection);
+			if (FAILED(result))	return false;
+
+			EnvDTE::VirtualPoint* pActivePoint = nullptr;
+			result = selection->get_ActivePoint(&pActivePoint);
+			if (FAILED(result))	return false;
+
+			result = pActivePoint->get_Line(&VsEditor.line);
+			if (FAILED(result))	return false;
+
+			result = pActivePoint->get_LineCharOffset(&VsEditor.column);
+			if (FAILED(result))	return false;
+
+			//get string under cursor
+			CComPtr<IDispatch> pDocDisp;
+			result = doc->Object(CComBSTR("TextDocument"), &pDocDisp);
+			if (FAILED(result))	return false;
+
+			CComQIPtr<EnvDTE::TextDocument> pTextDoc(pDocDisp);
+			long currentLine = 0;
+			result = selection->get_CurrentLine(&currentLine);
+			if (FAILED(result))	return false;
+
+			CComPtr<EnvDTE::EditPoint> pEditPoint;
+			result = pTextDoc->CreateEditPoint(NULL, &pEditPoint);
+			if (FAILED(result))	return false;
+
+			result = pEditPoint->MoveToLineAndOffset(currentLine, 1);
+			if (FAILED(result))	return false;
+
+			CComBSTR bstrLineText;
+			result = pEditPoint->GetLines(currentLine, currentLine + 1, &bstrLineText);
+			if (FAILED(result))	return false;
+
+
+			/*CComBSTR bstrLineText;
+			result = pEditPoint->GetLines(currentLine, currentLine + 1, &bstrLineText);
+			if (FAILED(result))	return;
+			*/
+
+			_bstr_t wrapper2(bstrLineText);
+			const char* str = wrapper2;
+			std::string s = str;
+			if (s.find(".note", 0) != std::string::npos)
 			{
-				return;
+				ai
 			}
 
-			pEditPoint->EndOfLine();
+			selection->GotoLine(5, VARIANT_FALSE);
+			selection->MoveToLineAndOffset(5, 20, VARIANT_TRUE);
+
+			//result = pEditPoint->MoveToLineAndOffset(anchorLine, 1);
+			//if (FAILED(result))
+			{
+				//return;
+			}
+
+			//pEditPoint->EndOfLine();
 
 			// Формируем строку-курсор (пробелы до нужной колонки + символ ^)
-			std::wstring shadowLine = L"\n";
-			for (int i = 1; i < cursorCol; ++i) shadowLine += L" ";
-			shadowLine += L"^";
+			//std::wstring shadowLine = L"\n";
+			//for (int i = 1; i < cursorCol; ++i) shadowLine += L" ";
+			//shadowLine += L"^";
 
-			pEditPoint->Insert(CComBSTR(shadowLine.c_str())); 
+			//pEditPoint->Insert(CComBSTR(shadowLine.c_str())); 
 
 		}
 
@@ -1454,28 +1515,28 @@ namespace editor
 
 
 			// 1. Стираем старый '^' (заменяем на пробел)
-			pEditPoint->MoveToLineAndOffset(anchorLine + 1, cursorCol);
+			//pEditPoint->MoveToLineAndOffset(anchorLine + 1, cursorCol);
 
-			CComPtr<EnvDTE::EditPoint> pEnd;
-			pEditPoint->CreateEditPoint(&pEnd);
-			pEnd->MoveToLineAndOffset(anchorLine + 1, cursorCol + 1);
+			//CComPtr<EnvDTE::EditPoint> pEnd;
+			//pEditPoint->CreateEditPoint(&pEnd);
+			//pEnd->MoveToLineAndOffset(anchorLine + 1, cursorCol + 1);
 
 			// Упаковываем pEnd в VARIANT
-			CComVariant vEnd(pEnd);
-			pEditPoint->ReplaceText(vEnd, CComBSTR(L" "), 0);
+			//CComVariant vEnd(pEnd);
+			//pEditPoint->ReplaceText(vEnd, CComBSTR(L" "), 0);
 
 			// 2. Обновляем координату
-			cursorCol += delta;
-			if (cursorCol < 1) cursorCol = 1;
+			//cursorCol += delta;
+			//if (cursorCol < 1) cursorCol = 1;
 
 			// 3. Рисуем новый '^'
-			pEditPoint->MoveToLineAndOffset(anchorLine + 1, cursorCol);
+			//pEditPoint->MoveToLineAndOffset(anchorLine + 1, cursorCol);
 
 			// Пересоздаем или перемещаем pEnd для новой позиции
-			pEnd->MoveToLineAndOffset(anchorLine + 1, cursorCol + 1);
+			//pEnd->MoveToLineAndOffset(anchorLine + 1, cursorCol + 1);
 
-			CComVariant vEndNew(pEnd);
-			pEditPoint->ReplaceText(vEndNew, CComBSTR(L"^"), 0);
+			//CComVariant vEndNew(pEnd);
+			//pEditPoint->ReplaceText(vEndNew, CComBSTR(L"^"), 0);
 		}
 
 		void ExitDrumMode() {
@@ -1510,21 +1571,21 @@ namespace editor
 				}
 
 				// Переходим на начало вспомогательной строки
-				pEditPoint->MoveToLineAndOffset(anchorLine + 1, 1);
+				//pEditPoint->MoveToLineAndOffset(anchorLine + 1, 1);
 
-				CComPtr<EnvDTE::EditPoint> pEnd;
-				pEditPoint->CreateEditPoint(&pEnd);
-				pEnd->LineDown(1); // Опускаемся на одну строку вниз, чтобы захватить весь текст с переносом
+				//CComPtr<EnvDTE::EditPoint> pEnd;
+				//pEditPoint->CreateEditPoint(&pEnd);
+				//pEnd->LineDown(1); // Опускаемся на одну строку вниз, чтобы захватить весь текст с переносом
 
 				// Ошибочное место исправляем здесь:
-				CComVariant vEnd(pEnd);
-				pEditPoint->Delete(vEnd);
+				//CComVariant vEnd(pEnd);
+				//pEditPoint->Delete(vEnd);
 
 				// Закрываем транзакцию
-				if (pUndo) {
-					pUndo->Close();
-					pUndo.Release(); // Освобождаем контекст
-				}
+				//if (pUndo) {
+//					pUndo->Close();
+	//				pUndo.Release(); // Освобождаем контекст
+		//		}
 			}
 		}
 	} trackerUI;
