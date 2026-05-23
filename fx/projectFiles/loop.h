@@ -994,10 +994,11 @@ namespace Loop
 			Object::Girl({
 				.quality = 1,
 				.xPos = 0,
-				.yPos = 0,
+				.yPos = 1,
 				.zPos = 0,
-				.brightness = 91,
-				.tickness = 0
+				.brightness = 69,
+				.tickness = 2,
+				.stencil = switcher::on
 			});
 
 

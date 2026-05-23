@@ -327,7 +327,7 @@ namespace Object {
 				.mode = (int)in.mode,
 				.skipper = in.skipper,
 				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
-				.modelPos = float4(in.xPos,in.yPos,in.zPos,0),
+				.modelPos = float4(in.xPos/100.,in.yPos / 100.,in.zPos / 100.,0),
 				.triCount = float4(dx11::ConstBuf::triangleCount,0,0,0),
 				.brightness = float4(in.brightness,0,0,0),
 				.tickness = float4(in.tickness,0,0,0),
@@ -944,7 +944,7 @@ namespace Object {
 		
 	}
 
-	cmd(Girl, int quality, int xPos, int yPos, int zPos, int brightness, int tickness)
+	cmd(Girl, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil)
 	{
 		reflect;
 
@@ -979,21 +979,23 @@ namespace Object {
 
 #if EditMode
 		Culling::Set({ cullmode::off });
-		Grl({
-			.count = (int)dx11::ConstBuf::triangleCount,
-			.skipper = 1,
-			.mode = pMode::point,
-			.r = 0,
-			.g = 0,
-			.b = 0,
-			.tMode = triMode::on,
-			.xPos = in.xPos,
-			.yPos = in.yPos,
-			.zPos = in.zPos,
-			.brightness = in.brightness,
-			.tickness = in.tickness
-			});
-
+		if (in.stencil == switcher::on)
+		{
+			Grl({
+				.count = (int)dx11::ConstBuf::triangleCount,
+				.skipper = 1,
+				.mode = pMode::point,
+				.r = 0,
+				.g = 0,
+				.b = 0,
+				.tMode = triMode::on,
+				.xPos = in.xPos,
+				.yPos = in.yPos,
+				.zPos = in.zPos,
+				.brightness = in.brightness,
+				.tickness = in.tickness
+				});
+		}
 
 		Culling::Set({ cullmode::off });
 		DepthBuf::Mode({ depthmode::readonly });
