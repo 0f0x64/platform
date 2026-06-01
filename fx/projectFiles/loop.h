@@ -1018,8 +1018,8 @@ namespace Loop
 				.camTime = 7203,
 				.camType = keyType::set,
 				.eye_x = 0,
-				.eye_y = 5,
-				.eye_z = 3321,
+				.eye_y = 0,
+				.eye_z = 3315,
 				.at_x = 0,
 				.at_y = 0,
 				.at_z = 0,
@@ -1031,7 +1031,7 @@ namespace Loop
 				.slide_x = 0,
 				.slide_y = 0,
 				.slide_z = 0,
-				.axisType = camAxis::global,
+				.axisType = camAxis::local,
 				.fly_x = -18,
 				.fly_y = 10,
 				.fly_z = 0,
@@ -1042,11 +1042,11 @@ namespace Loop
 			BasicCam::processCam();
 			Object::Girl({
 				.quality = 1,
-				.xPos = -12,
-				.yPos = 585,
+				.xPos = 26,
+				.yPos = 482,
 				.zPos = 0,
-				.brightness = 84,
-				.tickness = 2
+				.brightness = 70,
+				.tickness = 3
 			});
 
 

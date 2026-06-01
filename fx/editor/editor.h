@@ -1,5 +1,11 @@
 //live wheel param changer
 #include <atlbase.h>
+#include <comdef.h>
+#include <ole2.h>
+#include <unknwn.h>
+#include <textmgr.h>      // Здесь объявлен IVsTextView и IVsTextLines
+#include <textmgr2.h>
+#include <vsshell.h>
 #import "libid:80cc9f66-e7d8-4ddd-85b6-d9e6cd0e93e2" version("8.0") lcid("0") raw_interfaces_only named_guids
 //----
 #include <cctype>
@@ -101,7 +107,6 @@ namespace editor
 
 			return result;
 		}
-
 
 
 		bool is_id_char(char c) {
@@ -542,94 +547,6 @@ namespace editor
 			return true;
 		}
 
-		void AdjustString(std::string& s, size_t length, char paddingChar = ' ') {
-			s.resize(length, paddingChar);
-		}
-
-		bool FormatPatternLineInVS()
-		{
-			HRESULT result;
-			CComPtr<EnvDTE::Document> doc;
-			if (!GetActiveDoc(doc)) return false;
-
-			CComPtr<IDispatch> selection_dispatch;
-			result = doc->get_Selection(&selection_dispatch);
-			if (FAILED(result))	return false;
-
-			CComPtr<EnvDTE::TextSelection> selection;
-			result = selection_dispatch->QueryInterface(&selection);
-			if (FAILED(result))	return false;
-
-			CComPtr<IDispatch> pDocDisp;
-			result = doc->Object(CComBSTR("TextDocument"), &pDocDisp);
-			if (FAILED(result))	return false;
-
-			CComQIPtr<EnvDTE::TextDocument> pTextDoc(pDocDisp);
-			long currentLine = 0;
-			long currentColumn = 0;
-			result = selection->get_CurrentLine(&currentLine);
-			result = selection->get_CurrentColumn(&currentColumn);
-			if (FAILED(result))	return false;
-
-			CComPtr<EnvDTE::EditPoint> pEditPoint;
-			result = pTextDoc->CreateEditPoint(NULL, &pEditPoint);
-			if (FAILED(result))	return false;
-
-			result = pEditPoint->MoveToLineAndOffset(currentLine, 1);
-			if (FAILED(result))	return false;
-
-			CComBSTR bstrLineText;
-			result = pEditPoint->GetLines(currentLine, currentLine + 1, &bstrLineText);
-			if (FAILED(result))	return false;
-
-			CComPtr<EnvDTE::EditPoint> pEditStart;
-			pTextDoc->CreateEditPoint(NULL, &pEditStart);
-			pEditStart->MoveToLineAndOffset(currentLine, 1);
-
-			CComPtr<EnvDTE::EditPoint> pEditEnd;
-			pEditEnd = pEditPoint;
-			pEditEnd->EndOfLine();
-
-			_bstr_t wrapper2(bstrLineText);
-			const char* str = wrapper2;
-			std::string s = str;
-
-			//formatter
-			int patternDataStartLine = 5;
-			int patternStringLen = 57;
-			int Maj = 4;
-			int colimnsCount = 9;
-
-			if (currentLine >= patternDataStartLine)
-			{
-				if (s.length() != patternStringLen) AdjustString(s, patternStringLen);
-				
-				int rowNum = currentLine - patternDataStartLine;
-				s.at(0) = (rowNum % Maj == 0) ? '•' : ' ';
-				s.at(patternStringLen-1) = (rowNum % Maj == 0) ? '•' : ' ';
-				s.at(patternStringLen - 2) = '|';
-				std::string row = std::format("{:0>{}}", rowNum, 3);
-				s.replace(1, 3, row);
-				s.replace(4, 2, "| ");
-				for (int i = 0; i < colimnsCount; i++)
-				{
-					int ofs = 9;
-					s.replace(9+i*5, 3, " | ");
-				}
-			}
-
-			CComBSTR bstrNewText(s.c_str());
-			pEditStart->ReplaceText(CComVariant(pEditEnd), bstrNewText, (long)EnvDTE::vsEPReplaceTextOptions::vsEPReplaceTextKeepMarkers);
-
-			selection->MoveToLineAndOffset(currentLine, currentColumn, false);
-			//if (forceToNumStart)
-			{
-			//	selection->MoveToLineAndOffset(line, start + 1, VARIANT_FALSE);
-			}
-
-			return true;
-		}
-
 		bool haveChanges()
 		{
 			HRESULT result;
@@ -669,28 +586,6 @@ namespace editor
 
 		}
 
-		bool SetOvertypeMode(bool enable) {
-
-			CComPtr<EnvDTE::Document> doc;
-			if (!GetActiveDoc(doc)) return false;
-
-			if (!doc) return false;
-
-			CComPtr<IDispatch> spDisp;
-			// Получаем Selection активного окна этого документа
-			if (FAILED(doc->get_Selection(&spDisp)) || !spDisp) return false;
-
-			CComQIPtr<EnvDTE::TextSelection> selection;
-			selection = spDisp;
-			if (!selection) return false;
-
-			CComBSTR command(L"Edit.OvertypeMode");
-			CComBSTR args(L""); // Пустые аргументы тоже должны быть BSTR
-
-			DTE->ExecuteCommand(command, args);
-
-			return true;
-		}
 
 
 	} VsEditor;
@@ -1348,58 +1243,161 @@ namespace editor
 		CComPtr<EnvDTE::UndoContext> pUndo;
 		std::wstring activeDocPath;
 
+		class MyMarkerClient : public IVsTextMarkerClient {
+		private:
+			LONG m_refCount;
+			COLORREF m_customColor;
+
+		public:
+			MyMarkerClient(COLORREF color) : m_refCount(1), m_customColor(color) {}
+
+			// --- У реализации IUnknown ключевое слово override оставляем, оно стандартно ---
+			STDMETHODIMP QueryInterface(REFIID riid, void** ppvObject) override {
+				if (!ppvObject) return E_POINTER;
+				if (riid == __uuidof(IUnknown) || riid == __uuidof(IVsTextMarkerClient)) {
+					*ppvObject = static_cast<IVsTextMarkerClient*>(this);
+					AddRef();
+					return S_OK;
+				}
+				*ppvObject = nullptr;
+				return E_NOINTERFACE;
+			}
+			STDMETHODIMP_(ULONG) AddRef() override { return InterlockedIncrement(&m_refCount); }
+			STDMETHODIMP_(ULONG) Release() override {
+				LONG res = InterlockedDecrement(&m_refCount);
+				if (res == 0) delete this;
+				return res;
+			}
+
+			// --- Ровно 8 методов строго из вашего листинга textmgr.h (БЕЗ override) ---
+			virtual void STDMETHODCALLTYPE MarkerInvalidated(void) { return; }
+
+			virtual HRESULT STDMETHODCALLTYPE GetTipText(
+				IVsTextMarker* pMarker,
+				BSTR* pbstrText) {
+				return E_NOTIMPL;
+			}
+
+			virtual void STDMETHODCALLTYPE OnBufferSave(
+				LPCOLESTR pszFileName) {
+				return;
+			}
+
+			virtual void STDMETHODCALLTYPE OnBeforeBufferClose(void) { return; }
+
+			virtual HRESULT STDMETHODCALLTYPE GetMarkerCommandInfo(
+				IVsTextMarker* pMarker,
+				long iItem,
+				BSTR* pbstrText,
+				DWORD* pcmdf) {
+				return E_NOTIMPL;
+			}
+
+			virtual HRESULT STDMETHODCALLTYPE ExecMarkerCommand(
+				IVsTextMarker* pMarker,
+				long iItem) {
+				return E_NOTIMPL;
+			}
+
+			virtual void STDMETHODCALLTYPE OnAfterSpanReload(void) { return; }
+
+			virtual HRESULT STDMETHODCALLTYPE OnAfterMarkerChange(
+				IVsTextMarker* pMarker) {
+				return S_OK;
+			}
+		};
+
+		void HiLight(int line, int col, int col2)
+		{
+			if (!VsEditor.DTE) return;
+
+			EnvDTE::WindowPtr pActiveWindow = nullptr;
+			VsEditor.DTE->get_ActiveWindow(&pActiveWindow);
+
+			if (pActiveWindow) {
+				// 1. Получаем Win32 дескриптор (HWND) активного окна из EnvDTE.
+				// Этот вызов никогда не заблокируется маршалингом.
+				long hWndLong = 0;
+				pActiveWindow->get_HWnd(&hWndLong);
+				HWND hVsWindow = (HWND)(LONG_PTR)hWndLong;
+
+				if (hVsWindow) {
+					// 2. Получаем доступ к главному менеджеру сервисов Visual Studio
+					IServiceProvider* pServiceProvider = nullptr;
+					HRESULT hr = VsEditor.DTE->QueryInterface(IID_IServiceProvider, (void**)&pServiceProvider);
+
+					if (SUCCEEDED(hr) && pServiceProvider) {
+						// 3. Запрашиваем сервис монитора окон (IVsUIShell)
+						GUID clsidUiShell = __uuidof(VsUIShell);
+						GUID iidUiShell = __uuidof(IVsUIShell);
+						IUnknown* pUiShellUnk = nullptr;
+
+						hr = pServiceProvider->QueryService(clsidUiShell, iidUiShell, (void**)&pUiShellUnk);
+
+						if (SUCCEEDED(hr) && pUiShellUnk) {
+							IVsUIShell* pUiShell = (IVsUIShell*)pUiShellUnk;
+
+							// 4. КЛЮЧЕВОЙ ШАГ: Просим оболочку найти IVsWindowFrame по его HWND.
+							// Этот метод работает со 100% гарантией во внешних приложениях.
+							IVsWindowFrame* pWindowFrame = nullptr;
+							hr = pUiShell->FindWindowFrame((VSCOOKIE)hVsWindow, &pWindowFrame);
+
+							if (SUCCEEDED(hr) && pWindowFrame) {
+								VARIANT varView;
+								VariantInit(&varView);
+
+								// 5. Вытаскиваем представление документа (-1010 = VSFPROPID_DocView)
+								hr = pWindowFrame->GetProperty(-1010, &varView);
+
+								if (SUCCEEDED(hr) && varView.vt == VT_UNKNOWN && varView.punkVal != nullptr) {
+									IVsCodeWindow* pCodeWindow = nullptr;
+									hr = varView.punkVal->QueryInterface(__uuidof(IVsCodeWindow), (void**)&pCodeWindow);
+									VariantClear(&varView);
+
+									if (SUCCEEDED(hr) && pCodeWindow) {
+										IVsTextView* pTextView = nullptr;
+										hr = pCodeWindow->GetPrimaryView(&pTextView);
+
+										if (SUCCEEDED(hr) && pTextView) {
+											IVsTextLines* pTextLines = nullptr;
+											hr = pTextView->GetBuffer(&pTextLines);
+
+											if (SUCCEEDED(hr) && pTextLines) {
+												IVsTextLineMarker* pNewMarker = nullptr;
+
+												// 6. Создаем яркий красный маркер ошибки компиляции
+												hr = pTextLines->CreateLineMarker(
+													13, // 13 = MARKER_COMPILE_ERROR
+													line, col,
+													line, col2,
+													nullptr,
+													&pNewMarker
+												);
+
+												if (SUCCEEDED(hr) && pNewMarker) {
+													pNewMarker->Release(); // Оставляем маркер в памяти VS
+												}
+												pTextLines->Release();
+											}
+											pTextView->Release();
+										}
+										pCodeWindow->Release();
+									}
+								}
+								pWindowFrame->Release();
+							}
+							pUiShell->Release();
+						}
+						pServiceProvider->Release();
+					}
+				}
+			}
+		}
+
 		bool EnterDrumMode() {
 
 			HRESULT result;
-/*			CComPtr<EnvDTE::Document> doc;
-			if (!VsEditor.GetActiveDoc(doc)) 
-			{
-				return;
-			}
 
-			CComBSTR bstrPath;
-			doc->get_FullName(&bstrPath);
-			activeDocPath = bstrPath.m_str;
-
-			CComPtr<IDispatch> selection_dispatch;
-			result = doc->get_Selection(&selection_dispatch);
-			if (FAILED(result))
-			{
-				return;
-			}
-				
-
-			CComPtr<EnvDTE::TextSelection> selection;
-			result = selection_dispatch->QueryInterface(&selection);
-			if (FAILED(result))
-			{
-				return;
-			}
-
-			CComPtr<IDispatch> pDocDisp;
-			result = doc->Object(CComBSTR("TextDocument"), &pDocDisp);
-			if (FAILED(result))
-			{
-				return;
-			}
-
-			CComQIPtr<EnvDTE::TextDocument> pTextDoc(pDocDisp);
-			long currentLine = 0;
-			long currentColumn = 0;
-			result = selection->get_CurrentLine(&anchorLine);
-			result = selection->get_CurrentColumn(&cursorCol);
-			if (FAILED(result))
-			{
-				return;
-			}
-
-			CComPtr<EnvDTE::EditPoint> pEditPoint;
-			result = pTextDoc->CreateEditPoint(NULL, &pEditPoint);
-			if (FAILED(result))
-			{
-				return;
-			}
-			*/
 			CComPtr<EnvDTE::Document> doc;
 			if (!VsEditor.GetActiveDoc(doc)) return false;
 
@@ -1444,22 +1442,38 @@ namespace editor
 			result = pEditPoint->GetLines(currentLine, currentLine + 1, &bstrLineText);
 			if (FAILED(result))	return false;
 
-
-			/*CComBSTR bstrLineText;
-			result = pEditPoint->GetLines(currentLine, currentLine + 1, &bstrLineText);
-			if (FAILED(result))	return;
-			*/
-
 			_bstr_t wrapper2(bstrLineText);
 			const char* str = wrapper2;
 			std::string s = str;
 			if (s.find(".note", 0) != std::string::npos)
 			{
-				ai
+				int s_column = VsEditor.column - 1;
+				auto rb = s.find("\"", s_column + 1 );
+				auto lb = s.rfind("\"", s_column - 1);
+
+				if (rb != std::string::npos && lb != std::string::npos)
+				{
+					lb++;
+					int col = (s_column - lb) / 4;
+					col *= 4;
+					col += lb;	
+					//selection->GotoLine(VsEditor.line, VARIANT_FALSE);
+
+
+					HiLight(VsEditor.line, col+1, col+3);
+
+					//selection->put_Mode(EnvDTE::vsSelectionModeBox);
+					//selection->MoveToLineAndOffset(VsEditor.line, col + 1, VARIANT_FALSE);
+					//selection->MoveToLineAndOffset(VsEditor.line, col + 1 + 3, VARIANT_TRUE);
+					//bstr_t commandName(L"Edit.FindNextSelected");
+					//bstr_t commandArgs(L"");
+					//VsEditor.DTE->ExecuteCommand(commandName, commandArgs);
+
+					return true;
+				}
 			}
 
-			selection->GotoLine(5, VARIANT_FALSE);
-			selection->MoveToLineAndOffset(5, 20, VARIANT_TRUE);
+
 
 			//result = pEditPoint->MoveToLineAndOffset(anchorLine, 1);
 			//if (FAILED(result))
@@ -1475,7 +1489,7 @@ namespace editor
 			//shadowLine += L"^";
 
 			//pEditPoint->Insert(CComBSTR(shadowLine.c_str())); 
-
+			return false;
 		}
 
 		void MoveVisualCursor(int delta) {
@@ -1539,55 +1553,6 @@ namespace editor
 			//pEditPoint->ReplaceText(vEndNew, CComBSTR(L"^"), 0);
 		}
 
-		void ExitDrumMode() {
-			HRESULT result;
-			CComPtr<EnvDTE::Document> doc;
-			if (activeDocPath.empty()) return;
-
-			CComPtr<EnvDTE::Document> pTargetDoc;
-			CComBSTR bstrTarget(activeDocPath.c_str());
-
-			// Ищем документ в коллекции открытых документов по пути
-			CComPtr<EnvDTE::Documents> pDocs;
-			VsEditor.DTE->get_Documents(&pDocs);
-			pDocs->Item(CComVariant(bstrTarget), &doc);
-
-			if (doc) {
-
-				CComPtr<IDispatch> pDocDisp;
-				result = doc->Object(CComBSTR("TextDocument"), &pDocDisp);
-				if (FAILED(result))
-				{
-					return;
-				}
-
-				CComQIPtr<EnvDTE::TextDocument> pTextDoc(pDocDisp);
-
-				CComPtr<EnvDTE::EditPoint> pEditPoint;
-				result = pTextDoc->CreateEditPoint(NULL, &pEditPoint);
-				if (FAILED(result))
-				{
-					return;
-				}
-
-				// Переходим на начало вспомогательной строки
-				//pEditPoint->MoveToLineAndOffset(anchorLine + 1, 1);
-
-				//CComPtr<EnvDTE::EditPoint> pEnd;
-				//pEditPoint->CreateEditPoint(&pEnd);
-				//pEnd->LineDown(1); // Опускаемся на одну строку вниз, чтобы захватить весь текст с переносом
-
-				// Ошибочное место исправляем здесь:
-				//CComVariant vEnd(pEnd);
-				//pEditPoint->Delete(vEnd);
-
-				// Закрываем транзакцию
-				//if (pUndo) {
-//					pUndo->Close();
-	//				pUndo.Release(); // Освобождаем контекст
-		//		}
-			}
-		}
 	} trackerUI;
 
 
@@ -1692,6 +1657,7 @@ namespace editor
 	}
 
 	bool FileIsPattern = false;
+	bool DrumMode = false;
 
 	struct WindowRect {
 		long left, top, width, height;
@@ -1710,24 +1676,10 @@ namespace editor
 	}
 	
 
-	void PatternEditor()
+	void ShowPatternShield(bool show)
 	{
-		if (!VsEditor.UpdateFileName()) return;
-
-		if (!isFileName(VsEditor.fileName, "trackData.h"))
+		if (show)
 		{
-			if (FileIsPattern) trackerUI.ExitDrumMode();
-			//if (lastFileIsPattern) VsEditor.SetOvertypeMode(false);
-			FileIsPattern = false;
-			ShowWindow(TrackerShield, SW_HIDE);
-			
-			return;
-		}
-
-		if (!FileIsPattern)
-		{
-			trackerUI.EnterDrumMode();
-
 			CComPtr<EnvDTE::Window> activeWin;
 			VsEditor.DTE->get_ActiveWindow(&activeWin);
 
@@ -1738,19 +1690,58 @@ namespace editor
 					rc.left, rc.top, rc.width, rc.height,
 					SWP_SHOWWINDOW);
 			}
-
-			WINDOWPLACEMENT wp;
-			//GetWindowPlacement(editorWindow, &wp);
-			//SetWindowPlacement(hWnd, &wp);
-
-			//ShowWindow(TrackerShield, SW_SHOW);
-			//UpdateWindow(TrackerShield);
-			//SetFocus(TrackerShield);
-			FileIsPattern = true;
-
-			
-
 		}
+		else
+		{
+			ShowWindow(TrackerShield, SW_HIDE);
+		}
+	}
+
+	bool isMouseButtonDown = false;
+
+	void PatternEditor()
+	{
+		//mode change
+		bool isPressed = (GetAsyncKeyState(VK_MBUTTON) & 0x8000) != 0;
+
+		if (isPressed && !isMouseButtonDown)
+		{
+			if (!VsEditor.UpdateFileName()) return;
+
+			if (!isFileName(VsEditor.fileName, "trackData.h"))
+			{
+				if (DrumMode)
+				{
+					ShowPatternShield(false);
+					DrumMode = false;
+
+				}
+			}
+			else
+			{
+				if (!DrumMode)
+				{
+					if (trackerUI.EnterDrumMode())
+					{
+						ShowPatternShield(true);
+						DrumMode = true;
+					}
+				}
+				else
+				{
+					ShowPatternShield(false);
+					DrumMode = false;
+				}
+			}
+
+			isMouseButtonDown = true;
+
+		} else if (!isPressed && isMouseButtonDown) {
+
+			isMouseButtonDown = false;
+		}
+
+
 
 		//if (!lastFileIsPattern)
 		//VsEditor.SetOvertypeMode(true);
