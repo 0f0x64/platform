@@ -105,50 +105,76 @@ float3 CartesianToSpherical(float3 p)
     return float3(radius, theta, phi);
 }
 
+
 float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
 {
-    float3 pos = float3(hash(iid/200.),hash(iid/140.),hash(iid/120.))-.5;
-    uint inStars = 1232*2;
-
-    float3 pos3=pos;
-    float l=hash(iid%15)*20+20;
-    pos=torusKnot(grid*PI*2);
-    pos=rot3(pos,pos/12);
-    pos=rot3(pos,(iid%15)/3*float3(4,5,6));
-    
-    pos*=5.6;
-
-    pos+=rot3(pos,noise3(pos/10+1122));
-    pos=rot3(pos,noise3(pos/5+1122)/5);
-    pos+=noise3(pos/4+112)*6;
-
-    float dst=3;
-    for (int i=0;i<32;i++)
+    float3 sk[44];
+    int cn=44;
+    //iid=iid/55;
+   /* for (int i=0;i<44;i++)
     {
-        float4 j=(i+1)*float4(5,7,8,14)+time.x*.001;
-        float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
-        hole=normalize(hole)*62;
-        dst=165/(distance(pos,hole));
-        pos-=normalize(hole-pos)*pow(dst,1);
+        sk[i].x=sin(hash(i+11.13)*(time.y/1171+2111))*1;
+        sk[i].y=cos(hash(i+11.13)*(time.y/1171+2111))*1;
+        sk[i].y/=2;
+        sk[i].z=cos(hash(i+11.13)*(time.y/1171+2111))*1;
+        sk[i].xz *= 1-hash(i)/3;
+        sk[i].z*=2;
+        sk[i].z+=1;
+        sk[i].y+=.3;
+        //sk[i].y+=(hash(i)%2)/11.;
+    }*/
+
+        for (int i=0;i<44;i++)
+    {
+        sk[i].x=sin(hash(i+121.13)*(time.y/840+2111))*1;
+        sk[i].y=sin(hash(i+111.13)*(time.y/212+2111))*1;
+        sk[i].z=sin(hash(i+151.13)*(time.y/522+2111))*1;
     }
 
-    pos=CartesianToSpherical(pos);
-    pos.x+=noise3(pos/15)*22;
-    pos.x+=noise3(pos/15)*22;
-    pos=SphericalToCartesian(pos); 
+
+    float3 pos = 0;
+    pos=sk[iid%cn];
+
+    float3 form=.3/normalize(noise3(iid/123.*float3(1.1,2.3,3.5)))/275;
+   // form=rot3(form,noise3(pos/iid));
+    pos+=form;
+    float ind=hash(iid/123.)*(cn-1.);
+    float3 pos2=sk[ind];
+    //float f=pow(1./distance(pos,pos2)*1.065*hash(iid/123.),115);
+    float f=pow(1./(distance(pos,pos2)),115);
+    float f2=f;
+    f=saturate(f);
+    f*=hash(iid/11112.);
+    //f=pow(f,4);
+    f=distance(pos,pos2);
+    //if (f<.5) f=0;
     
-    for (int i=0;i<32;i++)
+
+    //f=min(f,1.3);
+    float3 dst=0;
+    //if (f>.6) dst=noise3(pos*112)/1;
+    //if (f<.1) f=0;
+    pos=lerp(pos,pos2,hash(f)*pow(f,.15));
+    //pos+=noise3(4*f/pos+time.x/252)*min(pow(f,12),1);
+    pos+=noise3(4*f/pos+time.x/52)*pow((f),12);
+    
+    
+    if (f>.9) 
     {
-        float4 j=(i+1)*float4(5,7,8,14)+time.x*.001;
-        float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
-        hole=normalize(hole)*62;
-        dst=192/(distance(pos,hole));
-        pos-=normalize(hole-pos)*pow(dst,1);
+        pos=normalize(noise3(float(iid)*float3(11,12,23)/11111.));
+        //pos*=2;
+        pos*=noise3(pos*5)+3;
+        pos*=22;
     }
-    pos*=1-noise3(pos/5)*pow(length(pos)/422,2.6);
-    //pos*=1+1/noise3(pos/3)*pow(length(pos)/422,5);
-    
-    return pos/6;
+    //if (f==0) pos+=2/(noise3(pos*122))*(1-f)/20;
+    //if (f==0) pos+=rot3(pos,1/(noise3(pos*122))*(1-f)/1222);
+    //if (f<.1) pos+=noise3(pos*2222)*f*10;
+    //if (f==0) pos=lerp(pos,sk[ind/23.],hash(ind/13.));
+    //if (f==0) pos+=rot3(noise3(pos*322),1/pos);
+    //if (f>1.1) pos=noise3(float(iid)*float3(5.1,3.1,7.1)/1112.)*3;
+
+    //return pos*65;
+    return pos*5;
 }
 
 float3 safe_frac_centered(float3 v)
@@ -162,7 +188,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
 {
      qid *= skipper;
      float t=time.x*.004;
-     uint inStars = 1232*123;
+     uint inStars = 1232*1213;
      if (mode==1||iid%inStars==0)
      {
         t=0;
@@ -180,7 +206,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     //color
     pos_color p;
     p.color.a=1;
-    p.color.rgb = noise3_u(pos*14*float3(122,1,112))/31+float3(6,2,3)/52;
+    p.color.rgb = noise3_u(pos*14*float3(12,55,112))/31+float3(1,3,5)/52;
     
     //p.color*=.5;
 //    p.color*=base_color*(pow(length(pos)/16,4)+.1);
@@ -188,41 +214,9 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     p.color=lerp(p.color,p.color.bgra,sin(length(pos)));
 //    p.color=lerp(p.color,base_color/144,1-saturate(pow(length(pos)/6,11)));
 //pos+=noise(pos/12)*12-6;
-pos*=1.5;
+pos*=.75;
 // 1. Извлекаем векторы осей из первых трех строк матрицы view
-    float3 r0 = float3(view[0][0][0], view[0][0][1], view[0][0][2]); // Right
-    float3 r1 = float3(view[0][1][0], view[0][1][1], view[0][1][2]); // Up
-    float3 r2 = float3(view[0][2][0], view[0][2][1], view[0][2][2]); // Forward
     
-    // 2. Извлекаем вектор смещения из 4-й строки матрицы view
-    float3 tt  = float3(view[0][3][0], view[0][3][1], view[0][3][2]); 
-
-    // 3. Вычисляем НАСТОЯЩУЮ МИРОВУЮ позицию камеры через dot product
-    float3 realCamPos;
-    realCamPos.x = -dot(tt, r0);
-    realCamPos.y = -dot(tt, r1);
-    realCamPos.z = -dot(tt, r2);
-
-     // 4. Находим расстояние от вершины до реальной камеры
-    // Увеличиваем cellSize по Z (например, 88.0f вместо 44.0f), чтобы туннель стал длиннее
-    float3 cellSize = float3(66.0f, 66.0f, 66.0f); 
-    
-    // ИСХИТРЕНИЕ: Искусственно сдвигаем базовую позицию вершины вперед по оси Z на CPU/GPU
-    // еще ДО расчета относительно камеры. 
-    // Это сместит центр ячейки зацикливания вперед, и мертвая зона сзади исчезнет.
-    float3 shiftedPos = pos;
-    // ... здесь можно сместить shiftedPos.z вперед, если ваш туннель направлен вдоль Z ...
-
-    float3 relativePos = pos - realCamPos;
-
-    // 5. Возвращаем железно рабочее и симметричное центрирование [-0.5, 0.5]
-    float3 scaledPos = relativePos / cellSize;
-    float3 loopedRelativePos = (scaledPos - floor(scaledPos + 0.5f)) * cellSize;
-
-    // 6. Собираем pos обратно (симметрия по всем осям сохранена, багов нет)
-    //pos = pos + loopedRelativePos - relativePos; 
-    //pos = loopedRelativePos - realCamPos;
-    pos = pos + (loopedRelativePos - relativePos);
 
      
     if (mode==1)
@@ -231,23 +225,23 @@ pos*=1.5;
         s=noise(iid)*62+11;
         //s*=1.5;
         p.pos=transform(pos,grid.zw,s);
-        p.color*=2.;
+        p.color*=0.1;
         p.sz=172;
     }
     else
     {
-        p.pos = transform(pos,grid.zw,1.2);
+        p.pos = transform(pos,grid.zw,1.1);
        //p.color=-noise(pos*.3+12)*.04+.02;;
        // p.color +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
          p.sz=2;
-         //p.color*=1.2;
+         p.color*=5;
 
          if (iid%inStars==0)
          {
               p.pos = transform_unisize(pos,grid.zw,75.5);
                p.sz=2;
-               p.color*=7;
-         }
+               p.color*=2;
+         } 
 
     }
       /*    if (iid==0)
@@ -263,14 +257,15 @@ pos*=1.5;
     //density compensation
     if (mode==0)
     {
-    p.color*=1*saturate(p.pos.w/27);
+    p.color*=1*saturate(p.pos.w/11);
     //p.color*=0;
 
     }
 
     if (mode==1)
     {
-    p.color*=.3*saturate(21/p.pos.w);
+    //p.color*=.3*saturate(21/p.pos.w);
+    //p.color*=1*saturate(p.pos.w/1);
     //p.color=.02;
     }
     

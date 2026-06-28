@@ -276,6 +276,8 @@ namespace Object {
 		
 	}
 
+	
+
 	cmd(Tau, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
@@ -309,14 +311,19 @@ namespace Object {
 	}
 
 #if EditMode
-	cmd(Grl, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness)
+
+	dx11::ConstBuf::sbObject HeroMesh;
+	dx11::ConstBuf::sbObject BossMesh;
+	dx11::ConstBuf::sbObject* MeshPtr = NULL;
+
+	void ShowMesh(dx11::ConstBuf::sbObject* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom)
 	{
-		reflect;
 
-		int gX = sqrt(in.count / in.skipper);
-		int gY = sqrt(in.count / in.skipper);
+		int gX = sqrt(count / skipper);
+		int gY = sqrt(count / skipper);
 
-		psModeSet(in.mode);
+		psModeSet(mode);
+		float zm = zoom / 100. + 1;
 
 		vs::girl = {
 			.params =
@@ -324,32 +331,33 @@ namespace Object {
 				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
 				.gX = gX,
 				.gY = gY,
-				.mode = (int)in.mode,
-				.skipper = in.skipper,
-				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
-				.modelPos = float4(in.xPos/100.,in.yPos / 100.,in.zPos / 100.,0),
-				.triCount = float4(dx11::ConstBuf::triangleCount,0,0,0),
-				.brightness = float4(in.brightness,0,0,0),
-				.tickness = float4(in.tickness,0,0,0),
+				.mode = (int)mode,
+				.skipper = skipper,
+				.base_color = float4(r / 100.,g / 100.,b / 100.,1),
+				.modelPos = float4(xPos/100.,yPos / 100.,zPos / 100.,0),
+				.triCount = float4(obj->triangleCount,0,0,0),
+				.brightness = float4(brightness,0,0,0),
+				.tickness = float4(tickness,0,0,0),
+				.zoom = float4(zm,zm,zm,1)
 			},
 		};
 
-		if (in.tMode == triMode::on)
+		if (tMode == triMode::on)
 		{
 			vs::girl.params.mode = 2;
 		}
 
 		vs::girl.set();
 
-		dx11::ConstBuf::BindSB(0);
-		dx11::ConstBuf::BindSB(1);
-		dx11::Rasterizer::Cull(cullmode::off);
+		obj->BindSB(0);
+		obj->BindSB(1);
 
-		if (in.tMode == triMode::on)
+
+		if (tMode == triMode::on)
 		{
 			//dx11::Shaders::resetShader(dx11::Shaders::basic);
 			//dx11::Shaders::resetShader(dx11::Shaders::basic);
-			Drawer::NullDrawerTri({ in.count, 1 });
+			Drawer::NullDrawerTri({ count, 1 });
 		}
 		else
 		{
@@ -358,7 +366,37 @@ namespace Object {
 
 		
 	}
+
+	cmd(Mesh, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom)
+	{
+		reflect;
+
+		int count = 500000;
+
+		DepthBuf::Mode({ depthmode::on });
+		BlendMode::Set({
+			.mode = blendmode::off,
+			.op = blendop::add
+			});
+
+		Culling::Set({ cullmode::off });
+		if (in.stencil == switcher::on)
+		{
+			ShowMesh(MeshPtr, (int)MeshPtr->triangleCount,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom);
+		}
+
+		Culling::Set({ cullmode::off });
+		DepthBuf::Mode({ depthmode::readonly });
+		BlendMode::Set({
+			.mode = blendmode::on,
+			.op = blendop::add
+			});
+
+		ShowMesh(MeshPtr, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom);
+	}
+
 #endif
+
 	cmd(ScorpBall, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
@@ -438,6 +476,33 @@ namespace Object {
 		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 
 		
+	}
+
+	cmd(Maze, int count, int skipper, pMode mode, int r, int g, int b)
+	{
+		reflect;
+
+		int gX = sqrt(in.count / in.skipper);
+		int gY = sqrt(in.count / in.skipper);
+
+		psModeSet(in.mode);
+
+		vs::maze = {
+			.params = {
+				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.gX = gX,
+				.gY = gY,
+				.mode = (int)in.mode,
+				.skipper = in.skipper,
+				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1)
+			},
+		};
+
+		vs::maze.set();
+
+		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
+
+
 	}
 
 	cmd(Rocks, int count, int skipper, pMode mode, int r, int g, int b)
@@ -944,9 +1009,16 @@ namespace Object {
 		
 	}
 
+
+	
+	
+
+
 	cmd(Girl, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil)
 	{
 		reflect;
+
+		//Object::Capri({ .quality = 1 });
 
 		int pillars_cnt2 = 2000 * 1000;
 
@@ -957,85 +1029,35 @@ namespace Object {
 
 		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
-		RenderTarget::Clear({ 0,0,0,0 });
-		DepthBuf::Clear({});
 
+		//vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
+		Maze({ pillars_cnt / 2,1,pMode::point,1390,925,111 });
 
-
-		Pillars(pillars_cnt, 1, pMode::point);
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 		//NeutronStar(neutronStar_cnt, 1, pMode::point);
 
-		Galaxy({ galaxy_cnt, 14, pMode::point ,100,200,300 });
+		//Galaxy({ galaxy_cnt, 14, pMode::point ,100,200,300 });
 
 		//RenderTarget::Set({ texture::pBuf,0 });
 		//RenderTarget::Clear({ 0,0,0,0 });
 
-		DepthBuf::Mode({ depthmode::on });
-		BlendMode::Set({
-			.mode = blendmode::off,
-			.op = blendop::add
-			});
+		//call show obj
 
-#if EditMode
-		Culling::Set({ cullmode::off });
-		if (in.stencil == switcher::on)
-		{
-			Grl({
-				.count = (int)dx11::ConstBuf::triangleCount,
-				.skipper = 1,
-				.mode = pMode::point,
-				.r = 0,
-				.g = 0,
-				.b = 0,
-				.tMode = triMode::on,
-				.xPos = in.xPos,
-				.yPos = in.yPos,
-				.zPos = in.zPos,
-				.brightness = in.brightness,
-				.tickness = in.tickness
-				});
-		}
-
-		Culling::Set({ cullmode::off });
-		DepthBuf::Mode({ depthmode::readonly });
-		BlendMode::Set({
-			.mode = blendmode::on,
-			.op = blendop::add
-			});
-
-
-		Grl({
-			.count = pillars_cnt2,
-			.skipper = 1,
-			.mode = pMode::point,
-			.r = 100,
-			.g = 252,
-			.b = 1400,
-			.tMode = triMode::off,
-			.xPos = in.xPos,
-			.yPos = in.yPos,
-			.zPos = in.zPos,
-			.brightness = in.brightness,
-			.tickness = in.tickness
-			});
-
-#endif
 		Culling::Set({ cullmode::off });
 		DepthBuf::Mode({ depthmode::off });
 
 		//mid
 		RenderTarget::Set({ texture::pBufMid,0 });
-		RenderTarget::Clear({ 0,0,0,0 });
+		vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
+		Maze({ pillars_cnt,94,pMode::glow,20,30,75 });
 
-
-		Galaxy({ galaxy_cnt, 4, pMode::glow ,100,200,300 });
+		//Galaxy({ galaxy_cnt, 4, pMode::glow ,100,200,300 });
 
 		//low
 		RenderTarget::Set({ texture::pBufLow,0 });
-		RenderTarget::Clear({ 0,0,0,0 });
 
-		Pillars(pillars_cnt, 10394, pMode::glow);
+
+		//Pillars(pillars_cnt, 10394, pMode::glow);
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
 		//------------------

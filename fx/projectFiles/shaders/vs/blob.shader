@@ -105,6 +105,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
          }
 
     }
+        
       /*    if (iid==0)
          {
               p.pos = transform(0,grid.zw,16.5);

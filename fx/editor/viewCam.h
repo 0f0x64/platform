@@ -106,6 +106,31 @@ namespace ViewCam
 		flyToCam = 0.f;
 	}
 
+	float stepAmp = 0.f;
+	float slideAmp = 0.f;
+
+	void Dolly()
+	{
+		stepAmp = clamp(stepAmp, -1.f, 1.f);
+		auto v = XMVector3Normalize(XMVECTOR(currentCamera.ViewVec))* stepAmp;
+		currentCamera.Target -= v;
+		targetCamera = currentCamera;
+	}
+
+	void Slide()
+	{
+		slideAmp = clamp(slideAmp, -1.f, 1.f);
+		XMVECTOR Position = XMVectorSubtract(currentCamera.Target, currentCamera.ViewVec);
+		XMVECTOR RightVec = XMVector3Cross(currentCamera.upVec, currentCamera.ViewVec);
+		RightVec = XMVector3Normalize(RightVec); // Обязательно нормализуем
+		XMVECTOR Offset = XMVectorScale(RightVec, slideAmp);
+
+		XMVECTOR NewPosition = XMVectorAdd(Position, Offset);
+		currentCamera.Target = XMVectorAdd(NewPosition, currentCamera.ViewVec);
+
+		targetCamera = currentCamera;
+	}
+
 
 	void TransCam(float x, float y, float z)
 	{

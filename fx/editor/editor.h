@@ -1281,11 +1281,13 @@ namespace editor
 		// Display the Open dialog box
 		if (GetOpenFileName(&ofn) == TRUE) {
 			
-			ConstBuf::LoadObj(ofn.lpstrFile);
+			//ConstBuf::LoadObj(ofn.lpstrFile);
 
 			//std::wcout << L"Selected file: " << ofn.lpstrFile << std::endl;
 		}
 	}
+
+	float step = 0;
 
 	void Process()
 	{
@@ -1498,6 +1500,25 @@ namespace editor
 			TimeLine::Draw();
 			paramEdit::showTrack();
 		}
+
+		//game mode
+
+		if (!GetAsyncKeyState(VK_CONTROL))
+		{
+			if (GetAsyncKeyState('W')) ViewCam::stepAmp += .01;
+			if (GetAsyncKeyState('S')) ViewCam::stepAmp -= .01;
+			if (GetAsyncKeyState('A')) ViewCam::slideAmp += .01;
+			if (GetAsyncKeyState('D')) ViewCam::slideAmp -= .01;
+
+
+			if (!(GetAsyncKeyState('W') || GetAsyncKeyState('S'))) ViewCam::stepAmp *= .75;
+			if (!(GetAsyncKeyState('A') || GetAsyncKeyState('D'))) ViewCam::slideAmp *= .75;
+		}
+
+		ViewCam::Dolly();
+		ViewCam::Slide();
+		
+		//
 
 		paramEdit::CamKeys();
 

@@ -991,15 +991,76 @@ namespace Loop
 			});
 
 			BasicCam::processCam();
+			
+			RenderTarget::Set({ texture::pBuf,0 });
+			RenderTarget::Clear({ 0,0,0,0 });
+			DepthBuf::Clear({});
+
+			RenderTarget::Set({ texture::pBufMid,0 });
+			RenderTarget::Clear({ 0,0,0,0 });
+
+			RenderTarget::Set({ texture::pBufLow,0 });
+			RenderTarget::Clear({ 0,0,0,0 });
+
+			Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
+			Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
+
+			RenderTarget::Set({ texture::pBuf,0 });
+
+			struct ppoints {
+				float4 pos;
+			};
+
+			ppoints path[] = {
+				{0,0,0,0},
+				{0,0,-1,0}
+			};
+
+			struct plinks {
+				int id[4];
+			};
+
+			plinks maze[] = {
+				{ 0,0,0,0 },
+				{ 1,0,0,0 }
+			};
+
+
+
+			/*Object::MeshPtr = &Object::HeroMesh;
+			Object::Mesh({
+					.quality = 1,
+					.xPos = 0,
+					.yPos = -358,
+					.zPos = 1129,
+					.brightness = 14,
+					.tickness = 2,
+					.stencil = switcher::on,
+					.zoom = -81
+				});
+
+			Object::MeshPtr = &Object::BossMesh;
+			Object::Mesh({
+				.quality = 1,
+				.xPos = 0,
+				.yPos = 9,
+				.zPos = 0,
+				.brightness = 114,
+				.tickness = 2,
+				.stencil = switcher::on,
+				.zoom = 110
+				});*/
+				
 			Object::Girl({
 				.quality = 1,
 				.xPos = 0,
-				.yPos = 1,
+				.yPos = -267,
 				.zPos = 0,
-				.brightness = 69,
+				.brightness = 19,
 				.tickness = 2,
 				.stencil = switcher::on
 			});
+
 
 
 		Compose();

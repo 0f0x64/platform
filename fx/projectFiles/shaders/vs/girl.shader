@@ -15,6 +15,7 @@ cbuffer params : register(b0)
     float4 triCount;
     float4 brightness;
     float4 tickness;
+    float4 zoom;
 }
 
 struct Vertex {
@@ -265,7 +266,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 
         //pos.y-=4;
     }
-    
+    pos*=zoom;
     pos+=modelPos.xyz;
     //pos.y+=1.9;
     //pos/=5;
