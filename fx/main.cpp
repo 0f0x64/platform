@@ -142,6 +142,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	MSG msg = { 0 };
 
 	UpdateWindow(hWnd);
+	SetActiveWindow(hWnd);
 
 	timer::StartCounter();
 

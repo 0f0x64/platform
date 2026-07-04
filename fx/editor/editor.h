@@ -1503,7 +1503,7 @@ namespace editor
 
 		//game mode
 
-		if (!GetAsyncKeyState(VK_CONTROL))
+		/*if (!GetAsyncKeyState(VK_CONTROL))
 		{
 			if (GetAsyncKeyState('W')) ViewCam::stepAmp += .01;
 			if (GetAsyncKeyState('S')) ViewCam::stepAmp -= .01;
@@ -1516,7 +1516,7 @@ namespace editor
 		}
 
 		ViewCam::Dolly();
-		ViewCam::Slide();
+		ViewCam::Slide();*/
 		
 		//
 

@@ -47,9 +47,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		
 		break;
 
-	/*case WM_SETCURSOR:
+	case WM_SETCURSOR:
 
-		switch (editor::ui::cursorID)
+		/*switch (editor::ui::cursorID)
 		{
 		case 0:
 			SetCursor(LoadCursor(NULL, IDC_ARROW));
@@ -70,8 +70,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			SetCursor(LoadCursor(NULL, IDC_IBEAM));
 			break;
 		}
-		break;
 		*/
+		// ѕровер€ем, что мышь находитс€ над клиентской (игровой) зоной окна
+		if (LOWORD(lParam) == HTCLIENT)
+		{
+			// ”станавливаем NULL (скрыт) или IDC_ARROW (стрелка)
+			SetCursor(Loop::gameCam ? NULL : LoadCursor(NULL, IDC_ARROW));
+			return TRUE; // —ообщаем Windows, что обработали курсор сами
+		}
+		break;
+		
 
 
 	case WM_MOUSEWHEEL:
@@ -108,31 +116,33 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		switch (wParam)
 		{
 			case VK_SPACE:
-				editor::TimeLine::Space();
+				//editor::TimeLine::Space();
 				break;
 			case VK_ESCAPE:
-				editor::ViewCam::ToggleViewMode();
+				//editor::ViewCam::ToggleViewMode();
+				Loop::gameCam = !Loop::gameCam;
+				//SetCursor(Loop::gameCam ? NULL : LoadCursor(NULL, IDC_ARROW));
 				break;
 			case 'A':
-				editor::ViewCam::AxisCamYaw(-90);
+				//editor::ViewCam::AxisCamYaw(-90);
 				break;
 			case 'D':
-				editor::ViewCam::AxisCamYaw(90);
+				//editor::ViewCam::AxisCamYaw(90);
 				break;
 			case 'S':
-				editor::ViewCam::AxisCamPitch(0);
+				//editor::ViewCam::AxisCamPitch(0);
 				break;
 			case 'X':
-				editor::ViewCam::AxisCamPitch(90);
+				//editor::ViewCam::AxisCamPitch(90);
 				break;
 			case 'W':
-				editor::ViewCam::AxisCamPitch(-90);
+				//editor::ViewCam::AxisCamPitch(-90);
 				break;
 			case VK_LEFT:
-				editor::paramEdit::cursorPos--;
+				//editor::paramEdit::cursorPos--;
 				break;
 			case VK_RIGHT:
-				editor::paramEdit::cursorPos++;
+				//editor::paramEdit::cursorPos++;
 				break;
 			case VK_HOME:
 				editor::paramEdit::cursorPos = 0;;
