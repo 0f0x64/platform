@@ -1229,17 +1229,21 @@ namespace Loop
 
 			// --- ПЕРЕМЕННЫЕ ДЛЯ ЗАПАЗДЫВАНИЯ КАМЕРЫ (должны сохраняться между кадрами) ---
 			static XMVECTOR lastUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-			static XMVECTOR currentCameraEye = XMVectorSet(0.0f, 0.0f, -10.0f, 1.0f); // Фактическая позиция камеры
-			static XMVECTOR currentCameraUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);  // Фактический Up камеры
+			static XMVECTOR smoothedLineEye = XMVectorSet(0.0f, 0.0f, -10.0f, 1.0f); // Сглаженная точка НА ОСИ нити
+			static XMVECTOR smoothedLineUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);  // Сглаженный верх ТРАССЫ
+			static XMVECTOR smoothedPlayerUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);  // Сглаженный верх ИГРОКА
 
-			// --- НАСТРОЙКИ СГЛАЖИВАНИЯ ---
-			float deltaTime = 0.016f;        // Передавайте ваш реальный dt кадра (таймер в секундах)
-			float distanceLerpFactor = 12.0f; // Плавность полета камеры вслед за героем (больше = быстрее)
-			float angularLerpFactor = 4.0f; // Плавность облета камеры вокруг нити (больше = быстрее)
+			// --- НАСТРОЙКИ СГЛАЖИВАНИЯ (ТЕПЕРЬ ТРИ НЕЗАВИСИМЫХ ПАРАМЕТРА) ---
+			float deltaTime = 0.016f;        // Передавайте ваш реальный dt кадра
 
-			// Коэффициенты интерполяции с защитой от разного FPS
+			float distanceLerpFactor = 3.0f;  // 1. СКОРОСТЬ СЛЕДОВАНИЯ ВДОЛЬ НИТИ (отставание сзади)
+			float trackAngularLerpFactor = 2.0f;  // 2. СКОРОСТЬ ПОВОРОТА ТРАССЫ (как плавно камера кренится на виражах нити)
+			float playerAngularLerpFactor = 12.0f; // 3. СКОРОСТЬ РЕАКЦИИ НА ИГРОКА (как быстро камера облетает при нажатии кнопок)
+
+			// Расчет весов интерполяции для каждого компонента
 			float t_dist = 1.0f - std::exp(-distanceLerpFactor * deltaTime);
-			float t_ang = 1.0f - std::exp(-angularLerpFactor * deltaTime);
+			float t_track = 1.0f - std::exp(-trackAngularLerpFactor * deltaTime);
+			float t_play = 1.0f - std::exp(-playerAngularLerpFactor * deltaTime);
 
 			// -------------------------------------------------------------
 
@@ -1250,73 +1254,79 @@ namespace Loop
 			XMVECTOR forward = XMVector3Normalize(p1 - p0);
 
 			// ==========================================
-			// ЭТАП 1: ПАРАЛЛЕЛЬНЫЙ ПЕРЕНОС ФРЕЙМА НИТИ
+			// ЭТАП 1: ПАРАЛЛЕЛЬНЫЙ ПЕРЕНОС ФРЕЙМА НИТИ (МГНОВЕННЫЙ)
 			// ==========================================
 			XMVECTOR dotResult = XMVector3Dot(lastUp, forward);
 			XMVECTOR upOnForward = XMVectorMultiply(forward, dotResult);
 			XMVECTOR lineUp = XMVector3Normalize(XMVectorSubtract(lastUp, upOnForward));
 
-			// Безопасная инициализация на старте
 			if (XMVector3Less(XMVector3LengthEst(lineUp), XMVectorSet(0.001f, 0.001f, 0.001f, 0.001f))) {
 				XMVECTOR alternative = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 				XMVECTOR right = XMVector3Normalize(XMVector3Cross(alternative, forward));
 				lineUp = XMVector3Normalize(XMVector3Cross(forward, right));
 			}
-			lastUp = lineUp; // Сохраняем стабильную основу пути для следующего кадра
+			lastUp = lineUp;
 
 			// ==========================================
-			// ЭТАП 2: ВРАЩЕНИЕ ВОКРУГ ОСИ НИТИ (МГНОВЕННЫЙ ЦЕЛЕВОЙ UP)
+			// ЭТАП 2: ВРАЩЕНИЕ ВОКРУГ ОСИ НИТИ (МГНОВЕННЫЙ ЦЕЛЕВОЙ UP ГЕРОЯ)
 			// ==========================================
 			XMVECTOR rotationQuat = XMQuaternionRotationAxis(forward, hero.axisAngle);
 			XMVECTOR targetUp = XMVector3Normalize(XMVector3Rotate(lineUp, rotationQuat));
 
 			// ==========================================
-			// ЭТАП 3: МАТРИЦА ГЕРОЯ (МГНОВЕННАЯ, COLUMN-MAJOR, БЕЗ ОШИБОК)
+			// ЭТАП 3: МАТРИЦА ГЕРОЯ (МГНОВЕННАЯ, COLUMN-MAJOR)
 			// ==========================================
-			// Персонаж обязан использовать ТОЧНЫЙ targetUp, чтобы реагировать на кнопки без задержек!
-			XMVECTOR Right = XMVector3Normalize(XMVector3Cross(targetUp, forward));
-			XMVECTOR RealUp = XMVector3Normalize(XMVector3Cross(forward, Right));
+			XMVECTOR HeroRight = XMVector3Normalize(XMVector3Cross(targetUp, forward));
+			XMVECTOR HeroRealUp = XMVector3Normalize(XMVector3Cross(forward, HeroRight));
+			//XMVECTOR HeroPosition = XMVectorSet(hero.pos.x, hero.pos.y, hero.pos.z, 1.0f);
+			XMVECTOR HeroPosition = XMVectorSet(0,0,0, 1.0f);
 
-			// ИСПРАВЛЕНО: Возвращаем реальную позицию героя вместо нулевого вектора
-			//XMVECTOR Position = XMVectorSet(hero.pos.x, hero.pos.y, hero.pos.z, 1.0f);
-			XMVECTOR Position = XMVectorSet(0,0,0, 1.0f);
-
-			XMMATRIX heroWorldMatrix = XMMATRIX(
-				XMVectorSet(XMVectorGetX(Right), XMVectorGetX(RealUp), XMVectorGetX(forward), 0.0f),
-				XMVectorSet(XMVectorGetY(Right), XMVectorGetY(RealUp), XMVectorGetY(forward), 0.0f),
-				XMVectorSet(XMVectorGetZ(Right), XMVectorGetZ(RealUp), XMVectorGetZ(forward), 0.0f),
-				XMVectorSet(XMVectorGetX(Position), XMVectorGetY(Position), XMVectorGetZ(Position), 1.0f)
+			Object::heroWorld = XMMatrixTranspose(XMMATRIX(
+				XMVectorSet(XMVectorGetX(HeroRight), XMVectorGetX(HeroRealUp), XMVectorGetX(forward), 0.0f),
+				XMVectorSet(XMVectorGetY(HeroRight), XMVectorGetY(HeroRealUp), XMVectorGetY(forward), 0.0f),
+				XMVectorSet(XMVectorGetZ(HeroRight), XMVectorGetZ(HeroRealUp), XMVectorGetZ(forward), 0.0f),
+				XMVectorSet(XMVectorGetX(HeroPosition), XMVectorGetY(HeroPosition), XMVectorGetZ(HeroPosition), 1.0f))
 			);
 
-			// ИСПРАВЛЕНО: Убрали XMMatrixTranspose. Матрица уже построена по столбцам для HLSL!
-			Object::heroWorld = XMMatrixTranspose(heroWorldMatrix);
+			// ==========================================
+			// ЭТАП 4: СГЛАЖИВАНИЕ ДВИЖЕНИЯ ВДОЛЬ ОСИ НИТИ
+			// ==========================================
+			XMVECTOR targetLineEye = p1 - forward * cd;
+			smoothedLineEye = XMVectorLerp(smoothedLineEye, targetLineEye, t_dist);
 
 			// ==========================================
-			// ЭТАП 4: СГЛАЖИВАНИЕ УГЛОВ КАМЕРЫ (ИНЕРЦИЯ ВРАЩЕНИЯ)
+			// ЭТАП 5: РАЗДЕЛЬНОЕ СГЛАЖИВАНИЕ ОРИЕНТАЦИЙ (ИСПРАВЛЕНО)
 			// ==========================================
-			// Плавно дотягиваем вектор "верха" камеры до текущего вектора игрока
-			currentCameraUp = XMVector3Normalize(XMVectorLerp(currentCameraUp, targetUp, t_ang));
+
+			// 1. Сглаживаем наклон самой трассы (виражи нити) со своей скоростью
+			smoothedLineUp = XMVector3Normalize(XMVectorLerp(smoothedLineUp, lineUp, t_track));
+
+			// 2. Вычисляем идеальный вектор игрока относительно СГЛАЖЕННОЙ трассы,
+			// чтобы поворот кнопок накладывался поверх плавно поворачивающейся основы.
+			XMVECTOR targetPlayerUp = XMVector3Normalize(XMVector3Rotate(smoothedLineUp, rotationQuat));
+
+			// 3. Сглаживаем реакцию на кнопки игрока со своей (высокой) скоростью
+			smoothedPlayerUp = XMVector3Normalize(XMVectorLerp(smoothedPlayerUp, targetPlayerUp, t_play));
+
+			// Финальный ап-вектор камеры — это наш полностью сглаженный по всем осям вектор
+			XMVECTOR currentCameraUp = smoothedPlayerUp;
 
 			// ==========================================
-			// ЭТАП 5: РАСЧЕТ ИДЕАЛЬНЫХ ТОЧЕК EYE И AT ДЛЯ КАМЕРЫ
+			// ЭТАП 6: ФОРМИРОВАНИЕ ФИНАЛЬНЫХ ТОЧЕК КАМЕРЫ
 			// ==========================================
-			XMVECTOR At = p1;
-			XMVECTOR Eye = At - forward * cd;
+			// Позиция камеры: берем сглаженную точку на оси и поднимаем по финальному Up
+			XMVECTOR currentCameraEye = smoothedLineEye + currentCameraUp * 2.0f;
 
-			// Смещаем идеальные точки по СГЛАЖЕННОМУ вектору, удерживая героя на нижней трети
-			Eye += currentCameraUp * 2.0f;
-			At += currentCameraUp * 4.5f;
+			// Точка назначения камеры: используем мгновенный p1 (героя), чтобы взгляд не отставал по осям, 
+			// но поднимаем по сглаженному Up, чтобы сохранить вертикальную треть
+			XMVECTOR targetAt = p1 + currentCameraUp * 4.5f;
 
 			// ==========================================
-			// ЭТАП 6: СГЛАЖИВАНИЕ ПОЗИЦИИ КАМЕРЫ И СБОРКА СИСТЕМЫ ВИДА
+			// ЭТАП 7: СБОРКА МАТРИЦЫ ВИДА
 			// ==========================================
-			// Плавно ведем физическую камеру к расчетной точке
-			currentCameraEye = XMVectorLerp(currentCameraEye, Eye, t_dist);
-
 			ConstBuf::camera = {
 				.world = XMMatrixIdentity(),
-				// Вектор вида по-прежнему требует транспонирования, так как XMMatrixLookAtLH строит row-major
-				.view = XMMatrixTranspose(XMMatrixLookAtLH(currentCameraEye, At, currentCameraUp)),
+				.view = XMMatrixTranspose(XMMatrixLookAtLH(currentCameraEye, targetAt, currentCameraUp)),
 				.proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(DegreesToRadians(hero.angle), dx11::iaspect, 0.01f, 100.0f))
 			};
 
