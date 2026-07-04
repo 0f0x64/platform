@@ -11,6 +11,10 @@ cbuffer params : register(b0)
     int mode;
     int skipper;
     float4 base_color;
+    float4 basePoint[1000];
+    int particlesCount;
+    int basePointsCount;
+
 }
 
 float toRad(float a)
@@ -105,67 +109,126 @@ float3 CartesianToSpherical(float3 p)
     return float3(radius, theta, phi);
 }
 
+float3 pillar2(float3 pp2,uint qid,uint iid,float2 grid,float a, float t, float h)
+{
+    float3 pos=pp2;
+    //float3 pos = float3(hash(iid/200.),hash(iid/140.),hash(iid/120.))-.5;
+    uint inStars = 1232*2;
+
+    float3 pos3=pos;
+    float l=hash(iid%15)*20+20;
+    pos=torusKnot(grid*PI*2);
+    pos=rot3(pos,pos/12);
+    pos=rot3(pos,(iid%15)/3*float3(4,5,6));
+    
+    pos*=5.6;
+
+    pos+=rot3(pos,noise3(pos/10+1122));
+    pos=rot3(pos,noise3(pos/5+1122)/5);
+    pos+=noise3(pos/4+112)*6;
+
+    float dst=3;
+    for (int i=0;i<32;i++)
+    {
+        float4 j=(i+1)*float4(5,7,8,14)+0*.001;
+        float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
+        hole=normalize(hole)*62;
+        dst=165/(distance(pos,hole));
+        pos-=normalize(hole-pos)*pow(dst,1);
+    }
+
+    pos=CartesianToSpherical(pos);
+    pos.x+=noise3(pos/15)*22;
+    pos.x+=noise3(pos/15)*22;
+    pos=SphericalToCartesian(pos); 
+    
+    for (int i=0;i<32;i++)
+    {
+        float4 j=(i+1)*float4(5,7,8,14)+t*.001;
+        float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
+        hole=normalize(hole)*62;
+        dst=192/(distance(pos,hole));
+        pos-=normalize(hole-pos)*pow(dst,1);
+    }
+    pos*=1-noise3(pos/5)*pow(length(pos)/422,2.6);
+    //pos*=1+1/noise3(pos/3)*pow(length(pos)/422,5);
+    
+    return pos/6;
+}
 
 float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
 {
-    float3 sk[44];
-    int cn=44;
-    //iid=iid/55;
-   /* for (int i=0;i<44;i++)
-    {
-        sk[i].x=sin(hash(i+11.13)*(time.y/1171+2111))*1;
-        sk[i].y=cos(hash(i+11.13)*(time.y/1171+2111))*1;
-        sk[i].y/=2;
-        sk[i].z=cos(hash(i+11.13)*(time.y/1171+2111))*1;
-        sk[i].xz *= 1-hash(i)/3;
-        sk[i].z*=2;
-        sk[i].z+=1;
-        sk[i].y+=.3;
-        //sk[i].y+=(hash(i)%2)/11.;
-    }*/
 
-        for (int i=0;i<44;i++)
+float pcount = 3725442./14./6.;
+float link =(iid%pcount)/pcount;
+//-----
+
+    float3 sk[44];
+    int cn=7;
+    float d=11111.;
+    for (int i=0;i<14;i++)
     {
-        sk[i].x=sin(hash(i+121.13)*(time.y/840+2111))*1;
-        sk[i].y=sin(hash(i+111.13)*(time.y/212+2111))*1;
-        sk[i].z=sin(hash(i+151.13)*(time.y/522+2111))*1;
+        sk[i].x=sin(hash(i+1.13)*(time.y/840+2111))*1;
+        sk[i].y=sin(hash(i+1.13)*(time.y/212+2111))*1;
+        sk[i].z=sin(hash(i+1.13)*(time.y/522+2111))*1;
+      //  sk[i].x=noise((i/d+1.13)*(time.y/840+2111))*2;
+       // sk[i].y=noise((i/d+2.13)*(time.y/212+2111))*2;
+       // sk[i].z=noise((i/d+1.33)*(time.y/522+2111))*2;
+
     }
 
 
-    float3 pos = 0;
-    pos=sk[iid%cn];
 
-    float3 form=.3/normalize(noise3(iid/123.*float3(1.1,2.3,3.5)))/275;
-   // form=rot3(form,noise3(pos/iid));
-    pos+=form;
-    float ind=hash(iid/123.)*(cn-1.);
-    float3 pos2=sk[ind];
-    //float f=pow(1./distance(pos,pos2)*1.065*hash(iid/123.),115);
-    float f=pow(1./(distance(pos,pos2)),115);
-    float f2=f;
-    f=saturate(f);
-    f*=hash(iid/11112.);
-    //f=pow(f,4);
-    f=distance(pos,pos2);
-    //if (f<.5) f=0;
-    
+    float3 pos = sk[iid%cn];
 
-    //f=min(f,1.3);
-    float3 dst=0;
-    //if (f>.6) dst=noise3(pos*112)/1;
-    //if (f<.1) f=0;
-    pos=lerp(pos,pos2,hash(f)*pow(f,.15));
-    //pos+=noise3(4*f/pos+time.x/252)*min(pow(f,12),1);
-    pos+=noise3(4*f/pos+time.x/52)*pow((f),12);
-    
-    
-    if (f>.9) 
+ 
+//pos.y/=3;
+
+float random_val = hash(float(iid)/1231231. + 341.123); // Изменили сид, чтобы не двоило с циклом
+int ind = int(floor(random_val * float(cn-1))); 
+float3 pos2 = sk[ind];
+
+//float f = frac(noise3_u(iid/12311.)*distance(pos,pos2));
+//float f = noise_u(iid);
+float f = frac(iid/1.);
+//float3 form = noise3(iid/float3(15,17,23)+31.123);
+//form=normalize(form)/14;
+//pos+=form;
+//pos2+=form;
+
+link=smoothstep(0,1,smoothstep(0,1,link));
+float link2=frac(link*4);
+pos = lerp(pos, pos2, link2);
+float factor = sqrt(1-pow(link*2-1,2)); 
+//factor = 1-abs(link*2-1);
+//pos+=factor*noise3(pos*24+link*22+iid/2222222.)/14;   
+pos+=pow(factor,2)*noise3(pos/link2*4)/cn;   
+//pos = lerp(p*2,pos, saturate(2/(distance(pos,p)*2+.1)));
+//pos+=1/p*pow(distance(pos,p),4)/5;
+
+pos+=noise3(pos*2);
+
+float3 p=pillar2(pos,qid,iid,grid,a,0,h);
+//p=normalize(p);
+//p=p/132+normalize(p)*2;
+//p+=normalize(p)*3;
+p/=38;
+p+=normalize(p)*2;
+
+//if (distance(pos,pos2)>.41) pos=p;
+pos=lerp(pos,p,saturate(1/pow(distance(pos,pos2),22)/11));
+
+
+
+    pos*=5;
+    /*if (f>.9) 
     {
         pos=normalize(noise3(float(iid)*float3(11,12,23)/11111.));
         //pos*=2;
         pos*=noise3(pos*5)+3;
         pos*=22;
-    }
+    }*/
+
     //if (f==0) pos+=2/(noise3(pos*122))*(1-f)/20;
     //if (f==0) pos+=rot3(pos,1/(noise3(pos*122))*(1-f)/1222);
     //if (f<.1) pos+=noise3(pos*2222)*f*10;
@@ -175,6 +238,21 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
 
     //return pos*65;
     return pos*5;
+}
+
+float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
+{
+
+
+    int pc = basePointsCount-1;
+
+    float ind = (pc*iid/(float)particlesCount);
+    float3 pos = basePoint[int(ind)];
+    float3 pos2 = basePoint[int(ind)+1];
+    pos=lerp(pos,pos2,frac(ind));
+  //  pos+=normalize(noise3(pos*12313))/12;
+ 
+    return pos;
 }
 
 float3 safe_frac_centered(float3 v)
@@ -198,7 +276,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
 
 
     //calc
-    float3 pos = pillar(qid,iid,grid.xy,0,t,0);
+    float3 pos = pillar3(qid,iid,grid.xy,0,t,0);
     float3 pos2=pos;
     
     //scatter
@@ -214,7 +292,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     p.color=lerp(p.color,p.color.bgra,sin(length(pos)));
 //    p.color=lerp(p.color,base_color/144,1-saturate(pow(length(pos)/6,11)));
 //pos+=noise(pos/12)*12-6;
-pos*=.75;
+//pos*=.75;
 // 1. Извлекаем векторы осей из первых трех строк матрицы view
     
 
@@ -236,13 +314,13 @@ pos*=.75;
          p.sz=2;
          p.color*=5;
 
-         if (iid%inStars==0)
+/*         if (iid%inStars==0)
          {
               p.pos = transform_unisize(pos,grid.zw,75.5);
                p.sz=2;
                p.color*=2;
          } 
-
+         */
     }
       /*    if (iid==0)
          {

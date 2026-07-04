@@ -315,6 +315,7 @@ namespace Object {
 	dx11::ConstBuf::sbObject HeroMesh;
 	dx11::ConstBuf::sbObject BossMesh;
 	dx11::ConstBuf::sbObject* MeshPtr = NULL;
+	XMMATRIX heroWorld;
 
 	void ShowMesh(dx11::ConstBuf::sbObject* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom)
 	{
@@ -328,7 +329,7 @@ namespace Object {
 		vs::girl = {
 			.params =
 			{
-				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+				.model = heroWorld,
 				.gX = gX,
 				.gY = gY,
 				.mode = (int)mode,
@@ -478,6 +479,123 @@ namespace Object {
 		
 	}
 
+	const int smoothPointMAX = 1000;
+
+	struct starline {
+		float4 basePoint[100];
+		float4 point[smoothPointMAX];
+		int basePointCount = 0;
+		int pointCount = 0;
+	};
+
+	struct {
+		starline line[100];
+		int lineCount = 0;
+	} starLineList;
+
+	cmd(SetLineCount, int lineCount)
+	{
+		reflect;
+		starLineList.lineCount = in.lineCount;
+	}
+
+	cmd(SetPointCountInLine, int line, int pointCount)
+	{
+		reflect;
+		starLineList.line[in.line].basePointCount = in.pointCount;
+	}
+
+	cmd(SetPointPosInLine, int line, int point, int x,int y, int z, int a)
+	{
+		reflect;
+		starLineList.line[in.line].basePoint[in.point] = float4(in.x,in.y,in.z,in.a);
+	}
+
+	// Вспомогательная функция сплайна Кэтмулла-Рома
+	float4 catmullRom(const float4& p0, const float4& p1, const float4& p2, const float4& p3, float t) {
+		float t2 = t * t;
+		float t3 = t2 * t;
+
+		float4 result;
+		result.x = 0.5f * ((2.0f * p1.x) + (-p0.x + p2.x) * t + (2.0f * p0.x - 5.0f * p1.x + 4.0f * p2.x - p3.x) * t2 + (-p0.x + 3.0f * p1.x - 3.0f * p2.x + p3.x) * t3);
+		result.y = 0.5f * ((2.0f * p1.y) + (-p0.y + p2.y) * t + (2.0f * p0.y - 5.0f * p1.y + 4.0f * p2.y - p3.y) * t2 + (-p0.y + 3.0f * p1.y - 3.0f * p2.y + p3.y) * t3);
+		result.z = 0.5f * ((2.0f * p1.z) + (-p0.z + p2.z) * t + (2.0f * p0.z - 5.0f * p1.z + 4.0f * p2.z - p3.z) * t2 + (-p0.z + 3.0f * p1.z - 3.0f * p2.z + p3.z) * t3);
+		result.w = 0.5f * ((2.0f * p1.w) + (-p0.w + p2.w) * t + (2.0f * p0.w - 5.0f * p1.w + 4.0f * p2.w - p3.w) * t2 + (-p0.w + 3.0f * p1.w - 3.0f * p2.w + p3.w) * t3);
+
+		return result;
+	}
+
+	void smoothStarline(starline& line, int stepsPerSegment) {
+		line.pointCount = 0; // Сбрасываем старый результат сглаживания
+
+		// Если исходных точек недостаточно для сглаживания или шаг некорректен
+		if (line.basePointCount < 2 || stepsPerSegment <= 0) {
+			// Просто копируем исходные точки в результирующий массив
+			int limit = (line.basePointCount > smoothPointMAX) ? smoothPointMAX : line.basePointCount;
+			for (int i = 0; i < limit; ++i) {
+				line.point[i] = line.basePoint[i];
+			}
+			line.pointCount = limit;
+			return;
+		}
+
+		// Проходим по сегментам между исходными точками basePoint
+		for (int i = 0; i < line.basePointCount - 1; ++i) {
+			// Формируем 4 опорные точки для Кэтмулла-Рома (с виртуальным продлением на краях)
+			float4 p0 = (i == 0) ? line.basePoint[i] : line.basePoint[i - 1];
+			float4 p1 = line.basePoint[i];
+			float4 p2 = line.basePoint[i + 1];
+			float4 p3 = (i == line.basePointCount - 2) ? line.basePoint[i + 1] : line.basePoint[i + 2];
+
+			// Генерируем промежуточные точки внутри текущего сегмента
+			for (int step = 0; step < stepsPerSegment; ++step) {
+				// Защита от переполнения жестко ограниченного массива point[100]
+				if (line.pointCount >= smoothPointMAX) {
+					return;
+				}
+
+				float t = (float)step / (float)stepsPerSegment;
+				line.point[line.pointCount] = catmullRom(p0, p1, p2, p3, t);
+				line.pointCount++;
+			}
+		}
+
+		// Добавляем финальную опорную точку, чтобы линия завершилась корректно
+		if (line.pointCount < smoothPointMAX) {
+			line.point[line.pointCount] = line.basePoint[line.basePointCount - 1];
+			line.pointCount++;
+		}
+	}
+
+	void initPatches()
+	{
+		// init maze
+		int ln = 0;
+		int pt = 0;
+
+		SetLineCount({ 1 });
+		SetPointCountInLine({ ln,12 });
+
+		pt = 0;
+		SetPointPosInLine({ ln,pt++, 0,0,0 });
+		SetPointPosInLine({ ln,pt++, 10,0,0 });
+		SetPointPosInLine({ ln,pt++, 10,0,10 });
+		SetPointPosInLine({ ln,pt++, 0,0,10 });
+
+		SetPointPosInLine({ ln,pt++, -10,0,20 });
+		SetPointPosInLine({ ln,pt++, 20,0,20 });
+		SetPointPosInLine({ ln,pt++, 20,0,-10 });
+		SetPointPosInLine({ ln,pt++, 0,0,-10 });
+
+		SetPointPosInLine({ ln,pt++, 0,20,-10 });
+		SetPointPosInLine({ ln,pt++, 10,25,10 });
+		SetPointPosInLine({ ln,pt++, 10,10,10 });
+		SetPointPosInLine({ ln,pt++, 10,-5,20 });
+
+		smoothStarline(starLineList.line[ln], 12);
+		//
+	}
+
 	cmd(Maze, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
@@ -487,20 +605,32 @@ namespace Object {
 
 		psModeSet(in.mode);
 
-		vs::maze = {
-			.params = {
-				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
-				.gX = gX,
-				.gY = gY,
-				.mode = (int)in.mode,
-				.skipper = in.skipper,
-				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1)
-			},
-		};
+		for (int i = 0; i < starLineList.lineCount; i++)
+		{
 
-		vs::maze.set();
+			vs::maze = {
+				.params = {
+					.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+					.gX = gX,
+					.gY = gY,
+					.mode = (int)in.mode,
+					.skipper = in.skipper,
+					.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
+				},
+			};
 
-		Drawer::NullDrawer({ 1,(int)gX * (int)gY });
+			vs::maze.params.particlesCount = in.count;
+			vs::maze.params.basePointsCount = starLineList.line[i].pointCount;
+
+			for (int j = 0; j < starLineList.line[i].pointCount; j++)
+			{
+				vs::maze.params.basePoint[j] = starLineList.line[i].point[j];
+			}
+
+			vs::maze.set();
+
+			Drawer::NullDrawer({ 1,in.count / in.skipper });
+		}
 
 
 	}
@@ -1031,7 +1161,7 @@ namespace Object {
 		RenderTarget::Set({ texture::pBuf,0 });
 
 		//vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
-		Maze({ pillars_cnt / 2,1,pMode::point,1390,925,111 });
+		Maze({ 10000,1,pMode::point,1390,925,111 });
 
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 		//NeutronStar(neutronStar_cnt, 1, pMode::point);
@@ -1048,8 +1178,8 @@ namespace Object {
 
 		//mid
 		RenderTarget::Set({ texture::pBufMid,0 });
-		vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
-		Maze({ pillars_cnt,94,pMode::glow,20,30,75 });
+		//vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
+		//Maze({ pillars_cnt,94,pMode::glow,20,30,75 });
 
 		//Galaxy({ galaxy_cnt, 4, pMode::glow ,100,200,300 });
 

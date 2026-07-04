@@ -267,7 +267,11 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
         //pos.y-=4;
     }
     pos*=zoom;
+    pos.y+=.4;
+    pos=mul((float3x3)model,pos);
     pos+=modelPos.xyz;
+    
+    
     //pos.y+=1.9;
     //pos/=5;
     //pos*=10.5; 

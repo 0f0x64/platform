@@ -253,6 +253,9 @@ int gY;
 int mode;
 int skipper;
 float4 base_color;
+float4 basePoint[1000];
+int particlesCount;
+int basePointsCount;
 } params;
 
 void set () {

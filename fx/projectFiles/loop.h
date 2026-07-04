@@ -934,6 +934,166 @@ namespace Loop
 
 	}
 
+	struct hero_ {
+		float4 pos = { 0,0,0,0 };
+		float4 normal = { 0,0,0,0 };
+		float axisAngle = 0;
+		float axisAngleSpeed = 0;
+		float axisAngleAccel = 0.01;
+		float maxAxisAngleSpeed = .1;
+		float yOffset = 40;
+		bool gravityMode = true;
+		float speed = 0;
+		float accel = 0.01;
+		float maxSpeed = .3;
+		float autoBrake = .9;
+		int lineIndex = 0;
+		float pointIndex = 0;
+		float angle = 100;
+	};
+
+	hero_ hero;
+
+	float distance(const float4& p1, const float4& p2) {
+		float dx = p2.x - p1.x;
+		float dy = p2.y - p1.y;
+		float dz = p2.z - p1.z;
+
+		return sqrt(dx * dx + dy * dy + dz * dz);
+	}
+
+	float4 lerp3(const float4& a, const float4& b, float t) {
+		return float4{
+			a.x + t * (b.x - a.x),
+			a.y + t * (b.y - a.y),
+			a.z + t * (b.z - a.z),
+			a.w // Сохраняем оригинальное значение w из первой точки
+		};
+	}
+
+	float frac(float x) {
+		return x - floor(x);
+	}
+
+	float4 normalize(const float4& v) {
+		// Считаем длину вектора по формуле Пифагора
+		float length = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+
+		// Защита от деления на ноль (если вектор нулевой)
+		if (length < 0.00001f) {
+			return float4{ 0.0f, 0.0f, 0.0f, v.w };
+		}
+
+		// Возвращаем нормализованный вектор
+		return float4{
+			v.x / length,
+			v.y / length,
+			v.z / length,
+			v.w // Поле w оставляем оригинальным
+		};
+	}
+
+	float4 cross(const float4& a, const float4& b) {
+		return float4{
+			a.y * b.z - a.z * b.y,
+			a.z * b.x - a.x * b.z,
+			a.x * b.y - a.y * b.x,
+			0.0f // Для векторов направления w обычно равен 0
+		};
+	}
+
+	float4 calculate_camera_up(const float4& eye, const float4& at) {
+		// 1. Вычисляем нормализованный вектор взгляда (Forward)
+		float4 forward = { at.x - eye.x, at.y - eye.y, at.z - eye.z, 0.0f };
+		forward = normalize(forward);
+
+		// 2. Задаем базовый мировой вектор "верх" (обычно ось Y)
+		float4 world_up = { 0.0f, 1.0f, 0.0f, 0.0f };
+
+		// КРАЙНИЙ СЛУЧАЙ (Gimbal Lock): Если камера смотрит строго вверх или строго вниз,
+		// вектор forward станет коллинеарен world_up. Векторное произведение выдаст 0.
+		// В этом случае временно меняем мировой ориентир на ось Z.
+		float dot = forward.x * world_up.x + forward.y * world_up.y + forward.z * world_up.z;
+		if (std::abs(dot) > 0.999f) {
+			world_up = float4{ 0.0f, 0.0f, 1.0f, 0.0f }; // Если смотрим вертикально, "верх" берем от Z
+		}
+
+		// 3. Находим вектор "право" (Right) через Cross Product
+		float4 right = normalize(cross(forward, world_up));
+
+		// 4. Находим финальный "верх" (Up), перпендикулярный и взгляду, и правому вектору
+		float4 up = normalize(cross(right, forward));
+
+		return up;
+	}
+
+	// 2. ФУНКЦИЯ ПОЛУЧЕНИЯ НАПРАВЛЕНИЯ МЕЖДУ ДВУМЯ ТОЧКАМИ
+	// Возвращает единичный вектор направления от точки 'from' к точке 'to'
+	float4 direction_between(const float4& from, const float4& to) {
+		// Находим вектор разности (вектор направления)
+		float4 dir = {
+			to.x - from.x,
+			to.y - from.y,
+			to.z - from.z,
+			from.w // w-компоненту обычно наследуют от базовой точки
+		};
+
+		// Вызываем отдельную функцию нормализации
+		return normalize(dir);
+	}
+
+	void processGravity()
+	{
+		if (!hero.gravityMode) return;
+
+		float minDistance = 1e9f; // Инициализируем заведомо большим числом
+		float4 closestPoint = { 0.0f, 0.0f, 0.0f, 0.0f };
+		bool foundPoint = false;
+
+		//Находим ОДНУ самую ближайшую точку
+		for (int i = 0; i < Object::starLineList.lineCount; i++)
+		{
+			for (int j = 0; j < Object::starLineList.line[i].pointCount; j++)
+			{
+				float dst = distance(hero.pos, Object::starLineList.line[i].point[j]);
+
+				// Если эта точка ближе, чем все предыдущие, запоминаем её
+				if (dst < minDistance)
+				{
+					minDistance = dst;
+					closestPoint = Object::starLineList.line[i].point[j];
+					foundPoint = true;
+					hero.lineIndex = i;
+					hero.pointIndex = (float)j;
+				}
+			}
+		}
+
+		hero.pos = lerp3(hero.pos, closestPoint, .1);
+
+		if (minDistance < .1) hero.gravityMode = false;
+	}
+
+	void Respawn()
+	{
+		if (GetAsyncKeyState('R'))
+		{
+			int range = 5;
+			hero.pos.x = rand() % range - range / 2;
+			hero.pos.y = rand() % range - range / 2;
+			hero.pos.z = rand() % range - range / 2;
+			int startLine = 0;
+			int startPoint = 0;
+			float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
+			hero.pos.x += destPoint.x;
+			hero.pos.y += destPoint.y;
+			hero.pos.z += destPoint.z;
+			hero.gravityMode = true;
+		}
+	}
+
+	
+
 	void scene3()
 	{
 		BasicCam::camPass = false;
@@ -1002,44 +1162,175 @@ namespace Loop
 			RenderTarget::Set({ texture::pBufLow,0 });
 			RenderTarget::Clear({ 0,0,0,0 });
 
-			Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
-			Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
+			
+			
 
 			RenderTarget::Set({ texture::pBuf,0 });
+			//
 
-			struct ppoints {
-				float4 pos;
+			Object::initPatches();
+
+			Respawn();
+			processGravity();
+
+
+			if (GetAsyncKeyState(VK_RIGHT))
+			{
+				hero.axisAngleSpeed -= hero.axisAngleAccel;
+			}
+
+			if (GetAsyncKeyState(VK_LEFT))
+			{
+				hero.axisAngleSpeed += hero.axisAngleAccel;
+			}
+
+			hero.axisAngleSpeed *= hero.autoBrake;
+			hero.axisAngleSpeed = clamp(hero.axisAngleSpeed, -hero.maxAxisAngleSpeed, hero.maxAxisAngleSpeed);
+			hero.axisAngle += hero.axisAngleSpeed;
+
+			if (GetAsyncKeyState(VK_UP))
+			{
+				hero.speed += hero.accel;
+			}
+			if (GetAsyncKeyState(VK_DOWN))
+			{
+				hero.speed -= hero.accel;
+			}
+
+			hero.speed *= hero.autoBrake;
+			hero.speed = clamp(hero.speed, -hero.maxSpeed, hero.maxSpeed);
+			
+			hero.pointIndex += hero.speed;
+			hero.pointIndex = clamp(hero.pointIndex, 1., (float)(Object::starLineList.line[hero.lineIndex].pointCount - 1));
+
+			float t0 = floor(hero.pointIndex);
+			float t1 = frac(hero.pointIndex);
+
+			float4 current_node = Object::starLineList.line[hero.lineIndex].point[(int)t0];
+			float4 next_node = Object::starLineList.line[hero.lineIndex].point[(int)t0+1];
+			//движение по пути
+			float4 follow_node = Object::starLineList.line[hero.lineIndex].point[(int)t0-1];
+			if (!hero.gravityMode)
+			{
+				hero.pos = lerp3(current_node, next_node, t1);
+
+			}
+
+			float4 follow = lerp3(follow_node, current_node, t1);
+
+
+			//float4 forward = direction_between(current_node, next_node);
+			//float4 base_up = calculate_camera_up(current_node, next_node);
+			//float4 right = normalize(cross(forward, base_up));
+			///float4 up = normalize(cross(right, forward));
+
+				
+			float cd = 6.0f; // Дистанция до героя
+
+			// Базовый ап-вектор нити. Должен сохраняться между кадрами (static или член класса).
+			static XMVECTOR lastUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+			XMVECTOR p0 = XMVectorSet(follow.x, follow.y, follow.z, 0.0f);
+			XMVECTOR p1 = XMVectorSet(hero.pos.x, hero.pos.y, hero.pos.z, 0.0f);
+
+			// 1. Направление взгляда / оси нити (Forward)
+			XMVECTOR forward = XMVector3Normalize(p1 - p0);
+
+			// ==========================================
+			// ЭТАП 1: ПАРАЛЛЕЛЬНОГО ПЕРЕНОС ФРЕЙМА НИТИ
+			// ==========================================
+			XMVECTOR dotResult = XMVector3Dot(lastUp, forward);
+			XMVECTOR upOnForward = XMVectorMultiply(forward, dotResult);
+			XMVECTOR lineUp = XMVector3Normalize(XMVectorSubtract(lastUp, upOnForward));
+
+			// Безопасная инициализация на старте
+			if (XMVector3Less(XMVector3LengthEst(lineUp), XMVectorSet(0.001f, 0.001f, 0.001f, 0.001f))) {
+				XMVECTOR alternative = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+				XMVECTOR right = XMVector3Normalize(XMVector3Cross(alternative, forward));
+				lineUp = XMVector3Normalize(XMVector3Cross(forward, right));
+			}
+			lastUp = lineUp; // Сохраняем стабильную основу пути для следующего кадра
+
+			// ==========================================
+			// ЭТАП 2: ВРАЩЕНИЕ ВОКРУГ ОСИ НИТИ (УЧЕТ HERO.AXISANGLE)
+			// ==========================================
+
+			// Создаем кватернион вращения вокруг вектора forward на угол игрока
+			// Внимание: если угол в градусах, замените на XMConvertToRadians(hero.axisAngle)
+			XMVECTOR rotationQuat = XMQuaternionRotationAxis(forward, hero.axisAngle);
+
+			// Поворачиваем базовый ап-вектор нити на угол персонажа
+			XMVECTOR Up = XMVector3Rotate(lineUp, rotationQuat);
+
+			// ==========================================
+
+			// 3. Базовые позиции камеры и цели
+			XMVECTOR At = p1;
+			XMVECTOR Eye = At - forward * cd;
+
+			// 4. Смещение для удержания героя на нижней трети вертикали
+			// Теперь Up направлен «от нити сквозь персонажа», поэтому камера 
+			// всегда окажется строго у него за спиной, под каким бы углом он ни бежал.
+			Eye += Up * 2.0f;
+			At += Up * 4.5f;
+
+			ConstBuf::camera = {
+				.world = XMMatrixIdentity(),
+				.view = XMMatrixTranspose(XMMatrixLookAtLH(Eye, At, Up)),
+				.proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(DegreesToRadians(hero.angle), dx11::iaspect, 0.01f, 100.0f))
 			};
 
-			ppoints path[] = {
-				{0,0,0,0},
-				{0,0,-1,0}
-			};
+			ConstBuf::Update(ConstBuf::cBuffer::camera);
+			ConstBuf::Set(ConstBuf::cBuffer::camera, ConstBuf::target::both);
+			
+			//hero matrix-----------------------------------------------------------
+			// --- Используем векторы forward и Up из предыдущих расчетов ---
+			// forward — направление нити (нормализован)
+			// Up      — ап-вектор персонажа с учетом hero.axisAngle (нормализован)
 
-			struct plinks {
-				int id[4];
-			};
+			// 1. Вычисляем вектор "Право" (Right) для персонажа
+			XMVECTOR Right = XMVector3Normalize(XMVector3Cross(Up, forward));
 
-			plinks maze[] = {
-				{ 0,0,0,0 },
-				{ 1,0,0,0 }
-			};
+			// 2. Гарантируем абсолютную ортогональность всех трех осей
+			XMVECTOR RealUp = XMVector3Normalize(XMVector3Cross(forward, Right));
+
+			// 3. Получаем позицию персонажа
+			//XMVECTOR Position = XMVectorSet(hero.pos.x, hero.pos.y, hero.pos.z, 1.0f);
+			XMVECTOR Position = XMVectorSet(0, 0, 0, 1.0f);
+
+			// 4. СТРОИМ COLUMN-MAJOR МАТРИЦУ НАПРЯМУЮ
+			// Вместо строк, мы заполняем столбцы (columns) матрицы XMMATRIX.
+			// Конструктор XMMATRIX(r0, r1, r2, r3) всегда принимает строки, поэтому 
+			// чтобы Right, RealUp и forward стали столбцами, мы конструируем их компоненты по горизонтали:
+			XMMATRIX heroWorldMatrix = XMMATRIX(
+				XMVectorSet(XMVectorGetX(Right), XMVectorGetX(RealUp), XMVectorGetX(forward), 0.0f), // Компоненты X осей + 0 в конце
+				XMVectorSet(XMVectorGetY(Right), XMVectorGetY(RealUp), XMVectorGetY(forward), 0.0f), // Компоненты Y осей + 0 в конце
+				XMVectorSet(XMVectorGetZ(Right), XMVectorGetZ(RealUp), XMVectorGetZ(forward), 0.0f), // Компоненты Z осей + 0 в конце
+				XMVectorSet(XMVectorGetX(Position), XMVectorGetY(Position), XMVectorGetZ(Position), 1.0f) // Весь вектор позиции в последней строке
+			);
+
+			// 6. Подготавливаем для передачи в константный буфер шейдера (Транспонируем, если HLSL требует column-major)
+			Object::heroWorld = XMMatrixTranspose(heroWorldMatrix);
+
+			//
 
 
-
-			/*Object::MeshPtr = &Object::HeroMesh;
+			//
+			Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
+			Object::MeshPtr = &Object::HeroMesh;
 			Object::Mesh({
 					.quality = 1,
-					.xPos = 0,
-					.yPos = -358,
-					.zPos = 1129,
+					.xPos = (int)(hero.pos.x*100),
+					.yPos = (int)(hero.pos.y*100),
+					.zPos = (int)(hero.pos.z*100),
 					.brightness = 14,
 					.tickness = 2,
 					.stencil = switcher::on,
 					.zoom = -81
 				});
 
-			Object::MeshPtr = &Object::BossMesh;
+			//Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
+			/*Object::MeshPtr = &Object::BossMesh;
 			Object::Mesh({
 				.quality = 1,
 				.xPos = 0,
@@ -1051,15 +1342,16 @@ namespace Loop
 				.zoom = 110
 				});*/
 				
+
 			Object::Girl({
-				.quality = 1,
-				.xPos = 0,
-				.yPos = -267,
-				.zPos = 0,
-				.brightness = 19,
-				.tickness = 2,
-				.stencil = switcher::on
-			});
+					.quality = 1,
+					.xPos = 0,
+					.yPos = 0,
+					.zPos = 0,
+					.brightness = 19,
+					.tickness = 2,
+					.stencil = switcher::on
+				});
 
 
 
