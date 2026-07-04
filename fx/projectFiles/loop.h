@@ -1227,8 +1227,21 @@ namespace Loop
 				
 			float cd = 6.0f; // Дистанция до героя
 
-			// Базовый ап-вектор нити. Должен сохраняться между кадрами (static или член класса).
+			// --- ПЕРЕМЕННЫЕ ДЛЯ ЗАПАЗДЫВАНИЯ КАМЕРЫ (должны сохраняться между кадрами) ---
 			static XMVECTOR lastUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+			static XMVECTOR currentCameraEye = XMVectorSet(0.0f, 0.0f, -10.0f, 1.0f); // Фактическая позиция камеры
+			static XMVECTOR currentCameraUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);  // Фактический Up камеры
+
+			// --- НАСТРОЙКИ СГЛАЖИВАНИЯ ---
+			float deltaTime = 0.016f;        // Передавайте ваш реальный dt кадра (таймер в секундах)
+			float distanceLerpFactor = 12.0f; // Плавность полета камеры вслед за героем (больше = быстрее)
+			float angularLerpFactor = 4.0f; // Плавность облета камеры вокруг нити (больше = быстрее)
+
+			// Коэффициенты интерполяции с защитой от разного FPS
+			float t_dist = 1.0f - std::exp(-distanceLerpFactor * deltaTime);
+			float t_ang = 1.0f - std::exp(-angularLerpFactor * deltaTime);
+
+			// -------------------------------------------------------------
 
 			XMVECTOR p0 = XMVectorSet(follow.x, follow.y, follow.z, 0.0f);
 			XMVECTOR p1 = XMVectorSet(hero.pos.x, hero.pos.y, hero.pos.z, 0.0f);
@@ -1237,7 +1250,7 @@ namespace Loop
 			XMVECTOR forward = XMVector3Normalize(p1 - p0);
 
 			// ==========================================
-			// ЭТАП 1: ПАРАЛЛЕЛЬНОГО ПЕРЕНОС ФРЕЙМА НИТИ
+			// ЭТАП 1: ПАРАЛЛЕЛЬНЫЙ ПЕРЕНОС ФРЕЙМА НИТИ
 			// ==========================================
 			XMVECTOR dotResult = XMVector3Dot(lastUp, forward);
 			XMVECTOR upOnForward = XMVectorMultiply(forward, dotResult);
@@ -1252,65 +1265,63 @@ namespace Loop
 			lastUp = lineUp; // Сохраняем стабильную основу пути для следующего кадра
 
 			// ==========================================
-			// ЭТАП 2: ВРАЩЕНИЕ ВОКРУГ ОСИ НИТИ (УЧЕТ HERO.AXISANGLE)
+			// ЭТАП 2: ВРАЩЕНИЕ ВОКРУГ ОСИ НИТИ (МГНОВЕННЫЙ ЦЕЛЕВОЙ UP)
 			// ==========================================
-
-			// Создаем кватернион вращения вокруг вектора forward на угол игрока
-			// Внимание: если угол в градусах, замените на XMConvertToRadians(hero.axisAngle)
 			XMVECTOR rotationQuat = XMQuaternionRotationAxis(forward, hero.axisAngle);
-
-			// Поворачиваем базовый ап-вектор нити на угол персонажа
-			XMVECTOR Up = XMVector3Rotate(lineUp, rotationQuat);
+			XMVECTOR targetUp = XMVector3Normalize(XMVector3Rotate(lineUp, rotationQuat));
 
 			// ==========================================
+			// ЭТАП 3: МАТРИЦА ГЕРОЯ (МГНОВЕННАЯ, COLUMN-MAJOR, БЕЗ ОШИБОК)
+			// ==========================================
+			// Персонаж обязан использовать ТОЧНЫЙ targetUp, чтобы реагировать на кнопки без задержек!
+			XMVECTOR Right = XMVector3Normalize(XMVector3Cross(targetUp, forward));
+			XMVECTOR RealUp = XMVector3Normalize(XMVector3Cross(forward, Right));
 
-			// 3. Базовые позиции камеры и цели
+			// ИСПРАВЛЕНО: Возвращаем реальную позицию героя вместо нулевого вектора
+			//XMVECTOR Position = XMVectorSet(hero.pos.x, hero.pos.y, hero.pos.z, 1.0f);
+			XMVECTOR Position = XMVectorSet(0,0,0, 1.0f);
+
+			XMMATRIX heroWorldMatrix = XMMATRIX(
+				XMVectorSet(XMVectorGetX(Right), XMVectorGetX(RealUp), XMVectorGetX(forward), 0.0f),
+				XMVectorSet(XMVectorGetY(Right), XMVectorGetY(RealUp), XMVectorGetY(forward), 0.0f),
+				XMVectorSet(XMVectorGetZ(Right), XMVectorGetZ(RealUp), XMVectorGetZ(forward), 0.0f),
+				XMVectorSet(XMVectorGetX(Position), XMVectorGetY(Position), XMVectorGetZ(Position), 1.0f)
+			);
+
+			// ИСПРАВЛЕНО: Убрали XMMatrixTranspose. Матрица уже построена по столбцам для HLSL!
+			Object::heroWorld = XMMatrixTranspose(heroWorldMatrix);
+
+			// ==========================================
+			// ЭТАП 4: СГЛАЖИВАНИЕ УГЛОВ КАМЕРЫ (ИНЕРЦИЯ ВРАЩЕНИЯ)
+			// ==========================================
+			// Плавно дотягиваем вектор "верха" камеры до текущего вектора игрока
+			currentCameraUp = XMVector3Normalize(XMVectorLerp(currentCameraUp, targetUp, t_ang));
+
+			// ==========================================
+			// ЭТАП 5: РАСЧЕТ ИДЕАЛЬНЫХ ТОЧЕК EYE И AT ДЛЯ КАМЕРЫ
+			// ==========================================
 			XMVECTOR At = p1;
 			XMVECTOR Eye = At - forward * cd;
 
-			// 4. Смещение для удержания героя на нижней трети вертикали
-			// Теперь Up направлен «от нити сквозь персонажа», поэтому камера 
-			// всегда окажется строго у него за спиной, под каким бы углом он ни бежал.
-			Eye += Up * 2.0f;
-			At += Up * 4.5f;
+			// Смещаем идеальные точки по СГЛАЖЕННОМУ вектору, удерживая героя на нижней трети
+			Eye += currentCameraUp * 2.0f;
+			At += currentCameraUp * 4.5f;
+
+			// ==========================================
+			// ЭТАП 6: СГЛАЖИВАНИЕ ПОЗИЦИИ КАМЕРЫ И СБОРКА СИСТЕМЫ ВИДА
+			// ==========================================
+			// Плавно ведем физическую камеру к расчетной точке
+			currentCameraEye = XMVectorLerp(currentCameraEye, Eye, t_dist);
 
 			ConstBuf::camera = {
 				.world = XMMatrixIdentity(),
-				.view = XMMatrixTranspose(XMMatrixLookAtLH(Eye, At, Up)),
+				// Вектор вида по-прежнему требует транспонирования, так как XMMatrixLookAtLH строит row-major
+				.view = XMMatrixTranspose(XMMatrixLookAtLH(currentCameraEye, At, currentCameraUp)),
 				.proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(DegreesToRadians(hero.angle), dx11::iaspect, 0.01f, 100.0f))
 			};
 
 			ConstBuf::Update(ConstBuf::cBuffer::camera);
 			ConstBuf::Set(ConstBuf::cBuffer::camera, ConstBuf::target::both);
-			
-			//hero matrix-----------------------------------------------------------
-			// --- Используем векторы forward и Up из предыдущих расчетов ---
-			// forward — направление нити (нормализован)
-			// Up      — ап-вектор персонажа с учетом hero.axisAngle (нормализован)
-
-			// 1. Вычисляем вектор "Право" (Right) для персонажа
-			XMVECTOR Right = XMVector3Normalize(XMVector3Cross(Up, forward));
-
-			// 2. Гарантируем абсолютную ортогональность всех трех осей
-			XMVECTOR RealUp = XMVector3Normalize(XMVector3Cross(forward, Right));
-
-			// 3. Получаем позицию персонажа
-			//XMVECTOR Position = XMVectorSet(hero.pos.x, hero.pos.y, hero.pos.z, 1.0f);
-			XMVECTOR Position = XMVectorSet(0, 0, 0, 1.0f);
-
-			// 4. СТРОИМ COLUMN-MAJOR МАТРИЦУ НАПРЯМУЮ
-			// Вместо строк, мы заполняем столбцы (columns) матрицы XMMATRIX.
-			// Конструктор XMMATRIX(r0, r1, r2, r3) всегда принимает строки, поэтому 
-			// чтобы Right, RealUp и forward стали столбцами, мы конструируем их компоненты по горизонтали:
-			XMMATRIX heroWorldMatrix = XMMATRIX(
-				XMVectorSet(XMVectorGetX(Right), XMVectorGetX(RealUp), XMVectorGetX(forward), 0.0f), // Компоненты X осей + 0 в конце
-				XMVectorSet(XMVectorGetY(Right), XMVectorGetY(RealUp), XMVectorGetY(forward), 0.0f), // Компоненты Y осей + 0 в конце
-				XMVectorSet(XMVectorGetZ(Right), XMVectorGetZ(RealUp), XMVectorGetZ(forward), 0.0f), // Компоненты Z осей + 0 в конце
-				XMVectorSet(XMVectorGetX(Position), XMVectorGetY(Position), XMVectorGetZ(Position), 1.0f) // Весь вектор позиции в последней строке
-			);
-
-			// 6. Подготавливаем для передачи в константный буфер шейдера (Транспонируем, если HLSL требует column-major)
-			Object::heroWorld = XMMatrixTranspose(heroWorldMatrix);
 
 			//
 
