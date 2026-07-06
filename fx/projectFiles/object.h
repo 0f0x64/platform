@@ -461,6 +461,32 @@ namespace Object {
 
 		psModeSet(in.mode);
 
+		XMMATRIX invViewMatrix = XMMatrixInverse(nullptr, XMMatrixTranspose(ConstBuf::camera.view[0]));
+		// Позиция камеры находится в 4-й строке инвертированной матрицы (вектор смещения)
+		XMVECTOR cameraPos = invViewMatrix.r[3];
+		// Если нужно получить отдельные float:
+		XMFLOAT3 eye;
+		XMStoreFloat3(&eye, cameraPos);
+
+		XMVECTOR cameraLookAtVec = XMVector3Normalize(invViewMatrix.r[2]);
+
+		// Сохраняем в структуру XMFLOAT3 для передачи в Shader Constants / Constant Buffer
+		XMFLOAT3 cameraForward;
+		XMStoreFloat3(&cameraForward, cameraLookAtVec);
+
+		// 1. Извлекаем и нормализуем вектор Right (1-я строка инвертированной матрицы)
+		XMVECTOR cameraRightVec = XMVector3Normalize(invViewMatrix.r[0]);
+
+		// 2. Извлекаем и нормализуем вектор Up (2-я строка инвертированной матрицы)
+		XMVECTOR cameraUpVec = XMVector3Normalize(invViewMatrix.r[1]);
+
+		// Сохраняем в структуры XMFLOAT3 для передачи в ваш Constant Buffer
+		XMFLOAT3 cameraRight;
+		XMStoreFloat3(&cameraRight, cameraRightVec);
+
+		XMFLOAT3 cameraUp;
+		XMStoreFloat3(&cameraUp, cameraUpVec);
+
 		vs::Virgo = {
 			.params = {
 				.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
@@ -468,7 +494,11 @@ namespace Object {
 				.gY = gY,
 				.mode = (int)in.mode,
 				.skipper = in.skipper,
-				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1)
+				.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
+				.eye = float4(eye.x,eye.y,eye.z,0),
+				.forward = float4(cameraForward.x,cameraForward.y,cameraForward.z,0),
+				.up = float4(cameraUp.x,cameraUp.y,cameraUp.z,0),
+				.right = float4(cameraRight.x,cameraRight.y,cameraRight.z,0),
 			},
 		};
 
@@ -578,9 +608,9 @@ namespace Object {
 
 		pt = 0;
 		SetPointPosInLine({ ln,pt++, 0,0,0 });
-		SetPointPosInLine({ ln,pt++, 10,0,0 });
+		SetPointPosInLine({ ln,pt++, 10,6,0 });
 		SetPointPosInLine({ ln,pt++, 10,0,10 });
-		SetPointPosInLine({ ln,pt++, 0,0,10 });
+		SetPointPosInLine({ ln,pt++, 0,4,10 });
 
 		SetPointPosInLine({ ln,pt++, -10,0,20 });
 		SetPointPosInLine({ ln,pt++, 20,0,20 });
@@ -1160,8 +1190,8 @@ namespace Object {
 		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
 
-		//vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
-		Maze({ 10000,1,pMode::point,1390,925,111 });
+		vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
+		Maze({ 200000,1,pMode::point,1390,925,111 });
 
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 		//NeutronStar(neutronStar_cnt, 1, pMode::point);
@@ -1178,8 +1208,8 @@ namespace Object {
 
 		//mid
 		RenderTarget::Set({ texture::pBufMid,0 });
-		//vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
-		//Maze({ pillars_cnt,94,pMode::glow,20,30,75 });
+		vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
+		Maze({ 200000,94,pMode::glow,20,30,75 });
 
 		//Galaxy({ galaxy_cnt, 4, pMode::glow ,100,200,300 });
 

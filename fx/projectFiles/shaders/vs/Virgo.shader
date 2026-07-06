@@ -11,6 +11,10 @@ cbuffer params : register(b0)
     int mode;
     int skipper;
     float4 base_color;
+    float4 eye;
+    float4 forward;
+    float4 up;
+    float4 right;
 }
 
 float toRad(float a)
@@ -125,7 +129,7 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     float dst=3;
     for (int i=0;i<32;i++)
     {
-        float4 j=(i+1)*float4(5,7,8,14)+time.x*.001;
+        float4 j=(i+1)*float4(5,7,8,14)+time.x*.00;
         float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
         hole=normalize(hole)*62;
         dst=165/(distance(pos,hole));
@@ -139,7 +143,7 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     
     for (int i=0;i<32;i++)
     {
-        float4 j=(i+1)*float4(5,7,8,14)+time.x*.001;
+        float4 j=(i+1)*float4(5,7,8,14)+time.x*.00;
         float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
         hole=normalize(hole)*62;
         dst=192/(distance(pos,hole));
@@ -156,6 +160,19 @@ float3 safe_frac_centered(float3 v)
     // floor(v + 0.5) сдвигает сетку так, чтобы центр ячейки был в нуле,
     // а вычитание из исходного вектора дает идеальный диапазон [-0.5, 0.5]
     return v - floor(v + 0.5f);
+}
+
+float GetCenteredCubeFade(float3 worldPos, float edge, float fadeWidth)
+{
+    // 1. Берем модуль координат, схлопывая 6 граней в 3 оси относительно центра (0,0,0)
+    float3 localPos = abs(worldPos);
+
+    // 2. Считаем плавное затухание от (edge - fadeWidth) до edge по всем осям сразу.
+    // Внутри куба будет 1.0, на самой грани и за ней — 0.0.
+    float3 axisFades = 1.0f - smoothstep(edge - fadeWidth, edge, localPos);
+
+    // 3. Перемножаем результаты осей. Если по любой из осей мы у грани — значение падает в 0.
+    return axisFades.x * axisFades.y * axisFades.z;
 }
 
 pos_color CalcParticles(uint qid,uint iid,float4 grid)
@@ -188,43 +205,53 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     p.color=lerp(p.color,p.color.bgra,sin(length(pos)));
 //    p.color=lerp(p.color,base_color/144,1-saturate(pow(length(pos)/6,11)));
 //pos+=noise(pos/12)*12-6;
-pos*=1.5;
-// 1. Извлекаем векторы осей из первых трех строк матрицы view
-    float3 r0 = float3(view[0][0][0], view[0][0][1], view[0][0][2]); // Right
-    float3 r1 = float3(view[0][1][0], view[0][1][1], view[0][1][2]); // Up
-    float3 r2 = float3(view[0][2][0], view[0][2][1], view[0][2][2]); // Forward
-    
-    // 2. Извлекаем вектор смещения из 4-й строки матрицы view
-    float3 tt  = float3(view[0][3][0], view[0][3][1], view[0][3][2]); 
+pos*=2.2;
+//pos/=2;
+pos2=pos;
 
-    // 3. Вычисляем НАСТОЯЩУЮ МИРОВУЮ позицию камеры через dot product
-    float3 realCamPos;
-    realCamPos.x = -dot(tt, r0);
-    realCamPos.y = -dot(tt, r1);
-    realCamPos.z = -dot(tt, r2);
 
-     // 4. Находим расстояние от вершины до реальной камеры
-    // Увеличиваем cellSize по Z (например, 88.0f вместо 44.0f), чтобы туннель стал длиннее
-    float3 cellSize = float3(66.0f, 66.0f, 66.0f); 
-    
-    // ИСХИТРЕНИЕ: Искусственно сдвигаем базовую позицию вершины вперед по оси Z на CPU/GPU
-    // еще ДО расчета относительно камеры. 
-    // Это сместит центр ячейки зацикливания вперед, и мертвая зона сзади исчезнет.
-    float3 shiftedPos = pos;
-    // ... здесь можно сместить shiftedPos.z вперед, если ваш туннель направлен вдоль Z ...
+float3 realCamPos = eye.xyz;     // Позиция камеры в мире
+float3 cameraAt   = forward.xyz; // Направление взгляда (нормализовано)
+float3 cellSize   = float3(66.0f, 66.0f, 66.0f); 
+float shiftDistance = -22.0f;    // Величина смещения
 
-    float3 relativePos = pos - realCamPos;
+// Сдвигаем геометрию в бесконечном пространстве до лупа
+float3 spaceShift = cameraAt * shiftDistance;
+float3 shiftedPos = pos + spaceShift;
 
-    // 5. Возвращаем железно рабочее и симметричное центрирование [-0.5, 0.5]
-    float3 scaledPos = relativePos / cellSize;
-    float3 loopedRelativePos = (scaledPos - floor(scaledPos + 0.5f)) * cellSize;
+// Зацикливаем смещенные координаты вокруг камеры
+float3 relativePos = shiftedPos - realCamPos;
+float3 scaledPos = relativePos / cellSize;
+float3 loopedRelativePos = (scaledPos - floor(scaledPos + 0.5f)) * cellSize;
 
-    // 6. Собираем pos обратно (симметрия по всем осям сохранена, багов нет)
-    //pos = pos + loopedRelativePos - relativePos; 
-    //pos = loopedRelativePos - realCamPos;
-    pos = pos + (loopedRelativePos - relativePos);
+// ФИНАЛЬНАЯ СБОРКА: возвращаем в мир и компенсируем сдвиг для плавного движения
+pos = realCamPos + loopedRelativePos - spaceShift;
 
-     
+
+// --- 2. ИСПРАВЛЕННЫЙ ФЕЙД (ЗАТУХАНИЕ) ---
+
+// Берем ЧЕСТНОЕ итоговое расстояние от получившегося объекта до камеры в мире
+float3 finalVisualRelativePos = pos - realCamPos;
+
+// Переводим это расстояние в модуль (абсолютное значение по осям)
+float3 localPos = abs(finalVisualRelativePos);
+
+// ВАЖНО: Так как из-за сдвига (-spaceShift) видимые границы ячейки 
+// тоже сместились на экране, мы динамически корректируем размер "коробки" отсечения.
+// Чтобы фейд не обрезал геометрию раньше времени, размер edge должен учитывать смещение по осям.
+float3 currentEdge = 33.0f + abs(spaceShift); 
+float fadeWidth = 11.0f;   
+
+// Считаем затухание отдельно для каждой оси с учетом динамической границы
+float3 axisFades = 1.0f - smoothstep(currentEdge - fadeWidth, currentEdge, localPos);
+
+// Финальный коэффициент затухания (1 в центре, 0 на краях видимости)
+float fadeFactor = axisFades.x * axisFades.y * axisFades.z;
+
+//    pos2=pos;
+    //pos/=2;
+    //pos-=2;
+    //pos=frac 
     if (mode==1)
     {
         float s=hash(iid)*33+11;
@@ -263,19 +290,31 @@ pos*=1.5;
     //density compensation
     if (mode==0)
     {
-    p.color*=1*saturate(p.pos.w/27);
-    //p.color*=0;
-
+    p.color*=1*saturate(p.pos.w/7);
     }
 
     if (mode==1)
     {
-    p.color*=.3*saturate(21/p.pos.w);
-    //p.color=.02;
+    //p.color*=.5*saturate(p.pos.z/p.pos.w/2);
+    p.color*=.3;
+
     }
+
+    p.color*=fadeFactor;    
+    //p.color/=max.04*p.pos.w;
+    //p.color=(p.pos.z/p.pos.w);
+
+    //pos/=13;
     
-   // p.color/=min(pow(p.pos.w,.5)*.1+1.5,5);
+    //p.color/=.4*min(pow(p.pos.w,.5)*.1+1.5,5);
+    //p.color*=pow(fogFactor(pos,0,11,24,25),1);
+
+    //p.color*=GetCenteredCubeFade(pos-eye,32,5);
+    
+    
     return p;
 }
+
+
 
 #include <../lib/particleVS_main2.shader>

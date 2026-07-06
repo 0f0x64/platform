@@ -1043,7 +1043,7 @@ namespace Loop
 		return normalize(dir);
 	}
 
-	void processGravity()
+	void processGravity(float amount)
 	{
 		if (!hero.gravityMode) return;
 
@@ -1070,7 +1070,7 @@ namespace Loop
 			}
 		}
 
-		hero.pos = lerp3(hero.pos, closestPoint, .1);
+		hero.pos = lerp3(hero.pos, closestPoint, .1* amount);
 
 		if (minDistance < .1) hero.gravityMode = false;
 	}
@@ -1093,7 +1093,7 @@ namespace Loop
 		}
 	}
 
-	bool gameCam = true;
+	
 	XMVECTOR tUP = { 0,1,0 };
 	XMVECTOR tFORWARD = { 0,0,1 };
 	float4 follow = { 0,0,0,0 };
@@ -1154,7 +1154,7 @@ namespace Loop
 				.jitter = 0
 			});
 
-			//BasicCam::processCam();
+			if (!gameCam) BasicCam::processCam();
 			
 			RenderTarget::Set({ texture::pBuf,0 });
 			RenderTarget::Clear({ 0,0,0,0 });
@@ -1175,19 +1175,25 @@ namespace Loop
 			Object::initPatches();
 
 			Respawn();
-			processGravity();
+			
 
 
 			if (GetActiveWindow() == hWnd)
 			{
 				if (GetAsyncKeyState(VK_SPACE))
 				{
-					hero.jumpHeight += .05;
-					auto d = tUP + tFORWARD * hero.speed;
+					hero.jumpHeight += .00005;
+					hero.jumpHeight = clamp(hero.jumpHeight, 0.f, 1.f);
+					auto d = tUP + tFORWARD * hero.speed*3;
 					hero.pos.x += XMVectorGetX(d);
 					hero.pos.y += XMVectorGetY(d);
 					hero.pos.z += XMVectorGetZ(d);
-			
+					hero.gravityMode = true;
+					processGravity(hero.jumpHeight);
+				}
+				else
+				{
+					processGravity(1- hero.jumpHeight);
 				}
 
 				if (GetAsyncKeyState('D'))
@@ -1201,11 +1207,12 @@ namespace Loop
 				}
 			}
 
-			if (hero.jumpHeight > 1)
+			if (hero.jumpHeight < .1)
 			{
-				hero.gravityMode = true;
+			//	hero.jumpHeight = 0;
+				//hero.gravityMode = true;
 			}
-			hero.jumpHeight *= .99;
+			hero.jumpHeight *= .9;
 
 
 			hero.axisAngleSpeed *= hero.autoBrake;
@@ -1243,15 +1250,8 @@ namespace Loop
 				hero.pos = lerp3(current_node, next_node, t1);
 				follow = lerp3(follow_node, current_node, t1);
 			}
-
-			
-
-
-			//float4 forward = direction_between(current_node, next_node);
-			//float4 base_up = calculate_camera_up(current_node, next_node);
-			//float4 right = normalize(cross(forward, base_up));
-			///float4 up = normalize(cross(right, forward));
-
+			static bool isMouseInitialized = false;
+			if (GetActiveWindow() == hWnd && gameCam) // Считаем мышь, только если окно в фокусе
 			if (!hero.gravityMode)
 			{
 				float cd = 5.0f; // Дистанция до героя
@@ -1264,7 +1264,7 @@ namespace Loop
 
 				static float mouseYaw = 0.0f;
 				static float mousePitch = 0.0f;
-				static bool isMouseInitialized = false;
+				
 
 				// --- НАСТРОЙКИ СГЛАЖИВАНИЯ И ЧУВСТВИТЕЛЬНОСТИ МЫШИ ---
 				float deltaTime = 0.016f;        // Реальный dt кадра
@@ -1281,7 +1281,7 @@ namespace Loop
 				HWND hwnd = hWnd;
 
 
-				if (GetActiveWindow() == hwnd && gameCam) // Считаем мышь, только если окно в фокусе
+				//if (GetActiveWindow() == hwnd && gameCam) // Считаем мышь, только если окно в фокусе
 				{
 					RECT rect;
 					GetWindowRect(hwnd, &rect);
@@ -1319,11 +1319,7 @@ namespace Loop
 						}
 					}
 				}
-				else
-				{
-					// Если окно потеряло фокус (например, Alt+Tab), сбрасываем инициализацию
-					isMouseInitialized = false;
-				}
+	
 
 				// Расчет весов интерполяции для каждого компонента
 				float t_dist = 1.0f - std::exp(-distanceLerpFactor * deltaTime);
@@ -1448,7 +1444,12 @@ namespace Loop
 
 				ConstBuf::Update(ConstBuf::cBuffer::camera);
 				ConstBuf::Set(ConstBuf::cBuffer::camera, ConstBuf::target::both);
-			}
+			}			
+			else
+				{
+					// Если окно потеряло фокус (например, Alt+Tab), сбрасываем инициализацию
+					isMouseInitialized = false;
+				}
 			//
 
 
@@ -1466,18 +1467,20 @@ namespace Loop
 					.zoom = -81
 				});
 
-			//Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
-			/*Object::MeshPtr = &Object::BossMesh;
+			//Object::heroWorld = XMMatrixTranspose(XMMatrixIdentity());
+
+			Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
+			Object::MeshPtr = &Object::BossMesh;
 			Object::Mesh({
 				.quality = 1,
-				.xPos = 0,
-				.yPos = 9,
-				.zPos = 0,
+				.xPos = 562,
+				.yPos = 3119,
+				.zPos = -263,
 				.brightness = 114,
 				.tickness = 2,
 				.stencil = switcher::on,
 				.zoom = 110
-				});*/
+				});
 				
 
 			Object::Girl({

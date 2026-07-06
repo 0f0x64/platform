@@ -612,6 +612,10 @@ int gY;
 int mode;
 int skipper;
 float4 base_color;
+float4 eye;
+float4 forward;
+float4 up;
+float4 right;
 } params;
 
 void set () {

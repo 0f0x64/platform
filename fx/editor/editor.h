@@ -1503,21 +1503,23 @@ namespace editor
 
 		//game mode
 
-		/*if (!GetAsyncKeyState(VK_CONTROL))
+		if (!gameCam)
 		{
-			if (GetAsyncKeyState('W')) ViewCam::stepAmp += .01;
-			if (GetAsyncKeyState('S')) ViewCam::stepAmp -= .01;
-			if (GetAsyncKeyState('A')) ViewCam::slideAmp += .01;
-			if (GetAsyncKeyState('D')) ViewCam::slideAmp -= .01;
+			if (!GetAsyncKeyState(VK_CONTROL))
+			{
+				if (GetAsyncKeyState('W')) ViewCam::stepAmp += .01;
+				if (GetAsyncKeyState('S')) ViewCam::stepAmp -= .01;
+				if (GetAsyncKeyState('A')) ViewCam::slideAmp += .01;
+				if (GetAsyncKeyState('D')) ViewCam::slideAmp -= .01;
 
 
-			if (!(GetAsyncKeyState('W') || GetAsyncKeyState('S'))) ViewCam::stepAmp *= .75;
-			if (!(GetAsyncKeyState('A') || GetAsyncKeyState('D'))) ViewCam::slideAmp *= .75;
+				if (!(GetAsyncKeyState('W') || GetAsyncKeyState('S'))) ViewCam::stepAmp *= .75;
+				if (!(GetAsyncKeyState('A') || GetAsyncKeyState('D'))) ViewCam::slideAmp *= .75;
+			}
+
+			ViewCam::Dolly();
+			ViewCam::Slide(); 
 		}
-
-		ViewCam::Dolly();
-		ViewCam::Slide();*/
-		
 		//
 
 		paramEdit::CamKeys();

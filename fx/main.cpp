@@ -55,6 +55,7 @@ using namespace dx11;
 #define cmd(name, ...) _Pragma("pack(push, 1)") struct CAT(name,_params) { FOR_EACH(SEMI, __VA_ARGS__) }; _Pragma("pack(pop)") \
     void name(CAT(name,_params) in)
 
+bool gameCam = true;
 #if EditMode
 	#include "editor\editor.h"
 #endif

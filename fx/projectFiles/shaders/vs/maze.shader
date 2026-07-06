@@ -250,8 +250,21 @@ float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
     float3 pos = basePoint[int(ind)];
     float3 pos2 = basePoint[int(ind)+1];
     pos=lerp(pos,pos2,frac(ind));
-  //  pos+=normalize(noise3(pos*12313))/12;
+    //pos+=normalize(noise3(pos*1.+frac(iid/11.))/12;
+    //pos+=noise(((iid*4)%particlesCount)-iid)/4;
+    //pos+=2/(noise3(pos*2-32*(iid*3)%particlesCount)+3)-.7;
+    //pos+=.01/sin(iid/1123.)*noise3(1./pos);
+
+    
+    float num = iid%7;
+    float num2 = iid%(particlesCount/50.);
+    //pos+=.0025/noise3(iid/213.*float3(4,5,6))/noise3(pos*2)/3;
  
+    float3 ofs=pow(noise3(pos/num+pos/num2)*2,3)*2;
+    ofs+=ofs/noise3(pos*12+33*num2+num)/51.;
+    pos+=ofs;
+    pos+=noise3(pos*5+time.x/23.)/8.;
+    //pos+=pow(num+(noise3(pos*11))/4,1);
     return pos;
 }
 
@@ -265,6 +278,7 @@ float3 safe_frac_centered(float3 v)
 pos_color CalcParticles(uint qid,uint iid,float4 grid)
 {
      qid *= skipper;
+     iid *= skipper;
      float t=time.x*.004;
      uint inStars = 1232*1213;
      if (mode==1||iid%inStars==0)
@@ -303,7 +317,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
         s=noise(iid)*62+11;
         //s*=1.5;
         p.pos=transform(pos,grid.zw,s);
-        p.color*=0.1;
+        p.color*=.7;
         p.sz=172;
     }
     else
@@ -312,7 +326,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
        //p.color=-noise(pos*.3+12)*.04+.02;;
        // p.color +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
          p.sz=2;
-         p.color*=5;
+         p.color*=2;
 
 /*         if (iid%inStars==0)
          {

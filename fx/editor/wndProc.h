@@ -75,7 +75,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (LOWORD(lParam) == HTCLIENT)
 		{
 			// Устанавливаем NULL (скрыт) или IDC_ARROW (стрелка)
-			SetCursor(Loop::gameCam ? NULL : LoadCursor(NULL, IDC_ARROW));
+			SetCursor(gameCam ? NULL : LoadCursor(NULL, IDC_ARROW));
 			return TRUE; // Сообщаем Windows, что обработали курсор сами
 		}
 		break;
@@ -120,7 +120,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			case VK_ESCAPE:
 				//editor::ViewCam::ToggleViewMode();
-				Loop::gameCam = !Loop::gameCam;
+				gameCam = !gameCam;
 				//SetCursor(Loop::gameCam ? NULL : LoadCursor(NULL, IDC_ARROW));
 				break;
 			case 'A':
