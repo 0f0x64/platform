@@ -535,10 +535,12 @@ namespace Object {
 		starLineList.line[in.line].basePointCount = in.pointCount;
 	}
 
+	const int denom = 1;
+
 	cmd(SetPointPosInLine, int line, int point, int x,int y, int z, int a)
 	{
 		reflect;
-		starLineList.line[in.line].basePoint[in.point] = float4(in.x,in.y,in.z,in.a);
+		starLineList.line[in.line].basePoint[in.point] = float4(in.x/ (float)denom,in.y/ (float)denom,in.z/ (float)denom,in.a);
 	}
 
 	// Вспомогательная функция сплайна Кэтмулла-Рома
@@ -597,33 +599,170 @@ namespace Object {
 		}
 	}
 
-	void initPatches()
+	// Функция плавной интерполяции (Smoothstep / Fade)
+	inline float perlin_fade(float t) {
+		return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
+	}
+
+	// Линейная интерполяция
+	inline float perlin_lerp(float t, float a, float b) {
+		return a + t * (b - a);
+	}
+
+	// Вычисление скалярного произведения с градиентным вектором
+	inline float perlin_grad(int hash, float x, float y, float z) {
+		int h = hash & 15;
+		float u = h < 8 ? x : y;
+		float v = h < 4 ? y : (h == 12 || h == 14 ? x : z);
+		return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+	}
+
+	// Вспомогательная функция для получения одного скалярного значения шума
+	float GetSinglePerlinNoise3D(float x, float y, float z) {
+		// Таблица перестановок Перлина (повторена дважды, чтобы избежать выхода за границы при +1)
+		static const int p[512] = {
+			151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
+			190,6,148,247,120,234,75,0,26,56,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,
+			125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,
+			105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,
+			135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,
+			82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,
+			153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,
+			251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,
+			157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,
+			66,215,61,156,180,
+			// Повторение массива
+			151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
+			190,6,148,247,120,234,75,0,26,56,62,94,252,219,203,117,35,11,32,57,177,33,88,237,149,56,87,174,20,
+			125,136,171,168,68,175,74,165,71,134,139,48,27,166,77,146,158,231,83,111,229,122,60,211,133,230,220,
+			105,92,41,55,46,245,40,244,102,143,54,65,25,63,161,1,216,80,73,209,76,132,187,208,89,18,169,200,196,
+			135,130,116,188,159,86,164,100,109,198,173,186,3,64,52,217,226,250,124,123,5,202,38,147,118,126,255,
+			82,85,212,207,206,59,227,47,16,58,17,182,189,28,42,223,183,170,213,119,248,152,2,44,154,163,70,221,
+			153,101,155,167,43,172,9,129,22,39,253,19,98,108,110,79,113,224,232,178,185,112,104,218,246,97,228,
+			251,34,242,193,238,210,144,12,191,179,162,241,81,51,145,235,249,14,239,107,49,192,214,31,181,199,106,
+			157,184,84,204,176,115,121,50,45,127,4,150,254,138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,
+			66,215,61,156,180
+		};
+
+		int X = static_cast<int>(std::floor(x)) & 255;
+		int Y = static_cast<int>(std::floor(y)) & 255;
+		int Z = static_cast<int>(std::floor(z)) & 255;
+
+		x -= std::floor(x);
+		y -= std::floor(y);
+		z -= std::floor(z);
+
+		float u = perlin_fade(x);
+		float v = perlin_fade(y);
+		float w = perlin_fade(z);
+
+		int A = p[X] + Y;
+		int AA = p[A] + Z;
+		int AB = p[A + 1] + Z;
+		int B = p[X + 1] + Y;
+		int BA = p[B] + Z;
+		int BB = p[B + 1] + Z;
+
+		return perlin_lerp(w, perlin_lerp(v, perlin_lerp(u, perlin_grad(p[AA], x, y, z),
+			perlin_grad(p[BA], x - 1, y, z)),
+			perlin_lerp(u, perlin_grad(p[AB], x, y - 1, z),
+				perlin_grad(p[BB], x - 1, y - 1, z))),
+			perlin_lerp(v, perlin_lerp(u, perlin_grad(p[AA + 1], x, y, z - 1),
+				perlin_grad(p[BA + 1], x - 1, y, z - 1)),
+				perlin_lerp(u, perlin_grad(p[AB + 1], x, y - 1, z - 1),
+					perlin_grad(p[BB + 1], x - 1, y - 1, z - 1))));
+	}
+
+	// Целевая функция, принимающая три аргумента и возвращающая XMVECTOR
+	XMVECTOR GetPerlinNoiseVector3(float x, float y, float z) {
+		// Смещаем координаты для каждого канала, чтобы значения X, Y и Z не дублировали друг друга
+		float nx = GetSinglePerlinNoise3D(x, y, z);
+		float ny = GetSinglePerlinNoise3D(x + 31.415f, y + 58.271f, z + 93.123f);
+		float nz = GetSinglePerlinNoise3D(x + 115.53f, y + 213.91f, z + 351.67f);
+
+		// Возвращаем упакованный в SIMD-регистр вектор (компонента W = 0.0f)
+		return XMVectorSet(nx, ny, nz, 0.0f);
+	}
+
+	void initPatches(float pathTime)
 	{
 		// init maze
 		int ln = 0;
 		int pt = 0;
 
-		SetLineCount({ 1 });
-		SetPointCountInLine({ ln,12 });
-
-		pt = 0;
-		SetPointPosInLine({ ln,pt++, 0,0,0 });
-		SetPointPosInLine({ ln,pt++, 10,6,0 });
+		//-----------------------------------------
+		//-----------start user space--------------
+		
+		//----line 0
+		pt = 0;//set to zero when started new line
+		SetPointPosInLine({ ln,pt++, 0,0,0});
+		SetPointPosInLine({ ln,pt++, 10,-1,0 });
 		SetPointPosInLine({ ln,pt++, 10,0,10 });
 		SetPointPosInLine({ ln,pt++, 0,4,10 });
 
-		SetPointPosInLine({ ln,pt++, -10,0,20 });
+		SetPointPosInLine({ ln,pt++, 2,0,20 });
 		SetPointPosInLine({ ln,pt++, 20,0,20 });
 		SetPointPosInLine({ ln,pt++, 20,0,-10 });
 		SetPointPosInLine({ ln,pt++, 0,0,-10 });
 
-		SetPointPosInLine({ ln,pt++, 0,20,-10 });
-		SetPointPosInLine({ ln,pt++, 10,25,10 });
+		SetPointPosInLine({ ln,pt++, 0,11,-10 });
+		SetPointPosInLine({ ln,pt++, 10,17,10 });
 		SetPointPosInLine({ ln,pt++, 10,10,10 });
 		SetPointPosInLine({ ln,pt++, 10,-5,20 });
 
-		smoothStarline(starLineList.line[ln], 12);
+		SetPointCountInLine({ ln++,pt });//call after fill points
+		//----
+
+		//line 1
+		pt = 0;//set to zero when started new line
+		SetPointPosInLine({ ln,pt++, -23,-20,-30 });
+		SetPointPosInLine({ ln,pt++, -3,0,-20 });
+		SetPointPosInLine({ ln,pt++, -11,20,10 });
+		SetPointPosInLine({ ln,pt++, 3,-20,20 });
+
+		SetPointCountInLine({ ln++,pt });//call after fill points
+		//----
+		
+		//------------end user space---------------
+		//-----------------------------------------
+
+		SetLineCount({ ln });//
+
+		for (int j = 0; j < starLineList.lineCount; j++)
+		{
+			smoothStarline(starLineList.line[j], 7*12./starLineList.line[j].basePointCount);
+		}
+
+		/*pathTime /= 100.;
+
+		for (int j = 0; j < 3; j++)
+		{
+			ln = j;
+			SetPointCountInLine({ ln,7 });
+			pt = 0;
+			for (int i = 0; i < 7; i++)
+			{
+				float4 pos;
+				float amp = 10 * 10000 * ((i+1) / (j + .3) + 4);
+				//pos.x = amp * sin(i * 13 + pathTime);
+				//pos.y = amp * cos(i * 14 + pathTime);
+				//pos.z = amp * sin(i * 15 + pathTime);
+
+				auto v = GetPerlinNoiseVector3(ln+i * .13 + pathTime, ln+i * .25 + pathTime, ln+i * .37 + pathTime) * amp;
+				pos.x = XMVectorGetX(v);
+				pos.y = XMVectorGetY(v);
+				pos.z = XMVectorGetZ(v);
+
+				SetPointPosInLine({ ln,pt++, (int)pos.x,(int)pos.y,(int)pos.z,0,10000 });
+
+			}
+
+			smoothStarline(starLineList.line[ln], 7);
+		}
+
+
 		//
+		*/
 	}
 
 	cmd(Maze, int count, int skipper, pMode mode, int r, int g, int b)

@@ -262,6 +262,7 @@ float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
  
     float3 ofs=pow(noise3(pos/num+pos/num2)*2,3)*2;
     ofs+=ofs/noise3(pos*12+33*num2+num)/51.;
+    ofs=rotZ(ofs,num2/922.);
     pos+=ofs;
     pos+=noise3(pos*5+time.x/23.)/8.;
     //pos+=pow(num+(noise3(pos*11))/4,1);
