@@ -1,4 +1,35 @@
 
+struct hero_ {
+	float4 pos = { 0,0,0,0 };
+	float4 normal = { 0,0,0,0 };
+	XMVECTOR forward = { 0,0,0 };
+	XMVECTOR upBeforeJump = { 0,0,0 };
+	XMVECTOR forwardBeforeJump = { 0,0,0 };
+	float axisAngle = 0;
+	float axisAngleSpeed = 0;
+	float axisAngleAccel = 0.01;
+	float maxAxisAngleSpeed = .1;
+	float yOffset = 40;
+	bool gravityMode = true;
+	float gravityProgress = 0.0f;
+
+	float speed = 0;
+	float accel = 0.01;
+	float maxSpeed = .8;
+	float autoBrake = .9;
+	int lineIndex = 0;
+	float pointIndex = 0;
+	float angle = 100;
+	float jumpHeight = 0;
+	float speedFactor = 0;
+	bool jump = false;
+	float pathTime = 0;
+	float pathTimeSpeed = 0;
+	float pathTimeSpeedAccel = .1;
+};
+
+hero_ hero;
+
 #include "gApi.h"
 #include "camera.h"
 #include "cubemap.h"
@@ -934,36 +965,7 @@ namespace Loop
 
 	}
 
-	struct hero_ {
-		float4 pos = { 0,0,0,0 };
-		float4 normal = { 0,0,0,0 };
-		XMVECTOR forward = { 0,0,0 };
-		XMVECTOR upBeforeJump = { 0,0,0 };
-		XMVECTOR forwardBeforeJump = { 0,0,0 };
-		float axisAngle = 0;
-		float axisAngleSpeed = 0;
-		float axisAngleAccel = 0.01;
-		float maxAxisAngleSpeed = .1;
-		float yOffset = 40;
-		bool gravityMode = true;
-		float gravityProgress = 0.0f;
-
-		float speed = 0;
-		float accel = 0.01;
-		float maxSpeed = .8;
-		float autoBrake = .9;
-		int lineIndex = 0;
-		float pointIndex = 0;
-		float angle = 100;
-		float jumpHeight = 0;
-		float speedFactor = 0;
-		bool jump = false;
-		float pathTime = 0;
-		float pathTimeSpeed = 0;
-		float pathTimeSpeedAccel = .1;
-	};
-
-	hero_ hero;
+	
 
 	float distance(const float4& p1, const float4& p2) {
 		float dx = p2.x - p1.x;

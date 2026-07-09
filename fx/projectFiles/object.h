@@ -696,29 +696,29 @@ namespace Object {
 		//----line 0
 		pt = 0;//set to zero when started new line
 		SetPointPosInLine({ ln,pt++, 0,0,0});
-		SetPointPosInLine({ ln,pt++, 10,-1,0 });
-		SetPointPosInLine({ ln,pt++, 10,0,10 });
-		SetPointPosInLine({ ln,pt++, 0,4,10 });
+		SetPointPosInLine({ ln,pt++, 10,0,0 });
+		SetPointPosInLine({ ln,pt++, 10,6,10 });
+		SetPointPosInLine({ ln,pt++, 0,0,7 });
 
 		SetPointPosInLine({ ln,pt++, 2,0,20 });
-		SetPointPosInLine({ ln,pt++, 20,0,20 });
-		SetPointPosInLine({ ln,pt++, 20,0,-10 });
-		SetPointPosInLine({ ln,pt++, 0,0,-10 });
+		SetPointPosInLine({ ln,pt++, 20,-5,20 });
+		SetPointPosInLine({ ln,pt++, 20,-4,5 });
+		SetPointPosInLine({ ln,pt++, 0,-6,-10 });
 
-		SetPointPosInLine({ ln,pt++, 0,11,-10 });
-		SetPointPosInLine({ ln,pt++, 10,17,10 });
-		SetPointPosInLine({ ln,pt++, 10,10,10 });
-		SetPointPosInLine({ ln,pt++, 10,-5,20 });
+		SetPointPosInLine({ ln,pt++, -10,0,-10 });
+		SetPointPosInLine({ ln,pt++, -24,0,-10 });
+		SetPointPosInLine({ ln,pt++, -20,10,10 });
+		SetPointPosInLine({ ln,pt++, -9,0,20 });
 
 		SetPointCountInLine({ ln++,pt });//call after fill points
 		//----
 
 		//line 1
 		pt = 0;//set to zero when started new line
-		SetPointPosInLine({ ln,pt++, -23,-20,-30 });
-		SetPointPosInLine({ ln,pt++, -3,0,-20 });
-		SetPointPosInLine({ ln,pt++, -11,20,10 });
-		SetPointPosInLine({ ln,pt++, 3,-20,20 });
+		SetPointPosInLine({ ln,pt++, -8,4,4 });
+		SetPointPosInLine({ ln,pt++, -3,-3,-20 });
+		SetPointPosInLine({ ln,pt++, -13,21,4 });
+		SetPointPosInLine({ ln,pt++, -18,-7,20 });
 
 		SetPointCountInLine({ ln++,pt });//call after fill points
 		//----
@@ -784,6 +784,7 @@ namespace Object {
 					.gY = gY,
 					.mode = (int)in.mode,
 					.skipper = in.skipper,
+					.heroPosition = hero.pos,
 					.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
 				},
 			};

@@ -252,6 +252,7 @@ int gX;
 int gY;
 int mode;
 int skipper;
+float4 heroPosition;
 float4 base_color;
 float4 basePoint[1000];
 int particlesCount;

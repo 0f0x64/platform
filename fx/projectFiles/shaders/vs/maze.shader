@@ -10,10 +10,12 @@ cbuffer params : register(b0)
     int gY;
     int mode;
     int skipper;
+    float4 heroPosition;
     float4 base_color;
     float4 basePoint[1000];
     int particlesCount;
     int basePointsCount;
+
 
 }
 
@@ -248,6 +250,7 @@ float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
 
     float ind = (pc*iid/(float)particlesCount);
     float3 pos = basePoint[int(ind)];
+    float3 pos3=pos;
     float3 pos2 = basePoint[int(ind)+1];
     pos=lerp(pos,pos2,frac(ind));
     //pos+=normalize(noise3(pos*1.+frac(iid/11.))/12;
@@ -262,10 +265,14 @@ float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
  
     float3 ofs=pow(noise3(pos/num+pos/num2)*2,3)*2;
     ofs+=ofs/noise3(pos*12+33*num2+num)/51.;
-    ofs=rotZ(ofs,num2/922.);
+    ofs=rotZ(ofs,num2/3222.);
+    ofs=rotZ(ofs,(iid/(float)particlesCount)*22);
     pos+=ofs;
     pos+=noise3(pos*5+time.x/23.)/8.;
     //pos+=pow(num+(noise3(pos*11))/4,1);
+
+    pos+=noise3(pos*3)*pow(distance(heroPosition,pos)/18.,5)*5;
+
     return pos;
 }
 
