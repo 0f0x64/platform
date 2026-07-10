@@ -967,53 +967,7 @@ namespace Loop
 
 	
 
-	float distance(const float4& p1, const float4& p2) {
-		float dx = p2.x - p1.x;
-		float dy = p2.y - p1.y;
-		float dz = p2.z - p1.z;
-
-		return sqrt(dx * dx + dy * dy + dz * dz);
-	}
-
-	float4 lerp3(const float4& a, const float4& b, float t) {
-		return float4{
-			a.x + t * (b.x - a.x),
-			a.y + t * (b.y - a.y),
-			a.z + t * (b.z - a.z),
-			a.w // Сохраняем оригинальное значение w из первой точки
-		};
-	}
-
-	float frac(float x) {
-		return x - floor(x);
-	}
-
-	float4 normalize(const float4& v) {
-		// Считаем длину вектора по формуле Пифагора
-		float length = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-
-		// Защита от деления на ноль (если вектор нулевой)
-		if (length < 0.00001f) {
-			return float4{ 0.0f, 0.0f, 0.0f, v.w };
-		}
-
-		// Возвращаем нормализованный вектор
-		return float4{
-			v.x / length,
-			v.y / length,
-			v.z / length,
-			v.w // Поле w оставляем оригинальным
-		};
-	}
-
-	float4 cross(const float4& a, const float4& b) {
-		return float4{
-			a.y * b.z - a.z * b.y,
-			a.z * b.x - a.x * b.z,
-			a.x * b.y - a.y * b.x,
-			0.0f // Для векторов направления w обычно равен 0
-		};
-	}
+	
 
 	float4 calculate_camera_up(const float4& eye, const float4& at) {
 		// 1. Вычисляем нормализованный вектор взгляда (Forward)
@@ -1638,19 +1592,19 @@ namespace Loop
 
 			//Object::heroWorld = XMMatrixTranspose(XMMatrixIdentity());
 
-		/*	Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
+			Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
 			Object::MeshPtr = &Object::BossMesh;
 			Object::Mesh({
 				.quality = 1,
-				.xPos = 562,
-				.yPos = 3119,
-				.zPos = -263,
+				.xPos = 0,
+				.yPos = 0,
+				.zPos = 0,
 				.brightness = 114,
 				.tickness = 2,
 				.stencil = switcher::on,
-				.zoom = 110
+				.zoom = 100
 				});
-				*/
+				
 
 			Object::Girl({
 					.quality = 1,

@@ -1,3 +1,51 @@
+float distance(const float4& p1, const float4& p2) {
+	float dx = p2.x - p1.x;
+	float dy = p2.y - p1.y;
+	float dz = p2.z - p1.z;
+
+	return sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+float4 lerp3(const float4& a, const float4& b, float t) {
+	return float4{
+		a.x + t * (b.x - a.x),
+		a.y + t * (b.y - a.y),
+		a.z + t * (b.z - a.z),
+		a.w // Сохраняем оригинальное значение w из первой точки
+	};
+}
+
+float frac(float x) {
+	return x - floor(x);
+}
+
+float4 normalize(const float4& v) {
+	// Считаем длину вектора по формуле Пифагора
+	float length = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+
+	// Защита от деления на ноль (если вектор нулевой)
+	if (length < 0.00001f) {
+		return float4{ 0.0f, 0.0f, 0.0f, v.w };
+	}
+
+	// Возвращаем нормализованный вектор
+	return float4{
+		v.x / length,
+		v.y / length,
+		v.z / length,
+		v.w // Поле w оставляем оригинальным
+	};
+}
+
+float4 cross(const float4& a, const float4& b) {
+	return float4{
+		a.y * b.z - a.z * b.y,
+		a.z * b.x - a.x * b.z,
+		a.x * b.y - a.y * b.x,
+		0.0f // Для векторов направления w обычно равен 0
+	};
+}
+
 namespace Object {
 
 	cmd(Show, 
@@ -523,16 +571,13 @@ namespace Object {
 		int lineCount = 0;
 	} starLineList;
 
+	int currentLine = -1;
+	int currentPoint = 0;
+	
 	cmd(SetLineCount, int lineCount)
 	{
 		reflect;
 		starLineList.lineCount = in.lineCount;
-	}
-
-	cmd(SetPointCountInLine, int line, int pointCount)
-	{
-		reflect;
-		starLineList.line[in.line].basePointCount = in.pointCount;
 	}
 
 	const int denom = 1;
@@ -541,6 +586,13 @@ namespace Object {
 	{
 		reflect;
 		starLineList.line[in.line].basePoint[in.point] = float4(in.x/ (float)denom,in.y/ (float)denom,in.z/ (float)denom,in.a);
+	}
+
+	cmd(AddPointToLine, int x, int y, int z, int a=0)
+	{
+		reflect;
+		starLineList.line[currentLine].basePoint[currentPoint++] = float4(in.x / (float)denom, in.y / (float)denom, in.z / (float)denom, in.a);
+		starLineList.line[currentLine].basePointCount = currentPoint;
 	}
 
 	// Вспомогательная функция сплайна Кэтмулла-Рома
@@ -598,6 +650,35 @@ namespace Object {
 			line.pointCount++;
 		}
 	}
+
+	
+
+	void Starline(starline& line, int stepsPerSegment) {
+		line.pointCount = 0; // Сбрасываем старый результат сглаживания
+
+		// Проходим по сегментам между исходными точками basePoint
+		for (int i = 0; i < line.basePointCount - 1; ++i) {
+
+			// Генерируем промежуточные точки внутри текущего сегмента
+			for (int step = 0; step < stepsPerSegment; ++step) {
+				// Защита от переполнения жестко ограниченного массива point[100]
+				if (line.pointCount >= smoothPointMAX) {
+					return;
+				}
+
+				float t = (float)step / (float)stepsPerSegment;
+				line.point[line.pointCount] = lerp3(line.basePoint[i],line.basePoint[i+1],t);
+				line.pointCount++;
+			}
+		}
+
+		// Добавляем финальную опорную точку, чтобы линия завершилась корректно
+		/*if (line.pointCount < smoothPointMAX) {
+			line.point[line.pointCount] = line.basePoint[line.basePointCount - 1];
+			line.pointCount++;
+		}*/
+	}
+
 
 	// Функция плавной интерполяции (Smoothstep / Fade)
 	inline float perlin_fade(float t) {
@@ -684,53 +765,57 @@ namespace Object {
 		return XMVectorSet(nx, ny, nz, 0.0f);
 	}
 
+	void NewLine()
+	{
+		currentLine++;
+		currentPoint = 0;
+		starLineList.lineCount = currentLine+1;
+	}
+
+
+
 	void initPatches(float pathTime)
 	{
 		// init maze
-		int ln = 0;
-		int pt = 0;
-
+		currentLine = -1;
+		// 
 		//-----------------------------------------
 		//-----------start user space--------------
 		
-		//----line 0
-		pt = 0;//set to zero when started new line
-		SetPointPosInLine({ ln,pt++, 0,0,0});
-		SetPointPosInLine({ ln,pt++, 10,0,0 });
-		SetPointPosInLine({ ln,pt++, 10,6,10 });
-		SetPointPosInLine({ ln,pt++, 0,0,7 });
+		NewLine();
 
-		SetPointPosInLine({ ln,pt++, 2,0,20 });
-		SetPointPosInLine({ ln,pt++, 20,-5,20 });
-		SetPointPosInLine({ ln,pt++, 20,-4,5 });
-		SetPointPosInLine({ ln,pt++, 0,-6,-10 });
+		AddPointToLine({ 0,0,0 });
+		AddPointToLine({ 10,0,0 });
+		AddPointToLine({ 10,6,10 });
+		AddPointToLine({ 0,0,7 });
+						 
+		AddPointToLine({ 2,-3,0 });
+		AddPointToLine({ 20,5,20 });
+		AddPointToLine({ 20,-4,5 });
+		AddPointToLine({ 0,-6,-10 });
+						 
+		AddPointToLine({ -10,-15,-10 });
+		AddPointToLine({ -24,0,-10 });
+		AddPointToLine({ -20,10,10 });
+		AddPointToLine({ -9,0,20 });
 
-		SetPointPosInLine({ ln,pt++, -10,0,-10 });
-		SetPointPosInLine({ ln,pt++, -24,0,-10 });
-		SetPointPosInLine({ ln,pt++, -20,10,10 });
-		SetPointPosInLine({ ln,pt++, -9,0,20 });
+		//------------------------------------------
 
-		SetPointCountInLine({ ln++,pt });//call after fill points
-		//----
+		NewLine();
 
-		//line 1
-		pt = 0;//set to zero when started new line
-		SetPointPosInLine({ ln,pt++, -8,4,4 });
-		SetPointPosInLine({ ln,pt++, -3,-3,-20 });
-		SetPointPosInLine({ ln,pt++, -13,21,4 });
-		SetPointPosInLine({ ln,pt++, -18,-7,20 });
+		AddPointToLine({ -8,4,4 });
+		AddPointToLine({ -3,-3,-20 });
+		AddPointToLine({ -13,21,4 });
+		AddPointToLine({ -18,-7,20 });
 
-		SetPointCountInLine({ ln++,pt });//call after fill points
-		//----
-		
+	
 		//------------end user space---------------
 		//-----------------------------------------
-
-		SetLineCount({ ln });//
 
 		for (int j = 0; j < starLineList.lineCount; j++)
 		{
 			smoothStarline(starLineList.line[j], 7*12./starLineList.line[j].basePointCount);
+			//Starline(starLineList.line[j], 7 * 12. / starLineList.line[j].basePointCount);
 		}
 
 		/*pathTime /= 100.;

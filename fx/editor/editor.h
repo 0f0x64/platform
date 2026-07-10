@@ -285,7 +285,7 @@ namespace editor
 		{
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
 			if (FAILED(result))
 				return false;
 
@@ -358,7 +358,7 @@ namespace editor
 		{
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
 			if (FAILED(result))
 				return false;
 
@@ -515,7 +515,7 @@ namespace editor
 		{
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
 			if (FAILED(result))
 				return false;
 
@@ -578,7 +578,7 @@ namespace editor
 
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
 			if (FAILED(result))
 				return false;
 
@@ -617,7 +617,7 @@ namespace editor
 
 			HRESULT result;
 			CLSID clsid;
-			result = ::CLSIDFromProgID(L"VisualStudio.DTE.17.0", &clsid);
+			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
 			if (FAILED(result))
 				return false;
 

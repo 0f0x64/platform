@@ -268,10 +268,10 @@ float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
     ofs=rotZ(ofs,num2/3222.);
     ofs=rotZ(ofs,(iid/(float)particlesCount)*22);
     pos+=ofs;
-    pos+=noise3(pos*5+time.x/23.)/8.;
+    //pos+=noise3(pos*5+time.x/23.)/8.;
     //pos+=pow(num+(noise3(pos*11))/4,1);
 
-    pos+=noise3(pos*3)*pow(distance(heroPosition,pos)/18.,5)*5;
+    //pos+=noise3(pos*3)*pow(distance(heroPosition,pos)/18.,5)*5;
 
     return pos;
 }
