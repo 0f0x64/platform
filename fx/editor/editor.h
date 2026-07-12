@@ -326,7 +326,7 @@ namespace editor
 			// 3. Двигаемся назад до начала документа или символа '{'
 			while (true) {
 				pPoint->get_AtStartOfDocument(&isAtStart);
-				if (isAtStart == VARIANT_TRUE) return -1;
+				if ((VARIANT_BOOL)isAtStart == VARIANT_TRUE) return -1;
 
 				// Сдвигаемся на 1 символ влево
 				pPoint->CharLeft(1);
@@ -603,7 +603,7 @@ namespace editor
 			VARIANT_BOOL isSaved;
 			doc->get_Saved(&isSaved);
 
-			if (isSaved == VARIANT_FALSE) {
+			if ((VARIANT_BOOL)isSaved == VARIANT_FALSE) {
 
 				return true;
 			}
@@ -612,18 +612,29 @@ namespace editor
 
 		}
 
+		bool Fail(HRESULT result)
+		{
+			if (FAILED(result))
+			{
+				Log("fail\n");
+				return true;
+			}
+			return false;
+		}
+
 		bool saveChanges()
 		{
 
 			HRESULT result;
 			CLSID clsid;
+			
 			result = ::CLSIDFromProgID(L"VisualStudio.DTE", &clsid);
-			if (FAILED(result))
+			if (Fail(result))
 				return false;
 
 			CComPtr<IUnknown> punk;
 			result = ::GetActiveObject(clsid, NULL, &punk);
-			if (FAILED(result))
+			if (Fail(result))
 				return false;
 
 			CComPtr<EnvDTE::_DTE> DTE;
@@ -631,18 +642,18 @@ namespace editor
 
 			CComPtr<EnvDTE::ItemOperations> item_ops;
 			result = DTE->get_ItemOperations(&item_ops);
-			if (FAILED(result))
+			if (Fail(result))
 				return false;
 
 			CComPtr<EnvDTE::Document> doc;
 			result = DTE->get_ActiveDocument(&doc);
-			if (FAILED(result))
+			if (Fail(result))
 				return false;
 
 			VARIANT_BOOL isSaved;
 			doc->get_Saved(&isSaved);
 
-			if (isSaved == VARIANT_FALSE) {
+			if ((VARIANT_BOOL)isSaved == VARIANT_FALSE) {
 
 				CComBSTR emptyPath(L"");
 				EnvDTE::vsSaveStatus status;

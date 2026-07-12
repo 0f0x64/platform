@@ -253,6 +253,7 @@ float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
     float3 pos3=pos;
     float3 pos2 = basePoint[int(ind)+1];
     pos=lerp(pos,pos2,frac(ind));
+    float3 pos_m=pos;
     //pos+=normalize(noise3(pos*1.+frac(iid/11.))/12;
     //pos+=noise(((iid*4)%particlesCount)-iid)/4;
     //pos+=2/(noise3(pos*2-32*(iid*3)%particlesCount)+3)-.7;
@@ -270,7 +271,11 @@ float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
     pos+=ofs;
     //pos+=noise3(pos*5+time.x/23.)/8.;
     //pos+=pow(num+(noise3(pos*11))/4,1);
-
+    float i01 = iid/(float)particlesCount;
+    float ic = pow(1-sin(i01*PI),54)*52;
+    pos+=noise3(pos*5)*ic;
+    if (i01<.005) pos = basePoint[0]+normalize(noise3(pos*22))*2.;
+    if (i01>.995) pos = basePoint[basePointsCount-1]+normalize(noise3(pos*22))*2.;
     //pos+=noise3(pos*3)*pow(distance(heroPosition,pos)/18.,5)*5;
 
     return pos;

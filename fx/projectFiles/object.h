@@ -595,6 +595,12 @@ namespace Object {
 		starLineList.line[currentLine].basePointCount = currentPoint;
 	}
 
+	void AddPoint( float4 p)
+	{
+		starLineList.line[currentLine].basePoint[currentPoint++] = p;
+		starLineList.line[currentLine].basePointCount = currentPoint;
+	}
+
 	// Вспомогательная функция сплайна Кэтмулла-Рома
 	float4 catmullRom(const float4& p0, const float4& p1, const float4& p2, const float4& p3, float t) {
 		float t2 = t * t;
@@ -607,6 +613,21 @@ namespace Object {
 		result.w = 0.5f * ((2.0f * p1.w) + (-p0.w + p2.w) * t + (2.0f * p0.w - 5.0f * p1.w + 4.0f * p2.w - p3.w) * t2 + (-p0.w + 3.0f * p1.w - 3.0f * p2.w + p3.w) * t3);
 
 		return result;
+	}
+
+	float getRandFloat()
+	{
+		return (rand() % 1000) / 500.-1.;
+	}
+
+	float4 getRandFloat4()
+	{
+		return {
+			getRandFloat(),
+			getRandFloat(),
+			getRandFloat(),
+			0
+		};
 	}
 
 	void smoothStarline(starline& line, int stepsPerSegment) {
@@ -673,10 +694,10 @@ namespace Object {
 		}
 
 		// Добавляем финальную опорную точку, чтобы линия завершилась корректно
-		/*if (line.pointCount < smoothPointMAX) {
+		if (line.pointCount < smoothPointMAX) {
 			line.point[line.pointCount] = line.basePoint[line.basePointCount - 1];
 			line.pointCount++;
-		}*/
+		}
 	}
 
 
@@ -772,7 +793,53 @@ namespace Object {
 		starLineList.lineCount = currentLine+1;
 	}
 
+	float4 gemini[] = {
+		// Pollux Line (Right Branch)
+		{  0.95f,  0.72f,  0.0f,  0.0f }, // Pollux
+		{  0.58f,  0.41f,  0.0f,  1.0f }, // Wasat
+		{  0.21f,  0.12f,  0.0f,  2.0f }, // Mebsuta
+		{ -0.25f, -0.28f,  0.0f,  3.0f }, // Mekbuda
+		{ -0.68f, -0.65f,  0.0f,  4.0f }, // Alhena
+		{ -0.92f, -0.85f,  0.0f,  5.0f }, // Alzirr
 
+		// Castor Line (Left Branch)
+		{  0.88f,  0.91f,  0.0f,  6.0f }, // Castor
+		{  0.45f,  0.62f,  0.0f,  7.0f }, // Kappa Gem
+		{  0.12f,  0.35f,  0.0f,  8.0f }, // Upsilon Gem
+		{ -0.18f,  0.08f,  0.0f,  9.0f }, // Propus
+		{ -0.52f, -0.22f,  0.0f, 10.0f }, // Tejat Posterior
+		{ -0.75f, -0.45f,  0.0f, 11.0f }, // Tejat Prior
+
+		// Connecting stars
+		{  0.32f,  0.18f,  0.0f, 12.0f }, // Lambda Gem
+		{  0.05f,  0.55f,  0.0f, 13.0f }, // Tau Gem
+		{ -0.15f,  0.42f,  0.0f, 14.0f }, // Theta Gem
+		{ -0.42f,  0.22f,  0.0f, 15.0f }, // Nu Gem
+		{ -0.85f, -0.12f,  0.0f, 16.0f }  // 1 Gem
+	};
+
+	void genSegment(float4 start, float4 end)
+	{
+		NewLine();
+		int seg = 10;
+		for (int k = 0; k <= seg; k++)
+		{
+			float4 p = lerp3(start, end, k / (float)seg);
+
+			float rs = .02 * sin((k / (float)seg) * PI);
+			p.x += getRandFloat() * rs;
+			p.y += getRandFloat() * rs;
+			p.z += getRandFloat() * rs;
+
+			// Масштабируем координаты точек для игрового мира
+			float scale = 600;
+			p.x *= scale;
+			p.y *= scale;
+			p.z *= scale;
+
+			AddPoint(p);
+		}
+	}
 
 	void initPatches(float pathTime)
 	{
@@ -782,40 +849,76 @@ namespace Object {
 		//-----------------------------------------
 		//-----------start user space--------------
 		
-		NewLine();
+		int starsCount = sizeof(gemini) / sizeof(float4);
+		
+		srand(100);
 
-		AddPointToLine({ 0,0,0 });
-		AddPointToLine({ 10,0,0 });
-		AddPointToLine({ 10,6,10 });
-		AddPointToLine({ 0,0,7 });
-						 
-		AddPointToLine({ 2,-3,0 });
-		AddPointToLine({ 20,5,20 });
-		AddPointToLine({ 20,-4,5 });
-		AddPointToLine({ 0,-6,-10 });
-						 
-		AddPointToLine({ -10,-15,-10 });
-		AddPointToLine({ -24,0,-10 });
-		AddPointToLine({ -20,10,10 });
-		AddPointToLine({ -9,0,20 });
+		for (int i = 0; i < starsCount; i++)
+		{
+			gemini[i].z = getRandFloat();
+		}
+		
+		genSegment(gemini[0], gemini[1]);
+		genSegment(gemini[1], gemini[2]);
+		genSegment(gemini[2], gemini[3]);
+		genSegment(gemini[3], gemini[4]);
+		genSegment(gemini[4], gemini[5]);
+		genSegment(gemini[6], gemini[7]);
+		genSegment(gemini[7], gemini[8]);
+		genSegment(gemini[8], gemini[8]);
+		genSegment(gemini[9], gemini[10]);
+		genSegment(gemini[10], gemini[11]);
+		genSegment(gemini[0], gemini[6]);
+		genSegment(gemini[7], gemini[12]);
+		genSegment(gemini[12], gemini[13]);
+		genSegment(gemini[13], gemini[14]);
+		genSegment(gemini[14], gemini[15]);
+		genSegment(gemini[10], gemini[16]);
 
-		//------------------------------------------
 
-		NewLine();
 
-		AddPointToLine({ -8,4,4 });
-		AddPointToLine({ -3,-3,-20 });
-		AddPointToLine({ -13,21,4 });
-		AddPointToLine({ -18,-7,20 });
+		/*for (int i = 0; i < starsCount; i++)
+		{
+			// Начинаем с i + 1, чтобы не проверять i==j и не дублировать пары (j,i)
+			for (int j = i + 1; j < starsCount; j++)
+			{
+				float4 start = gemini[i];
+				float4 end = gemini[j];
 
-	
+				// Проверка дистанции в исходном диапазоне -1...1
+				if (distance(start, end) < .75)
+				{
+					NewLine();
+					int seg = 10;
+					for (int k = 0; k <= seg; k++)
+					{
+						float4 p = lerp3(start, end, k / (float)seg);
+
+						float rs = .02*sin((k / (float)seg)*PI);
+						p.x += getRandFloat()*rs;
+						p.y += getRandFloat()*rs;
+						p.z += getRandFloat()*rs;
+
+						// Масштабируем координаты точек для игрового мира
+						float scale = 600;
+						p.x *= scale;
+						p.y *= scale;
+						p.z *= scale;
+
+						AddPoint(p);
+					}
+				}
+			}
+		}*/
+
+			
 		//------------end user space---------------
 		//-----------------------------------------
 
 		for (int j = 0; j < starLineList.lineCount; j++)
 		{
 			smoothStarline(starLineList.line[j], 7*12./starLineList.line[j].basePointCount);
-			//Starline(starLineList.line[j], 7 * 12. / starLineList.line[j].basePointCount);
+			//Starline(starLineList.line[j], 3*12. / starLineList.line[j].basePointCount);
 		}
 
 		/*pathTime /= 100.;

@@ -1110,8 +1110,7 @@ namespace Loop
 
 	
 	XMVECTOR tUP = { 0,1,0 };
-	XMVECTOR tFORWARD = { 0,0,1 };
-	float4 follow = { 0,0,111,0 };
+	float4 follow = { 0,0,11,0 };
 	float4 curent_i = { 0,0,11,0 }; 
 	XMVECTOR p0 = { 0,0,0 };
 	XMVECTOR p1 = { 0,0,1 };
@@ -1282,14 +1281,6 @@ namespace Loop
 
 			}
 
-			//if (hero.jumpHeight < .1)
-			{
-			//	hero.jumpHeight = 0;
-				//hero.gravityMode = true;
-			}
-			
-
-
 			hero.axisAngleSpeed *= hero.autoBrake;
 			hero.axisAngleSpeed = clamp(hero.axisAngleSpeed, -hero.maxAxisAngleSpeed, hero.maxAxisAngleSpeed);
 			hero.axisAngle += hero.axisAngleSpeed;
@@ -1393,21 +1384,10 @@ namespace Loop
 					}
 				}
 	
-				float c = pow(hero.jumpHeight,1);
-				
 				// Расчет весов интерполяции для каждого компонента
 				float t_dist = 1.0f - std::exp(-distanceLerpFactor * deltaTime);
 				float t_track = 1.0f - std::exp(-trackAngularLerpFactor * deltaTime);
 				float t_play = 1.0f - std::exp(-playerAngularLerpFactor * deltaTime);
-				
-				//t_dist = lerp(t_dist, 0., c);
-				//t_track = lerp(t_track, 0., c);
-				//t_play = lerp(t_play, 0., c);
-
-				// -------------------------------------------------------------
-
-	
-
 
 				if (!hero.jump)
 				{
@@ -1416,12 +1396,9 @@ namespace Loop
 					jv *= jAmp;
 
 					p0 = XMVectorLerp(p0,XMVectorSet(follow.x, follow.y, follow.z, 0.0f), jv);
-					//p1 = XMVectorLerp(p1,XMVectorSet(hero.pos.x, hero.pos.y, hero.pos.z, 0.0f),jv);
-
+					
 					curent_i = lerp3(current_node, next_node, t1);
 					p1 = XMVectorLerp(p1, XMVectorSet(curent_i.x, curent_i.y, curent_i.z, 0.0f), jv);
-					//p1 = XMVectorLerp(p1, p2, 1);
-
 
 					XMVECTOR forward = XMVector3Normalize(p1 - p0);
 					hero.forward = XMVectorLerp(hero.forward,forward, jv);
@@ -1436,15 +1413,10 @@ namespace Loop
 					p1 = XMVectorLerp(p1,XMVectorSet(hero.pos.x, hero.pos.y, hero.pos.z, 0.0f),jv);
 
 					curent_i = lerp3(current_node, next_node, t1);
-					//p1 = XMVectorLerp(p1, XMVectorSet(curent_i.x, curent_i.y, curent_i.z, 0.0f), .1);
-					//p1 = XMVectorLerp(p1, p2, 1);
-
 
 					XMVECTOR forward = XMVector3Normalize(p1 - p0);
 					hero.forward = XMVectorLerp(hero.forward, forward, jv);
 				}
-
-
 
 				// ==========================================
 				// ЭТАП 1: ПАРАЛЛЕЛЬНЫЙ ПЕРЕНОС ФРЕЙМА НИТИ
@@ -1473,7 +1445,6 @@ namespace Loop
 				XMVECTOR HeroRealUp = XMVector3Normalize(XMVector3Cross(hero.forward, HeroRight));
 				XMVECTOR HeroPosition = XMVectorSet(0, 0, 0, 1.0f);
 				tUP = HeroRealUp;
-				tFORWARD = hero.forward;
 
 				Object::heroWorld = XMMatrixTranspose(XMMATRIX(
 					XMVectorSet(XMVectorGetX(HeroRight), XMVectorGetX(HeroRealUp), XMVectorGetX(hero.forward), 0.0f),
@@ -1510,12 +1481,12 @@ namespace Loop
 				float finalPitch = mousePitch * mouseInfluenceFactor;
 
 				// ==========================================
-	// ЭТАП 7: ФОРМИРОВАНИЕ ТОЧЕК КАМЕРЫ ЧЕРЕЗ ЗАНИЖЕННЫЙ ЦЕНТР ВРАЩЕНИЯ (PIVOT)
-	// ==========================================
+				// ЭТАП 7: ФОРМИРОВАНИЕ ТОЧЕК КАМЕРЫ ЧЕРЕЗ ЗАНИЖЕННЫЙ ЦЕНТР ВРАЩЕНИЯ (PIVOT)
+				// ==========================================
 
-	// 1. Создаем виртуальную точку опоры (Pivot). 
-	// Мы опускаем центр вращения камеры НИЖЕ ног персонажа по вектору currentCameraUp.
-	// За счет этого персонаж визуально поднимется вверх и окажется ровно на нижней трети экрана!
+				// 1. Создаем виртуальную точку опоры (Pivot). 
+				// Мы опускаем центр вращения камеры НИЖЕ ног персонажа по вектору currentCameraUp.
+				// За счет этого персонаж визуально поднимется вверх и окажется ровно на нижней трети экрана!
 				float pivotOffset = -1.8f; // Подберите это значение: больше число = персонаж ниже на экране
 				XMVECTOR cameraPivot = p1 - currentCameraUp * pivotOffset;
 
@@ -1543,18 +1514,11 @@ namespace Loop
 
 				// 8. ТОЧКА НАЗНАЧЕНИЯ (Куда смотрим)
 				// Камера всегда жестко и стабильно смотрит в центр вращения cameraPivot.
-				// Никаких дополнительных кватернионов наклона взгляда. Математика чистая и без прыжков!
 				XMVECTOR finalCameraAt = cameraPivot;
 
 				XMVECTOR camForwardVec = XMVector3Normalize(finalCameraAt - finalCameraEye);
 				hero.speedFactor = XMVectorGetX(XMVector3Dot(camForwardVec, hero.forward));
 				hero.speedFactor = sign(hero.speedFactor) * pow(abs(hero.speedFactor), .125);
-
-				/*char buf[10];
-				_itoa(hero.jumpHeight * 100, buf, 10);
-				OutputDebugString(buf);
-				OutputDebugString("\n");*/
-				//hero.speed *= hero.speedFactor;
 
 				// ==========================================
 				// ЭТАП 8: СБОРКА МАТРИЦЫ ВИДА
@@ -1592,7 +1556,7 @@ namespace Loop
 
 			//Object::heroWorld = XMMatrixTranspose(XMMatrixIdentity());
 
-			Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
+			/*Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
 			Object::MeshPtr = &Object::BossMesh;
 			Object::Mesh({
 				.quality = 1,
@@ -1603,7 +1567,7 @@ namespace Loop
 				.tickness = 2,
 				.stencil = switcher::on,
 				.zoom = 100
-				});
+				});*/
 				
 
 			Object::Girl({
