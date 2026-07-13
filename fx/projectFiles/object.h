@@ -626,9 +626,11 @@ namespace Object {
 			getRandFloat(),
 			getRandFloat(),
 			getRandFloat(),
-			0
+			getRandFloat()
 		};
 	}
+
+
 
 	void smoothStarline(starline& line, int stepsPerSegment) {
 		line.pointCount = 0; // —брасываем старый результат сглаживани€
@@ -953,6 +955,8 @@ namespace Object {
 		*/
 	}
 
+	float4 hero_pos;
+
 	cmd(Maze, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
@@ -972,7 +976,7 @@ namespace Object {
 					.gY = gY,
 					.mode = (int)in.mode,
 					.skipper = in.skipper,
-					.heroPosition = hero.pos,
+					.heroPosition = hero_pos,
 					.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
 				},
 			};
