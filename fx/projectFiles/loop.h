@@ -67,100 +67,83 @@ struct hero_ {
 	} gravity;
 
 	void SpreadLandingUpVector(int lineIndex, int landingPointIdx, XMVECTOR correctLandingUp)
+{
+	auto& line = Object::starLineList.line[lineIndex];
+	if (line.pointCount < 2) return;
+
+	int maxIdx = line.pointCount - 1;
+	landingPointIdx = clamp(landingPointIdx, 0, maxIdx);
+
+	// Строим чистый рельсовый верх в точке приземления
+	XMVECTOR pL0 = F2V(line.point[landingPointIdx]);
+	XMVECTOR pL1 = F2V(line.point[landingPointIdx == maxIdx ? maxIdx - 1 : landingPointIdx + 1]);
+	XMVECTOR tLanding = XMVector3Normalize(XMVectorSubtract(pL1, pL0));
+	
+	XMVECTOR refUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	if (fabsf(XMVectorGetX(XMVector3Dot(tLanding, refUp))) > 0.95f) refUp = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	XMVECTOR baseUpLanding = XMVector3Normalize(XMVector3Cross(tLanding, XMVector3Normalize(XMVector3Cross(refUp, tLanding))));
+
+	// === ЧЕСТНЫЙ РАСЧЕТ КВАТЕРНИOНА ПOВOРOТА МЕЖДУ ДВУМЯ ВЕКТOРАМИ ===
+	XMVECTOR vFrom = baseUpLanding;
+	XMVECTOR vTo = XMVector3Normalize(correctLandingUp);
+	
+	float dotProd = clamp(XMVectorGetX(XMVector3Dot(vFrom, vTo)), -1.0f, 1.0f);
+	XMVECTOR deltaQuat;
+
+	if (dotProd > 0.9999f)
 	{
-		auto& line = Object::starLineList.line[lineIndex];
-		if (line.pointCount < 2) return;
-
-		int maxIdx = line.pointCount - 1;
-		landingPointIdx = clamp(landingPointIdx, 0, maxIdx);
-
-		// ИСПРАВЛЕНИЕ: Выгружаем XMVECTOR в float4 массив через твою функцию V2F
-		XMVECTOR normLandingUp = XMVector3Normalize(correctLandingUp);
-		line.upVector[landingPointIdx] = V2F(normLandingUp);
-
-		// ====================================================================
-		// НАПРАВЛЕНИЕ 1: ПРОКАТЫВАЕМ ВПЕРЕД ПО ЦЕПОЧКЕ (от landingPointIdx до конца)
-		// ====================================================================
-		for (int i = landingPointIdx; i < maxIdx; ++i)
-		{
-			// Используем честный F2V для всех чтений и правильное имя массива upVector
-			XMVECTOR pCurr = F2V(line.point[i]);
-			XMVECTOR pNext = F2V(line.point[i + 1]);
-			XMVECTOR upCurr = F2V(line.upVector[i]);
-
-			XMVECTOR tCurr = XMVector3Normalize(XMVectorSubtract(pNext, pCurr));
-			if (XMVector3Equal(tCurr, XMVectorZero())) tCurr = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-
-			XMVECTOR tNext = tCurr;
-			if (i < maxIdx - 1) {
-				XMVECTOR pFuture = F2V(line.point[i + 2]);
-				tNext = XMVector3Normalize(XMVectorSubtract(pFuture, pNext));
-				if (XMVector3Equal(tNext, XMVectorZero())) tNext = tCurr;
-			}
-
-			XMVECTOR rotationAxis = XMVector3Cross(tCurr, tNext);
-			float axisLength = XMVectorGetX(XMVector3Length(rotationAxis));
-
-			XMVECTOR calculatedUpNext;
-			if (axisLength > 0.0001f)
-			{
-				rotationAxis = XMVector3Normalize(rotationAxis);
-				float dotProd = clamp(XMVectorGetX(XMVector3Dot(tCurr, tNext)), -1.0f, 1.0f);
-				float angle = acosf(dotProd);
-
-				XMMATRIX rotMat = XMMatrixRotationAxis(rotationAxis, angle);
-				calculatedUpNext = XMVector3Normalize(XMVector3TransformNormal(upCurr, rotMat));
-			}
-			else
-			{
-				calculatedUpNext = upCurr;
-			}
-
-			// ИСПРАВЛЕНИЕ: Сохраняем в память float4 по новому имени через V2F
-			line.upVector[i + 1] = V2F(calculatedUpNext);
-		}
-
-		// ====================================================================
-		// НАПРАВЛЕНИЕ 2: ПРОКАТЫВАЕМ НАЗАД ПО ЦЕПОЧКЕ (от landingPointIdx до начала)
-		// ====================================================================
-		for (int i = landingPointIdx; i > 0; --i)
-		{
-			XMVECTOR pCurr = F2V(line.point[i]);
-			XMVECTOR pPrev = F2V(line.point[i - 1]);
-			XMVECTOR upCurr = F2V(line.upVector[i]);
-
-			XMVECTOR tCurr = XMVector3Normalize(XMVectorSubtract(pPrev, pCurr));
-			if (XMVector3Equal(tCurr, XMVectorZero())) tCurr = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
-
-			XMVECTOR tNext = tCurr;
-			if (i > 1) {
-				XMVECTOR pPast = F2V(line.point[i - 2]);
-				tNext = XMVector3Normalize(XMVectorSubtract(pPast, pPrev));
-				if (XMVector3Equal(tNext, XMVectorZero())) tNext = tCurr;
-			}
-
-			XMVECTOR rotationAxis = XMVector3Cross(tCurr, tNext);
-			float axisLength = XMVectorGetX(XMVector3Length(rotationAxis));
-
-			XMVECTOR calculatedUpPrev;
-			if (axisLength > 0.0001f)
-			{
-				rotationAxis = XMVector3Normalize(rotationAxis);
-				float dotProd = clamp(XMVectorGetX(XMVector3Dot(tCurr, tNext)), -1.0f, 1.0f);
-				float angle = acosf(dotProd);
-
-				XMMATRIX rotMat = XMMatrixRotationAxis(rotationAxis, angle);
-				calculatedUpPrev = XMVector3Normalize(XMVector3TransformNormal(upCurr, rotMat));
-			}
-			else
-			{
-				calculatedUpPrev = upCurr;
-			}
-
-			// ИСПРАВЛЕНИЕ: Сохраняем в память float4 по новому имени через V2F при проходе назад
-			line.upVector[i - 1] = V2F(calculatedUpPrev);
-		}
+		deltaQuat = XMQuaternionIdentity();
 	}
+	else if (dotProd < -0.9999f)
+	{
+		// Векторы противоположны, ищем любую ортогональную ось для разворота на 180 градусов
+		XMVECTOR orthoAxis = XMVector3Cross(vFrom, XMVectorSet(1, 0, 0, 0));
+		if (XMVectorGetX(XMVector3LengthSq(orthoAxis)) < 0.001f) orthoAxis = XMVector3Cross(vFrom, XMVectorSet(0, 1, 0, 0));
+		deltaQuat = XMQuaternionRotationAxis(XMVector3Normalize(orthoAxis), XM_PI);
+	}
+	else
+	{
+		XMVECTOR crossAxis = XMVector3Cross(vFrom, vTo);
+		float s = sqrtf((1.0f + dotProd) * 2.0f);
+		float invS = 1.0f / s;
+		deltaQuat = XMVectorSet(
+			XMVectorGetX(crossAxis) * invS,
+			XMVectorGetY(crossAxis) * invS,
+			XMVectorGetZ(crossAxis) * invS,
+			s * 0.5f
+		);
+	}
+
+	// Раскидываем этот кватернион по всей линии
+	for (int i = 0; i <= maxIdx; ++i)
+	{
+		XMVECTOR pCurr = F2V(line.point[i]);
+		XMVECTOR pNext = F2V(line.point[i == maxIdx ? maxIdx - 1 : i + 1]);
+		XMVECTOR tangent = XMVector3Normalize(XMVectorSubtract(pNext, pCurr));
+		if (i == maxIdx) tangent = XMVector3Normalize(XMVectorSubtract(pCurr, pNext));
+		if (XMVector3Equal(tangent, XMVectorZero())) tangent = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+
+		// Базовый "слепой" верх для текущей точки
+		XMVECTOR localRefUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+		if (fabsf(XMVectorGetX(XMVector3Dot(tangent, localRefUp))) > 0.95f) localRefUp = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+		XMVECTOR localBaseUp = XMVector3Normalize(XMVector3Cross(tangent, XMVector3Normalize(XMVector3Cross(localRefUp, tangent))));
+
+		// Коэффициент угасания закрутки (1.0f держит космический угол жестко по всей линии)
+		float nodeDistance = fabsf((float)(i - landingPointIdx));
+		float blendFactor = clamp(1.0f - (nodeDistance / (float)line.pointCount), 0.0f, 1.0f);
+
+		// Если ты хочешь, чтобы угол приземления вообще не угасал к концам рельса, раскомментируй строку ниже:
+		blendFactor = 1.0f;
+
+		XMVECTOR blendedQuat = XMQuaternionSlerp(XMQuaternionIdentity(), deltaQuat, blendFactor);
+		XMVECTOR finalVertexUp = XMVector3Normalize(XMVector3Rotate(localBaseUp, blendedQuat));
+
+		// Финальная жесткая ортогонализация под 90 градусов к рельсу
+		finalVertexUp = XMVector3Normalize(XMVectorSubtract(finalVertexUp, tangent * XMVectorGetX(XMVector3Dot(finalVertexUp, tangent))));
+
+		line.upVector[i] = V2F(finalVertexUp);
+	}
+}
 
 	XMVECTOR CalculateAndSpreadLandingUp(XMVECTOR startPos, XMVECTOR endPos, int lineIdx, int pointIdx)
 	{
@@ -1575,7 +1558,7 @@ namespace Loop
 			if (segLenCheck < 0.001f) segLenCheck = 1.0f;
 
 			hero.pointIndex += (hero.speed * fixedStep * 50.f) / segLenCheck;
-			hero.pointIndex = clamp(hero.pointIndex, 0.f, (float)maxPointIdx);
+			hero.pointIndex = clamp(hero.pointIndex, 1.f, (float)maxPointIdx-1.);
 		}
 
 		// Вычисление индексов и непрерывной дробной части
