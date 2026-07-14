@@ -1685,21 +1685,53 @@ namespace Loop
 	{
 		const float camRadius = 5.0f; // Расстояние от камеры до героя
 
-		// === ИСПРАВЛЕНИЕ: БАЗИС ИЗВЛЕКАЕТСЯ СТРОГО ИЗ МАТРИЦЫ ПЕРСОНАЖА ===
-		// Мы больше не собираем матрицу пути вручную. Мы берем актуальную Object::heroWorld, 
-		// в которой уже сидит плавный разворот в воздухе или движение по рельсу.
-		XMMATRIX heroMatrixRowMajor = Object::heroWorld;
+		// ====================================================================
+		// СУПЕРСТАБИЛЬНЫЙ БАЗИС КРИВОЙ ДЛЯ КАМЕРЫ (ПОЛНАЯ ИЗОЛЯЦИЯ ОТ AXIS ANGLE)
+		// ====================================================================
+		const auto& currentLine = Object::starLineList.line[hero.lineIndex];
+		int maxPointIdx = currentLine.pointCount - 1;
 
-		// Зануляем позицию в 4-й строке, чтобы XMMatrixDecompose честно вытащил чистый кватернион вращения тела
-		heroMatrixRowMajor.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+		XMVECTOR pathForward = hero.lineTangent; // Чистый непрерывный тангенс
+
+		// ТОЧЕЧНОЕ ИСПРАВЛЕНИЕ: Динамический выбор апвектора для ориентации орбиты камеры
+		XMVECTOR pathUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+		if (hero.gravity.mode)
+		{
+			// Пока мы летим, целевым апвектором для кватерниона камеры становится 
+			// наш вычисленный в воздухе landingUp. Камера начнет докручиваться ЗАРАНЕЕ!
+			pathUp = hero.landingUp;
+		}
+		else
+		{
+			// Когда приземлились — плавно берем апвектор рельса из волнового массива
+			int currIdx = clamp((int)floorf(hero.pointIndex), 0, maxPointIdx);
+			int nextIdx = clamp(currIdx + 1, 0, maxPointIdx);
+			float t = hero.pointIndex - floorf(hero.pointIndex);
+			if (currIdx == maxPointIdx) t = 0.0f;
+
+			XMVECTOR upCurr = F2V(currentLine.upVector[currIdx]);
+			XMVECTOR upNext = F2V(currentLine.upVector[nextIdx]);
+			pathUp = XMVector3Normalize(VectorLerp(upCurr, upNext, t));
+		}
+
+		// Строим Right строго по выбранному, не прыгающему pathUp
+		XMVECTOR pathRight = XMVector3Normalize(XMVector3Cross(pathUp, pathForward));
+
+		// Собираем чистую Row-Major матрицу пути (детерминант всегда +1.0)
+		XMMATRIX pathMatrixRowMajor = XMMatrixIdentity();
+		pathMatrixRowMajor.r[0] = pathRight;
+		pathMatrixRowMajor.r[1] = pathUp; // Передает непрерывный наклон в Decompose!
+		pathMatrixRowMajor.r[2] = pathForward;
+		pathMatrixRowMajor.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 
 		XMVECTOR heroScale, heroRotQ, heroTranslation;
-		XMMatrixDecompose(&heroScale, &heroRotQ, &heroTranslation, heroMatrixRowMajor);
+		XMMatrixDecompose(&heroScale, &heroRotQ, &heroTranslation, pathMatrixRowMajor);
 
 		// Позицию берем строго из физических координат героя
 		heroTranslation = hero.pos;
 
-		// === ЧЕСТНОЕ СФЕРИЧЕСКОЕ СГЛАЖИВАНИЕ ДЛЯ ИЗОЛЯЦИИ ОТ РЫВКОВ ===
+		// Сглаживание инерции (Защита от стартовых бросков)
 		if (cameraFirstFrame)
 		{
 			smoothedHeroPos = heroTranslation;
@@ -1708,32 +1740,31 @@ namespace Loop
 		}
 		else
 		{
-			// Коэффициенты сглаживания: 5.0f для позиции, 4.0f для вращения.
-			// Камера плавно догоняет и докручивается вслед за телом персонажа.
 			float posStep = clamp(deltaTime * 5.0f, 0.0f, 1.0f);
-			float rotStep = clamp(deltaTime * .10f, 0.0f, 1.0f);
+
+			// ИСПРАВЛЕНИЕ: Ставим твой мягкий коэффициент 0.1f для шёлковой докрутки
+			// (При 60 FPS deltaTime * 0.6f как раз превращается в честные 0.01)
+			float rotStep = clamp(deltaTime * 0.6f, 0.0f, 1.0f);
 
 			smoothedHeroPos = XMVectorLerp(smoothedHeroPos, heroTranslation, posStep);
-
-			// Постоянный непрерывный Slerp к кватерниону тела героя. 
-			// Так как тело в воздухе разворачивается плавно, камера будет шёлково 
-			// докручивать горизонт на протяжении всего полета, и в момент касания 
-			// не возникнет абсолютно никакого излома углов!
+			// Сглаживаем стабильный геометрический кватернион, который плавно меняется еще в полете!
 			smoothedHeroRotQ = XMQuaternionSlerp(smoothedHeroRotQ, heroRotQ, rotStep);
 		}
 
-		// Восстанавливаем сглаженную матрицу ориентации из кватерниона
+		// Восстанавливаем сглаженную матрицу ориентации нити из кватерниона
 		XMMATRIX mSmoothedHero = XMMatrixRotationQuaternion(smoothedHeroRotQ);
 		XMVECTOR smoothedRight = mSmoothedHero.r[0];
 		XMVECTOR smoothedUp = mSmoothedHero.r[1];
 		XMVECTOR smoothedForward = mSmoothedHero.r[2];
 
-		// Накладываем ручной твист axisAngle поверх СМУЗИРОВАННОГО базового вектора
+		// ====================================================================
+		// ЧЕСТНАЯ И МОНОЛИТНАЯ КОМПЕНСАЦИЯ AXIS ANGLE БЕЗ ДЖИТТEРА
+		// ====================================================================
 		XMMATRIX rotationCompMatrix = XMMatrixRotationAxis(smoothedForward, -hero.axisAngle);
 		XMVECTOR compRight = XMVector3TransformNormal(smoothedRight, rotationCompMatrix);
 		XMVECTOR compUp = XMVector3TransformNormal(smoothedUp, rotationCompMatrix);
 
-		// Накладываем глобальные инвертированные углы мыши
+		// Накладываем глобальные инвертированные углы мыши поверх скомпенсированного базиса
 		float cosPitch = cosf(mousePitch);
 		XMVECTOR localMouseOffset = XMVectorSet(
 			cosPitch * sinf(mouseYaw),
@@ -1742,7 +1773,7 @@ namespace Loop
 			0.0f
 		);
 
-		// Раскладываем смещение мыши по скомпенсированным осям
+		// Раскладываем смещение мыши по СКОМПЕНСИРОВАННЫМ осям
 		XMVECTOR worldMouseOffset = XMVectorZero();
 		worldMouseOffset = XMVectorAdd(worldMouseOffset, compRight * XMVectorGetX(localMouseOffset));
 		worldMouseOffset = XMVectorAdd(worldMouseOffset, compUp * XMVectorGetY(localMouseOffset));
@@ -1751,7 +1782,7 @@ namespace Loop
 		finalCameraAt = smoothedHeroPos;
 		finalCameraEye = XMVectorAdd(finalCameraAt, worldMouseOffset * camRadius);
 
-		// Вектор Up для LookAt-матрицы удерживает выровненный горизонт
+		// Вектор Up для LookAt-матрицы должен удерживать правильный наклон
 		finalCameraUp = compUp;
 
 		// СБОРКА VIEW МАТРИЦЫ С УЧЕТОМ ИНДЕКСОВ СТРОК
