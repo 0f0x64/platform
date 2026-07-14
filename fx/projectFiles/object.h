@@ -562,6 +562,7 @@ namespace Object {
 	struct starline {
 		float4 basePoint[100];
 		float4 point[smoothPointMAX];
+		float4 upVector[smoothPointMAX];
 		int basePointCount = 0;
 		int pointCount = 0;
 	};
