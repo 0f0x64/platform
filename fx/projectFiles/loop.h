@@ -1730,7 +1730,7 @@ namespace Loop
 			float rotStep = clamp(deltaTime * 0.6f, 0.0f, 1.0f);
 
 			smoothedHeroPos = XMVectorLerp(smoothedHeroPos, heroTranslation, posStep);
-			// Сглаживаем стабильный геометрический кватернион, который плавно меняется еще в полете!
+			// Сглаживаем стабильный geometric кватернион, который плавно меняется еще в полете!
 			smoothedHeroRotQ = XMQuaternionSlerp(smoothedHeroRotQ, heroRotQ, rotStep);
 		}
 
@@ -1772,6 +1772,18 @@ namespace Loop
 		XMVECTOR camForward = XMVector3Normalize(XMVectorSubtract(finalCameraAt, finalCameraEye));
 		XMVECTOR camRight = XMVector3Normalize(XMVector3Cross(finalCameraUp, camForward));
 		XMVECTOR exactUp = XMVector3Normalize(XMVector3Cross(camForward, camRight));
+
+		// ====================================================================
+		// СДВИГ ПЕРСОНАЖА НА НИЖНЮЮ ТРЕТЬ ЭКРАНА (FRAMING OFFSET)
+		// ====================================================================
+		// Значение 1.35f идеально смещает точку прицеливания вверх по экрану, 
+		// за счет чего сам персонаж визуально уходит в нижнюю треть кадра.
+		float screenOffsetY = 2.735f;
+		XMVECTOR localScreenVerticalOffset = exactUp * screenOffsetY;
+
+		// Смещаем точку фокуса и позицию глаза камеры параллельно вдоль экрана
+		finalCameraAt = XMVectorAdd(finalCameraAt, localScreenVerticalOffset);
+		finalCameraEye = XMVectorAdd(finalCameraEye, localScreenVerticalOffset);
 
 		XMMATRIX viewMatrix = XMMatrixIdentity();
 		viewMatrix.r[0] = XMVectorSet(XMVectorGetX(camRight), XMVectorGetX(exactUp), XMVectorGetX(camForward), 0.0f);
