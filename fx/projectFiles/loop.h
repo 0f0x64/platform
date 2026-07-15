@@ -39,6 +39,7 @@ struct hero_ {
 	XMVECTOR forwardBeforeJump = { 0.0f, 0.0f, 1.0f, 0.0f };
 	XMVECTOR lineTangent = { 0.0f, 0.0f, 1.0f, 0.0f };
 	XMVECTOR landingUp = { 0.0f, 0.0f, 1.0f, 0.0f };
+	float startAirDistance = 0;
 	int lineIndex = 0;
 	float pointIndex = 0;
 
@@ -262,18 +263,35 @@ struct hero_ {
 		}
 	}
 
+	// Функция вычисления длины по трем координатам
+	float length3(const float4& v) {
+		return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	}
+
+	bool firstRun = true;
+
 	void Respawn()
 	{
-		if (!GetAsyncKeyState('R')) return;
 
-		int range = 10;
-		pos = getRandVector4()*range;
-		int startLine = 0;
-		int startPoint = 0;
-		float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
-		pos += F2V(Object::starLineList.line[startLine].point[startPoint]);
-		gravity.mode = true;
-		gravity.progress = 0.0f;
+		if (firstRun || ((!firstRun) && GetAsyncKeyState('R')))
+		{
+			if (!firstRun)
+			{
+				while (GetAsyncKeyState('R')) { Sleep(16); };
+			}
+
+			srand(timer::frameBeginTime);
+			firstRun = false;
+			int range = 20;
+			pos = getRandVector4() * range;
+			startAirDistance = length3(V2F(pos));
+			int startLine = rand()% Object::starLineList.lineCount;
+			int startPoint = rand() % Object::starLineList.line[startLine].pointCount;
+			float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
+			pos += F2V(destPoint);
+			gravity.mode = true;
+			gravity.progress = 0.0f;
+		}
 
 	}
 	
@@ -1464,11 +1482,16 @@ namespace Loop
 		XMVECTOR airTangent = XMVector3Normalize(XMVectorSubtract(pNext, pCurrent));
 		if (XMVector3Equal(airTangent, XMVectorZero())) airTangent = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
-		// 2. Находим честный апвектор в воздухе (перпендикуляр от рельса к персонажу)
+		// 2. Находим честную позицию на линии строго под персонажем
 		float progressT = hero.pointIndex - floorf(hero.pointIndex);
 		XMVECTOR projectedPosOnLine = VectorLerp(pCurrent, pNext, progressT);
-		XMVECTOR rawAirUp = XMVectorSubtract(hero.pos, projectedPosOnLine);
 
+		// 3. Вычисляем ТЕКУЩУЮ физическую дистанцию до нити приземления
+		float distanceToLine = XMVectorGetX(XMVector3Length(XMVectorSubtract(hero.pos, projectedPosOnLine)));
+		if (distanceToLine < 0.001f) distanceToLine = 0.001f;
+
+		// 4. Находим честный апвектор в воздухе (перпендикуляр от рельса к персонажу)
+		XMVECTOR rawAirUp = XMVectorSubtract(hero.pos, projectedPosOnLine);
 		XMVECTOR proj = XMVector3Dot(rawAirUp, airTangent);
 		XMVECTOR airUp = XMVector3Normalize(XMVectorSubtract(rawAirUp, XMVectorMultiply(airTangent, proj)));
 
@@ -1476,10 +1499,10 @@ namespace Loop
 			airUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 		}
 
-		// 3. Строим честный правый вектор
+		// 5. Строим честный правый вектор целевого базиса
 		XMVECTOR airRight = XMVector3Normalize(XMVector3Cross(airUp, airTangent));
 
-		// 4. Собираем ЦЕЛЕВУЮ Row-Major матрицу, к которой персонаж должен развернуться
+		// 6. Собираем ЦЕЛЕВУЮ Row-Major матрицу, к которой персонаж должен быть развернут
 		XMMATRIX targetAirMatrix = XMMatrixIdentity();
 		targetAirMatrix.r[0] = airRight;
 		targetAirMatrix.r[1] = airUp;
@@ -1487,15 +1510,25 @@ namespace Loop
 
 		XMVECTOR targetQuat = XMQuaternionRotationMatrix(targetAirMatrix);
 
-		// 5. Извлекаем текущую ориентацию из Object::heroWorld
-		XMMATRIX currentWorldRow = XMMatrixTranspose(Object::heroWorld); // Из Column в Row
+		// 7. Извлекаем текущую ориентацию из Object::heroWorld (чистый Row-Major без Transpose!)
+		XMMATRIX currentWorldRow = Object::heroWorld;
 		currentWorldRow.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f); // Зануляем позицию для честного Decompose
 
 		XMVECTOR currentScale, currentQuat, currentTrans;
 		XMMatrixDecompose(&currentScale, &currentQuat, &currentTrans, currentWorldRow);
 
-		// 6. Сферическая плавная интерполяция (Slerp)
-		float blendStep = clamp(deltaTime * 8.0f, 0.0f, 1.0f);
+		// ====================================================================
+		// МАТЕМАТИЧЕСКАЯ ГАРАНТИЯ: ИНТЕРПОЛЯЦИЯ ПО ПРОГРЕССУ РАССТОЯНИЯ
+		// ====================================================================
+		// Вычисляем, какой процент пути от точки спауна до нити персонаж уже пролетел.
+		// На старте (distanceToLine == startAirDistance) progress равен 0.0f (тело летит свободно).
+		// В момент касания (distanceToLine == 0.0f) progress равен строго 1.0f.
+		float airProgress = 1.0f - (distanceToLine / hero.startAirDistance);
+
+		// Зажимаем коэффициент в рамки [0, 1]
+		float blendStep = clamp(airProgress, 0.0f, 1.0f);
+
+		// Сферическая плавная интерполяция идет строго по пройденному пути!
 		XMVECTOR smoothQuat = XMQuaternionSlerp(currentQuat, targetQuat, blendStep);
 
 		// Восстанавливаем финальную сглаженную матрицу вращения кадра полета
@@ -1512,29 +1545,16 @@ namespace Loop
 		Object::heroWorld = finalAirRot;
 	}
 
-	void ProcessGravityMove(float deltaTime)
-	{
-		if (hero.gravity.mode)
-		{
-			// ... Если здесь выше у тебя был код изменения физической позиции hero.pos 
-			// под действием гравитации (например, hero.pos += gravityVelocity * deltaTime), оставь его тут ...
-
-			// НОВЫЙ КИНЕМАТOГРАФИЧНЫЙ РАЗВОРOТ В ВОЗДУХЕ:
-			// Функция сама рассчитает плавное вращение к рельсу, привяжет hero.pos,
-			// обновит tUP, hero.forward и запишет в Object::heroWorld правильный Row-Major.
-			OrientHeroTowardsLineInAir(deltaTime);
-
-			// Мгновенно выходим, чтобы старый код сборки матрицы больше ничего не затирал
-			return;
-		}
-	}
+	
 
 	void UpdateHeroOnLine(float deltaTime)
 	{
 		// === СОСТОЯНИЕ 1: РЕЖИМ СВОБОДНОЙ ГРАВИТАЦИИ ===
-		ProcessGravityMove(deltaTime);
-
-		if (hero.gravity.mode) return;
+		if (hero.gravity.mode)
+		{
+			OrientHeroTowardsLineInAir(deltaTime);
+			return;
+		}
 
 		// === СОСТОЯНИЕ 2: ДВИЖЕНИЕ ПО НИТЯМ ===
 		if (hero.lineIndex < 0 || hero.lineIndex >= Object::starLineList.lineCount) return;
@@ -1679,13 +1699,13 @@ namespace Loop
 		// ТОЧЕЧНОЕ ИСПРАВЛЕНИЕ: Динамический выбор апвектора для ориентации орбиты камеры
 		XMVECTOR pathUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 
-		if (hero.gravity.mode)
+		//if (hero.gravity.mode)
 		{
 			// Пока мы летим, целевым апвектором для кватерниона камеры становится 
 			// наш вычисленный в воздухе landingUp. Камера начнет докручиваться ЗАРАНЕЕ!
-			pathUp = hero.landingUp;
+			//pathUp = hero.landingUp;
 		}
-		else
+		//else
 		{
 			// Когда приземлились — плавно берем апвектор рельса из волнового массива
 			int currIdx = clamp((int)floorf(hero.pointIndex), 0, maxPointIdx);
