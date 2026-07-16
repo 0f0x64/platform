@@ -320,9 +320,11 @@ struct hero_ {
 	}
 
 	bool firstRun = true;
-	
+	bool respawnInProgress = true;
+
 	void Respawn()
 	{
+		if (airProgress >= 1.f) respawnInProgress = false;
 
 		if (firstRun || ((!firstRun) && GetAsyncKeyState('R')))
 		{
@@ -330,6 +332,8 @@ struct hero_ {
 			{
 				while (GetAsyncKeyState('R')) { Sleep(16); };
 			}
+
+			respawnInProgress = true;
 
 			cameraFirstFrame = true;
 			srand(timer::frameBeginTime);
@@ -1516,23 +1520,6 @@ namespace Loop
 
 		int maxPointIdx = currentLine.pointCount - 1;
 		
-		/* {
-		// Находим индексы сегмента, над которым летим
-		int currIdx = clamp((int)floorf(hero.pointIndex), 1, maxPointIdx - 2);
-		int nextIdx = currIdx + 1;
-
-		XMVECTOR pCurrent = F2V(currentLine.point[currIdx]);
-		XMVECTOR pNext = F2V(currentLine.point[nextIdx]);
-
-		// 1. Тангенс сегмента, к которому мы приближаемся
-		XMVECTOR airTangent = XMVector3Normalize(XMVectorSubtract(pNext, pCurrent));
-
-		if (XMVector3Equal(airTangent, XMVectorZero())) airTangent = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-
-		// 2. Находим честную позицию на линии строго под персонажем
-		float progressT = hero.pointIndex - floorf(hero.pointIndex);
-		XMVECTOR projectedPosOnLine = VectorLerp(pCurrent, pNext, progressT);
-	}*/
 		XMVECTOR airTangent = getSmoothTangent();
 		XMVECTOR projectedPosOnLine = posOnLine;
 
@@ -1594,8 +1581,28 @@ namespace Loop
 
 		// Отдаем в шейдер в чистом Row-Major под твой макрос mul((float3x3)model, pos)
 		Object::heroOnRails = finalAirRot;
+
+		//----------------
+		static float mouseYawIner = mouseYaw;
+
+		// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
+		float targetA = -std::round(mouseYaw / PI) * PI;
+
+		mouseYawIner = lerp(mouseYawIner, targetA, pow(min(deltaTime * 3., 1.), 1.5));
+		XMMATRIX reverseRot = XMMatrixRotationAxis(tUP, mouseYawIner);
+		finalAirRot = XMMatrixMultiply(finalAirRot, reverseRot);
+
+
+		hero.forward = finalAirRot.r[2];
+
+		// Отдаем в шейдер в чистом Row-Major под твой макрос (float3x3) без заваливаний
 		Object::heroWorld = finalAirRot;
-		hero.axisAngle = 0;
+
+		//Object::heroWorld = finalAirRot;
+		if (hero.respawnInProgress)
+		{
+			hero.axisAngle = 0;
+		}
 	}
 
 	float smoothstep(float edge0, float edge1, float x) {
@@ -1687,21 +1694,25 @@ namespace Loop
 		HeroRealUp = XMVector3Normalize(XMVectorSubtract(HeroRealUp, tangentSmooth * XMVectorGetX(XMVector3Dot(HeroRealUp, tangentSmooth))));
 		XMVECTOR HeroRight = XMVector3Normalize(XMVector3Cross(HeroRealUp, tangentSmooth));
 
+		XMVECTOR heroForward = tangentSmooth;
+
 		// Логика прыжка
-		if (!hero.jump) {
-			hero.upBeforeJump = HeroRealUp;
-			hero.pos = posOnLine;
-			hero.forwardBeforeJump = tangentSmooth;
-		}
-		else {
+		if (hero.jump)
+		{
 			HeroRealUp = hero.upBeforeJump;
 			HeroRight = XMVector3Normalize(XMVector3Cross(HeroRealUp, tangentSmooth));
+			//heroForward = hero.forwardBeforeJump;
+		} 
+		else 
+		{
+			hero.upBeforeJump = HeroRealUp;
+			hero.pos = posOnLine;
+			hero.forwardBeforeJump = hero.forward;// *sign(hero.speed);
 		}
 
 		tUP = HeroRealUp;
 
-		XMVECTOR heroForward = tangentSmooth;
-		//if (hero.jump) heroForward = hero.forwardBeforeJump;
+
 
 		// Сборка чистой Row-Major матрицы вращения со строгими индексами строк r
 		XMMATRIX rowMajorRot = XMMatrixIdentity();
@@ -1731,8 +1742,11 @@ namespace Loop
 	{
 		float camRadius = 2.5f; // Расстояние от камеры до героя
 
-		camRadius = lerp(1., camRadius, hero.airProgress);
-		hero.yOffset = lerp(0., .4 * 1000, hero.airProgress);
+		if (hero.respawnInProgress)
+		{
+			camRadius = lerp(1., camRadius, hero.airProgress);
+			hero.yOffset = lerp(0., .4 * 1000, hero.airProgress);
+		}
 
 		XMVECTOR heroScale, heroRotQ, heroTranslation;
 		XMMatrixDecompose(&heroScale, &heroRotQ, &heroTranslation, Object::heroOnRails);
@@ -1944,6 +1958,7 @@ namespace Loop
 				ProcessMouseInput();
 
 				hero.Respawn();
+
 				hero.ProcessMove(); // Изменяет скорости и углы
 				hero.ProcessJump(); // Обрабатывает прыжок и свободную гравитацию
 
