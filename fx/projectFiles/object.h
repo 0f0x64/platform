@@ -366,7 +366,7 @@ namespace Object {
 	XMMATRIX heroOnRails;
 	XMMATRIX heroWorld;
 
-	void ShowMesh(dx11::ConstBuf::sbObject* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom)
+	void ShowMesh(dx11::ConstBuf::sbObject* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom, int onLineOfs)
 	{
 
 		int gX = sqrt(count / skipper);
@@ -388,7 +388,8 @@ namespace Object {
 				.triCount = float4(obj->triangleCount,0,0,0),
 				.brightness = float4(brightness,0,0,0),
 				.tickness = float4(tickness,0,0,0),
-				.zoom = float4(zm,zm,zm,1)
+				.zoom = float4(zm,zm,zm,1),
+				.onLineOfs = (float)onLineOfs/1000.f
 			},
 		};
 
@@ -417,7 +418,7 @@ namespace Object {
 		
 	}
 
-	cmd(Mesh, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom)
+	cmd(Mesh, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs)
 	{
 		reflect;
 
@@ -432,7 +433,7 @@ namespace Object {
 		Culling::Set({ cullmode::off });
 		if (in.stencil == switcher::on)
 		{
-			ShowMesh(MeshPtr, (int)MeshPtr->triangleCount,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom);
+			ShowMesh(MeshPtr, (int)MeshPtr->triangleCount,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs);
 		}
 
 		Culling::Set({ cullmode::off });
@@ -442,7 +443,7 @@ namespace Object {
 			.op = blendop::add
 			});
 
-		ShowMesh(MeshPtr, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom);
+		ShowMesh(MeshPtr, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom, in.onLineOfs);
 	}
 
 #endif

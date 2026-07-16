@@ -134,6 +134,7 @@ float4 triCount;
 float4 brightness;
 float4 tickness;
 float4 zoom;
+float onLineOfs;
 } params;
 
 void set () {

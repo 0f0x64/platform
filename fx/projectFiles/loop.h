@@ -59,8 +59,9 @@ struct hero_ {
 
 	bool jump = false;
 	float jumpHeight = 0;
+	float airProgress = 0;
 
-	float yOffset = 0;
+	float yOffset = .4*1000.;
 
 	struct {
 		bool mode = true;
@@ -1468,6 +1469,44 @@ namespace Loop
 		}
 	}
 
+	XMVECTOR posOnLine;
+
+	XMVECTOR getSmoothTangent()
+	{
+		const auto& currentLine = Object::starLineList.line[hero.lineIndex];
+		int maxPointIdx = currentLine.pointCount - 1;
+		// Вычисление индексов и непрерывной дробной части
+		int currIdx = clamp((int)floorf(hero.pointIndex), 0, maxPointIdx);
+		int nextIdx = clamp(currIdx + 1, 0, maxPointIdx);
+
+		float t = hero.pointIndex - floorf(hero.pointIndex);
+		if (currIdx == maxPointIdx) t = 0.0f;
+
+		XMVECTOR pCurrent = F2V(currentLine.point[currIdx]);
+		XMVECTOR pNext = F2V(currentLine.point[nextIdx]);
+
+		// 1. Плавно интерполируем позицию на линии
+		posOnLine = VectorLerp(pCurrent, pNext, t);
+
+		// ====================================================================
+		// НЕПРЕРЫВНЫЙ СГЛАЖЕННЫЙ ТАНГЕНС ПУТИ
+		// ====================================================================
+		XMVECTOR tangentCurr = XMVector3Normalize(XMVectorSubtract(pNext, pCurrent));
+		if (XMVector3Equal(tangentCurr, XMVectorZero())) tangentCurr = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+
+		int futureIdx = clamp(nextIdx + 1, 0, maxPointIdx);
+		XMVECTOR tangentNext = tangentCurr;
+		if (nextIdx != futureIdx) {
+			XMVECTOR pFuture = F2V(currentLine.point[futureIdx]);
+			tangentNext = XMVector3Normalize(XMVectorSubtract(pFuture, pNext));
+			if (XMVector3Equal(tangentNext, XMVectorZero())) tangentNext = tangentCurr;
+		}
+
+		XMVECTOR tangentSmooth = XMVector3Normalize(VectorLerp(tangentCurr, tangentNext, t));
+		hero.lineTangent = tangentSmooth;
+		return tangentSmooth;
+	}
+
 	void OrientHeroTowardsLineInAir(float deltaTime)
 	{
 		// Проверяем, что индекс линии валиден и она существует
@@ -1476,7 +1515,8 @@ namespace Loop
 		if (currentLine.pointCount < 2) return;
 
 		int maxPointIdx = currentLine.pointCount - 1;
-
+		
+		/* {
 		// Находим индексы сегмента, над которым летим
 		int currIdx = clamp((int)floorf(hero.pointIndex), 1, maxPointIdx - 2);
 		int nextIdx = currIdx + 1;
@@ -1492,6 +1532,9 @@ namespace Loop
 		// 2. Находим честную позицию на линии строго под персонажем
 		float progressT = hero.pointIndex - floorf(hero.pointIndex);
 		XMVECTOR projectedPosOnLine = VectorLerp(pCurrent, pNext, progressT);
+	}*/
+		XMVECTOR airTangent = getSmoothTangent();
+		XMVECTOR projectedPosOnLine = posOnLine;
 
 		// 3. Вычисляем ТЕКУЩУЮ физическую дистанцию до нити приземления
 		float distanceToLine = XMVectorGetX(XMVector3Length(XMVectorSubtract(hero.pos, projectedPosOnLine)));
@@ -1530,10 +1573,11 @@ namespace Loop
 		// Вычисляем, какой процент пути от точки спауна до нити персонаж уже пролетел.
 		// На старте (distanceToLine == startAirDistance) progress равен 0.0f (тело летит свободно).
 		// В момент касания (distanceToLine == 0.0f) progress равен строго 1.0f.
-		float airProgress = 1.0f - (distanceToLine / hero.startAirDistance);
-		airProgress = pow(airProgress, 2.5);
+		hero.airProgress = 1.0f - (distanceToLine / hero.startAirDistance);
+		hero.airProgress = pow(hero.airProgress, 2.5);
+		hero.airProgress = clamp(hero.airProgress, 0.0f, 1.0f);
 		// Зажимаем коэффициент в рамки [0, 1]
-		float blendStep = clamp(airProgress, 0.0f, 1.0f);
+		float blendStep = hero.airProgress;
 
 		// Сферическая плавная интерполяция идет строго по пройденному пути!
 		XMVECTOR smoothQuat = XMQuaternionSlerp(currentQuat, targetQuat, blendStep);
@@ -1561,6 +1605,8 @@ namespace Loop
 		// 2. Вычисляем сглаживание по формуле: 3t^2 - 2t^3
 		return t * t * (3.0f - 2.0f * t);
 	}
+
+	
 
 	void UpdateHeroOnLine(float deltaTime)
 	{
@@ -1593,38 +1639,17 @@ namespace Loop
 			if (segLenCheck < 0.001f) segLenCheck = 1.0f;
 
 			hero.pointIndex += (hero.speed * fixedStep * 50.f) / segLenCheck;
-			hero.pointIndex = clamp(hero.pointIndex, 1.f, (float)maxPointIdx-1.);
 		}
 
-		// Вычисление индексов и непрерывной дробной части
+		hero.pointIndex = clamp(hero.pointIndex, 1.f, (float)maxPointIdx);
+
 		int currIdx = clamp((int)floorf(hero.pointIndex), 0, maxPointIdx);
 		int nextIdx = clamp(currIdx + 1, 0, maxPointIdx);
 
+		XMVECTOR tangentSmooth = getSmoothTangent();
 		float t = hero.pointIndex - floorf(hero.pointIndex);
 		if (currIdx == maxPointIdx) t = 0.0f;
 
-		XMVECTOR pCurrent = F2V(currentLine.point[currIdx]);
-		XMVECTOR pNext = F2V(currentLine.point[nextIdx]);
-
-		// 1. Плавно интерполируем позицию на линии
-		XMVECTOR posOnLine = VectorLerp(pCurrent, pNext, t);
-
-		// ====================================================================
-		// ИСПРАВЛЕНИЕ РЫВКА: НЕПРЕРЫВНЫЙ СГЛАЖЕННЫЙ ТАНГЕНС ПУТИ
-		// ====================================================================
-		XMVECTOR tangentCurr = XMVector3Normalize(XMVectorSubtract(pNext, pCurrent));
-		if (XMVector3Equal(tangentCurr, XMVectorZero())) tangentCurr = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-
-		int futureIdx = clamp(nextIdx + 1, 0, maxPointIdx);
-		XMVECTOR tangentNext = tangentCurr;
-		if (nextIdx != futureIdx) {
-			XMVECTOR pFuture = F2V(currentLine.point[futureIdx]);
-			tangentNext = XMVector3Normalize(XMVectorSubtract(pFuture, pNext));
-			if (XMVector3Equal(tangentNext, XMVectorZero())) tangentNext = tangentCurr;
-		}
-
-		XMVECTOR tangentSmooth = XMVector3Normalize(VectorLerp(tangentCurr, tangentNext, t));
-		hero.lineTangent = tangentSmooth;
 
 		// ====================================================================
 		// СВЯЗЫВАНИЕ ЧЕРЕЗ СКОМПОНОВАННЫЙ МАССИВ upVector (ПЛАВНЫЙ БАЗИС КВАТЕРНИОНОВ)
@@ -1665,7 +1690,7 @@ namespace Loop
 		// Логика прыжка
 		if (!hero.jump) {
 			hero.upBeforeJump = HeroRealUp;
-			hero.pos = XMVectorAdd(posOnLine, HeroRealUp * hero.yOffset);
+			hero.pos = posOnLine;
 			hero.forwardBeforeJump = tangentSmooth;
 		}
 		else {
@@ -1676,7 +1701,7 @@ namespace Loop
 		tUP = HeroRealUp;
 
 		XMVECTOR heroForward = tangentSmooth;
-		if (hero.jump) heroForward = hero.forwardBeforeJump;
+		//if (hero.jump) heroForward = hero.forwardBeforeJump;
 
 		// Сборка чистой Row-Major матрицы вращения со строгими индексами строк r
 		XMMATRIX rowMajorRot = XMMatrixIdentity();
@@ -1704,7 +1729,10 @@ namespace Loop
 
 	void UpdateCamera(float deltaTime)
 	{
-		const float camRadius = 2.5f; // Расстояние от камеры до героя
+		float camRadius = 2.5f; // Расстояние от камеры до героя
+
+		camRadius = lerp(1., camRadius, hero.airProgress);
+		hero.yOffset = lerp(0., .4 * 1000, hero.airProgress);
 
 		XMVECTOR heroScale, heroRotQ, heroTranslation;
 		XMMatrixDecompose(&heroScale, &heroRotQ, &heroTranslation, Object::heroOnRails);
@@ -1765,6 +1793,7 @@ namespace Loop
 		// ====================================================================
 		float screenOffsetY = 1.335f;
 
+		//посадка на линию
 		static float landedTimer = 1;
 		landedTimer += deltaTime;
 		if (hero.gravity.mode)
@@ -1777,6 +1806,8 @@ namespace Loop
 		float smoothLT = smoothstep(0, 1, landedTimer / landindDur);
 		smoothLT = pow(smoothLT,.25);
 		screenOffsetY -= sin(PI * smoothLT) * landingAmp;
+		//смещение полет-приземление
+		screenOffsetY = lerp(0, screenOffsetY, hero.airProgress);
 
 		XMVECTOR localScreenVerticalOffset = exactUp * screenOffsetY;
 
@@ -1935,7 +1966,8 @@ namespace Loop
 					.brightness = 14,
 					.tickness = 2,
 					.stencil = switcher::on,
-					.zoom = -81
+					.zoom = -81,
+					.onLineOfs = (int)hero.yOffset
 				});
 
 			//Object::heroWorld = XMMatrixTranspose(XMMatrixIdentity());
