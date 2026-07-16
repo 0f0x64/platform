@@ -30,6 +30,7 @@ float4 follow = { 0,0,11,0 };
 float4 curent_i = { 0,0,11,0 };
 XMVECTOR p0 = { 0,0,0 };
 XMVECTOR p1 = { 0,0,1 };
+bool cameraFirstFrame = true;
 
 struct hero_ {
 
@@ -191,11 +192,54 @@ struct hero_ {
 
 		return finalLandingUp;
 	}
+
+	float fracPointIndex = 0;
 	
+	float4 projectPointToLine(float4 pos, float4 p1, float4 p2) {
+		// 1. Считаем вектор линии (p2 - p1) только по 3D осям (XYZ)
+		float lineX = p2.x - p1.x;
+		float lineY = p2.y - p1.y;
+		float lineZ = p2.z - p1.z;
+
+		// 2. Считаем вектор от начала линии к точке pos (pos - p1)
+		float posX = pos.x - p1.x;
+		float posY = pos.y - p1.y;
+		float posZ = pos.z - p1.z;
+
+		// 3. Скалярное произведение (Dot Product) векторов на плоскости XYZ
+		float dotProduct = posX * lineX + posY * lineY + posZ * lineZ;
+
+		// 4. Квадрат длины отрезка линии (X^2 + Y^2 + Z^2)
+		float lineLengthSq = lineX * lineX + lineY * lineY + lineZ * lineZ;
+
+		// Защита от деления на ноль (если closestPoint и closestPoint2 совпали)
+		if (lineLengthSq < 1e-6f) {
+			return p1;
+		}
+
+		// 5. Вычисляем фактор проекции t
+		float t = dotProduct / lineLengthSq;
+
+		// ЕСЛИ ВАМ НУЖЕН ОТРЕЗОК (ограничить точку строго МЕЖДУ closestPoint и closestPoint2):
+		// Раскомментируйте строчку ниже, чтобы точка не улетала в бесконечность за пределы рельса
+		 t = std::clamp(t, 0.0f, 1.0f);
+		 fracPointIndex = t;
+		// 6. Формируем финальную 3D-точку: p1 + lineVec * t
+		float4 result;
+		result.x = p1.x + lineX * t;
+		result.y = p1.y + lineY * t;
+		result.z = p1.z + lineZ * t;
+		result.w = 1.0f; // Гарантируем, что это корректная точка в 3D пространстве
+
+		return result;
+	}
+
 	void ProcessGravity()
 	{
 		float minDistance = 1e9f; // Инициализируем заведомо большим числом
 		float4 closestPoint = { 0.0f, 0.0f, 0.0f, 0.0f };
+		float4 closestPoint2 = { 0.0f, 0.0f, 0.0f, 0.0f };
+		float closestPoint2Index = 0;
 		bool foundPoint = false;
 
 		//Находим ОДНУ самую ближайшую точку
@@ -210,6 +254,8 @@ struct hero_ {
 				if (dst < minDistance)
 				{
 					minDistance = dst;
+					closestPoint2 = closestPoint;
+					closestPoint2Index = pointIndex;
 					closestPoint = Object::starLineList.line[i].point[j];
 					foundPoint = true;
 					lineIndex = i;
@@ -222,7 +268,11 @@ struct hero_ {
 		{
 			// Загружаем векторы
 			XMVECTOR startPos = pos;
-			XMVECTOR endPos = F2V(closestPoint);
+
+			auto iEndPos = projectPointToLine(V2F(pos), closestPoint, closestPoint2);
+			pointIndex = lerp(pointIndex, closestPoint2Index, fracPointIndex);
+
+			XMVECTOR endPos = F2V(iEndPos);
 
 			landingUp = CalculateAndSpreadLandingUp(startPos, endPos, lineIndex, pointIndex);
 
@@ -269,7 +319,7 @@ struct hero_ {
 	}
 
 	bool firstRun = true;
-
+	
 	void Respawn()
 	{
 
@@ -280,13 +330,14 @@ struct hero_ {
 				while (GetAsyncKeyState('R')) { Sleep(16); };
 			}
 
+			cameraFirstFrame = true;
 			srand(timer::frameBeginTime);
 			firstRun = false;
 			int range = 20;
 			pos = getRandVector4() * range;
 			startAirDistance = length3(V2F(pos));
 			int startLine = rand()% Object::starLineList.lineCount;
-			int startPoint = rand() % Object::starLineList.line[startLine].pointCount;
+			int startPoint = rand() % (Object::starLineList.line[startLine].pointCount-2)+1;
 			float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
 			pos += F2V(destPoint);
 			gravity.mode = true;
@@ -297,8 +348,6 @@ struct hero_ {
 	
 	void ProcessJump()
 	{
-		//if (GetActiveWindow() != hWnd) return;
-
 		auto space = GetAsyncKeyState(VK_SPACE);
 
 		if (space && !gravity.mode)
@@ -313,7 +362,7 @@ struct hero_ {
 			}
 			else {
 				upBeforeJump = tUP;
-				forwardBeforeJump = forward;
+				forwardBeforeJump = lineTangent*sign(speed);
 				jumpHeight = 1.;
 				jump = true;
 			}
@@ -1354,49 +1403,6 @@ namespace Loop
 	}
 
 	
-
-	
-
-	float4 calculate_camera_up(const float4& eye, const float4& at) {
-		// 1. Вычисляем нормализованный вектор взгляда (Forward)
-		float4 forward = { at.x - eye.x, at.y - eye.y, at.z - eye.z, 0.0f };
-		forward = normalize(forward);
-
-		// 2. Задаем базовый мировой вектор "верх" (обычно ось Y)
-		float4 world_up = { 0.0f, 1.0f, 0.0f, 0.0f };
-
-		// КРАЙНИЙ СЛУЧАЙ (Gimbal Lock): Если камера смотрит строго вверх или строго вниз,
-		// вектор forward станет коллинеарен world_up. Векторное произведение выдаст 0.
-		// В этом случае временно меняем мировой ориентир на ось Z.
-		float dot = forward.x * world_up.x + forward.y * world_up.y + forward.z * world_up.z;
-		if (std::abs(dot) > 0.999f) {
-			world_up = float4{ 0.0f, 0.0f, 1.0f, 0.0f }; // Если смотрим вертикально, "верх" берем от Z
-		}
-
-		// 3. Находим вектор "право" (Right) через Cross Product
-		float4 right = normalize(cross(forward, world_up));
-
-		// 4. Находим финальный "верх" (Up), перпендикулярный и взгляду, и правому вектору
-		float4 up = normalize(cross(right, forward));
-
-		return up;
-	}
-
-	// 2. ФУНКЦИЯ ПОЛУЧЕНИЯ НАПРАВЛЕНИЯ МЕЖДУ ДВУМЯ ТОЧКАМИ
-	// Возвращает единичный вектор направления от точки 'from' к точке 'to'
-	float4 direction_between(const float4& from, const float4& to) {
-		// Находим вектор разности (вектор направления)
-		float4 dir = {
-			to.x - from.x,
-			to.y - from.y,
-			to.z - from.z,
-			from.w // w-компоненту обычно наследуют от базовой точки
-		};
-
-		// Вызываем отдельную функцию нормализации
-		return normalize(dir);
-	}
-
 	// Глобальные координаты камеры
 	XMVECTOR finalCameraEye = XMVectorSet(0.0f, 5.0f, -25.0f, 1.0f);
 	XMVECTOR finalCameraAt = XMVectorZero();
@@ -1411,7 +1417,7 @@ namespace Loop
 	// Сглаживание декомпозиции
 	XMVECTOR smoothedHeroPos = XMVectorZero();
 	XMVECTOR smoothedHeroRotQ = XMQuaternionIdentity();
-	bool cameraFirstFrame = true;
+	
 
 	inline XMVECTOR VectorLerp(FXMVECTOR V1, FXMVECTOR V2, float t) {
 		return XMVectorLerp(V1, V2, t);
@@ -1472,7 +1478,7 @@ namespace Loop
 		int maxPointIdx = currentLine.pointCount - 1;
 
 		// Находим индексы сегмента, над которым летим
-		int currIdx = clamp((int)floorf(hero.pointIndex), 0, maxPointIdx - 1);
+		int currIdx = clamp((int)floorf(hero.pointIndex), 1, maxPointIdx - 2);
 		int nextIdx = currIdx + 1;
 
 		XMVECTOR pCurrent = F2V(currentLine.point[currIdx]);
@@ -1480,6 +1486,7 @@ namespace Loop
 
 		// 1. Тангенс сегмента, к которому мы приближаемся
 		XMVECTOR airTangent = XMVector3Normalize(XMVectorSubtract(pNext, pCurrent));
+
 		if (XMVector3Equal(airTangent, XMVectorZero())) airTangent = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 
 		// 2. Находим честную позицию на линии строго под персонажем
@@ -1511,7 +1518,7 @@ namespace Loop
 		XMVECTOR targetQuat = XMQuaternionRotationMatrix(targetAirMatrix);
 
 		// 7. Извлекаем текущую ориентацию из Object::heroWorld (чистый Row-Major без Transpose!)
-		XMMATRIX currentWorldRow = Object::heroWorld;
+		XMMATRIX currentWorldRow = Object::heroOnRails;
 		currentWorldRow.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f); // Зануляем позицию для честного Decompose
 
 		XMVECTOR currentScale, currentQuat, currentTrans;
@@ -1524,7 +1531,7 @@ namespace Loop
 		// На старте (distanceToLine == startAirDistance) progress равен 0.0f (тело летит свободно).
 		// В момент касания (distanceToLine == 0.0f) progress равен строго 1.0f.
 		float airProgress = 1.0f - (distanceToLine / hero.startAirDistance);
-
+		airProgress = pow(airProgress, 2.5);
 		// Зажимаем коэффициент в рамки [0, 1]
 		float blendStep = clamp(airProgress, 0.0f, 1.0f);
 
@@ -1542,10 +1549,18 @@ namespace Loop
 		finalAirRot.r[3] = XMVectorSetW(hero.pos, 1.0f);
 
 		// Отдаем в шейдер в чистом Row-Major под твой макрос mul((float3x3)model, pos)
+		Object::heroOnRails = finalAirRot;
 		Object::heroWorld = finalAirRot;
+		hero.axisAngle = 0;
 	}
 
-	
+	float smoothstep(float edge0, float edge1, float x) {
+		// 1. Нормализуем x в диапазон [0.0, 1.0] и жестко ограничиваем его (clamp)
+		float t = std::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
+
+		// 2. Вычисляем сглаживание по формуле: 3t^2 - 2t^3
+		return t * t * (3.0f - 2.0f * t);
+	}
 
 	void UpdateHeroOnLine(float deltaTime)
 	{
@@ -1670,13 +1685,16 @@ namespace Loop
 		rowMajorRot.r[2] = heroForward;
 		rowMajorRot.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 
+		Object::heroOnRails = rowMajorRot;
+		static float mouseYawIner = mouseYaw;
+
 		// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
-		float cameraLookSign = sign(hero.speedFactor);
-		if (cameraLookSign < 0.0f && !hero.jump)
-		{
-			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, XM_PI);
+		float targetA =  -std::round(mouseYaw / PI) * PI;
+
+			mouseYawIner = lerp(mouseYawIner, targetA, pow(min(deltaTime*3.,1.),1.5));
+			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, mouseYawIner);
 			rowMajorRot = XMMatrixMultiply(rowMajorRot, reverseRot);
-		}
+		
 
 		hero.forward = rowMajorRot.r[2];
 
@@ -1686,50 +1704,10 @@ namespace Loop
 
 	void UpdateCamera(float deltaTime)
 	{
-		const float camRadius = 5.0f; // Расстояние от камеры до героя
-
-		// ====================================================================
-		// СУПЕРСТАБИЛЬНЫЙ БАЗИС КРИВОЙ ДЛЯ КАМЕРЫ (ПОЛНАЯ ИЗОЛЯЦИЯ ОТ AXIS ANGLE)
-		// ====================================================================
-		const auto& currentLine = Object::starLineList.line[hero.lineIndex];
-		int maxPointIdx = currentLine.pointCount - 1;
-
-		XMVECTOR pathForward = hero.lineTangent; // Чистый непрерывный тангенс
-
-		// ТОЧЕЧНОЕ ИСПРАВЛЕНИЕ: Динамический выбор апвектора для ориентации орбиты камеры
-		XMVECTOR pathUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-		//if (hero.gravity.mode)
-		{
-			// Пока мы летим, целевым апвектором для кватерниона камеры становится 
-			// наш вычисленный в воздухе landingUp. Камера начнет докручиваться ЗАРАНЕЕ!
-			//pathUp = hero.landingUp;
-		}
-		//else
-		{
-			// Когда приземлились — плавно берем апвектор рельса из волнового массива
-			int currIdx = clamp((int)floorf(hero.pointIndex), 0, maxPointIdx);
-			int nextIdx = clamp(currIdx + 1, 0, maxPointIdx);
-			float t = hero.pointIndex - floorf(hero.pointIndex);
-			if (currIdx == maxPointIdx) t = 0.0f;
-
-			XMVECTOR upCurr = F2V(currentLine.upVector[currIdx]);
-			XMVECTOR upNext = F2V(currentLine.upVector[nextIdx]);
-			pathUp = XMVector3Normalize(VectorLerp(upCurr, upNext, t));
-		}
-
-		// Строим Right строго по выбранному, не прыгающему pathUp
-		XMVECTOR pathRight = XMVector3Normalize(XMVector3Cross(pathUp, pathForward));
-
-		// Собираем чистую Row-Major матрицу пути (детерминант всегда +1.0)
-		XMMATRIX pathMatrixRowMajor = XMMatrixIdentity();
-		pathMatrixRowMajor.r[0] = pathRight;
-		pathMatrixRowMajor.r[1] = pathUp; // Передает непрерывный наклон в Decompose!
-		pathMatrixRowMajor.r[2] = pathForward;
-		pathMatrixRowMajor.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+		const float camRadius = 2.5f; // Расстояние от камеры до героя
 
 		XMVECTOR heroScale, heroRotQ, heroTranslation;
-		XMMatrixDecompose(&heroScale, &heroRotQ, &heroTranslation, pathMatrixRowMajor);
+		XMMatrixDecompose(&heroScale, &heroRotQ, &heroTranslation, Object::heroOnRails);
 
 		// Позицию берем строго из физических координат героя
 		heroTranslation = hero.pos;
@@ -1743,14 +1721,10 @@ namespace Loop
 		}
 		else
 		{
-			float posStep = clamp(deltaTime * 5.0f, 0.0f, 1.0f);
-
-			// ИСПРАВЛЕНИЕ: Ставим твой мягкий коэффициент 0.1f для шёлковой докрутки
-			// (При 60 FPS deltaTime * 0.6f как раз превращается в честные 0.01)
-			float rotStep = clamp(deltaTime * 0.6f, 0.0f, 1.0f);
+			float posStep = clamp(deltaTime * 3.0f, 0.0f, 1.0f);
+			float rotStep = clamp(deltaTime * 1.0f, 0.0f, 1.0f);
 
 			smoothedHeroPos = XMVectorLerp(smoothedHeroPos, heroTranslation, posStep);
-			// Сглаживаем стабильный geometric кватернион, который плавно меняется еще в полете!
 			smoothedHeroRotQ = XMQuaternionSlerp(smoothedHeroRotQ, heroRotQ, rotStep);
 		}
 
@@ -1759,13 +1733,6 @@ namespace Loop
 		XMVECTOR smoothedRight = mSmoothedHero.r[0];
 		XMVECTOR smoothedUp = mSmoothedHero.r[1];
 		XMVECTOR smoothedForward = mSmoothedHero.r[2];
-
-		// ====================================================================
-		// ЧЕСТНАЯ И МОНОЛИТНАЯ КОМПЕНСАЦИЯ AXIS ANGLE БЕЗ ДЖИТТEРА
-		// ====================================================================
-		XMMATRIX rotationCompMatrix = XMMatrixRotationAxis(smoothedForward, -hero.axisAngle);
-		XMVECTOR compRight = XMVector3TransformNormal(smoothedRight, rotationCompMatrix);
-		XMVECTOR compUp = XMVector3TransformNormal(smoothedUp, rotationCompMatrix);
 
 		// Накладываем глобальные инвертированные углы мыши поверх скомпенсированного базиса
 		float cosPitch = cosf(mousePitch);
@@ -1778,15 +1745,15 @@ namespace Loop
 
 		// Раскладываем смещение мыши по СКОМПЕНСИРОВАННЫМ осям
 		XMVECTOR worldMouseOffset = XMVectorZero();
-		worldMouseOffset = XMVectorAdd(worldMouseOffset, compRight * XMVectorGetX(localMouseOffset));
-		worldMouseOffset = XMVectorAdd(worldMouseOffset, compUp * XMVectorGetY(localMouseOffset));
+		worldMouseOffset = XMVectorAdd(worldMouseOffset, smoothedRight * XMVectorGetX(localMouseOffset));
+		worldMouseOffset = XMVectorAdd(worldMouseOffset, smoothedUp * XMVectorGetY(localMouseOffset));
 		worldMouseOffset = XMVectorAdd(worldMouseOffset, smoothedForward * XMVectorGetZ(localMouseOffset));
 
 		finalCameraAt = smoothedHeroPos;
 		finalCameraEye = XMVectorAdd(finalCameraAt, worldMouseOffset * camRadius);
 
 		// Вектор Up для LookAt-матрицы должен удерживать правильный наклон
-		finalCameraUp = compUp;
+		finalCameraUp = smoothedUp;
 
 		// СБОРКА VIEW МАТРИЦЫ С УЧЕТОМ ИНДЕКСОВ СТРОК
 		XMVECTOR camForward = XMVector3Normalize(XMVectorSubtract(finalCameraAt, finalCameraEye));
@@ -1796,9 +1763,21 @@ namespace Loop
 		// ====================================================================
 		// СДВИГ ПЕРСОНАЖА НА НИЖНЮЮ ТРЕТЬ ЭКРАНА (FRAMING OFFSET)
 		// ====================================================================
-		// Значение 1.35f идеально смещает точку прицеливания вверх по экрану, 
-		// за счет чего сам персонаж визуально уходит в нижнюю треть кадра.
-		float screenOffsetY = 2.735f;
+		float screenOffsetY = 1.335f;
+
+		static float landedTimer = 1;
+		landedTimer += deltaTime;
+		if (hero.gravity.mode)
+		{
+			landedTimer = 0;
+		}
+		float landindDur = 5.;
+		float landingAmp = .15;
+		landedTimer = clamp(landedTimer, 0., landindDur);
+		float smoothLT = smoothstep(0, 1, landedTimer / landindDur);
+		smoothLT = pow(smoothLT,.25);
+		screenOffsetY -= sin(PI * smoothLT) * landingAmp;
+
 		XMVECTOR localScreenVerticalOffset = exactUp * screenOffsetY;
 
 		// Смещаем точку фокуса и позицию глаза камеры параллельно вдоль экрана
@@ -1834,6 +1813,31 @@ namespace Loop
 		// Стабильное обновление speedFactor для следующего кадра
 		hero.speedFactor = XMVectorGetX(XMVector3Dot(camForward, hero.lineTangent));
 	}
+
+	float processTimer()
+	{
+		static double lastFrameTime = timer::GetCounter();
+		double currentFrameTime = timer::GetCounter();
+
+		// Получаем дельту времени в секундах
+		float realDeltaTime = (float)(currentFrameTime - lastFrameTime);
+		lastFrameTime = currentFrameTime;
+
+		// Защита: при самом первом старте или если realDeltaTime равен нулю, 
+		// принудительно ставим стандартный шаг 1/60, чтобы не было деления на ноль.
+		if (realDeltaTime <= 0.0001f) {
+			realDeltaTime = 1.0f / 60.0f;
+		}
+
+		// Зажимаем сверху на 0.1 сек (100 мс), чтобы при фризах или лагах отладки 
+		// физику и камеру не разрывало на гигантские расстояния
+		if (realDeltaTime > 0.1f) {
+			realDeltaTime = 0.1f;
+		}
+
+		return realDeltaTime;
+	}
+
 	void scene3()
 	{
 		BasicCam::camPass = false;
@@ -1904,289 +1908,24 @@ namespace Loop
 
 			if (GetActiveWindow() == hWnd && gameCam)
 			{
-				static double lastFrameTime = timer::GetCounter();
-				double currentFrameTime = timer::GetCounter();
+				float realDeltaTime = processTimer();
 
-				// Получаем дельту времени в секундах
-				float realDeltaTime = (float)(currentFrameTime - lastFrameTime);
-				lastFrameTime = currentFrameTime;
-
-				// Защита: при самом первом старте или если realDeltaTime равен нулю, 
-				// принудительно ставим стандартный шаг 1/60, чтобы не было деления на ноль.
-				if (realDeltaTime <= 0.0001f) {
-					realDeltaTime = 1.0f / 60.0f;
-				}
-
-				// Зажимаем сверху на 0.1 сек (100 мс), чтобы при фризах или лагах отладки 
-				// физику и камеру не разрывало на гигантские расстояния
-				if (realDeltaTime > 0.1f) {
-					realDeltaTime = 0.1f;
-				}
-
-				// 1. Считываем ввод мыши
 				ProcessMouseInput();
 
-				// 2. Выполняются ваши базовые методы (не трогаем их код)
 				hero.Respawn();
 				hero.ProcessMove(); // Изменяет скорости и углы
 				hero.ProcessJump(); // Обрабатывает прыжок и свободную гравитацию
 
-				// Вспомогательный вызов, который вы убрали
 				hero.pathControl.Process();
-
-				// 3. НОВЫЙ ВЫЗОВ: Рассчитывает движение по нити и Object::heroWorld
 				UpdateHeroOnLine(realDeltaTime);
-
-				// 4. Обновляем камеру (она мгновенно подхватит hero.pos без застываний)
 				UpdateCamera(realDeltaTime);
 			}
-
-			/*
-			{
-				hero.pointIndex += hero.speed * hero.speedFactor;
-				hero.pointIndex = clamp(hero.pointIndex, 1., (float)(Object::starLineList.line[hero.lineIndex].pointCount - 1));
-
-				float t0 = floor(hero.pointIndex);
-				float t1 = frac(hero.pointIndex);
-
-				float4 current_node = Object::starLineList.line[hero.lineIndex].point[(int)t0];
-				float4 next_node = Object::starLineList.line[hero.lineIndex].point[(int)t0 + 1];
-				//движение по пути
-				float4 follow_node = Object::starLineList.line[hero.lineIndex].point[(int)t0 - 1];
-
-				if (!hero.gravity.mode && !hero.jump)
-				{
-					hero.pos = F2V(lerp3(current_node, next_node, t1));
-
-				}
-
-				follow = lerp3(follow_node, current_node, t1);
-				static bool isMouseInitialized = false;
-				if (GetActiveWindow() == hWnd && gameCam) // Считаем мышь, только если окно в фокусе
-				{
-					float cd = 3.0f; // Дистанция до героя
-
-					// --- ПЕРЕМЕННЫЕ ДЛЯ ЗАПАЗДЫВАНИЯ КАМЕРЫ И МЫШИ (static) ---
-					static XMVECTOR lastUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-					static XMVECTOR smoothedLineEye = XMVectorSet(0.0f, 0.0f, -10.0f, 1.0f);
-					static XMVECTOR smoothedLineUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-					static XMVECTOR smoothedPlayerUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-					static float mouseYaw = 0.0f;
-					static float mousePitch = 0.0f;
-
-
-					// --- НАСТРОЙКИ СГЛАЖИВАНИЯ И ЧУВСТВИТЕЛЬНОСТИ МЫШИ ---
-					float deltaTime = 0.016f;        // Реальный dt кадра
-					float distanceLerpFactor = 7.0f;
-					float trackAngularLerpFactor = 5.0f;
-					float playerAngularLerpFactor = 12.0f;
-
-					float mouseSensitivity = 0.002f; // Чувствительность мыши (в радианах на пиксель)
-
-					// ==========================================
-					// ЭТАП 0: ЗАХВАТ И РАСЧЕТ ДЕЛЬТ МЫШИ (ЧЕРЕЗ WIN32)
-					// ==========================================
-					{
-						RECT rect;
-						GetWindowRect(hWnd, &rect);
-
-						// Находим центр окна
-						int centerX = rect.left + (rect.right - rect.left) / 2;
-						int centerY = rect.top + (rect.bottom - rect.top) / 2;
-
-						POINT currentPos;
-						if (GetCursorPos(&currentPos))
-						{
-							if (!isMouseInitialized)
-							{
-								// В самый первый кадр просто сбрасываем мышь в центр без расчета дельт,
-								// иначе камеру мгновенно улетит в сторону из-за старых координат курсора.
-								SetCursorPos(centerX, centerY);
-								isMouseInitialized = true;
-							}
-							else
-							{
-								// Считаем разницу между центром и текущим положением
-								int deltaX = currentPos.x - centerX;
-								int deltaY = currentPos.y - centerY;
-
-								// Накапливаем углы (инвертируем Y, если нужно классическое управление)
-								mouseYaw += (float)deltaX * mouseSensitivity;
-								mousePitch += (float)deltaY * mouseSensitivity; // Минус, чтобы мышь вверх поднимала взгляд
-
-								// Ограничиваем Pitch (взгляд вверх/вниз), чтобы камеру не вывернуло наизнанку (ограничение ~85 градусов)
-								float pitchLimit = 1.48f / 2.; // В радианах (85 градусов)
-								mousePitch = clamp(mousePitch, -pitchLimit, pitchLimit);
-
-								// Возвращаем курсор обратно в центр для следующего кадра
-								SetCursorPos(centerX, centerY);
-							}
-						}
-					}
-
-					// Расчет весов интерполяции для каждого компонента
-					float t_dist = 1.0f - std::exp(-distanceLerpFactor * deltaTime);
-					float t_track = 1.0f - std::exp(-trackAngularLerpFactor * deltaTime);
-					float t_play = 1.0f - std::exp(-playerAngularLerpFactor * deltaTime);
-
-					if (!hero.jump)
-					{
-						float jAmp = .1;
-						float jv = pow(hero.gravity.acceleratedT, 2);
-						jv *= jAmp;
-
-						p0 = XMVectorLerp(p0, XMVectorSet(follow.x, follow.y, follow.z, 0.0f), jv);
-
-						curent_i = lerp3(current_node, next_node, t1);
-						p1 = XMVectorLerp(p1, XMVectorSet(curent_i.x, curent_i.y, curent_i.z, 0.0f), jv);
-
-						XMVECTOR forward = XMVector3Normalize(p1 - p0);
-						hero.forward = XMVectorLerp(hero.forward, forward, jv);
-					}
-					else
-					{
-						float jAmp = .1;
-						float jv = pow(1 - hero.jumpHeight, 2);
-						jv *= jAmp;
-
-						p0 = XMVectorLerp(p0, XMVectorSet(follow.x, follow.y, follow.z, 0.0f), jv);
-						p1 = XMVectorLerp(p1, hero.pos, jv);
-
-						curent_i = lerp3(current_node, next_node, t1);
-
-						XMVECTOR forward = XMVector3Normalize(p1 - p0);
-						hero.forward = XMVectorLerp(hero.forward, forward, jv);
-					}
-
-					// ==========================================
-					// ЭТАП 1: ПАРАЛЛЕЛЬНЫЙ ПЕРЕНОС ФРЕЙМА НИТИ
-					// ==========================================
-					XMVECTOR dotResult = XMVector3Dot(lastUp, hero.forward);
-					XMVECTOR upOnForward = XMVectorMultiply(hero.forward, dotResult);
-					XMVECTOR lineUp = XMVector3Normalize(XMVectorSubtract(lastUp, upOnForward));
-
-					if (XMVector3Less(XMVector3LengthEst(lineUp), XMVectorSet(0.001f, 0.001f, 0.001f, 0.001f))) {
-						XMVECTOR alternative = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-						XMVECTOR right = XMVector3Normalize(XMVector3Cross(alternative, hero.forward));
-						lineUp = XMVector3Normalize(XMVector3Cross(hero.forward, right));
-					}
-					lastUp = lineUp;
-
-					// ==========================================
-					// ЭТАП 2: ВРАЩЕНИЕ ВОКРУГ ОСИ НИТИ (МГНОВЕННЫЙ ЦЕЛЕВОЙ UP ГЕРОЯ)
-					// ==========================================
-					XMVECTOR rotationQuat = XMQuaternionRotationAxis(hero.forward, hero.axisAngle);
-					XMVECTOR targetUp = XMVector3Normalize(XMVector3Rotate(lineUp, rotationQuat));
-
-					// ==========================================
-					// ЭТАП 3: МАТРИЦА ГЕРОЯ (МГНОВЕННАЯ, COLUMN-MAJOR)
-					// ==========================================
-					XMVECTOR HeroRight = XMVector3Normalize(XMVector3Cross(targetUp, hero.forward));
-					XMVECTOR HeroRealUp = XMVector3Normalize(XMVector3Cross(hero.forward, HeroRight));
-					XMVECTOR HeroPosition = XMVectorSet(0, 0, 0, 1.0f);
-					tUP = HeroRealUp;
-
-					Object::heroWorld = XMMatrixTranspose(XMMATRIX(
-						XMVectorSet(XMVectorGetX(HeroRight), XMVectorGetX(HeroRealUp), XMVectorGetX(hero.forward), 0.0f),
-						XMVectorSet(XMVectorGetY(HeroRight), XMVectorGetY(HeroRealUp), XMVectorGetY(hero.forward), 0.0f),
-						XMVectorSet(XMVectorGetZ(HeroRight), XMVectorGetZ(HeroRealUp), XMVectorGetZ(hero.forward), 0.0f),
-						XMVectorSet(XMVectorGetX(HeroPosition), XMVectorGetY(HeroPosition), XMVectorGetZ(HeroPosition), 1.0f)
-					));
-
-					// ==========================================
-					// ЭТАП 4: СГЛАЖИВАНИЕ ДВИЖЕНИЯ ВДОЛЬ ОСИ НИТИ
-					// ==========================================
-					XMVECTOR targetLineEye = p1 - hero.forward * cd;
-					smoothedLineEye = XMVectorLerp(smoothedLineEye, targetLineEye, t_dist);
-
-					// ==========================================
-					// ЭТАП 5: РАЗДЕЛЬНОЕ СГЛАЖИВАНИЕ ОРИЕНТАЦИЙ
-					// ==========================================
-					smoothedLineUp = XMVector3Normalize(XMVectorLerp(smoothedLineUp, lineUp, t_track));
-					XMVECTOR targetPlayerUp = XMVector3Normalize(XMVector3Rotate(smoothedLineUp, rotationQuat));
-					smoothedPlayerUp = XMVector3Normalize(XMVectorLerp(smoothedPlayerUp, targetPlayerUp, t_play));
-
-					XMVECTOR currentCameraUp = smoothedPlayerUp;
-
-					// ==========================================
-					// ЭТАП 6: РАСЧЕТ ИНТЕНСИВНОСТИ ОСМОТРА МЫШЬЮ ОТ СКОРОСТИ
-					// ==========================================
-					float currentSpeedAbs = std::abs(hero.speed);
-					float maxSpeed = max(hero.maxSpeed, 0.0001f);
-
-					float mouseInfluenceFactor = 1.0f - (currentSpeedAbs / maxSpeed);
-					mouseInfluenceFactor = clamp(mouseInfluenceFactor, 0.0f, 1.0f);
-
-					float finalYaw = mouseYaw * mouseInfluenceFactor;
-					float finalPitch = mousePitch * mouseInfluenceFactor;
-
-					// ==========================================
-					// ЭТАП 7: ФОРМИРОВАНИЕ ТОЧЕК КАМЕРЫ ЧЕРЕЗ ЗАНИЖЕННЫЙ ЦЕНТР ВРАЩЕНИЯ (PIVOT)
-					// ==========================================
-
-					// 1. Создаем виртуальную точку опоры (Pivot). 
-					// Мы опускаем центр вращения камеры НИЖЕ ног персонажа по вектору currentCameraUp.
-					// За счет этого персонаж визуально поднимется вверх и окажется ровно на нижней трети экрана!
-					float pivotOffset = -1.8f; // Подберите это значение: больше число = персонаж ниже на экране
-					XMVECTOR cameraPivot = p1 - currentCameraUp * pivotOffset;
-
-					// 2. Находим базовую позицию камеры (без мыши) относительно этой точки опоры
-					XMVECTOR baseCameraEye = smoothedLineEye + currentCameraUp * 2.0f;
-
-					// 3. Вычисляем базовый вектор смещения от заниженного центра опоры
-					XMVECTOR baseOffsetFromPivot = XMVectorSubtract(baseCameraEye, cameraPivot);
-
-					// 4. Строим локальные оси камеры для правильного наложения мыши
-					XMVECTOR camForward = XMVector3Normalize(XMVectorNegate(baseOffsetFromPivot)); // Направление строго на Pivot
-					XMVECTOR camRight = XMVector3Normalize(XMVector3Cross(currentCameraUp, camForward));
-					XMVECTOR camUp = XMVector3Normalize(XMVector3Cross(camForward, camRight));
-
-					// 5. Создаем кватернионы вращения мыши вокруг локальных осей
-					XMVECTOR mouseYawQuat = XMQuaternionRotationAxis(camUp, finalYaw);
-					XMVECTOR mousePitchQuat = XMQuaternionRotationAxis(camRight, finalPitch);
-					XMVECTOR mouseCombinedQuat = XMQuaternionMultiply(mousePitchQuat, mouseYawQuat);
-
-					// 6. Вращаем вектор смещения вокруг нашей виртуальной точки опоры
-					XMVECTOR rotatedOffsetFromPivot = XMVector3Rotate(baseOffsetFromPivot, mouseCombinedQuat);
-
-					// 7. ФИНАЛЬНАЯ ПОЗИЦИЯ КАМЕРЫ НА СФЕРЕ ОБЛЕТА
-					XMVECTOR finalCameraEye = XMVectorAdd(cameraPivot, rotatedOffsetFromPivot);
-
-					// 8. ТОЧКА НАЗНАЧЕНИЯ (Куда смотрим)
-					// Камера всегда жестко и стабильно смотрит в центр вращения cameraPivot.
-					XMVECTOR finalCameraAt = cameraPivot;
-
-					XMVECTOR camForwardVec = XMVector3Normalize(finalCameraAt - finalCameraEye);
-					hero.speedFactor = XMVectorGetX(XMVector3Dot(camForwardVec, hero.forward));
-					hero.speedFactor = sign(hero.speedFactor) * pow(abs(hero.speedFactor), .125);
-
-					// ==========================================
-					// ЭТАП 8: СБОРКА МАТРИЦЫ ВИДА
-					// ==========================================
-					ConstBuf::camera = {
-						.world = XMMatrixIdentity(),
-						.view = XMMatrixTranspose(XMMatrixLookAtLH(finalCameraEye, finalCameraAt, currentCameraUp)),
-						.proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(DegreesToRadians(hero.cameraAngle), dx11::iaspect, 0.01f, 100.0f))
-					};
-
-					ConstBuf::Update(ConstBuf::cBuffer::camera);
-					ConstBuf::Set(ConstBuf::cBuffer::camera, ConstBuf::target::both);
-				}
-				else
-				{
-					// Если окно потеряло фокус (например, Alt+Tab), сбрасываем инициализацию
-					isMouseInitialized = false;
-				}
-			}
-			*/
-			//
 
 
 			//
 			Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
 			Object::MeshPtr = &Object::HeroMesh;
-			float4 p = V2F(hero.pos * 100);
+			float4 p = V2F(hero.pos * 10000.);
 
 			Object::Mesh({
 					.quality = 1,

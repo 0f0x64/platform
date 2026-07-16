@@ -363,6 +363,7 @@ namespace Object {
 	dx11::ConstBuf::sbObject HeroMesh;
 	dx11::ConstBuf::sbObject BossMesh;
 	dx11::ConstBuf::sbObject* MeshPtr = NULL;
+	XMMATRIX heroOnRails;
 	XMMATRIX heroWorld;
 
 	void ShowMesh(dx11::ConstBuf::sbObject* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom)
@@ -383,7 +384,7 @@ namespace Object {
 				.mode = (int)mode,
 				.skipper = skipper,
 				.base_color = float4(r / 100.,g / 100.,b / 100.,1),
-				.modelPos = float4(xPos/100.,yPos / 100.,zPos / 100.,0),
+				.modelPos = float4(xPos/10000.,yPos / 10000.,zPos / 10000.,0),
 				.triCount = float4(obj->triangleCount,0,0,0),
 				.brightness = float4(brightness,0,0,0),
 				.tickness = float4(tickness,0,0,0),
