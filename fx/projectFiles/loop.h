@@ -46,13 +46,13 @@ struct hero_ {
 
 	float speedFactor = 1;
 	float speed = 0;
-	float accel = 0.01;
-	float maxSpeed = .8;
-	float autoBrake = .9;
+	float accel = 0.0075;
+	float maxSpeed = .5;
+	float autoBrake = .95;
 
 	float axisAngle = 0;
 	float axisAngleSpeed = 0;
-	float axisAngleAccel = 0.01;
+	float axisAngleAccel = 0.009;
 	float maxAxisAngleSpeed = .1;
 
 	float cameraAngle = 100;
@@ -407,6 +407,12 @@ struct hero_ {
 		{
 			// Плавный разгон вперед с учетом знака камеры
 			speed += accel * sign(speedFactor);
+
+			if (sign(speed) != sign(speedFactor))
+			{
+				speed *= .95;
+			}
+
 			pressingMove = true;
 		}
 		if (GetAsyncKeyState('S'))
