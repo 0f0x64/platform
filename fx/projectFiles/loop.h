@@ -55,6 +55,7 @@ struct hero_ {
 	float axisAngleSpeed = 0;
 	float axisAngleAccel = 10;
 	float maxAxisAngleSpeed = 4;
+	float autoBrakeAxis = 0.7;
 
 	float changeDirSpeed = 10;
 
@@ -400,7 +401,10 @@ struct hero_ {
 			jump = false;
 		}
 
-		pos += jumpHeight * upVector * deltaTime + forwardVector * speed*deltaTime*airSpeedAmp;
+		if (jump || gravity.mode)
+		{
+			pos += jumpHeight * upVector * deltaTime + forwardVector * speed * deltaTime * airSpeedAmp;
+		}
 
 		float dt = deltaTime / (1. / 60.);
 		jumpHeight *= pow(jumpDeAccel,dt);
@@ -463,7 +467,7 @@ struct hero_ {
 		if (!pressingRotation)
 		{
 			float dt = deltaTime / (1. / 6.);
-			axisAngleSpeed *= pow(autoBrake, dt);
+			axisAngleSpeed *= pow(autoBrakeAxis, dt);
 			if (fabsf(axisAngleSpeed) < 0.001f) axisAngleSpeed = 0.0f;
 		}
 
@@ -1451,7 +1455,7 @@ namespace Loop
 
 
 	cmd(SetHeroParams, int accel,int maxSpeed,int autoBrake,int axisAngleAccel,int maxAxisSpeed,int changeDirSpeed,
-		int cameraAngle,int jumpStartImpulse,int jumpLandingTreshold,int jumpDeAccel,int posI, int	rotI,int gravitySpeed, int airSpeedAmp)
+		int cameraAngle,int jumpStartImpulse,int jumpLandingTreshold,int jumpDeAccel,int posI, int	rotI,int gravitySpeed, int airSpeedAmp, int autoBrakeAxis)
 	{
 		reflect;
 		float denom = 100;
@@ -1469,6 +1473,7 @@ namespace Loop
 		hero.rotI = in.rotI/denom;
 		hero.gravity.speed = in.gravitySpeed/denom;
 		hero.airSpeedAmp = in.airSpeedAmp / denom;
+		hero.autoBrakeAxis = in.autoBrakeAxis / denom;
 	}
 
 
@@ -1686,13 +1691,6 @@ namespace Loop
 
 	void UpdateHeroOnLine(float deltaTime)
 	{
-		// === ÑÎÑÒÎßÍÈÅ 1: ĞÅÆÈÌ ÑÂÎÁÎÄÍÎÉ ÃĞÀÂÈÒÀÖÈÈ ===
-		if (hero.gravity.mode)
-		{
-			OrientHeroTowardsLineInAir(deltaTime);
-			return;
-		}
-
 		// === ÑÎÑÒÎßÍÈÅ 2: ÄÂÈÆÅÍÈÅ ÏÎ ÍÈÒßÌ ===
 		if (hero.lineIndex < 0 || hero.lineIndex >= Object::starLineList.lineCount) return;
 		const auto& currentLine = Object::starLineList.line[hero.lineIndex];
@@ -1937,15 +1935,18 @@ namespace Loop
 			.axisAngleAccel = 122,
 			.maxAxisSpeed = 80,
 			.changeDirSpeed = 218,
-			.cameraAngle = 100,
-			.jumpStartImpulse = 1493,
+			.cameraAngle = 130,
+			.jumpStartImpulse = 793,
 			.jumpLandingTreshold = 10,
 			.jumpDeAccel = 98,
 			.posI = 300,
 			.rotI = 100,
 			.gravitySpeed = 17,
-			.airSpeedAmp = 100
+			.airSpeedAmp = 100,
+			.autoBrakeAxis = 70
 			});
+
+		//hero.cameraAngle = pow(abs(hero.speed),2.)*4.;
 
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
@@ -2020,13 +2021,21 @@ namespace Loop
 				ProcessMouseInput();
 
 				hero.Respawn();
+				hero.pathControl.Process();
 
 				hero.ProcessMove(deltaTime); // Èçìåíÿåò ñêîğîñòè è óãëû
 				hero.ProcessJump(deltaTime); // Îáğàáàòûâàåò ïğûæîê è ñâîáîäíóş ãğàâèòàöèş
 				hero.ProcessGravity(deltaTime);
+				// === ÑÎÑÒÎßÍÈÅ 1: ĞÅÆÈÌ ÑÂÎÁÎÄÍÎÉ ÃĞÀÂÈÒÀÖÈÈ ===
+				if (hero.gravity.mode)
+				{
+					OrientHeroTowardsLineInAir(deltaTime);
+				}
+				else
+				{
+					UpdateHeroOnLine(deltaTime);
+				}
 
-				hero.pathControl.Process();
-				UpdateHeroOnLine(deltaTime);
 				UpdateCamera(deltaTime);
 			}
 

@@ -939,7 +939,7 @@ namespace Object {
 
 		for (int j = 0; j < starLineList.lineCount; j++)
 		{
-			smoothStarline(starLineList.line[j], 7*12./starLineList.line[j].basePointCount);
+			smoothStarline(starLineList.line[j], 17*12./starLineList.line[j].basePointCount);
 			//Starline(starLineList.line[j], 3*12. / starLineList.line[j].basePointCount);
 		}
 
