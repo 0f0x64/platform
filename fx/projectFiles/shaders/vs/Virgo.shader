@@ -129,7 +129,7 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     float dst=3;
     for (int i=0;i<32;i++)
     {
-        float4 j=(i+1)*float4(5,7,8,14)+time.x*.0005;
+        float4 j=(i+1)*float4(5,7,8,14)+time.x*.000;
         float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
         hole=normalize(hole)*62;
         dst=165/(distance(pos,hole));
@@ -143,7 +143,7 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     
     for (int i=0;i<32;i++)
     {
-        float4 j=(i+1)*float4(5,7,8,14)+time.x*.0005;
+        float4 j=(i+1)*float4(5,7,8,14)+time.x*.000;
         float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
         hole=normalize(hole)*62;
         dst=192/(distance(pos,hole));

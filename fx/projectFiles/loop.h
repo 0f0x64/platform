@@ -25,7 +25,6 @@ XMVECTOR getRandVector4()
 	};
 }
 
-XMVECTOR tUP = { 0,1,0 };
 float4 follow = { 0,0,11,0 };
 float4 curent_i = { 0,0,11,0 };
 XMVECTOR p0 = { 0,0,0 };
@@ -35,9 +34,11 @@ bool cameraFirstFrame = true;
 struct hero_ {
 
 	XMVECTOR pos = { 0.0f, 0.0f, 0.0f, 1.0f };
-	XMVECTOR forward = { 0.0f, 0.0f, 1.0f, 0.0f };
-	XMVECTOR upBeforeJump = { 0.0f, 1.0f, 0.0f, 0.0f };
-	XMVECTOR forwardBeforeJump = { 0.0f, 0.0f, 1.0f, 0.0f };
+	XMVECTOR forwardVector = { 0.0f, 0.0f, 1.0f, 0.0f };
+	XMVECTOR upVector = { 0.0f, 1.0f, 0.0f, 0.0f };
+	XMVECTOR rightVector = { 1.0f, 0.0f, 0.0f, 0.0f };
+//	XMVECTOR upBeforeJump = { 0.0f, 1.0f, 0.0f, 0.0f };
+//	XMVECTOR forwardBeforeJump = { 0.0f, 0.0f, 1.0f, 0.0f };
 	XMVECTOR lineTangent = { 0.0f, 0.0f, 1.0f, 0.0f };
 	XMVECTOR landingUp = { 0.0f, 0.0f, 1.0f, 0.0f };
 	float startAirDistance = 0;
@@ -46,19 +47,25 @@ struct hero_ {
 
 	float speedFactor = 1;
 	float speed = 0;
-	float accel = 0.0075;
-	float maxSpeed = .5;
-	float autoBrake = .95;
+	float accel = 4;
+	float maxSpeed = 15;
+	float autoBrake = 0.95;
 
 	float axisAngle = 0;
 	float axisAngleSpeed = 0;
-	float axisAngleAccel = 0.009;
-	float maxAxisAngleSpeed = .1;
+	float axisAngleAccel = 10;
+	float maxAxisAngleSpeed = 4;
+
+	float changeDirSpeed = 10;
 
 	float cameraAngle = 100;
 
 	bool jump = false;
 	float jumpHeight = 0;
+	float jumpStartImpulse = 6.f;
+	float jumpLandingTreshold = .1f;
+	float jumpDeAccel = .98;
+
 	float airProgress = 0;
 
 	float yOffset = .4*1000.;
@@ -67,7 +74,13 @@ struct hero_ {
 		bool mode = true;
 		float progress = 0.0f;
 		float acceleratedT = 0;
+		float speed = .175f;
 	} gravity;
+
+	float posI = 3.f;
+	float rotI = 1.f;
+
+	float airSpeedAmp = 1.f;
 
 	void SpreadLandingUpVector(int lineIndex, int landingPointIdx, XMVECTOR correctLandingUp)
 {
@@ -230,50 +243,60 @@ struct hero_ {
 		result.x = p1.x + lineX * t;
 		result.y = p1.y + lineY * t;
 		result.z = p1.z + lineZ * t;
-		result.w = 1.0f; // Гарантируем, что это корректная точка в 3D пространстве
+		result.w = .0f; // Гарантируем, что это корректная точка в 3D пространстве
 
 		return result;
 	}
 
-	void ProcessGravity()
+	void ProcessGravity(float deltaTime)
 	{
-		float minDistance = 1e9f; // Инициализируем заведомо большим числом
-		float4 closestPoint = { 0.0f, 0.0f, 0.0f, 0.0f };
-		float4 closestPoint2 = { 0.0f, 0.0f, 0.0f, 0.0f };
-		float closestPoint2Index = 0;
-		bool foundPoint = false;
+		if (!gravity.mode) return;
 
-		//Находим ОДНУ самую ближайшую точку
+		float minDistance = 1e9f;
+		float4 bestProjPoint = { 0,0,0,0 };
+		int bestLineIndex = -1;
+		float bestPointIndex = 0.0f;
+		bool found = false;
+
+		// 1. Ищем ближайший ОТРЕЗОК, а не одиночную точку
 		for (int i = 0; i < Object::starLineList.lineCount; i++)
 		{
-			for (int j = 0; j < Object::starLineList.line[i].pointCount; j++)
+			// Проходим по отрезкам: от j до j+1
+			for (int j = 0; j < Object::starLineList.line[i].pointCount - 1; j++)
 			{
+				float4 p1 = Object::starLineList.line[i].point[j];
+				float4 p2 = Object::starLineList.line[i].point[j + 1];
 
-				float dst = distance(V2F(pos), Object::starLineList.line[i].point[j]);
+				// Проецируем текущую позицию на отрезок (используем ранее созданную функцию)
+				float4 proj = projectPointToLine(V2F(pos), p1, p2);
 
-				// Если эта точка ближе, чем все предыдущие, запоминаем её
+				// Считаем расстояние от игрока до его проекции на этот отрезок
+				float dst = distance(V2F(pos), proj);
+
 				if (dst < minDistance)
 				{
 					minDistance = dst;
-					closestPoint2 = closestPoint;
-					closestPoint2Index = pointIndex;
-					closestPoint = Object::starLineList.line[i].point[j];
-					foundPoint = true;
-					lineIndex = i;
-					pointIndex = (float)j;
+					bestProjPoint = proj;
+					bestLineIndex = i;
+					// Точный дробный индекс на линии (например, 2.5 означает ровно посередине между точкой 2 и 3)
+					bestPointIndex = (float)j + fracPointIndex;
+					found = true;
 				}
 			}
 		}
 
-		if (foundPoint)
+		if (found)
 		{
+			lineIndex = bestLineIndex;
+			pointIndex = bestPointIndex;
+
+
 			// Загружаем векторы
 			XMVECTOR startPos = pos;
 
-			auto iEndPos = projectPointToLine(V2F(pos), closestPoint, closestPoint2);
-			pointIndex = lerp(pointIndex, closestPoint2Index, fracPointIndex);
 
-			XMVECTOR endPos = F2V(iEndPos);
+
+			XMVECTOR endPos = F2V(bestProjPoint);
 
 			landingUp = CalculateAndSpreadLandingUp(startPos, endPos, lineIndex, pointIndex);
 
@@ -282,11 +305,11 @@ struct hero_ {
 			float distance;
 			XMStoreFloat(&distance, distVector);
 			// 3. Зависимость скорости от расстояния
-			const float gravitySpeed = 2.0f; // Фиксированная скорость притяжения (метров в секунду)
+			 // Фиксированная скорость притяжения (метров в секунду)
 
 			// Вычисляем, какую долю от всего пути игрок должен пройти за этот кадр.
 			// Формула: (Скорость * ВремяКадра) / ОставшеесяРасстояние
-			float step = (gravitySpeed * 1. / 60.) / distance;
+			float step = (gravity.speed * deltaTime) / distance;
 
 			// Прибавляем шаг к общему прогрессу
 			gravity.progress += step;
@@ -347,70 +370,60 @@ struct hero_ {
 			pos += F2V(destPoint);
 			gravity.mode = true;
 			gravity.progress = 0.0f;
+			forwardVector = XMVECTOR{ 0,0,1 };
+			upVector = XMVECTOR{ 0,1,0 };
+			rightVector = XMVECTOR{ 1,0,0 };
 		}
 
 	}
 	
-	void ProcessJump()
+
+
+	void ProcessJump(float deltaTime)
 	{
 		auto space = GetAsyncKeyState(VK_SPACE);
 
 		if (space && !gravity.mode)
 		{
-			if (jump)
+			if (!jump)
 			{
-				if (jumpHeight < .01) {
-					jump = false;
-					gravity.mode = true;
-					gravity.progress = 0.0f;
-				}
-			}
-			else {
-				upBeforeJump = tUP;
-				forwardBeforeJump = lineTangent*sign(speed);
-				jumpHeight = 1.;
+				jumpHeight = jumpStartImpulse;
 				jump = true;
+				gravity.mode = true;
+				gravity.progress = 0.0f;
+				speed *= airSpeedAmp;
 			}
 		}
 
-		if (!space && jump)
-		{
+		if (jumpHeight < jumpLandingTreshold) {
+			jumpHeight = 0;
 			jump = false;
-			gravity.mode = true;
-			gravity.progress = 0.0f;
 		}
 
-		if (!jump && gravity.mode)
-		{
-			ProcessGravity();
-		}
+		pos += jumpHeight * upVector * deltaTime + forwardVector * speed*deltaTime*airSpeedAmp;
 
-		if (jumpHeight >= .01)
-		{
-			pos += jumpHeight * upBeforeJump / 2. + forwardBeforeJump * speed;
-		}
+		float dt = deltaTime / (1. / 60.);
+		jumpHeight *= pow(jumpDeAccel,dt);
 
-		if (gravity.mode)
-		{
-			pos += forwardBeforeJump * speed * (1 - gravity.acceleratedT * gravity.acceleratedT);
-		}
-
-		jumpHeight *= .8;
 		
 	}
 
-	void ProcessMove()
+	void ProcessMove(float deltaTime)
 	{
+		if (jump || gravity.mode) return;
+
 		bool pressingMove = false;
 
 		if (GetAsyncKeyState('W'))
 		{
 			// Плавный разгон вперед с учетом знака камеры
-			speed += accel * sign(speedFactor);
+			speed += accel * sign(speedFactor)*deltaTime;
 
 			if (sign(speed) != sign(speedFactor))
 			{
-				speed *= .95;
+				speed += accel * sign(speedFactor) * deltaTime;
+				float dt = deltaTime / (1. / 600.);
+				//speed *= pow(autoBrake, dt);//double force for reverse
 			}
 
 			pressingMove = true;
@@ -418,14 +431,15 @@ struct hero_ {
 		if (GetAsyncKeyState('S'))
 		{
 			// Плавный разгон назад с учетом знака камеры
-			speed -= accel * sign(speedFactor);
+			speed -= accel * sign(speedFactor)*deltaTime;
 			pressingMove = true;
 		}
 
 		// Если ни одна кнопка движения не нажата — плавно тормозим (автобрейк)
 		if (!pressingMove)
 		{
-			speed *= autoBrake;
+			float dt = deltaTime / (1. / 6.);
+			speed *= pow(autoBrake, dt);
 			// Мягкое зануление совсем маленькой скорости, чтобы персонаж не полз бесконечно
 			if (fabsf(speed) < 0.001f) speed = 0.0f;
 		}
@@ -437,23 +451,24 @@ struct hero_ {
 		bool pressingRotation = false;
 		if (GetAsyncKeyState('A'))
 		{
-			axisAngleSpeed -= axisAngleAccel*sign(speedFactor);
+			axisAngleSpeed -= axisAngleAccel*sign(speedFactor) *deltaTime;
 			pressingRotation = true;
 		}
 		if (GetAsyncKeyState('D'))
 		{
-			axisAngleSpeed += axisAngleAccel * sign(speedFactor);
+			axisAngleSpeed += axisAngleAccel * sign(speedFactor) * deltaTime;
 			pressingRotation = true;
 		}
 
 		if (!pressingRotation)
 		{
-			axisAngleSpeed *= autoBrake;
+			float dt = deltaTime / (1. / 6.);
+			axisAngleSpeed *= pow(autoBrake, dt);
 			if (fabsf(axisAngleSpeed) < 0.001f) axisAngleSpeed = 0.0f;
 		}
 
 		axisAngleSpeed = clamp(axisAngleSpeed, -maxAxisAngleSpeed, maxAxisAngleSpeed);
-		axisAngle += axisAngleSpeed;
+		axisAngle += axisAngleSpeed *deltaTime;
 	}
 
 	struct {
@@ -1434,6 +1449,29 @@ namespace Loop
 		return XMVectorLerp(V1, V2, t);
 	}
 
+
+	cmd(SetHeroParams, int accel,int maxSpeed,int autoBrake,int axisAngleAccel,int maxAxisSpeed,int changeDirSpeed,
+		int cameraAngle,int jumpStartImpulse,int jumpLandingTreshold,int jumpDeAccel,int posI, int	rotI,int gravitySpeed, int airSpeedAmp)
+	{
+		reflect;
+		float denom = 100;
+		hero.accel = in.accel/denom;
+		hero.maxSpeed = in.maxSpeed/denom;
+		hero.autoBrake = in.autoBrake/denom;
+		hero.axisAngleAccel = in.axisAngleAccel/denom;
+		hero.maxAxisAngleSpeed = in.maxAxisSpeed/denom;
+		hero.changeDirSpeed = in.changeDirSpeed/denom;
+		hero.cameraAngle = in.cameraAngle;
+		hero.jumpStartImpulse = in.jumpStartImpulse/denom;
+		hero.jumpLandingTreshold = in.jumpLandingTreshold/denom;
+		hero.jumpDeAccel = in.jumpDeAccel/denom;
+		hero.posI = in.posI/denom;
+		hero.rotI = in.rotI/denom;
+		hero.gravity.speed = in.gravitySpeed/denom;
+		hero.airSpeedAmp = in.airSpeedAmp / denom;
+	}
+
+
 	void ProcessMouseInput()
 	{
 		if (GetForegroundWindow() != hWnd) {
@@ -1517,6 +1555,36 @@ namespace Loop
 		return tangentSmooth;
 	}
 
+	XMMATRIX getHeroOnRailsMatrix(XMVECTOR forward, XMVECTOR up, XMVECTOR right)
+	{
+		XMMATRIX rowMajorRot = XMMatrixIdentity();
+		rowMajorRot.r[0] = right;
+		rowMajorRot.r[1] = up;
+		rowMajorRot.r[2] = forward;
+		rowMajorRot.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+
+		return rowMajorRot;
+	}
+
+	XMMATRIX getMouseLookMatrix(XMMATRIX rowMajorRot, XMVECTOR HeroRealUp, float deltaTime)
+	{
+
+		static float mouseYawIner = mouseYaw;
+
+		// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
+		float targetA = -std::round(mouseYaw / PI) * PI;
+
+		mouseYawIner = lerp(mouseYawIner, targetA, pow(min(deltaTime * hero.changeDirSpeed, 1.), 1.5));
+		XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, mouseYawIner);
+		XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
+
+
+		//hero.forward = result.r[2];
+
+		// Отдаем в шейдер в чистом Row-Major под твой макрос (float3x3) без заваливаний
+		return result;
+	}
+
 	void OrientHeroTowardsLineInAir(float deltaTime)
 	{
 		// Проверяем, что индекс линии валиден и она существует
@@ -1527,14 +1595,21 @@ namespace Loop
 		int maxPointIdx = currentLine.pointCount - 1;
 		
 		XMVECTOR airTangent = getSmoothTangent();
-		XMVECTOR projectedPosOnLine = posOnLine;
+
+		if (!hero.respawnInProgress)
+		{
+			airTangent = hero.forwardVector;
+		}
+
+		//auto s = XMVectorGetX(XMVector3Dot(airTangent, hero.forwardBeforeJump));
+		//airTangent *= sign(s);
 
 		// 3. Вычисляем ТЕКУЩУЮ физическую дистанцию до нити приземления
-		float distanceToLine = XMVectorGetX(XMVector3Length(XMVectorSubtract(hero.pos, projectedPosOnLine)));
+		float distanceToLine = XMVectorGetX(XMVector3Length(XMVectorSubtract(hero.pos, posOnLine)));
 		if (distanceToLine < 0.001f) distanceToLine = 0.001f;
 
 		// 4. Находим честный апвектор в воздухе (перпендикуляр от рельса к персонажу)
-		XMVECTOR rawAirUp = XMVectorSubtract(hero.pos, projectedPosOnLine);
+		XMVECTOR rawAirUp = XMVectorSubtract(hero.pos, posOnLine);
 		XMVECTOR proj = XMVector3Dot(rawAirUp, airTangent);
 		XMVECTOR airUp = XMVector3Normalize(XMVectorSubtract(rawAirUp, XMVectorMultiply(airTangent, proj)));
 
@@ -1579,8 +1654,8 @@ namespace Loop
 		XMMATRIX finalAirRot = XMMatrixRotationQuaternion(smoothQuat);
 
 		// Синхронизируем системные векторы
-		hero.forward = finalAirRot.r[2];
-		tUP = finalAirRot.r[1];
+		hero.forwardVector = finalAirRot.r[2];
+		hero.upVector = finalAirRot.r[1];
 
 		// Встраиваем текущую физическую позицию полета в 4-ю строку матрицы
 		finalAirRot.r[3] = XMVectorSetW(hero.pos, 1.0f);
@@ -1589,20 +1664,8 @@ namespace Loop
 		Object::heroOnRails = finalAirRot;
 
 		//----------------
-		static float mouseYawIner = mouseYaw;
-
-		// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
-		float targetA = -std::round(mouseYaw / PI) * PI;
-
-		mouseYawIner = lerp(mouseYawIner, targetA, pow(min(deltaTime * 3., 1.), 1.5));
-		XMMATRIX reverseRot = XMMatrixRotationAxis(tUP, mouseYawIner);
-		finalAirRot = XMMatrixMultiply(finalAirRot, reverseRot);
-
-
-		hero.forward = finalAirRot.r[2];
-
-		// Отдаем в шейдер в чистом Row-Major под твой макрос (float3x3) без заваливаний
-		Object::heroWorld = finalAirRot;
+		
+		Object::heroWorld = getMouseLookMatrix(finalAirRot, hero.upVector, deltaTime);
 
 		//Object::heroWorld = finalAirRot;
 		if (hero.respawnInProgress)
@@ -1637,9 +1700,6 @@ namespace Loop
 
 		int maxPointIdx = currentLine.pointCount - 1;
 
-		// Фиксированный шаг времени для физики (защита от флуктуаций таймера)
-		const float fixedStep = 1.0f / 60.0f;
-
 		// Шаг по нити на основе знаковой скорости героя
 		if (!hero.jump)
 		{
@@ -1651,7 +1711,7 @@ namespace Loop
 			float segLenCheck = XMVectorGetX(XMVector3Length(XMVectorSubtract(pNextCheck, pCurrCheck)));
 			if (segLenCheck < 0.001f) segLenCheck = 1.0f;
 
-			hero.pointIndex += (hero.speed * fixedStep * 50.f) / segLenCheck;
+			hero.pointIndex += (hero.speed * deltaTime) / segLenCheck;
 		}
 
 		hero.pointIndex = clamp(hero.pointIndex, 1.f, (float)maxPointIdx);
@@ -1691,7 +1751,7 @@ namespace Loop
 		XMVECTOR HeroUpBase = matSmooth.r[1];
 
 		// ====================================================================
-		// УПРАВЛЕНИЕ ТВIСТОМ ВОКРУГ СГЛАЖЕННОГО ТАНГЕНСА
+		// УПРАВЛЕНИЕ ТВИСТОМ ВОКРУГ СГЛАЖЕННОГО ТАНГЕНСА
 		// ====================================================================
 		XMMATRIX twistMatrix = XMMatrixRotationAxis(tangentSmooth, -hero.axisAngle);
 		XMVECTOR HeroRealUp = XMVector3TransformNormal(HeroUpBase, twistMatrix);
@@ -1705,43 +1765,23 @@ namespace Loop
 		// Логика прыжка
 		if (hero.jump)
 		{
-			HeroRealUp = hero.upBeforeJump;
-			HeroRight = XMVector3Normalize(XMVector3Cross(HeroRealUp, tangentSmooth));
-			//heroForward = hero.forwardBeforeJump;
+			HeroRealUp = hero.upVector;
+			HeroRight = hero.rightVector;
+			heroForward = hero.lineTangent;
 		} 
 		else 
 		{
-			hero.upBeforeJump = HeroRealUp;
+			hero.upVector = HeroRealUp;
+			hero.rightVector = HeroRight;
+			hero.forwardVector = heroForward;
+
+			//hero.upBeforeJump = HeroRealUp;
 			hero.pos = posOnLine;
-			hero.forwardBeforeJump = hero.forward;// *sign(hero.speed);
+			//hero.forwardBeforeJump = hero.lineTangent;// *sign(hero.speedFactor);
 		}
 
-		tUP = HeroRealUp;
-
-
-
-		// Сборка чистой Row-Major матрицы вращения со строгими индексами строк r
-		XMMATRIX rowMajorRot = XMMatrixIdentity();
-		rowMajorRot.r[0] = HeroRight;
-		rowMajorRot.r[1] = HeroRealUp;
-		rowMajorRot.r[2] = heroForward;
-		rowMajorRot.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-
-		Object::heroOnRails = rowMajorRot;
-		static float mouseYawIner = mouseYaw;
-
-		// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
-		float targetA =  -std::round(mouseYaw / PI) * PI;
-
-			mouseYawIner = lerp(mouseYawIner, targetA, pow(min(deltaTime*3.,1.),1.5));
-			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, mouseYawIner);
-			rowMajorRot = XMMatrixMultiply(rowMajorRot, reverseRot);
-		
-
-		hero.forward = rowMajorRot.r[2];
-
-		// Отдаем в шейдер в чистом Row-Major под твой макрос (float3x3) без заваливаний
-		Object::heroWorld = rowMajorRot;
+		Object::heroOnRails = getHeroOnRailsMatrix(heroForward, HeroRealUp, HeroRight);
+		Object::heroWorld = getMouseLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime);
 	}
 
 	void UpdateCamera(float deltaTime)
@@ -1769,8 +1809,9 @@ namespace Loop
 		}
 		else
 		{
-			float posStep = clamp(deltaTime * 3.0f, 0.0f, 1.0f);
-			float rotStep = clamp(deltaTime * 1.0f, 0.0f, 1.0f);
+			float posStep = clamp(deltaTime * hero.posI, 0.0f, 1.0f);
+			float rotStep = clamp(deltaTime * hero.rotI, 0.0f, 1.0f);
+
 
 			smoothedHeroPos = XMVectorLerp(smoothedHeroPos, heroTranslation, posStep);
 			smoothedHeroRotQ = XMQuaternionSlerp(smoothedHeroRotQ, heroRotQ, rotStep);
@@ -1867,11 +1908,11 @@ namespace Loop
 
 	float processTimer()
 	{
-		static double lastFrameTime = timer::GetCounter();
-		double currentFrameTime = timer::GetCounter();
+		static double lastFrameTime = timer::frameBeginTime;
+		double currentFrameTime = timer::frameBeginTime;
 
 		// Получаем дельту времени в секундах
-		float realDeltaTime = (float)(currentFrameTime - lastFrameTime);
+		float realDeltaTime = (float)(currentFrameTime - lastFrameTime)/100.f;
 		lastFrameTime = currentFrameTime;
 
 		// Защита: при самом первом старте или если realDeltaTime равен нулю, 
@@ -1880,17 +1921,32 @@ namespace Loop
 			realDeltaTime = 1.0f / 60.0f;
 		}
 
-		// Зажимаем сверху на 0.1 сек (100 мс), чтобы при фризах или лагах отладки 
+		// Зажимаем сверху на 10 fps чтобы при фризах или лагах отладки 
 		// физику и камеру не разрывало на гигантские расстояния
-		if (realDeltaTime > 0.1f) {
-			realDeltaTime = 0.1f;
-		}
+		realDeltaTime = min(realDeltaTime, 1.f / 10.f);
 
 		return realDeltaTime;
 	}
 
 	void scene3()
 	{
+		SetHeroParams({
+			.accel = 32,
+			.maxSpeed = 282,
+			.autoBrake = 95,
+			.axisAngleAccel = 122,
+			.maxAxisSpeed = 80,
+			.changeDirSpeed = 218,
+			.cameraAngle = 100,
+			.jumpStartImpulse = 1493,
+			.jumpLandingTreshold = 10,
+			.jumpDeAccel = 98,
+			.posI = 300,
+			.rotI = 100,
+			.gravitySpeed = 17,
+			.airSpeedAmp = 100
+			});
+
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
 
@@ -1959,18 +2015,19 @@ namespace Loop
 
 			if (GetActiveWindow() == hWnd && gameCam)
 			{
-				float realDeltaTime = processTimer();
+				float deltaTime = processTimer();
 
 				ProcessMouseInput();
 
 				hero.Respawn();
 
-				hero.ProcessMove(); // Изменяет скорости и углы
-				hero.ProcessJump(); // Обрабатывает прыжок и свободную гравитацию
+				hero.ProcessMove(deltaTime); // Изменяет скорости и углы
+				hero.ProcessJump(deltaTime); // Обрабатывает прыжок и свободную гравитацию
+				hero.ProcessGravity(deltaTime);
 
 				hero.pathControl.Process();
-				UpdateHeroOnLine(realDeltaTime);
-				UpdateCamera(realDeltaTime);
+				UpdateHeroOnLine(deltaTime);
+				UpdateCamera(deltaTime);
 			}
 
 
@@ -2008,6 +2065,7 @@ namespace Loop
 				
 
 			Object::hero_pos = V2F(hero.pos);
+			
 			Object::Girl({
 					.quality = 1,
 					.xPos = 0,

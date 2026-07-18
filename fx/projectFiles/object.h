@@ -858,7 +858,7 @@ namespace Object {
 		
 		srand(100);
 
-		for (int i = 0; i < starsCount; i++)
+		/*for (int i = 0; i < starsCount; i++)
 		{
 			gemini[i].z = getRandFloat();
 		}
@@ -880,6 +880,23 @@ namespace Object {
 		genSegment(gemini[14], gemini[15]);
 		genSegment(gemini[10], gemini[16]);
 
+		*/
+
+		NewLine();
+		AddPointToLine({ 0,0,0 });
+		AddPointToLine({ 100,0,0 });
+		AddPointToLine({ 200,0,0 });
+		AddPointToLine({ 200,110,0 });
+		AddPointToLine({ 100,110,0 });
+		AddPointToLine({ 0,10,0 });
+
+		NewLine();
+		AddPointToLine({ 0,0,10 });
+		AddPointToLine({ 100,0,10 });
+		AddPointToLine({ 200,0,10 });
+		AddPointToLine({ 200,110,10 });
+		AddPointToLine({ 100,110,10 });
+		AddPointToLine({ 0,10,10 });
 
 
 		/*for (int i = 0; i < starsCount; i++)
