@@ -1652,7 +1652,7 @@ namespace Loop
 		hero.airProgress = pow(hero.airProgress, 2.5);
 		hero.airProgress = clamp(hero.airProgress, 0.0f, 1.0f);
 		// Зажимаем коэффициент в рамки [0, 1]
-		float blendStep = hero.gravity.acceleratedT;
+		float blendStep = pow(hero.gravity.acceleratedT,.85);
 
 		// Сферическая плавная интерполяция идет строго по пройденному пути!
 		XMVECTOR smoothQuat = XMQuaternionSlerp(currentQuat, targetQuat, blendStep);
@@ -1788,11 +1788,26 @@ namespace Loop
 	{
 		float camRadius = 2.5f; // Расстояние от камеры до героя
 
+		float heroCamOffset = .4*1000;
 		if (hero.respawnInProgress)
 		{
-			camRadius = lerp(1., camRadius, hero.airProgress);
-			hero.yOffset = lerp(0., .4 * 1000, hero.airProgress);
+			//camRadius = lerp(1., camRadius, hero.gravity.acceleratedT);
+			//hero.yOffset = lerp(0., heroCamOffset, hero.gravity.acceleratedT);
 		}
+		
+		float airCoef = 1;
+		if (hero.jump)
+		{
+			airCoef = hero.jumpHeight / hero.jumpStartImpulse;
+		}
+
+		if (hero.gravity.mode)
+		{
+			airCoef = hero.gravity.acceleratedT;
+		}
+
+		hero.yOffset = lerp(0., heroCamOffset, airCoef);
+
 
 		XMVECTOR heroScale, heroRotQ, heroTranslation;
 		XMMatrixDecompose(&heroScale, &heroRotQ, &heroTranslation, Object::heroOnRails);
@@ -1811,7 +1826,8 @@ namespace Loop
 		{
 			float posStep = clamp(deltaTime * hero.posI, 0.0f, 1.0f);
 			float rotStep = clamp(deltaTime * hero.rotI, 0.0f, 1.0f);
-
+			posStep *= lerp(0.5,1.,(airCoef));
+			rotStep *= lerp(0.25, 1., (airCoef));
 
 			smoothedHeroPos = XMVectorLerp(smoothedHeroPos, heroTranslation, posStep);
 			smoothedHeroRotQ = XMQuaternionSlerp(smoothedHeroRotQ, heroRotQ, rotStep);
@@ -1937,7 +1953,7 @@ namespace Loop
 			.axisAngleAccel = 122,
 			.maxAxisSpeed = 80,
 			.changeDirSpeed = 218,
-			.cameraAngle = 130,
+			.cameraAngle = 100,
 			.jumpStartImpulse = 793,
 			.jumpLandingTreshold = 10,
 			.jumpDeAccel = 98,
