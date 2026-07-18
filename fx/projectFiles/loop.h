@@ -1614,9 +1614,11 @@ namespace Loop
 		if (distanceToLine < 0.001f) distanceToLine = 0.001f;
 
 		// 4. Находим честный апвектор в воздухе (перпендикуляр от рельса к персонажу)
-		XMVECTOR rawAirUp = XMVectorSubtract(hero.pos, posOnLine);
-		XMVECTOR proj = XMVector3Dot(rawAirUp, airTangent);
-		XMVECTOR airUp = XMVector3Normalize(XMVectorSubtract(rawAirUp, XMVectorMultiply(airTangent, proj)));
+		//XMVECTOR rawAirUp = XMVectorSubtract(hero.pos, posOnLine);
+		//XMVECTOR proj = XMVector3Dot(rawAirUp, airTangent);
+		//XMVECTOR airUp = XMVector3Normalize(XMVectorSubtract(rawAirUp, XMVectorMultiply(airTangent, proj)));
+
+		XMVECTOR airUp = hero.landingUp;
 
 		if (XMVector3Less(XMVector3LengthEst(airUp), XMVectorSet(0.001f, 0.001f, 0.001f, 0.001f))) {
 			airUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -1650,7 +1652,7 @@ namespace Loop
 		hero.airProgress = pow(hero.airProgress, 2.5);
 		hero.airProgress = clamp(hero.airProgress, 0.0f, 1.0f);
 		// Зажимаем коэффициент в рамки [0, 1]
-		float blendStep = hero.airProgress;
+		float blendStep = hero.gravity.acceleratedT;
 
 		// Сферическая плавная интерполяция идет строго по пройденному пути!
 		XMVECTOR smoothQuat = XMQuaternionSlerp(currentQuat, targetQuat, blendStep);
@@ -2026,7 +2028,7 @@ namespace Loop
 				hero.ProcessMove(deltaTime); // Изменяет скорости и углы
 				hero.ProcessJump(deltaTime); // Обрабатывает прыжок и свободную гравитацию
 				hero.ProcessGravity(deltaTime);
-				// === СОСТОЯНИЕ 1: РЕЖИМ СВОБОДНОЙ ГРАВИТАЦИИ ===
+
 				if (hero.gravity.mode)
 				{
 					OrientHeroTowardsLineInAir(deltaTime);
