@@ -135,6 +135,7 @@ float4 brightness;
 float4 tickness;
 float4 zoom;
 float onLineOfs;
+float jumpCharge;
 } params;
 
 void set () {

@@ -1,15 +1,146 @@
-d1
+по кор геймплею
 
-d2
-
-d1
-
-c2
-................
+доработать генерацию сплайна - зависимость количества промежуточных точек от расстояния
+заменить мейнлуп на синк обджект
 
 
+#include <dxgi1_3.h>
+#include <windows.h>
+
+// Переменные, которые нужно сохранить при инициализации графики
+IDXGISwapChain3* pSwapChain = nullptr; 
+HANDLE           hFrameEvent = nullptr; // Наш "коллбэк"-ивент от видеокарты
+
+void InitGraphics(HWND hWnd) 
+{
+    // 1. Описываем Swap Chain
+    DXGI_SWAP_CHAIN_DESC1 desc = {};
+    desc.Width = 0;
+    desc.Height = 0;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    desc.BufferCount = 2; // Двойная буферизация
+    desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // Обязательно для современных Windows
+    
+    // ВАЖНО: Включаем поддержку ожидания кадра от видеокарты!
+    desc.Flags = DXGI_SWAP_CHAIN_FLAG_FRAME_LATENCY_WAITABLE_OBJECT;
+
+    // ... код создания SwapChain через DXGIFactory ...
+    // (Допустим, мы получили указатель pSwapChain)
+
+    // 2. Настраиваем очередь кадров. 
+    // Запрещаем видеокарте копить кадры про запас. 1 = жесткий лок без задержек ввода
+    pSwapChain->SetMaximumFrameLatency(1);
+
+    // 3. Забираем у видеокарты системный хэндл события (тот самый "коллбэк")
+    hFrameEvent = pSwapChain->GetFrameLatencyWaitableObject();
+}
+
+#include <windows.h>
+
+void AppLoop()
+{
+    bool running = true;
+    MSG msg = {};
+
+    while (running)
+    {
+        // 1. Обрабатываем стандартные сообщения Windows (клики, изменение размера окна и т.д.)
+        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            if (msg.message == WM_QUIT)
+            {
+                running = false;
+            }
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+
+        if (!running) break;
+
+        // 2. ИДЕАЛЬНЫЙ КОЛЛБЭК ОТ ВИДЕОКАРТЫ
+        // Поток засыпает на уровне ядра ОС. Нагрузка на CPU = 0%.
+        // Windows разбудит этот поток РОДНО тогда, когда монитор обновится (V-Sync)
+        // и видеокарта освободит буфер для нового кадра.
+        WaitForSingleObjectEx(hFrameEvent, INFINITE, TRUE);
+
+        // 3. СЧИТАЕМ ТАЙМЕР ДЛЯ ФИЗИКИ (теперь он будет показывать стабильные 16.66 мс)
+        float deltaTime = processTimer(); 
+
+        // 4. ЛОГИКА И ОТРИСОВКА
+        Loop::mainLoop();
+
+        // 5. ВЫВОД НА ЭКРАН
+        // Первый параметр (1) включает V-Sync. 
+        // Так как мы использовали Waitable Object, Present вернет управление мгновенно,
+        // а спать поток будет на строчке WaitForSingleObjectEx выше.
+        pSwapChain->Present(1, 0); 
+    }
+}
+
+// Вместо вызова CreateDXGIFactory1 из либы:
+typedef HRESULT(WINAPI* PFN_CREATE_DXGI_FACTORY)(REFIID, void**);
+
+// Демосценерский способ загрузки:
+HMODULE hDxgi = LoadLibraryA("dxgi.dll");
+
+// Каждая функция в DXGI.dll имеет свой постоянный номер (Ordinal).
+// Например, CreateDXGIFactory1 имеет номер 10.
+// Передавая (LPCSTR)10 вместо строки "CreateDXGIFactory1", мы экономим байты на имени!
+PFN_CREATE_DXGI_FACTORY pCreateDXGIFactory = 
+    (PFN_CREATE_DXGI_FACTORY)GetProcAddress(hDxgi, (LPCSTR)10); 
 
 
+и отлогировать
+
+#include <dxgi1_3.h>
+
+// Функция возвращает частоту в Гц (например, 60.0, 144.0)
+float GetMonitorRefreshRate(IDXGISwapChain* pSwapChain)
+{
+    IDXGIOutput* pOutput = nullptr;
+    // 1. Получаем монитор, на котором сейчас находится окно
+    if (SUCCEEDED(pSwapChain->GetContainingOutput(&pOutput)))
+    {
+        DXGI_OUTPUT_DESC desc;
+        pOutput->GetDesc(&desc);
+        
+        // 2. Получаем текущие настройки дисплея из Win32
+        DEVMODEW devMode = {};
+        devMode.dmSize = sizeof(devMode);
+        
+        if (EnumDisplaySettingsW(desc.DeviceName, ENUM_CURRENT_SETTINGS, &devMode))
+        {
+            pOutput->Release();
+            return (float)devMode.dmDisplayFrequency; // Возвращает герцовку (60, 144, 240)
+        }
+        pOutput->Release();
+    }
+    return 60.0f; // Дефолтное значение, если что-то пошло не так
+}
+
+#include <windows.h>
+
+float GetVBlankRate(HWND hWnd)
+{
+    // Получаем контекст устройства для окна
+    HDC hdc = GetDC(hWnd);
+    
+    // VREFRESH возвращает физическую частоту обновления экрана в Гц
+    int refreshRate = GetDeviceCaps(hdc, VREFRESH);
+    
+    ReleaseDC(hWnd, hdc);
+    
+    // Защита: если система вернула 0 или 1 (такое бывает на старых драйверах/виртуалках)
+    if (refreshRate <= 1) {
+        return 60.0f; 
+    }
+    
+    return (float)refreshRate; // Вернет 60, 120, 144, 240 и т.д.
+}
+
+//-----------
 
 таймлайн
 

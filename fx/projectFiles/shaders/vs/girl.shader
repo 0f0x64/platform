@@ -17,6 +17,7 @@ cbuffer params : register(b0)
     float4 tickness;
     float4 zoom;
     float onLineOfs;
+    float jumpCharge;
 }
 
 struct Vertex {
@@ -269,6 +270,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     }
     pos*=zoom;
     pos.y+=onLineOfs;
+    pos.y*=.5+jumpCharge*.5;
     pos=mul((float3x3)model,pos);
     pos+=modelPos.xyz;
     

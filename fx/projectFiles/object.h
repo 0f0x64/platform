@@ -366,7 +366,7 @@ namespace Object {
 	XMMATRIX heroOnRails;
 	XMMATRIX heroWorld;
 
-	void ShowMesh(dx11::ConstBuf::sbObject* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom, int onLineOfs)
+	void ShowMesh(dx11::ConstBuf::sbObject* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom, int onLineOfs, int jumpCharge)
 	{
 
 		int gX = sqrt(count / skipper);
@@ -389,7 +389,8 @@ namespace Object {
 				.brightness = float4(brightness,0,0,0),
 				.tickness = float4(tickness,0,0,0),
 				.zoom = float4(zm,zm,zm,1),
-				.onLineOfs = (float)onLineOfs/1000.f
+				.onLineOfs = (float)onLineOfs/1000.f,
+				.jumpCharge = (float)jumpCharge / 100.f,
 			},
 		};
 
@@ -418,7 +419,7 @@ namespace Object {
 		
 	}
 
-	cmd(Mesh, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs)
+	cmd(Mesh, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs, int jumpCharge)
 	{
 		reflect;
 
@@ -433,7 +434,7 @@ namespace Object {
 		Culling::Set({ cullmode::off });
 		if (in.stencil == switcher::on)
 		{
-			ShowMesh(MeshPtr, (int)MeshPtr->triangleCount,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs);
+			ShowMesh(MeshPtr, (int)MeshPtr->triangleCount,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs, in.jumpCharge);
 		}
 
 		Culling::Set({ cullmode::off });
@@ -443,7 +444,7 @@ namespace Object {
 			.op = blendop::add
 			});
 
-		ShowMesh(MeshPtr, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom, in.onLineOfs);
+		ShowMesh(MeshPtr, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom, in.onLineOfs, in.jumpCharge);
 	}
 
 #endif
@@ -635,8 +636,17 @@ namespace Object {
 
 
 
-	void smoothStarline(starline& line, int stepsPerSegment) {
+	void smoothStarline(starline& line) {
 		line.pointCount = 0; // Сбрасываем старый результат сглаживания
+
+		float totalLength = 0;
+		for (int i = 0; i < line.basePointCount-1; i++)
+		{
+			totalLength += distance(line.basePoint[i], line.basePoint[i + 1]);
+		}
+
+		int stepsPerSegment = totalLength/25.;
+		if (stepsPerSegment < 2) stepsPerSegment = 2;
 
 		// Если исходных точек недостаточно для сглаживания или шаг некорректен
 		if (line.basePointCount < 2 || stepsPerSegment <= 0) {
@@ -826,7 +836,8 @@ namespace Object {
 	void genSegment(float4 start, float4 end)
 	{
 		NewLine();
-		int seg = 10;
+		int seg = distance(start,end)*20.;
+		if (seg == 0) seg += 2;
 		for (int k = 0; k <= seg; k++)
 		{
 			float4 p = lerp3(start, end, k / (float)seg);
@@ -858,7 +869,7 @@ namespace Object {
 		
 		srand(100);
 
-		/*for (int i = 0; i < starsCount; i++)
+		for (int i = 0; i < starsCount; i++)
 		{
 			gemini[i].z = getRandFloat();
 		}
@@ -880,7 +891,7 @@ namespace Object {
 		genSegment(gemini[14], gemini[15]);
 		genSegment(gemini[10], gemini[16]);
 
-		*/
+		
 
 		NewLine();
 		AddPointToLine({ 0,0,0 });
@@ -891,12 +902,12 @@ namespace Object {
 		AddPointToLine({ 0,10,0 });
 
 		NewLine();
-		AddPointToLine({ 0,0,10 });
+		AddPointToLine({ 0,0,3 });
 		AddPointToLine({ 100,0,10 });
-		AddPointToLine({ 200,0,10 });
-		AddPointToLine({ 200,110,10 });
-		AddPointToLine({ 100,110,10 });
-		AddPointToLine({ 0,10,10 });
+		AddPointToLine({ 200,0,13 });
+		AddPointToLine({ 200,110,13 });
+		AddPointToLine({ 100,110,3 });
+		AddPointToLine({ 0,10,3 });
 
 
 		/*for (int i = 0; i < starsCount; i++)
@@ -939,7 +950,7 @@ namespace Object {
 
 		for (int j = 0; j < starLineList.lineCount; j++)
 		{
-			smoothStarline(starLineList.line[j], 17*12./starLineList.line[j].basePointCount);
+			smoothStarline(starLineList.line[j]);
 			//Starline(starLineList.line[j], 3*12. / starLineList.line[j].basePointCount);
 		}
 
