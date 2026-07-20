@@ -462,6 +462,9 @@
   <ItemGroup>
     <Text Include="todo.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <Object Include="projectFiles\hero.obj" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

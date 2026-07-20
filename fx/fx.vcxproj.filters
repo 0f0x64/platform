@@ -49,6 +49,9 @@
     <Filter Include="Source Files\projectFiles\shadersSource\ui\ps">
       <UniqueIdentifier>{53f62341-fa47-42fd-b61c-e8c1aae5be58}</UniqueIdentifier>
     </Filter>
+    <Filter Include="meshes">
+      <UniqueIdentifier>{7cc2c216-dc2f-4a84-842e-f80255358648}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -360,5 +363,10 @@
     <None Include="projectFiles\shaders\vs\maze.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="projectFiles\hero.obj">
+      <Filter>meshes</Filter>
+    </Object>
   </ItemGroup>
 </Project>
