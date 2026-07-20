@@ -463,7 +463,9 @@
     <Text Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Object Include="projectFiles\hero.obj" />
+    <Object Include="projectFiles\hero.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

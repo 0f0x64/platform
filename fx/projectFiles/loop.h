@@ -1,3 +1,10 @@
+// 1. Одно единственное состояние клавиши
+bool g_SpaceIsDown = false;
+
+// 2. Две высокоточные наносекундные метки времени кликов
+double g_SpaceDownTime = 0.0;
+double g_SpaceUpTime = 0.0;
+
 // Функция вычисления длины по трем координатам
 float length3(const float4& v) {
 	return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
@@ -544,44 +551,48 @@ struct hero_ {
 	float chargeTimer = 0.0f;
 	bool isCharging = false;
 	float jumpChargeProgress = 1;
+	float currentJumpStartHeight = 0;
 
 	void ProcessJump(float deltaTime)
 	{
-		auto space = GetAsyncKeyState(VK_SPACE);
-
-		// Настройки баланса зарядки
-		const float MIN_JUMP_IMPULSE = jumpStartImpulse/5.;
+		// Настройки баланса зарядки (ПЕРЕВЕДЕНЫ В МИЛЛИСЕКУНДЫ)
+		const float MIN_JUMP_IMPULSE = jumpStartImpulse / 20.0f;
 		const float MAX_JUMP_IMPULSE = jumpStartImpulse;
-		const float MAX_CHARGE_TIME = 3.0f;
-		const float SLOWDOWN_DURATION = 0.8f;
 
-		// Настройка скорости распрямления в воздухе (чем меньше число, тем быстрее распрямится)
+		const float MAX_CHARGE_TIME = 300.0f; // 3000 мс = 3 секунды честной зарядки
+		const float SLOWDOWN_DURATION = 200.0f;  // 800 мс = 0.8 секунды на торможение
+		const float SHORT_CLICK_THRESHOLD = 80.0f; // 80 мс = анатомический порог быстрого клика
+
 		const float UNROLL_SPEED = 0.05f;
-
 		float chargeSpeedFactor = 1.0f;
 
 		// 1. ЛОГИКА НАКОПЛЕНИЯ ЗАРЯДА И ВЫЧИСЛЕНИЯ ЗАМЕДЛЕНИЯ
 		if (!gravity.mode)
 		{
-			if (space) // Кнопка удерживается
+			// ЕСЛИ КНОПКА ЗАЖАТА
+			if (g_SpaceIsDown)
 			{
+				// Первый кадр нажатия кнопки
 				if (!isCharging)
 				{
 					isCharging = true;
 					chargeTimer = 0.0f;
+					// Жестко синхронизируем старт с вашим миллисекундным таймером
+					g_SpaceDownTime = timer::GetCounter();
 				}
 
-				chargeTimer += deltaTime;
+				// Вычисляем точное физическое время удержания в миллисекундах
+				double now = timer::GetCounter();
+				chargeTimer = (float)(now - g_SpaceDownTime);
 
 				// Вычисляем чистый прогресс зарядки (от 0.0 до 1.0)
 				float currentProgress = chargeTimer / MAX_CHARGE_TIME;
 				if (currentProgress > 1.0f) currentProgress = 1.0f;
 
-				// === ИСПРАВЛЕНИЕ: Бленд плавно опускается сообразно проценту зарядки ===
+				// Бленд плавно опускается сообразно проценту зарядки
 				jumpChargeProgress = 1.0f - currentProgress;
 
 				// Если передержали заряд дольше максимума — плавно тормозим
-				// При этом jumpChargeProgress остается равен 0.0f (максимальная глубина приседа)
 				if (chargeTimer > MAX_CHARGE_TIME)
 				{
 					float overchargeTime = chargeTimer - MAX_CHARGE_TIME;
@@ -591,14 +602,24 @@ struct hero_ {
 					chargeSpeedFactor = 1.0f - slowdownProgress * 0.9f;
 				}
 			}
-			else if (!space && isCharging) // Кнопку ОТПУСТИЛИ — прыгаем!
+			// ЕСЛИ КНОПКА НЕ ЗАЖАТА, НО МЫ НАХОДИЛИСЬ В ПРОЦЕССЕ ЗАРЯДКИ — ПРЫГАЕМ!
+			else if (!g_SpaceIsDown && isCharging)
 			{
 				isCharging = false;
 
-				float progress = chargeTimer / MAX_CHARGE_TIME;
+				// Вычисляем чистую разницу времени между кликами в миллисекундах
+				float exactHoldDuration = (float)(g_SpaceUpTime - g_SpaceDownTime);
+
+				if (exactHoldDuration < SHORT_CLICK_THRESHOLD || exactHoldDuration <= 0.0f)
+				{
+					jumpChargeProgress = 1.0f; // Возвращаем стойку в дефолт
+					return;
+				}
+
+				float progress = exactHoldDuration / MAX_CHARGE_TIME;
 				if (progress > 1.0f) progress = 1.0f;
 
-				//float smoothProgress = sqrtf(progress);
+				// Ваша оригинальная S-образная кривая
 				float smoothProgress = progress * progress * (3.0f - 2.0f * progress);
 				jumpHeight = MIN_JUMP_IMPULSE + (MAX_JUMP_IMPULSE - MIN_JUMP_IMPULSE) * smoothProgress;
 
@@ -610,7 +631,7 @@ struct hero_ {
 			}
 			else
 			{
-				// Если игрок на нити и НЕ жмет пробел — удерживаем 1.0 (обычная стойка)
+				// Обычная стойка на нити без нажатий
 				jumpChargeProgress = 1.0f;
 			}
 		}
@@ -619,10 +640,8 @@ struct hero_ {
 			// === В ПОЛЕТЕ: БЫСТРО РАСПРЯМЛЯЕМ ДО 1 ===
 			if (jumpChargeProgress < 1.0f)
 			{
-				// Масштабируем скорость распрямления под deltaTime (база под 60 FPS)
 				float dt = deltaTime / (1. / 60.);
 				jumpChargeProgress += (1.0f - jumpChargeProgress) * (1.0f - powf(UNROLL_SPEED, dt));
-
 				if (jumpChargeProgress > 1.0f) jumpChargeProgress = 1.0f;
 			}
 		}
@@ -646,8 +665,16 @@ struct hero_ {
 		// 4. ВАША ОРИГИНАЛЬНАЯ ЛОГИКА ЗАТУХАНИЯ СКОРОСТИ ПРЫЖКА
 		float dt = deltaTime / (1. / 60.);
 		jumpHeight *= pow(jumpDeAccel, dt);
-	}
 
+		if (jump && currentJumpStartHeight == 0.0f)
+		{
+			currentJumpStartHeight = jumpHeight;
+		}
+		else if (!jump)
+		{
+			currentJumpStartHeight = 0.0f; // Сбрасываем при приземлении
+		}
+	}
 	/*
 	//fixed jump
 	void ProcessJump(float deltaTime)
@@ -2065,6 +2092,7 @@ namespace Loop
 			//hero.yOffset = lerp(0., heroCamOffset, hero.gravity.acceleratedT);
 		}
 		
+		/*
 		float airCoef = 1;
 		if (hero.jump)
 		{
@@ -2076,6 +2104,24 @@ namespace Loop
 			airCoef = hero.gravity.acceleratedT;
 		}
 
+		hero.yOffset = lerp(0., heroCamOffset, airCoef);*/
+
+		// По умолчанию на линии (в базе) коэффициент равен 1.0f
+		float airCoef = 1.0f;
+
+		if (hero.jump)
+		{
+			if (hero.currentJumpStartHeight > 0.0001f)
+			{
+				airCoef = (hero.jumpHeight / hero.currentJumpStartHeight);
+			}
+		}
+		else if (hero.gravity.mode)
+		{
+			airCoef = hero.gravity.acceleratedT;
+		}
+
+		
 		hero.yOffset = lerp(0., heroCamOffset, airCoef);
 
 
@@ -2155,6 +2201,10 @@ namespace Loop
 		screenOffsetY -= sin(PI * smoothLT) * landingAmp;
 		//смещение полет-приземление
 		screenOffsetY = lerp(0, screenOffsetY, hero.airProgress);
+		if (!hero.gravity.mode)
+		{
+			hero.jumpChargeProgress = 1.-.5*sin(PI * smoothLT);
+		}
 
 		XMVECTOR localScreenVerticalOffset = exactUp * screenOffsetY;
 

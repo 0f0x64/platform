@@ -101,6 +101,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	case WM_KEYUP:
 	{
+		if (wParam == VK_SPACE)
+		{
+			g_SpaceIsDown = false;
+			g_SpaceUpTime = timer::GetCounter();
+		}
 		break;
 	}
 	case WM_SYSKEYUP:
@@ -113,6 +118,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_KEYDOWN:
 	{
+		if (wParam == VK_SPACE && !(lParam & (1 << 30)))
+		{
+			g_SpaceIsDown = true;
+			g_SpaceDownTime = timer::GetCounter();
+		}
+
 		switch (wParam)
 		{
 			case VK_SPACE:
