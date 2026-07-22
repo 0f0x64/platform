@@ -72,9 +72,9 @@ struct hero_ {
 	bool jump = false;
 	float jumpHeight = 0;
 	float jumpStartImpulse = 6.f;
-	float jumpLandingTreshold = .1f;
+	float jumpLandingTreshold = .01f;
 	float jumpDeAccel = .98;
-
+	
 	float airProgress = 0;
 
 	float yOffset = .4*1000.;
@@ -544,6 +544,7 @@ struct hero_ {
 			forwardVector = XMVECTOR{ 0,0,1 };
 			upVector = XMVECTOR{ 0,1,0 };
 			rightVector = XMVECTOR{ 1,0,0 };
+			lastJumpAmpPercent = 1;
 		}
 
 	}
@@ -551,7 +552,8 @@ struct hero_ {
 	float chargeTimer = 0.0f;
 	bool isCharging = false;
 	float jumpChargeProgress = 1;
-	float currentJumpStartHeight = 0;
+		float lastJumpAmpPercent = 1;
+		float jumpProgress = 1;
 
 	void ProcessJump(float deltaTime)
 	{
@@ -559,9 +561,9 @@ struct hero_ {
 		const float MIN_JUMP_IMPULSE = jumpStartImpulse / 20.0f;
 		const float MAX_JUMP_IMPULSE = jumpStartImpulse;
 
-		const float MAX_CHARGE_TIME = 300.0f; // 3000 мс = 3 секунды честной зарядки
+		const float MAX_CHARGE_TIME = 600.0f; // 3000 мс = 3 секунды честной зарядки
 		const float SLOWDOWN_DURATION = 200.0f;  // 800 мс = 0.8 секунды на торможение
-		const float SHORT_CLICK_THRESHOLD = 80.0f; // 80 мс = анатомический порог быстрого клика
+		const float SHORT_CLICK_THRESHOLD = 40.0f; // 80 мс = анатомический порог быстрого клика
 
 		const float UNROLL_SPEED = 0.05f;
 		float chargeSpeedFactor = 1.0f;
@@ -588,6 +590,8 @@ struct hero_ {
 				// Вычисляем чистый прогресс зарядки (от 0.0 до 1.0)
 				float currentProgress = chargeTimer / MAX_CHARGE_TIME;
 				if (currentProgress > 1.0f) currentProgress = 1.0f;
+				lastJumpAmpPercent = currentProgress;
+				currentProgress = pow(currentProgress, .5);
 
 				// Бленд плавно опускается сообразно проценту зарядки
 				jumpChargeProgress = 1.0f - currentProgress;
@@ -612,8 +616,9 @@ struct hero_ {
 
 				if (exactHoldDuration < SHORT_CLICK_THRESHOLD || exactHoldDuration <= 0.0f)
 				{
-					jumpChargeProgress = 1.0f; // Возвращаем стойку в дефолт
-					return;
+				//	jumpChargeProgress = 1.0f; // Возвращаем стойку в дефолт
+					//jump = false;
+					//return;
 				}
 
 				float progress = exactHoldDuration / MAX_CHARGE_TIME;
@@ -621,6 +626,9 @@ struct hero_ {
 
 				// Ваша оригинальная S-образная кривая
 				float smoothProgress = progress * progress * (3.0f - 2.0f * progress);
+				jumpProgress = smoothProgress;
+				//float smoothProgress = progress * progress * progress;
+
 				jumpHeight = MIN_JUMP_IMPULSE + (MAX_JUMP_IMPULSE - MIN_JUMP_IMPULSE) * smoothProgress;
 
 				jump = true;
@@ -647,7 +655,7 @@ struct hero_ {
 		}
 
 		// 2. ВАША ОРИГИНАЛЬНАЯ ЛОГИКА ПРИЗЕМЛЕНИЯ
-		if (jumpHeight < jumpLandingTreshold) {
+		if (jumpHeight < 1.01- pow(lastJumpAmpPercent,.25)) {
 			jumpHeight = 0;
 			jump = false;
 		}
@@ -657,23 +665,11 @@ struct hero_ {
 		{
 			pos += jumpHeight * upVector * deltaTime + forwardVector * speed * deltaTime * airSpeedAmp;
 		}
-		else
-		{
-			pos += forwardVector * (speed * chargeSpeedFactor) * deltaTime;
-		}
 
 		// 4. ВАША ОРИГИНАЛЬНАЯ ЛОГИКА ЗАТУХАНИЯ СКОРОСТИ ПРЫЖКА
 		float dt = deltaTime / (1. / 60.);
 		jumpHeight *= pow(jumpDeAccel, dt);
 
-		if (jump && currentJumpStartHeight == 0.0f)
-		{
-			currentJumpStartHeight = jumpHeight;
-		}
-		else if (!jump)
-		{
-			currentJumpStartHeight = 0.0f; // Сбрасываем при приземлении
-		}
 	}
 	/*
 	//fixed jump
@@ -2083,14 +2079,12 @@ namespace Loop
 
 	void UpdateCamera(float deltaTime)
 	{
-		float camRadius = 2.5f; // Расстояние от камеры до героя
+		float camRadius = 2.f; // Расстояние от камеры до героя
 
 		float heroCamOffset = .4*1000;
-		if (hero.respawnInProgress)
-		{
-			//camRadius = lerp(1., camRadius, hero.gravity.acceleratedT);
-			//hero.yOffset = lerp(0., heroCamOffset, hero.gravity.acceleratedT);
-		}
+		float airCoef = 1.0f;
+
+
 		
 		/*
 		float airCoef = 1;
@@ -2107,23 +2101,36 @@ namespace Loop
 		hero.yOffset = lerp(0., heroCamOffset, airCoef);*/
 
 		// По умолчанию на линии (в базе) коэффициент равен 1.0f
-		float airCoef = 1.0f;
 
-		if (hero.jump)
+
+		if (hero.jump && hero.lastJumpAmpPercent >.5)
 		{
-			if (hero.currentJumpStartHeight > 0.0001f)
-			{
-				airCoef = (hero.jumpHeight / hero.currentJumpStartHeight);
-			}
+			//airCoef = 1;
+			airCoef = 1.-hero.jumpProgress;
+			//airCoef = hero.jumpHeight / hero.jumpStartImpulse;
 		}
-		else if (hero.gravity.mode)
+		
+		if (hero.gravity.mode && hero.lastJumpAmpPercent > .5)
 		{
 			airCoef = hero.gravity.acceleratedT;
 		}
-
 		
-		hero.yOffset = lerp(0., heroCamOffset, airCoef);
+		if (hero.respawnInProgress)
+		{
+			//camRadius = lerp(1., camRadius, hero.gravity.acceleratedT);
+			airCoef = hero.gravity.acceleratedT;
+		}
 
+		if (!hero.respawnInProgress)
+		{
+			//airCoef *= 1.-hero.currentJumpStartHeight / hero.jumpStartImpulse;
+			//airCoef = 1 - airCoef;
+			//airCoef *= hero.lastJumpAmpPercent;
+			//airCoef = 1 - airCoef;
+		}
+
+		hero.yOffset = lerp(0, heroCamOffset, airCoef);
+		//hero.yOffset = heroCamOffset;
 
 		XMVECTOR heroScale, heroRotQ, heroTranslation;
 		XMMatrixDecompose(&heroScale, &heroRotQ, &heroTranslation, Object::heroOnRails);
@@ -2143,7 +2150,7 @@ namespace Loop
 			float posStep = clamp(deltaTime * hero.posI, 0.0f, 1.0f);
 			float rotStep = clamp(deltaTime * hero.rotI, 0.0f, 1.0f);
 			posStep *= lerp(0.5,1.,(airCoef));
-			rotStep *= lerp(0.25, 1., (airCoef));
+			rotStep *= lerp(0.5, 1., (airCoef));
 
 			smoothedHeroPos = XMVectorLerp(smoothedHeroPos, heroTranslation, posStep);
 			smoothedHeroRotQ = XMQuaternionSlerp(smoothedHeroRotQ, heroRotQ, rotStep);
@@ -2194,16 +2201,21 @@ namespace Loop
 			landedTimer = 0;
 		}
 		float landindDur = 5.;
-		float landingAmp = .15;
+		float landingAmp = .2;
 		landedTimer = clamp(landedTimer, 0., landindDur);
 		float smoothLT = smoothstep(0, 1, landedTimer / landindDur);
-		smoothLT = pow(smoothLT,.25);
-		screenOffsetY -= sin(PI * smoothLT) * landingAmp;
+		smoothLT = pow(smoothLT,.5);
+
+		//screenOffsetY -= sin(PI * smoothLT*2)*(1- smoothLT) * landingAmp* hero.lastJumpAmpPercent;
+		
 		//смещение полет-приземление
-		screenOffsetY = lerp(0, screenOffsetY, hero.airProgress);
-		if (!hero.gravity.mode)
+		screenOffsetY = lerp(0, screenOffsetY, pow(hero.airProgress,1));
+		screenOffsetY = lerp(screenOffsetY, 0, (1.- pow(abs(cosPitch),3))*(1-abs(hero.speed/hero.maxSpeed)));
+
+		//присед при приземлении
+		if (!hero.gravity.mode && !hero.isCharging)
 		{
-			hero.jumpChargeProgress = 1.-.5*sin(PI * smoothLT);
+			hero.jumpChargeProgress = 1.-.5*sin(PI * smoothLT)* hero.lastJumpAmpPercent;
 		}
 
 		XMVECTOR localScreenVerticalOffset = exactUp * screenOffsetY;

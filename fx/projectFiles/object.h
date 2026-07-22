@@ -869,7 +869,7 @@ namespace Object {
 		
 		srand(100);
 
-		for (int i = 0; i < starsCount; i++)
+		/*for (int i = 0; i < starsCount; i++)
 		{
 			gemini[i].z = getRandFloat();
 		}
@@ -890,7 +890,7 @@ namespace Object {
 		genSegment(gemini[13], gemini[14]);
 		genSegment(gemini[14], gemini[15]);
 		genSegment(gemini[10], gemini[16]);
-
+		*/
 		
 
 		NewLine();
