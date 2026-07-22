@@ -48,7 +48,7 @@ struct hero_ {
 	XMVECTOR upVector = { 0.0f, 1.0f, 0.0f, 0.0f };
 	XMVECTOR rightVector = { 1.0f, 0.0f, 0.0f, 0.0f };
 	XMVECTOR lineTangent = { 0.0f, 0.0f, 1.0f, 0.0f };
-	XMVECTOR landingUp = { 0.0f, 0.0f, 1.0f, 0.0f };
+	XMVECTOR landingUp = { 0.0f, 1.0f, 0.0f, 0.0f };
 	float startAirDistance = 0;
 	int lineIndex = 0;
 	float pointIndex = 0;
@@ -63,7 +63,7 @@ struct hero_ {
 	float axisAngleSpeed = 0;
 	float axisAngleAccel = 10;
 	float maxAxisAngleSpeed = 4;
-	float autoBrakeAxis = 0.7;
+	float autoBrakeAxis = 0.4;
 
 	float changeDirSpeed = 10;
 
@@ -426,8 +426,6 @@ struct hero_ {
 
 	void ProcessGravity(float deltaTime)
 	{
-		if (!gravity.mode) return;
-
 		float minDistance = 1e9f;
 		float4 bestProjPoint = { 0,0,0,0 };
 		int bestLineIndex = -1;
@@ -491,22 +489,24 @@ struct hero_ {
 			gravity.progress += step;
 
 			// Ограничиваем прогресс единицей
-			float t = min(gravity.progress, 1.0f);
+			float t = clamp(gravity.progress, 0. ,1.);
 
 			// Опционально: оставляем кубическое сглаживание для эффекта разгона
 			// Если нужно абсолютно линейное движение с одинаковой скоростью — удалите эту строчку и используйте просто t
 			gravity.acceleratedT = t * t;
 
 			// 4. Интерполяция положения
-			XMVECTOR newPos = DirectX::XMVectorLerp(startPos, endPos, gravity.acceleratedT);
-
-			// Сохраняем результат обратно в структуру игрока
-			pos = newPos;
+			pos = DirectX::XMVectorLerp(startPos, endPos, gravity.acceleratedT);
 
 			if (gravity.acceleratedT > 0.99f)
 			{
+				gravity.acceleratedT = 1.;
 				gravity.mode = false;
 				gravity.progress = 0.0f;
+				pos = endPos;
+				respawnInProgress = false;
+				axisAngle = 0;
+				axisAngleSpeed = 0;
 
 			}
 
@@ -518,8 +518,6 @@ struct hero_ {
 
 	void Respawn()
 	{
-		if (airProgress >= 1.f) respawnInProgress = false;
-
 		if (firstRun || ((!firstRun) && GetAsyncKeyState('R')))
 		{
 			if (!firstRun)
@@ -541,9 +539,11 @@ struct hero_ {
 			pos += F2V(destPoint);
 			gravity.mode = true;
 			gravity.progress = 0.0f;
+
 			forwardVector = XMVECTOR{ 0,0,1 };
 			upVector = XMVECTOR{ 0,1,0 };
 			rightVector = XMVECTOR{ 1,0,0 };
+			
 			lastJumpAmpPercent = 1;
 		}
 
@@ -663,7 +663,7 @@ struct hero_ {
 		// 3. АДАПТИРОВАННАЯ ЛОГИКА ПЕРЕМЕЩЕНИЯ
 		if (jump || gravity.mode)
 		{
-			pos += jumpHeight * upVector * deltaTime + forwardVector * speed * deltaTime * airSpeedAmp;
+			pos += (jumpHeight * upVector + forwardVector * speed * airSpeedAmp) * deltaTime;
 		}
 
 		// 4. ВАША ОРИГИНАЛЬНАЯ ЛОГИКА ЗАТУХАНИЯ СКОРОСТИ ПРЫЖКА
@@ -1832,20 +1832,26 @@ namespace Loop
 		XMVECTOR pNext = F2V(currentLine.point[nextIdx]);
 
 		// 1. Плавно интерполируем позицию на линии
-		posOnLine = VectorLerp(pCurrent, pNext, t);
+		//posOnLine = VectorLerp(pCurrent, pNext, t);
 
 		// ====================================================================
 		// НЕПРЕРЫВНЫЙ СГЛАЖЕННЫЙ ТАНГЕНС ПУТИ
 		// ====================================================================
 		XMVECTOR tangentCurr = XMVector3Normalize(XMVectorSubtract(pNext, pCurrent));
-		if (XMVector3Equal(tangentCurr, XMVectorZero())) tangentCurr = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+		if (XMVector3Equal(tangentCurr, XMVectorZero()))
+		{
+			tangentCurr = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+		}
 
 		int futureIdx = clamp(nextIdx + 1, 0, maxPointIdx);
 		XMVECTOR tangentNext = tangentCurr;
 		if (nextIdx != futureIdx) {
 			XMVECTOR pFuture = F2V(currentLine.point[futureIdx]);
 			tangentNext = XMVector3Normalize(XMVectorSubtract(pFuture, pNext));
-			if (XMVector3Equal(tangentNext, XMVectorZero())) tangentNext = tangentCurr;
+			if (XMVector3Equal(tangentNext, XMVectorZero()))
+			{
+				tangentNext = tangentCurr;
+			}
 		}
 
 		XMVECTOR tangentSmooth = XMVector3Normalize(VectorLerp(tangentCurr, tangentNext, t));
@@ -1869,17 +1875,12 @@ namespace Loop
 
 		static float mouseYawIner = mouseYaw;
 
-		// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
-		float targetA = -std::round(mouseYaw / PI) * PI;
+		float targetA = -std::round(mouseYaw / PI) * PI;// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
 
 		mouseYawIner = lerp(mouseYawIner, targetA, pow(min(deltaTime * hero.changeDirSpeed, 1.), 1.5));
 		XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, mouseYawIner);
 		XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
 
-
-		//hero.forward = result.r[2];
-
-		// Отдаем в шейдер в чистом Row-Major под твой макрос (float3x3) без заваливаний
 		return result;
 	}
 
@@ -1894,28 +1895,11 @@ namespace Loop
 		
 		XMVECTOR airTangent = getSmoothTangent();
 
-		if (!hero.respawnInProgress)
-		{
-			airTangent = hero.forwardVector;
-		}
-
-		//auto s = XMVectorGetX(XMVector3Dot(airTangent, hero.forwardBeforeJump));
-		//airTangent *= sign(s);
-
 		// 3. Вычисляем ТЕКУЩУЮ физическую дистанцию до нити приземления
 		float distanceToLine = XMVectorGetX(XMVector3Length(XMVectorSubtract(hero.pos, posOnLine)));
 		if (distanceToLine < 0.001f) distanceToLine = 0.001f;
 
-		// 4. Находим честный апвектор в воздухе (перпендикуляр от рельса к персонажу)
-		//XMVECTOR rawAirUp = XMVectorSubtract(hero.pos, posOnLine);
-		//XMVECTOR proj = XMVector3Dot(rawAirUp, airTangent);
-		//XMVECTOR airUp = XMVector3Normalize(XMVectorSubtract(rawAirUp, XMVectorMultiply(airTangent, proj)));
-
 		XMVECTOR airUp = hero.landingUp;
-
-		if (XMVector3Less(XMVector3LengthEst(airUp), XMVectorSet(0.001f, 0.001f, 0.001f, 0.001f))) {
-			airUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-		}
 
 		// 5. Строим честный правый вектор целевого базиса
 		XMVECTOR airRight = XMVector3Normalize(XMVector3Cross(airUp, airTangent));
@@ -1956,6 +1940,7 @@ namespace Loop
 		// Синхронизируем системные векторы
 		hero.forwardVector = finalAirRot.r[2];
 		hero.upVector = finalAirRot.r[1];
+		hero.rightVector = XMVector3Normalize(XMVector3Cross(hero.upVector, hero.forwardVector));
 
 		// Встраиваем текущую физическую позицию полета в 4-ю строку матрицы
 		finalAirRot.r[3] = XMVectorSetW(hero.pos, 1.0f);
@@ -1966,12 +1951,9 @@ namespace Loop
 		//----------------
 		
 		Object::heroWorld = getMouseLookMatrix(finalAirRot, hero.upVector, deltaTime);
+		hero.axisAngle = 0;
+		hero.axisAngleSpeed = 0;
 
-		//Object::heroWorld = finalAirRot;
-		if (hero.respawnInProgress)
-		{
-			hero.axisAngle = 0;
-		}
 	}
 
 	float smoothstep(float edge0, float edge1, float x) {
@@ -1986,35 +1968,36 @@ namespace Loop
 
 	void UpdateHeroOnLine(float deltaTime)
 	{
-		// === СОСТОЯНИЕ 2: ДВИЖЕНИЕ ПО НИТЯМ ===
 		if (hero.lineIndex < 0 || hero.lineIndex >= Object::starLineList.lineCount) return;
+
 		const auto& currentLine = Object::starLineList.line[hero.lineIndex];
 		if (currentLine.pointCount < 2) return;
 
 		int maxPointIdx = currentLine.pointCount - 2;
 
-		// Шаг по нити на основе знаковой скорости героя
-		if (!hero.jump)
-		{
-			int currIdxCheck = clamp((int)floorf(hero.pointIndex), 2, maxPointIdx);
-			int nextIdxCheck = clamp(currIdxCheck + 1, 0, maxPointIdx);
-			XMVECTOR pCurrCheck = F2V(currentLine.point[currIdxCheck]);
-			XMVECTOR pNextCheck = F2V(currentLine.point[nextIdxCheck]);
+		int currIdxCheck = clamp((int)floorf(hero.pointIndex), 2, maxPointIdx);
+		int nextIdxCheck = clamp(currIdxCheck + 1, 0, maxPointIdx);
+		XMVECTOR pCurrCheck = F2V(currentLine.point[currIdxCheck]);
+		XMVECTOR pNextCheck = F2V(currentLine.point[nextIdxCheck]);
 
-			float segLenCheck = XMVectorGetX(XMVector3Length(XMVectorSubtract(pNextCheck, pCurrCheck)));
-			if (segLenCheck < 0.001f) segLenCheck = 1.0f;
+		float segLenCheck = XMVectorGetX(XMVector3Length(XMVectorSubtract(pNextCheck, pCurrCheck)));
+		if (segLenCheck < 0.001f) segLenCheck = 1.0f;
 
-			hero.pointIndex += (hero.speed * deltaTime) / segLenCheck;
-		}
+		hero.pointIndex += (hero.speed * deltaTime) / segLenCheck;
 
 		hero.pointIndex = clamp(hero.pointIndex, 2.f, (float)maxPointIdx);
 
 		int currIdx = clamp((int)floorf(hero.pointIndex), 0, maxPointIdx);
 		int nextIdx = clamp(currIdx + 1, 0, maxPointIdx);
 
+		XMVECTOR pCurrent = F2V(currentLine.point[currIdx]);
+		XMVECTOR pNext = F2V(currentLine.point[nextIdx]);
+
 		XMVECTOR tangentSmooth = getSmoothTangent();
+
 		float t = hero.pointIndex - floorf(hero.pointIndex);
 		if (currIdx == maxPointIdx) t = 0.0f;
+		posOnLine = VectorLerp(pCurrent, pNext, t);
 
 
 		// ====================================================================
@@ -2055,23 +2038,10 @@ namespace Loop
 
 		XMVECTOR heroForward = tangentSmooth;
 
-		// Логика прыжка
-		if (hero.jump)
-		{
-			HeroRealUp = hero.upVector;
-			HeroRight = hero.rightVector;
-			heroForward = hero.lineTangent;
-		} 
-		else 
-		{
 			hero.upVector = HeroRealUp;
 			hero.rightVector = HeroRight;
 			hero.forwardVector = heroForward;
-
-			//hero.upBeforeJump = HeroRealUp;
-			hero.pos = posOnLine;
-			//hero.forwardBeforeJump = hero.lineTangent;// *sign(hero.speedFactor);
-		}
+			hero.pos = VectorLerp(pCurrent, pNext, t);;
 
 		Object::heroOnRails = getHeroOnRailsMatrix(heroForward, HeroRealUp, HeroRight);
 		Object::heroWorld = getMouseLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime);
@@ -2079,55 +2049,32 @@ namespace Loop
 
 	void UpdateCamera(float deltaTime)
 	{
+		float jumpMargin = .7;
 		float camRadius = 2.f; // Расстояние от камеры до героя
 
 		float heroCamOffset = .4*1000;
 		float airCoef = 1.0f;
 
-
-		
-		/*
-		float airCoef = 1;
-		if (hero.jump)
+		if (hero.lastJumpAmpPercent > jumpMargin) //большой прыжок - будем следить камерой
 		{
-			airCoef = hero.jumpHeight / hero.jumpStartImpulse;
-		}
+			if (hero.jump)
+			{
+				airCoef = 1. - hero.jumpProgress;
+			}
 
-		if (hero.gravity.mode)
-		{
-			airCoef = hero.gravity.acceleratedT;
-		}
+			if (hero.gravity.mode)
+			{
+				airCoef = hero.gravity.acceleratedT;
+			}
 
-		hero.yOffset = lerp(0., heroCamOffset, airCoef);*/
-
-		// По умолчанию на линии (в базе) коэффициент равен 1.0f
-
-
-		if (hero.jump && hero.lastJumpAmpPercent >.5)
-		{
-			//airCoef = 1;
-			airCoef = 1.-hero.jumpProgress;
-			//airCoef = hero.jumpHeight / hero.jumpStartImpulse;
-		}
-		
-		if (hero.gravity.mode && hero.lastJumpAmpPercent > .5)
-		{
-			airCoef = hero.gravity.acceleratedT;
 		}
 		
 		if (hero.respawnInProgress)
 		{
-			//camRadius = lerp(1., camRadius, hero.gravity.acceleratedT);
+			camRadius = lerp(1., camRadius, hero.gravity.acceleratedT);
 			airCoef = hero.gravity.acceleratedT;
 		}
 
-		if (!hero.respawnInProgress)
-		{
-			//airCoef *= 1.-hero.currentJumpStartHeight / hero.jumpStartImpulse;
-			//airCoef = 1 - airCoef;
-			//airCoef *= hero.lastJumpAmpPercent;
-			//airCoef = 1 - airCoef;
-		}
 
 		hero.yOffset = lerp(0, heroCamOffset, airCoef);
 		//hero.yOffset = heroCamOffset;
@@ -2137,9 +2084,13 @@ namespace Loop
 
 		// Позицию берем строго из физических координат героя
 		heroTranslation = hero.pos;
+		if (hero.lastJumpAmpPercent <= jumpMargin)
+		{
+			//heroTranslation = posOnLine;
+		}
 
 		// Сглаживание инерции (Защита от стартовых бросков)
-		if (cameraFirstFrame)
+		if (cameraFirstFrame || hero.respawnInProgress)
 		{
 			smoothedHeroPos = heroTranslation;
 			smoothedHeroRotQ = heroRotQ;
@@ -2149,9 +2100,10 @@ namespace Loop
 		{
 			float posStep = clamp(deltaTime * hero.posI, 0.0f, 1.0f);
 			float rotStep = clamp(deltaTime * hero.rotI, 0.0f, 1.0f);
-			posStep *= lerp(0.5,1.,(airCoef));
-			rotStep *= lerp(0.5, 1., (airCoef));
 
+			posStep *= lerp(0.5, 1., airCoef);
+			rotStep *= lerp(0.5, 1., airCoef);
+	
 			smoothedHeroPos = XMVectorLerp(smoothedHeroPos, heroTranslation, posStep);
 			smoothedHeroRotQ = XMQuaternionSlerp(smoothedHeroRotQ, heroRotQ, rotStep);
 		}
@@ -2208,9 +2160,13 @@ namespace Loop
 
 		//screenOffsetY -= sin(PI * smoothLT*2)*(1- smoothLT) * landingAmp* hero.lastJumpAmpPercent;
 		
-		//смещение полет-приземление
-		screenOffsetY = lerp(0, screenOffsetY, pow(hero.airProgress,1));
-		screenOffsetY = lerp(screenOffsetY, 0, (1.- pow(abs(cosPitch),3))*(1-abs(hero.speed/hero.maxSpeed)));
+		if ((hero.jump || hero.gravity.mode) && hero.lastJumpAmpPercent > jumpMargin)
+		{
+			//смещение полет-приземление
+			screenOffsetY = lerp(0, screenOffsetY, pow(hero.airProgress, 1));
+			// если камера смотрит сверху/снизу - смещаем пивот в центр - убираем оффсет. но если игрок дивигается - возвращаем (из за инерции)
+			screenOffsetY = lerp(screenOffsetY, 0, (1. - pow(abs(cosPitch), 3)) * (1 - abs(hero.speed / hero.maxSpeed)));
+		}
 
 		//присед при приземлении
 		if (!hero.gravity.mode && !hero.isCharging)
@@ -2375,16 +2331,18 @@ namespace Loop
 
 				hero.ProcessMove(deltaTime); // Изменяет скорости и углы
 				hero.ProcessJump(deltaTime); // Обрабатывает прыжок и свободную гравитацию
-				hero.ProcessGravity(deltaTime);
 
 				if (hero.gravity.mode)
 				{
+					hero.ProcessGravity(deltaTime);
 					OrientHeroTowardsLineInAir(deltaTime);
+					
+					
 				}
-				else
-				{
+				else {
 					UpdateHeroOnLine(deltaTime);
 				}
+
 
 				UpdateCamera(deltaTime);
 			}
