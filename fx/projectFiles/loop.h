@@ -2076,7 +2076,7 @@ namespace Loop
 		}
 
 
-		hero.yOffset = lerp(0, heroCamOffset, airCoef);
+		//hero.yOffset = lerp(0, heroCamOffset, airCoef);
 		//hero.yOffset = heroCamOffset;
 
 		XMVECTOR heroScale, heroRotQ, heroTranslation;
@@ -2163,9 +2163,9 @@ namespace Loop
 		if ((hero.jump || hero.gravity.mode) && hero.lastJumpAmpPercent > jumpMargin)
 		{
 			//смещение полет-приземление
-			screenOffsetY = lerp(0, screenOffsetY, pow(hero.airProgress, 1));
+		//	screenOffsetY = lerp(0, screenOffsetY, pow(hero.airProgress, 1));
 			// если камера смотрит сверху/снизу - смещаем пивот в центр - убираем оффсет. но если игрок дивигается - возвращаем (из за инерции)
-			screenOffsetY = lerp(screenOffsetY, 0, (1. - pow(abs(cosPitch), 3)) * (1 - abs(hero.speed / hero.maxSpeed)));
+		//	screenOffsetY = lerp(screenOffsetY, 0, (1. - pow(abs(cosPitch), 3)) * (1 - abs(hero.speed / hero.maxSpeed)));
 		}
 
 		//присед при приземлении
