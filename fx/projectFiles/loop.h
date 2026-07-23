@@ -336,35 +336,65 @@ struct hero_ {
 		}
 	}
 
-
 	XMVECTOR CalculateAndSpreadLandingUp(XMVECTOR startPos, XMVECTOR endPos, int lineIdx, int pointIdx)
 	{
-		// 1. Получаем доступ к конкретной линии
 		const auto& targetLine = Object::starLineList.line[lineIdx];
 		int maxPointIdx = targetLine.pointCount - 1;
 
-		// Ограничиваем индекс сегмента для безопасности
 		int currIdx = clamp(pointIdx, 0, maxPointIdx - 1);
 		int nextIdx = currIdx + 1;
 
-		// Используем твой F2V для конвертации вершин в XMVECTOR
 		XMVECTOR pCurrentVertex = F2V(targetLine.point[currIdx]);
 		XMVECTOR pNextVertex = F2V(targetLine.point[nextIdx]);
 
-		// 2. Считаем честный геометрический тангенс сегмента
 		XMVECTOR segmentTangent = XMVector3Normalize(XMVectorSubtract(pNextVertex, pCurrentVertex));
 		if (XMVector3Equal(segmentTangent, XMVectorZero())) {
 			segmentTangent = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 		}
 
-		// 3. Находим чистый вектор от точки приземления к исходной позиции в воздухе
-		XMVECTOR rawLandingUp = XMVectorSubtract(startPos, endPos);
+		// ====================================================================
+		// ГИБРИДНОЕ ПЛАВНОЕ СМЕШИВАНИЕ (ПЛАВНЫЙ СДВИГ БАЗИСА ПРИ КАСАНИИ)
+		// ====================================================================
 
-		// 4. Ортогонализация Грэма-Шмидта под 90 градусов
-		XMVECTOR landingProjection = XMVector3Dot(rawLandingUp, segmentTangent);
-		XMVECTOR cleanLandingUp = XMVectorSubtract(rawLandingUp, XMVectorMultiply(segmentTangent, landingProjection));
+		// 1. Считаем чистый геометрический вектор от линии к игроку
+		XMVECTOR lineToHero = XMVectorSubtract(startPos, endPos);
+		XMVECTOR geomLandingUp = XMVector3Normalize(lineToHero);
 
-		// 5. Защита от деления на ноль
+		// Если векторы совпали (игрок строго на линии), берем дефолт
+		if (XMVector3Less(XMVector3LengthEst(lineToHero), XMVectorSet(0.001f, 0.001f, 0.001f, 0.001f))) {
+			geomLandingUp = upVector;
+		}
+
+		// 2. Вычисляем текущую физическую дистанцию
+		float currentDistance = XMVectorGetX(XMVector3Length(lineToHero));
+
+		// Параметры зоны интерполяции (настрой под масштаб своего мира)
+		const float START_STABILIZE_DIST = 2.5f; // На этой дистанции начинаем подмешивать upVector героя
+		const float END_STABILIZE_DIST = 0.1f;   // На этой дистанции полностью переходим на upVector героя
+
+		// Вычисляем коэффициент смешивания tBlend (от 0.0 до 1.0)
+		// 0.0 — далеко (чистая геометрия дельты), 1.0 — вплотную (чистый апвектор героя)
+		float tBlend = (START_STABILIZE_DIST - currentDistance) / (START_STABILIZE_DIST - END_STABILIZE_DIST);
+		tBlend = clamp(tBlend, 0.0f, 1.0f);
+
+		// Делаем кривую смешивания более мягкой у краев
+		tBlend = tBlend * tBlend * (3.0f - 2.0f * tBlend);
+
+		// 3. Смешиваем геометрический вектор с апвектором героя
+		// Перед смешиванием проверяем полярность, чтобы Lerp не пошел через ноль при переворотах
+		XMVECTOR targetHeroUp = upVector;
+		if (XMVectorGetX(XMVector3Dot(geomLandingUp, targetHeroUp)) < 0.0f) {
+			targetHeroUp = XMVectorNegate(targetHeroUp);
+		}
+
+		// Линейно интерполируем целевой вектор приземления
+		XMVECTOR mixedLandingUp = XMVectorLerp(geomLandingUp, targetHeroUp, tBlend);
+
+		// 4. Финальная ортогонализация Грэма-Шмидта относительно тангенса отрезка
+		XMVECTOR landingProjection = XMVector3Dot(mixedLandingUp, segmentTangent);
+		XMVECTOR cleanLandingUp = XMVectorSubtract(mixedLandingUp, XMVectorMultiply(segmentTangent, landingProjection));
+
+		// Защита от деления на ноль
 		if (XMVector3Less(XMVector3LengthEst(cleanLandingUp), XMVectorSet(0.001f, 0.001f, 0.001f, 0.001f)))
 		{
 			XMVECTOR defaultWorldUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
@@ -374,10 +404,9 @@ struct hero_ {
 			cleanLandingUp = XMVector3Normalize(XMVector3Cross(segmentTangent, XMVector3Normalize(XMVector3Cross(defaultWorldUp, segmentTangent))));
 		}
 
-		// Нормализуем финальный перпендикуляр приземления
 		XMVECTOR finalLandingUp = XMVector3Normalize(cleanLandingUp);
 
-		// 6. Запускаем волну распространения по ломаной линии
+		// Запускаем волну распространения по ломаной линии
 		SpreadLandingUpVector(lineIdx, currIdx, finalLandingUp);
 
 		return finalLandingUp;
