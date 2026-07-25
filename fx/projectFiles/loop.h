@@ -1,25 +1,8 @@
 
-// Глобальные координаты камеры
-XMVECTOR finalCameraEye = XMVectorSet(0.0f, 5.0f, -25.0f, 1.0f);
-XMVECTOR finalCameraAt = XMVectorZero();
-XMVECTOR finalCameraUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-
-// НАКОПЛЕННЫЕ УГЛЫ МЫШИ ИЗ ВАШЕГО БЛОКА
-
-
-// Сглаживание декомпозиции
-XMVECTOR smoothedHeroPos = XMVectorZero();
-XMVECTOR smoothedHeroRotQ = XMQuaternionIdentity();
 
 XMVECTOR posOnLine;
 
 // helper math
-
-
-inline XMVECTOR VectorLerp(FXMVECTOR V1, FXMVECTOR V2, float t) {
-	return XMVectorLerp(V1, V2, t);
-}
-
 
 XMVECTOR F2V(float4 v)
 {
@@ -49,6 +32,94 @@ XMVECTOR getRandVector4()
 
 
 
+struct inputController_ {
+	
+	struct {
+		float yaw = 0.0f;
+		float pitch = 0.0f;
+		float sensitivity = 0.0015f;
+		bool isInitialized = false;  
+
+		void processInput()
+		{
+			RECT rect;
+			GetWindowRect(hWnd, &rect);
+
+			int centerX = rect.left + (rect.right - rect.left) / 2;
+			int centerY = rect.top + (rect.bottom - rect.top) / 2;
+
+			POINT currentPos;
+			if (GetCursorPos(&currentPos))
+			{
+				if (!isInitialized)
+				{
+					SetCursorPos(centerX, centerY);
+					isInitialized = true;
+				}
+				else
+				{
+					int deltaX = currentPos.x - centerX;
+					int deltaY = currentPos.y - centerY;
+					yaw -= (float)deltaX * sensitivity;
+					pitch += (float)deltaY * sensitivity;
+
+					float pitchLimit = DegreesToRadians(85);
+					pitch = clamp(pitch, -pitchLimit, pitchLimit);
+
+					SetCursorPos(centerX, centerY);
+				}
+			}
+		}
+
+		XMMATRIX getLookMatrix(XMMATRIX rowMajorRot, XMVECTOR HeroRealUp, float deltaTime, float heroChangeDirSpeed)
+		{
+
+			static float yawInner = yaw;
+
+			float targetA = -std::round(yaw / PI) * PI;// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
+
+			yawInner = lerp(yawInner, targetA, pow(min(deltaTime * heroChangeDirSpeed, 1.), 1.5));
+			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, yawInner);
+			XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
+
+			return result;
+		}
+
+	} mouse;
+
+	bool isForwardPressed()
+	{
+		return GetAsyncKeyState('W');
+	}
+
+	bool isBackwardPressed()
+	{
+		return GetAsyncKeyState('S');
+	}
+
+	bool isRightPressed()
+	{
+		return GetAsyncKeyState('D');
+	}
+
+	bool isLeftPressed()
+	{
+		return GetAsyncKeyState('A');
+	}
+
+	bool jumpKeyIsDown = false;
+	double jumpKeyDownTime = 0.0;
+	double jumpKeyUpTime = 0.0;
+
+	bool isJumpPressed()
+	{
+		return GetAsyncKeyState(VK_SPACE);
+	}
+
+};
+
+inputController_ inputController;
+
 
 bool cameraFirstFrame = true;
 
@@ -60,6 +131,7 @@ struct hero_ {
 	XMVECTOR rightVector = { 1.0f, 0.0f, 0.0f, 0.0f };
 	XMVECTOR lineTangent = { 0.0f, 0.0f, 1.0f, 0.0f };
 	XMVECTOR landingUp = { 0.0f, 1.0f, 0.0f, 0.0f };
+
 	float startAirDistance = 0;
 	int lineIndex = 0;
 	float pointIndex = 0;
@@ -85,17 +157,15 @@ struct hero_ {
 	float jumpDeAccel = .98;
 	
 	float airProgress = 0;
-
-	float yOffset = .4*1000.;
+	
+	float yOffset = .5*1000.;
 
 	float chargeTimer = 0.0f;
 	bool isCharging = false;
 	float jumpChargeProgress = 1;
 	float lastJumpAmpPercent = 1;
 	float jumpProgress = 1;
-	bool jumpKeyIsDown = false;
-	double jumpKeyDownTime = 0.0;
-	double jumpKeyUpTime = 0.0;
+
 
 	float fracPointIndex = 0;
 
@@ -308,7 +378,7 @@ struct hero_ {
 		float bestPointIndex = 0.0f;
 		bool found = false;
 
-		// 1. Ищем ближайший ОТРЕЗОК, а не одиночную точку
+		// Ищем ближайший отрезок
 		for (int i = 0; i < Object::starLineList.lineCount; i++)
 		{
 			// Проходим по отрезкам: от j до j+1
@@ -317,7 +387,7 @@ struct hero_ {
 				float4 p1 = Object::starLineList.line[i].point[j];
 				float4 p2 = Object::starLineList.line[i].point[j + 1];
 
-				// Проецируем текущую позицию на отрезок (используем ранее созданную функцию)
+				// Проецируем текущую позицию на отрезок
 				float4 proj = projectPointToLine(V2F(pos), p1, p2);
 
 				// Считаем расстояние от игрока до его проекции на этот отрезок
@@ -328,7 +398,7 @@ struct hero_ {
 					minDistance = dst;
 					bestProjPoint = proj;
 					bestLineIndex = i;
-					// Точный дробный индекс на линии (например, 2.5 означает ровно посередине между точкой 2 и 3)
+					// Точный дробный индекс на линии
 					bestPointIndex = (float)j + fracPointIndex;
 					found = true;
 				}
@@ -340,25 +410,17 @@ struct hero_ {
 			lineIndex = bestLineIndex;
 			pointIndex = bestPointIndex;
 
-
 			// Загружаем векторы
 			XMVECTOR startPos = pos;
-
-
 
 			XMVECTOR endPos = F2V(bestProjPoint);
 
 			landingUp = CalculateAndSpreadLandingUp(startPos, endPos, lineIndex, pointIndex);
 
-			// 2. Рассчитываем текущее расстояние
+			// Рассчитываем текущее расстояние
 			XMVECTOR distVector = DirectX::XMVector3Length(DirectX::XMVectorSubtract(endPos, startPos));
 			float distance;
 			XMStoreFloat(&distance, distVector);
-			// 3. Зависимость скорости от расстояния
-			 // Фиксированная скорость притяжения (метров в секунду)
-
-			// Вычисляем, какую долю от всего пути игрок должен пройти за этот кадр.
-			// Формула: (Скорость * ВремяКадра) / ОставшеесяРасстояние
 			float step = (gravity.speed * deltaTime) / distance;
 
 			// Прибавляем шаг к общему прогрессу
@@ -367,11 +429,9 @@ struct hero_ {
 			// Ограничиваем прогресс единицей
 			float t = clamp(gravity.progress, 0. ,1.);
 
-			// Опционально: оставляем кубическое сглаживание для эффекта разгона
-			// Если нужно абсолютно линейное движение с одинаковой скоростью — удалите эту строчку и используйте просто t
+			// для эффекта разгона
 			gravity.acceleratedT = t * t;
 
-			// 4. Интерполяция положения
 			pos = DirectX::XMVectorLerp(startPos, endPos, gravity.acceleratedT);
 
 			if (gravity.acceleratedT > 0.99f)
@@ -442,7 +502,7 @@ struct hero_ {
 		if (!gravity.mode)
 		{
 			// ЕСЛИ КНОПКА ЗАЖАТА
-			if (jumpKeyIsDown)
+			if (inputController.jumpKeyIsDown)
 			{
 				// Первый кадр нажатия кнопки
 				if (!isCharging)
@@ -450,12 +510,12 @@ struct hero_ {
 					isCharging = true;
 					chargeTimer = 0.0f;
 					// Жестко синхронизируем старт с вашим миллисекундным таймером
-					jumpKeyDownTime = timer::GetCounter();
+					inputController.jumpKeyDownTime = timer::GetCounter();
 				}
 
 				// Вычисляем точное физическое время удержания в миллисекундах
 				double now = timer::GetCounter();
-				chargeTimer = (float)(now - jumpKeyDownTime);
+				chargeTimer = (float)(now - inputController.jumpKeyDownTime);
 
 				// Вычисляем чистый прогресс зарядки (от 0.0 до 1.0)
 				float currentProgress = chargeTimer / MAX_CHARGE_TIME;
@@ -477,12 +537,12 @@ struct hero_ {
 				}
 			}
 			// ЕСЛИ КНОПКА НЕ ЗАЖАТА, НО МЫ НАХОДИЛИСЬ В ПРОЦЕССЕ ЗАРЯДКИ — ПРЫГАЕМ!
-			else if (!jumpKeyIsDown && isCharging)
+			else if (!inputController.jumpKeyIsDown && isCharging)
 			{
 				isCharging = false;
 
 				// Вычисляем чистую разницу времени между кликами в миллисекундах
-				float exactHoldDuration = (float)(jumpKeyUpTime - jumpKeyDownTime);
+				float exactHoldDuration = (float)(inputController.jumpKeyUpTime - inputController.jumpKeyDownTime);
 
 				if (exactHoldDuration < SHORT_CLICK_THRESHOLD || exactHoldDuration <= 0.0f)
 				{
@@ -547,8 +607,8 @@ struct hero_ {
 		if (jump || gravity.mode) return;
 
 		bool pressingMove = false;
-
-		if (GetAsyncKeyState('W'))
+		
+		if (inputController.isForwardPressed())
 		{
 			// Плавный разгон вперед с учетом знака камеры
 			speed += accel * sign(speedFactor)*deltaTime;
@@ -562,7 +622,7 @@ struct hero_ {
 
 			pressingMove = true;
 		}
-		if (GetAsyncKeyState('S'))
+		if (inputController.isBackwardPressed())
 		{
 			// Плавный разгон назад с учетом знака камеры
 			speed -= accel * sign(speedFactor)*deltaTime;
@@ -583,12 +643,12 @@ struct hero_ {
 
 		// --- Логика вращения вокруг нити (A / D) ---
 		bool pressingRotation = false;
-		if (GetAsyncKeyState('A'))
+		if (inputController.isLeftPressed())
 		{
 			axisAngleSpeed -= axisAngleAccel*sign(speedFactor) *deltaTime;
 			pressingRotation = true;
 		}
-		if (GetAsyncKeyState('D'))
+		if (inputController.isRightPressed())
 		{
 			axisAngleSpeed += axisAngleAccel * sign(speedFactor) * deltaTime;
 			pressingRotation = true;
@@ -629,66 +689,59 @@ struct hero_ {
 
 	} pathControl;
 
-	float mouseYaw = 0.0f;
-	float mousePitch = 0.0f;
-	float mouseSensitivity = 0.0015f; // Чувствительность мыши
-	bool isMouseInitialized = false;  // Флаг защиты от стартового рывка
-
-	void ProcessMouseInput()
-	{
-		RECT rect;
-		GetWindowRect(hWnd, &rect);
-
-		// Находим центр окна
-		int centerX = rect.left + (rect.right - rect.left) / 2;
-		int centerY = rect.top + (rect.bottom - rect.top) / 2;
-
-		POINT currentPos;
-		if (GetCursorPos(&currentPos))
-		{
-			if (!isMouseInitialized)
-			{
-				SetCursorPos(centerX, centerY);
-				isMouseInitialized = true;
-			}
-			else
-			{
-				int deltaX = currentPos.x - centerX;
-				int deltaY = currentPos.y - centerY;
-				mouseYaw -= (float)deltaX * mouseSensitivity;
-				mousePitch += (float)deltaY * mouseSensitivity;
-
-				// Ограничиваем Pitch в пределах честных 85 градусов
-				float pitchLimit = DegreesToRadians(85);
-				mousePitch = clamp(mousePitch, -pitchLimit, pitchLimit);
-
-				SetCursorPos(centerX, centerY);
-			}
-		}
-	}
-
-	XMMATRIX getMouseLookMatrix(XMMATRIX rowMajorRot, XMVECTOR HeroRealUp, float deltaTime)
-	{
-
-		static float mouseYawIner = mouseYaw;
-
-		float targetA = -std::round(mouseYaw / PI) * PI;// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
-
-		mouseYawIner = lerp(mouseYawIner, targetA, pow(min(deltaTime * changeDirSpeed, 1.), 1.5));
-		XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, mouseYawIner);
-		XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
-
-		return result;
-	}
+	
 };
 
 hero_ hero;
 
+
+
 struct gameCamera_ {
 
 	float lensAngle = 100;
-	float posInertion = 1;
+	float posInertion = 3;
 	float rotInertion = 1;
+
+	XMVECTOR smoothedHeroPos = XMVectorZero();
+	XMVECTOR smoothedHeroRotQ = XMQuaternionIdentity();
+
+	// Глобальные координаты камеры
+	XMVECTOR finalCameraEye = XMVectorSet(0.0f, 5.0f, -25.0f, 1.0f);
+	XMVECTOR finalCameraAt = XMVectorZero();
+	XMVECTOR finalCameraUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+	void constBufSet(XMMATRIX viewMatrix)
+	{
+		// Запись в буфер констант
+		ConstBuf::camera.world[0] = XMMatrixIdentity();
+		ConstBuf::camera.view[0] = XMMatrixTranspose(viewMatrix);
+
+		XMMATRIX rowMajorProj = XMMatrixPerspectiveFovLH(
+			DegreesToRadians(lensAngle),
+			dx11::iaspect,
+			0.01f, 100.0f
+		);
+		ConstBuf::camera.proj[0] = XMMatrixTranspose(rowMajorProj);
+
+		// Отправка обновленного буфера первой камеры на GPU
+		ConstBuf::Update(ConstBuf::cBuffer::camera);
+		ConstBuf::Set(ConstBuf::cBuffer::camera, ConstBuf::target::both);
+	}
+
+	XMMATRIX calcCameraMatrix(XMVECTOR right, XMVECTOR up, XMVECTOR forward,XMVECTOR eye )
+	{
+		XMMATRIX viewMatrix = XMMatrixIdentity();
+		viewMatrix.r[0] = XMVectorSet(XMVectorGetX(right), XMVectorGetX(up), XMVectorGetX(forward), 0.0f);
+		viewMatrix.r[1] = XMVectorSet(XMVectorGetY(right), XMVectorGetY(up), XMVectorGetY(forward), 0.0f);
+		viewMatrix.r[2] = XMVectorSet(XMVectorGetZ(right), XMVectorGetZ(up), XMVectorGetZ(forward), 0.0f);
+		viewMatrix.r[3] = XMVectorSet(
+			-XMVectorGetX(XMVector3Dot(eye, right)),
+			-XMVectorGetX(XMVector3Dot(eye, up)),
+			-XMVectorGetX(XMVector3Dot(eye, forward)),
+			1.0f
+		);
+		return viewMatrix;
+	}
 
 	void Update(float deltaTime)
 	{
@@ -758,11 +811,11 @@ struct gameCamera_ {
 		XMVECTOR smoothedForward = mSmoothedHero.r[2];
 
 		// Накладываем глобальные инвертированные углы мыши поверх скомпенсированного базиса
-		float cosPitch = cosf(hero.mousePitch);
+		float cosPitch = cosf(inputController.mouse.pitch);
 		XMVECTOR localMouseOffset = XMVectorSet(
-			cosPitch * sinf(hero.mouseYaw),
-			sinf(hero.mousePitch),
-			-cosPitch * cosf(hero.mouseYaw),
+			cosPitch * sinf(inputController.mouse.yaw),
+			sinf(inputController.mouse.pitch),
+			-cosPitch * cosf(inputController.mouse.yaw),
 			0.0f
 		);
 
@@ -807,9 +860,11 @@ struct gameCamera_ {
 		{
 			//смещение полет-приземление
 		//	screenOffsetY = lerp(0, screenOffsetY, pow(hero.airProgress, 1));
-			// если камера смотрит сверху/снизу - смещаем пивот в центр - убираем оффсет. но если игрок дивигается - возвращаем (из за инерции)
-		//	screenOffsetY = lerp(screenOffsetY, 0, (1. - pow(abs(cosPitch), 3)) * (1 - abs(hero.speed / hero.maxSpeed)));
 		}
+
+		// если камера смотрит сверху/снизу - смещаем пивот в центр - убираем оффсет. но если игрок дивигается - возвращаем (из за инерции)
+		screenOffsetY = lerp(screenOffsetY, 0, (1. - pow(abs(cosPitch), 5)) * (1 - abs(hero.speed / hero.maxSpeed)));
+
 
 		//присед при приземлении
 		if (!hero.gravity.mode && !hero.isCharging)
@@ -823,31 +878,9 @@ struct gameCamera_ {
 		finalCameraAt = XMVectorAdd(finalCameraAt, localScreenVerticalOffset);
 		finalCameraEye = XMVectorAdd(finalCameraEye, localScreenVerticalOffset);
 
-		XMMATRIX viewMatrix = XMMatrixIdentity();
-		viewMatrix.r[0] = XMVectorSet(XMVectorGetX(camRight), XMVectorGetX(exactUp), XMVectorGetX(camForward), 0.0f);
-		viewMatrix.r[1] = XMVectorSet(XMVectorGetY(camRight), XMVectorGetY(exactUp), XMVectorGetY(camForward), 0.0f);
-		viewMatrix.r[2] = XMVectorSet(XMVectorGetZ(camRight), XMVectorGetZ(exactUp), XMVectorGetZ(camForward), 0.0f);
-		viewMatrix.r[3] = XMVectorSet(
-			-XMVectorGetX(XMVector3Dot(finalCameraEye, camRight)),
-			-XMVectorGetX(XMVector3Dot(finalCameraEye, exactUp)),
-			-XMVectorGetX(XMVector3Dot(finalCameraEye, camForward)),
-			1.0f
-		);
+		XMMATRIX viewMatrix = calcCameraMatrix(camRight, exactUp, camForward, finalCameraEye);
 
-		// Запись в буфер констант
-		ConstBuf::camera.world[0] = XMMatrixIdentity();
-		ConstBuf::camera.view[0] = XMMatrixTranspose(viewMatrix);
-
-		XMMATRIX rowMajorProj = XMMatrixPerspectiveFovLH(
-			DegreesToRadians(lensAngle),
-			dx11::iaspect,
-			0.01f, 100.0f
-		);
-		ConstBuf::camera.proj[0] = XMMatrixTranspose(rowMajorProj);
-
-		// Отправка обновленного буфера первой камеры на GPU
-		ConstBuf::Update(ConstBuf::cBuffer::camera);
-		ConstBuf::Set(ConstBuf::cBuffer::camera, ConstBuf::target::both);
+		constBufSet(viewMatrix);
 
 		// Стабильное обновление speedFactor для следующего кадра
 		hero.speedFactor = XMVectorGetX(XMVector3Dot(camForward, hero.lineTangent));
@@ -893,7 +926,7 @@ XMVECTOR getSmoothTangent()
 		}
 	}
 
-	XMVECTOR tangentSmooth = XMVector3Normalize(VectorLerp(tangentCurr, tangentNext, t));
+	XMVECTOR tangentSmooth = XMVector3Normalize(XMVectorLerp(tangentCurr, tangentNext, t));
 	hero.lineTangent = tangentSmooth;
 	return tangentSmooth;
 }
@@ -977,7 +1010,7 @@ void OrientHeroTowardsLineInAir(float deltaTime)
 
 	//----------------
 
-	Object::heroWorld = hero.getMouseLookMatrix(finalAirRot, hero.upVector, deltaTime);
+	Object::heroWorld = inputController.mouse.getLookMatrix(finalAirRot, hero.upVector, deltaTime, hero.changeDirSpeed);
 	hero.axisAngle = 0;
 	hero.axisAngleSpeed = 0;
 
@@ -1014,7 +1047,7 @@ void UpdateHeroOnLine(float deltaTime)
 
 	float t = hero.pointIndex - floorf(hero.pointIndex);
 	if (currIdx == maxPointIdx) t = 0.0f;
-	posOnLine = VectorLerp(pCurrent, pNext, t);
+	posOnLine = XMVectorLerp(pCurrent, pNext, t);
 
 
 	// ====================================================================
@@ -1058,10 +1091,10 @@ void UpdateHeroOnLine(float deltaTime)
 	hero.upVector = HeroRealUp;
 	hero.rightVector = HeroRight;
 	hero.forwardVector = heroForward;
-	hero.pos = VectorLerp(pCurrent, pNext, t);;
+	hero.pos = XMVectorLerp(pCurrent, pNext, t);
 
 	Object::heroOnRails = getHeroOnRailsMatrix(heroForward, HeroRealUp, HeroRight);
-	Object::heroWorld = hero.getMouseLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime);
+	Object::heroWorld = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime,hero.changeDirSpeed);
 }
 
 
@@ -1074,6 +1107,8 @@ float processTimer()
 	// Получаем дельту времени в секундах
 	float realDeltaTime = (float)(currentFrameTime - lastFrameTime) / 100.f;
 	lastFrameTime = currentFrameTime;
+
+
 
 	// Защита: при самом первом старте или если realDeltaTime равен нулю, 
 	// принудительно ставим стандартный шаг 1/60, чтобы не было деления на ноль.
@@ -2143,7 +2178,7 @@ namespace Loop
 			{
 				float deltaTime = processTimer();
 
-				hero.ProcessMouseInput();
+				inputController.mouse.processInput();
 
 				hero.Respawn();
 				hero.pathControl.Process();
@@ -2178,7 +2213,7 @@ namespace Loop
 					.brightness = 9,
 					.tickness = 4,
 					.stencil = switcher::on,
-					.zoom = -80,
+					.zoom = -75,
 					.onLineOfs = (int)hero.yOffset,
 					.jumpCharge = (int)(hero.jumpChargeProgress*100.)
 				});
