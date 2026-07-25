@@ -103,8 +103,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		if (wParam == VK_SPACE)
 		{
-			g_SpaceIsDown = false;
-			g_SpaceUpTime = timer::GetCounter();
+			hero.jumpKeyIsDown = false;
+			hero.jumpKeyUpTime = timer::GetCounter();
 		}
 		break;
 	}
@@ -120,8 +120,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 		if (wParam == VK_SPACE && !(lParam & (1 << 30)))
 		{
-			g_SpaceIsDown = true;
-			g_SpaceDownTime = timer::GetCounter();
+			hero.jumpKeyIsDown = true;
+			hero.jumpKeyDownTime = timer::GetCounter();
 		}
 
 		switch (wParam)

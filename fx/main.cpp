@@ -19,7 +19,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 #include "settings.h" 
 #include "tools.h"
 #include "timer.h"
-#include "utils.h"
+
 
 #if EditMode
 bool loadFlag=false;
@@ -41,8 +41,14 @@ bool loadFlag=false;
 int cmdCounter = 0;//reset it in loop start point
 
 #include "types.h"
+
+float DegreesToRadians(float degrees);
+
 #include "dx11\dx.h"
 #include "Xaudio2.h"
+
+#include "utils.h"
+
 #include "projectFiles\sound\trackStruct.h"
 #include "projectFiles\sound\trackData.h"
 
