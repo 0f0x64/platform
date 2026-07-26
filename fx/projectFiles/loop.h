@@ -166,6 +166,8 @@ struct hero_ {
 	float lastJumpAmpPercent = 1;
 	float jumpProgress = 1;
 
+	float landingTimer = 0;
+	float landingCoef = 0;
 
 	float fracPointIndex = 0;
 
@@ -449,6 +451,27 @@ struct hero_ {
 		}
 	}
 
+	void processLanding(float deltaTime)
+	{
+		landingTimer += deltaTime;
+
+		if (gravity.mode)
+		{
+			landingTimer = 0;
+		}
+
+		float landindDur = .5;
+
+		landingTimer = clamp(landingTimer, 0., landindDur);
+		landingCoef = landingTimer / landindDur;
+		float smoothLT = pow(smoothstep(0, 1, landingTimer / landindDur), .5);
+
+		//присед при приземлении
+		if (!gravity.mode && !isCharging)
+		{
+			jumpChargeProgress = 1. - .5 * sin(PI * smoothLT) * lastJumpAmpPercent;
+		}
+	}
 
 	void Respawn()
 	{
@@ -544,13 +567,6 @@ struct hero_ {
 				// Вычисляем чистую разницу времени между кликами в миллисекундах
 				float exactHoldDuration = (float)(inputController.jumpKeyUpTime - inputController.jumpKeyDownTime);
 
-				if (exactHoldDuration < SHORT_CLICK_THRESHOLD || exactHoldDuration <= 0.0f)
-				{
-				//	jumpChargeProgress = 1.0f; // Возвращаем стойку в дефолт
-					//jump = false;
-					//return;
-				}
-
 				float progress = exactHoldDuration / MAX_CHARGE_TIME;
 				if (progress > 1.0f) progress = 1.0f;
 
@@ -585,7 +601,8 @@ struct hero_ {
 		}
 
 		// 2. ВАША ОРИГИНАЛЬНАЯ ЛОГИКА ПРИЗЕМЛЕНИЯ
-		if (jumpHeight < 1.01- pow(lastJumpAmpPercent,.25)) {
+		//if (jumpHeight < 1.01- pow(lastJumpAmpPercent,.25)) {
+		if (jumpHeight < 1) {
 			jumpHeight = 0;
 			jump = false;
 		}
@@ -593,12 +610,13 @@ struct hero_ {
 		// 3. АДАПТИРОВАННАЯ ЛОГИКА ПЕРЕМЕЩЕНИЯ
 		if (jump || gravity.mode)
 		{
-			pos += (jumpHeight * upVector + forwardVector * speed * airSpeedAmp) * deltaTime;
+			pos += (jumpHeight * upVector + forwardVector * speed * airSpeedAmp + rightVector*axisAngleSpeed ) * deltaTime;
 		}
 
 		// 4. ВАША ОРИГИНАЛЬНАЯ ЛОГИКА ЗАТУХАНИЯ СКОРОСТИ ПРЫЖКА
 		float dt = deltaTime / (1. / 60.);
 		jumpHeight *= pow(jumpDeAccel, dt);
+
 
 	}
 
@@ -745,45 +763,18 @@ struct gameCamera_ {
 
 	void Update(float deltaTime)
 	{
-		float jumpMargin = .7;
 		float camRadius = 2.f; // Расстояние от камеры до героя
-
-		float heroCamOffset = .4 * 1000;
-		float airCoef = 1.0f;
-
-		if (hero.lastJumpAmpPercent > jumpMargin) //большой прыжок - будем следить камерой
-		{
-			if (hero.jump)
-			{
-				airCoef = 1. - hero.jumpProgress;
-			}
-
-			if (hero.gravity.mode)
-			{
-				airCoef = hero.gravity.acceleratedT;
-			}
-
-		}
 
 		if (hero.respawnInProgress)
 		{
-			camRadius = lerp(1., camRadius, hero.gravity.acceleratedT);
-			airCoef = hero.gravity.acceleratedT;
+			camRadius = lerp(1.5, camRadius, hero.gravity.acceleratedT);
 		}
-
-
-		//hero.yOffset = lerp(0, heroCamOffset, airCoef);
-		//hero.yOffset = heroCamOffset;
 
 		XMVECTOR heroScale, heroRotQ, heroTranslation;
 		XMMatrixDecompose(&heroScale, &heroRotQ, &heroTranslation, Object::heroOnRails);
 
 		// Позицию берем строго из физических координат героя
 		heroTranslation = hero.pos;
-		if (hero.lastJumpAmpPercent <= jumpMargin)
-		{
-			//heroTranslation = posOnLine;
-		}
 
 		// Сглаживание инерции (Защита от стартовых бросков)
 		if (cameraFirstFrame || hero.respawnInProgress)
@@ -794,11 +785,9 @@ struct gameCamera_ {
 		}
 		else
 		{
-			float posStep = clamp(deltaTime * posInertion, 0.0f, 1.0f);
-			float rotStep = clamp(deltaTime * rotInertion, 0.0f, 1.0f);
-
-			posStep *= lerp(0.5, 1., airCoef);
-			rotStep *= lerp(0.5, 1., airCoef);
+			// Используем экспоненту для независимости от FPS
+			float posStep = 1.0f - std::exp(-posInertion * deltaTime);
+			float rotStep = 1.0f - std::exp(-rotInertion * deltaTime);
 
 			smoothedHeroPos = XMVectorLerp(smoothedHeroPos, heroTranslation, posStep);
 			smoothedHeroRotQ = XMQuaternionSlerp(smoothedHeroRotQ, heroRotQ, rotStep);
@@ -842,35 +831,12 @@ struct gameCamera_ {
 		float screenOffsetY = 1.335f;
 
 		//посадка на линию
-		static float landedTimer = 1;
-		landedTimer += deltaTime;
-		if (hero.gravity.mode)
-		{
-			landedTimer = 0;
-		}
-		float landindDur = 5.;
-		float landingAmp = .2;
-		landedTimer = clamp(landedTimer, 0., landindDur);
-		float smoothLT = smoothstep(0, 1, landedTimer / landindDur);
-		smoothLT = pow(smoothLT, .5);
-
-		//screenOffsetY -= sin(PI * smoothLT*2)*(1- smoothLT) * landingAmp* hero.lastJumpAmpPercent;
-
-		if ((hero.jump || hero.gravity.mode) && hero.lastJumpAmpPercent > jumpMargin)
-		{
-			//смещение полет-приземление
-		//	screenOffsetY = lerp(0, screenOffsetY, pow(hero.airProgress, 1));
-		}
+		float landingCamAmp = .2;
+		float smoothLT = pow(smoothstep(0, 1, hero.landingCoef),.5);
+		screenOffsetY -= sin(PI * smoothLT*2)*(1- smoothLT) * landingCamAmp * hero.lastJumpAmpPercent;
 
 		// если камера смотрит сверху/снизу - смещаем пивот в центр - убираем оффсет. но если игрок дивигается - возвращаем (из за инерции)
 		screenOffsetY = lerp(screenOffsetY, 0, (1. - pow(abs(cosPitch), 5)) * (1 - abs(hero.speed / hero.maxSpeed)));
-
-
-		//присед при приземлении
-		if (!hero.gravity.mode && !hero.isCharging)
-		{
-			hero.jumpChargeProgress = 1. - .5 * sin(PI * smoothLT) * hero.lastJumpAmpPercent;
-		}
 
 		XMVECTOR localScreenVerticalOffset = exactUp * screenOffsetY;
 
@@ -1011,8 +977,8 @@ void OrientHeroTowardsLineInAir(float deltaTime)
 	//----------------
 
 	Object::heroWorld = inputController.mouse.getLookMatrix(finalAirRot, hero.upVector, deltaTime, hero.changeDirSpeed);
-	hero.axisAngle = 0;
-	hero.axisAngleSpeed = 0;
+	//hero.axisAngle = 0;
+	//hero.axisAngleSpeed = 0;
 
 }
 
@@ -1104,21 +1070,12 @@ float processTimer()
 	static double lastFrameTime = timer::frameBeginTime;
 	double currentFrameTime = timer::frameBeginTime;
 
-	// Получаем дельту времени в секундах
-	float realDeltaTime = (float)(currentFrameTime - lastFrameTime) / 100.f;
+	float realDeltaTime = (float)(currentFrameTime - lastFrameTime) / 1000.f;
 	lastFrameTime = currentFrameTime;
 
-
-
-	// Защита: при самом первом старте или если realDeltaTime равен нулю, 
-	// принудительно ставим стандартный шаг 1/60, чтобы не было деления на ноль.
 	if (realDeltaTime <= 0.0001f) {
 		realDeltaTime = 1.0f / 60.0f;
 	}
-
-	// Зажимаем сверху на 10 fps чтобы при фризах или лагах отладки 
-	// физику и камеру не разрывало на гигантские расстояния
-	realDeltaTime = min(realDeltaTime, 1.f / 10.f);
 
 	return realDeltaTime;
 }
@@ -2088,24 +2045,24 @@ namespace Loop
 	void scene3()
 	{
 		SetHeroParams({
-			.accel = 32,
-			.maxSpeed = 282,
-			.autoBrake = 95,
-			.axisAngleAccel = 122,
-			.maxAxisSpeed = 80,
-			.changeDirSpeed = 218,
-			.jumpStartImpulse = 1293,
+			.accel = 351,
+			.maxSpeed = 1925,
+			.autoBrake = 65,
+			.axisAngleAccel = 1220,
+			.maxAxisSpeed = 800,
+			.changeDirSpeed = 980,
+			.jumpStartImpulse = 3053,
 			.jumpLandingTreshold = 10,
-			.jumpDeAccel = 98,
-			.gravitySpeed = 17,
+			.jumpDeAccel = 90,
+			.gravitySpeed = 88,
 			.airSpeedAmp = 100,
-			.autoBrakeAxis = 70
+			.autoBrakeAxis = 30
 			});
 
 		SetCameraParams({
 			.angle = 110,
-			.posInertion = 300,
-			.rotInertion = 100
+			.posInertion = 1400,
+			.rotInertion = 1000
 			});
 
 		BasicCam::camPass = false;
@@ -2118,22 +2075,77 @@ namespace Loop
 
 		cmdCounter = precalcOfs;
 		frameConst();
-		InputAsm::Set({ topology::triList });
-		BlendMode::Set({
-			.mode = blendmode::on,
-			.op = blendop::add
-			});
-		DepthBuf::Mode({ depthmode::off });
-		Culling::Set({ cullmode::back });
+		
+			
+			//
 
-		//cameraMan::run({});
+			Object::initPatches(hero.pathControl.Time);
 
-		int Dur = 20;
-		int t = timer::timeCursor / SAMPLES_IN_FRAME / FRAMES_PER_SECOND / Dur;
-				
+			if (GetActiveWindow() == hWnd && gameCam)
+			{
+				float deltaTime = processTimer();
+
+				inputController.mouse.processInput();
+
+				hero.Respawn();
+
+				const float FIXED_DT = 1.0f / 60.0f; // Строго 16.66 мс для физики
+				static float accumulator = 0.0f;
+				static float smoothedCameraDT = FIXED_DT;
+				const float EMA_SMOOTH_FACTOR = 0.15f; // Коэффициент фильтра времени
+
+				accumulator += deltaTime;
+
+				if (accumulator > 0.1f) accumulator = 0.1f;
+
+				while (accumulator >= FIXED_DT) {
+
+					hero.pathControl.Process();
+					hero.ProcessMove(FIXED_DT); 
+					hero.ProcessJump(FIXED_DT); 
+
+					if (hero.gravity.mode)
+					{
+						hero.ProcessGravity(FIXED_DT);
+						OrientHeroTowardsLineInAir(FIXED_DT);
+					}
+					else
+					{
+						UpdateHeroOnLine(FIXED_DT);
+					}
+
+					hero.processLanding(FIXED_DT);
+
+					gameCamera.Update(FIXED_DT);
+
+					accumulator -= FIXED_DT;
+				}
+
+				float alpha = accumulator / FIXED_DT;
+				alpha = std::clamp(alpha, 0.0f, 1.0f);
+				//TODO: implement characters and camera matrix interpolation (render only)
+			}
+
+			//---------
+			//RENDERING
+			//---------
+
+			InputAsm::Set({ topology::triList });
+			BlendMode::Set({
+				.mode = blendmode::on,
+				.op = blendop::add
+				});
+			DepthBuf::Mode({ depthmode::off });
+			Culling::Set({ cullmode::back });
+
+			//cameraMan::run({});
+
+			int Dur = 20;
+			int t = timer::timeCursor / SAMPLES_IN_FRAME / FRAMES_PER_SECOND / Dur;
+
 			BasicCam::camCounter = 0;
 			BasicCam::setCamKey({
-				.camTime = 0*SAMPLES_IN_FRAME*FRAMES_PER_SECOND*Dur,
+				.camTime = 0 * SAMPLES_IN_FRAME * FRAMES_PER_SECOND * Dur,
 				.camType = keyType::set,
 				.eye_x = 43,
 				.eye_y = -52,
@@ -2154,10 +2166,10 @@ namespace Loop
 				.fly_y = 0,
 				.fly_z = 0,
 				.jitter = 0
-			});
+				});
 
 			if (!gameCam) BasicCam::processCam();
-			
+
 			RenderTarget::Set({ texture::pBuf,0 });
 			RenderTarget::Clear({ 0,0,0,0 });
 			DepthBuf::Clear({});
@@ -2169,36 +2181,6 @@ namespace Loop
 			RenderTarget::Clear({ 0,0,0,0 });
 
 			RenderTarget::Set({ texture::pBuf,0 });
-			
-			//
-
-			Object::initPatches(hero.pathControl.Time);
-
-			if (GetActiveWindow() == hWnd && gameCam)
-			{
-				float deltaTime = processTimer();
-
-				inputController.mouse.processInput();
-
-				hero.Respawn();
-				hero.pathControl.Process();
-
-				hero.ProcessMove(deltaTime); // Изменяет скорости и углы
-				hero.ProcessJump(deltaTime); // Обрабатывает прыжок и свободную гравитацию
-
-				if (hero.gravity.mode)
-				{
-					hero.ProcessGravity(deltaTime);
-					OrientHeroTowardsLineInAir(deltaTime);
-				}
-				else 
-				{
-					UpdateHeroOnLine(deltaTime);
-				}
-
-				gameCamera.Update(deltaTime);
-			}
-
 
 			//
 			Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");

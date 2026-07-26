@@ -85,7 +85,7 @@ void UpdateFrame(double time)
 
 	#endif
 
-	if (time >= timer::nextFrameTime)
+	//if (time >= timer::nextFrameTime)
 	{
 		timer::frameBeginTime = timer::GetCounter();
 
@@ -113,7 +113,7 @@ void UpdateFrame(double time)
 		timer::nextFrameTime = timer::frameBeginTime + FRAME_LEN;
 	}
 
-	Sleep((DWORD)min(FRAME_LEN, max(FRAME_LEN - timer::frameRenderingDuration, 0)));
+	//Sleep((DWORD)min(FRAME_LEN, max(FRAME_LEN - timer::frameRenderingDuration, 0)));
 
 }
 
