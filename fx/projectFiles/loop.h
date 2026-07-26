@@ -1,6 +1,6 @@
 
 
-XMVECTOR posOnLine;
+
 
 // helper math
 
@@ -126,6 +126,7 @@ bool cameraFirstFrame = true;
 struct hero_ {
 
 	XMVECTOR pos = { 0.0f, 0.0f, 0.0f, 1.0f };
+	XMVECTOR posOnLine = { 0.0f, 0.0f, 0.0f, 1.0f };
 	XMVECTOR forwardVector = { 0.0f, 0.0f, 1.0f, 0.0f };
 	XMVECTOR upVector = { 0.0f, 1.0f, 0.0f, 0.0f };
 	XMVECTOR rightVector = { 1.0f, 0.0f, 0.0f, 0.0f };
@@ -683,6 +684,210 @@ struct hero_ {
 		axisAngle += axisAngleSpeed *deltaTime;
 	}
 
+	XMVECTOR getSmoothTangent()
+	{
+		const auto& currentLine = Object::starLineList.line[lineIndex];
+		int maxPointIdx = currentLine.pointCount - 1;
+		// Вычисление индексов и непрерывной дробной части
+		int currIdx = clamp((int)floorf(pointIndex), 0, maxPointIdx);
+		int nextIdx = clamp(currIdx + 1, 0, maxPointIdx);
+
+		float t = pointIndex - floorf(pointIndex);
+		if (currIdx == maxPointIdx) t = 0.0f;
+
+		XMVECTOR pCurrent = F2V(currentLine.point[currIdx]);
+		XMVECTOR pNext = F2V(currentLine.point[nextIdx]);
+
+		// ====================================================================
+		// НЕПРЕРЫВНЫЙ СГЛАЖЕННЫЙ ТАНГЕНС ПУТИ
+		// ====================================================================
+		XMVECTOR tangentCurr = XMVector3Normalize(XMVectorSubtract(pNext, pCurrent));
+		if (XMVector3Equal(tangentCurr, XMVectorZero()))
+		{
+			tangentCurr = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+		}
+
+		int futureIdx = clamp(nextIdx + 1, 0, maxPointIdx);
+		XMVECTOR tangentNext = tangentCurr;
+		if (nextIdx != futureIdx) {
+			XMVECTOR pFuture = F2V(currentLine.point[futureIdx]);
+			tangentNext = XMVector3Normalize(XMVectorSubtract(pFuture, pNext));
+			if (XMVector3Equal(tangentNext, XMVectorZero()))
+			{
+				tangentNext = tangentCurr;
+			}
+		}
+
+		XMVECTOR tangentSmooth = XMVector3Normalize(XMVectorLerp(tangentCurr, tangentNext, t));
+		lineTangent = tangentSmooth;
+		return tangentSmooth;
+	}
+
+	XMMATRIX getHeroOnRailsMatrix(XMVECTOR forward, XMVECTOR up, XMVECTOR right)
+	{
+		XMMATRIX rowMajorRot = XMMatrixIdentity();
+		rowMajorRot.r[0] = right;
+		rowMajorRot.r[1] = up;
+		rowMajorRot.r[2] = forward;
+		rowMajorRot.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+
+		return rowMajorRot;
+	}
+
+	void OrientHeroTowardsLineInAir(float deltaTime)
+	{
+		// Проверяем, что индекс линии валиден и она существует
+		if (lineIndex < 0 || lineIndex >= Object::starLineList.lineCount) return;
+		const auto& currentLine = Object::starLineList.line[lineIndex];
+		if (currentLine.pointCount < 2) return;
+
+		int maxPointIdx = currentLine.pointCount - 1;
+
+		XMVECTOR airTangent = getSmoothTangent();
+
+		// 3. Вычисляем ТЕКУЩУЮ физическую дистанцию до нити приземления
+		float distanceToLine = XMVectorGetX(XMVector3Length(XMVectorSubtract(pos, posOnLine)));
+		if (distanceToLine < 0.001f) distanceToLine = 0.001f;
+
+		XMVECTOR airUp = landingUp;
+
+		// 5. Строим честный правый вектор целевого базиса
+		XMVECTOR airRight = XMVector3Normalize(XMVector3Cross(airUp, airTangent));
+
+		// 6. Собираем ЦЕЛЕВУЮ Row-Major матрицу, к которой персонаж должен быть развернут
+		XMMATRIX targetAirMatrix = XMMatrixIdentity();
+		targetAirMatrix.r[0] = airRight;
+		targetAirMatrix.r[1] = airUp;
+		targetAirMatrix.r[2] = airTangent;
+
+		XMVECTOR targetQuat = XMQuaternionRotationMatrix(targetAirMatrix);
+
+		// 7. Извлекаем текущую ориентацию из Object::heroWorld (чистый Row-Major без Transpose!)
+		XMMATRIX currentWorldRow = Object::heroOnRails;
+		currentWorldRow.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f); // Зануляем позицию для честного Decompose
+
+		XMVECTOR currentScale, currentQuat, currentTrans;
+		XMMatrixDecompose(&currentScale, &currentQuat, &currentTrans, currentWorldRow);
+
+		// ====================================================================
+		// МАТЕМАТИЧЕСКАЯ ГАРАНТИЯ: ИНТЕРПОЛЯЦИЯ ПО ПРОГРЕССУ РАССТОЯНИЯ
+		// ====================================================================
+		// Вычисляем, какой процент пути от точки спауна до нити персонаж уже пролетел.
+		// На старте (distanceToLine == startAirDistance) progress равен 0.0f (тело летит свободно).
+		// В момент касания (distanceToLine == 0.0f) progress равен строго 1.0f.
+		airProgress = 1.0f - (distanceToLine / startAirDistance);
+		airProgress = pow(airProgress, 2.5);
+		airProgress = clamp(airProgress, 0.0f, 1.0f);
+		// Зажимаем коэффициент в рамки [0, 1]
+		float blendStep = pow(gravity.acceleratedT, .85);
+
+		// Сферическая плавная интерполяция идет строго по пройденному пути!
+		XMVECTOR smoothQuat = XMQuaternionSlerp(currentQuat, targetQuat, blendStep);
+
+		// Восстанавливаем финальную сглаженную матрицу вращения кадра полета
+		XMMATRIX finalAirRot = XMMatrixRotationQuaternion(smoothQuat);
+
+		// Синхронизируем системные векторы
+		forwardVector = finalAirRot.r[2];
+		upVector = finalAirRot.r[1];
+		rightVector = XMVector3Normalize(XMVector3Cross(upVector, forwardVector));
+
+		// Встраиваем текущую физическую позицию полета в 4-ю строку матрицы
+		finalAirRot.r[3] = XMVectorSetW(pos, 1.0f);
+
+		// Отдаем в шейдер в чистом Row-Major под твой макрос mul((float3x3)model, pos)
+		Object::heroOnRails = finalAirRot;
+
+		//----------------
+
+		Object::heroWorld = inputController.mouse.getLookMatrix(finalAirRot, upVector, deltaTime, changeDirSpeed);
+		axisAngle = lerp(axisAngle, 0, blendStep);
+		axisAngleSpeed = lerp(axisAngleSpeed, 0, blendStep);
+		//hero.axisAngle = 0;
+		//hero.axisAngleSpeed = 0;
+
+	}
+
+	void UpdateHeroOnLine(float deltaTime)
+	{
+		if (lineIndex < 0 || lineIndex >= Object::starLineList.lineCount) return;
+
+		const auto& currentLine = Object::starLineList.line[lineIndex];
+		if (currentLine.pointCount < 2) return;
+
+		int maxPointIdx = currentLine.pointCount - 2;
+
+		int currIdxCheck = clamp((int)floorf(pointIndex), 2, maxPointIdx);
+		int nextIdxCheck = clamp(currIdxCheck + 1, 0, maxPointIdx);
+		XMVECTOR pCurrCheck = F2V(currentLine.point[currIdxCheck]);
+		XMVECTOR pNextCheck = F2V(currentLine.point[nextIdxCheck]);
+
+		float segLenCheck = XMVectorGetX(XMVector3Length(XMVectorSubtract(pNextCheck, pCurrCheck)));
+		if (segLenCheck < 0.001f) segLenCheck = 1.0f;
+
+		pointIndex += (speed * deltaTime) / segLenCheck;
+
+		pointIndex = clamp(pointIndex, 2.f, (float)maxPointIdx);
+
+		int currIdx = clamp((int)floorf(pointIndex), 0, maxPointIdx);
+		int nextIdx = clamp(currIdx + 1, 0, maxPointIdx);
+
+		XMVECTOR pCurrent = F2V(currentLine.point[currIdx]);
+		XMVECTOR pNext = F2V(currentLine.point[nextIdx]);
+
+		XMVECTOR tangentSmooth = getSmoothTangent();
+
+		float t = pointIndex - floorf(pointIndex);
+		if (currIdx == maxPointIdx) t = 0.0f;
+		posOnLine = XMVectorLerp(pCurrent, pNext, t);
+
+		// ====================================================================
+		// СВЯЗЫВАНИЕ ЧЕРЕЗ СКОМПОНОВАННЫЙ МАССИВ upVector (ПЛАВНЫЙ БАЗИС КВАТЕРНИОНОВ)
+		// ====================================================================
+		// Извлекаем волнообразно распределенные апвекторы для левой и правой вершин отрезка
+		XMVECTOR upCurr = F2V(currentLine.upVector[currIdx]);
+		XMVECTOR upNext = F2V(currentLine.upVector[nextIdx]);
+
+		// Строим жестко ортогональные тройки векторов в вершинах, привязываясь к общему tangentSmooth
+		XMVECTOR rightCurr = XMVector3Normalize(XMVector3Cross(upCurr, tangentSmooth));
+		XMMATRIX matRotCurr = XMMatrixIdentity();
+		matRotCurr.r[0] = rightCurr; matRotCurr.r[1] = upCurr; matRotCurr.r[2] = tangentSmooth;
+		XMVECTOR qCurr = XMQuaternionRotationMatrix(matRotCurr);
+
+		XMVECTOR rightNext = XMVector3Normalize(XMVector3Cross(upNext, tangentSmooth));
+		XMMATRIX matRotNext = XMMatrixIdentity();
+		matRotNext.r[0] = rightNext; matRotNext.r[1] = upNext; matRotNext.r[2] = tangentSmooth;
+		XMVECTOR qNext = XMQuaternionRotationMatrix(matRotNext);
+
+		// Сферическая интерполяция кватернионов рельса (идеальная непрерывность на стыках без микро-кивков)
+		XMVECTOR qSmooth = XMQuaternionSlerp(qCurr, qNext, t);
+		XMMATRIX matSmooth = XMMatrixRotationQuaternion(qSmooth);
+
+		// Достаем идеально сглаженные опорные оси
+		XMVECTOR HeroRightBase = matSmooth.r[0];
+		XMVECTOR HeroUpBase = matSmooth.r[1];
+
+		// ====================================================================
+		// УПРАВЛЕНИЕ ТВИСТОМ ВОКРУГ СГЛАЖЕННОГО ТАНГЕНСА
+		// ====================================================================
+		XMMATRIX twistMatrix = XMMatrixRotationAxis(tangentSmooth, -axisAngle);
+		XMVECTOR HeroRealUp = XMVector3TransformNormal(HeroUpBase, twistMatrix);
+
+		// Жесткая финальная ортогонализация всей тройки осей
+		HeroRealUp = XMVector3Normalize(XMVectorSubtract(HeroRealUp, tangentSmooth * XMVectorGetX(XMVector3Dot(HeroRealUp, tangentSmooth))));
+		XMVECTOR HeroRight = XMVector3Normalize(XMVector3Cross(HeroRealUp, tangentSmooth));
+
+		XMVECTOR heroForward = tangentSmooth;
+
+		upVector = HeroRealUp;
+		rightVector = HeroRight;
+		forwardVector = heroForward;
+		pos = XMVectorLerp(pCurrent, pNext, t);
+
+		Object::heroOnRails = getHeroOnRailsMatrix(heroForward, HeroRealUp, HeroRight);
+		Object::heroWorld = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime, changeDirSpeed);
+	}
+
 	struct {
 		float Time = 0;
 		float Speed = 0;
@@ -854,214 +1059,6 @@ struct gameCamera_ {
 };
 
 gameCamera_ gameCamera;
-
-XMVECTOR getSmoothTangent()
-{
-	const auto& currentLine = Object::starLineList.line[hero.lineIndex];
-	int maxPointIdx = currentLine.pointCount - 1;
-	// Вычисление индексов и непрерывной дробной части
-	int currIdx = clamp((int)floorf(hero.pointIndex), 0, maxPointIdx);
-	int nextIdx = clamp(currIdx + 1, 0, maxPointIdx);
-
-	float t = hero.pointIndex - floorf(hero.pointIndex);
-	if (currIdx == maxPointIdx) t = 0.0f;
-
-	XMVECTOR pCurrent = F2V(currentLine.point[currIdx]);
-	XMVECTOR pNext = F2V(currentLine.point[nextIdx]);
-
-	// 1. Плавно интерполируем позицию на линии
-	//posOnLine = VectorLerp(pCurrent, pNext, t);
-
-	// ====================================================================
-	// НЕПРЕРЫВНЫЙ СГЛАЖЕННЫЙ ТАНГЕНС ПУТИ
-	// ====================================================================
-	XMVECTOR tangentCurr = XMVector3Normalize(XMVectorSubtract(pNext, pCurrent));
-	if (XMVector3Equal(tangentCurr, XMVectorZero()))
-	{
-		tangentCurr = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
-	}
-
-	int futureIdx = clamp(nextIdx + 1, 0, maxPointIdx);
-	XMVECTOR tangentNext = tangentCurr;
-	if (nextIdx != futureIdx) {
-		XMVECTOR pFuture = F2V(currentLine.point[futureIdx]);
-		tangentNext = XMVector3Normalize(XMVectorSubtract(pFuture, pNext));
-		if (XMVector3Equal(tangentNext, XMVectorZero()))
-		{
-			tangentNext = tangentCurr;
-		}
-	}
-
-	XMVECTOR tangentSmooth = XMVector3Normalize(XMVectorLerp(tangentCurr, tangentNext, t));
-	hero.lineTangent = tangentSmooth;
-	return tangentSmooth;
-}
-
-XMMATRIX getHeroOnRailsMatrix(XMVECTOR forward, XMVECTOR up, XMVECTOR right)
-{
-	XMMATRIX rowMajorRot = XMMatrixIdentity();
-	rowMajorRot.r[0] = right;
-	rowMajorRot.r[1] = up;
-	rowMajorRot.r[2] = forward;
-	rowMajorRot.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-
-	return rowMajorRot;
-}
-
-
-
-void OrientHeroTowardsLineInAir(float deltaTime)
-{
-	// Проверяем, что индекс линии валиден и она существует
-	if (hero.lineIndex < 0 || hero.lineIndex >= Object::starLineList.lineCount) return;
-	const auto& currentLine = Object::starLineList.line[hero.lineIndex];
-	if (currentLine.pointCount < 2) return;
-
-	int maxPointIdx = currentLine.pointCount - 1;
-
-	XMVECTOR airTangent = getSmoothTangent();
-
-	// 3. Вычисляем ТЕКУЩУЮ физическую дистанцию до нити приземления
-	float distanceToLine = XMVectorGetX(XMVector3Length(XMVectorSubtract(hero.pos, posOnLine)));
-	if (distanceToLine < 0.001f) distanceToLine = 0.001f;
-
-	XMVECTOR airUp = hero.landingUp;
-
-	// 5. Строим честный правый вектор целевого базиса
-	XMVECTOR airRight = XMVector3Normalize(XMVector3Cross(airUp, airTangent));
-
-	// 6. Собираем ЦЕЛЕВУЮ Row-Major матрицу, к которой персонаж должен быть развернут
-	XMMATRIX targetAirMatrix = XMMatrixIdentity();
-	targetAirMatrix.r[0] = airRight;
-	targetAirMatrix.r[1] = airUp;
-	targetAirMatrix.r[2] = airTangent;
-
-	XMVECTOR targetQuat = XMQuaternionRotationMatrix(targetAirMatrix);
-
-	// 7. Извлекаем текущую ориентацию из Object::heroWorld (чистый Row-Major без Transpose!)
-	XMMATRIX currentWorldRow = Object::heroOnRails;
-	currentWorldRow.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f); // Зануляем позицию для честного Decompose
-
-	XMVECTOR currentScale, currentQuat, currentTrans;
-	XMMatrixDecompose(&currentScale, &currentQuat, &currentTrans, currentWorldRow);
-
-	// ====================================================================
-	// МАТЕМАТИЧЕСКАЯ ГАРАНТИЯ: ИНТЕРПОЛЯЦИЯ ПО ПРОГРЕССУ РАССТОЯНИЯ
-	// ====================================================================
-	// Вычисляем, какой процент пути от точки спауна до нити персонаж уже пролетел.
-	// На старте (distanceToLine == startAirDistance) progress равен 0.0f (тело летит свободно).
-	// В момент касания (distanceToLine == 0.0f) progress равен строго 1.0f.
-	hero.airProgress = 1.0f - (distanceToLine / hero.startAirDistance);
-	hero.airProgress = pow(hero.airProgress, 2.5);
-	hero.airProgress = clamp(hero.airProgress, 0.0f, 1.0f);
-	// Зажимаем коэффициент в рамки [0, 1]
-	float blendStep = pow(hero.gravity.acceleratedT, .85);
-
-	// Сферическая плавная интерполяция идет строго по пройденному пути!
-	XMVECTOR smoothQuat = XMQuaternionSlerp(currentQuat, targetQuat, blendStep);
-
-	// Восстанавливаем финальную сглаженную матрицу вращения кадра полета
-	XMMATRIX finalAirRot = XMMatrixRotationQuaternion(smoothQuat);
-
-	// Синхронизируем системные векторы
-	hero.forwardVector = finalAirRot.r[2];
-	hero.upVector = finalAirRot.r[1];
-	hero.rightVector = XMVector3Normalize(XMVector3Cross(hero.upVector, hero.forwardVector));
-
-	// Встраиваем текущую физическую позицию полета в 4-ю строку матрицы
-	finalAirRot.r[3] = XMVectorSetW(hero.pos, 1.0f);
-
-	// Отдаем в шейдер в чистом Row-Major под твой макрос mul((float3x3)model, pos)
-	Object::heroOnRails = finalAirRot;
-
-	//----------------
-
-	Object::heroWorld = inputController.mouse.getLookMatrix(finalAirRot, hero.upVector, deltaTime, hero.changeDirSpeed);
-	//hero.axisAngle = 0;
-	//hero.axisAngleSpeed = 0;
-
-}
-
-void UpdateHeroOnLine(float deltaTime)
-{
-	if (hero.lineIndex < 0 || hero.lineIndex >= Object::starLineList.lineCount) return;
-
-	const auto& currentLine = Object::starLineList.line[hero.lineIndex];
-	if (currentLine.pointCount < 2) return;
-
-	int maxPointIdx = currentLine.pointCount - 2;
-
-	int currIdxCheck = clamp((int)floorf(hero.pointIndex), 2, maxPointIdx);
-	int nextIdxCheck = clamp(currIdxCheck + 1, 0, maxPointIdx);
-	XMVECTOR pCurrCheck = F2V(currentLine.point[currIdxCheck]);
-	XMVECTOR pNextCheck = F2V(currentLine.point[nextIdxCheck]);
-
-	float segLenCheck = XMVectorGetX(XMVector3Length(XMVectorSubtract(pNextCheck, pCurrCheck)));
-	if (segLenCheck < 0.001f) segLenCheck = 1.0f;
-
-	hero.pointIndex += (hero.speed * deltaTime) / segLenCheck;
-
-	hero.pointIndex = clamp(hero.pointIndex, 2.f, (float)maxPointIdx);
-
-	int currIdx = clamp((int)floorf(hero.pointIndex), 0, maxPointIdx);
-	int nextIdx = clamp(currIdx + 1, 0, maxPointIdx);
-
-	XMVECTOR pCurrent = F2V(currentLine.point[currIdx]);
-	XMVECTOR pNext = F2V(currentLine.point[nextIdx]);
-
-	XMVECTOR tangentSmooth = getSmoothTangent();
-
-	float t = hero.pointIndex - floorf(hero.pointIndex);
-	if (currIdx == maxPointIdx) t = 0.0f;
-	posOnLine = XMVectorLerp(pCurrent, pNext, t);
-
-
-	// ====================================================================
-	// СВЯЗЫВАНИЕ ЧЕРЕЗ СКОМПОНОВАННЫЙ МАССИВ upVector (ПЛАВНЫЙ БАЗИС КВАТЕРНИОНОВ)
-	// ====================================================================
-	// Извлекаем волнообразно распределенные апвекторы для левой и правой вершин отрезка
-	XMVECTOR upCurr = F2V(currentLine.upVector[currIdx]);
-	XMVECTOR upNext = F2V(currentLine.upVector[nextIdx]);
-
-	// Строим жестко ортогональные тройки векторов в вершинах, привязываясь к общему tangentSmooth
-	XMVECTOR rightCurr = XMVector3Normalize(XMVector3Cross(upCurr, tangentSmooth));
-	XMMATRIX matRotCurr = XMMatrixIdentity();
-	matRotCurr.r[0] = rightCurr; matRotCurr.r[1] = upCurr; matRotCurr.r[2] = tangentSmooth;
-	XMVECTOR qCurr = XMQuaternionRotationMatrix(matRotCurr);
-
-	XMVECTOR rightNext = XMVector3Normalize(XMVector3Cross(upNext, tangentSmooth));
-	XMMATRIX matRotNext = XMMatrixIdentity();
-	matRotNext.r[0] = rightNext; matRotNext.r[1] = upNext; matRotNext.r[2] = tangentSmooth;
-	XMVECTOR qNext = XMQuaternionRotationMatrix(matRotNext);
-
-	// Сферическая интерполяция кватернионов рельса (идеальная непрерывность на стыках без микро-кивков)
-	XMVECTOR qSmooth = XMQuaternionSlerp(qCurr, qNext, t);
-	XMMATRIX matSmooth = XMMatrixRotationQuaternion(qSmooth);
-
-	// Достаем идеально сглаженные опорные оси
-	XMVECTOR HeroRightBase = matSmooth.r[0];
-	XMVECTOR HeroUpBase = matSmooth.r[1];
-
-	// ====================================================================
-	// УПРАВЛЕНИЕ ТВИСТОМ ВОКРУГ СГЛАЖЕННОГО ТАНГЕНСА
-	// ====================================================================
-	XMMATRIX twistMatrix = XMMatrixRotationAxis(tangentSmooth, -hero.axisAngle);
-	XMVECTOR HeroRealUp = XMVector3TransformNormal(HeroUpBase, twistMatrix);
-
-	// Жесткая финальная ортогонализация всей тройки осей
-	HeroRealUp = XMVector3Normalize(XMVectorSubtract(HeroRealUp, tangentSmooth * XMVectorGetX(XMVector3Dot(HeroRealUp, tangentSmooth))));
-	XMVECTOR HeroRight = XMVector3Normalize(XMVector3Cross(HeroRealUp, tangentSmooth));
-
-	XMVECTOR heroForward = tangentSmooth;
-
-	hero.upVector = HeroRealUp;
-	hero.rightVector = HeroRight;
-	hero.forwardVector = heroForward;
-	hero.pos = XMVectorLerp(pCurrent, pNext, t);
-
-	Object::heroOnRails = getHeroOnRailsMatrix(heroForward, HeroRealUp, HeroRight);
-	Object::heroWorld = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime,hero.changeDirSpeed);
-}
 
 
 
@@ -2107,11 +2104,11 @@ namespace Loop
 					if (hero.gravity.mode)
 					{
 						hero.ProcessGravity(FIXED_DT);
-						OrientHeroTowardsLineInAir(FIXED_DT);
+						hero.OrientHeroTowardsLineInAir(FIXED_DT);
 					}
 					else
 					{
-						UpdateHeroOnLine(FIXED_DT);
+						hero.UpdateHeroOnLine(FIXED_DT);
 					}
 
 					hero.processLanding(FIXED_DT);
