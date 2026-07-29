@@ -781,6 +781,22 @@ namespace Object {
 		starLineList.lineCount = currentLine+1;
 	}
 
+	cmd(NewStar, int x, int y, int z, int rad)
+	{
+		reflect;
+
+		currentLine++;
+		currentPoint = 0;
+		starLineList.lineCount = currentLine + 1;
+
+		starLineList.line[currentLine].basePoint[0] = float4(in.x / (float)denom, in.y / (float)denom, in.z / (float)denom, in.rad / (float)denom);
+		starLineList.line[currentLine].basePointCount = 1;
+		
+		starLineList.line[currentLine].point[0] = starLineList.line[currentLine].basePoint[0];
+		starLineList.line[currentLine].pointCount = 1;
+	}
+
+
 	float4 gemini[] = {
 		// Pollux Line (Right Branch)
 		{  0.95f,  0.72f,  0.0f,  0.0f }, // Pollux
@@ -882,6 +898,8 @@ namespace Object {
 		AddPointToLine({ 100,110,3 });
 		AddPointToLine({ 0,10,3 });
 
+		NewStar({ 38,0,9,11 });
+		NewStar({ 28,0,-9,14 });
 
 		/*for (int i = 0; i < starsCount; i++)
 		{
@@ -923,7 +941,10 @@ namespace Object {
 
 		for (int j = 0; j < starLineList.lineCount; j++)
 		{
-			smoothStarline(starLineList.line[j]);
+			if (starLineList.line[j].basePointCount > 1)
+			{
+				smoothStarline(starLineList.line[j]);
+			}
 			//Starline(starLineList.line[j], 3*12. / starLineList.line[j].basePointCount);
 		}
 
@@ -972,6 +993,7 @@ namespace Object {
 
 		for (int i = 0; i < starLineList.lineCount; i++)
 		{
+			if (starLineList.line[i].pointCount == 1) continue;//skip all lone stars
 
 			vs::maze = {
 				.params = {
@@ -994,6 +1016,41 @@ namespace Object {
 			}
 
 			vs::maze.set();
+
+			Drawer::NullDrawer({ 1,in.count / in.skipper });
+		}
+
+
+	}
+
+	cmd(AllStars, int count, int skipper, pMode mode, int r, int g, int b)
+	{
+		reflect;
+
+		int gX = sqrt(in.count / in.skipper);
+		int gY = sqrt(in.count / in.skipper);
+
+		psModeSet(in.mode);
+
+		for (int i = 0; i < starLineList.lineCount; i++)
+		{
+			if (starLineList.line[i].pointCount != 1) continue;//skip all paths
+
+			auto sd = starLineList.line[i].point[0];
+
+			vs::star = {
+				.params = {
+					.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+					.gX = gX,
+					.gY = gY,
+					.mode = (int)in.mode,
+					.skipper = in.skipper,
+					.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
+					.PosRad = float4(sd.x,sd.y,sd.z,sd.w)
+				},
+			};
+
+			vs::star.set();
 
 			Drawer::NullDrawer({ 1,in.count / in.skipper });
 		}
@@ -1529,6 +1586,8 @@ namespace Object {
 		vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
 		Maze({ 200000,1,pMode::point,1390,925,111 });
 
+		AllStars({ 200000,1,pMode::point,1390,925,111 });
+
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 		//NeutronStar(neutronStar_cnt, 1, pMode::point);
 
@@ -1546,6 +1605,8 @@ namespace Object {
 		RenderTarget::Set({ texture::pBufMid,0 });
 		vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
 		Maze({ 200000,94,pMode::glow,20,30,75 });
+
+		AllStars({ 200000,94,pMode::glow,20,30,75 });
 
 		//Galaxy({ galaxy_cnt, 4, pMode::glow ,100,200,300 });
 

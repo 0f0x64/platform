@@ -363,6 +363,9 @@
     <None Include="projectFiles\shaders\vs\maze.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
+    <None Include="projectFiles\shaders\vs\star.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Object Include="projectFiles\hero.obj">

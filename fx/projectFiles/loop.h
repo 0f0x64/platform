@@ -739,17 +739,34 @@ struct hero_ {
 		// Проверяем, что индекс линии валиден и она существует
 		if (lineIndex < 0 || lineIndex >= Object::starLineList.lineCount) return;
 		const auto& currentLine = Object::starLineList.line[lineIndex];
-		if (currentLine.pointCount < 2) return;
+		XMVECTOR airTangent;
+		XMVECTOR airUp;
 
-		int maxPointIdx = currentLine.pointCount - 1;
+		if (currentLine.pointCount == 1) //star
+		{
+			airTangent = getSmoothTangent();
+			XMVECTOR starPos = F2V(currentLine.point[0]);
+			airUp = XMVector3Normalize(pos - starPos);
 
-		XMVECTOR airTangent = getSmoothTangent();
+			XMVECTOR flightDirection = hero.forwardVector;
+			XMVECTOR forwardProjection = XMVector3Dot(flightDirection, airUp);
+			XMVECTOR airTangent = XMVector3Normalize(XMVectorSubtract(flightDirection, airUp * forwardProjection));
+
+			if (XMVector3Equal(airTangent, XMVectorZero())) {
+				XMVECTOR oldRight = hero.rightVector;
+				XMVECTOR rightProjection = XMVector3Dot(oldRight, airUp);
+				airTangent = XMVector3Normalize(XMVectorSubtract(oldRight, airUp * rightProjection));
+			}
+		} 
+		else //path
+		{
+			airTangent = getSmoothTangent();
+			airUp = landingUp;
+		}
 
 		// 3. Вычисляем ТЕКУЩУЮ физическую дистанцию до нити приземления
 		float distanceToLine = XMVectorGetX(XMVector3Length(XMVectorSubtract(pos, posOnLine)));
 		if (distanceToLine < 0.001f) distanceToLine = 0.001f;
-
-		XMVECTOR airUp = landingUp;
 
 		// 5. Строим честный правый вектор целевого базиса
 		XMVECTOR airRight = XMVector3Normalize(XMVector3Cross(airUp, airTangent));

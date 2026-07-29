@@ -453,6 +453,7 @@
     <None Include="projectFiles\shaders\vs\scorpBall.shader" />
     <None Include="projectFiles\shaders\vs\simpleCube.shader" />
     <None Include="projectFiles\shaders\vs\space.shader" />
+    <None Include="projectFiles\shaders\vs\star.shader" />
     <None Include="projectFiles\shaders\vs\Tau.shader" />
     <None Include="projectFiles\shaders\vs\transporter.shader" />
     <None Include="projectFiles\shaders\vs\tree.shader" />
