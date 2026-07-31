@@ -18,18 +18,10 @@ cbuffer params : register(b0)
     float4 zoom;
     float onLineOfs;
     float jumpCharge;
-    float4 modelCenterScale;
-}
-
-cbuffer bones : register(b4)
-{
-    float4x4 gBones[256];
 }
 
 struct Vertex {
     float4 pos;
-    uint4 joints;
-    float4 weights;
 };
 
 // Our StructuredBuffer at t0
@@ -41,17 +33,6 @@ struct Index {
  
 // Our StructuredBuffer at t0
 StructuredBuffer<Index> ibf : register(t1);
-
-float3 skinPos(Vertex v)
-{
-    uint4 ids = min(v.joints, 255);
-    float4 p =
-        mul(float4(v.pos.xyz, 1), gBones[ids.x]) * v.weights.x +
-        mul(float4(v.pos.xyz, 1), gBones[ids.y]) * v.weights.y +
-        mul(float4(v.pos.xyz, 1), gBones[ids.z]) * v.weights.z +
-        mul(float4(v.pos.xyz, 1), gBones[ids.w]) * v.weights.w;
-    return (p.xyz - modelCenterScale.xyz) * modelCenterScale.w;
-}
 
 float toRad(float a)
 {
@@ -94,13 +75,6 @@ float CalculateTriangleArea(float3 p0, float3 p1, float3 p2)
     return length(cross(edge1, edge2)) * 0.5f;
 }
 
-float3 SafeTriangleNormal(float3 p0, float3 p1, float3 p2)
-{
-    float3 n = cross(p1 - p0, p2 - p0);
-    float l = length(n);
-    if (l < 0.000001f) return float3(0, 0, 0);
-    return n / l;
-}
 float3 getRandomPointInTriangle(float3 g, float3 g1, float3 g2, float r, int iid,float s)
 {
     
@@ -194,14 +168,14 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 //  float3 _p1 = mesh[ind[1]].xyz;
 //  float3 _p2 = mesh[ind[2]].xyz;
 
-    float3 _p0 = skinPos(vbf[ind4.x]);
-    float3 _p1 = skinPos(vbf[ind4.y]);
-    float3 _p2 = skinPos(vbf[ind4.z]);
+    float3 _p0 = vbf[ind4.x].pos.xyz;
+    float3 _p1 = vbf[ind4.y].pos.xyz;
+    float3 _p2 = vbf[ind4.z].pos.xyz;
 
 
     float s =CalculateTriangleArea(_p0,_p1,_p2);
     pos = getRandomPointInTriangle(_p0,_p1,_p2,iid/11231.,iid,s);
-    float3 nrml = SafeTriangleNormal(_p0,_p1,_p2);
+    float3 nrml = CalculateNormal(_p0,_p1,_p2);
     pos+=nrml*tickness.xxx/100;
 
     //pos=_p0+normalize(hash33(iid/1213.*float3(1,2,3)))*11;
@@ -281,14 +255,14 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
         ind4 = ibf[vid/3].i;
         uint ind2[] = {ind4.x,ind4.y,ind4.z};
 
-        pos = skinPos(vbf[ind2[vid%3]]);
+        pos = vbf[ind2[vid%3]].pos.xyz;
         p1.color=1.15;
         p1.sz=1.2;
 
-    float3 _p0 = skinPos(vbf[ind4.x]);
-    float3 _p1 = skinPos(vbf[ind4.y]);
-    float3 _p2 = skinPos(vbf[ind4.z]);
-        float3 nrml = SafeTriangleNormal(_p0,_p1,_p2);
+    float3 _p0 = vbf[ind4.x].pos.xyz;
+    float3 _p1 = vbf[ind4.y].pos.xyz;
+    float3 _p2 = vbf[ind4.z].pos.xyz;
+        float3 nrml = CalculateNormal(_p0,_p1,_p2);
         //pos-=nrml*1;
         //pos-=nrml*1;
 
