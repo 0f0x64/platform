@@ -40,7 +40,7 @@ namespace gltfAnim
 		std::vector<Joint> joints;
 		std::vector<AnimationClip> animations;
 		std::vector<XMFLOAT4X4> bindLocal;
-		XMFLOAT4 modelCenterScale = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		float4 modelCenterScale = float4(0.0f, 0.0f, 0.0f, 1.0f);
 		std::string modelPath;
 		std::string animationPath;
 		std::string status;

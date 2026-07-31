@@ -385,7 +385,14 @@
     <ClInclude Include="editor\viewCam.h" />
     <ClInclude Include="editor\wndProc.h" />
     <ClInclude Include="gApi.h" />
-    <ClInclude Include="generated\constBufReflect.h" />
+    <ClInclude Include="generated\constBufReflect.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_no_minifier|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Relsease_standart_linker|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Reflector|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="generated\libList.h" />
     <ClInclude Include="generated\processedShaders.h" />
     <ClInclude Include="generated\processedShadersCompile.h" />
