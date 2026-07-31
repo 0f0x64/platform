@@ -666,6 +666,7 @@ const char* girl =
 "    float4 triCount;\n"
 "    float4 brightness;\n"
 "    float4 tickness;\n"
+"    float4 modelCenterScale;\n"
 "    float4 zoom;\n"
 "    float onLineOfs;\n"
 "    float jumpCharge;\n"

@@ -15,6 +15,7 @@ cbuffer params : register(b0)
     float4 triCount;
     float4 brightness;
     float4 tickness;
+    float4 modelCenterScale;
     float4 zoom;
     float onLineOfs;
     float jumpCharge;

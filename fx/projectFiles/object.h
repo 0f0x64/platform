@@ -390,7 +390,7 @@ namespace Object {
 				.triCount = float4(obj->triangleCount,0,0,0),
 				.brightness = float4(brightness,0,0,0),
 				.tickness = float4(tickness,0,0,0),
-				//.modelCenterScale = centerScale,
+				.modelCenterScale = centerScale,
 				.zoom = float4(zm,zm,zm,1),
 				.onLineOfs = (float)onLineOfs/1000.f,
 				.jumpCharge = (float)jumpCharge / 100.f,
