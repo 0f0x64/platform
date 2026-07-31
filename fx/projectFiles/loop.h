@@ -2180,7 +2180,8 @@ namespace Loop
 			RenderTarget::Set({ texture::pBuf,0 });
 
 			//
-			Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
+			//Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
+			ConstBuf::LoadObj("..//fx//projectFiles//hero.obj");
 			Object::MeshPtr = &Object::HeroMesh;
 			float4 p = V2F(hero.pos * 10000.);
 
