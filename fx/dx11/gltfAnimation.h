@@ -1,0 +1,745 @@
+#pragma once
+
+#include <algorithm>
+#include <cmath>
+#include <cstdio>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+namespace gltfAnim
+{
+	static const int BoneLimit = 256;
+
+	struct AnimationChannel
+	{
+		int joint = -1;
+		cgltf_animation_path_type path = cgltf_animation_path_type_invalid;
+		std::vector<float> times;
+		std::vector<XMFLOAT4> values;
+	};
+
+	struct AnimationClip
+	{
+		std::string name;
+		float duration = 0.0f;
+		std::vector<AnimationChannel> channels;
+	};
+
+	struct Joint
+	{
+		std::string name;
+		int parent = -1;
+		XMFLOAT4X4 local;
+		XMFLOAT4X4 global;
+		XMFLOAT4X4 inverseBind;
+	};
+
+	struct Scene
+	{
+		std::vector<Joint> joints;
+		std::vector<AnimationClip> animations;
+		std::vector<XMFLOAT4X4> bindLocal;
+		XMFLOAT4 modelCenterScale = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		std::string modelPath;
+		std::string animationPath;
+		std::string status;
+		int currentAnimation = 0;
+		float currentTime = 0.0f;
+		XMMATRIX bonePalette[BoneLimit];
+	};
+
+	inline Scene scene;
+	inline ID3D11Buffer* boneBuffer = nullptr;
+
+	inline int NodeIndex(cgltf_data* data, const cgltf_node* node)
+	{
+		if (!node)
+		{
+			return -1;
+		}
+		return static_cast<int>(node - data->nodes);
+	}
+
+	inline int FindJointByName(const char* name)
+	{
+		if (!name || !name[0])
+		{
+			return -1;
+		}
+
+		for (size_t i = 0; i < scene.joints.size(); ++i)
+		{
+			if (scene.joints[i].name == name)
+			{
+				return static_cast<int>(i);
+			}
+		}
+
+		return -1;
+	}
+
+	inline std::string BaseName(const char* path)
+	{
+		if (!path || !path[0])
+		{
+			return "";
+		}
+
+		std::string value(path);
+		const size_t slash = value.find_last_of("\\/");
+		if (slash != std::string::npos)
+		{
+			value = value.substr(slash + 1);
+		}
+		return value;
+	}
+
+	inline std::string CanonicalizeJointName(const std::string& name)
+	{
+		if (name.size() > 4)
+		{
+			const size_t dot = name.size() - 4;
+			if (name[dot] == '.' &&
+				name[dot + 1] >= '0' && name[dot + 1] <= '9' &&
+				name[dot + 2] >= '0' && name[dot + 2] <= '9' &&
+				name[dot + 3] >= '0' && name[dot + 3] <= '9')
+			{
+				return name.substr(0, dot);
+			}
+		}
+		return name;
+	}
+
+	inline int ResolveAnimationTargetJoint(cgltf_data* data, cgltf_node* node, bool remapToCurrentSkeleton)
+	{
+		if (!remapToCurrentSkeleton)
+		{
+			return NodeIndex(data, node);
+		}
+
+		const int byName = FindJointByName(node ? node->name : nullptr);
+		if (byName >= 0)
+		{
+			return byName;
+		}
+
+		if (node && node->name)
+		{
+			const std::string canonical = CanonicalizeJointName(node->name);
+			for (size_t i = 0; i < scene.joints.size(); ++i)
+			{
+				if (CanonicalizeJointName(scene.joints[i].name) == canonical)
+				{
+					return static_cast<int>(i);
+				}
+			}
+		}
+
+		const int byIndex = NodeIndex(data, node);
+		if (byIndex >= 0 && byIndex < static_cast<int>(scene.joints.size()))
+		{
+			return byIndex;
+		}
+
+		return -1;
+	}
+
+	inline XMMATRIX ReadNodeLocal(const cgltf_node& node)
+	{
+		if (node.has_matrix)
+		{
+			XMFLOAT4X4 m{};
+			for (int r = 0; r < 4; ++r)
+			{
+				for (int c = 0; c < 4; ++c)
+				{
+					m.m[r][c] = node.matrix[r * 4 + c];
+				}
+			}
+			return XMLoadFloat4x4(&m);
+		}
+
+		XMVECTOR translation = XMVectorZero();
+		if (node.has_translation)
+		{
+			translation = XMVectorSet(node.translation[0], node.translation[1], node.translation[2], 0.0f);
+		}
+
+		XMVECTOR rotation = XMQuaternionIdentity();
+		if (node.has_rotation)
+		{
+			rotation = XMQuaternionNormalize(
+				XMVectorSet(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]));
+		}
+
+		XMVECTOR scale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+		if (node.has_scale)
+		{
+			scale = XMVectorSet(node.scale[0], node.scale[1], node.scale[2], 1.0f);
+		}
+
+		return XMMatrixScalingFromVector(scale) *
+			XMMatrixRotationQuaternion(rotation) *
+			XMMatrixTranslationFromVector(translation);
+	}
+
+	inline void ResolveGlobalPoseJoint(size_t idx, std::vector<char>& resolved, std::vector<char>& inStack)
+	{
+		if (idx >= scene.joints.size() || resolved[idx])
+		{
+			return;
+		}
+
+		if (inStack[idx])
+		{
+			scene.joints[idx].global = scene.joints[idx].local;
+			resolved[idx] = 1;
+			return;
+		}
+
+		inStack[idx] = 1;
+
+		const int parentIdx = scene.joints[idx].parent;
+		if (parentIdx < 0 || static_cast<size_t>(parentIdx) >= scene.joints.size())
+		{
+			scene.joints[idx].global = scene.joints[idx].local;
+		}
+		else
+		{
+			ResolveGlobalPoseJoint(static_cast<size_t>(parentIdx), resolved, inStack);
+
+			const XMMATRIX parent = XMLoadFloat4x4(&scene.joints[parentIdx].global);
+			const XMMATRIX local = XMLoadFloat4x4(&scene.joints[idx].local);
+			XMStoreFloat4x4(&scene.joints[idx].global, local * parent);
+		}
+
+		inStack[idx] = 0;
+		resolved[idx] = 1;
+	}
+
+	inline void UpdateGlobalPose()
+	{
+		if (scene.joints.empty())
+		{
+			return;
+		}
+
+		std::vector<char> resolved(scene.joints.size(), 0);
+		std::vector<char> inStack(scene.joints.size(), 0);
+
+		for (size_t i = 0; i < scene.joints.size(); ++i)
+		{
+			ResolveGlobalPoseJoint(i, resolved, inStack);
+		}
+	}
+
+	inline void BuildBonePalette()
+	{
+		for (int i = 0; i < BoneLimit; ++i)
+		{
+			scene.bonePalette[i] = XMMatrixIdentity();
+		}
+
+		const size_t count = std::min<size_t>(scene.joints.size(), BoneLimit);
+		for (size_t i = 0; i < count; ++i)
+		{
+			const XMMATRIX global = XMLoadFloat4x4(&scene.joints[i].global);
+			const XMMATRIX inverseBind = XMLoadFloat4x4(&scene.joints[i].inverseBind);
+			scene.bonePalette[i] = XMMatrixTranspose(inverseBind * global);
+		}
+	}
+
+	inline void ResetToBindPose()
+	{
+		for (size_t i = 0; i < scene.joints.size() && i < scene.bindLocal.size(); ++i)
+		{
+			scene.joints[i].local = scene.bindLocal[i];
+		}
+		UpdateGlobalPose();
+	}
+
+	inline XMFLOAT3 ExtractTranslation(const XMFLOAT4X4& matrix)
+	{
+		XMVECTOR scale;
+		XMVECTOR rotation;
+		XMVECTOR translation;
+		if (XMMatrixDecompose(&scale, &rotation, &translation, XMLoadFloat4x4(&matrix)))
+		{
+			return XMFLOAT3(XMVectorGetX(translation), XMVectorGetY(translation), XMVectorGetZ(translation));
+		}
+		return XMFLOAT3(0.0f, 0.0f, 0.0f);
+	}
+
+	inline void SetTranslation(XMFLOAT4X4& matrix, const XMFLOAT3& value)
+	{
+		XMVECTOR scale = XMVectorSet(1.0f, 1.0f, 1.0f, 0.0f);
+		XMVECTOR rotation = XMQuaternionIdentity();
+		XMVECTOR oldTranslation;
+		const XMMATRIX local = XMLoadFloat4x4(&matrix);
+		XMMatrixDecompose(&scale, &rotation, &oldTranslation, local);
+
+		XMVECTOR translation = XMVectorSet(value.x, value.y, value.z, 0.0f);
+		XMStoreFloat4x4(&matrix,
+			XMMatrixScalingFromVector(scale) *
+			XMMatrixRotationQuaternion(rotation) *
+			XMMatrixTranslationFromVector(translation));
+	}
+
+	inline int GetJointDepth(int jointIndex)
+	{
+		int depth = 0;
+		int current = jointIndex;
+		while (current >= 0 && current < static_cast<int>(scene.joints.size()))
+		{
+			current = scene.joints[current].parent;
+			depth++;
+		}
+		return depth;
+	}
+
+	inline int FindRootMotionJointIndex(const AnimationClip& clip)
+	{
+		int bestJoint = -1;
+		int bestDepth = 0x7fffffff;
+		for (const AnimationChannel& channel : clip.channels)
+		{
+			if (channel.path != cgltf_animation_path_type_translation ||
+				channel.joint < 0 ||
+				channel.joint >= static_cast<int>(scene.joints.size()))
+			{
+				continue;
+			}
+
+			bool parentAlsoTranslated = false;
+			const int parent = scene.joints[channel.joint].parent;
+			for (const AnimationChannel& other : clip.channels)
+			{
+				if (other.path == cgltf_animation_path_type_translation && other.joint == parent)
+				{
+					parentAlsoTranslated = true;
+					break;
+				}
+			}
+			if (parentAlsoTranslated)
+			{
+				continue;
+			}
+
+			const int depth = GetJointDepth(channel.joint);
+			if (depth < bestDepth)
+			{
+				bestDepth = depth;
+				bestJoint = channel.joint;
+			}
+		}
+		return bestJoint;
+	}
+
+	inline void Update(float deltaTime)
+	{
+		if (scene.animations.empty() || scene.joints.empty())
+		{
+			BuildBonePalette();
+			return;
+		}
+
+		AnimationClip& clip = scene.animations[scene.currentAnimation % scene.animations.size()];
+		if (clip.duration <= 0.0f)
+		{
+			BuildBonePalette();
+			return;
+		}
+
+		scene.currentTime = fmodf(scene.currentTime + deltaTime, clip.duration);
+		ResetToBindPose();
+
+		for (size_t jointIdx = 0; jointIdx < scene.joints.size(); ++jointIdx)
+		{
+			XMVECTOR scale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+			XMVECTOR rotation = XMQuaternionIdentity();
+			XMVECTOR translation = XMVectorZero();
+			XMVECTOR decomposedScale;
+			XMVECTOR decomposedRotation;
+			XMVECTOR decomposedTranslation;
+			const XMMATRIX currentLocal = XMLoadFloat4x4(&scene.joints[jointIdx].local);
+			if (XMMatrixDecompose(&decomposedScale, &decomposedRotation, &decomposedTranslation, currentLocal))
+			{
+				scale = decomposedScale;
+				rotation = decomposedRotation;
+				translation = decomposedTranslation;
+			}
+
+			bool animated = false;
+			for (const AnimationChannel& channel : clip.channels)
+			{
+				if (channel.joint != static_cast<int>(jointIdx) || channel.times.empty() || channel.values.empty())
+				{
+					continue;
+				}
+
+				animated = true;
+				size_t key = 0;
+				for (size_t i = 0; i + 1 < channel.times.size(); ++i)
+				{
+					key = i;
+					if (scene.currentTime < channel.times[i + 1])
+					{
+						break;
+					}
+				}
+
+				float alpha = 0.0f;
+				XMVECTOR a = XMLoadFloat4(&channel.values[key]);
+				XMVECTOR b = a;
+				if (key + 1 < channel.times.size())
+				{
+					const float t0 = channel.times[key];
+					const float t1 = channel.times[key + 1];
+					if (t1 - t0 > 0.0001f)
+					{
+						alpha = (std::max)(0.0f, (std::min)(1.0f, (scene.currentTime - t0) / (t1 - t0)));
+						b = XMLoadFloat4(&channel.values[key + 1]);
+					}
+				}
+
+				if (channel.path == cgltf_animation_path_type_translation)
+				{
+					translation = XMVectorLerp(a, b, alpha);
+				}
+				else if (channel.path == cgltf_animation_path_type_rotation)
+				{
+					a = XMQuaternionNormalize(a);
+					b = XMQuaternionNormalize(b);
+					if (XMVectorGetX(XMQuaternionDot(a, b)) < 0.0f)
+					{
+						b = XMVectorNegate(b);
+					}
+					rotation = XMQuaternionNormalize(XMQuaternionSlerp(a, b, alpha));
+				}
+				else if (channel.path == cgltf_animation_path_type_scale)
+				{
+					scale = XMVectorLerp(a, b, alpha);
+				}
+			}
+
+			if (animated)
+			{
+				const XMMATRIX local = XMMatrixScalingFromVector(scale) *
+					XMMatrixRotationQuaternion(rotation) *
+					XMMatrixTranslationFromVector(translation);
+				XMStoreFloat4x4(&scene.joints[jointIdx].local, local);
+			}
+		}
+
+		UpdateGlobalPose();
+
+		const int rootMotionJoint = FindRootMotionJointIndex(clip);
+		if (rootMotionJoint >= 0 && rootMotionJoint < static_cast<int>(scene.bindLocal.size()))
+		{
+			SetTranslation(scene.joints[rootMotionJoint].local, ExtractTranslation(scene.bindLocal[rootMotionJoint]));
+			UpdateGlobalPose();
+		}
+
+		BuildBonePalette();
+	}
+
+	inline void NextAnimation()
+	{
+		if (scene.animations.empty())
+		{
+			scene.currentAnimation = 0;
+			scene.currentTime = 0.0f;
+			return;
+		}
+
+		scene.currentAnimation = (scene.currentAnimation + 1) % static_cast<int>(scene.animations.size());
+		scene.currentTime = 0.0f;
+		ResetToBindPose();
+		BuildBonePalette();
+	}
+
+	inline void PrevAnimation()
+	{
+		if (scene.animations.empty())
+		{
+			scene.currentAnimation = 0;
+			scene.currentTime = 0.0f;
+			return;
+		}
+
+		const int count = static_cast<int>(scene.animations.size());
+		scene.currentAnimation = (scene.currentAnimation + count - 1) % count;
+		scene.currentTime = 0.0f;
+		ResetToBindPose();
+		BuildBonePalette();
+	}
+
+	inline void SetAnimation(int index)
+	{
+		if (scene.animations.empty())
+		{
+			scene.currentAnimation = 0;
+			scene.currentTime = 0.0f;
+			return;
+		}
+
+		if (index < 0)
+		{
+			index = 0;
+		}
+
+		scene.currentAnimation = index % static_cast<int>(scene.animations.size());
+		scene.currentTime = 0.0f;
+		ResetToBindPose();
+		BuildBonePalette();
+	}
+
+	inline const char* CurrentAnimationLabel()
+	{
+		static char label[128];
+		if (scene.animations.empty())
+		{
+			return "Anim: none";
+		}
+
+		const int index = scene.currentAnimation % static_cast<int>(scene.animations.size());
+		const char* name = scene.animations[index].name.empty() ? "unnamed" : scene.animations[index].name.c_str();
+		std::snprintf(label, sizeof(label), "Anim %d/%d: %s",
+			index + 1,
+			static_cast<int>(scene.animations.size()),
+			name);
+		return label;
+	}
+
+	inline const char* CurrentModelLabel()
+	{
+		static char label[192];
+		const std::string model = BaseName(scene.modelPath.c_str());
+		const std::string anim = BaseName(scene.animationPath.c_str());
+		std::snprintf(label, sizeof(label), "Model: %s | Anim file: %s",
+			model.empty() ? "none" : model.c_str(),
+			anim.empty() ? "embedded" : anim.c_str());
+		return label;
+	}
+
+	inline const char* AnimationStatusLabel()
+	{
+		static char label[160];
+		std::snprintf(label, sizeof(label), "Clips: %d | %s",
+			static_cast<int>(scene.animations.size()),
+			scene.status.empty() ? "ready" : scene.status.c_str());
+		return label;
+	}
+
+	inline std::vector<std::string> AnimationMenu()
+	{
+		std::vector<std::string> menu;
+		menu.reserve(scene.animations.size());
+		for (size_t i = 0; i < scene.animations.size(); ++i)
+		{
+			char item[160];
+			const char* name = scene.animations[i].name.empty() ? "unnamed" : scene.animations[i].name.c_str();
+			std::snprintf(item, sizeof(item), "%d. %s", static_cast<int>(i + 1), name);
+			menu.push_back(item);
+		}
+		return menu;
+	}
+
+	inline void CreateBoneBuffer(ID3D11Device* device)
+	{
+		if (boneBuffer)
+		{
+			return;
+		}
+
+		D3D11_BUFFER_DESC desc{};
+		desc.Usage = D3D11_USAGE_DEFAULT;
+		desc.ByteWidth = sizeof(scene.bonePalette);
+		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		desc.CPUAccessFlags = 0;
+		desc.StructureByteStride = 16;
+		device->CreateBuffer(&desc, nullptr, &boneBuffer);
+	}
+
+	inline void BindBones(ID3D11DeviceContext* context)
+	{
+		if (!boneBuffer)
+		{
+			return;
+		}
+
+		context->UpdateSubresource(boneBuffer, 0, nullptr, scene.bonePalette, 0, 0);
+		context->VSSetConstantBuffers(4, 1, &boneBuffer);
+	}
+
+	inline void ReadSkeleton(cgltf_data* data)
+	{
+		scene.joints.clear();
+		scene.bindLocal.clear();
+		scene.currentTime = 0.0f;
+
+		scene.joints.resize(data->nodes_count);
+		scene.bindLocal.resize(data->nodes_count);
+
+		for (cgltf_size i = 0; i < data->nodes_count; ++i)
+		{
+			cgltf_node& node = data->nodes[i];
+			Joint& joint = scene.joints[i];
+			joint.name = node.name ? node.name : "";
+			joint.parent = -1;
+			XMMATRIX local = ReadNodeLocal(node);
+			XMStoreFloat4x4(&joint.local, local);
+			XMStoreFloat4x4(&joint.global, local);
+			XMStoreFloat4x4(&joint.inverseBind, XMMatrixIdentity());
+			scene.bindLocal[i] = joint.local;
+		}
+
+		for (cgltf_size i = 0; i < data->nodes_count; ++i)
+		{
+			cgltf_node& node = data->nodes[i];
+			for (cgltf_size c = 0; c < node.children_count; ++c)
+			{
+				const int child = NodeIndex(data, node.children[c]);
+				if (child >= 0 && child < static_cast<int>(scene.joints.size()))
+				{
+					scene.joints[child].parent = static_cast<int>(i);
+				}
+			}
+		}
+
+		UpdateGlobalPose();
+
+		for (size_t i = 0; i < scene.joints.size(); ++i)
+		{
+			const XMMATRIX global = XMLoadFloat4x4(&scene.joints[i].global);
+			XMStoreFloat4x4(&scene.joints[i].inverseBind, XMMatrixInverse(nullptr, global));
+		}
+
+		if (data->skins_count > 0)
+		{
+			cgltf_skin& skin = data->skins[0];
+			if (skin.inverse_bind_matrices)
+			{
+				for (cgltf_size i = 0; i < skin.joints_count; ++i)
+				{
+					const int nodeIndex = NodeIndex(data, skin.joints[i]);
+					if (nodeIndex < 0 || nodeIndex >= static_cast<int>(scene.joints.size()))
+					{
+						continue;
+					}
+
+					float values[16]{};
+					if (cgltf_accessor_read_float(skin.inverse_bind_matrices, i, values, 16))
+					{
+						XMFLOAT4X4 ib{};
+						for (int r = 0; r < 4; ++r)
+						{
+							for (int c = 0; c < 4; ++c)
+							{
+								ib.m[r][c] = values[r * 4 + c];
+							}
+						}
+						scene.joints[nodeIndex].inverseBind = ib;
+					}
+				}
+			}
+		}
+
+		BuildBonePalette();
+	}
+
+	inline bool ReadAnimations(cgltf_data* data, bool replaceExisting = true, bool remapToCurrentSkeleton = false)
+	{
+		if (replaceExisting)
+		{
+			scene.animations.clear();
+			scene.currentAnimation = 0;
+			scene.currentTime = 0.0f;
+		}
+
+		const size_t oldCount = scene.animations.size();
+
+		for (cgltf_size ai = 0; ai < data->animations_count; ++ai)
+		{
+			cgltf_animation& src = data->animations[ai];
+			AnimationClip clip;
+			clip.name = src.name ? src.name : "";
+
+			for (cgltf_size ci = 0; ci < src.channels_count; ++ci)
+			{
+				cgltf_animation_channel& srcChannel = src.channels[ci];
+				if (!srcChannel.sampler || !srcChannel.target_node)
+				{
+					continue;
+				}
+
+				cgltf_animation_sampler& sampler = *srcChannel.sampler;
+				if (!sampler.input || !sampler.output)
+				{
+					continue;
+				}
+
+				AnimationChannel channel;
+				if (remapToCurrentSkeleton)
+				{
+					channel.joint = ResolveAnimationTargetJoint(data, srcChannel.target_node, true);
+				}
+				else
+				{
+					channel.joint = ResolveAnimationTargetJoint(data, srcChannel.target_node, false);
+				}
+				if (channel.joint < 0)
+				{
+					continue;
+				}
+				channel.path = srcChannel.target_path;
+				channel.times.resize(sampler.input->count);
+
+				for (cgltf_size i = 0; i < sampler.input->count; ++i)
+				{
+					float value = 0.0f;
+					cgltf_accessor_read_float(sampler.input, i, &value, 1);
+					channel.times[i] = value;
+					clip.duration = (std::max)(clip.duration, value);
+				}
+
+				const bool isRotation = channel.path == cgltf_animation_path_type_rotation;
+				const bool isCubicSpline = sampler.interpolation == cgltf_interpolation_type_cubic_spline;
+				channel.values.resize(channel.times.size());
+				for (size_t i = 0; i < channel.times.size(); ++i)
+				{
+					cgltf_size sampleIndex = isCubicSpline ? static_cast<cgltf_size>(i * 3 + 1) : static_cast<cgltf_size>(i);
+					if (sampleIndex >= sampler.output->count) sampleIndex = sampler.output->count - 1;
+
+					float values[4]{ 0.0f, 0.0f, 0.0f, isRotation ? 1.0f : 0.0f };
+					cgltf_accessor_read_float(sampler.output, sampleIndex, values, isRotation ? 4 : 3);
+					channel.values[i] = XMFLOAT4(values[0], values[1], values[2], values[3]);
+				}
+
+				clip.channels.push_back(std::move(channel));
+			}
+
+			if (!clip.channels.empty())
+			{
+				scene.animations.push_back(std::move(clip));
+			}
+		}
+
+		const bool added = scene.animations.size() > oldCount;
+		if (added)
+		{
+			scene.currentAnimation = static_cast<int>(oldCount);
+			scene.currentTime = 0.0f;
+			ResetToBindPose();
+			BuildBonePalette();
+		}
+		return added;
+	}
+
+	inline void FillSkinDefaults(vertex& out)
+	{
+		out.joints = XMUINT4(0, 0, 0, 0);
+		out.weights = XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f);
+	}
+}

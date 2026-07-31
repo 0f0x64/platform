@@ -364,6 +364,7 @@
     <ClInclude Include="dx11\device.h" />
     <ClInclude Include="dx11\draw.h" />
     <ClInclude Include="dx11\dx.h" />
+    <ClInclude Include="dx11\gltfAnimation.h" />
     <ClInclude Include="dx11\IA.h" />
     <ClInclude Include="dx11\rasterizer.h" />
     <ClInclude Include="dx11\sampler.h" />

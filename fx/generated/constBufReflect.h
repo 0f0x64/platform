@@ -136,6 +136,7 @@ float4 tickness;
 float4 zoom;
 float onLineOfs;
 float jumpCharge;
+float4 modelCenterScale;
 } params;
 
 void set () {

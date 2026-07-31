@@ -310,7 +310,7 @@ namespace editor
 			CComPtr<IDispatch> pSelectionObj;
 			doc->get_Selection(&pSelectionObj);
 			CComPtr<EnvDTE::TextSelection> pSelection;
-			pSelectionObj->QueryInterface(&pSelection);
+			pSelectionObj->QueryInterface(__uuidof(EnvDTE::TextSelection), reinterpret_cast<void**>(&pSelection.p));
 
 			// 2. Создаем точку для навигации
 			CComPtr<EnvDTE::VirtualPoint> pVirtualPoint;
@@ -394,7 +394,7 @@ namespace editor
 				return false;
 
 			CComPtr<EnvDTE::TextSelection> selection;
-			result = selection_dispatch->QueryInterface(&selection);
+			result = selection_dispatch->QueryInterface(__uuidof(EnvDTE::TextSelection), reinterpret_cast<void**>(&selection.p));
 			if (FAILED(result))
 				return false;
 
@@ -543,7 +543,7 @@ namespace editor
 				return false;
 
 			CComPtr<EnvDTE::TextSelection> selection;
-			result = selection_dispatch->QueryInterface(&selection);
+			result = selection_dispatch->QueryInterface(__uuidof(EnvDTE::TextSelection), reinterpret_cast<void**>(&selection.p));
 			if (FAILED(result))
 				return false;
 
@@ -1282,7 +1282,8 @@ namespace editor
 		ofn.hwndOwner = NULL;
 		ofn.lpstrFile = szFile;
 		ofn.nMaxFile = sizeof(szFile);
-		ofn.lpstrFilter = "Wavefront OBJ (*.obj)\0*.obj\0All Files (*.*)\0*.*\0";
+		//ofn.lpstrFilter = "Wavefront OBJ (*.obj)\0*.obj\0All Files (*.*)\0*.*\0";
+		ofn.lpstrFilter = "GLTF 2.0 binary (*.glb)\0*.glb\0All Files (*.*)\0*.*\0";
 		ofn.nFilterIndex = 1;
 		ofn.lpstrFileTitle = NULL;
 		ofn.nMaxFileTitle = 0;
@@ -1295,6 +1296,52 @@ namespace editor
 			//ConstBuf::LoadObj(ofn.lpstrFile);
 
 			//std::wcout << L"Selected file: " << ofn.lpstrFile << std::endl;
+		}
+	}
+
+	void OpenAnimationDialog() {
+
+		OPENFILENAME ofn;
+		TCHAR szFile[32768] = { 0 };
+
+		ZeroMemory(&ofn, sizeof(ofn));
+		ofn.lStructSize = sizeof(ofn);
+		ofn.hwndOwner = NULL;
+		ofn.lpstrFile = szFile;
+		ofn.nMaxFile = sizeof(szFile);
+		ofn.lpstrFilter = "GLTF 2.0 animation (*.glb)\0*.glb\0All Files (*.*)\0*.*\0";
+		ofn.nFilterIndex = 1;
+		ofn.lpstrFileTitle = NULL;
+		ofn.nMaxFileTitle = 0;
+		ofn.lpstrInitialDir = NULL;
+		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_ALLOWMULTISELECT | OFN_EXPLORER;
+
+		if (GetOpenFileName(&ofn) == TRUE) {
+			std::vector<std::string> files;
+			char* cursor = ofn.lpstrFile;
+			std::string first = cursor;
+			cursor += first.size() + 1;
+
+			if (*cursor == 0) {
+				files.push_back(first);
+			}
+			else {
+				while (*cursor != 0) {
+					std::string name = cursor;
+					files.push_back(first + "\\" + name);
+					cursor += name.size() + 1;
+				}
+			}
+
+			ConstBuf::LoadAnimations(files);
+		}
+	}
+
+	void OpenAnimationMenu() {
+		std::vector<std::string> animMenu = ConstBuf::gltfAnim::AnimationMenu();
+		int selected = showEnum(hWnd, animMenu);
+		if (selected >= 0) {
+			ConstBuf::gltfAnim::SetAnimation(selected);
 		}
 	}
 
@@ -1541,11 +1588,92 @@ namespace editor
 		if (isKeyDown(CAM_KEY)|| ViewCam::flyToCam < 1.f)
 		{
 			ViewCam::Draw();
-		} 
-		
-		if (paramEdit::ButtonPressed("Load Model", 0, 0, ui::style::box::width, ui::style::box::height))
+		}
+		ui::Box::Setup();
+		ui::style::Base();
+		ui::style::button::hAlign = ui::style::align_h::center;
+		ui::style::button::zoom = false;
+		ui::style::text::width = .023f;
+		ui::style::text::height = .034f;
+		ui::style::text::tracking = 3.0f;
+		ui::style::box::height = ui::style::text::height * 1.15f;
+
+		const float bw = ui::style::box::width;
+		const float bh = ui::style::box::height;
+		const float gap = 0.008f;
+		const float modelY = 0.035f;
+		static bool modelMenuOpen = false;
+
+		ui::style::button::selected = modelMenuOpen;
+		bool modelPressed = paramEdit::ButtonPressed(modelMenuOpen ? "Model        ^" : "Model        v", 0, modelY, bw, bh);
+		ui::style::button::selected = false;
+		if (modelPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
 		{
-			loadFlag = true;
+			modelMenuOpen = !modelMenuOpen;
+		}
+
+		if (modelMenuOpen)
+		{
+			const float panelX = 0.0f;
+			const float panelY = modelY + bh + gap;
+			const float panelW = bw * 3.9f + gap * 3.0f;
+			const float panelH = bh * 3.0f + gap * 4.0f;
+
+			ui::style::box::r = ui::style::box::g = ui::style::box::b = .08f;
+			ui::style::box::a = .92f;
+			ui::style::box::outlineBrightness = .18f;
+			ui::Box::Draw(panelX, panelY, panelW, panelH);
+			ui::style::Base();
+			ui::style::button::hAlign = ui::style::align_h::center;
+			ui::style::button::zoom = false;
+			ui::style::text::width = .023f;
+			ui::style::text::height = .034f;
+			ui::style::text::tracking = 3.0f;
+			ui::style::box::height = bh;
+
+			float ux = panelX + gap;
+			float uy = panelY + gap;
+
+			if (paramEdit::ButtonPressed("Load Model", ux, uy, bw, bh))
+			{
+				loadFlag = true;
+			}
+			else
+			{
+				loadFlag = false;
+			}
+			ux += bw + gap;
+
+			bool loadAnimPressed = paramEdit::ButtonPressed("Load Anims", ux, uy, bw, bh);
+			if (loadAnimPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
+			{
+				OpenAnimationDialog();
+			}
+			ux += bw + gap;
+
+			bool prevAnimPressed = paramEdit::ButtonPressed("Prev", ux, uy, bw * 0.55f, bh);
+			if (prevAnimPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
+			{
+				ConstBuf::gltfAnim::PrevAnimation();
+			}
+			ux += bw * 0.55f + gap;
+
+			bool nextAnimPressed = paramEdit::ButtonPressed("Next", ux, uy, bw * 0.55f, bh);
+			if (nextAnimPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
+			{
+				ConstBuf::gltfAnim::NextAnimation();
+			}
+
+			uy += bh + gap;
+			std::string animDropLabel = std::string(ConstBuf::gltfAnim::CurrentAnimationLabel()) + "        v";
+			bool animMenuPressed = paramEdit::ButtonPressed(animDropLabel.c_str(), panelX + gap, uy, panelW - gap * 2.0f, bh);
+			if (animMenuPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
+			{
+				OpenAnimationMenu();
+			}
+
+			uy += bh + gap;
+			paramEdit::Button(ConstBuf::gltfAnim::AnimationStatusLabel(), panelX + gap, uy, panelW - gap * 2.0f, bh);
 		}
 		else
 		{
@@ -1553,10 +1681,6 @@ namespace editor
 		}
 
 		Rasterizer::Scissors({ 0,0,(float)dx11::width,(float)dx11::height });
-		ui::Box::Setup();
-		ui::style::Base();
-		ui::style::button::hAlign = ui::style::align_h::center;
-		ui::style::button::zoom = true;
 	}
 
 	void SaveAndExit()
