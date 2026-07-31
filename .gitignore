@@ -369,3 +369,4 @@ FodyWeavers.xsd
 /fx/Editor_Debug
 Editor_Debug
 Editor_Release
+/Editor_Debug/platform.exe
