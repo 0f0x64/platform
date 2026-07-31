@@ -359,6 +359,7 @@
   <ItemGroup>
     <ClInclude Include="dx11\blend.h" />
     <ClInclude Include="dx11\camera.h" />
+    <ClInclude Include="dx11\cgltf.h" />
     <ClInclude Include="dx11\constBuf.h" />
     <ClInclude Include="dx11\depth.h" />
     <ClInclude Include="dx11\device.h" />

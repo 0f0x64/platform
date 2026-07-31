@@ -612,52 +612,52 @@ namespace ConstBuf
 		return true;
 	}
 
-	//void LoadObj(const char* name)
-	//{
-	//	if (LoadObjToPointersGLTF(name, &vArray, &iArray, vertexCount, triangleCount))
-	//	{
-	//		gltfAnim::scene.modelPath = name ? name : "";
-	//		gltfAnim::scene.animationPath.clear();
-	//		gltfAnim::scene.status = "Model loaded";
-	//		if (vertexCount > 0)
-	//		{
-	//			float xMax = vArray[0].position.x;
-	//			float xMin = vArray[0].position.x;
-	//			float yMax = vArray[0].position.y;
-	//			float yMin = vArray[0].position.y;
-	//			float zMax = vArray[0].position.z;
-	//			float zMin = vArray[0].position.z;
-	//
-	//			for (int i = 1; i < vertexCount; i++)
-	//			{
-	//				xMax = max(xMax, vArray[i].position.x);
-	//				xMin = min(xMin, vArray[i].position.x);
-	//				yMax = max(yMax, vArray[i].position.y);
-	//				yMin = min(yMin, vArray[i].position.y);
-	//				zMax = max(zMax, vArray[i].position.z);
-	//				zMin = min(zMin, vArray[i].position.z);
-	//			}
-	//
-	//			float xCenter = (xMax + xMin) / 2.0f;
-	//			float yCenter = (yMax + yMin) / 2.0f;
-	//			float zCenter = (zMax + zMin) / 2.0f;
-	//			float xSize = xMax - xMin;
-	//			float ySize = yMax - yMin;
-	//			float zSize = zMax - zMin;
-	//			float maxSize = max(max(xSize, ySize), zSize);
-	//			float scale = maxSize > 0.00001f ? (4.0f / maxSize) : 1.0f;
-	//
-	//			gltfAnim::scene.modelCenterScale = XMFLOAT4(xCenter, yCenter, zCenter, scale);
-	//		}
-	//
-	//		CreateSB(0, sizeof(vertex), vertexCount, vArray);
-	//		CreateSB(1, sizeof(index), triangleCount, iArray);
-	//	}
-	//		else
-	//	{
-	//		gltfAnim::scene.status = "Model load failed";
-	//	}
-	//}
+	void LoadObj(const char* name)
+	{
+		if (LoadObjToPointersGLTF(name, &vArray, &iArray, vertexCount, triangleCount))
+		{
+			gltfAnim::scene.modelPath = name ? name : "";
+			gltfAnim::scene.animationPath.clear();
+			gltfAnim::scene.status = "Model loaded";
+			if (vertexCount > 0)
+			{
+				float xMax = vArray[0].position.x;
+				float xMin = vArray[0].position.x;
+				float yMax = vArray[0].position.y;
+				float yMin = vArray[0].position.y;
+				float zMax = vArray[0].position.z;
+				float zMin = vArray[0].position.z;
+	
+				for (int i = 1; i < vertexCount; i++)
+				{
+					xMax = max(xMax, vArray[i].position.x);
+					xMin = min(xMin, vArray[i].position.x);
+					yMax = max(yMax, vArray[i].position.y);
+					yMin = min(yMin, vArray[i].position.y);
+					zMax = max(zMax, vArray[i].position.z);
+					zMin = min(zMin, vArray[i].position.z);
+				}
+	
+				float xCenter = (xMax + xMin) / 2.0f;
+				float yCenter = (yMax + yMin) / 2.0f;
+				float zCenter = (zMax + zMin) / 2.0f;
+				float xSize = xMax - xMin;
+				float ySize = yMax - yMin;
+				float zSize = zMax - zMin;
+				float maxSize = max(max(xSize, ySize), zSize);
+				float scale = maxSize > 0.00001f ? (4.0f / maxSize) : 1.0f;
+	
+				gltfAnim::scene.modelCenterScale = float4(xCenter, yCenter, zCenter, scale);
+			}
+	
+			CreateSB(0, sizeof(vertex), vertexCount, vArray);
+			CreateSB(1, sizeof(index), triangleCount, iArray);
+		}
+			else
+		{
+			gltfAnim::scene.status = "Model load failed";
+		}
+	}
 	
 	bool LoadAnimations(const char* name, bool replaceExisting = true)
 	{
