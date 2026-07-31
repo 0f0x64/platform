@@ -376,6 +376,7 @@ namespace Object {
 		float zm = zoom / 100. + 1;
 
 		float4 centerScale = ConstBuf::gltfAnim::scene.modelCenterScale;
+		uint32_t triCnt = obj ? obj->triangleCount : ConstBuf::triangleCount;
 
 		vs::girl = {
 			.params =
@@ -387,7 +388,7 @@ namespace Object {
 				.skipper = skipper,
 				.base_color = float4(r / 100.,g / 100.,b / 100.,1),
 				.modelPos = float4(xPos/10000.,yPos / 10000.,zPos / 10000.,0),
-				.triCount = float4(obj->triangleCount,0,0,0),
+				.triCount = float4(triCnt,0,0,0),
 				.brightness = float4(brightness,0,0,0),
 				.tickness = float4(tickness,0,0,0),
 				.modelCenterScale = centerScale,
@@ -407,8 +408,14 @@ namespace Object {
 		dx11::ConstBuf::gltfAnim::Update(1.0f / FRAMES_PER_SECOND);
 		dx11::ConstBuf::gltfAnim::BindBones(dx11::context);
 
-		obj->BindSB(0);
-		obj->BindSB(1);
+		if (obj) {
+			obj->BindSB(0);
+			obj->BindSB(1);
+		}
+		else {
+			ConstBuf::BindSB(0);
+			ConstBuf::BindSB(1);
+		}
 
 
 		if (tMode == triMode::on)
@@ -440,7 +447,8 @@ namespace Object {
 		Culling::Set({ cullmode::off });
 		if (in.stencil == switcher::on)
 		{
-			ShowMesh(MeshPtr, (int)MeshPtr->triangleCount,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs, in.jumpCharge);
+			uint32_t triCnt = MeshPtr ? MeshPtr->triangleCount : ConstBuf::triangleCount;
+			ShowMesh(MeshPtr, (int)triCnt,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs, in.jumpCharge);
 		}
 
 		Culling::Set({ cullmode::off });

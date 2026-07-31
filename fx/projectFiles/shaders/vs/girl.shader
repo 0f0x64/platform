@@ -25,15 +25,15 @@ cbuffer bones : register(b4) {
     float4x4 gBones[256];
 }
 
-struct Vertex {
-    float4 pos;
-};
-
-//struct Vertex { // NEW
+//struct Vertex { // OLD
 //    float4 pos;
-//    uint4 joints;
-//    float4 weights;
 //};
+
+struct Vertex { // NEW
+    float4 pos;
+    uint4 joints;
+    float4 weights;
+};
 
 // Our StructuredBuffer at t0
 StructuredBuffer<Vertex> vbf : register(t0);
@@ -76,15 +76,15 @@ float3 sm3(float3 x)
     return smoothstep(0,1,smoothstep(0,1,x));
 }
 
-//float3 skinPos(Vertex v) {
-//    uint4 ids = min(v.joints, 255);
-//    float4 p =
-//        mul(float4(v.pos.xyz, 1), gBones[ids.x]) * v.weights.x +
-//        mul(float4(v.pos.xyz, 1), gBones[ids.y]) * v.weights.y +
-//        mul(float4(v.pos.xyz, 1), gBones[ids.z]) * v.weights.z +
-//        mul(float4(v.pos.xyz, 1), gBones[ids.w]) * v.weights.w;
-//    return (p.xyz - modelCenterScale.xyz) * modelCenterScale.w;
-//}
+float3 skinPos(Vertex v) {
+    uint4 ids = min(v.joints, 255);
+    float4 p =
+        mul(float4(v.pos.xyz, 1), gBones[ids.x]) * v.weights.x +
+        mul(float4(v.pos.xyz, 1), gBones[ids.y]) * v.weights.y +
+        mul(float4(v.pos.xyz, 1), gBones[ids.z]) * v.weights.z +
+        mul(float4(v.pos.xyz, 1), gBones[ids.w]) * v.weights.w;
+    return (p.xyz - modelCenterScale.xyz) * modelCenterScale.w;
+}
 
 float3 SafeTriangleNormal(float3 p0, float3 p1, float3 p2) {
     float3 n = cross(p1 - p0, p2 - p0);
@@ -196,9 +196,9 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 //  float3 _p1 = mesh[ind[1]].xyz;
 //  float3 _p2 = mesh[ind[2]].xyz;
 
-    float3 _p0 = vbf[ind4.x].pos.xyz;
-    float3 _p1 = vbf[ind4.y].pos.xyz;
-    float3 _p2 = vbf[ind4.z].pos.xyz;
+    float3 _p0 = skinPos(vbf[ind4.x]);
+    float3 _p1 = skinPos(vbf[ind4.y]);
+    float3 _p2 = skinPos(vbf[ind4.z]);
 
 
     float s =CalculateTriangleArea(_p0,_p1,_p2);
@@ -283,13 +283,13 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
         ind4 = ibf[vid/3].i;
         uint ind2[] = {ind4.x,ind4.y,ind4.z};
 
-        pos = vbf[ind2[vid%3]].pos.xyz;
+        pos = skinPos(vbf[ind2[vid%3]]);
         p1.color=1.15;
         p1.sz=1.2;
 
-    float3 _p0 = vbf[ind4.x].pos.xyz;
-    float3 _p1 = vbf[ind4.y].pos.xyz;
-    float3 _p2 = vbf[ind4.z].pos.xyz;
+    float3 _p0 = skinPos(vbf[ind4.x]);
+    float3 _p1 = skinPos(vbf[ind4.y]);
+    float3 _p2 = skinPos(vbf[ind4.z]);
         float3 nrml = CalculateNormal(_p0,_p1,_p2);
         //pos-=nrml*1;
         //pos-=nrml*1;
