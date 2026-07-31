@@ -21,9 +21,19 @@ cbuffer params : register(b0)
     float jumpCharge;
 }
 
+cbuffer bones : register(b4) {
+    float4x4 gBones[256];
+}
+
 struct Vertex {
     float4 pos;
 };
+
+//struct Vertex { // NEW
+//    float4 pos;
+//    uint4 joints;
+//    float4 weights;
+//};
 
 // Our StructuredBuffer at t0
 StructuredBuffer<Vertex> vbf : register(t0);
@@ -32,7 +42,7 @@ struct Index {
     float4 i;
 };
  
-// Our StructuredBuffer at t0
+// Our StructuredBuffer at t1
 StructuredBuffer<Index> ibf : register(t1);
 
 float toRad(float a)
@@ -64,6 +74,23 @@ float3 sm2(float x)
 float3 sm3(float3 x)
 {
     return smoothstep(0,1,smoothstep(0,1,x));
+}
+
+//float3 skinPos(Vertex v) {
+//    uint4 ids = min(v.joints, 255);
+//    float4 p =
+//        mul(float4(v.pos.xyz, 1), gBones[ids.x]) * v.weights.x +
+//        mul(float4(v.pos.xyz, 1), gBones[ids.y]) * v.weights.y +
+//        mul(float4(v.pos.xyz, 1), gBones[ids.z]) * v.weights.z +
+//        mul(float4(v.pos.xyz, 1), gBones[ids.w]) * v.weights.w;
+//    return (p.xyz - modelCenterScale.xyz) * modelCenterScale.w;
+//}
+
+float3 SafeTriangleNormal(float3 p0, float3 p1, float3 p2) {
+    float3 n = cross(p1 - p0, p2 - p0);
+    float l = length(n);
+    if (l < 0.000001f) return float3(0, 0, 0);
+    return n / l;
 }
 
 float CalculateTriangleArea(float3 p0, float3 p1, float3 p2)
