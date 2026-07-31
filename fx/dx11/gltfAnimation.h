@@ -14,7 +14,7 @@ namespace gltfAnim
 	struct AnimationChannel
 	{
 		int joint = -1;
-		cgltf_animation_path_type path = cgltf_animation_path_type_invalid;
+		dx11::ConstBuf::cgltf_animation_path_type path = cgltf_animation_path_type_invalid;
 		std::vector<float> times;
 		std::vector<XMFLOAT4> values;
 	};
