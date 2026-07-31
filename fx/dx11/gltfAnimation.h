@@ -14,7 +14,7 @@ namespace gltfAnim
 	struct AnimationChannel
 	{
 		int joint = -1;
-		dx11::ConstBuf::cgltf_animation_path_type path = cgltf_animation_path_type_invalid;
+		ConstBuf::cgltf_animation_path_type path = ConstBuf::cgltf_animation_path_type_invalid;
 		std::vector<float> times;
 		std::vector<XMFLOAT4> values;
 	};
@@ -52,7 +52,7 @@ namespace gltfAnim
 	inline Scene scene;
 	inline ID3D11Buffer* boneBuffer = nullptr;
 
-	inline int NodeIndex(cgltf_data* data, const cgltf_node* node)
+	inline int NodeIndex(cgltf_data* data, const ConstBuf::cgltf_node* node)
 	{
 		if (!node)
 		{
@@ -737,7 +737,7 @@ namespace gltfAnim
 		return added;
 	}
 
-	inline void FillSkinDefaults(vertex& out)
+	inline void FillSkinDefaults(ConstBuf::vertex& out)
 	{
 		out.joints = XMUINT4(0, 0, 0, 0);
 		out.weights = XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f);
