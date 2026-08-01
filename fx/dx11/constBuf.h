@@ -329,6 +329,7 @@ namespace ConstBuf
 		cgltf_options options = {0};
 		cgltf_data* data = NULL;
 		cgltf_result result = cgltf_parse_file(&options, filename.c_str(), &data);
+
 		if (result == cgltf_result_success)
 		{
 
@@ -528,6 +529,26 @@ namespace ConstBuf
 
 			cgltf_free(data);
 		}
+		else {
+			switch (result) {
+			case cgltf_result_file_not_found:
+				Log("cgltf error: file not found: %s\n", filename.c_str());
+				break;
+			case cgltf_result_io_error:
+				Log("cgltf error: IO error reading: %s\n", filename.c_str());
+				break;
+			case cgltf_result_invalid_json:
+				Log("cgltf error: invalid JSON in: %s\n", filename.c_str());
+				break;
+			case cgltf_result_invalid_gltf:
+				Log("cgltf error: invalid glTF in: %s\n", filename.c_str());
+				break;
+			default:
+				Log("cgltf error: unknown error %d for: %s\n", filename.c_str());
+				break;
+			}
+		}
+
 		return result == cgltf_result_success && vCount > 0 && iCount > 0;
 	}
 
@@ -612,8 +633,12 @@ namespace ConstBuf
 		return true;
 	}
 
+	bool loaded = false;
+
 	void LoadObj(const char* name)
 	{
+		if (loaded) return;
+
 		if (LoadObjToPointersGLTF(name, &vArray, &iArray, vertexCount, triangleCount))
 		{
 			gltfAnim::scene.modelPath = name ? name : "";
@@ -652,10 +677,14 @@ namespace ConstBuf
 	
 			CreateSB(0, sizeof(vertex), vertexCount, vArray);
 			CreateSB(1, sizeof(index), triangleCount, iArray);
+
+			loaded = true;
+			Log("GLTF model loaded successfully\n");
 		}
 			else
 		{
 			gltfAnim::scene.status = "Model load failed";
+			Log("GLTF model load failed\n");
 		}
 	}
 	
