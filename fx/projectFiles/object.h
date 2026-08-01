@@ -560,10 +560,10 @@ namespace Object {
 		
 	}
 
-	const int smoothPointMAX = 1000;
+	const int smoothPointMAX = 3500;
 
 	struct starline {
-		float4 basePoint[100];
+		float4 basePoint[10000];
 		float4 point[smoothPointMAX];
 		float4 upVector[smoothPointMAX];
 		int basePointCount = 0;
@@ -846,6 +846,8 @@ namespace Object {
 		}
 	}
 
+
+
 	void initPatches(float pathTime)
 	{
 		// init maze
@@ -883,6 +885,58 @@ namespace Object {
 		
 
 		NewLine();
+		AddPointToLine({ 60,-50,-20 });
+		AddPointToLine({ 61,-65,-33 });
+		AddPointToLine({ 24,-41,-2 });
+
+		AddPointToLine({ 41,-68,-2 });
+		AddPointToLine({ 48,-5,6 });
+		AddPointToLine({ 81,-11,-2 });
+
+		AddPointToLine({ 52,-26,-28 });
+		AddPointToLine({ 70,-27,-49 });
+		AddPointToLine({ 82,-33,-41 });
+
+		AddPointToLine({ 77,-6,-35 });
+		AddPointToLine({ 98,-26,-57 });
+		AddPointToLine({ 61,-40,-39 });
+
+		AddPointToLine({ 28,2,-39 });
+		AddPointToLine({ 56,4,-72 });
+		AddPointToLine({ 72,-23,-59 });
+
+		AddPointToLine({ 53,-23,-51 });
+		AddPointToLine({ 107,-88,-53 });
+		AddPointToLine({ 100,-55,-55 });
+
+		AddPointToLine({ 84,1,-16 });
+		AddPointToLine({ 78,21,-40 });
+		AddPointToLine({ 69,5,-56 });
+
+		AddPointToLine({ 89,16,-48 });
+		AddPointToLine({ 119,51,-53 });
+		AddPointToLine({ 69,15,-49 });
+
+		AddPointToLine({ 23,-24,-50 });
+		AddPointToLine({ 32,95,-64 });
+		AddPointToLine({ 24,40,-32 });
+
+		AddPointToLine({ 36,34,60 });
+		AddPointToLine({ 28,1,-5 });
+		AddPointToLine({ 44,64,-26 });
+
+		AddPointToLine({ 47,44,-33 });
+		AddPointToLine({ 33,41,-6 });
+		AddPointToLine({ 56,48,-54 });
+
+		AddPointToLine({ 31,22,-57 });
+		AddPointToLine({ 26,5,-11 });
+		AddPointToLine({ 42,47,-4 });
+
+		AddPointToLine({ 70,24,-58 });
+		AddPointToLine({ 35,40,-65 });
+
+		/*NewLine();
 		AddPointToLine({ 0,0,0 });
 		AddPointToLine({ 100,0,0 });
 		AddPointToLine({ 200,0,0 });
@@ -896,10 +950,80 @@ namespace Object {
 		AddPointToLine({ 200,0,13 });
 		AddPointToLine({ 200,110,13 });
 		AddPointToLine({ 100,110,3 });
-		AddPointToLine({ 0,10,3 });
+		AddPointToLine({ 0,10,3 });*/
 
-		NewStar({ 38,0,9,11 });
-		NewStar({ 28,0,-9,14 });
+		//NewStar({ 0,0,0,66 });
+
+		float ofs = 13;
+		float4 starPathStart = float4(0, 0, starLineList.line[currentLine].point[0].w + ofs,0);
+		int starPatchPCount = 44;
+	//	NewLine();
+		float4 cStar = starPathStart;
+
+		float rad = starLineList.line[currentLine].point[0].w + ofs;          // Радиус сферы (подберите под ваш масштаб)
+		float waveAmp = 0.0f;           // Высота переплетения (над/под)
+		int totalTurns = 7;            // !!! ЖЕСТКИЙ КОНТРОЛЬ ВИТКОВ !!! (сколько раз обернется вокруг сферы)
+		float noiseStrength = 1.4f;     // Степень "хаотичности" изгибов (0.0 - идеальная спираль, выше - хаос)
+
+		XMVECTOR centerOffset = XMVectorSet(starLineList.line[currentLine].point[0].x/100., starLineList.line[currentLine].point[0].y / 100., starLineList.line[currentLine].point[0].z / 100., 0.0f);
+
+
+		for (int i = 0; i < starPatchPCount; i++)
+		{
+			// 1. Получаем линейный прогресс от 0.0 до 1.0 вдоль всей линии
+			float progress = (float)i / (starPatchPCount - 1);
+
+			// 2. Базовые углы вращения, жестко завязанные на количество витков
+			// Точка гарантированно сделает ровно столько оборотов, сколько указано в totalTurns
+			float baseAngleX = progress * totalTurns * XM_2PI;
+			float baseAngleY = progress * totalTurns * XM_PI;
+			float baseAngleZ = progress * (totalTurns * 0.5f) * XM_2PI;
+
+			// 3. Накладываем детерминированный псевдослучайный шум на углы (модуляция фазы)
+			// Шум зависит от progress, поэтому узор стабилен, но плавно изгибается
+			float rawNoiseX = std::sin(progress * 45.0f + 12.9f) * 43758.54f;
+			float noiseX = (rawNoiseX - std::floor(rawNoiseX)) * noiseStrength;
+
+			float rawNoiseY = std::sin(progress * 67.0f + 41.1f) * 75124.12f;
+			float noiseY = (rawNoiseY - std::floor(rawNoiseY)) * noiseStrength;
+
+			float rawNoiseZ = std::sin(progress * 89.0f + 59.3f) * 63241.15f;
+			float noiseZ = (rawNoiseZ - std::floor(rawNoiseZ)) * noiseStrength;
+
+			// Итоговые углы для текущей точки
+			float rotX = baseAngleX + noiseX;
+			float rotY = baseAngleY + noiseY;
+			float rotZ = baseAngleZ + noiseZ;
+
+			// 4. Вычисляем динамический радиус для эффекта переплетения (над/под)
+			// Частота волны привязана к количеству витков, чтобы пересечения огибали друг друга
+			float waveFreq = totalTurns * 4.0f;
+			float wave = std::sin(progress * waveFreq * XM_2PI);
+			float currentRad = rad + (wave * waveAmp);
+
+			// 5. Создаем базовый вектор на радиусе
+			XMVECTOR basePoint = XMVectorSet(0.0f, 0.0f, currentRad, 1.0f);
+
+			// 6. Поворот по трем осям через DirectXMath
+			XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(rotX, rotY, rotZ);
+			XMVECTOR rotatedPoint = XMVector3Transform(basePoint, rotationMatrix);
+
+			// 7. Смещение центра сферы
+			XMVECTOR finalPoint = XMVectorAdd(rotatedPoint, centerOffset);
+
+			// 8. Выгрузка в структуру cStar
+			XMFLOAT4 storeStar;
+			XMStoreFloat4(&storeStar, finalPoint);
+
+			cStar.x = storeStar.x;
+			cStar.y = storeStar.y;
+			cStar.z = storeStar.z;
+
+			
+				//AddPointToLine({ (int)cStar.x, (int)cStar.y, (int)cStar.z });
+		}
+
+		//NewStar({ 28,0,-9,14 });
 
 		/*for (int i = 0; i < starsCount; i++)
 		{

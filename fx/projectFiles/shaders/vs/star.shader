@@ -50,15 +50,15 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
         //pos*=(abs(sin(atan2(pos.x,pos.y)*2+PI/2))+1)+1;
         //pos*=(abs(sin(atan2(pos.y,pos.z)*2+PI/2))+1)+1;
         //pos/=4;
-        float3 hole=float3(0,0,0)*13;
-        float dst=7/(distance(pos,hole));
+        float3 hole=float3(0,0,0)*1;
+        float dst=9/(distance(pos,hole)+2);
         pos-=normalize(hole-pos)*pow(dst,4);
         //pos/=4;
 
-        pos=lerp(pos,normalize(pos)*22,saturate(length(pos/82)));
+        //pos=lerp(pos,normalize(pos)*.1,saturate(length(pos/82)));
         
-        pos+=1/rot3(pos,pos/3);
-        pos*=1+frac(length(pos)+time.x/40);
+        pos+=3./rot3(pos,pos/3);
+        pos*=1+frac(length(pos)/3+time.x/40)/12;
         //pos/=2;
         
     }else{
@@ -69,7 +69,8 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
          //pos.y-=6;
 
     }
-
+   pos = float3(hash(iid/200.),hash(iid/140.),hash(iid/120.))-.5;
+    pos=normalize(pos)*17;
 
 
     //pos*=.9;
@@ -129,7 +130,7 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     }
     else
     {
-        p.pos = transform_unisize(pos,grid.zw,1.75);
+        p.pos = transform_unisize(pos,grid.zw,5.75);
        //p.color=-noise(pos*.3+12)*.04+.02;;
        // p.color +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
          p.sz=1;

@@ -742,7 +742,8 @@ struct hero_ {
 		XMVECTOR airTangent;
 		XMVECTOR airUp;
 
-		if (currentLine.pointCount == 1) //star
+		if (currentLine.pointCount < 2) return;
+/*		if (currentLine.pointCount == 1) //star
 		{
 			airTangent = getSmoothTangent();
 			XMVECTOR starPos = F2V(currentLine.point[0]);
@@ -758,7 +759,7 @@ struct hero_ {
 				airTangent = XMVector3Normalize(XMVectorSubtract(oldRight, airUp * rightProjection));
 			}
 		} 
-		else //path
+		else //path*/
 		{
 			airTangent = getSmoothTangent();
 			airUp = landingUp;

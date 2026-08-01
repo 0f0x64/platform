@@ -12,7 +12,7 @@ cbuffer params : register(b0)
     int skipper;
     float4 heroPosition;
     float4 base_color;
-    float4 basePoint[1000];
+    float4 basePoint[3600];
     int particlesCount;
     int basePointsCount;
 
