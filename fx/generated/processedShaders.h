@@ -1611,7 +1611,7 @@ const char* maze =
 "    int skipper;\n"
 "    float4 heroPosition;\n"
 "    float4 base_color;\n"
-"    float4 basePoint[1000];\n"
+"    float4 basePoint[3500];\n"
 "    int particlesCount;\n"
 "    int basePointsCount;\n"
 "\n"

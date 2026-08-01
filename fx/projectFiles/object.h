@@ -560,10 +560,10 @@ namespace Object {
 		
 	}
 
-	const int smoothPointMAX = 1000;
+	const int smoothPointMAX = 3500;
 
 	struct starline {
-		float4 basePoint[100];
+		float4 basePoint[200];
 		float4 point[smoothPointMAX];
 		float4 upVector[smoothPointMAX];
 		int basePointCount = 0;
