@@ -10,6 +10,7 @@
 namespace gltfAnim
 {
 	static const int BoneLimit = 256;
+	bool animPlaying = false;
 
 	struct AnimationChannel
 	{
@@ -338,6 +339,8 @@ namespace gltfAnim
 
 	inline void Update(float deltaTime)
 	{
+		if (!animPlaying) return;
+
 		if (scene.animations.empty() || scene.joints.empty())
 		{
 			BuildBonePalette();
