@@ -339,7 +339,10 @@ namespace gltfAnim
 
 	inline void Update(float deltaTime)
 	{
-		if (!animPlaying) return;
+		if (!animPlaying) {
+			scene.currentTime = 0;
+			return;
+		}
 
 		if (scene.animations.empty() || scene.joints.empty())
 		{
@@ -357,7 +360,6 @@ namespace gltfAnim
 		scene.currentTime += deltaTime;
 		if (scene.currentTime >= clip.duration) {
 			animPlaying = false;
-			scene.currentTime = 0;
 			return;
 		}
 
