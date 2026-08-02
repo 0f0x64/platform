@@ -9,7 +9,7 @@ cbuffer params : register(b0)
 
 #define PI 3.1415926535897932384626433832795
 
-float4 PS(VS_OUTPUT_PARTICLE input, bool isFrontFace : SV_IsFrontFace) : SV_Target
+float4 PS(VS_OUTPUT_PARTICLE2 input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
     float3 c = saturate(1.-2.*length(input.uv-.5));
 

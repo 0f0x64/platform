@@ -544,6 +544,7 @@ int mode;
 int skipper;
 float4 base_color;
 float4 PosRad;
+int triMode;
 } params;
 
 void set () {
@@ -794,7 +795,45 @@ context->UpdateSubresource(dx11::Shaders::PS[1].params, 0, NULL, &params, 0, 0);
 context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[1].params);
 }
 
+} basic2;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+float hilight;
+} params;
+
+void set () {
+Shaders::pShader(2);
+context->UpdateSubresource(dx11::Shaders::PS[2].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[2].params);
+}
+
 } basicLow;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+float hilight;
+} params;
+
+void set () {
+Shaders::pShader(3);
+context->UpdateSubresource(dx11::Shaders::PS[3].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[3].params);
+}
+
+} basicLow2;
 
 }
 
@@ -810,9 +849,9 @@ float sz;
 } params;
 
 void set () {
-Shaders::pShader(2);
-context->UpdateSubresource(dx11::Shaders::PS[2].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[2].params);
+Shaders::pShader(4);
+context->UpdateSubresource(dx11::Shaders::PS[4].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[4].params);
 }
 
 } cat;
@@ -826,7 +865,7 @@ struct {
 struct {} params;
 
 void set () {
-Shaders::pShader(3);
+Shaders::pShader(5);
 }
 
 } cubemapCreator;
@@ -852,7 +891,7 @@ addr sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::pShader(4);
+Shaders::pShader(6);
 Textures::TextureToShader((texture)textures.env, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
@@ -880,7 +919,7 @@ addr sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::pShader(5);
+Shaders::pShader(7);
 Textures::TextureToShader((texture)textures.geo, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
 }
@@ -901,9 +940,9 @@ float sz;
 } params;
 
 void set () {
-Shaders::pShader(6);
-context->UpdateSubresource(dx11::Shaders::PS[6].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[6].params);
+Shaders::pShader(8);
+context->UpdateSubresource(dx11::Shaders::PS[8].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[8].params);
 }
 
 } obj1;
@@ -934,9 +973,9 @@ addr sam1AddressV;
 } samplers;
 
 void set () {
-Shaders::pShader(7);
-context->UpdateSubresource(dx11::Shaders::PS[7].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[7].params);
+Shaders::pShader(9);
+context->UpdateSubresource(dx11::Shaders::PS[9].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[9].params);
 Textures::TextureToShader((texture)textures.screen, 0, targetshader::pixel); 
 Textures::TextureToShader((texture)textures.screenMid, 1, targetshader::pixel); 
 Textures::TextureToShader((texture)textures.screenLow, 2, targetshader::pixel); 
@@ -944,6 +983,25 @@ Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1Addre
 }
 
 } output;
+
+}
+
+namespace ps{
+
+struct { 
+
+struct 
+{
+float hilight;
+} params;
+
+void set () {
+Shaders::pShader(10);
+context->UpdateSubresource(dx11::Shaders::PS[10].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[10].params);
+}
+
+} starTri;
 
 }
 
@@ -968,9 +1026,9 @@ float slider_type;
 } params;
 
 void set () {
-Shaders::pShader(8);
-context->UpdateSubresource(dx11::Shaders::PS[8].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[8].params);
+Shaders::pShader(11);
+context->UpdateSubresource(dx11::Shaders::PS[11].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[11].params);
 }
 
 } box_ps;
@@ -1003,9 +1061,9 @@ addr s1AddressV;
 } samplers;
 
 void set () {
-Shaders::pShader(9);
-context->UpdateSubresource(dx11::Shaders::PS[9].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[9].params);
+Shaders::pShader(12);
+context->UpdateSubresource(dx11::Shaders::PS[12].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[12].params);
 Textures::TextureToShader((texture)textures.tex, 0, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.s1Filter, samplers.s1AddressU, samplers.s1AddressV); 
 }
@@ -1024,9 +1082,9 @@ float4 color;
 } params;
 
 void set () {
-Shaders::pShader(10);
-context->UpdateSubresource(dx11::Shaders::PS[10].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[10].params);
+Shaders::pShader(13);
+context->UpdateSubresource(dx11::Shaders::PS[13].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[13].params);
 }
 
 } lineDrawerUV_ps;
@@ -1043,9 +1101,9 @@ float4 color;
 } params;
 
 void set () {
-Shaders::pShader(11);
-context->UpdateSubresource(dx11::Shaders::PS[11].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[11].params);
+Shaders::pShader(14);
+context->UpdateSubresource(dx11::Shaders::PS[14].params, 0, NULL, &params, 0, 0);
+context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[14].params);
 }
 
 } lineDrawer_ps;

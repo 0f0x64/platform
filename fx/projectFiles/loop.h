@@ -2198,22 +2198,7 @@ namespace Loop
 			RenderTarget::Set({ texture::pBuf,0 });
 
 			//
-			Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
-			Object::MeshPtr = &Object::HeroMesh;
-			float4 p = V2F(hero.pos * 10000.);
 
-			Object::Mesh({
-					.quality = 1,
-					.xPos = (int)(p.x),
-					.yPos = (int)(p.y),
-					.zPos = (int)(p.z),
-					.brightness = 9,
-					.tickness = 4,
-					.stencil = switcher::on,
-					.zoom = -75,
-					.onLineOfs = (int)hero.yOffset,
-					.jumpCharge = (int)(hero.jumpChargeProgress*100.)
-				});
 
 			//Object::heroWorld = XMMatrixTranspose(XMMatrixIdentity());
 
@@ -2243,6 +2228,27 @@ namespace Loop
 					.stencil = switcher::on
 				});
 
+			Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
+			Object::MeshPtr = &Object::HeroMesh;
+			float4 p = V2F(hero.pos * 10000.);
+
+			RenderTarget::Set({ texture::pBuf,0 });
+
+			Object::Mesh({
+					.quality = 1,
+					.xPos = (int)(p.x),
+					.yPos = (int)(p.y),
+					.zPos = (int)(p.z),
+					.brightness = 9,
+					.tickness = 4,
+					.stencil = switcher::on,
+					.zoom = -75,
+					.onLineOfs = (int)hero.yOffset,
+					.jumpCharge = (int)(hero.jumpChargeProgress * 100.)
+				});
+
+			Culling::Set({ cullmode::off });
+			DepthBuf::Mode({ depthmode::off });
 
 
 		Compose();

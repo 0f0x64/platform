@@ -416,13 +416,16 @@
     <None Include="projectFiles\shaders\lib\particleVS_main2.shader" />
     <None Include="projectFiles\shaders\lib\utils.shader" />
     <None Include="projectFiles\shaders\ps\basic.shader" />
+    <None Include="projectFiles\shaders\ps\basic2.shader" />
     <None Include="projectFiles\shaders\ps\basicLow.shader" />
+    <None Include="projectFiles\shaders\ps\basicLow2.shader" />
     <None Include="projectFiles\shaders\ps\cat.shader" />
     <None Include="projectFiles\shaders\ps\cubemapCreator.shader" />
     <None Include="projectFiles\shaders\ps\genNormals.shader" />
     <None Include="projectFiles\shaders\ps\obj1.shader" />
     <None Include="projectFiles\shaders\ps\cubeMapViewer.shader" />
     <None Include="projectFiles\shaders\ps\output.shader" />
+    <None Include="projectFiles\shaders\ps\starTri.shader" />
     <None Include="projectFiles\shaders\ui\ps\box_ps.shader" />
     <None Include="projectFiles\shaders\ui\ps\letter_ps.shader" />
     <None Include="projectFiles\shaders\ui\ps\lineDrawerUV_ps.shader" />

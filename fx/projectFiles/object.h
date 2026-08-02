@@ -167,6 +167,25 @@ namespace Object {
 		}
 	}
 
+	void psModeSet2(pMode mode)
+	{
+		switch (mode)
+		{
+		case pMode::point:
+		{
+			ps::basic2 = { .params = {.hilight = 0.f } };
+			ps::basic2.set();
+			break;
+		}
+		case pMode::glow:
+		{
+			ps::basicLow2 = { .params = {.hilight = 0.f } };
+			ps::basicLow2.set();
+			break;
+		}
+		}
+	}
+
 	void PillarsHand(int count, int skipper, pMode mode)
 	{
 		int gX = sqrt(count / skipper);
@@ -885,58 +904,6 @@ namespace Object {
 		
 
 		NewLine();
-		AddPointToLine({ 60,-50,-20 });
-		AddPointToLine({ 61,-65,-33 });
-		AddPointToLine({ 24,-41,-2 });
-
-		AddPointToLine({ 41,-68,-2 });
-		AddPointToLine({ 48,-5,6 });
-		AddPointToLine({ 81,-11,-2 });
-
-		AddPointToLine({ 52,-26,-28 });
-		AddPointToLine({ 70,-27,-49 });
-		AddPointToLine({ 82,-33,-41 });
-
-		AddPointToLine({ 77,-6,-35 });
-		AddPointToLine({ 98,-26,-57 });
-		AddPointToLine({ 61,-40,-39 });
-
-		AddPointToLine({ 28,2,-39 });
-		AddPointToLine({ 56,4,-72 });
-		AddPointToLine({ 72,-23,-59 });
-
-		AddPointToLine({ 53,-23,-51 });
-		AddPointToLine({ 107,-88,-53 });
-		AddPointToLine({ 100,-55,-55 });
-
-		AddPointToLine({ 84,1,-16 });
-		AddPointToLine({ 78,21,-40 });
-		AddPointToLine({ 69,5,-56 });
-
-		AddPointToLine({ 89,16,-48 });
-		AddPointToLine({ 119,51,-53 });
-		AddPointToLine({ 69,15,-49 });
-
-		AddPointToLine({ 23,-24,-50 });
-		AddPointToLine({ 32,95,-64 });
-		AddPointToLine({ 24,40,-32 });
-
-		AddPointToLine({ 36,34,60 });
-		AddPointToLine({ 28,1,-5 });
-		AddPointToLine({ 44,64,-26 });
-
-		AddPointToLine({ 47,44,-33 });
-		AddPointToLine({ 33,41,-6 });
-		AddPointToLine({ 56,48,-54 });
-
-		AddPointToLine({ 31,22,-57 });
-		AddPointToLine({ 26,5,-11 });
-		AddPointToLine({ 42,47,-4 });
-
-		AddPointToLine({ 70,24,-58 });
-		AddPointToLine({ 35,40,-65 });
-
-		/*NewLine();
 		AddPointToLine({ 0,0,0 });
 		AddPointToLine({ 100,0,0 });
 		AddPointToLine({ 200,0,0 });
@@ -950,9 +917,9 @@ namespace Object {
 		AddPointToLine({ 200,0,13 });
 		AddPointToLine({ 200,110,13 });
 		AddPointToLine({ 100,110,3 });
-		AddPointToLine({ 0,10,3 });*/
+		AddPointToLine({ 0,10,3 });
 
-		//NewStar({ 0,0,0,66 });
+		NewStar({ 0,0,0,66 });
 
 		float ofs = 13;
 		float4 starPathStart = float4(0, 0, starLineList.line[currentLine].point[0].w + ofs,0);
@@ -1147,14 +1114,35 @@ namespace Object {
 
 	}
 
-	cmd(AllStars, int count, int skipper, pMode mode, int r, int g, int b)
+	cmd(AllStars, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode)
 	{
 		reflect;
 
 		int gX = sqrt(in.count / in.skipper);
 		int gY = sqrt(in.count / in.skipper);
 
-		psModeSet(in.mode);
+		if (in.tMode == triMode::on)
+		{
+			ps::starTri.set();
+
+			Culling::Set({ cullmode::front });
+			DepthBuf::Mode({ depthmode::on });
+			BlendMode::Set({
+				.mode = blendmode::off,
+				.op = blendop::add
+				});
+		}
+		else
+		{
+			psModeSet2(in.mode);
+
+			Culling::Set({ cullmode::off });
+			DepthBuf::Mode({ depthmode::readonly });
+			BlendMode::Set({
+				.mode = blendmode::on,
+				.op = blendop::add
+				});
+		}
 
 		for (int i = 0; i < starLineList.lineCount; i++)
 		{
@@ -1162,24 +1150,48 @@ namespace Object {
 
 			auto sd = starLineList.line[i].point[0];
 
+			int count = 500000;
+
+			
+			if (in.tMode == triMode::on)
+			{
+				gX = 64;
+				gY = 32;
+			}
+
 			vs::star = {
 				.params = {
 					.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
 					.gX = gX,
 					.gY = gY,
 					.mode = (int)in.mode,
-					.skipper = in.skipper,
+					.skipper = 0,
 					.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
-					.PosRad = float4(sd.x,sd.y,sd.z,sd.w)
+					.PosRad = float4(sd.x,sd.y,sd.z,sd.w),
+					.triMode = (int)in.tMode
 				},
 			};
-
+			
 			vs::star.set();
 
-			Drawer::NullDrawer({ 1,in.count / in.skipper });
+			if (in.tMode == triMode::on) {
+				Drawer::NullDrawerTri({ gX * gY * 2, 1 });
+			}
+			else
+			{
+				Drawer::NullDrawer({ 1,in.count / in.skipper });
+			}			
+
 		}
 
+		psModeSet(in.mode);
 
+		Culling::Set({ cullmode::off });
+		DepthBuf::Mode({ depthmode::readonly });
+		BlendMode::Set({
+			.mode = blendmode::on,
+			.op = blendop::add
+			});
 	}
 
 	cmd(Rocks, int count, int skipper, pMode mode, int r, int g, int b)
@@ -1707,10 +1719,13 @@ namespace Object {
 		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
 
+		AllStars({ 200000,1,pMode::point,1390,925,111,triMode::on });
+
 		vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
 		Maze({ 200000,1,pMode::point,1390,925,111 });
 
-		AllStars({ 200000,1,pMode::point,1390,925,111 });
+
+		AllStars({ 200000,1,pMode::point,1390,925,111,triMode::off });
 
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 		//NeutronStar(neutronStar_cnt, 1, pMode::point);
@@ -1730,7 +1745,7 @@ namespace Object {
 		vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
 		Maze({ 200000,94,pMode::glow,20,30,75 });
 
-		AllStars({ 200000,94,pMode::glow,20,30,75 });
+		//AllStars({ 200000,94,pMode::glow,20,30,75,triMode::off });
 
 		//Galaxy({ galaxy_cnt, 4, pMode::glow ,100,200,300 });
 

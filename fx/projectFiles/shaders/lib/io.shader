@@ -30,3 +30,12 @@ struct VS_OUTPUT_PARTICLE
     float4 color : COLOR0;
     float size : COLOR1;
 };
+
+struct VS_OUTPUT_PARTICLE2
+{
+    float4 pos : SV_POSITION;
+    float4 wpos : POSITION0;
+    float2 uv : TEXCOORD0;
+    float4 color : COLOR0;
+    float size : COLOR1;
+};

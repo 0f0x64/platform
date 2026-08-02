@@ -24,6 +24,19 @@ float4 getGridInst(uint vID, uint iID, int gX,int gY)
     return float4(float2(iID % gX, floor(iID / gX))/float2(gX,gY), map[vID % 6]); 
 }
 
+float4 getGridInst2(uint vID, uint iID, uint gX,uint gY)
+{
+    uint index = vID / 6;
+    float2 map[6] = { 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
+    float2 uv = map[vID % 6];
+    float2 grid = (float2((index % gX), index / gX)+ (uv - .5) + .5) / float2(gX,gY);
+    return float4(grid, uv);
+
+    //uint index = vID / 6;
+    //float2 map[6] = { 0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1 };
+    return float4(float2(index % ((uint)gX), floor(index / ((uint)gX)))/float2(gX,gY), map[vID % 6]); 
+} 
+
 float3 ACESFilm(float3 x)
 {
     float a = 2.51f;
@@ -120,6 +133,14 @@ float3 noise3_u(float3 p)
 struct pos_color
 {
     float4 pos;
+    float4 color;
+    float sz;
+};
+
+struct pos_color2
+{
+    float4 pos;
+    float4 wpos;
     float4 color;
     float sz;
 };

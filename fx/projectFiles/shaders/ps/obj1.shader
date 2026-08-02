@@ -148,6 +148,6 @@ float4 PS(VS_OUTPUT input) : SV_Target
     float3 pos = sphere(uv)*2;
     //
     //return 1;
-    return float4(pos, 1.);
+    return float4(pos, 0.);
 
 }
