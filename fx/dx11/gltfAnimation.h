@@ -354,7 +354,14 @@ namespace gltfAnim
 			return;
 		}
 
-		scene.currentTime = fmodf(scene.currentTime + deltaTime, clip.duration);
+		scene.currentTime += deltaTime;
+		if (scene.currentTime >= clip.duration) {
+			animPlaying = false;
+			scene.currentTime = 0;
+			return;
+		}
+
+		//scene.currentTime = fmodf(scene.currentTime + deltaTime, clip.duration);
 		ResetToBindPose();
 
 		for (size_t jointIdx = 0; jointIdx < scene.joints.size(); ++jointIdx)
