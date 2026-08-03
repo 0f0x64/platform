@@ -357,7 +357,7 @@ namespace gltfAnim
 			return;
 		}
 
-		scene.currentTime += deltaTime;
+		scene.currentTime += deltaTime * 0.1f;
 		if (scene.currentTime >= clip.duration) {
 			animPlaying = false;
 			return;
