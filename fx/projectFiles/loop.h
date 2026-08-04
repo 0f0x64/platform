@@ -2186,7 +2186,7 @@ namespace Loop
 			//
 			//Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
 			//Object::MeshPtr = &Object::HeroMesh;
-			ConstBuf::LoadObj("..//fx//projectFiles//aspid_land.glb");
+			ConstBuf::LoadObj("..//fx//projectFiles//Aspid_Landing_Leva.glb");
 			Object::MeshPtr = nullptr;
 			float4 p = V2F(hero.pos * 10000.);
 
