@@ -25,6 +25,8 @@ namespace gltfAnim
 		std::string name;
 		float duration = 0.0f;
 		std::vector<AnimationChannel> channels;
+
+		float speed = 1.0f;
 	};
 
 	struct Joint
@@ -357,8 +359,8 @@ namespace gltfAnim
 			return;
 		}
 
-		scene.currentTime += deltaTime * 0.1f;
-		if (scene.currentTime >= clip.duration) {
+		scene.currentTime += deltaTime * 0.1f * clip.speed;
+		if (scene.currentTime >= clip.duration || scene.currentTime < 0) {
 			animPlaying = false;
 			return;
 		}

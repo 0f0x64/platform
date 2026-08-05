@@ -452,6 +452,8 @@ struct hero_ {
 		}
 	}
 
+	float prevJumpChargeProgress = 1;
+
 	void processLanding(float deltaTime)
 	{
 		landingTimer += deltaTime;
@@ -473,9 +475,21 @@ struct hero_ {
 			jumpChargeProgress = 1. - .5 * sin(PI * smoothLT) * lastJumpAmpPercent;
 		}
 
+		float delta = prevJumpChargeProgress - jumpChargeProgress;
+		delta = delta == 0 ? 0 : delta / abs(delta);
+
+		ConstBuf::gltfAnim::scene.animations[0].speed = delta;
+
+		/*Log(std::to_string(jumpChargeProgress).c_str());
+		Log("\n");
+		Log(std::to_string(delta).c_str());
+		Log("\n");*/
+
 		if (!gravity.mode && jumpChargeProgress != 1.0f && landingCoef != 1.0f) {
 			ConstBuf::gltfAnim::animPlaying = true;
 		}
+
+		prevJumpChargeProgress = jumpChargeProgress;
 	}
 
 	void Respawn()
@@ -2186,7 +2200,7 @@ namespace Loop
 			//
 			//Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
 			//Object::MeshPtr = &Object::HeroMesh;
-			ConstBuf::LoadObj("..//fx//projectFiles//Aspid_Landing_Leva.glb");
+			ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
 			Object::MeshPtr = nullptr;
 			float4 p = V2F(hero.pos * 10000.);
 
@@ -2200,8 +2214,10 @@ namespace Loop
 					.stencil = switcher::on,
 					.zoom = -75,
 					.onLineOfs = (int)hero.yOffset,
-					.jumpCharge = (int)(hero.jumpChargeProgress*100.)
+					.jumpCharge = 100
 				});
+
+			//.jumpCharge = (int)(hero.jumpChargeProgress*100.)
 
 			//Object::heroWorld = XMMatrixTranspose(XMMatrixIdentity());
 
