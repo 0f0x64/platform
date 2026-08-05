@@ -463,7 +463,7 @@ struct hero_ {
 			landingTimer = 0;
 		}
 
-		float landindDur = .5;
+		float landindDur = .85;
 
 		landingTimer = clamp(landingTimer, 0., landindDur);
 		landingCoef = landingTimer / landindDur;
@@ -479,11 +479,6 @@ struct hero_ {
 		delta = delta == 0 ? 0 : delta / abs(delta);
 
 		ConstBuf::gltfAnim::scene.animations[0].speed = delta;
-
-		/*Log(std::to_string(jumpChargeProgress).c_str());
-		Log("\n");
-		Log(std::to_string(delta).c_str());
-		Log("\n");*/
 
 		if (!gravity.mode && jumpChargeProgress != 1.0f && landingCoef != 1.0f) {
 			ConstBuf::gltfAnim::animPlaying = true;
