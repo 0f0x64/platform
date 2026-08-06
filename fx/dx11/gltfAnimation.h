@@ -27,6 +27,7 @@ namespace gltfAnim
 		std::vector<AnimationChannel> channels;
 
 		float speed = 1.0f;
+		float currentTime = 0.0f;
 	};
 
 	struct Joint
@@ -48,7 +49,7 @@ namespace gltfAnim
 		std::string animationPath;
 		std::string status;
 		int currentAnimation = 0;
-		float currentTime = 0.0f;
+		//float currentTime = 0.0f;
 		XMMATRIX bonePalette[BoneLimit];
 	};
 
@@ -341,10 +342,10 @@ namespace gltfAnim
 
 	inline void Update(float deltaTime)
 	{
-		if (!animPlaying) {
+		/*if (!animPlaying) {
 			scene.currentTime = 0;
 			return;
-		}
+		}*/
 
 		if (scene.animations.empty() || scene.joints.empty())
 		{
@@ -359,8 +360,13 @@ namespace gltfAnim
 			return;
 		}
 
-		scene.currentTime += deltaTime * 0.1f * clip.speed;
-		if (scene.currentTime >= clip.duration || scene.currentTime < 0) {
+		if (!animPlaying) {
+			clip.currentTime = 0;
+			return;
+		}
+
+		clip.currentTime += deltaTime * clip.speed;
+		if (clip.currentTime >= clip.duration || clip.currentTime < 0) {
 			animPlaying = false;
 			return;
 		}
@@ -397,7 +403,7 @@ namespace gltfAnim
 				for (size_t i = 0; i + 1 < channel.times.size(); ++i)
 				{
 					key = i;
-					if (scene.currentTime < channel.times[i + 1])
+					if (clip.currentTime < channel.times[i + 1])
 					{
 						break;
 					}
@@ -412,7 +418,7 @@ namespace gltfAnim
 					const float t1 = channel.times[key + 1];
 					if (t1 - t0 > 0.0001f)
 					{
-						alpha = (std::max)(0.0f, (std::min)(1.0f, (scene.currentTime - t0) / (t1 - t0)));
+						alpha = (std::max)(0.0f, (std::min)(1.0f, (clip.currentTime - t0) / (t1 - t0)));
 						b = XMLoadFloat4(&channel.values[key + 1]);
 					}
 				}
@@ -463,12 +469,14 @@ namespace gltfAnim
 		if (scene.animations.empty())
 		{
 			scene.currentAnimation = 0;
-			scene.currentTime = 0.0f;
 			return;
 		}
 
-		scene.currentAnimation = (scene.currentAnimation + 1) % static_cast<int>(scene.animations.size());
-		scene.currentTime = 0.0f;
+		int animId = (scene.currentAnimation + 1) % static_cast<int>(scene.animations.size());
+
+		scene.currentAnimation = animId;
+		AnimationClip& clip = scene.animations[animId];
+		clip.currentTime = 0.0f;
 		ResetToBindPose();
 		BuildBonePalette();
 	}
@@ -478,13 +486,15 @@ namespace gltfAnim
 		if (scene.animations.empty())
 		{
 			scene.currentAnimation = 0;
-			scene.currentTime = 0.0f;
 			return;
 		}
 
 		const int count = static_cast<int>(scene.animations.size());
-		scene.currentAnimation = (scene.currentAnimation + count - 1) % count;
-		scene.currentTime = 0.0f;
+		int animId = (scene.currentAnimation + count - 1) % count;
+
+		scene.currentAnimation = animId;
+		AnimationClip& clip = scene.animations[animId];
+		clip.currentTime = 0.0f;
 		ResetToBindPose();
 		BuildBonePalette();
 	}
@@ -494,7 +504,6 @@ namespace gltfAnim
 		if (scene.animations.empty())
 		{
 			scene.currentAnimation = 0;
-			scene.currentTime = 0.0f;
 			return;
 		}
 
@@ -503,8 +512,11 @@ namespace gltfAnim
 			index = 0;
 		}
 
-		scene.currentAnimation = index % static_cast<int>(scene.animations.size());
-		scene.currentTime = 0.0f;
+		int animId = index % static_cast<int>(scene.animations.size());
+
+		scene.currentAnimation = animId;
+		AnimationClip& clip = scene.animations[animId];
+		clip.currentTime = 0.0f;
 		ResetToBindPose();
 		BuildBonePalette();
 	}
@@ -591,7 +603,6 @@ namespace gltfAnim
 	{
 		scene.joints.clear();
 		scene.bindLocal.clear();
-		scene.currentTime = 0.0f;
 
 		scene.joints.resize(data->nodes_count);
 		scene.bindLocal.resize(data->nodes_count);
@@ -669,7 +680,6 @@ namespace gltfAnim
 		{
 			scene.animations.clear();
 			scene.currentAnimation = 0;
-			scene.currentTime = 0.0f;
 		}
 
 		const size_t oldCount = scene.animations.size();
@@ -743,8 +753,11 @@ namespace gltfAnim
 		const bool added = scene.animations.size() > oldCount;
 		if (added)
 		{
-			scene.currentAnimation = static_cast<int>(oldCount);
-			scene.currentTime = 0.0f;
+			int animId = static_cast<int>(oldCount);
+
+			scene.currentAnimation = animId;
+			AnimationClip& clip = scene.animations[animId];
+			clip.currentTime = 0.0f;
 			ResetToBindPose();
 			BuildBonePalette();
 		}

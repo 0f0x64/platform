@@ -452,8 +452,6 @@ struct hero_ {
 		}
 	}
 
-	float prevJumpChargeProgress = 1;
-
 	void processLanding(float deltaTime)
 	{
 		landingTimer += deltaTime;
@@ -475,16 +473,13 @@ struct hero_ {
 			jumpChargeProgress = 1. - .5 * sin(PI * smoothLT) * lastJumpAmpPercent;
 		}
 
-		float delta = prevJumpChargeProgress - jumpChargeProgress;
-		delta = delta == 0 ? 0 : delta / abs(delta);
-
-		ConstBuf::gltfAnim::scene.animations[0].speed = delta;
-
 		if (!gravity.mode && jumpChargeProgress != 1.0f && landingCoef != 1.0f) {
 			ConstBuf::gltfAnim::animPlaying = true;
-		}
 
-		prevJumpChargeProgress = jumpChargeProgress;
+			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[0];
+			clip.speed = 0;
+			clip.currentTime = (1 - jumpChargeProgress) * clip.duration;
+		}
 	}
 
 	void Respawn()
