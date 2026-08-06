@@ -473,13 +473,13 @@ struct hero_ {
 			jumpChargeProgress = 1. - .5 * sin(PI * smoothLT) * lastJumpAmpPercent;
 		}
 
-		if (!gravity.mode && jumpChargeProgress != 1.0f && landingCoef != 1.0f) {
+		//if (!gravity.mode && jumpChargeProgress != 1.0f) {
 			ConstBuf::gltfAnim::animPlaying = true;
 
 			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[0];
 			clip.speed = 0;
 			clip.currentTime = (1 - jumpChargeProgress) * clip.duration;
-		}
+		//}
 	}
 
 	void Respawn()
