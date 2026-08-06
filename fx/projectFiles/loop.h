@@ -461,7 +461,7 @@ struct hero_ {
 			landingTimer = 0;
 		}
 
-		float landindDur = .85;
+		float landindDur = .5;
 
 		landingTimer = clamp(landingTimer, 0., landindDur);
 		landingCoef = landingTimer / landindDur;
