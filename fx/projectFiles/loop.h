@@ -476,7 +476,7 @@ struct hero_ {
 		//if (!gravity.mode && jumpChargeProgress != 1.0f) {
 			ConstBuf::gltfAnim::animPlaying = true;
 
-			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[0];
+			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[ConstBuf::gltfAnim::scene.currentAnimation]; // 0
 			clip.speed = 0;
 			clip.currentTime = (1 - jumpChargeProgress) * clip.duration;
 		//}
