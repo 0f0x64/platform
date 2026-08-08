@@ -2228,10 +2228,10 @@ namespace Loop
 			ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
 			Object::MeshPtr = nullptr;
 
-			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true);
-			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//aspid_land.glb", true);
-			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Aspid_Landing_Leva.glb", true);
-			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//hero_landing.glb", true);
+			//ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true);
+			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//aspid_land.glb", true);//Гигант
+			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Aspid_Landing_Leva.glb", true);//Присяд дефолт
+			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//AnimationsAspid (1).glb", true);
 
 			sceneInitialized = true;
 			}
