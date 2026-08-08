@@ -2088,6 +2088,24 @@ namespace Loop
 
 			if (GetActiveWindow() == hWnd && gameCam)
 			{
+
+				// ===== Переключение анимаций по клавишам [ и ] ===== //
+				static bool keyPrevWasDown = false;
+				static bool keyNextWasDown = false;
+
+				bool keyPrev = (GetAsyncKeyState(VK_OEM_4) & 0x8000) != 0;   // '[' — назад
+				bool keyNext = (GetAsyncKeyState(VK_OEM_6) & 0x8000) != 0;   // ']' — вперёд
+
+				if (keyPrev && !keyPrevWasDown)
+					ConstBuf::gltfAnim::PrevAnimation();
+				if (keyNext && !keyNextWasDown)
+					ConstBuf::gltfAnim::NextAnimation();
+
+				keyPrevWasDown = keyPrev;
+				keyNextWasDown = keyNext;
+				SetWindowTextA(hWnd, ConstBuf::gltfAnim::CurrentAnimationLabel()); //Отображение какая из анимаций сейчас используется(в названии окна слева вверху)
+				// ===== //
+
 				float deltaTime = processTimer();
 
 				inputController.mouse.processInput();
@@ -2130,6 +2148,15 @@ namespace Loop
 				alpha = std::clamp(alpha, 0.0f, 1.0f);
 				//TODO: implement characters and camera matrix interpolation (render only)
 			}
+
+			if (!isPrecalc)
+			{
+				Precalc();
+			}
+
+			cmdCounter = precalcOfs;
+			frameConst();
+
 
 			//---------
 			//RENDERING
@@ -2190,8 +2217,26 @@ namespace Loop
 			//
 			//Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
 			//Object::MeshPtr = &Object::HeroMesh;
+
+			//ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
+			//Object::MeshPtr = nullptr;
+
+			// --- ЗАГРУЗКА МОДЕЛИ --- //
+			static bool sceneInitialized = false;
+			if (!sceneInitialized)
+			{
 			ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
 			Object::MeshPtr = nullptr;
+
+			//ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true);
+			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//aspid_land.glb", true);//Гигант
+			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Aspid_Landing_Leva.glb", true);//Присяд дефолт
+			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//AnimationsAspid (1).glb", true);
+
+			sceneInitialized = true;
+			}
+			// ----- //
+
 			float4 p = V2F(hero.pos * 10000.);
 
 			Object::Mesh({

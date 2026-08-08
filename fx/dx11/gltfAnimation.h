@@ -769,4 +769,24 @@ namespace gltfAnim
 		out.joints = XMUINT4(0, 0, 0, 0);
 		out.weights = XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f);
 	}
+
+	inline bool LoadAnimationFile(const char* path, bool remapToCurrentSkeleton = true)
+	{
+		cgltf_options opts{};
+		cgltf_data* data = nullptr;
+
+		if (cgltf_parse_file(&opts, path, &data) != cgltf_result_success)
+			return false;
+
+		if (cgltf_load_buffers(&opts, data, path) != cgltf_result_success)
+		{
+			cgltf_free(data);
+			return false;
+		}
+
+		bool added = ReadAnimations(data, false, remapToCurrentSkeleton);
+		cgltf_free(data);
+		return added;
+	}
+
 }
