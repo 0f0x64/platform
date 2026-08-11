@@ -665,6 +665,17 @@ struct hero_ {
 			if (fabsf(speed) < 0.001f) speed = 0.0f;
 		}
 
+		if (abs(speed) > 0.5f) {
+			ConstBuf::gltfAnim::scene.currentAnimation = 1;
+			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[1];
+			clip.isPlaying = true;
+		}
+		else {
+			ConstBuf::gltfAnim::scene.currentAnimation = 0;
+			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[1];
+			clip.isPlaying = false;
+		}
+
 		// Жесткий зажим скорости в максимальные рамки
 		speed = clamp(speed, -maxSpeed, maxSpeed);
 
