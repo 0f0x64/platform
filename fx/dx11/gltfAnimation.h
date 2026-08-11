@@ -10,7 +10,6 @@
 namespace gltfAnim
 {
 	static const int BoneLimit = 256;
-	bool animPlaying = false;
 
 	struct AnimationChannel
 	{
@@ -28,6 +27,8 @@ namespace gltfAnim
 
 		float speed = 1.0f;
 		float currentTime = 0.0f;
+		bool looped = false;
+		bool isPlaying = false;
 	};
 
 	struct Joint
@@ -360,18 +361,23 @@ namespace gltfAnim
 			return;
 		}
 
-		if (!animPlaying) {
+		if (!clip.isPlaying) {
 			clip.currentTime = 0;
 			return;
 		}
 
-		clip.currentTime += deltaTime * clip.speed;
-		if (clip.currentTime >= clip.duration || clip.currentTime < 0) {
-			animPlaying = false;
-			return;
+		if (clip.looped) {
+			clip.currentTime = fmodf(clip.currentTime + deltaTime, clip.duration);
+		}
+		else {
+			clip.currentTime += deltaTime * clip.speed;
+			if (clip.currentTime >= clip.duration || clip.currentTime < 0) {
+				clip.isPlaying = false;
+				return;
+			}
 		}
 
-		//scene.currentTime = fmodf(scene.currentTime + deltaTime, clip.duration);
+		
 		ResetToBindPose();
 
 		for (size_t jointIdx = 0; jointIdx < scene.joints.size(); ++jointIdx)

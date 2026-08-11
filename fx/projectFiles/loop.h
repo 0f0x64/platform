@@ -474,9 +474,9 @@ struct hero_ {
 		}
 
 		//if (!gravity.mode && jumpChargeProgress != 1.0f) {
-			ConstBuf::gltfAnim::animPlaying = true;
+			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[0];
 
-			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[ConstBuf::gltfAnim::scene.currentAnimation]; // 0
+			clip.isPlaying = true;
 			clip.speed = 0;
 			clip.currentTime = (1 - jumpChargeProgress) * clip.duration;
 		//}
@@ -2227,11 +2227,6 @@ namespace Loop
 			{
 			ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
 			Object::MeshPtr = nullptr;
-
-			//ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true);
-			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//aspid_land.glb", true);//Гигант
-			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Aspid_Landing_Leva.glb", true);//Присяд дефолт
-			ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//AnimationsAspid (1).glb", true);
 
 			sceneInitialized = true;
 			}
