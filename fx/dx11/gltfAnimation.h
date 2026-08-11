@@ -460,12 +460,12 @@ namespace gltfAnim
 
 		UpdateGlobalPose();
 
-		const int rootMotionJoint = FindRootMotionJointIndex(clip);
+		/*const int rootMotionJoint = FindRootMotionJointIndex(clip);
 		if (rootMotionJoint >= 0 && rootMotionJoint < static_cast<int>(scene.bindLocal.size()))
 		{
 			SetTranslation(scene.joints[rootMotionJoint].local, ExtractTranslation(scene.bindLocal[rootMotionJoint]));
 			UpdateGlobalPose();
-		}
+		}*/
 
 		BuildBonePalette();
 	}
