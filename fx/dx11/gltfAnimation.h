@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../utils.h"
+
 namespace gltfAnim
 {
 	static const int BoneLimit = 256;
@@ -25,6 +27,7 @@ namespace gltfAnim
 		float duration = 0.0f;
 		std::vector<AnimationChannel> channels;
 
+		float weight = 1.0f;
 		float speed = 1.0f;
 		float currentTime = 0.0f;
 		bool looped = false;
@@ -354,119 +357,180 @@ namespace gltfAnim
 			return;
 		}
 
-		AnimationClip& clip = scene.animations[scene.currentAnimation % scene.animations.size()];
-		if (clip.duration <= 0.0f)
+		// Проверяем, есть ли хоть один играющий клип
+		bool anyPlaying = false;
+		for (AnimationClip& clip : scene.animations)
+		{
+			if (clip.isPlaying && clip.weight > 0.0f && clip.duration > 0.0f)
+			{
+				anyPlaying = true;
+				break;
+			}
+		}
+
+		if (!anyPlaying)
 		{
 			BuildBonePalette();
 			return;
 		}
 
-		if (!clip.isPlaying) {
-			clip.currentTime = 0;
-			return;
-		}
+		ResetToBindPose();
 
-		if (clip.looped) {
-			clip.currentTime = fmodf(clip.currentTime + deltaTime, clip.duration);
-		}
-		else {
-			clip.currentTime += deltaTime * clip.speed;
-			if (clip.currentTime >= clip.duration || clip.currentTime < 0) {
-				clip.isPlaying = false;
-				return;
+		// Накопители для смешивания
+		std::vector<XMVECTOR> accumScale(scene.joints.size(), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+		std::vector<XMVECTOR> accumRotation(scene.joints.size(), XMQuaternionIdentity());
+		std::vector<XMVECTOR> accumTranslation(scene.joints.size(), XMVectorZero());
+		std::vector<bool> jointAnimated(scene.joints.size(), false);
+		float totalWeight = 0.0f;
+
+		// Проходим по всем клипам
+		for (AnimationClip& clip : scene.animations)
+		{
+			if (!clip.isPlaying || clip.weight <= 0.0f || clip.duration <= 0.0f)
+			{
+				continue;
+			}
+
+			// Обновляем время клипа
+			if (clip.looped)
+			{
+				clip.currentTime = fmodf(clip.currentTime + deltaTime * clip.speed, clip.duration);
+			}
+			else
+			{
+				clip.currentTime += deltaTime * clip.speed;
+				if (clip.currentTime >= clip.duration || clip.currentTime < 0.0f)
+				{
+					clip.currentTime = clamp(clip.currentTime, 0.0f, clip.duration);
+					clip.isPlaying = false;
+					continue;
+				}
+			}
+
+			totalWeight += clip.weight;
+
+			// Для каждого joint в этом клипе
+			for (size_t jointIdx = 0; jointIdx < scene.joints.size(); ++jointIdx)
+			{
+				// Декомпозируем текущую локальную матрицу (после ResetToBindPose)
+				XMVECTOR scale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+				XMVECTOR rotation = XMQuaternionIdentity();
+				XMVECTOR translation = XMVectorZero();
+				XMVECTOR decompScale, decompRotation, decompTranslation;
+				const XMMATRIX currentLocal = XMLoadFloat4x4(&scene.joints[jointIdx].local);
+				if (XMMatrixDecompose(&decompScale, &decompRotation, &decompTranslation, currentLocal))
+				{
+					scale = decompScale;
+					rotation = decompRotation;
+					translation = decompTranslation;
+				}
+
+				bool animated = false;
+
+				// Ищем каналы для этого joint в данном клипе
+				for (const AnimationChannel& channel : clip.channels)
+				{
+					if (channel.joint != static_cast<int>(jointIdx) || channel.times.empty() || channel.values.empty())
+					{
+						continue;
+					}
+
+					animated = true;
+
+					// Поиск ключа
+					size_t key = 0;
+					for (size_t i = 0; i + 1 < channel.times.size(); ++i)
+					{
+						key = i;
+						if (clip.currentTime < channel.times[i + 1])
+						{
+							break;
+						}
+					}
+
+					float alpha = 0.0f;
+					XMVECTOR a = XMLoadFloat4(&channel.values[key]);
+					XMVECTOR b = a;
+					if (key + 1 < channel.times.size())
+					{
+						const float t0 = channel.times[key];
+						const float t1 = channel.times[key + 1];
+						if (t1 - t0 > 0.0001f)
+						{
+							alpha = (std::max)(0.0f, (std::min)(1.0f, (clip.currentTime - t0) / (t1 - t0)));
+							b = XMLoadFloat4(&channel.values[key + 1]);
+						}
+					}
+
+					if (channel.path == cgltf_animation_path_type_translation)
+					{
+						translation = XMVectorLerp(a, b, alpha);
+					}
+					else if (channel.path == cgltf_animation_path_type_rotation)
+					{
+						a = XMQuaternionNormalize(a);
+						b = XMQuaternionNormalize(b);
+						if (XMVectorGetX(XMQuaternionDot(a, b)) < 0.0f)
+						{
+							b = XMVectorNegate(b);
+						}
+						rotation = XMQuaternionNormalize(XMQuaternionSlerp(a, b, alpha));
+					}
+					else if (channel.path == cgltf_animation_path_type_scale)
+					{
+						//scale = XMVectorLerp(a, b, alpha);
+						continue;
+					}
+				}
+
+				if (animated)
+				{
+					// Взвешенное смешивание
+					if (!jointAnimated[jointIdx])
+					{
+						// Первый вклад — инициализируем накопители
+						accumScale[jointIdx] = XMVectorScale(scale, clip.weight);
+						accumRotation[jointIdx] = XMVectorScale(rotation, clip.weight);
+						accumTranslation[jointIdx] = XMVectorScale(translation, clip.weight);
+						jointAnimated[jointIdx] = true;
+					}
+					else
+					{
+						// Последующие вклады — добавляем с весом
+						accumScale[jointIdx] = XMVectorAdd(accumScale[jointIdx], XMVectorScale(scale, clip.weight));
+						accumTranslation[jointIdx] = XMVectorAdd(accumTranslation[jointIdx], XMVectorScale(translation, clip.weight));
+
+						// Кватернионы смешиваем через slerp с весом относительно накопленного
+						float blend = clip.weight / (totalWeight > 0.0f ? totalWeight : 1.0f);
+						accumRotation[jointIdx] = XMQuaternionSlerp(accumRotation[jointIdx], rotation, blend);
+					}
+				}
 			}
 		}
 
-		
-		ResetToBindPose();
+		// Нормализация и применение
+		float invTotalWeight = totalWeight > 0.0f ? (1.0f / totalWeight) : 1.0f;
 
 		for (size_t jointIdx = 0; jointIdx < scene.joints.size(); ++jointIdx)
 		{
-			XMVECTOR scale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-			XMVECTOR rotation = XMQuaternionIdentity();
-			XMVECTOR translation = XMVectorZero();
-			XMVECTOR decomposedScale;
-			XMVECTOR decomposedRotation;
-			XMVECTOR decomposedTranslation;
-			const XMMATRIX currentLocal = XMLoadFloat4x4(&scene.joints[jointIdx].local);
-			if (XMMatrixDecompose(&decomposedScale, &decomposedRotation, &decomposedTranslation, currentLocal))
+			if (!jointAnimated[jointIdx])
 			{
-				scale = decomposedScale;
-				rotation = decomposedRotation;
-				translation = decomposedTranslation;
+				continue;
 			}
 
-			bool animated = false;
-			for (const AnimationChannel& channel : clip.channels)
-			{
-				if (channel.joint != static_cast<int>(jointIdx) || channel.times.empty() || channel.values.empty())
-				{
-					continue;
-				}
+			// Нормализуем scale и translation
+			XMVECTOR finalScale = XMVectorScale(accumScale[jointIdx], invTotalWeight);
+			XMVECTOR finalTranslation = XMVectorScale(accumTranslation[jointIdx], invTotalWeight);
+			XMVECTOR finalRotation = XMQuaternionNormalize(accumRotation[jointIdx]);
 
-				animated = true;
-				size_t key = 0;
-				for (size_t i = 0; i + 1 < channel.times.size(); ++i)
-				{
-					key = i;
-					if (clip.currentTime < channel.times[i + 1])
-					{
-						break;
-					}
-				}
-
-				float alpha = 0.0f;
-				XMVECTOR a = XMLoadFloat4(&channel.values[key]);
-				XMVECTOR b = a;
-				if (key + 1 < channel.times.size())
-				{
-					const float t0 = channel.times[key];
-					const float t1 = channel.times[key + 1];
-					if (t1 - t0 > 0.0001f)
-					{
-						alpha = (std::max)(0.0f, (std::min)(1.0f, (clip.currentTime - t0) / (t1 - t0)));
-						b = XMLoadFloat4(&channel.values[key + 1]);
-					}
-				}
-
-				if (channel.path == cgltf_animation_path_type_translation)
-				{
-					translation = XMVectorLerp(a, b, alpha);
-				}
-				else if (channel.path == cgltf_animation_path_type_rotation)
-				{
-					a = XMQuaternionNormalize(a);
-					b = XMQuaternionNormalize(b);
-					if (XMVectorGetX(XMQuaternionDot(a, b)) < 0.0f)
-					{
-						b = XMVectorNegate(b);
-					}
-					rotation = XMQuaternionNormalize(XMQuaternionSlerp(a, b, alpha));
-				}
-				else if (channel.path == cgltf_animation_path_type_scale)
-				{
-					scale = XMVectorLerp(a, b, alpha);
-				}
-			}
-
-			if (animated)
-			{
-				const XMMATRIX local = XMMatrixScalingFromVector(scale) *
-					XMMatrixRotationQuaternion(rotation) *
-					XMMatrixTranslationFromVector(translation);
-				XMStoreFloat4x4(&scene.joints[jointIdx].local, local);
-			}
+			// Собираем матрицу
+			const XMMATRIX local = XMMatrixScalingFromVector(finalScale) *
+				XMMatrixRotationQuaternion(finalRotation) *
+				XMMatrixTranslationFromVector(finalTranslation);
+			XMStoreFloat4x4(&scene.joints[jointIdx].local, local);
 		}
 
 		UpdateGlobalPose();
-
-		/*const int rootMotionJoint = FindRootMotionJointIndex(clip);
-		if (rootMotionJoint >= 0 && rootMotionJoint < static_cast<int>(scene.bindLocal.size()))
-		{
-			SetTranslation(scene.joints[rootMotionJoint].local, ExtractTranslation(scene.bindLocal[rootMotionJoint]));
-			UpdateGlobalPose();
-		}*/
-
 		BuildBonePalette();
 	}
 

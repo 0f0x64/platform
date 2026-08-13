@@ -476,8 +476,6 @@ struct hero_ {
 		//if (!gravity.mode && jumpChargeProgress != 1.0f) {
 			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[0];
 
-			clip.isPlaying = true;
-			clip.speed = 0;
 			clip.currentTime = (1 - jumpChargeProgress) * clip.duration;
 		//}
 	}
@@ -666,12 +664,12 @@ struct hero_ {
 		}
 
 		if (abs(speed) > 0.5f) {
-			ConstBuf::gltfAnim::scene.currentAnimation = 1;
+			//ConstBuf::gltfAnim::scene.currentAnimation = 1;
 			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[1];
 			clip.isPlaying = true;
 		}
 		else {
-			ConstBuf::gltfAnim::scene.currentAnimation = 0;
+			//ConstBuf::gltfAnim::scene.currentAnimation = 0;
 			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[1];
 			clip.isPlaying = false;
 		}
@@ -2099,23 +2097,6 @@ namespace Loop
 
 			if (GetActiveWindow() == hWnd && gameCam)
 			{
-
-				// ===== ѕереключение анимаций по клавишам [ и ] ===== //
-				static bool keyPrevWasDown = false;
-				static bool keyNextWasDown = false;
-
-				bool keyPrev = (GetAsyncKeyState(VK_OEM_4) & 0x8000) != 0;   // '[' Ч назад
-				bool keyNext = (GetAsyncKeyState(VK_OEM_6) & 0x8000) != 0;   // ']' Ч вперЄд
-
-				if (keyPrev && !keyPrevWasDown)
-					ConstBuf::gltfAnim::PrevAnimation();
-				if (keyNext && !keyNextWasDown)
-					ConstBuf::gltfAnim::NextAnimation();
-
-				keyPrevWasDown = keyPrev;
-				keyNextWasDown = keyNext;
-				SetWindowTextA(hWnd, ConstBuf::gltfAnim::CurrentAnimationLabel()); //ќтображение кака€ из анимаций сейчас используетс€(в названии окна слева вверху)
-				// ===== //
 
 				float deltaTime = processTimer();
 

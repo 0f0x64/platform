@@ -685,7 +685,12 @@ namespace ConstBuf
 			//gltfAnim::LoadAnimationFile("..//fx//projectFiles//aspid_land.glb", true);//Гигант
 			//gltfAnim::LoadAnimationFile("..//fx//projectFiles//Aspid_Landing_Leva.glb", true);//Обратный присяд
 
+			gltfAnim::scene.animations[0].isPlaying = true;
+			gltfAnim::scene.animations[0].speed = 0;
+			gltfAnim::scene.animations[0].weight = 0.5f;
+
 			gltfAnim::scene.animations[1].looped = true;
+			gltfAnim::scene.animations[1].weight = 0.5f;
 		}
 			else
 		{
