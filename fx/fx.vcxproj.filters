@@ -366,6 +366,15 @@
     <None Include="projectFiles\shaders\vs\star.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
+    <None Include="projectFiles\shaders\ps\basic2.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\basicLow2.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\starTri.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Object Include="projectFiles\hero.obj">

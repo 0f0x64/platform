@@ -20,77 +20,102 @@ float toRad(float a)
     return a*PI/180.;
 }
 
+float3 rand3D(float3 p) 
+{
+    float3 s = float3(
+        dot(p, float3(127.1, 311.7, 74.7)), 
+        dot(p, float3(269.5, 183.3, 246.1)),
+        dot(p, float3(113.5, 271.9, 124.3))
+    );
+    return frac(sin(s) * 43758.5453);
+}
+
+float4 cells3D(float3 localPos)
+{   
+    // Масштабируем трехмерное пространство
+    localPos *= 10.0;
+    
+    float3 iuv = floor(localPos);
+    float3 guv = frac(localPos);
+
+    float mDist = 1.0;
+        
+    float3 mPos = 0;
+    // Цикл по соседним ячейкам в 3D (3x3x3 = 27 итераций)
+    for (float z = -1.0; z <= 1.0; z++) 
+    {
+        for (float y = -1.0; y <= 1.0; y++) 
+        {
+            for (float x = -1.0; x <= 1.0; x++) 
+            {            
+                float3 neighbor = float3(x, y, z); 
+                float3 pointPos = rand3D(iuv + neighbor);			
+                
+                // Анимация движения точек внутри своих мини-кубов
+                pointPos = 0.5 + 0.5 * sin(time.x / 342.0 + 6.2831 * pointPos);		
+                
+                
+                // Вектор разности в 3D
+                float3 diff = neighbor + pointPos - guv;            
+                
+                // Расчет трехмерной дистанции с вашей кастомной вариацией масштаба ячеек
+                float dist = length(diff) * (1.0 + rand3D(iuv + neighbor + 100.0).x * 0.25);
+                if (dist<mDist) mPos = diff;
+                
+                //if (dist<mDist) mPos = pointPos - guv;
+                //if (dist<mDist) mPos = neighbor - guv;
+
+                mDist = min(mDist, dist);
+            }
+        }
+    }
+    
+    // Эффект свечения / метасфер
+    //mDist = 0.1 / (1.0 - clamp(mDist, 0.0, 1.0));       
+    mDist = 0.1 / (1.0 - mDist);       
+    return float4(mPos,mDist);
+    
+    // Смешивание интенсивности
+    float color = lerp(0.0, 1.0, mDist) * 1.5;        
+
+    return color;    
+} 
+
 float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
 {
-    float3 pos = float3(hash(iid/200.),hash(iid/140.),hash(iid/120.))-.5;
-    pos=normalize(pos)*2;
+    float3 h2=float3(hash(iid/200.),hash(iid/140.),hash(iid/120.))-.5;
+    float3 pos = h2;
+    float3 k = float3(iid/123.,iid/234.,iid/345.)/13.;
+    //k=noise3(111/(k+1))*75;
+    pos=noise3(k);
+    pos=normalize(pos)*1.;
 
-    pos+=pos*noise3(pos);
+    pos*=1+rot3(pos,noise3(pos*4.5)*17)/4;
+    pos=rot3(pos,noise3(pos*2-time.x*.0005)*2);
+    pos=rot3(pos,noise3(pos/222)*2);
 
-    //pos*=4;
-    
-    a=hash(iid/1000.);
-    //pos+=noise3(a*351*float3(4,25,67))*1.7;
+    pos*=.81+pow(.65/(frac(length(pos/2)*7-time.x*0.0005)+.017),.75)*.1;
 
-    //pos = rot3(pos,noise3(pos*.8+float3(0,t,0))/6);
-    pos=rot3(pos,pos/3);
-    //pos=rotY(pos,pos);
-    //pos=rotX(pos,pos);
-    //pos=rotZ(pos,pos);
-    pos+= noise3(pos)*.8;
-    pos = rot3(pos,noise3(pos.zyx*1.6+float3(0,-t,0))/12);
-    pos/=100;
-    pos=normalize(pos);
-    //pos+=(frac(pos/7)-.5)*4;
+
     float3 pos2=pos;
     
-    //if (iid%2==0)
-    {
-        //pos=4/(abs(pos)+.03)*sign(pos);
-        //pos.y=-pow(((noise(pos+time.x/40))),3)*6;
-        //pos=normalize(pos)*5;
-        //pos*=(abs(sin(atan2(pos.x,pos.y)*2+PI/2))+1)+1;
-        //pos*=(abs(sin(atan2(pos.y,pos.z)*2+PI/2))+1)+1;
-        //pos/=4;
-        float3 hole=float3(0,0,0)*13;
-        float dst=.1/(distance(pos,hole));
-        pos-=normalize(hole-pos)*pow(dst,4);
-        //pos/=4;
-
-        //pos=lerp(pos,normalize(pos),saturate(length(pos/82)));
-        
-        //pos+=1/rot3(pos,pos/3);
-        pos*=1+frac(length(pos)+time.x/4);
-        //pos/=2;
-        
-    }
-    //else{
-      //  pos=normalize(pos);
-         //pos=lerp(pos,normalize(pos)*18+pos/32,saturate(length(pos/12)));
-         //pos/=4;
-         //pos=rot3(pos,pos+time.x/20);
-         //pos.y-=6;
-
-    //}
-
-
-
-    //pos*=.9;
-    float dst=3;
-/*    for (int i=0;i<32;i++)
-    {
-        float4 j=(i+1)*float4(11,12,13,14)+time.x*.003;
-        float3 hole=float3(sin(j.x),cos(j.y),sin(j.z)*cos(j.w));
-        hole=normalize(hole)*(8.3+.5*sin((pos)+time.x*.01));
-        dst=3/(distance(pos,hole));
-        pos-=sign(i%3-.5)*normalize(hole-pos)*pow(dst,3);
-       // pos=rot3(pos,saturate((hole*pos)/.1)*12);
-    }*/
-  
-    //pos+= noise3(pos/6)*.8;
-
+        //pos+=noise3(pos*12)*1.;
+    //pos=noise3(h2*22);
+    pos*=1+h2*frac(time.xxx*.001+h2*222)/(length(pos*42)+6);
+    float4 c = cells3D(pos/3.);
+    //pos=lerp(pos,pos+c.xyz,.1/c.w);
+    pos+=.3*c.w*normalize(pos);
+    //pos+=c.xyz*(.1/c.w);
+    //pos+= pos*c.xyz/(c.w+7);
+    pos=rot3(pos,time.xxx/1522.+length(noise3(pos)));
+    //pos2=pos+normalize(pos)*noise(frac(pos+time.x/222));
+        //pos+=normalize(pos)*cells3D(pos2/3-time.x/111).w*.2;
+//        pos=rot3(pos,noise3(pos*3-time.x/12)/12);
+        //pos=normalize(pos)*2;
+      //pos=pos*.2+normalize(pos)*.6;
+        //pos=pos*frac(time.xxx*.005+pos)*.2+normalize(pos);
     
-    return pos/2;
+    return pos/2.32;
 }
 
 
@@ -99,7 +124,7 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
 {
      qid *= skipper;
      float t=time.x*.004;
-     uint inStars = 10000;
+     uint inStars = 300;
      if (mode==1||iid%inStars==0)
      {
         t=0;
@@ -126,7 +151,7 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
      {
 
      pos = pillar(qid,iid,grid.xy,0,t,0);
-     pos*=2;
+     pos*=2.2;
      }
 
 
@@ -141,7 +166,8 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
     pos_color2 p;
     p.wpos = float4(pos,1);
     p.color = float4(noise3_u(111+float3(113,11,111)*221+177+sin(pos2*.48)),1)/110.+.0015;
-    p.color*=base_color/2;
+    //p.color*=base_color/2;
+    p.color.rgb*=float3(7,3,1)*2;
     //p.color=lerp(p.color,p.color.bgra,saturate(pow(length(pos)/13,13)));
     if (triMode==1)
     {
@@ -163,12 +189,14 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
 
              if (iid%inStars==0)
              {
-                  p.pos = transform_unisize(pos,grid.zw,151.5);
+                 float s= noise(pos)*100+55;
+                  p.pos = transform_unisize(pos,grid.zw,s);
                    p.sz=2;
                    p.color*=3;
              }
 
         }
+        //p.color=0;
     }
 
     if (triMode==0)
@@ -176,6 +204,7 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
         float4 posT = mul(float4(pos,1), view[0]);
         posT = mul(posT, proj[0]);
         p.pos=posT;
+        
     }
 
     //p.color=10;
@@ -191,7 +220,7 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
   
    
     //density compensation
-    //p.color/=min(pow(p.pos.w,1.1)*.21+.5,11);
+    p.color/=min(pow(p.pos.w,1.1)*.21+.5,1);
     return p;
 }
 

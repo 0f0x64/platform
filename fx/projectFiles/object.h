@@ -904,22 +904,30 @@ namespace Object {
 		
 
 		NewLine();
-		AddPointToLine({ 0,0,0 });
+		AddPointToLine({ 0,11,-16 });
 		AddPointToLine({ 100,0,0 });
 		AddPointToLine({ 200,0,0 });
 		AddPointToLine({ 200,110,0 });
 		AddPointToLine({ 100,110,0 });
-		AddPointToLine({ 0,10,0 });
+		AddPointToLine({ 0,6,0 });
 
 		NewLine();
-		AddPointToLine({ 0,0,3 });
+		AddPointToLine({ -39,-34,3 });
 		AddPointToLine({ 100,0,10 });
 		AddPointToLine({ 200,0,13 });
 		AddPointToLine({ 200,110,13 });
 		AddPointToLine({ 100,110,3 });
-		AddPointToLine({ 0,10,3 });
+		AddPointToLine({ -32,-4,3 });
 
-		NewStar({ 0,0,0,66 });
+		NewLine();
+		AddPointToLine({ -44,-5,-5 });
+		AddPointToLine({ -11,-32,-4 });
+		AddPointToLine({ 22,-16,25 });
+		AddPointToLine({ 22,17,13 });
+		AddPointToLine({ -3,31,11 });
+		AddPointToLine({ -33,16,13 });
+
+		NewStar({ 0,0,0,306 });
 
 		float ofs = 13;
 		float4 starPathStart = float4(0, 0, starLineList.line[currentLine].point[0].w + ofs,0);
@@ -1128,7 +1136,7 @@ namespace Object {
 			Culling::Set({ cullmode::front });
 			DepthBuf::Mode({ depthmode::on });
 			BlendMode::Set({
-				.mode = blendmode::off,
+				.mode = blendmode::on,
 				.op = blendop::add
 				});
 		}
@@ -1719,15 +1727,21 @@ namespace Object {
 		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
 
+		OuterSpace(outerSpace_cnt, 1, pMode::point);
+
 		AllStars({ 200000,1,pMode::point,1390,925,111,triMode::on });
+		//AllStars({ 200000,1,pMode::point,1390,925,111,triMode::off });
+		
+		Culling::Set({ cullmode::off });
+		DepthBuf::Mode({ depthmode::readonly });
+		BlendMode::Set({
+			.mode = blendmode::on,
+			.op = blendop::add
+			});
 
 		vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
 		Maze({ 200000,1,pMode::point,1390,925,111 });
 
-
-		AllStars({ 200000,1,pMode::point,1390,925,111,triMode::off });
-
-		OuterSpace(outerSpace_cnt, 1, pMode::point);
 		//NeutronStar(neutronStar_cnt, 1, pMode::point);
 
 		//Galaxy({ galaxy_cnt, 14, pMode::point ,100,200,300 });
@@ -1738,7 +1752,7 @@ namespace Object {
 		//call show obj
 
 		Culling::Set({ cullmode::off });
-		DepthBuf::Mode({ depthmode::off });
+		DepthBuf::Mode({ depthmode::readonly });
 
 		//mid
 		RenderTarget::Set({ texture::pBufMid,0 });
@@ -1746,12 +1760,13 @@ namespace Object {
 		Maze({ 200000,94,pMode::glow,20,30,75 });
 
 		//AllStars({ 200000,94,pMode::glow,20,30,75,triMode::off });
+		//AllStars({ 200000,1,pMode::point,1390,925,111,triMode::on });
 
 		//Galaxy({ galaxy_cnt, 4, pMode::glow ,100,200,300 });
 
 		//low
 		RenderTarget::Set({ texture::pBufLow,0 });
-
+		
 
 		//Pillars(pillars_cnt, 10394, pMode::glow);
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);

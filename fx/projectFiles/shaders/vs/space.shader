@@ -82,7 +82,8 @@ pos_color CalcParticles(uint qid, float4 grid)
         }
     } 
 
-
+    //p.pos.w*=.99944;
+    //p.pos.w+=-.001;
     
     return p;
 }

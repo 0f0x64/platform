@@ -970,6 +970,12 @@ struct
 filter sam1Filter;
 addr sam1AddressU;
 addr sam1AddressV;
+filter sam2Filter;
+addr sam2AddressU;
+addr sam2AddressV;
+filter sam3Filter;
+addr sam3AddressU;
+addr sam3AddressV;
 } samplers;
 
 void set () {
@@ -980,6 +986,8 @@ Textures::TextureToShader((texture)textures.screen, 0, targetshader::pixel);
 Textures::TextureToShader((texture)textures.screenMid, 1, targetshader::pixel); 
 Textures::TextureToShader((texture)textures.screenLow, 2, targetshader::pixel); 
 Sampler::Sampler(targetshader::pixel, 0, samplers.sam1Filter, samplers.sam1AddressU, samplers.sam1AddressV); 
+Sampler::Sampler(targetshader::pixel, 1, samplers.sam2Filter, samplers.sam2AddressU, samplers.sam2AddressV); 
+Sampler::Sampler(targetshader::pixel, 2, samplers.sam3Filter, samplers.sam3AddressU, samplers.sam3AddressV); 
 }
 
 } output;

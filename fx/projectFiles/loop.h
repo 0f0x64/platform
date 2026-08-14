@@ -1200,8 +1200,18 @@ namespace Loop
 		ps::output.samplers = {
 				.sam1Filter = filter::linear,
 				.sam1AddressU = addr::wrap,
-				.sam1AddressV = addr::wrap
+				.sam1AddressV = addr::wrap,
+				
+				.sam2Filter = filter::linear,
+				.sam2AddressU = addr::wrap,
+				.sam2AddressV = addr::wrap,
+
+				.sam3Filter = filter::linear,
+				.sam3AddressU = addr::wrap,
+				.sam3AddressV = addr::wrap
+
 		};
+
 
 		vs::quad.set();
 		ps::output.set();

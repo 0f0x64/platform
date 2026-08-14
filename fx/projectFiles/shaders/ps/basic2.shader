@@ -21,6 +21,6 @@ float4 PS(VS_OUTPUT_PARTICLE2 input, bool isFrontFace : SV_IsFrontFace) : SV_Tar
     //  d+=c*3;
     if (length(input.size)<=1.1) return float4(15*input.color.rgb/9.,1);
 
-    return float4(d*input.color.rgb/9.,0);
+    return float4(d*input.color.rgb/9.,0 );
 
 }
