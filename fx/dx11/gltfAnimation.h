@@ -351,6 +351,8 @@ namespace gltfAnim
 			return;
 		}*/
 
+		ResetToBindPose();
+
 		if (scene.animations.empty() || scene.joints.empty())
 		{
 			BuildBonePalette();
@@ -373,8 +375,6 @@ namespace gltfAnim
 			BuildBonePalette();
 			return;
 		}
-
-		ResetToBindPose();
 
 		// Накопители для смешивания
 		std::vector<XMVECTOR> accumScale(scene.joints.size(), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
