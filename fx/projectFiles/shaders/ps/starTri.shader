@@ -189,7 +189,7 @@ float4 PS(VS_OUTPUT_PARTICLE2 input, bool isFrontFace : SV_IsFrontFace) : SV_Tar
     // ТЕКСТУРА 1: ИСХОДНЫЙ ДИСК (cells3D)
     // =================================================================
     float3 p_disk = p + rot3(p, noise3(p * 16.41 + t * 0.5)) * 0.2;
-    float cellTex = saturate( cells3D(p_disk * 12.4) * 0.18) * diskZone*14;
+    float cellTex = saturate( cells3D(p_disk * 12.4) * 0.18) * diskZone*4;
     
     // =================================================================
     // ТЕКСТУРА 2: МЯГКАЯ ЗА ТУХАЮЩАЯ КОРОНА
@@ -199,22 +199,22 @@ float4 PS(VS_OUTPUT_PARTICLE2 input, bool isFrontFace : SV_IsFrontFace) : SV_Tar
     float radialNoise1 = noise3(float3(radialUV.x * 145.0, radialUV.y * 14.0, t * 4.10)) * 0.5 + 0.5;
     float radialNoise2 = noise3(float3(radialUV.x * 125.0, radialUV.y * 16.0, t * 3.3)) * 0.5 + 0.5;
     
-    radialNoise1 = .521/cells3D(.05*float3(radialUV.x * 45.0, radialUV.y * 14.0, t * 1.10));
-    radialNoise2 = .521/cells3D(.05*float3(radialUV.x * 125.0, radialUV.y * 16.0, t * 2.3));
+    radialNoise1 = .321/cells3D(.05*float3(radialUV.x * 145.0, radialUV.y * 14.0, t * 1.10));
+    radialNoise2 = .321/cells3D(.05*float3(radialUV.x * 125.0, radialUV.y * 16.0, t * 2.3));
     
     // МЯГКОЕ смешивание вместо жесткого pow(..., 2.2). Лучи получаются пушистыми
     float coronaTex = saturate((radialNoise1 + radialNoise2) * 0.25) * coronaZone;
-    coronaTex*=.5+1.3*sin(radialUV*6);
+    coronaTex*=.5+.3*sin(radialUV*16);
     // Плавное затухание короны к краям геометрии (умножаем на edgeFade)
-    coronaTex *= edgeFade * 1.5;
-    coronaTex *= 1-saturate(diskZone*1);
+    coronaTex *= edgeFade * 5.5;
+    coronaTex *= 1-saturate(diskZone*2);
     
     // =================================================================
     // СМЕШИВАНИЕ И МЯГКИЙ РАСЧЕТ ЦВЕТА
     // =================================================================
     // Соединяем текстуры. Диск дает плотность в центре, корона — пушистость на краях
     
-    float finalPlasma = (cellTex * 42) + (coronaTex * 4.0);
+    float finalPlasma = (cellTex * 142) + (coronaTex * 4.0);
 
     // Градиент цвета: мягкий переход от оранжевого к дымчатому бело-желтому свечению
     //float3 centerColor = float3(1.0, 0.75, 0.5) * finalPlasma*114;
@@ -223,10 +223,10 @@ float4 PS(VS_OUTPUT_PARTICLE2 input, bool isFrontFace : SV_IsFrontFace) : SV_Tar
     float3 edgeGlow    =  coronaZone * finalPlasma * 113.5;
     //return float4(edgeGlow,1);
     edgeGlow=max(edgeGlow,0)*saturate(1-diskZone*8);
-    float3 finalColor = (centerColor + edgeGlow) * 122.0 * input.color.rgb;
+    float3 finalColor = (centerColor + edgeGlow) * 222.0 * input.color.rgb;
 
     float coronaMask = saturate(pow(edgeFade,2));
-    coronaMask=pow(.5+.5*cos(edgeFade*PI-.66),81)*10;
+    coronaMask=pow(.5+.5*cos(edgeFade*PI-.766),81)*10;
     coronaMask*=1-saturate(diskZone);
     finalColor+=pow(coronaMask,.8)*22222*(input.color+1);
 
