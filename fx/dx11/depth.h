@@ -9,7 +9,7 @@ namespace Depth
 		// Depth test parameters
 		dsDesc.DepthEnable = false;
 		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
 		// Stencil test parameters
 		dsDesc.StencilEnable = true;

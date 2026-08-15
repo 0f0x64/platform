@@ -1122,6 +1122,8 @@ namespace Object {
 
 	}
 
+	int starStencilTarget = 0;
+
 	cmd(AllStars, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode)
 	{
 		reflect;
@@ -1133,8 +1135,14 @@ namespace Object {
 		{
 			ps::starTri.set();
 
-			Culling::Set({ cullmode::front });
-			DepthBuf::Mode({ depthmode::on });
+			Culling::Set({ cullmode::front }); 
+			DepthBuf::Mode({ depthmode::off });
+
+			if (starStencilTarget == 2)
+			{
+				DepthBuf::Mode({ depthmode::off });
+			}
+
 			BlendMode::Set({
 				.mode = blendmode::on,
 				.op = blendop::add
@@ -1160,11 +1168,22 @@ namespace Object {
 
 			int count = 500000;
 
-			
+			int w = sd.w;
 			if (in.tMode == triMode::on)
 			{
 				gX = 64;
 				gY = 32;
+
+
+				if (starStencilTarget == 1)
+				{
+				//	w *= .975;
+				}
+
+				if (starStencilTarget == 2)
+				{
+					//w *= 1.15;
+				}
 			}
 
 			vs::star = {
@@ -1175,7 +1194,7 @@ namespace Object {
 					.mode = (int)in.mode,
 					.skipper = 0,
 					.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
-					.PosRad = float4(sd.x,sd.y,sd.z,sd.w),
+					.PosRad = float4(sd.x,sd.y,sd.z,w),
 					.triMode = (int)in.tMode
 				},
 			};
@@ -1726,12 +1745,9 @@ namespace Object {
 
 		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
+		starStencilTarget = 0;
+		AllStars({ 200000,1,pMode::point,1000,200,10,triMode::on });
 
-		OuterSpace(outerSpace_cnt, 1, pMode::point);
-
-		AllStars({ 200000,1,pMode::point,1390,925,111,triMode::on });
-		//AllStars({ 200000,1,pMode::point,1390,925,111,triMode::off });
-		
 		Culling::Set({ cullmode::off });
 		DepthBuf::Mode({ depthmode::readonly });
 		BlendMode::Set({
@@ -1739,23 +1755,26 @@ namespace Object {
 			.op = blendop::add
 			});
 
+		OuterSpace(outerSpace_cnt, 1, pMode::point);
+
+		//AllStars({ 200000,1,pMode::point,26,11,2,triMode::off });
+		
 		vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
 		Maze({ 200000,1,pMode::point,1390,925,111 });
 
-		//NeutronStar(neutronStar_cnt, 1, pMode::point);
-
-		//Galaxy({ galaxy_cnt, 14, pMode::point ,100,200,300 });
-
-		//RenderTarget::Set({ texture::pBuf,0 });
-		//RenderTarget::Clear({ 0,0,0,0 });
-
-		//call show obj
-
-		Culling::Set({ cullmode::off });
-		DepthBuf::Mode({ depthmode::readonly });
 
 		//mid
 		RenderTarget::Set({ texture::pBufMid,0 });
+		starStencilTarget = 1;
+
+		//AllStars({ 200000,1,pMode::point,0,0,0,triMode::on });
+		Culling::Set({ cullmode::off });
+		DepthBuf::Mode({ depthmode::readonly });
+		BlendMode::Set({
+			.mode = blendmode::on,
+			.op = blendop::add
+			});
+
 		vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
 		Maze({ 200000,94,pMode::glow,20,30,75 });
 
@@ -1766,8 +1785,17 @@ namespace Object {
 
 		//low
 		RenderTarget::Set({ texture::pBufLow,0 });
-		
+		starStencilTarget = 2;
+		//AllStars({ 200000,1,pMode::point,7,2,0,triMode::on });
 
+		Culling::Set({ cullmode::off });
+		DepthBuf::Mode({ depthmode::readonly });
+		BlendMode::Set({
+			.mode = blendmode::on,
+			.op = blendop::add
+			});
+
+		//AllStars({ 200000,1,pMode::glow,1390,925,111,triMode::off });
 		//Pillars(pillars_cnt, 10394, pMode::glow);
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 

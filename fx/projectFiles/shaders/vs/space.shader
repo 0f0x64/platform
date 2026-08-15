@@ -17,15 +17,16 @@ float4 transform2(float3 pos,float2 grid, float size)
     float2 uv = grid-.5;
     float2 scale = float2(proj[0]._m00,proj[0]._m11);
     float4 posT;
-    posT.w=1;
     posT.xyz = mul(pos/1.2, (float3x3)view[0]);
+    posT.xy+=uv*size*.1;
+    posT.w=1;
 
-        float4 pt = mul(posT, proj[0]);
-        float2 sz = uv*.002*(posT.z/posT.w)*size;
-        sz = uv*size*.1;
-        posT.xy+=sz;
+    //    float4 pt = mul(posT, proj[0]);
+        //float2 sz = uv*.002*(posT.z/posT.w)*size;
+        //sz = uv*size*.1;
+        //posT.xy+=sz;
         posT = mul(posT, proj[0]);
-
+        //return 0;
         return posT;
 }
 
@@ -43,6 +44,7 @@ float4 transform_unisize2(float3 pos,float2 grid,float size)
         posT = mul(posT, proj[0]);
         posT.xy+=sz;
 
+        return 0;
         return posT;
 }
 
@@ -79,9 +81,11 @@ pos_color CalcParticles(uint qid, float4 grid)
             p.pos=transform2(pos,grid.zw,63);
             p.color*=.051;
             p.sz=2;
-        }
-    } 
 
+        }
+        
+    } 
+    p.pos.w=p.pos.z;
     //p.pos.w*=.99944;
     //p.pos.w+=-.001;
     

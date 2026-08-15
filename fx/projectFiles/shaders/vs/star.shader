@@ -166,7 +166,6 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
     pos_color2 p;
     p.wpos = float4(pos,1);
     p.color = float4(noise3_u(111+float3(113,11,111)*221+177+sin(pos2*.48)),1)/110.+.0015;
-    //p.color*=base_color/2;
     p.color.rgb*=float3(7,3,1)*2;
     //p.color=lerp(p.color,p.color.bgra,saturate(pow(length(pos)/13,13)));
     if (triMode==1)
@@ -204,7 +203,7 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
         float4 posT = mul(float4(pos,1), view[0]);
         posT = mul(posT, proj[0]);
         p.pos=posT;
-        
+        p.color=base_color;
     }
 
     //p.color=10;
@@ -220,7 +219,8 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
   
    
     //density compensation
-    p.color/=min(pow(p.pos.w,1.1)*.21+.5,1);
+    //p.color/=min(pow(p.pos.w,1.1)*.21+.5,1);
+        
     return p;
 }
 

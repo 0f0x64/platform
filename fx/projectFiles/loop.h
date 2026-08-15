@@ -2201,9 +2201,11 @@ namespace Loop
 
 			RenderTarget::Set({ texture::pBufMid,0 });
 			RenderTarget::Clear({ 0,0,0,0 });
+			DepthBuf::Clear({});
 
 			RenderTarget::Set({ texture::pBufLow,0 });
 			RenderTarget::Clear({ 0,0,0,0 });
+			DepthBuf::Clear({});
 
 			RenderTarget::Set({ texture::pBuf,0 });
 
