@@ -687,10 +687,10 @@ namespace ConstBuf
 
 			gltfAnim::scene.animations[0].isPlaying = true;
 			gltfAnim::scene.animations[0].speed = 0;
-			gltfAnim::scene.animations[0].weight = 0.5f;
+			gltfAnim::scene.animations[0].weight = 1.0f;
 
 			gltfAnim::scene.animations[1].looped = true;
-			gltfAnim::scene.animations[1].weight = 0.5f;
+			gltfAnim::scene.animations[1].weight = 0.25f;
 		}
 			else
 		{

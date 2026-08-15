@@ -399,7 +399,7 @@ namespace gltfAnim
 			else
 			{
 				clip.currentTime += deltaTime * clip.speed;
-				if (clip.currentTime >= clip.duration || clip.currentTime < 0.0f)
+				if (clip.currentTime > clip.duration || clip.currentTime < 0.0f)
 				{
 					clip.currentTime = clamp(clip.currentTime, 0.0f, clip.duration);
 					clip.isPlaying = false;
