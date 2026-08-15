@@ -478,11 +478,6 @@ struct hero_ {
 
 			clip.isPlaying = jumpChargeProgress != 1.0f;
 			clip.currentTime = (1 - jumpChargeProgress) * clip.duration;
-
-			Log(std::to_string(clip.currentTime).c_str());
-			Log("; ");
-			Log(std::to_string(clip.duration).c_str());
-			Log("\n");
 		//}
 	}
 
