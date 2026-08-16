@@ -1757,7 +1757,7 @@ namespace Object {
 
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 
-		//AllStars({ 200000,1,pMode::point,26,11,2,triMode::off });
+		AllStars({ 200000,1,pMode::point,26,11,2,triMode::off });
 		
 		vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
 		Maze({ 200000,1,pMode::point,1390,925,111 });

@@ -118,7 +118,34 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     return pos/2.32;
 }
 
+float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
+{
+    float3 pos = float3(hash(iid/200.),hash(iid/140.),hash(iid/120.))-.5;
+    pos=normalize(pos)*2;
 
+    pos+=pos*noise3(pos);
+    pos*=4;
+    a=hash(iid/1000.);
+    pos=rot3(pos,pos/3);
+    pos+= noise3(pos)*.8;
+    pos = rot3(pos,noise3(pos.zyx*1.6+float3(0,-t,0))/12);
+    
+    float3 pos2=pos;
+    
+        pos=4/(abs(pos)+.03)*sign(pos);
+        float3 hole=float3(0,0,0)*13;
+        float dst=7/(distance(pos,hole));
+        pos-=normalize(hole-pos)*pow(dst,4);
+
+        pos=lerp(pos,normalize(pos)*22,saturate(length(pos/82)));
+        
+        pos+=1/rot3(pos,pos/3);
+        pos*=1+frac(length(pos)+time.x/40);
+        pos/=2;
+       
+   
+    return pos/2;
+}
 
 pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
 {
@@ -150,7 +177,7 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
      if (triMode==1)
      {
 
-     pos = pillar(qid,iid,grid.xy,0,t,0);
+     pos = pillar3(qid,iid,grid.xy,0,t,0)*.21;
      pos*=2.2;
      }
 
@@ -170,6 +197,8 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
     //p.color=lerp(p.color,p.color.bgra,saturate(pow(length(pos)/13,13)));
     if (triMode==1)
     {
+    //p.color=lerp(p.color,p.color.bgra,saturate(pow(length(pos)/13,13)));
+
         if (mode==1)
         {
             float s=hash(iid)*33+11;
@@ -180,21 +209,20 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
         }
         else
         {
-            p.pos = transform_unisize(pos,grid.zw,5.75);
+            p.pos = transform_unisize(pos,grid.zw,1.75);
            //p.color=-noise(pos*.3+12)*.04+.02;;
            // p.color +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
-             p.sz=11;
+             p.sz=1;
              p.color*=1.2;
 
-             if (iid%inStars==0)
+             if (iid%2111==0)
              {
-                 float s= noise(pos)*100+55;
-                  p.pos = transform_unisize(pos,grid.zw,s);
+                  p.pos = transform_unisize(pos,grid.zw,151.5);
                    p.sz=2;
                    p.color*=3;
              }
 
-        }
+        }  
         //p.color=0;
     }
 
