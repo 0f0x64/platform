@@ -28,6 +28,7 @@ namespace gltfAnim
 		std::vector<AnimationChannel> channels;
 
 		float weight = 1.0f;
+		float realWeight = 1.0f;
 		float speed = 1.0f;
 		float currentTime = 0.0f;
 		bool looped = false;
@@ -488,7 +489,7 @@ namespace gltfAnim
 					{
 						// Первый вклад — инициализируем накопители
 						accumScale[jointIdx] = XMVectorScale(scale, clip.weight);
-						accumRotation[jointIdx] = rotation; //XMVectorScale(rotation, clip.weight);
+						accumRotation[jointIdx] = XMVectorScale(rotation, clip.weight);
 						accumTranslation[jointIdx] = XMVectorScale(translation, clip.weight);
 						jointAnimated[jointIdx] = true;
 						jointWeightSum[jointIdx] = clip.weight;
@@ -499,7 +500,6 @@ namespace gltfAnim
 						accumScale[jointIdx] = XMVectorAdd(accumScale[jointIdx], XMVectorScale(scale, clip.weight));
 						accumTranslation[jointIdx] = XMVectorAdd(accumTranslation[jointIdx], XMVectorScale(translation, clip.weight));
 
-						// Кватернионы смешиваем через slerp с весом относительно накопленного
 						float blend = clip.weight / (jointWeightSum[jointIdx] + clip.weight);
 						accumRotation[jointIdx] = XMQuaternionSlerp(accumRotation[jointIdx], rotation, blend);
 						jointWeightSum[jointIdx] += clip.weight;
@@ -868,11 +868,9 @@ namespace gltfAnim
 		AnimationClip& clip = scene.animations[0];
 
 		clip.isPlaying = true;
+		clip.realWeight = 0.0f;
 
-		float targetWeight = clip.weight;
-		clip.weight = 0;
-
-		interp::Animate(clip.weight, targetWeight, 0.1f);
+		//interp::Animate(clip.realWeight, 1.0f, 0.1f);
 	}
 
 }

@@ -212,7 +212,7 @@
     <ClInclude Include="dx11\cgltf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="interp.h">
+    <ClInclude Include="projectFiles\interp.h">
       <Filter>Source Files\projectFiles</Filter>
     </ClInclude>
   </ItemGroup>

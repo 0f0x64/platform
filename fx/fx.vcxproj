@@ -401,7 +401,7 @@
     <ClInclude Include="generated\uiShaderMargin.h" />
     <ClInclude Include="generated\vsList.h" />
     <ClInclude Include="girl.h" />
-    <ClInclude Include="interp.h" />
+    <ClInclude Include="projectFiles\interp.h" />
     <ClInclude Include="projectFiles\camera.h" />
     <ClInclude Include="projectFiles\cubemap.h" />
     <ClInclude Include="projectFiles\loop.h" />
