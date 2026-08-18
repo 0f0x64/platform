@@ -366,7 +366,6 @@ namespace gltfAnim
 			if (clip.isPlaying && clip.weight > 0.0f && clip.duration > 0.0f)
 			{
 				anyPlaying = true;
-				break;
 			}
 		}
 
@@ -381,7 +380,8 @@ namespace gltfAnim
 		std::vector<XMVECTOR> accumRotation(scene.joints.size(), XMQuaternionIdentity());
 		std::vector<XMVECTOR> accumTranslation(scene.joints.size(), XMVectorZero());
 		std::vector<bool> jointAnimated(scene.joints.size(), false);
-		float totalWeight = 0.0f;
+
+		std::vector<float> jointWeightSum(scene.joints.size(), 0.0f);
 
 		// Проходим по всем клипам
 		for (AnimationClip& clip : scene.animations)
@@ -406,8 +406,6 @@ namespace gltfAnim
 					continue;
 				}
 			}
-
-			totalWeight += clip.weight;
 
 			// Для каждого joint в этом клипе
 			for (size_t jointIdx = 0; jointIdx < scene.joints.size(); ++jointIdx)
@@ -490,9 +488,10 @@ namespace gltfAnim
 					{
 						// Первый вклад — инициализируем накопители
 						accumScale[jointIdx] = XMVectorScale(scale, clip.weight);
-						accumRotation[jointIdx] = XMVectorScale(rotation, clip.weight);
+						accumRotation[jointIdx] = rotation; //XMVectorScale(rotation, clip.weight);
 						accumTranslation[jointIdx] = XMVectorScale(translation, clip.weight);
 						jointAnimated[jointIdx] = true;
+						jointWeightSum[jointIdx] = clip.weight;
 					}
 					else
 					{
@@ -501,16 +500,20 @@ namespace gltfAnim
 						accumTranslation[jointIdx] = XMVectorAdd(accumTranslation[jointIdx], XMVectorScale(translation, clip.weight));
 
 						// Кватернионы смешиваем через slerp с весом относительно накопленного
-						float blend = clip.weight / (totalWeight > 0.0f ? totalWeight : 1.0f);
+						float blend = clip.weight / (jointWeightSum[jointIdx] + clip.weight);
 						accumRotation[jointIdx] = XMQuaternionSlerp(accumRotation[jointIdx], rotation, blend);
+						jointWeightSum[jointIdx] += clip.weight;
 					}
 				}
 			}
 		}
 
-		// Нормализация и применение
-		float invTotalWeight = totalWeight > 0.0f ? (1.0f / totalWeight) : 1.0f;
+		/*Log(std::to_string(totalWeight).c_str());
+		Log(" | ");
+		Log(std::to_string(invTotalWeight).c_str());
+		Log("\n");*/
 
+		// Нормализация
 		for (size_t jointIdx = 0; jointIdx < scene.joints.size(); ++jointIdx)
 		{
 			if (!jointAnimated[jointIdx])
@@ -518,9 +521,11 @@ namespace gltfAnim
 				continue;
 			}
 
+			float invJointWeight = jointWeightSum[jointIdx] > 0.0f ? 1.0f / jointWeightSum[jointIdx] : 1.0f;
+
 			// Нормализуем scale и translation
-			XMVECTOR finalScale = XMVectorScale(accumScale[jointIdx], invTotalWeight);
-			XMVECTOR finalTranslation = XMVectorScale(accumTranslation[jointIdx], invTotalWeight);
+			XMVECTOR finalScale = XMVectorScale(accumScale[jointIdx], invJointWeight);
+			XMVECTOR finalTranslation = XMVectorScale(accumTranslation[jointIdx], invJointWeight);
 			XMVECTOR finalRotation = XMQuaternionNormalize(accumRotation[jointIdx]);
 
 			// Собираем матрицу
