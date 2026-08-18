@@ -30,6 +30,8 @@ XMVECTOR getRandVector4()
 #include "cubemap.h"
 #include "object.h"
 
+#include "interp.h"
+
 
 
 struct inputController_ {
@@ -2136,6 +2138,8 @@ namespace Loop
 
 					accumulator -= FIXED_DT;
 				}
+
+				interp::UpdateTweens(deltaTime);
 
 				float alpha = accumulator / FIXED_DT;
 				alpha = std::clamp(alpha, 0.0f, 1.0f);

@@ -3,8 +3,6 @@
 #include <vector>
 #include <memory>
 
-#include "timer.h"
-
 
 namespace interp {
 
@@ -62,7 +60,7 @@ namespace interp {
     class ITween {
     public:
         virtual ~ITween() = default;
-        virtual void Update() = 0;
+        virtual void Update(float deltaTime) = 0;
         virtual bool IsPlaying() const = 0;
         virtual bool IsPaused() const = 0;
         virtual void Start() = 0;
@@ -76,7 +74,7 @@ namespace interp {
     {
     public:
         Tween(T* target, const T& endValue, double duration, Curve curve = Curve::Linear)
-            : target(target), endValue(endValue), duration(duration * 1000), curve(curve), { // Multiply duration by 1000 to convert to milliseconds
+            : target(target), endValue(endValue), duration(duration * 1000), curve(curve) { // Multiply duration by 1000 to convert to milliseconds
             if (target) {
                 startValue = *target;
             }
@@ -112,10 +110,10 @@ namespace interp {
             isPaused = false;
         }
 
-        void Update() {
+        void Update(float deltaTime) {
             if (!isPlaying || !target) return;
 
-            passedTime += timer::deltaTime;
+            passedTime += deltaTime;
 
             float t = min(1.0f, passedTime / duration);
             *target = interpolate(t);
@@ -186,9 +184,9 @@ namespace interp {
         return tween;
     }
 
-    inline void UpdateTweens() {
+    inline void UpdateTweens(float deltaTime) {
         for (auto& tween : _activeTweens) {
-            tween->Update();
+            tween->Update(deltaTime);
         }
 
         _activeTweens.erase(

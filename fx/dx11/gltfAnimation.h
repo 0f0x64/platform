@@ -864,4 +864,15 @@ namespace gltfAnim
 		return added;
 	}
 
+	inline void PlayAnimation(int id) {
+		AnimationClip& clip = scene.animations[0];
+
+		clip.isPlaying = true;
+
+		float targetWeight = clip.weight;
+		clip.weight = 0;
+
+		interp::Animate(clip.weight, targetWeight, 0.1f);
+	}
+
 }
