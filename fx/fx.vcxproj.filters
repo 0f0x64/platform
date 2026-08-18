@@ -209,6 +209,12 @@
     <ClInclude Include="editor\textEditor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dx11\cgltf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="interp.h">
+      <Filter>Source Files\dx11</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">
