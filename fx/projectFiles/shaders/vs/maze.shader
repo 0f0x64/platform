@@ -313,10 +313,13 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     p.color.a=1;
     p.color.rgb = noise3_u(pos*14*float3(12,55,112))/31+float3(1,3,5)/52;
     
+    
     //p.color*=.5;
 //    p.color*=base_color*(pow(length(pos)/16,4)+.1);
     //p.color*=1+sin(grid.x*PI*8);
     p.color=lerp(p.color,p.color.bgra,sin(length(pos)));
+
+    p.color.rgb = float3(3,1,0)/25;
 //    p.color=lerp(p.color,base_color/144,1-saturate(pow(length(pos)/6,11)));
 //pos+=noise(pos/12)*12-6;
 //pos*=.75;

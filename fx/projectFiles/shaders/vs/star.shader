@@ -118,7 +118,7 @@ float3 pillar(uint qid,uint iid,float2 grid,float a, float t, float h)
     return pos/2.32;
 }
 
-float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
+float4 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
 {
     float3 pos = float3(hash(iid/200.),hash(iid/140.),hash(iid/120.))-.5;
     pos=normalize(pos)*2;
@@ -128,23 +128,28 @@ float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
     a=hash(iid/1000.);
     pos=rot3(pos,pos/3);
     pos+= noise3(pos)*.8;
-    pos = rot3(pos,noise3(pos.zyx*1.6+float3(0,-t,0))/12);
-    
+    //pos = rot3(pos,noise3(pos.zyx*1.6+float3(0,-t,0))/12);
     float3 pos2=pos;
     
         pos=4/(abs(pos)+.03)*sign(pos);
-        float3 hole=float3(0,0,0)*13;
-        float dst=7/(distance(pos,hole));
-        pos-=normalize(hole-pos)*pow(dst,4);
+        float dst=7/(length(pos));
+        pos+=normalize(pos)*pow(dst,4);
 
         pos=lerp(pos,normalize(pos)*22,saturate(length(pos/82)));
+
+        pos+=3/(rot3(pos,pos/3));
+        float tt=frac(length(pos)+time.x/40);
+        pos+=normalize(pos)*tt;
+        pos*=1+frac(length(pos))/5;
         
-        pos+=1/rot3(pos,pos/3);
-        pos*=1+frac(length(pos)+time.x/40);
-        pos/=2;
-       
+        pos/=3;
+                        float ttt=pow(length(pos)/8,11.5);
+       //pos*=4;
+       //pos-=22221/pow(pos,3);
+       //pos/=6;
+       //pos+=normalize(pos)*frac(length(pos2)+time.x/22)*5;
    
-    return pos/2;
+    return float4(pos/2,ttt);
 }
 
 pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
@@ -172,12 +177,12 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
     pos.z = sin(theta) * sin(phi);
 
    
-
+    float4 pw=0;
 
      if (triMode==1)
      {
-
-     pos = pillar3(qid,iid,grid.xy,0,t,0)*.21;
+         pw=pillar3(qid,iid,grid.xy,0,t,0)*.21;
+     pos = pw.xyz;
      pos*=2.2;
      }
 
@@ -206,6 +211,7 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
             p.pos=transform(pos,grid.zw,s);
             p.color*=1.3;
             p.sz=172;
+            
         }
         else
         {
@@ -214,12 +220,23 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
            // p.color +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
              p.sz=1;
              p.color*=1.2;
-
+             
              if (iid%2111==0)
              {
+                  pos.xyz = float3(hash(iid/200.),hash(iid/140.),hash(iid/120.))-.5;
+                  pos*=60;
+                  pos+=normalize(pos)*4;
+                  float tt=frac(length(pos)+time.x/140);
+                  pos+=normalize(pos)*tt*42;
+                  //pos
+
                   p.pos = transform_unisize(pos,grid.zw,151.5);
                    p.sz=2;
                    p.color*=3;
+                   p.color*=1-tt;
+             }else{
+                 //p.color*=pow(saturate(1-length(pos)/72),.5);
+                 //p.color*=saturate(1-pw.w);
              }
 
         }  

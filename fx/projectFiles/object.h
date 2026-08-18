@@ -590,7 +590,7 @@ namespace Object {
 	};
 
 	struct {
-		starline line[100];
+		starline line[200];
 		int lineCount = 0;
 	} starLineList;
 
@@ -637,7 +637,7 @@ namespace Object {
 			totalLength += distance(line.basePoint[i], line.basePoint[i + 1]);
 		}
 
-		int stepsPerSegment = totalLength/25.;
+		int stepsPerSegment = totalLength/50.;
 		if (stepsPerSegment < 2) stepsPerSegment = 2;
 
 		// Если исходных точек недостаточно для сглаживания или шаг некорректен
@@ -911,7 +911,7 @@ namespace Object {
 		AddPointToLine({ 100,110,0 });
 		AddPointToLine({ 0,6,0 });
 
-		NewLine();
+		/*NewLine();
 		AddPointToLine({ -39,-34,3 });
 		AddPointToLine({ 100,0,10 });
 		AddPointToLine({ 200,0,13 });
@@ -925,115 +925,166 @@ namespace Object {
 		AddPointToLine({ 22,-16,25 });
 		AddPointToLine({ 22,17,13 });
 		AddPointToLine({ -3,31,11 });
-		AddPointToLine({ -33,16,13 });
+		AddPointToLine({ -33,16,13 });*/
 
 		NewStar({ 0,0,0,306 });
 
-		float ofs = 13;
-		float4 starPathStart = float4(0, 0, starLineList.line[currentLine].point[0].w + ofs,0);
-		int starPatchPCount = 44;
-	//	NewLine();
-		float4 cStar = starPathStart;
-
-		float rad = starLineList.line[currentLine].point[0].w + ofs;          // Радиус сферы (подберите под ваш масштаб)
-		float waveAmp = 0.0f;           // Высота переплетения (над/под)
-		int totalTurns = 7;            // !!! ЖЕСТКИЙ КОНТРОЛЬ ВИТКОВ !!! (сколько раз обернется вокруг сферы)
-		float noiseStrength = 1.4f;     // Степень "хаотичности" изгибов (0.0 - идеальная спираль, выше - хаос)
-
-		XMVECTOR centerOffset = XMVectorSet(starLineList.line[currentLine].point[0].x/100., starLineList.line[currentLine].point[0].y / 100., starLineList.line[currentLine].point[0].z / 100., 0.0f);
-
-
-		for (int i = 0; i < starPatchPCount; i++)
+		/*
+		for (int j = 0; j < 10; j++)
 		{
-			// 1. Получаем линейный прогресс от 0.0 до 1.0 вдоль всей линии
-			float progress = (float)i / (starPatchPCount - 1);
-
-			// 2. Базовые углы вращения, жестко завязанные на количество витков
-			// Точка гарантированно сделает ровно столько оборотов, сколько указано в totalTurns
-			float baseAngleX = progress * totalTurns * XM_2PI;
-			float baseAngleY = progress * totalTurns * XM_PI;
-			float baseAngleZ = progress * (totalTurns * 0.5f) * XM_2PI;
-
-			// 3. Накладываем детерминированный псевдослучайный шум на углы (модуляция фазы)
-			// Шум зависит от progress, поэтому узор стабилен, но плавно изгибается
-			float rawNoiseX = std::sin(progress * 45.0f + 12.9f) * 43758.54f;
-			float noiseX = (rawNoiseX - std::floor(rawNoiseX)) * noiseStrength;
-
-			float rawNoiseY = std::sin(progress * 67.0f + 41.1f) * 75124.12f;
-			float noiseY = (rawNoiseY - std::floor(rawNoiseY)) * noiseStrength;
-
-			float rawNoiseZ = std::sin(progress * 89.0f + 59.3f) * 63241.15f;
-			float noiseZ = (rawNoiseZ - std::floor(rawNoiseZ)) * noiseStrength;
-
-			// Итоговые углы для текущей точки
-			float rotX = baseAngleX + noiseX;
-			float rotY = baseAngleY + noiseY;
-			float rotZ = baseAngleZ + noiseZ;
-
-			// 4. Вычисляем динамический радиус для эффекта переплетения (над/под)
-			// Частота волны привязана к количеству витков, чтобы пересечения огибали друг друга
-			float waveFreq = totalTurns * 4.0f;
-			float wave = std::sin(progress * waveFreq * XM_2PI);
-			float currentRad = rad + (wave * waveAmp);
-
-			// 5. Создаем базовый вектор на радиусе
-			XMVECTOR basePoint = XMVectorSet(0.0f, 0.0f, currentRad, 1.0f);
-
-			// 6. Поворот по трем осям через DirectXMath
-			XMMATRIX rotationMatrix = XMMatrixRotationRollPitchYaw(rotX, rotY, rotZ);
-			XMVECTOR rotatedPoint = XMVector3Transform(basePoint, rotationMatrix);
-
-			// 7. Смещение центра сферы
-			XMVECTOR finalPoint = XMVectorAdd(rotatedPoint, centerOffset);
-
-			// 8. Выгрузка в структуру cStar
-			XMFLOAT4 storeStar;
-			XMStoreFloat4(&storeStar, finalPoint);
-
-			cStar.x = storeStar.x;
-			cStar.y = storeStar.y;
-			cStar.z = storeStar.z;
-
-			
-				//AddPointToLine({ (int)cStar.x, (int)cStar.y, (int)cStar.z });
-		}
-
-		//NewStar({ 28,0,-9,14 });
-
-		/*for (int i = 0; i < starsCount; i++)
-		{
-			// Начинаем с i + 1, чтобы не проверять i==j и не дублировать пары (j,i)
-			for (int j = i + 1; j < starsCount; j++)
+			NewLine();
+			int g = 10;
+			float r = 1 + j/7.;
+			for (int i = 0; i < g; i++)
 			{
-				float4 start = gemini[i];
-				float4 end = gemini[j];
-
-				// Проверка дистанции в исходном диапазоне -1...1
-				if (distance(start, end) < .75)
-				{
-					NewLine();
-					int seg = 10;
-					for (int k = 0; k <= seg; k++)
-					{
-						float4 p = lerp3(start, end, k / (float)seg);
-
-						float rs = .02*sin((k / (float)seg)*PI);
-						p.x += getRandFloat()*rs;
-						p.y += getRandFloat()*rs;
-						p.z += getRandFloat()*rs;
-
-						// Масштабируем координаты точек для игрового мира
-						float scale = 600;
-						p.x *= scale;
-						p.y *= scale;
-						p.z *= scale;
-
-						AddPoint(p);
-					}
-				}
+				
+				float x = sin(2 * PI * i / (float)g);
+				float y = cos(2 * PI * i / (float)g);
+				x *= r;
+				y *= r;
+				int _x = x * 40;
+				int _y = y * 40;
+				AddPointToLine({ _x,_y,0 });
 			}
 		}*/
 
+		/*
+		for (int j = 0; j < 10; j++)
+		{
+			NewLine();
+			int g = 10;
+			float r = 1.0f + j / 7.0f;
+
+			// 1. Генерируем случайные углы для полноценного 3D-разворота плоскости
+			float alpha = ((float)rand() / RAND_MAX) * XM_2PI; // Вокруг Z
+			float beta = ((float)rand() / RAND_MAX) * XM_PI;  // Наклон (Вокруг X)
+			float gamma = ((float)rand() / RAND_MAX) * XM_2PI; // Вокруг новой Z
+
+			// 2. Создаем матрицы вращения d3d11 и объединяем их в одну общую матрицу трансформации
+			XMMATRIX rotZ1 = XMMatrixRotationZ(alpha);
+			XMMATRIX rotX = XMMatrixRotationX(beta);
+			XMMATRIX rotZ2 = XMMatrixRotationZ(gamma);
+
+			// В DirectX матрицы перемножаются слева направо: Сначала Z2, потом наклон X, потом Z1
+			XMMATRIX finalRotation = rotZ2 * rotX * rotZ1;
+
+			for (int i = 0; i < g; i++)
+			{
+				// 3. Базовая точка на плоском кольце (Z = 0)
+				float angle = XM_2PI * i / (float)g;
+				XMVECTOR basePoint = XMVectorSet(r * sinf(angle), r * cosf(angle), 0.0f, 1.0f);
+
+				// 4. Умножаем вектор на матрицу вращения
+				XMVECTOR rotatedPoint = XMVector3Transform(basePoint, finalRotation);
+
+				// 5. Извлекаем данные, масштабируем (* 40) и приводим к int
+				int _x = (int)(XMVectorGetX(rotatedPoint) * 40.0f);
+				int _y = (int)(XMVectorGetY(rotatedPoint) * 40.0f);
+				int _z = (int)(XMVectorGetZ(rotatedPoint) * 40.0f);
+
+				AddPointToLine({ _x, _y, _z });
+			}
+		}
+		*/
+
+		/*
+		for (int j = 0; j < 10; j++)
+		{
+			NewLine();
+
+			// g = 12 идеально для гладкой петли Катмулла-Рома
+			int g = 12;
+			// ТВОЙ ИСХОДНЫЙ МАСШТАБ
+			float r = 1.0f + j / 7.0f;
+
+			// Фиксируем сид для каждого протуберанца
+			unsigned int starSeed = 101 + j;
+			srand(starSeed);
+
+			// Случайные углы 3D-гироскопа, чтобы петли торчали из звезды в разные стороны
+			float alpha = ((float)rand() / RAND_MAX) * XM_2PI;
+			float beta = ((float)rand() / RAND_MAX) * XM_PI;
+			float gamma = ((float)rand() / RAND_MAX) * XM_2PI;
+
+			XMMATRIX rotZ1 = XMMatrixRotationZ(alpha);
+			XMMATRIX rotX = XMMatrixRotationX(beta);
+			XMMATRIX rotZ2 = XMMatrixRotationZ(gamma);
+			XMMATRIX finalRotation = rotZ2 * rotX * rotZ1;
+
+			for (int i = 0; i < g; i++)
+			{
+				// Пускаем angle по полному кругу, но за счет сдвига это будет петля, 
+				// растущая ИЗ центра
+				float angle = XM_2PI * i / (float)(g - 1);
+
+				// ГЕОМЕТРИЧЕСКИЙ ТРЮК:
+				// Строим базовый круг, но сдвигаем его по Y на величину радиуса (+ r).
+				// Теперь при угле angle = PI точка (0, -r + r) окажется ровно в координатах (0, 0, 0) - т.е. в центре звезды.
+				float x_raw = r * sinf(angle);
+				float y_raw = r * cosf(angle) + r; // <-- СДВИГ ОСИ ВЫТАЛКИВАНИЯ
+				float z_raw = 0.0f;
+
+				XMVECTOR basePoint = XMVectorSet(x_raw, y_raw, z_raw, 1.0f);
+
+				// Поворачиваем петлю. Теперь она вращается НЕ вокруг своего геометрического центра,
+				// а вокруг точки своего основания, которая привязана к ядру звезды.
+				XMVECTOR rotatedPoint = XMVector3Transform(basePoint, finalRotation);
+
+				// ТВОЙ ИСХОДНЫЙ МАСШТАБ ДЛЯ ДВИЖКА (* 40)
+				int _x = (int)(XMVectorGetX(rotatedPoint) * 40.0f);
+				int _y = (int)(XMVectorGetY(rotatedPoint) * 40.0f);
+				int _z = (int)(XMVectorGetZ(rotatedPoint) * 40.0f);
+
+				AddPointToLine({ _x, _y, _z });
+			}
+		}*/
+
+		// Большой внешний цикл — хаотично рассыпаем 100 прямых лазерных штрихов
+for (int j = 0; j < 60; j++)
+{
+	NewLine();
+
+	// Прямая линия из 5 точек. Для идеального лерпа этого достаточно,
+	// сплайн Катмулла-Рома прорисует её как ровную световую струну
+	int g = 5;
+
+	// Случайный масштаб (расстояние от центра звезды до начала луча)
+	float randScale = (float)rand() / RAND_MAX;
+	float r_start = (3.0f + (randScale * 10.0f) / 7.0f) * 0.35f;
+
+	// Длина самого лазерного штриха (в твоих пропорциях, например, небольшая фиксированная длина)
+	float rayLength = 3.2f;
+	float r_end = r_start + rayLength;
+
+	// Рандомный разворот всей линии целиком по двум осям (Yaw и Pitch)
+	float yaw = ((float)rand() / RAND_MAX) * XM_2PI; // Поворот вокруг Y
+	float pitch = ((float)rand() / RAND_MAX) * XM_PI;  // Наклон вокруг X
+
+	XMMATRIX finalRotation = XMMatrixRotationRollPitchYaw(pitch, yaw, 0.0f);
+
+	for (int i = 0; i < g; i++)
+	{
+		// t строго от 0.0 (начало штриха) до 1.0 (конец штриха)
+		float t = (float)i / (float)(g - 1);
+
+		// ЧЕСТНЫЙ ЛЕРП: линия абсолютно прямая и направлена строго вдоль оси Y наружу
+		float x_raw = 0.0f;
+		float y_raw = r_start + (r_end - r_start) * t;
+		float z_raw = 0.0f;
+
+		XMVECTOR basePoint = XMVectorSet(x_raw, y_raw, z_raw, 1.0f);
+
+		// Поворачиваем всю прямую линию одинаково
+		XMVECTOR rotatedPoint = XMVector3Transform(basePoint, finalRotation);
+
+		// ТВОЙ ИСХОДНЫЙ МАСШТАБ (* 40)
+		int _x = (int)(XMVectorGetX(rotatedPoint) * 40.0f);
+		int _y = (int)(XMVectorGetY(rotatedPoint) * 40.0f);
+		int _z = (int)(XMVectorGetZ(rotatedPoint) * 40.0f);
+
+		AddPointToLine({ _x, _y, _z });
+	}
+}
 			
 		//------------end user space---------------
 		//-----------------------------------------
@@ -1768,13 +1819,15 @@ namespace Object {
 		starStencilTarget = 1;
 
 		//AllStars({ 200000,1,pMode::point,0,0,0,triMode::on });
+		
 		Culling::Set({ cullmode::off });
 		DepthBuf::Mode({ depthmode::readonly });
 		BlendMode::Set({
 			.mode = blendmode::on,
 			.op = blendop::add
 			});
-
+		//AllStars({ 200000,1,pMode::point,26,11,2,triMode::off });
+		
 		vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
 		Maze({ 200000,94,pMode::glow,20,30,75 });
 
@@ -1799,6 +1852,7 @@ namespace Object {
 		//Pillars(pillars_cnt, 10394, pMode::glow);
 		OuterSpace(outerSpace_cnt, 64, pMode::glow);
 
+		//AllStars({ 200000,1,pMode::point,26,11,2,triMode::off });
 		//------------------
 		//hi
 		
