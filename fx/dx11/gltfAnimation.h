@@ -364,7 +364,7 @@ namespace gltfAnim
 		bool anyPlaying = false;
 		for (AnimationClip& clip : scene.animations)
 		{
-			if (clip.isPlaying && clip.weight > 0.0f && clip.duration > 0.0f)
+			if (clip.isPlaying && clip.weight > 0.0f && clip.realWeight > 0.0f && clip.duration > 0.0f)
 			{
 				anyPlaying = true;
 			}
@@ -387,7 +387,7 @@ namespace gltfAnim
 		// Проходим по всем клипам
 		for (AnimationClip& clip : scene.animations)
 		{
-			if (!clip.isPlaying || clip.weight <= 0.0f || clip.duration <= 0.0f)
+			if (!clip.isPlaying || clip.weight <= 0.0f || clip.realWeight <= 0.0f || clip.duration <= 0.0f)
 			{
 				continue;
 			}
@@ -514,6 +514,7 @@ namespace gltfAnim
 		Log("\n");*/
 
 		// Нормализация
+		// Теперь применяем realWeight — насколько сильно анимация влияет на bind pose
 		for (size_t jointIdx = 0; jointIdx < scene.joints.size(); ++jointIdx)
 		{
 			if (!jointAnimated[jointIdx])
