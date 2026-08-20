@@ -463,7 +463,8 @@ namespace gltfAnim
 
 					if (channel.path == cgltf_animation_path_type_translation)
 					{
-						translation = XMVectorLerp(a, b, alpha);
+						XMVECTOR animTrans = XMVectorLerp(a, b, alpha);
+						translation = XMVectorLerp(decompTranslation, animTrans, clip.realWeight);
 					}
 					else if (channel.path == cgltf_animation_path_type_rotation)
 					{
@@ -473,7 +474,8 @@ namespace gltfAnim
 						{
 							b = XMVectorNegate(b);
 						}
-						rotation = XMQuaternionNormalize(XMQuaternionSlerp(a, b, alpha));
+						XMVECTOR animRot = XMQuaternionNormalize(XMQuaternionSlerp(a, b, alpha));
+						rotation = XMQuaternionSlerp(decompRotation, animRot, clip.realWeight);
 					}
 					else if (channel.path == cgltf_animation_path_type_scale)
 					{
@@ -489,7 +491,7 @@ namespace gltfAnim
 					{
 						// Первый вклад — инициализируем накопители
 						accumScale[jointIdx] = XMVectorScale(scale, clip.weight);
-						accumRotation[jointIdx] = XMVectorScale(rotation, clip.weight);
+						accumRotation[jointIdx] = rotation; //XMVectorScale(rotation, clip.weight);
 						accumTranslation[jointIdx] = XMVectorScale(translation, clip.weight);
 						jointAnimated[jointIdx] = true;
 						jointWeightSum[jointIdx] = clip.weight;
@@ -514,7 +516,6 @@ namespace gltfAnim
 		Log("\n");*/
 
 		// Нормализация
-		// Теперь применяем realWeight — насколько сильно анимация влияет на bind pose
 		for (size_t jointIdx = 0; jointIdx < scene.joints.size(); ++jointIdx)
 		{
 			if (!jointAnimated[jointIdx])
@@ -866,7 +867,10 @@ namespace gltfAnim
 	}
 
 	inline void PlayAnimation(int id) {
-		AnimationClip& clip = scene.animations[0];
+		AnimationClip& clip = scene.animations[id];
+
+		if (clip.isPlaying)
+			return;
 
 		clip.isPlaying = true;
 		clip.realWeight = 0.0f;
