@@ -479,10 +479,10 @@ struct hero_ {
 			clip.currentTime = (1 - jumpChargeProgress) * clip.duration;
 
 			if (jumpChargeProgress != 1.0f) {
-				ConstBuf::gltfAnim::PlayAnimation(0, 0.1f);
+				ConstBuf::gltfAnim::PlayAnimation(0);
 			}
 			else {
-				ConstBuf::gltfAnim::StopAnimation(0, 0.1f);
+				ConstBuf::gltfAnim::StopAnimation(0);
 			}
 		//}
 	}
