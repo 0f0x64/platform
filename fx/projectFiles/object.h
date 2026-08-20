@@ -21,7 +21,7 @@ float frac(float x) {
 
 float4 normalize(const float4& v) {
 	// Считаем длину вектора по формуле Пифагора
-	float length = std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	float length = ::std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 
 	// Защита от деления на ноль (если вектор нулевой)
 	if (length < 0.00001f) {
@@ -748,13 +748,13 @@ namespace Object {
 			66,215,61,156,180
 		};
 
-		int X = static_cast<int>(std::floor(x)) & 255;
-		int Y = static_cast<int>(std::floor(y)) & 255;
-		int Z = static_cast<int>(std::floor(z)) & 255;
+		int X = static_cast<int>(::std::floor(x)) & 255;
+		int Y = static_cast<int>(::std::floor(y)) & 255;
+		int Z = static_cast<int>(::std::floor(z)) & 255;
 
-		x -= std::floor(x);
-		y -= std::floor(y);
-		z -= std::floor(z);
+		x -= ::std::floor(x);
+		y -= ::std::floor(y);
+		z -= ::std::floor(z);
 
 		float u = perlin_fade(x);
 		float v = perlin_fade(y);

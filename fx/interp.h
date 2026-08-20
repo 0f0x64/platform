@@ -1,7 +1,8 @@
-#include <functional>
-#include <cmath>
+//#include <functional>
 #include <vector>
+#include <cmath>
 #include <memory>
+#include <algorithm>
 
 
 namespace interp {
@@ -74,10 +75,11 @@ namespace interp {
     {
     public:
         Tween(T* target, const T& endValue, double duration, Curve curve = Curve::Linear)
-            : target(target), endValue(endValue), duration(duration * 1000), curve(curve) { // Multiply duration by 1000 to convert to milliseconds
+            : target(target), endValue(endValue), duration(duration), curve(curve) {
             if (target) {
                 startValue = *target;
             }
+            passedTime = 0;
         }
 
         void Start() {
@@ -151,15 +153,15 @@ namespace interp {
     };
 
 
-    std::vector<std::unique_ptr<ITween>> _activeTweens;
+    static ::std::vector<::std::unique_ptr<ITween>> _activeTweens;
 
 
     template<typename T, typename U>
     Tween<T>& CreateTween(T& target, const U& endValue, double duration, Curve curve = Curve::Linear) {
 
         // Searching for existing tween with this target
-        auto it = std::find_if(_activeTweens.begin(), _activeTweens.end(),
-            [&target](const std::unique_ptr<ITween>& tween) {
+        auto it = ::std::find_if(_activeTweens.begin(), _activeTweens.end(),
+            [&target](const ::std::unique_ptr<ITween>& tween) {
                 auto* specificTween = dynamic_cast<Tween<T>*>(tween.get());
                 if (specificTween && specificTween->GetTarget() == &target) {
                     return true;
@@ -171,9 +173,9 @@ namespace interp {
             _activeTweens.erase(it);
         }
 
-        auto tween = std::make_unique<Tween<T>>(&target, static_cast<T>(endValue), duration, curve);
+        auto tween = ::std::make_unique<Tween<T>>(&target, static_cast<T>(endValue), duration, curve);
         Tween<T>& ref = *tween;
-        _activeTweens.push_back(std::move(tween));
+        _activeTweens.push_back(::std::move(tween));
         return ref;
     }
 
@@ -190,7 +192,7 @@ namespace interp {
         }
 
         _activeTweens.erase(
-            std::remove_if(_activeTweens.begin(), _activeTweens.end(),
+            ::std::remove_if(_activeTweens.begin(), _activeTweens.end(),
                 [](const auto& tween) { return !tween->IsPlaying() && !tween->IsPaused(); }),
             _activeTweens.end()
         );

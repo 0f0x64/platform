@@ -15,7 +15,7 @@
 #include <fstream>
 #include <regex>
 
-using namespace std;
+using namespace ::std;
 
 bool minifier = false;
 bool final_release = false;
@@ -57,9 +57,9 @@ void SelfLocate()
 	SetCurrentDirectory((LPSTR)pathToExe);
 }
 
-std::vector <std::string> vsList;
-std::vector <std::string> psList;
-std::vector <std::string> libList;
+::std::vector <::std::string> vsList;
+::std::vector <::std::string> psList;
+::std::vector <::std::string> libList;
 
 void Process(string shaderName, string inPath, string outPath, ofstream& ofile)
 {
@@ -130,15 +130,15 @@ void Process(string shaderName, string inPath, string outPath, ofstream& ofile)
 
 }
 
-void removeDoubleSpaces(std::string& str) {
-	std::regex pattern("\\s{2,}");
-	str = std::regex_replace(str, pattern, " ");
+void removeDoubleSpaces(::std::string& str) {
+	::std::regex pattern("\\s{2,}");
+	str = ::std::regex_replace(str, pattern, " ");
 }
 
-std::vector<std::string> regex_split(const std::string& str, const std::regex& reg) {
+::std::vector<::std::string> regex_split(const ::std::string& str, const ::std::regex& reg) {
 
-	const std::sregex_token_iterator beg{ str.cbegin(), str.cend(), reg, -1 };
-	const std::sregex_token_iterator end{};
+	const ::std::sregex_token_iterator beg{ str.cbegin(), str.cend(), reg, -1 };
+	const ::std::sregex_token_iterator end{};
 	return { beg, end };
 }
 
@@ -236,7 +236,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 				samplersCounter++;
 			}
 
-			std:string cbText;
+			::std:string cbText;
 
 			res = s.find(cb);
 			if (found)
@@ -293,12 +293,12 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 
 
 					removeDoubleSpaces(cbText);
-					std::erase(cbText, '\t');
-					std::erase(cbText, '\n');
+					::std::erase(cbText, '\t');
+					::std::erase(cbText, '\n');
 					if (cbText.at(0) == ' ') cbText.erase(0, 1);
 					while (cbText.at(cbText.length() - 1) == ' ') cbText.erase(cbText.length() - 1, 1);
 
-					const std::regex reg{ R"(;)" };
+					const ::std::regex reg{ R"(;)" };
 					auto tokens = regex_split(cbText, reg);
 
 					for (int i = 0;i < tokens.size();i++)
@@ -306,15 +306,15 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 						while (tokens[i].at(0) == ' ') tokens[i].erase(0, 1);
 						
 
-						if (tokens[i].find(",") != std::string::npos)
+						if (tokens[i].find(",") != ::std::string::npos)
 						{
 							tokens[i].at(tokens[i].find(" ")) = ',';
 
-							const std::regex reg{ R"(,)" };
+							const ::std::regex reg{ R"(,)" };
 							auto tokens_ins = regex_split(tokens[i], reg);
 							for (int j = 1;j < tokens_ins.size();j++)
 							{
-								std::erase(tokens_ins[j], ' ');
+								::std::erase(tokens_ins[j], ' ');
 								params += tokens_ins[0]+" "+ tokens_ins[j]+";\n";
 
 							}
@@ -463,11 +463,11 @@ int pShadersCount = 0;
 int libShadersCount = 0;
 int libShadersCount2 = 0;
 
-void catToFile(const std::filesystem::path& sandbox, ofstream& ofile, std::vector <std::string>& outputName, int& counter, const char* preStr, const char* postStr)
+void catToFile(const ::std::filesystem::path& sandbox, ofstream& ofile, ::std::vector <::std::string>& outputName, int& counter, const char* preStr, const char* postStr)
 {
-	for (auto const& cat : std::filesystem::directory_iterator{ sandbox })
+	for (auto const& cat : ::std::filesystem::directory_iterator{ sandbox })
 	{
-		std::string fName = cat.path().string();
+		::std::string fName = cat.path().string();
 		auto o = fName.rfind("\\", fName.length());
 		fName.erase(0, o + 1);
 		o = fName.find(shaderExtension);
@@ -484,24 +484,24 @@ void catToFile(const std::filesystem::path& sandbox, ofstream& ofile, std::vecto
 #include <string>
 #include <vector>
 
-struct Field { std::string name; bool is_char; };
-struct Level { std::vector<Field> fields; };
+struct Field { ::std::string name; bool is_char; };
+struct Level { ::std::vector<Field> fields; };
 
 void genTrackParser() {
 
-	std::ifstream file("..\\fx\\projectFiles\\sound\\trackStruct.h");
+	::std::ifstream file("..\\fx\\projectFiles\\sound\\trackStruct.h");
 
 	// Открываем файл для записи результата
-	std::ofstream out("..\\fx\\generated\\trackParser.h", std::ios::trunc);
+	::std::ofstream out("..\\fx\\generated\\trackParser.h", ::std::ios::trunc);
 	if (!out.is_open()) {
-		std::cerr << "Error: Could not create output file!" << std::endl;
+		::std::cerr << "Error: Could not create output file!" << ::std::endl;
 		return;
 	}
 
-	std::vector<Level> hierarchy;
+	::std::vector<Level> hierarchy;
 	hierarchy.push_back({}); // Root (_track)
 
-	std::string word;
+	::std::string word;
 	while (file >> word) {
 		// 1. Управление вложенностью
 		if (word == "struct") {
@@ -511,7 +511,7 @@ void genTrackParser() {
 				continue;
 			}
 			// Если после struct идет имя, а потом {, тоже проваливаемся
-			std::string next; file >> next;
+			::std::string next; file >> next;
 			if (next == "{") hierarchy.push_back({});
 			continue;
 		}
@@ -521,7 +521,7 @@ void genTrackParser() {
 			// Читаем имя массива после }, например "channels[32];"
 			if (file >> word) {
 				size_t br = word.find('[');
-				if (br != std::string::npos && !hierarchy.empty()) {
+				if (br != ::std::string::npos && !hierarchy.empty()) {
 					hierarchy.back().fields.push_back({ word.substr(0, br), false });
 				}
 			}
@@ -532,18 +532,18 @@ void genTrackParser() {
 		if (word == "const" || word == "static" || word == "unsigned" || word == "volatile") continue;
 
 		// 3. ПАРА: Тип + Имя
-		std::string type = word;
-		std::string name;
+		::std::string type = word;
+		::std::string name;
 		if (!(file >> name)) break;
 
 		// Если "имя" оказалось символом начала/конца, это не поле
 		if (name == "{" || name == "}") continue;
 
 		size_t pos = name.find_first_of("[;");
-		std::string clean = (pos == std::string::npos) ? name : name.substr(0, pos);
+		::std::string clean = (pos == ::std::string::npos) ? name : name.substr(0, pos);
 
 		// Фильтр: не пустое, не число, не Count, и не ключевое слово
-		if (!clean.empty() && !std::isdigit(clean[0]) && clean.find("Count") == std::string::npos) {
+		if (!clean.empty() && !::std::isdigit(clean[0]) && clean.find("Count") == ::std::string::npos) {
 			if (clean != "struct" && clean != "const") {
 				hierarchy.back().fields.push_back({ clean, (type == "char") });
 			}
@@ -552,20 +552,20 @@ void genTrackParser() {
 
 	// --- Генерация ---
 	out << "#pragma once\n#include <string>\n#include <cstring>\n#include <cstdlib>\n#include <iostream>\n\n";
-	out << "inline bool parse_generated(std::istream& in, _track& t) {\n"
+	out << "inline bool parse_generated(::std::istream& in, _track& t) {\n"
 		<< "    memset(&t, 0, sizeof(_track));\n"
-		<< "    std::string line; int i_ch = -1, i_cl = -1; bool found = false;\n"
-		<< "    while (std::getline(in, line)) {\n"
-		<< "        if (line.find('.') == std::string::npos) continue;\n"
+		<< "    ::std::string line; int i_ch = -1, i_cl = -1; bool found = false;\n"
+		<< "    while (::std::getline(in, line)) {\n"
+		<< "        if (line.find('.') == ::std::string::npos) continue;\n"
 		<< "        found = true;\n";
 
 	for (size_t i = 0; i < hierarchy.size(); ++i) {
-		std::string path = "t";
+		::std::string path = "t";
 		if (i == 1) path = "t.channels[i_ch]";
 		if (i == 2) path = "t.channels[i_ch].clips[i_cl]";
 
 		for (auto& f : hierarchy[i].fields) {
-			out << "        if (line.find(\"." << f.name << "\") != std::string::npos) {\n";
+			out << "        if (line.find(\"." << f.name << "\") != ::std::string::npos) {\n";
 			if (f.name == "channels") {
 				out << "            if (++i_ch >= 32) return false;\n            i_cl = -1; t.channelsCount = i_ch + 1;\n";
 			}
@@ -574,19 +574,19 @@ void genTrackParser() {
 			}
 			else if (f.is_char) {
 				out << "            size_t s = line.find('\"'), e = line.rfind('\"');\n"
-					<< "            if (s != std::string::npos && e != std::string::npos && s < e) {\n"
+					<< "            if (s != ::std::string::npos && e != ::std::string::npos && s < e) {\n"
 					<< "                size_t len = (e-s-1 > 127) ? 127 : e-s-1;\n"
 					<< "                memcpy(" << path << "." << f.name << ", line.c_str()+s+1, len);\n"
 					<< "                " << path << "." << f.name << "[len] = '\\0';\n"
 					<< "            }\n";
 			}
 			else {
-				out << "            size_t eq = line.find('='); if (eq != std::string::npos) {\n"
+				out << "            size_t eq = line.find('='); if (eq != ::std::string::npos) {\n"
 					<< "                const char* v = line.c_str() + eq + 1;\n"
 					<< "                while (*v == ' ' || *v == '\\t') v++;\n"
-					<< "                if (line.find(\"off\") != std::string::npos) " << path << "." << f.name << " = 0;\n"
-					<< "                else if (line.find(\"on\") != std::string::npos) " << path << "." << f.name << " = 1;\n"
-					<< "                else " << path << "." << f.name << " = std::atoi(v);\n"
+					<< "                if (line.find(\"off\") != ::std::string::npos) " << path << "." << f.name << " = 0;\n"
+					<< "                else if (line.find(\"on\") != ::std::string::npos) " << path << "." << f.name << " = 1;\n"
+					<< "                else " << path << "." << f.name << " = ::std::atoi(v);\n"
 					<< "            }\n";
 			}
 			out << "            continue;\n        }\n";
@@ -617,12 +617,12 @@ int main(int argc, char* argv[])
 
 	SelfLocate();
 
-	const std::filesystem::path UIvsSandbox{ UIinVPath };
-	const std::filesystem::path UIpsSandbox{ UIinPPath };
+	const ::std::filesystem::path UIvsSandbox{ UIinVPath };
+	const ::std::filesystem::path UIpsSandbox{ UIinPPath };
 
-	const std::filesystem::path vsSandbox{ inVPath };
-	const std::filesystem::path psSandbox{ inPPath };
-	const std::filesystem::path libSandbox{ inLibPath };
+	const ::std::filesystem::path vsSandbox{ inVPath };
+	const ::std::filesystem::path psSandbox{ inPPath };
+	const ::std::filesystem::path libSandbox{ inLibPath };
 
 	int i = 0;
 

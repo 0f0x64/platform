@@ -30,8 +30,6 @@ XMVECTOR getRandVector4()
 #include "cubemap.h"
 #include "object.h"
 
-#include "interp.h"
-
 
 
 struct inputController_ {
@@ -78,7 +76,7 @@ struct inputController_ {
 
 			static float yawInner = yaw;
 
-			float targetA = -std::round(yaw / PI) * PI;// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
+			float targetA = -::std::round(yaw / PI) * PI;// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
 
 			yawInner = lerp(yawInner, targetA, pow(min(deltaTime * heroChangeDirSpeed, 1.), 1.5));
 			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, yawInner);
@@ -195,7 +193,7 @@ struct hero_ {
 		landingPointIdx = clamp(landingPointIdx, 0, maxIdx);
 
 		// 1. Предрасчет тангенсов (направлений) для всех точек
-		std::vector<XMVECTOR> tangents(line.pointCount);
+		::std::vector<XMVECTOR> tangents(line.pointCount);
 		for (int i = 0; i <= maxIdx; ++i)
 		{
 			XMVECTOR pCurr = F2V(line.point[i]);
@@ -363,7 +361,7 @@ struct hero_ {
 
 		// ЕСЛИ ВАМ НУЖЕН ОТРЕЗОК (ограничить точку строго МЕЖДУ closestPoint и closestPoint2):
 		// Раскомментируйте строчку ниже, чтобы точка не улетала в бесконечность за пределы рельса
-		 t = std::clamp(t, 0.0f, 1.0f);
+		 t = ::std::clamp(t, 0.0f, 1.0f);
 		 fracPointIndex = t;
 		// 6. Формируем финальную 3D-точку: p1 + lineVec * t
 		float4 result;
@@ -667,14 +665,10 @@ struct hero_ {
 		}
 
 		if (abs(speed) > 0.5f) {
-			//ConstBuf::gltfAnim::scene.currentAnimation = 1;
-			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[1];
-			clip.isPlaying = true;
+			ConstBuf::gltfAnim::PlayAnimation(1);
 		}
 		else {
-			//ConstBuf::gltfAnim::scene.currentAnimation = 0;
-			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[1];
-			clip.isPlaying = false;
+			ConstBuf::gltfAnim::StopAnimation(1);
 		}
 
 		// Жесткий зажим скорости в максимальные рамки
@@ -1011,8 +1005,8 @@ struct gameCamera_ {
 		else
 		{
 			// Используем экспоненту для независимости от FPS
-			float posStep = 1.0f - std::exp(-posInertion * deltaTime);
-			float rotStep = 1.0f - std::exp(-rotInertion * deltaTime);
+			float posStep = 1.0f - ::std::exp(-posInertion * deltaTime);
+			float rotStep = 1.0f - ::std::exp(-rotInertion * deltaTime);
 
 			smoothedHeroPos = XMVectorLerp(smoothedHeroPos, heroTranslation, posStep);
 			smoothedHeroRotQ = XMQuaternionSlerp(smoothedHeroRotQ, heroRotQ, rotStep);
@@ -2139,10 +2133,10 @@ namespace Loop
 					accumulator -= FIXED_DT;
 				}
 
-				interp::UpdateTweens(deltaTime);
+				ConstBuf::interp::UpdateTweens(deltaTime);
 
 				float alpha = accumulator / FIXED_DT;
-				alpha = std::clamp(alpha, 0.0f, 1.0f);
+				alpha = ::std::clamp(alpha, 0.0f, 1.0f);
 				//TODO: implement characters and camera matrix interpolation (render only)
 			}
 

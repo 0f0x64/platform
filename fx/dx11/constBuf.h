@@ -111,23 +111,23 @@ namespace ConstBuf
 			context->VSSetShaderResources(slot, 1, &pSB_SRV[slot]);
 		}
 
-		bool LoadObjToPointers(const std::string& filename, vertex** outVertices, index** outIndices, uint32_t& vCount, uint32_t& iCount)
+		bool LoadObjToPointers(const ::std::string& filename, vertex** outVertices, index** outIndices, uint32_t& vCount, uint32_t& iCount)
 		{
-			std::vector<float4> temp_positions;
-			std::vector<vertex> final_vertices;
-			std::vector<index> final_triangles;
+			::std::vector<float4> temp_positions;
+			::std::vector<vertex> final_vertices;
+			::std::vector<index> final_triangles;
 
-			std::ifstream file(filename);
+			::std::ifstream file(filename);
 			if (!file.is_open())
 			{
 				return false;
 			}
 
-			std::string line;
-			while (std::getline(file, line)) {
+			::std::string line;
+			while (::std::getline(file, line)) {
 				if (line.empty()) continue;
-				std::stringstream ss(line);
-				std::string prefix;
+				::std::stringstream ss(line);
+				::std::string prefix;
 				ss >> prefix;
 
 				if (prefix == "v") {
@@ -140,7 +140,7 @@ namespace ConstBuf
 					index tri = {};
 					// We assume a triangulated OBJ (3 vertices per face)
 					for (int i = 0; i < 3; i++) {
-						std::string vStr;
+						::std::string vStr;
 						ss >> vStr;
 
 						// Parse indices (v/vt/vn). We only care about 'v' (pIdx)
@@ -184,8 +184,8 @@ namespace ConstBuf
 			*outVertices = new vertex[vCount];
 			*outIndices = new index[iCount];
 
-			std::memcpy(*outVertices, final_vertices.data(), sizeof(vertex) * vCount);
-			std::memcpy(*outIndices, final_triangles.data(), sizeof(index) * iCount);
+			::std::memcpy(*outVertices, final_vertices.data(), sizeof(vertex) * vCount);
+			::std::memcpy(*outIndices, final_triangles.data(), sizeof(index) * iCount);
 
 			return true;
 		}
@@ -324,7 +324,7 @@ namespace ConstBuf
 #include "gltfAnimation.h"
 
 
-	bool LoadObjToPointersGLTF(const std::string& filename, vertex** outVertices, index** outIndices, uint32_t& vCount, uint32_t& iCount) 
+	bool LoadObjToPointersGLTF(const ::std::string& filename, vertex** outVertices, index** outIndices, uint32_t& vCount, uint32_t& iCount) 
 	{
 		cgltf_options options = {0};
 		cgltf_data* data = NULL;
@@ -554,23 +554,23 @@ namespace ConstBuf
 
 
 	
-	bool LoadObjToPointers(const std::string& filename, vertex** outVertices, index** outIndices, uint32_t& vCount, uint32_t& iCount) 
+	bool LoadObjToPointers(const ::std::string& filename, vertex** outVertices, index** outIndices, uint32_t& vCount, uint32_t& iCount) 
 	{
-		std::vector<float4> temp_positions;
-		std::vector<vertex> final_vertices;
-		std::vector<index> final_triangles;
+		::std::vector<float4> temp_positions;
+		::std::vector<vertex> final_vertices;
+		::std::vector<index> final_triangles;
 
-		std::ifstream file(filename);
+		::std::ifstream file(filename);
 		if (!file.is_open())
 		{
 			return false;
 		}
 
-		std::string line;
-		while (std::getline(file, line)) {
+		::std::string line;
+		while (::std::getline(file, line)) {
 			if (line.empty()) continue;
-			std::stringstream ss(line);
-			std::string prefix;
+			::std::stringstream ss(line);
+			::std::string prefix;
 			ss >> prefix;
 
 			if (prefix == "v") {
@@ -583,7 +583,7 @@ namespace ConstBuf
 				index tri = {};
 				// We assume a triangulated OBJ (3 vertices per face)
 				for (int i = 0; i < 3; i++) {
-					std::string vStr;
+					::std::string vStr;
 					ss >> vStr;
 
 					// Parse indices (v/vt/vn). We only care about 'v' (pIdx)
@@ -627,8 +627,8 @@ namespace ConstBuf
 		*outVertices = new vertex[vCount];
 		*outIndices = new index[iCount];
 
-		std::memcpy(*outVertices, final_vertices.data(), sizeof(vertex) * vCount);
-		std::memcpy(*outIndices, final_triangles.data(), sizeof(index) * iCount);
+		::std::memcpy(*outVertices, final_vertices.data(), sizeof(vertex) * vCount);
+		::std::memcpy(*outIndices, final_triangles.data(), sizeof(index) * iCount);
 
 		return true;
 	}
@@ -723,7 +723,7 @@ namespace ConstBuf
 		return loaded;
 	}
 
-	bool LoadAnimations(const std::vector<std::string>& names)
+	bool LoadAnimations(const ::std::vector<::std::string>& names)
 	{
 		bool loadedAny = false;
 		for (size_t i = 0; i < names.size(); ++i)
@@ -739,7 +739,7 @@ namespace ConstBuf
 			}
 			else
 			{
-				gltfAnim::scene.animationPath = std::to_string(names.size()) + " animation files";
+				gltfAnim::scene.animationPath = ::std::to_string(names.size()) + " animation files";
 			}
 			gltfAnim::scene.status = "Animations loaded";
 		}

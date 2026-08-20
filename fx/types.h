@@ -101,9 +101,9 @@ int getTypeMax(int typeIndex)
 	return typeDesc[typeIndex]._max;
 }
 
-bool isNumber(const std::string& token)
+bool isNumber(const ::std::string& token)
 {
-	return std::regex_match(token, std::regex("(\\+|-)?[0-9]*(\\.?([0-9]+))$"));
+	return ::std::regex_match(token, ::std::regex("(\\+|-)?[0-9]*(\\.?([0-9]+))$"));
 }
 
 bool fillTypeTable(int size, const char* name, int _min_value, int _max_value, const char* enumStr = NULL)

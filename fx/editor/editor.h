@@ -52,25 +52,25 @@ namespace editor
 			int end_ = (int)pos;
 
 			// 1. Если курсор на пробеле или знаке, ищем цифру вплотную
-			if (!std::isdigit((unsigned char)str[pos])) {
-				if (pos < n && std::isdigit((unsigned char)str[pos + 1])) { start_ = end_ = (int)pos + 1; }
-				else if (pos > 0 && std::isdigit((unsigned char)str[pos - 1])) { start_ = end_ = (int)pos - 1; }
+			if (!::std::isdigit((unsigned char)str[pos])) {
+				if (pos < n && ::std::isdigit((unsigned char)str[pos + 1])) { start_ = end_ = (int)pos + 1; }
+				else if (pos > 0 && ::std::isdigit((unsigned char)str[pos - 1])) { start_ = end_ = (int)pos - 1; }
 				else if (str[pos] != '-' && str[pos] != '+') return nullptr;
 			}
 
 			// 2. Расширяемся вправо (собираем все цифры)
-			while (end_ + 1 < (int)n && std::isdigit((unsigned char)str[end_ + 1])) {
+			while (end_ + 1 < (int)n && ::std::isdigit((unsigned char)str[end_ + 1])) {
 				end_++;
 			}
 
 			// 3. Расширяемся влево (собираем все цифры)
-			while (start_ > 0 && std::isdigit((unsigned char)str[start_ - 1])) {
+			while (start_ > 0 && ::std::isdigit((unsigned char)str[start_ - 1])) {
 				start_--;
 			}
 
 			// 4. Ищем знак перед числом (с учетом пробелов)
 			int signPos = start_ - 1;
-			while (signPos >= 0 && std::isspace((unsigned char)str[signPos])) {
+			while (signPos >= 0 && ::std::isspace((unsigned char)str[signPos])) {
 				signPos--;
 			}
 
@@ -102,7 +102,7 @@ namespace editor
 
 
 		bool is_id_char(char c) {
-			return std::isalnum(static_cast<unsigned char>(c)) || c == '_';
+			return ::std::isalnum(static_cast<unsigned char>(c)) || c == '_';
 		}
 
 		bool isText(const char* str, int pos) {
@@ -152,7 +152,7 @@ namespace editor
 			typeName[0] = '\0';
 
 			if (!str || pos < 0) return false;
-			int length = static_cast<int>(std::strlen(str));
+			int length = static_cast<int>(::std::strlen(str));
 
 			// КОРРЕКЦИЯ: Если курсор стоит ПОСЛЕ слова, смещаемся на 1 символ влево, 
 			// чтобы "захватить" идентификатор.
@@ -175,27 +175,27 @@ namespace editor
 			while (idxEnd < length && is_id_char(str[idxEnd])) idxEnd++;
 
 			// Валидация: не начинается с цифры
-			if (std::isdigit(static_cast<unsigned char>(str[idxStart]))) return false;
+			if (::std::isdigit(static_cast<unsigned char>(str[idxStart]))) return false;
 
 			// 2. Ищем "::" слева от idxStart
 			int i = idxStart - 1;
-			while (i >= 1 && std::isspace(static_cast<unsigned char>(str[i]))) i--;
+			while (i >= 1 && ::std::isspace(static_cast<unsigned char>(str[i]))) i--;
 
 			if (i < 1 || str[i] != ':' || str[i - 1] != ':') return false;
 
 			int opPos = i - 1;
 			int typeEnd = opPos - 1;
-			while (typeEnd >= 0 && std::isspace(static_cast<unsigned char>(str[typeEnd]))) typeEnd--;
+			while (typeEnd >= 0 && ::std::isspace(static_cast<unsigned char>(str[typeEnd]))) typeEnd--;
 			if (typeEnd < 0 || !is_id_char(str[typeEnd])) return false;
 
 			int typeStart = typeEnd;
 			while (typeStart >= 0 && is_id_char(str[typeStart])) typeStart--;
 			typeStart++;
-			if (std::isdigit(static_cast<unsigned char>(str[typeStart]))) return false;
+			if (::std::isdigit(static_cast<unsigned char>(str[typeStart]))) return false;
 
 			int typeLen = typeEnd - typeStart + 1;
 			if (typeLen >= (int)sizeof(typeName)) typeLen = sizeof(typeName) - 1;
-			std::strncpy(typeName, str + typeStart, typeLen);
+			::std::strncpy(typeName, str + typeStart, typeLen);
 			typeName[typeLen] = '\0';
 
 			start = idxStart;
@@ -210,7 +210,7 @@ namespace editor
 			funcName[0] = '\0';
 
 			if (!str || pos < 0) return false;
-			int length = static_cast<int>(std::strlen(str));
+			int length = static_cast<int>(::std::strlen(str));
 
 			// 1. Корректируем позицию, если курсор стоит сразу после слова или перед ({
 			int checkPos = pos;
@@ -231,11 +231,11 @@ namespace editor
 			while (idxEnd < length && is_id_char(str[idxEnd])) idxEnd++;
 			idxEnd--;
 
-			if (idxStart > idxEnd || std::isdigit(static_cast<unsigned char>(str[idxStart]))) return false;
+			if (idxStart > idxEnd || ::std::isdigit(static_cast<unsigned char>(str[idxStart]))) return false;
 
 			// 3. Проверка маркера СПРАВА: "({", пропуская пробелы
 			int right = idxEnd + 1;
-			while (right < length && std::isspace(static_cast<unsigned char>(str[right]))) right++;
+			while (right < length && ::std::isspace(static_cast<unsigned char>(str[right]))) right++;
 
 			if (right >= length - 1 || str[right] != '(' || str[right + 1] != '{') {
 				return false;
@@ -250,18 +250,18 @@ namespace editor
 			}
 			else {
 				// Пропускаем пробелы слева
-				while (left >= 0 && std::isspace(static_cast<unsigned char>(str[left]))) left--;
+				while (left >= 0 && ::std::isspace(static_cast<unsigned char>(str[left]))) left--;
 
 				if (left < 0) {
 					leftValid = true;
 				}
-				else if (std::isspace(static_cast<unsigned char>(str[idxStart - 1]))) {
+				else if (::std::isspace(static_cast<unsigned char>(str[idxStart - 1]))) {
 					leftValid = true; // Был пробел
 				}
 				else if (left >= 1 && str[left] == ':' && str[left - 1] == ':') {
 					leftValid = true; // Был оператор ::
 				}
-				else if (std::ispunct(static_cast<unsigned char>(str[left]))) {
+				else if (::std::ispunct(static_cast<unsigned char>(str[left]))) {
 					leftValid = true; // Любой знак пунктуации (напр. '=' или ';')
 				}
 			}
@@ -272,7 +272,7 @@ namespace editor
 			int nameLen = idxEnd - idxStart + 1;
 			if (nameLen >= (int)sizeof(funcName)) nameLen = sizeof(funcName) - 1;
 
-			std::strncpy(funcName, str + idxStart, nameLen);
+			::std::strncpy(funcName, str + idxStart, nameLen);
 			funcName[nameLen] = '\0';
 
 			start = idxStart;
@@ -439,7 +439,7 @@ namespace editor
 
 			_bstr_t wrapper2(bstrLineText);
 			const char* str = wrapper2;
-			std::string s = str;
+			::std::string s = str;
 
 			//calc offset
 			CComPtr<EnvDTE::EditPoint> startT;
@@ -683,10 +683,10 @@ namespace editor
 #define REFLECTION true
 
 #if REFLECTION
-	#define reflect editor::paramEdit::reflect_f(&in, caller, std::source_location::current())
+	#define reflect editor::paramEdit::reflect_f(&in, caller, ::std::source_location::current())
 
 	#define cmd(name, ...) _Pragma("pack(push, 1)") struct CAT(name,_params) { FOR_EACH(SEMI, __VA_ARGS__) }; _Pragma("pack(pop)") \
-    void name(CAT(name,_params) in, const std::source_location caller = std::source_location::current())
+    void name(CAT(name,_params) in, const ::std::source_location caller = ::std::source_location::current())
 
 #endif
 
@@ -694,10 +694,10 @@ bool resize = true;
 
 using namespace dx11;
 
-std::vector<std::string> regex_split(const std::string& str, const std::regex& reg) {
+::std::vector<::std::string> regex_split(const ::std::string& str, const ::std::regex& reg) {
 
-	const std::sregex_token_iterator beg{ str.cbegin(), str.cend(), reg, -1 };
-	const std::sregex_token_iterator end{};
+	const ::std::sregex_token_iterator beg{ str.cbegin(), str.cend(), reg, -1 };
+	const ::std::sregex_token_iterator end{};
 	return { beg, end };
 }
 
@@ -1053,9 +1053,9 @@ namespace editor
 		
 	}
 
-	namespace fs = std::filesystem;
+	namespace fs = ::std::filesystem;
 
-	void getPathParts(const std::string& fullPath, std::string& nameOnly, std::string& parentFolder) {
+	void getPathParts(const ::std::string& fullPath, ::std::string& nameOnly, ::std::string& parentFolder) {
 		fs::path p(fullPath);
 
 		// 1. Имя файла без расширения (stem)
@@ -1069,11 +1069,11 @@ namespace editor
 
 	void recompileShader()
 	{
-		std::string name, folder;
+		::std::string name, folder;
 
 		getPathParts(VsEditor.fileName, name, folder);
 
-		std::string rPath = "\/" + folder + "\/" + name + dx11::Shaders::shaderExtension;
+		::std::string rPath = "\/" + folder + "\/" + name + dx11::Shaders::shaderExtension;
 
 		// detect vertex/pixel shader and slot
 		if (folder[0] == 'v')
@@ -1121,7 +1121,7 @@ namespace editor
 	typedef PreferredAppMode(WINAPI* PfnSetPreferredAppMode)(PreferredAppMode);
 	typedef void (WINAPI* PfnFlushMenuThemes)();
 
-	int showEnum(HWND hwnd, const std::vector<std::string>& enumMenu) {
+	int showEnum(HWND hwnd, const ::std::vector<::std::string>& enumMenu) {
 		if (enumMenu.empty()) return -1;
 
 		// Подключаем темную тему
@@ -1191,7 +1191,7 @@ namespace editor
 
 		void ProcessCamKeyContextMenu()
 		{
-			std::vector<std::string> enumMenu = { "grab view camera","grab view camera with timestamp","grab timestamp only" };
+			::std::vector<::std::string> enumMenu = { "grab view camera","grab view camera with timestamp","grab timestamp only" };
 
 			switch (showEnum(hWnd, enumMenu))
 			{
@@ -1217,7 +1217,7 @@ namespace editor
 	long long getMaxFractionValue(const char* fractionStr) {
 		if (!fractionStr) return 0;
 
-		size_t length = std::strlen(fractionStr);
+		size_t length = ::std::strlen(fractionStr);
 		if (length == 0) return 0;
 
 		// Вычисляем 10^length - 1
@@ -1231,10 +1231,10 @@ namespace editor
 		return maxVal - 1;
 	}
 
-	std::string updateFractionalPart(const char* paramStr, int delta) {
+	::std::string updateFractionalPart(const char* paramStr, int delta) {
 		if (!paramStr || paramStr[0] == '\0') return "";
 
-		std::string original(paramStr);
+		::std::string original(paramStr);
 		size_t length = original.length();
 
 		// 1. Вычисляем верхний предел (насыщение)
@@ -1244,7 +1244,7 @@ namespace editor
 		long long max_val = limit - 1;
 
 		// 2. Преобразуем текущую строку в число
-		long long value = std::stoll(original);
+		long long value = ::std::stoll(original);
 
 		// 3. Применяем дельту с насыщением
 		value += delta;
@@ -1253,7 +1253,7 @@ namespace editor
 		if (value < 0) value = 0;             // Упор в нижнюю границу (00...0)
 
 		// 4. Форматируем обратно в строку
-		std::string result = std::to_string(value);
+		::std::string result = ::std::to_string(value);
 
 		// 5. Дополняем ведущими нулями до исходной длины
 		if (result.length() < length) {
@@ -1263,7 +1263,7 @@ namespace editor
 		return result;
 	}
 
-	std::string startTextValue;
+	::std::string startTextValue;
 	bool mPressed = false;
 	bool timeAlwaysOn = true;
 
@@ -1295,7 +1295,7 @@ namespace editor
 			
 			//ConstBuf::LoadObj(ofn.lpstrFile);
 
-			//std::wcout << L"Selected file: " << ofn.lpstrFile << std::endl;
+			//::std::wcout << L"Selected file: " << ofn.lpstrFile << ::std::endl;
 		}
 	}
 
@@ -1317,9 +1317,9 @@ namespace editor
 		ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_ALLOWMULTISELECT | OFN_EXPLORER;
 
 		if (GetOpenFileName(&ofn) == TRUE) {
-			std::vector<std::string> files;
+			::std::vector<::std::string> files;
 			char* cursor = ofn.lpstrFile;
-			std::string first = cursor;
+			::std::string first = cursor;
 			cursor += first.size() + 1;
 
 			if (*cursor == 0) {
@@ -1327,7 +1327,7 @@ namespace editor
 			}
 			else {
 				while (*cursor != 0) {
-					std::string name = cursor;
+					::std::string name = cursor;
 					files.push_back(first + "\\" + name);
 					cursor += name.size() + 1;
 				}
@@ -1338,7 +1338,7 @@ namespace editor
 	}
 
 	void OpenAnimationMenu() {
-		std::vector<std::string> animMenu = ConstBuf::gltfAnim::AnimationMenu();
+		::std::vector<::std::string> animMenu = ConstBuf::gltfAnim::AnimationMenu();
 		int selected = showEnum(hWnd, animMenu);
 		if (selected >= 0) {
 			ConstBuf::gltfAnim::SetAnimation(selected);
@@ -1371,7 +1371,7 @@ namespace editor
 							click = true;
 
 							oldValue = atoi(VsEditor.paramStr);
-							startTextValue = std::string(VsEditor.paramStr);
+							startTextValue = ::std::string(VsEditor.paramStr);
 							oldMouseY = pt.y;
 							lastValue = oldValue;
 							VsEditor.slider = oldValue;
@@ -1390,7 +1390,7 @@ namespace editor
 							mPressed = true;
 							int tID = getTypeIndex(VsEditor.typeName);
 							int tCnt = getEnumCount(tID);
-							std::vector<std::string> enumMenu;
+							::std::vector<::std::string> enumMenu;
 							for (int i = 0; i < tCnt; i++)
 							{
 								enumMenu.push_back(getStrValue(tID, i));
@@ -1444,7 +1444,7 @@ namespace editor
 				int delta = -(pt.y - oldMouseY) * scale/2;
 
 				newValue = oldValue + delta;
-				std::string newValueStr;
+				::std::string newValueStr;
 
 				if (newValue != lastValue) {
 
@@ -1665,7 +1665,7 @@ namespace editor
 			}
 
 			uy += bh + gap;
-			std::string animDropLabel = std::string(ConstBuf::gltfAnim::CurrentAnimationLabel()) + "        v";
+			::std::string animDropLabel = ::std::string(ConstBuf::gltfAnim::CurrentAnimationLabel()) + "        v";
 			bool animMenuPressed = paramEdit::ButtonPressed(animDropLabel.c_str(), panelX + gap, uy, panelW - gap * 2.0f, bh);
 			if (animMenuPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
 			{

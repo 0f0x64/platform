@@ -29,14 +29,14 @@ static BOOL CALLBACK enumWindowCallback(HWND hWnd, LPARAM lparam)
 	int length = GetWindowTextLength(hWnd);
 	char* buffer = new char[length + 1];
 	GetWindowText(hWnd, buffer, length + 1);
-	std::string windowTitle(buffer);
+	::std::string windowTitle(buffer);
 	delete[] buffer;
 
 	if (IsWindowVisible(hWnd) && length != 0) 
 	{
-		if (std::string::npos != windowTitle.find("platform"))
+		if (::std::string::npos != windowTitle.find("platform"))
 		{
-			if (std::string::npos != windowTitle.find("Visual Studio"))
+			if (::std::string::npos != windowTitle.find("Visual Studio"))
 			{
 				vsHWND = hWnd;
 			}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../interp.h"
+
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -17,15 +19,15 @@ namespace gltfAnim
 	{
 		int joint = -1;
 		ConstBuf::cgltf_animation_path_type path = ConstBuf::cgltf_animation_path_type_invalid;
-		std::vector<float> times;
-		std::vector<XMFLOAT4> values;
+		::std::vector<float> times;
+		::std::vector<XMFLOAT4> values;
 	};
 
 	struct AnimationClip
 	{
-		std::string name;
+		::std::string name;
 		float duration = 0.0f;
-		std::vector<AnimationChannel> channels;
+		::std::vector<AnimationChannel> channels;
 
 		float weight = 1.0f;
 		float realWeight = 1.0f;
@@ -37,7 +39,7 @@ namespace gltfAnim
 
 	struct Joint
 	{
-		std::string name;
+		::std::string name;
 		int parent = -1;
 		XMFLOAT4X4 local;
 		XMFLOAT4X4 global;
@@ -46,13 +48,13 @@ namespace gltfAnim
 
 	struct Scene
 	{
-		std::vector<Joint> joints;
-		std::vector<AnimationClip> animations;
-		std::vector<XMFLOAT4X4> bindLocal;
+		::std::vector<Joint> joints;
+		::std::vector<AnimationClip> animations;
+		::std::vector<XMFLOAT4X4> bindLocal;
 		float4 modelCenterScale = float4(0.0f, 0.0f, 0.0f, 1.0f);
-		std::string modelPath;
-		std::string animationPath;
-		std::string status;
+		::std::string modelPath;
+		::std::string animationPath;
+		::std::string status;
 		int currentAnimation = 0;
 		//float currentTime = 0.0f;
 		XMMATRIX bonePalette[BoneLimit];
@@ -88,23 +90,23 @@ namespace gltfAnim
 		return -1;
 	}
 
-	inline std::string BaseName(const char* path)
+	inline ::std::string BaseName(const char* path)
 	{
 		if (!path || !path[0])
 		{
 			return "";
 		}
 
-		std::string value(path);
+		::std::string value(path);
 		const size_t slash = value.find_last_of("\\/");
-		if (slash != std::string::npos)
+		if (slash != ::std::string::npos)
 		{
 			value = value.substr(slash + 1);
 		}
 		return value;
 	}
 
-	inline std::string CanonicalizeJointName(const std::string& name)
+	inline ::std::string CanonicalizeJointName(const ::std::string& name)
 	{
 		if (name.size() > 4)
 		{
@@ -135,7 +137,7 @@ namespace gltfAnim
 
 		if (node && node->name)
 		{
-			const std::string canonical = CanonicalizeJointName(node->name);
+			const ::std::string canonical = CanonicalizeJointName(node->name);
 			for (size_t i = 0; i < scene.joints.size(); ++i)
 			{
 				if (CanonicalizeJointName(scene.joints[i].name) == canonical)
@@ -193,7 +195,7 @@ namespace gltfAnim
 			XMMatrixTranslationFromVector(translation);
 	}
 
-	inline void ResolveGlobalPoseJoint(size_t idx, std::vector<char>& resolved, std::vector<char>& inStack)
+	inline void ResolveGlobalPoseJoint(size_t idx, ::std::vector<char>& resolved, ::std::vector<char>& inStack)
 	{
 		if (idx >= scene.joints.size() || resolved[idx])
 		{
@@ -234,8 +236,8 @@ namespace gltfAnim
 			return;
 		}
 
-		std::vector<char> resolved(scene.joints.size(), 0);
-		std::vector<char> inStack(scene.joints.size(), 0);
+		::std::vector<char> resolved(scene.joints.size(), 0);
+		::std::vector<char> inStack(scene.joints.size(), 0);
 
 		for (size_t i = 0; i < scene.joints.size(); ++i)
 		{
@@ -250,7 +252,7 @@ namespace gltfAnim
 			scene.bonePalette[i] = XMMatrixIdentity();
 		}
 
-		const size_t count = std::min<size_t>(scene.joints.size(), BoneLimit);
+		const size_t count = ::std::min<size_t>(scene.joints.size(), BoneLimit);
 		for (size_t i = 0; i < count; ++i)
 		{
 			const XMMATRIX global = XMLoadFloat4x4(&scene.joints[i].global);
@@ -377,12 +379,12 @@ namespace gltfAnim
 		}
 
 		// Накопители для смешивания
-		std::vector<XMVECTOR> accumScale(scene.joints.size(), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
-		std::vector<XMVECTOR> accumRotation(scene.joints.size(), XMQuaternionIdentity());
-		std::vector<XMVECTOR> accumTranslation(scene.joints.size(), XMVectorZero());
-		std::vector<bool> jointAnimated(scene.joints.size(), false);
+		::std::vector<XMVECTOR> accumScale(scene.joints.size(), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+		::std::vector<XMVECTOR> accumRotation(scene.joints.size(), XMQuaternionIdentity());
+		::std::vector<XMVECTOR> accumTranslation(scene.joints.size(), XMVectorZero());
+		::std::vector<bool> jointAnimated(scene.joints.size(), false);
 
-		std::vector<float> jointWeightSum(scene.joints.size(), 0.0f);
+		::std::vector<float> jointWeightSum(scene.joints.size(), 0.0f);
 
 		// Проходим по всем клипам
 		for (AnimationClip& clip : scene.animations)
@@ -456,7 +458,7 @@ namespace gltfAnim
 						const float t1 = channel.times[key + 1];
 						if (t1 - t0 > 0.0001f)
 						{
-							alpha = (std::max)(0.0f, (std::min)(1.0f, (clip.currentTime - t0) / (t1 - t0)));
+							alpha = (::std::max)(0.0f, (::std::min)(1.0f, (clip.currentTime - t0) / (t1 - t0)));
 							b = XMLoadFloat4(&channel.values[key + 1]);
 						}
 					}
@@ -510,9 +512,9 @@ namespace gltfAnim
 			}
 		}
 
-		/*Log(std::to_string(totalWeight).c_str());
+		/*Log(::std::to_string(totalWeight).c_str());
 		Log(" | ");
-		Log(std::to_string(invTotalWeight).c_str());
+		Log(::std::to_string(invTotalWeight).c_str());
 		Log("\n");*/
 
 		// Нормализация
@@ -608,7 +610,7 @@ namespace gltfAnim
 
 		const int index = scene.currentAnimation % static_cast<int>(scene.animations.size());
 		const char* name = scene.animations[index].name.empty() ? "unnamed" : scene.animations[index].name.c_str();
-		std::snprintf(label, sizeof(label), "Anim %d/%d: %s",
+		::std::snprintf(label, sizeof(label), "Anim %d/%d: %s",
 			index + 1,
 			static_cast<int>(scene.animations.size()),
 			name);
@@ -618,9 +620,9 @@ namespace gltfAnim
 	inline const char* CurrentModelLabel()
 	{
 		static char label[192];
-		const std::string model = BaseName(scene.modelPath.c_str());
-		const std::string anim = BaseName(scene.animationPath.c_str());
-		std::snprintf(label, sizeof(label), "Model: %s | Anim file: %s",
+		const ::std::string model = BaseName(scene.modelPath.c_str());
+		const ::std::string anim = BaseName(scene.animationPath.c_str());
+		::std::snprintf(label, sizeof(label), "Model: %s | Anim file: %s",
 			model.empty() ? "none" : model.c_str(),
 			anim.empty() ? "embedded" : anim.c_str());
 		return label;
@@ -629,21 +631,21 @@ namespace gltfAnim
 	inline const char* AnimationStatusLabel()
 	{
 		static char label[160];
-		std::snprintf(label, sizeof(label), "Clips: %d | %s",
+		::std::snprintf(label, sizeof(label), "Clips: %d | %s",
 			static_cast<int>(scene.animations.size()),
 			scene.status.empty() ? "ready" : scene.status.c_str());
 		return label;
 	}
 
-	inline std::vector<std::string> AnimationMenu()
+	inline ::std::vector<::std::string> AnimationMenu()
 	{
-		std::vector<std::string> menu;
+		::std::vector<::std::string> menu;
 		menu.reserve(scene.animations.size());
 		for (size_t i = 0; i < scene.animations.size(); ++i)
 		{
 			char item[160];
 			const char* name = scene.animations[i].name.empty() ? "unnamed" : scene.animations[i].name.c_str();
-			std::snprintf(item, sizeof(item), "%d. %s", static_cast<int>(i + 1), name);
+			::std::snprintf(item, sizeof(item), "%d. %s", static_cast<int>(i + 1), name);
 			menu.push_back(item);
 		}
 		return menu;
@@ -802,7 +804,7 @@ namespace gltfAnim
 					float value = 0.0f;
 					cgltf_accessor_read_float(sampler.input, i, &value, 1);
 					channel.times[i] = value;
-					clip.duration = (std::max)(clip.duration, value);
+					clip.duration = (::std::max)(clip.duration, value);
 				}
 
 				const bool isRotation = channel.path == cgltf_animation_path_type_rotation;
@@ -818,12 +820,12 @@ namespace gltfAnim
 					channel.values[i] = XMFLOAT4(values[0], values[1], values[2], values[3]);
 				}
 
-				clip.channels.push_back(std::move(channel));
+				clip.channels.push_back(::std::move(channel));
 			}
 
 			if (!clip.channels.empty())
 			{
-				scene.animations.push_back(std::move(clip));
+				scene.animations.push_back(::std::move(clip));
 			}
 		}
 
@@ -866,16 +868,27 @@ namespace gltfAnim
 		return added;
 	}
 
-	inline void PlayAnimation(int id) {
+	inline void PlayAnimation(int id, float time = 0.2f) {
 		AnimationClip& clip = scene.animations[id];
 
 		if (clip.isPlaying)
 			return;
 
-		clip.isPlaying = true;
 		clip.realWeight = 0.0f;
+		clip.isPlaying = true;
 
-		//interp::Animate(clip.realWeight, 1.0f, 0.1f);
+		interp::Animate(clip.realWeight, 1.0f, time);
+	}
+
+	inline void StopAnimation(int id, float time = 0.2f) {
+		AnimationClip& clip = scene.animations[id];
+
+		if (!clip.isPlaying)
+			return;
+
+		clip.isPlaying = false;
+
+		interp::Animate(clip.realWeight, 0.0f, time);
 	}
 
 }

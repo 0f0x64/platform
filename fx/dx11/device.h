@@ -18,8 +18,8 @@ namespace Device
 		hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)(&pFactory));
 		UINT i = 0;
 		IDXGIAdapter* pAdapter;
-		std::vector <IDXGIAdapter*> vAdapters;
-		std::vector<std::string> adaptersNames;
+		::std::vector <IDXGIAdapter*> vAdapters;
+		::std::vector<::std::string> adaptersNames;
 
 		while (pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND)
 		{

@@ -3,12 +3,12 @@ namespace paramEdit {
 
 	void showStackItem(int i, float& x, float& y, float w, float lead, float sel);
 
-	void removeDoubleSpaces(std::string& str) {
-		std::regex pattern("\\s{2,}");
-		str = std::regex_replace(str, pattern, " ");
+	void removeDoubleSpaces(::std::string& str) {
+		::std::regex pattern("\\s{2,}");
+		str = ::std::regex_replace(str, pattern, " ");
 	}
 
-	void getTypeAndName(std::string& src, std::string& typeStr, std::string& nameStr)
+	void getTypeAndName(::std::string& src, ::std::string& typeStr, ::std::string& nameStr)
 	{
 		bool type = false;
 		bool name = false;
@@ -42,13 +42,13 @@ namespace paramEdit {
 		strcpy(cmdParamDesc[cmdCounter].param[index].name, name);
 	}
 
-	void FillCaller(const std::source_location caller)
+	void FillCaller(const ::std::source_location caller)
 	{
 		strcpy(cmdParamDesc[cmdCounter].caller.fileName, caller.file_name());
 		cmdParamDesc[cmdCounter].caller.line = caller.line();
 	}
 
-	void CopyStrWithSkipper(std::string& in, std::string& lineStr, std::string skippers)
+	void CopyStrWithSkipper(::std::string& in, ::std::string& lineStr, ::std::string skippers)
 	{
 		unsigned int t = 0;
 		while (t < in.length())
@@ -66,17 +66,17 @@ namespace paramEdit {
 		}
 	}
 
-	bool isParam(std::string line)
+	bool isParam(::std::string line)
 	{
 		char* p;
 		strtol(line.c_str(), &p, 10);
 		return *p == 0;
 	}
 
-	void CreateCallStr(int cmdIndex, std::string& callStr, std::string& tab)
+	void CreateCallStr(int cmdIndex, ::std::string& callStr, ::std::string& tab)
 	{
 		auto c = &cmdParamDesc[cmdIndex];
-		std::string funcStr = c->funcName;
+		::std::string funcStr = c->funcName;
 		callStr = funcStr;
 		callStr += "({";
 			if (!c->single_line)
@@ -114,7 +114,7 @@ namespace paramEdit {
 				}
 				else
 				{
-					callStr += std::to_string(c->param[i].value);
+					callStr += ::std::to_string(c->param[i].value);
 				}
 			}
 
@@ -137,14 +137,14 @@ namespace paramEdit {
 
 		if (c->pCount == 0) return;
 
-		std::string callStr;
+		::std::string callStr;
 		
 
 		//save
 		const char* filename = c->caller.fileName;
 		const int lineNum = c->caller.line;
 
-		using namespace std;
+		using namespace ::std;
 		string inFilePath = filename;
 		string outFilePath = inFilePath + "_";
 
@@ -153,7 +153,7 @@ namespace paramEdit {
 		ifstream ifile(inFilePath);
 		ofstream ofile(outFilePath);
 
-		std::string caller;
+		::std::string caller;
 		int lc = 1;
 		if (ifile.is_open())
 		{
@@ -163,7 +163,7 @@ namespace paramEdit {
 				lc++;
 			}
 
-			std::string tab;
+			::std::string tab;
 			int nc = 0;
 			int cCount = 1;
 			while (true)
@@ -240,16 +240,16 @@ namespace paramEdit {
 	}
 
 	struct DataNode {
-		std::string callSite;
+		::std::string callSite;
 		int index;
 	};
 
-	static std::unordered_map<std::string, int> registry;
+	static ::std::unordered_map<::std::string, int> registry;
 	static int next_index = 0;
 
 	void RegCmd(auto caller)
 	{
-		std::string key = std::string(caller.file_name()) + ":" + std::to_string(caller.line());
+		::std::string key = ::std::string(caller.file_name()) + ":" + ::std::to_string(caller.line());
 
 		auto it = registry.find(key);
 
@@ -266,7 +266,7 @@ namespace paramEdit {
 		}
 	}
 
-	void reflect_f(auto* in, const std::source_location caller, const std::source_location currentFunc)//name and types without names
+	void reflect_f(auto* in, const ::std::source_location caller, const ::std::source_location currentFunc)//name and types without names
 	{
 
 		RegCmd(caller);
@@ -277,23 +277,23 @@ namespace paramEdit {
 		{
 			FillCaller(caller);
 
-			std::string fn = currentFunc.function_name();
+			::std::string fn = currentFunc.function_name();
 			auto rb = fn.find("(");
 			auto fp = fn.rfind("::", rb);
 			auto op = fn.rfind("::", fp - 2);
-			if (op == std::string::npos)
+			if (op == ::std::string::npos)
 			{
 				op = fn.rfind(" ", fp - 2)-1;
 			}
-			std::string objName = fn.substr(op + 2, fp - op - 2);
-			std::string funcName = fn.substr(fp + 2, rb - fp - 2);;
+			::std::string objName = fn.substr(op + 2, fp - op - 2);
+			::std::string funcName = fn.substr(fp + 2, rb - fp - 2);;
 
 			//auto fnStart = fn.rfind(" ", rb)+1;
-			//std::string fullName = fn.substr(fnStart, rb - fnStart);
+			//::std::string fullName = fn.substr(fnStart, rb - fnStart);
 
 			strcpy(c->funcName, (objName + "::" + funcName).c_str());
-			std::ifstream ifile(currentFunc.file_name());
-			std::string s;
+			::std::ifstream ifile(currentFunc.file_name());
+			::std::string s;
 
 			int lc = 1;
 
@@ -306,23 +306,23 @@ namespace paramEdit {
 					if (!getline(ifile, s)) break;
 					if (lc == currentFunc.line()) break;
 
-					std::string lineStr;
+					::std::string lineStr;
 					CopyStrWithSkipper(s, lineStr, " \t");
 
-					if (std::string::npos != lineStr.find("namespace" + objName))
+					if (::std::string::npos != lineStr.find("namespace" + objName))
 					{
 						obj_is_found = true;
 					}
 
 					if (obj_is_found)
 					{
-						std::string Declaration = "cmd(" + funcName;
+						::std::string Declaration = "cmd(" + funcName;
 						auto cmdDecl = lineStr.find(Declaration);
-						if (std::string::npos != cmdDecl)
+						if (::std::string::npos != cmdDecl)
 						{
-							std::string pStr;
+							::std::string pStr;
 
-							if (std::string::npos == lineStr.find(")", cmdDecl))
+							if (::std::string::npos == lineStr.find(")", cmdDecl))
 							{
 								while (true)
 								{
@@ -336,7 +336,7 @@ namespace paramEdit {
 							auto cmdOfs = s.find("cmd");
 							auto commaOfs = s.find(",",cmdOfs);
 
-							if (commaOfs == std::string::npos)//no params
+							if (commaOfs == ::std::string::npos)//no params
 							{
 								c->pCount = 0;
 								c->uiDraw = &showStackItem;
@@ -347,18 +347,18 @@ namespace paramEdit {
 							auto end = s.find(")");
 							//end = s.rfind(",", end);
 							pStr = s.substr(commaOfs + 1, end -1 - commaOfs);
-							std::erase(pStr, '\t');
-							std::erase(pStr, '\n');
+							::std::erase(pStr, '\t');
+							::std::erase(pStr, '\n');
 
 
-							const std::regex reg{ R"(,)" };
+							const ::std::regex reg{ R"(,)" };
 							auto tokens = regex_split(pStr, reg);
 
 							int param_ofs = 0;
 							int j = 0;
 							for (int i = 0; i < tokens.size(); i++)
 							{
-								std::string typeStr, nameStr;
+								::std::string typeStr, nameStr;
 								getTypeAndName(tokens[i], typeStr, nameStr);
 								auto typeID = getTypeIndex(typeStr.c_str());
 								c->param[j].typeIndex = typeID;
@@ -371,7 +371,7 @@ namespace paramEdit {
 								{
 
 									auto br = nameStr.find("[");
-									if (br != std::string::npos)
+									if (br != ::std::string::npos)
 									{
 										nameStr = nameStr.substr(0, br);
 									}
@@ -380,11 +380,11 @@ namespace paramEdit {
 								{
 									auto br = nameStr.find("[");
 
-									if (br != std::string::npos)
+									if (br != ::std::string::npos)
 									{
 										auto rbr = nameStr.find("]");
 										auto cs = nameStr.substr(br + 1, rbr - br-1);
-										cnt = std::stoi(cs);
+										cnt = ::std::stoi(cs);
 
 									}
 								}
@@ -419,9 +419,9 @@ namespace paramEdit {
 
 
 			//get caller string
-			std::ifstream ifileCaller(caller.file_name());
+			::std::ifstream ifileCaller(caller.file_name());
 
-			std::string funcStr;
+			::std::string funcStr;
 			lc = 1;
 
 			if (ifileCaller.is_open())
@@ -433,7 +433,7 @@ namespace paramEdit {
 
 					lc++;
 				}
-				if (s.find(";") !=std::string::npos)
+				if (s.find(";") !=::std::string::npos)
 				{
 					c->single_line = true;
 				}
@@ -442,13 +442,13 @@ namespace paramEdit {
 					c->single_line = false;
 				}
 
-				std::string fullStr = s;
+				::std::string fullStr = s;
 				c->caller.endLine = lc;
 				
 
 				auto s2 = s;
-				std::erase(s2, ' ');
-				std::erase(s2, '\t');
+				::std::erase(s2, ' ');
+				::std::erase(s2, '\t');
 
 				auto br = s2.find("(");
 				auto fcn = s2.substr(0, br);
@@ -457,10 +457,10 @@ namespace paramEdit {
 
 
 				auto pStart = s.find("{") + 1;
-				std::string funcStr = s.substr(pStart, s.size()-pStart);
+				::std::string funcStr = s.substr(pStart, s.size()-pStart);
 				auto pEnd = funcStr.find("}");
 
-				if (std::string::npos == pEnd)
+				if (::std::string::npos == pEnd)
 				{
 					while (true)
 					{
@@ -477,36 +477,36 @@ namespace paramEdit {
 					funcStr = funcStr.substr(0, pEnd);
 				}
 
-				//std::erase(funcStr, ' ');
-				std::erase(funcStr, '\t');
-				std::erase(funcStr, '\n');
+				//::std::erase(funcStr, ' ');
+				::std::erase(funcStr, '\t');
+				::std::erase(funcStr, '\n');
 
-				std::string paramStr = funcStr;
+				::std::string paramStr = funcStr;
 
-				const std::regex reg{ R"(,)" };
+				const ::std::regex reg{ R"(,)" };
 				auto pTokens = regex_split(paramStr, reg);
 				c->pCount = pTokens.size();
 				//TODO - prevent missmatch pTokens.size with pCount
 				for (int i = 0; i < c->pCount; i++)
 				{
-					std::string pname;
-					std::string pvalue;
+					::std::string pname;
+					::std::string pvalue;
 
 					if (!strcmp(c->param[i].type, "pStr"))
 					{
 						auto start = pTokens[i].find('\"');
 						auto end = pTokens[i].rfind('\"');
-						std::string text = pTokens[i].substr(start + 1, end - start - 1);
+						::std::string text = pTokens[i].substr(start + 1, end - start - 1);
 						strcpy(c->param[i].strValue, text.c_str());
 						continue;
 					}
 
-					std::erase(pTokens[i], ' ');
+					::std::erase(pTokens[i], ' ');
 
 					auto pId = i;
 					auto eqPos = pTokens[i].find('=');
 
-					if (eqPos != std::string::npos)//init with field names
+					if (eqPos != ::std::string::npos)//init with field names
 					{
 						pname = pTokens[i].substr(1, eqPos - 1);
 						pId = getParamIndexByStr(cmdCounter, pname.c_str());
@@ -526,9 +526,9 @@ namespace paramEdit {
 
 						if (isTypeEnum(cmdParamDesc[cmdCounter].param[pId].typeIndex))
 						{
-							std::string pTypeStr = cmdParamDesc[cmdCounter].param[pId].type;
+							::std::string pTypeStr = cmdParamDesc[cmdCounter].param[pId].type;
 							pTypeStr += "::";
-							if (pvalue.find(pTypeStr) == std::string::npos)
+							if (pvalue.find(pTypeStr) == ::std::string::npos)
 							{
 								c->param[i].bypass = true;
 								strcpy(c->param[i].strValue, pvalue.c_str());
@@ -536,7 +536,7 @@ namespace paramEdit {
 							}
 							else {
 								auto enumStart = pvalue.find("::") + 2;
-								std::string enumStr = pvalue.substr(enumStart, pvalue.size() - enumStart);
+								::std::string enumStr = pvalue.substr(enumStart, pvalue.size() - enumStart);
 								c->param[i].value = GetEnumValue(c->param[i].typeIndex, enumStr.c_str());
 							}
 						}
@@ -548,7 +548,7 @@ namespace paramEdit {
 							}
 							else
 							{
-								c->param[i].value = std::stoi(pvalue);
+								c->param[i].value = ::std::stoi(pvalue);
 							}
 
 						}
@@ -618,7 +618,7 @@ namespace paramEdit {
 		const char* filename = cmdParamDesc[cmdCounter].caller.fileName;
 		const int lineNum = cmdParamDesc[cmdCounter].caller.line;
 
-		using namespace std;
+		using namespace ::std;
 		string inFilePath = filename;
 
 		string s;
@@ -643,7 +643,7 @@ namespace paramEdit {
 				s2.erase(remove(s2.begin(), s2.end(), '\t'), s2.end());
 
 				constexpr auto regex_str = R"(,)";
-				const std::regex reg{ regex_str };
+				const ::std::regex reg{ regex_str };
 				const auto tokens = regex_split(s2, reg);
 
 				int j = 0;
@@ -852,7 +852,7 @@ bool ButtonPressed(const char* str, float x, float y, float w, float h)
 
 enum class dir {x,y,r};
 
-void processSlider(int cmdIndex, std::string pName,float x, float y,float w,float h, dir direction)
+void processSlider(int cmdIndex, ::std::string pName,float x, float y,float w,float h, dir direction)
 {
 
 	int paramIndex = getParamIndexByStr(cmdIndex, pName.c_str());
@@ -862,7 +862,7 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 	ui::style::box::progress = cmdParamDesc[cmdIndex].param[paramIndex].value / range;;
 	ui::style::box::slider_type = (int)direction+1;
 		
-	std::string buttonText = pName +"::" + std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value);
+	::std::string buttonText = pName +"::" + ::std::to_string(cmdParamDesc[cmdIndex].param[paramIndex].value);
 	if (ButtonPressed(cmdIndex,buttonText.c_str(), x, y, w, h))
 	{
 		storedParam = cmdParamDesc[cmdIndex].param[paramIndex].value;
@@ -885,7 +885,7 @@ void processSlider(int cmdIndex, std::string pName,float x, float y,float w,floa
 	ui::style::box::progress = 0;
 }
 
-void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w, float h, const char* shortName = "")
+void processSwitcher(int cmdIndex, ::std::string pName, float x, float y, float w, float h, const char* shortName = "")
 {
 	int paramIndex = getParamIndexByStr(cmdIndex, pName.c_str());
 	ui::style::button::inverted = cmdParamDesc[cmdIndex].param[paramIndex].value == 0 ? false : true;
@@ -899,7 +899,7 @@ void processSwitcher(int cmdIndex, std::string pName, float x, float y, float w,
 
 //TRACKER
 
-void processSwitcher(std::string pName, float x, float y, float w, float h, int ch, auto& var, const char* shortName = "")
+void processSwitcher(::std::string pName, float x, float y, float w, float h, int ch, auto& var, const char* shortName = "")
 {
 	ui::style::button::inverted = var == switcher::off ? false : true;
 	ui::style::button::selected = false;
@@ -911,7 +911,7 @@ void processSwitcher(std::string pName, float x, float y, float w, float h, int 
 }
 
 
-void processSlider(std::string pName, float x, float y, float w, float h, auto& var, dir direction, int _min, int _max, bool displayNum=true)
+void processSlider(::std::string pName, float x, float y, float w, float h, auto& var, dir direction, int _min, int _max, bool displayNum=true)
 {
 	float range = _max-_min;
 	ui::style::box::signed_progress = _min < 0.f ? 1.f : 0.f;
@@ -919,15 +919,15 @@ void processSlider(std::string pName, float x, float y, float w, float h, auto& 
 	ui::style::box::progress = var / range;;
 	ui::style::box::slider_type = (int)direction + 1;
 
-	std::string buttonText = "";
+	::std::string buttonText = "";
 	if (pName.length() > 0)
 	{
 		buttonText = pName;
-		if (displayNum) buttonText += "::" + std::to_string(var);
+		if (displayNum) buttonText += "::" + ::std::to_string(var);
 	}
 	else
 	{
-		if (displayNum) buttonText += std::to_string(var);
+		if (displayNum) buttonText += ::std::to_string(var);
 	}
 
 	if (ButtonPressed(buttonText.c_str(), x, y, w, h))
