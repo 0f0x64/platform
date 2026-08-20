@@ -30,7 +30,7 @@ namespace gltfAnim
 		::std::vector<AnimationChannel> channels;
 
 		float weight = 1.0f;
-		float realWeight = 1.0f;
+		float realWeight = 0.0f;
 		float speed = 1.0f;
 		float currentTime = 0.0f;
 		bool looped = false;
@@ -366,7 +366,7 @@ namespace gltfAnim
 		bool anyPlaying = false;
 		for (AnimationClip& clip : scene.animations)
 		{
-			if (clip.isPlaying && clip.weight > 0.0f && clip.realWeight > 0.0f && clip.duration > 0.0f)
+			if ((clip.isPlaying || clip.realWeight > 0.0f) && clip.weight > 0.0f && clip.duration > 0.0f)
 			{
 				anyPlaying = true;
 			}
@@ -389,7 +389,7 @@ namespace gltfAnim
 		// Проходим по всем клипам
 		for (AnimationClip& clip : scene.animations)
 		{
-			if (!clip.isPlaying || clip.weight <= 0.0f || clip.realWeight <= 0.0f || clip.duration <= 0.0f)
+			if ((!clip.isPlaying && clip.realWeight <= 0.0f) || clip.weight <= 0.0f || clip.duration <= 0.0f)
 			{
 				continue;
 			}

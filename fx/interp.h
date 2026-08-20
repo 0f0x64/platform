@@ -68,6 +68,9 @@ namespace interp {
         virtual void Stop() = 0;
         virtual void Pause() = 0;
         virtual void Resume() = 0;
+
+        virtual const ::std::type_info& GetTypeInfo() const = 0;
+        virtual void* GetTargetPtr() const = 0;
     };
 
     template<typename T>
@@ -132,6 +135,14 @@ namespace interp {
         T GetCurrentValue() const { return target ? *target : T{}; }
         T* GetTarget() const { return target; }
 
+        const std::type_info& GetTypeInfo() const override {
+            return typeid(T);
+        }
+
+        void* GetTargetPtr() const override {
+            return static_cast<void*>(target);
+        }
+
     private:
         T* target;
         T startValue;
@@ -162,11 +173,10 @@ namespace interp {
         // Searching for existing tween with this target
         auto it = ::std::find_if(_activeTweens.begin(), _activeTweens.end(),
             [&target](const ::std::unique_ptr<ITween>& tween) {
-                auto* specificTween = dynamic_cast<Tween<T>*>(tween.get());
-                if (specificTween && specificTween->GetTarget() == &target) {
-                    return true;
+                if (tween->GetTypeInfo() != typeid(T)) {
+                    return false;
                 }
-                return false;
+                return tween->GetTargetPtr() == static_cast<void*>(&target);
             });
 
         if (it != _activeTweens.end()) {
