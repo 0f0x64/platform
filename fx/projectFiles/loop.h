@@ -474,15 +474,15 @@ struct hero_ {
 		}
 
 		//if (!gravity.mode && jumpChargeProgress != 1.0f) {
-			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[1];
+			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[2];
 
 			clip.currentTime = (1 - jumpChargeProgress) * clip.duration;
 
 			if (jumpChargeProgress != 1.0f) {
-				ConstBuf::gltfAnim::PlayAnimation(1);
+				ConstBuf::gltfAnim::PlayAnimation(2);
 			}
 			else {
-				ConstBuf::gltfAnim::StopAnimation(1);
+				ConstBuf::gltfAnim::StopAnimation(2);
 			}
 		//}
 	}
@@ -671,10 +671,10 @@ struct hero_ {
 		}
 
 		if (abs(speed) > 0.5f) {
-			ConstBuf::gltfAnim::PlayAnimation(2);
+			ConstBuf::gltfAnim::PlayAnimation(3);
 		}
 		else {
-			ConstBuf::gltfAnim::StopAnimation(2);
+			ConstBuf::gltfAnim::StopAnimation(3);
 		}
 
 		// Жесткий зажим скорости в максимальные рамки

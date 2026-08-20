@@ -681,18 +681,23 @@ namespace ConstBuf
 			loaded = true;
 			Log("GLTF model loaded successfully\n");
 
+			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // Бездействие
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // Присяд
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//AnimationsAspid (1).glb", true); // Бег
 			//gltfAnim::LoadAnimationFile("..//fx//projectFiles//aspid_land.glb", true);//Гигант
 			//gltfAnim::LoadAnimationFile("..//fx//projectFiles//Aspid_Landing_Leva.glb", true);//Обратный присяд
 
-			gltfAnim::scene.animations[1].isPlaying = true;
-			gltfAnim::scene.animations[1].speed = 0;
-			gltfAnim::scene.animations[1].weight = 1.0f;
-			//gltfAnim::scene.animations[1].realWeight = 0.5f;
+			gltfAnim::scene.animations[0].isPlaying = false;
 
-			gltfAnim::scene.animations[2].looped = true;
-			gltfAnim::scene.animations[2].weight = 0.25f;
+			gltfAnim::scene.animations[2].isPlaying = true;
+			gltfAnim::scene.animations[2].speed = 0;
+			gltfAnim::scene.animations[2].weight = 1.0f;
+			//gltfAnim::scene.animations[2].realWeight = 0.5f;
+
+			gltfAnim::scene.animations[3].looped = true;
+			gltfAnim::scene.animations[3].weight = 0.25f;
+
+			gltfAnim::PlayAnimation(1, 0.0f);
 		}
 			else
 		{
