@@ -474,15 +474,15 @@ struct hero_ {
 		}
 
 		//if (!gravity.mode && jumpChargeProgress != 1.0f) {
-			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[0];
+			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[1];
 
 			clip.currentTime = (1 - jumpChargeProgress) * clip.duration;
 
 			if (jumpChargeProgress != 1.0f) {
-				ConstBuf::gltfAnim::PlayAnimation(0);
+				ConstBuf::gltfAnim::PlayAnimation(1);
 			}
 			else {
-				ConstBuf::gltfAnim::StopAnimation(0);
+				ConstBuf::gltfAnim::StopAnimation(1);
 			}
 		//}
 	}
@@ -671,10 +671,10 @@ struct hero_ {
 		}
 
 		if (abs(speed) > 0.5f) {
-			ConstBuf::gltfAnim::PlayAnimation(1);
+			ConstBuf::gltfAnim::PlayAnimation(2);
 		}
 		else {
-			ConstBuf::gltfAnim::StopAnimation(1);
+			ConstBuf::gltfAnim::StopAnimation(2);
 		}
 
 		// Жесткий зажим скорости в максимальные рамки
@@ -2223,7 +2223,7 @@ namespace Loop
 			if (!sceneInitialized)
 			{
 			//ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
-			ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
+			ConstBuf::LoadObj("..//fx//projectFiles//A-Pose.glb");
 			Object::MeshPtr = nullptr;
 
 			sceneInitialized = true;
