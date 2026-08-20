@@ -385,6 +385,7 @@ namespace gltfAnim
 		::std::vector<bool> jointAnimated(scene.joints.size(), false);
 
 		::std::vector<float> jointWeightSum(scene.joints.size(), 0.0f);
+		std::vector<float> jointRealWeightSum(scene.joints.size(), 0.0f);
 
 		// Проходим по всем клипам
 		for (AnimationClip& clip : scene.animations)
@@ -465,8 +466,7 @@ namespace gltfAnim
 
 					if (channel.path == cgltf_animation_path_type_translation)
 					{
-						XMVECTOR animTrans = XMVectorLerp(a, b, alpha);
-						translation = XMVectorLerp(decompTranslation, animTrans, clip.realWeight);
+						translation = XMVectorLerp(a, b, alpha);
 					}
 					else if (channel.path == cgltf_animation_path_type_rotation)
 					{
@@ -476,8 +476,7 @@ namespace gltfAnim
 						{
 							b = XMVectorNegate(b);
 						}
-						XMVECTOR animRot = XMQuaternionNormalize(XMQuaternionSlerp(a, b, alpha));
-						rotation = XMQuaternionSlerp(decompRotation, animRot, clip.realWeight);
+						rotation = XMQuaternionNormalize(XMQuaternionSlerp(a, b, alpha));
 					}
 					else if (channel.path == cgltf_animation_path_type_scale)
 					{
@@ -491,23 +490,22 @@ namespace gltfAnim
 					// Взвешенное смешивание
 					if (!jointAnimated[jointIdx])
 					{
-						// Первый вклад — инициализируем накопители
-						accumScale[jointIdx] = XMVectorScale(scale, clip.weight);
-						accumRotation[jointIdx] = rotation; //XMVectorScale(rotation, clip.weight);
-						accumTranslation[jointIdx] = XMVectorScale(translation, clip.weight);
+						accumScale[jointIdx] = scale;
+						accumRotation[jointIdx] = rotation;
+						accumTranslation[jointIdx] = translation;
 						jointAnimated[jointIdx] = true;
 						jointWeightSum[jointIdx] = clip.weight;
 					}
 					else
 					{
-						// Последующие вклады — добавляем с весом
-						accumScale[jointIdx] = XMVectorAdd(accumScale[jointIdx], XMVectorScale(scale, clip.weight));
-						accumTranslation[jointIdx] = XMVectorAdd(accumTranslation[jointIdx], XMVectorScale(translation, clip.weight));
-
 						float blend = clip.weight / (jointWeightSum[jointIdx] + clip.weight);
+						accumTranslation[jointIdx] = XMVectorLerp(accumTranslation[jointIdx], translation, blend);
 						accumRotation[jointIdx] = XMQuaternionSlerp(accumRotation[jointIdx], rotation, blend);
+						// Scale не смешиваем — оставляем от первого клипа
 						jointWeightSum[jointIdx] += clip.weight;
 					}
+
+					jointRealWeightSum[jointIdx] += clip.realWeight * clip.weight;
 				}
 			}
 		}
@@ -527,10 +525,18 @@ namespace gltfAnim
 
 			float invJointWeight = jointWeightSum[jointIdx] > 0.0f ? 1.0f / jointWeightSum[jointIdx] : 1.0f;
 
-			// Нормализуем scale и translation
-			XMVECTOR finalScale = XMVectorScale(accumScale[jointIdx], invJointWeight);
-			XMVECTOR finalTranslation = XMVectorScale(accumTranslation[jointIdx], invJointWeight);
-			XMVECTOR finalRotation = XMQuaternionNormalize(accumRotation[jointIdx]);
+			float blendedRealWeight = jointRealWeightSum[jointIdx] * invJointWeight;
+			blendedRealWeight = clamp(blendedRealWeight, 0.0f, 1.0f);
+
+			// Bind pose для этой кости
+			XMVECTOR bindScale, bindRotation, bindTranslation;
+			XMMATRIX bindLocal = XMLoadFloat4x4(&scene.bindLocal[jointIdx]);
+			XMMatrixDecompose(&bindScale, &bindRotation, &bindTranslation, bindLocal);
+
+			// Смешиваем накопленную анимационную позу с bind pose по blendedRealWeight
+			XMVECTOR finalTranslation = XMVectorLerp(bindTranslation, accumTranslation[jointIdx], blendedRealWeight);
+			XMVECTOR finalRotation = XMQuaternionSlerp(bindRotation, accumRotation[jointIdx], blendedRealWeight);
+			XMVECTOR finalScale = XMVectorLerp(bindScale, accumScale[jointIdx], blendedRealWeight);
 
 			// Собираем матрицу
 			const XMMATRIX local = XMMatrixScalingFromVector(finalScale) *
