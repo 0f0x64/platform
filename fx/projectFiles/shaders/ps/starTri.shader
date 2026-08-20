@@ -215,7 +215,7 @@ float4 PS(VS_OUTPUT_PARTICLE2 input, bool isFrontFace : SV_IsFrontFace) : SV_Tar
     // Соединяем текстуры. Диск дает плотность в центре, корона — пушистость на краях
     
     float finalPlasma = (cellTex * 142) + (coronaTex * 4.0);
-
+    
     // Градиент цвета: мягкий переход от оранжевого к дымчатому бело-желтому свечению
     //float3 centerColor = float3(1.0, 0.75, 0.5) * finalPlasma*114;
     float3 centerColor = finalPlasma*114;
@@ -224,6 +224,8 @@ float4 PS(VS_OUTPUT_PARTICLE2 input, bool isFrontFace : SV_IsFrontFace) : SV_Tar
     //return float4(edgeGlow,1);
     edgeGlow=max(edgeGlow,0)*saturate(1-diskZone*8);
     float3 finalColor = (centerColor + edgeGlow) * 222.0 * input.color.rgb;
+
+    
 
     float coronaMask = saturate(pow(edgeFade,2));
     coronaMask=pow(.5+.5*cos(edgeFade*PI-.766),81)*10;
@@ -238,6 +240,7 @@ float4 PS(VS_OUTPUT_PARTICLE2 input, bool isFrontFace : SV_IsFrontFace) : SV_Tar
     //finalColor=saturate(diskZone)*22222222;
     
     finalColor*=alphaMask;
+    //return float4(noise3(p*52)*saturate(1-edgeFade*6)*22,1);
 
     // Ослабляем discard, чтобы он не делал "огрызки", а лишь слегка прорежал текстуру
     if (finalPlasma * (edgeFade + 0.1) * 1.0 < 0.02 + hash(p * 12.0).r * 0.04) 

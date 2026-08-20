@@ -143,6 +143,7 @@ float4 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
         pos*=1+frac(length(pos))/5;
         
         pos/=3;
+
                         float ttt=pow(length(pos)/8,11.5);
        //pos*=4;
        //pos-=22221/pow(pos,3);

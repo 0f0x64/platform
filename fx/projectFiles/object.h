@@ -904,10 +904,10 @@ namespace Object {
 		
 
 		NewLine();
-		AddPointToLine({ 0,11,-16 });
-		AddPointToLine({ 100,0,0 });
+		AddPointToLine({ 0,-8,-16 });
+		AddPointToLine({ 100,-111,0 });
 		AddPointToLine({ 200,0,0 });
-		AddPointToLine({ 200,110,0 });
+		AddPointToLine({ 200,79,0 });
 		AddPointToLine({ 100,110,0 });
 		AddPointToLine({ 0,6,0 });
 
@@ -1040,6 +1040,7 @@ namespace Object {
 		}*/
 
 		// Большой внешний цикл — хаотично рассыпаем 100 прямых лазерных штрихов
+/*
 for (int j = 0; j < 60; j++)
 {
 	NewLine();
@@ -1084,7 +1085,7 @@ for (int j = 0; j < 60; j++)
 
 		AddPointToLine({ _x, _y, _z });
 	}
-}
+}*/
 			
 		//------------end user space---------------
 		//-----------------------------------------

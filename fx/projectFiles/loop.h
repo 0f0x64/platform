@@ -71,6 +71,8 @@ struct inputController_ {
 			}
 		}
 
+		float heroRotationAnimAngle = 0;
+
 		XMMATRIX getLookMatrix(XMMATRIX rowMajorRot, XMVECTOR HeroRealUp, float deltaTime, float heroChangeDirSpeed)
 		{
 
@@ -79,8 +81,15 @@ struct inputController_ {
 			float targetA = -std::round(yaw / PI) * PI;// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
 
 			yawInner = lerp(yawInner, targetA, pow(min(deltaTime * heroChangeDirSpeed, 1.), 1.5));
+
 			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, yawInner);
 			XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
+
+			float diff = targetA - yawInner;
+			float radiansLeft = std::abs(diff);
+			float progress01 = (PI - min(radiansLeft, PI)) / PI;
+			bool isTurningRight = (diff > 0.0f);
+			heroRotationAnimAngle = isTurningRight ? progress01 : (1.0f - progress01);
 
 			return result;
 		}
