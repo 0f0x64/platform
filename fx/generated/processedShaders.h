@@ -6097,6 +6097,7 @@ const char* starTri =
 "    radialNoise2 = .321/cells3D(.05*float3(radialUV.x * 125.0, radialUV.y * 16.0, t * 2.3));\n"
 "    \n"
 "    // МЯГКОЕ смешивание вместо жесткого pow(..., 2.2). Лучи получаются пушистыми\n"
+"\n"
 "    float coronaTex = saturate((radialNoise1 + radialNoise2) * 0.25) * coronaZone;\n"
 "    coronaTex*=.5+.3*sin(radialUV*16);\n"
 "    // Плавное затухание короны к краям геометрии (умножаем на edgeFade)\n"
