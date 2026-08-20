@@ -2222,6 +2222,7 @@ namespace Loop
 			static bool sceneInitialized = false;
 			if (!sceneInitialized)
 			{
+			//ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
 			ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
 			Object::MeshPtr = nullptr;
 
