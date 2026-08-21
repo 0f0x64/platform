@@ -458,7 +458,11 @@ struct hero_ {
 
 		if (gravity.mode)
 		{
+			ConstBuf::gltfAnim::PlayAnimation(5);
 			landingTimer = 0;
+		}
+		else {
+			ConstBuf::gltfAnim::StopAnimation(5);
 		}
 
 		float landindDur = .5;
@@ -636,7 +640,13 @@ struct hero_ {
 
 	void ProcessMove(float deltaTime)
 	{
-		if (jump || gravity.mode) return;
+		if (jump || gravity.mode) {
+			ConstBuf::gltfAnim::StopAnimation(3);
+			ConstBuf::gltfAnim::StopAnimation(4);
+			ConstBuf::gltfAnim::StopAnimation(1);
+
+			return;
+		}
 
 		bool pressingMove = false;
 		

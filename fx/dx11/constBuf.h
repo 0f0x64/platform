@@ -685,8 +685,7 @@ namespace ConstBuf
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // Присяд
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//AnimationsAspid (1).glb", true); // Ходьба
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // Бег
-			//gltfAnim::LoadAnimationFile("..//fx//projectFiles//aspid_land.glb", true);//Гигант
-			//gltfAnim::LoadAnimationFile("..//fx//projectFiles//Aspid_Landing_Leva.glb", true);//Обратный присяд
+			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // Падение
 
 			gltfAnim::scene.animations[0].isPlaying = false;
 
@@ -700,6 +699,9 @@ namespace ConstBuf
 			gltfAnim::scene.animations[3].looped = true;
 
 			gltfAnim::scene.animations[4].looped = true;
+
+			gltfAnim::scene.animations[5].looped = true;
+			gltfAnim::scene.animations[5].speed = 0.1f;
 		}
 			else
 		{
