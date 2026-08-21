@@ -689,6 +689,8 @@ namespace ConstBuf
 
 			gltfAnim::scene.animations[0].isPlaying = false;
 
+			gltfAnim::scene.animations[1].looped = true;
+
 			gltfAnim::scene.animations[2].isPlaying = true;
 			gltfAnim::scene.animations[2].speed = 0;
 			gltfAnim::scene.animations[2].weight = 1.0f;
