@@ -670,15 +670,26 @@ struct hero_ {
 			if (fabsf(speed) < 0.001f) speed = 0.0f;
 		}
 
-		if (abs(speed) > 0.5f) {
+		// Жесткий зажим скорости в максимальные рамки
+		speed = clamp(speed, -maxSpeed, maxSpeed);
+
+		// Логика включения анимаций ходьбы и бега
+		if (fabsf(speed) > 0.5f) {
+			float weight = fabsf(speed) / maxSpeed;
+			ConstBuf::gltfAnim::scene.animations[4].weight = weight;
+			ConstBuf::gltfAnim::scene.animations[3].weight = 1 - weight;
+
 			ConstBuf::gltfAnim::PlayAnimation(3);
+			ConstBuf::gltfAnim::PlayAnimation(4);
+
+			ConstBuf::gltfAnim::StopAnimation(1);
 		}
 		else {
 			ConstBuf::gltfAnim::StopAnimation(3);
-		}
+			ConstBuf::gltfAnim::StopAnimation(4);
 
-		// Жесткий зажим скорости в максимальные рамки
-		speed = clamp(speed, -maxSpeed, maxSpeed);
+			ConstBuf::gltfAnim::PlayAnimation(1);
+		}
 
 		// --- Логика вращения вокруг нити (A / D) ---
 		bool pressingRotation = false;
