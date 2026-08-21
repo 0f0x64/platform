@@ -683,7 +683,7 @@ namespace ConstBuf
 
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // Бездействие
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // Присяд
-			gltfAnim::LoadAnimationFile("..//fx//projectFiles//AnimationsAspid (1).glb", true); // Ходьба
+			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // Ходьба
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // Бег
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // Падение
 
