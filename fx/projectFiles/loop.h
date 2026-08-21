@@ -675,9 +675,12 @@ struct hero_ {
 
 		// Логика включения анимаций ходьбы и бега
 		if (fabsf(speed) > 0.5f) {
-			float weight = fabsf(speed) / maxSpeed;
+			float weight = min(max(fabsf(speed) - 5.0f, 0.0f) / 12.0f, 1.0f);
 			ConstBuf::gltfAnim::scene.animations[4].weight = weight;
 			ConstBuf::gltfAnim::scene.animations[3].weight = 1 - weight;
+
+			Log(std::to_string(weight).c_str());
+			Log("\n");
 
 			ConstBuf::gltfAnim::PlayAnimation(3);
 			ConstBuf::gltfAnim::PlayAnimation(4);

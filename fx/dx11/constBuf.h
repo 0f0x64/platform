@@ -698,7 +698,6 @@ namespace ConstBuf
 			//gltfAnim::scene.animations[2].realWeight = 0.5f;
 
 			gltfAnim::scene.animations[3].looped = true;
-			gltfAnim::scene.animations[3].weight = 0.25f;
 
 			gltfAnim::scene.animations[4].looped = true;
 		}
