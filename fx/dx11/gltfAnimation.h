@@ -881,6 +881,7 @@ namespace gltfAnim
 			return;
 
 		clip.realWeight = 1.0f;
+		clip.currentTime = 0.0f;
 		clip.isPlaying = true;
 
 		//interp::Animate(clip.realWeight, 1.0f, time);
