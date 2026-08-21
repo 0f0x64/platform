@@ -679,9 +679,6 @@ struct hero_ {
 			ConstBuf::gltfAnim::scene.animations[4].weight = weight;
 			ConstBuf::gltfAnim::scene.animations[3].weight = 1 - weight;
 
-			Log(std::to_string(weight).c_str());
-			Log("\n");
-
 			ConstBuf::gltfAnim::PlayAnimation(3);
 			ConstBuf::gltfAnim::PlayAnimation(4);
 
