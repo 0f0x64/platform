@@ -73,26 +73,68 @@ struct inputController_ {
 
 		float heroRotationAnimAngle = 0;
 
+		void LogF(float f)
+		{
+			char buf[11];
+			_itoa(f * 100, buf, 10);
+			Log(buf);
+			Log("\n");
+		}
+
+		float heroRotateAngleAnim = 0;
+
 		XMMATRIX getLookMatrix(XMMATRIX rowMajorRot, XMVECTOR HeroRealUp, float deltaTime, float heroChangeDirSpeed)
 		{
-
+			static bool animStarted = false;
 			static float yawInner = yaw;
 
 			float targetA = -std::round(yaw / PI) * PI;// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
 
-			yawInner = lerp(yawInner, targetA, pow(min(deltaTime * heroChangeDirSpeed, 1.), 1.5));
-
-			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, yawInner);
-			XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
-
 			float diff = targetA - yawInner;
-			float radiansLeft = std::abs(diff);
-			float progress01 = (PI - min(radiansLeft, PI)) / PI;
-			bool isTurningRight = (diff > 0.0f);
-			heroRotationAnimAngle = isTurningRight ? progress01 : (1.0f - progress01);
+			
+			static float diffStored = diff;
+			static float frame = 0;
+			static float lastTargetA = targetA;
+			int frames = 30;
+
+			if (fabs(diff) > PI / 2.f && !animStarted)
+			{
+				animStarted = true;
+				diffStored = diff;
+				frame = 0;
+				if (diff > 0) Log("right\n");
+				if (diff < 0) Log("left\n");
+
+				if (diff < 0) lastTargetA = targetA;
+			}
+
+			if (frame >= frames && animStarted)
+			{
+				animStarted = false;
+				lastTargetA = targetA;
+				yawInner = targetA;
+				heroRotateAngleAnim = 0;
+				
+			}
+
+			if (animStarted)
+			{
+				float fr = frame / (float)frames;
+				if (diffStored < 0) fr = 1 - fr;
+				heroRotateAngleAnim = PI*(fr);
+
+				frame++;
+
+			}
+
+			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, heroRotateAngleAnim + lastTargetA);
+
+			XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
 
 			return result;
 		}
+
+		//yawInner = lerp(yawInner, targetA, pow(min(deltaTime * heroChangeDirSpeed, 1.), 1.5));
 
 	} mouse;
 
