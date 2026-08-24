@@ -689,6 +689,10 @@ struct hero_ {
 			ConstBuf::gltfAnim::scene.animations[4].weight = weight;
 			ConstBuf::gltfAnim::scene.animations[3].weight = 1 - weight;
 
+			float animSpeed = pow(fabsf(speed) / 12.0f, 0.25f);
+			ConstBuf::gltfAnim::scene.animations[4].speed = animSpeed;
+			ConstBuf::gltfAnim::scene.animations[3].speed = animSpeed;
+
 			ConstBuf::gltfAnim::PlayAnimation(3);
 			ConstBuf::gltfAnim::PlayAnimation(4);
 
