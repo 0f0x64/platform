@@ -927,7 +927,9 @@ namespace Object {
 		AddPointToLine({ -3,31,11 });
 		AddPointToLine({ -33,16,13 });*/
 
-		NewStar({ 0,0,0,306 });
+		NewStar({ 27,-63,21,263 });
+
+		NewStar({ 82,-99,3,56 });
 
 		/*
 		for (int j = 0; j < 10; j++)
@@ -1041,7 +1043,7 @@ namespace Object {
 
 		// Большой внешний цикл — хаотично рассыпаем 100 прямых лазерных штрихов
 
-for (int j = 0; j < 60; j++)
+/*for (int j = 0; j < 60; j++)
 {
 	NewLine();
 
@@ -1085,8 +1087,7 @@ for (int j = 0; j < 60; j++)
 
 		AddPointToLine({ _x, _y, _z });
 	}
-}
-			
+}*/			
 		//------------end user space---------------
 		//-----------------------------------------
 
@@ -1185,8 +1186,6 @@ for (int j = 0; j < 60; j++)
 
 		if (in.tMode == triMode::on)
 		{
-			ps::starTri.set();
-
 			Culling::Set({ cullmode::front }); 
 			DepthBuf::Mode({ depthmode::off });
 
@@ -1236,6 +1235,15 @@ for (int j = 0; j < 60; j++)
 				{
 					//w *= 1.15;
 				}
+
+				auto sd = starLineList.line[i].point[0];
+				ps::starTri.params = {
+						.PosRad = float4(sd.x,sd.y,sd.z,sd.w)
+
+				};
+
+				ps::starTri.set();
+
 			}
 
 			vs::star = {
@@ -1809,7 +1817,7 @@ for (int j = 0; j < 60; j++)
 
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 
-		AllStars({ 200000,1,pMode::point,26,11,2,triMode::off });
+		//AllStars({ 200000,1,pMode::point,26,11,2,triMode::off });
 		
 		vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
 		Maze({ 200000,1,pMode::point,1390,925,111 });

@@ -4,8 +4,8 @@
 
 cbuffer params : register(b0)
 {
-    float hilight;
-};
+    float4 PosRad;
+}; 
 
 #define PI 3.1415926535897932384626433832795
 
@@ -26,9 +26,8 @@ float3 GetWorldViewDir(float3 worldPos, float3 cameraPos)
     return normalize(worldPos - cameraPos);
 }
 
-float CalculateFresnelFade(float3 localPos, float3 worldViewDir, float power)
+float CalculateFresnelFade(float3 normal, float3 worldViewDir, float power)
 {
-    float3 normal = normalize(localPos);
     float fresnel = saturate(abs(dot(normal, worldViewDir)));
     return pow(fresnel, power);
 }
@@ -63,7 +62,7 @@ float cells3D(float3 localPos)
                 float3 pointPos = rand3D(iuv + neighbor);			
                 
                 // Анимация движения точек внутри своих мини-кубов
-                pointPos = 0.5 + 0.5 * sin(time.x / 52.0 + 6.2831 * pointPos);		
+                pointPos = 0.5 + 0.5 * sin(time.x / 11152.0 + 6.2831 * pointPos);		
                 
                 // Вектор разности в 3D
                 float3 diff = neighbor + pointPos - guv;            
@@ -130,123 +129,93 @@ return .1/(noise(sin(p+time.x/112)*22)/2+.5);
 
 float4 PS(VS_OUTPUT_PARTICLE2 input, bool isFrontFace : SV_IsFrontFace) : SV_Target
 {
-    float3 p = normalize(input.wpos.xyz);
+    float3 nrml = normalize(input.wpos.xyz);
 
     float3 cameraPos   = GetWorldSpaceCameraPos(view[0]);
-    float3 worldViewDir = GetWorldViewDir(input.wpos, cameraPos);
-    
-    // Мягкий базовый Френель
-    float edgeFade = CalculateFresnelFade(input.wpos, worldViewDir, 3.);
-    float t = time.x * 0.01;
+    float3 wpos = input.wpos.xyz+PosRad.xyz;
+    float3 worldViewDir = GetWorldViewDir(wpos, cameraPos);
+    float edgeFade = CalculateFresnelFade(nrml, worldViewDir, 3.);
+    float t = time.x * 0.00;
 
-    // Стабильный базис для радиальных лучей (без багов при смещении)
-    float3 dirToPixel = normalize(input.wpos.xyz);
+    float3 dirToPixel = nrml;
+    float3 viewAxis = normalize(PosRad.xyz-cameraPos);
 
-    // 2. Вектор направления от камеры к центру звезды (стабильная ось Z нашего виртуального экрана)
-    // Так как центр звезды в (0,0,0), это просто инвертированная позиция камеры
-    float3 viewAxis = normalize(-cameraPos);
-
-    // 3. Строим стабильный мировой базис, перпендикулярный лучу зрения, 
-    // но жестко привязанный к глобальной оси Y мира (0, 1, 0)
-    float3 globalUp = float3(0.0, 1.0, 0.0);
-    
-    // Вектор "Вправо" всегда горизонтален миру, как бы вы ни крутили камеру по оси взгляда
+   /* float3 globalUp = float3(0.0, 1.0, 0.0);
     float3 worldRight = normalize(cross(viewAxis, globalUp));
-    // Вектор "Вверх" достраивает честную плоскую систему координат
     float3 worldUp    = cross(worldRight, viewAxis);
 
-    // 4. Проецируем 3D-направление пикселя на наш стабильный мировой экран.
-    // Это полностью убирает зависимость от поворота камеры (roll) вокруг своей оси!
     float radialX = dot(dirToPixel, worldRight);
     float radialY = dot(dirToPixel, worldUp);
     float radialZ = dot(dirToPixel, viewAxis);
 
-    float3 ppp=noise(p*4+time.x/1100)*.1;
-     radialX +=ppp.x;
-     radialY +=ppp.y;
-     radialZ +=ppp.z;
-
-    // Считаем полярный угол. Теперь лучи намертво прибиты к пространству сцены.
-    float phi = abs(atan2(radialY, radialX));
-    float phi2 = abs(atan2(radialY, radialZ));
-    // Мягкая радиальная развертка: Y идет плавно от центра наружу
-//    float2 radialUV = float2(phi / 6.2831, 1.0 - edgeFade);
-    float2 radialUV = float2(phi / 6.2831, phi2 / 6.2831);
-    //radialUV /=1+noise3(radialUV.xyy*5).xy;
+    float phi = (atan2(radialY, radialX));
+    float phi2 = (atan2(radialY, radialZ));
+    //float2 radialUV = float2(phi / 6.2831, phi2 / 6.2831);
+    float2 radialUV = float2(phi, phi2) * (1.0 / 6.2831853) + 0.5;*/
     
-    
-
-    // =================================================================
-    // ЗОНИРОВАНИЕ (Теперь мягкое, без резких ступеней)
-    // =================================================================
-    // Базовый диск плавно зануляется к краям
-    float diskZone = saturate(edgeFade * 3.0 - 0.5); 
-    
-    // Корона активна везде, кроме самого центра, и плавно сходит на нет
+    float diskZone = saturate(edgeFade * 2.5 - 0.5); 
     float coronaZone = saturate(1.0 - edgeFade); 
+// 1. Направление от центра звезды на камеру (нормированное, без учета дистанции)
+// 1. Направление от центра звезды на камеру
+float3 toCamera = normalize(PosRad.xyz - cameraPos);
 
-    // =================================================================
-    // ТЕКСТУРА 1: ИСХОДНЫЙ ДИСК (cells3D)
-    // =================================================================
-    float3 p_disk = p + rot3(p, noise3(p * 16.41 + t * 0.5)) * 0.2;
-    float cellTex = saturate( cells3D(p_disk * 12.4) * 0.18) * diskZone*4;
+// 1. Твой оригинальный 3D вектор силуэта
+float3 radialVector = nrml - toCamera * dot(nrml, toCamera);
+
+// 2. ФИКС ДРЕБЕЗЖАНИЯ ПРИ ЗУМЕ:
+// Вместо нормализации всего 3D вектора (normalize(radialVector)), 
+// мы берем только плоские компоненты .xy и нормализуем ИХ как 2D-вектор!
+// Это полностью уничтожает координату глубины Z. 
+// Теперь, когда при приближении камеры перспектива FOV микроскопически качает 3D-вектор 
+// по оси Z, плоский stableAngle.xy остается математически мертвой константой. 
+// Лучи застынут и перестанут дребезжать при движении вперед-назад.
+float2 stableAngle = normalize(radialVector.xy);
+
+// 3. ГЕНЕРИРУЕМ ЛУЧИ (Используем чистый, застывший stableAngle)
+float3 uvNoise1 = float3(stableAngle.xy * 1.0, t * 1.10);
+float3 uvNoise2 = float3(stableAngle.yx * 1.0, t * 2.30);
+
+float noiseValue1 = .321 / cells3D(uvNoise1);
+float noiseValue2 = .321 / cells3D(uvNoise2);
+float rawRayNoise = saturate((noiseValue1 + noiseValue2) * 0.125);
+
+// 4. ТВОЕ АНАЛИТИЧЕСКОЕ ВЫТЯГИВАНИЕ ЛУЧЕЙ
+float rayLengthMask = pow(edgeFade, 0.035); 
+
+float coronaTex = rawRayNoise * rayLengthMask * coronaZone;
+
+// Твоя высокочастотная модуляция "игл" (тоже на стабильном векторе)
+//coronaTex *= .5 + .4 * sin(stableAngle.x * 6.0) * cos(stableAngle.y * 24.0); 
+
+float3 p_disk = nrml;
+float cellTex = saturate(cells3D(p_disk * 12.4) * 0.18) * diskZone * 3;
     
-    // =================================================================
-    // ТЕКСТУРА 2: МЯГКАЯ ЗА ТУХАЮЩАЯ КОРОНА
-    // =================================================================
-    //radialUV/=1+rot3(radialUV.xyy*noise3(p/4),noise3(p));
-    // Уменьшаем частоту шума по оси лучей (95 -> 45), чтобы они были шире и мягче
-    float radialNoise1 = noise3(float3(radialUV.x * 145.0, radialUV.y * 14.0, t * 4.10)) * 0.5 + 0.5;
-    float radialNoise2 = noise3(float3(radialUV.x * 125.0, radialUV.y * 16.0, t * 3.3)) * 0.5 + 0.5;
-    
-    radialNoise1 = .321/cells3D(.05*float3(radialUV.x * 145.0, radialUV.y * 14.0, t * 1.10));
-    radialNoise2 = .321/cells3D(.05*float3(radialUV.x * 125.0, radialUV.y * 16.0, t * 2.3));
-    
-    // МЯГКОЕ смешивание вместо жесткого pow(..., 2.2). Лучи получаются пушистыми
-    float coronaTex = saturate((radialNoise1 + radialNoise2) * 0.25) * coronaZone;
-    coronaTex*=.5+.3*sin(radialUV*16);
-    // Плавное затухание короны к краям геометрии (умножаем на edgeFade)
-    coronaTex *= edgeFade * 5.5;
-    coronaTex *= 1-saturate(diskZone*2);
-    
-    // =================================================================
-    // СМЕШИВАНИЕ И МЯГКИЙ РАСЧЕТ ЦВЕТА
-    // =================================================================
-    // Соединяем текстуры. Диск дает плотность в центре, корона — пушистость на краях
+    //float3 uvwNoise1 = float3(radialU * 18.0, radialV * 1.5, t * 1.10);
+    //float3 uvwNoise2 = float3(radialU * 12.0, radialV * 1.0, t * 2.3);
+
+//float radialNoise1 = .321 / cells3D(uvwNoise1);
+//float radialNoise2 = .321 / cells3D(uvwNoise2);
+
+//float coronaTex = saturate((radialNoise1 + radialNoise2) * 0.25) * coronaZone;
+//coronaTex *= .5 + .3 * sin(radialU * 6.0);   
+//coronaTex *= .5 + .3 * cos(radialTangent.x * 5.0);
+//    float coronaTex = saturate((radialNoise1 + radialNoise2) * 0.25) * coronaZone;
+//    coronaTex*=.5+.3*sin(radialU*16);
+    coronaTex *= edgeFade * 4.5;
+    coronaTex *= 1-saturate(diskZone);
     
     float finalPlasma = (cellTex * 142) + (coronaTex * 4.0);
-    
-    // Градиент цвета: мягкий переход от оранжевого к дымчатому бело-желтому свечению
-    //float3 centerColor = float3(1.0, 0.75, 0.5) * finalPlasma*114;
     float3 centerColor = finalPlasma*114;
-    
     float3 edgeGlow    =  coronaZone * finalPlasma * 113.5;
-    //return float4(edgeGlow,1);
     edgeGlow=max(edgeGlow,0)*saturate(1-diskZone*8);
     float3 finalColor = (centerColor + edgeGlow) * 222.0 * input.color.rgb;
-
-    
-
     float coronaMask = saturate(pow(edgeFade,2));
     coronaMask=pow(.5+.5*cos(edgeFade*PI-.766),81)*10;
     coronaMask*=1-saturate(diskZone);
     finalColor+=pow(coronaMask,.8)*22222*(input.color+1);
 
-    // =================================================================
-    // РВАНЫЙ КРАЙ БЕЗ ГРЯЗИ
-    // =================================================================
-    // Возвращаем вашу исходную мягкую альфу для таяния краев
     float alphaMask = diskZone + coronaTex * 13.0;
-    //finalColor=saturate(diskZone)*22222222;
-    
     finalColor*=alphaMask;
-    //return float4(noise3(p*52)*saturate(1-edgeFade*6)*22,1);
-
-    // Ослабляем discard, чтобы он не делал "огрызки", а лишь слегка прорежал текстуру
-    if (finalPlasma * (edgeFade + 0.1) * 1.0 < 0.02 + hash(p * 12.0).r * 0.04) 
-    {
-     //  discard;
-    }
      
     return float4(finalColor / 22222.0, saturate(alphaMask)); 
 } 

@@ -189,6 +189,8 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
 
 
     pos*=PosRad.w/10.;
+    float3 pos0 = pos;    
+
     pos.xyz+=PosRad.xyz;
 
     float3 pos2=pos;
@@ -197,7 +199,7 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
     
     //color
     pos_color2 p;
-    p.wpos = float4(pos,1);
+    p.wpos = float4(pos0,1);
     p.color = float4(noise3_u(111+float3(113,11,111)*221+177+sin(pos2*.48)),1)/110.+.0015;
     p.color.rgb*=float3(7,3,1)*2;
     //p.color=lerp(p.color,p.color.bgra,saturate(pow(length(pos)/13,13)));

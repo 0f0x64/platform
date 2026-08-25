@@ -1000,7 +1000,7 @@ struct {
 
 struct 
 {
-float hilight;
+float4 PosRad;
 } params;
 
 void set () {

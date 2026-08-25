@@ -38,4 +38,6 @@ struct VS_OUTPUT_PARTICLE2
     float2 uv : TEXCOORD0;
     float4 color : COLOR0;
     float size : COLOR1;
+
 };
+  
