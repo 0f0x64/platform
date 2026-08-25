@@ -2115,6 +2115,15 @@ namespace Loop
 			Precalc();
 		}
 
+		static bool loadedSounds = false;
+		if (!loadedSounds) {
+			loadedSounds = true;
+
+			dx11::Audio::LoadOggFile("demotivation", "..//fx//projectFiles//demotivation.ogg");
+
+			dx11::Audio::Play("demotivation");
+		}
+
 		cmdCounter = precalcOfs;
 		frameConst();
 		
@@ -2393,15 +2402,6 @@ namespace Loop
 
 	void mainLoop()
 	{
-		static bool loadedSounds = false;
-		if (!loadedSounds) {
-			loadedSounds = true;
-
-			dx11::Audio::LoadOggFile("punch-swing", "punch-swing.wav");
-
-			dx11::Audio::Play("punch-swing");
-		}
-		
 		scene3();
 		//track__();
 

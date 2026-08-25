@@ -880,11 +880,11 @@ namespace gltfAnim
 		if (clip.isPlaying)
 			return;
 
-		clip.realWeight = 1.0f;
+		//clip.realWeight = 0.0f;
 		clip.currentTime = 0.0f;
 		clip.isPlaying = true;
 
-		//interp::Animate(clip.realWeight, 1.0f, time);
+		interp::Animate(clip.realWeight, 1.0f, time);
 	}
 
 	inline void StopAnimation(int id, float time = 0.2f) {
@@ -893,10 +893,9 @@ namespace gltfAnim
 		if (!clip.isPlaying)
 			return;
 
-		clip.realWeight = 0.0f;
 		clip.isPlaying = false;
 
-		//interp::Animate(clip.realWeight, 0.0f, time);
+		interp::Animate(clip.realWeight, 0.0f, time);
 	}
 
 }
