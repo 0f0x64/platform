@@ -62,9 +62,11 @@ namespace dx11
 	#include "shaders.h"
 	#include "draw.h"
 	#include "IA.h"
+	#include "audio.h"
 
 	void Init()
 	{
+		Audio::Init();
 		Device::Init();
 		Rasterizer::Init();
 		Depth::Init();

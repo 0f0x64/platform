@@ -212,8 +212,11 @@
     <ClInclude Include="dx11\cgltf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="projectFiles\interp.h">
-      <Filter>Source Files\projectFiles</Filter>
+    <ClInclude Include="interp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dx11\audio.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -372,6 +375,7 @@
     <None Include="projectFiles\shaders\vs\maze.shader">
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="projectFiles\hero.obj">
