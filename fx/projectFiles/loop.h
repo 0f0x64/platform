@@ -2393,6 +2393,14 @@ namespace Loop
 
 	void mainLoop()
 	{
+		static bool loadedSounds = false;
+		if (!loadedSounds) {
+			loadedSounds = true;
+
+			dx11::Audio::LoadOggFile("punch-swing", "punch-swing.wav");
+
+			dx11::Audio::Play("punch-swing");
+		}
 		
 		scene3();
 		//track__();
