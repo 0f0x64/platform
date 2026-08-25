@@ -64,6 +64,7 @@ using namespace dx11;
 bool gameCam = false;
 #if EditMode
 	#include "editor\editor.h"
+	#include "editor\LivePT.h"
 #endif
 
 #include "projectFiles\loop.h"

@@ -375,6 +375,7 @@
     <ClInclude Include="editor\editorWindow.h" />
     <ClInclude Include="editor\font.h" />
     <ClInclude Include="editor\hotReload.h" />
+    <ClInclude Include="editor\LivePT.h" />
     <ClInclude Include="editor\paramEdit.h" />
     <ClInclude Include="editor\style.h" />
     <ClInclude Include="editor\textEditor.h" />

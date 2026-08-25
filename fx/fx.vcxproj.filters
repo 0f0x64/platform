@@ -206,6 +206,9 @@
     <ClInclude Include="editor\textEditor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="editor\LivePT.h">
+      <Filter>Source Files\editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">
