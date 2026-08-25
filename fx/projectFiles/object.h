@@ -1041,7 +1041,7 @@ namespace Object {
 
 		// Большой внешний цикл — хаотично рассыпаем 100 прямых лазерных штрихов
 
-for (int j = 0; j < 60; j++)
+for (int j = 0; j < 2; j++)
 {
 	NewLine();
 
@@ -1258,7 +1258,7 @@ for (int j = 0; j < 60; j++)
 			}
 			else
 			{
-				Drawer::NullDrawer({ 1,in.count / in.skipper });
+				//Drawer::NullDrawer({ 1,in.count / in.skipper });
 			}			
 
 		}
