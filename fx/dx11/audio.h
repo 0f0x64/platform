@@ -63,7 +63,7 @@ namespace Audio
 	soundDesc Sounds[max_audio];
 	std::unordered_map<std::string, int> SoundName;
 
-	//std::list<IXAudio2SourceVoice*> activeVoices;
+	std::list<IXAudio2SourceVoice*> activeVoices;
 
 	int soundsCount;
 
@@ -107,13 +107,22 @@ namespace Audio
 		IXAudio2SourceVoice* pSourceVoice;
 
 		HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
-		if (FAILED(hr)) { /* Обработка ошибки */ }
+		if (FAILED(hr)) {
+			Log("Failed to coinitialize ex");
+			return;
+		}
 
 		hr = XAudio2Create(&pXAudio2, 0);
-		if (FAILED(hr)) { /* Обработка ошибки */ }
+		if (FAILED(hr)) {
+			Log("Failed to create XAudio2");
+			return;
+		}
 
 		hr = pXAudio2->CreateMasteringVoice(&pMasteringVoice);
-		if (FAILED(hr)) { /* Обработка ошибки */ }
+		if (FAILED(hr)) {
+			Log("Failed to create mastering voice");
+			return;
+		}
 
 		for (int x = 0; x < MAXCHANNELS - 1; x++)
 		{
@@ -147,13 +156,13 @@ namespace Audio
 	};
 
 	void Release() {
-		//// Сначала уничтожаем все активные голоса
-		//for (auto& voice : activeVoices) {
-		//	if (voice) {
-		//		voice->DestroyVoice();
-		//	}
-		//}
-		//activeVoices.clear();
+		// Сначала уничтожаем все активные голоса
+		for (auto& voice : activeVoices) {
+			if (voice) {
+				voice->DestroyVoice();
+			}
+		}
+		activeVoices.clear();
 
 		// Затем освобождаем буферы каналов
 		for (int x = 0; x < MAXCHANNELS; x++) {
@@ -194,7 +203,7 @@ namespace Audio
 		}
 
 		pVoice->Start(0);
-		//activeVoices.push_back(pVoice);
+		activeVoices.push_back(pVoice);
 
 		return pVoice;
 	};
@@ -218,7 +227,7 @@ namespace Audio
 		return state.BuffersQueued > 0;
 	};
 
-	/*void UpdateVoices() {
+	void UpdateVoices() {
 		for (auto it = activeVoices.begin(); it != activeVoices.end(); ) {
 			if (!IsPlaying(*it)) {
 				DeleteVoice(*it);
@@ -228,7 +237,7 @@ namespace Audio
 				++it;
 			}
 		}
-	};*/
+	};
 
 	void LoadWavFile(const std::string name, const char* filename) {
 		if (soundsCount >= max_audio) {
