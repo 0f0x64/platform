@@ -356,6 +356,44 @@ namespace gltfAnim
 
 	/////////////////////////////////////////////////////
 
+	inline int FindJointByPatterns(
+		const ::std::vector<Joint>& joints,
+		const ::std::vector<const char*>& patterns)
+	{
+		for (size_t i = 0; i < joints.size(); ++i)
+		{
+			::std::string name = joints[i].name;
+
+			std::transform(
+				name.begin(),
+				name.end(),
+				name.begin(),
+				[](unsigned char c)
+				{
+					return static_cast<char>(std::tolower(c));
+				});
+
+			for (const char* pat : patterns)
+			{
+				::std::string p = pat;
+
+				std::transform(
+					p.begin(),
+					p.end(),
+					p.begin(),
+					[](unsigned char c)
+					{
+						return static_cast<char>(std::tolower(c));
+					});
+
+				if (name.find(p) != ::std::string::npos)
+					return static_cast<int>(i);
+			}
+		}
+
+		return -1;
+	}
+
 	struct LookAtConfig
 	{
 		int headIdx = -1;
@@ -648,6 +686,30 @@ namespace gltfAnim
 
 	/////////////////////////////////////////////////////
 
+	inline void PlayAnimation(int id, float time = 0.2f) {
+		AnimationClip& clip = scene.animations[id];
+
+		if (clip.isPlaying)
+			return;
+
+		//clip.realWeight = 0.0f;
+		clip.currentTime = 0.0f;
+		clip.isPlaying = true;
+
+		interp::Animate(clip.realWeight, 1.0f, time);
+	}
+
+	inline void StopAnimation(int id, float time = 0.2f) {
+		AnimationClip& clip = scene.animations[id];
+
+		if (!clip.isPlaying)
+			return;
+
+		clip.isPlaying = false;
+
+		interp::Animate(clip.realWeight, 0.0f, time);
+	}
+
 	inline void Update(float deltaTime)
 	{
 		/*if (!animPlaying) {
@@ -689,8 +751,10 @@ namespace gltfAnim
 		std::vector<float> jointRealWeightSum(scene.joints.size(), 0.0f);
 
 		// Проходим по всем клипам
-		for (AnimationClip& clip : scene.animations)
+		for (size_t i = 0; i < scene.animations.size(); i++)
 		{
+			AnimationClip& clip = scene.animations[i];
+
 			if ((!clip.isPlaying && clip.realWeight <= 0.0f) || clip.weight <= 0.0f || clip.duration <= 0.0f)
 			{
 				continue;
@@ -707,7 +771,7 @@ namespace gltfAnim
 				if (clip.currentTime > clip.duration || clip.currentTime < 0.0f)
 				{
 					clip.currentTime = clamp(clip.currentTime, 0.0f, clip.duration);
-					clip.isPlaying = false;
+					StopAnimation(i);
 					continue;
 				}
 			}
@@ -1173,30 +1237,6 @@ namespace gltfAnim
 		bool added = ReadAnimations(data, false, remapToCurrentSkeleton);
 		cgltf_free(data);
 		return added;
-	}
-
-	inline void PlayAnimation(int id, float time = 0.2f) {
-		AnimationClip& clip = scene.animations[id];
-
-		if (clip.isPlaying)
-			return;
-
-		//clip.realWeight = 0.0f;
-		clip.currentTime = 0.0f;
-		clip.isPlaying = true;
-
-		interp::Animate(clip.realWeight, 1.0f, time);
-	}
-
-	inline void StopAnimation(int id, float time = 0.2f) {
-		AnimationClip& clip = scene.animations[id];
-
-		if (!clip.isPlaying)
-			return;
-
-		clip.isPlaying = false;
-
-		interp::Animate(clip.realWeight, 0.0f, time);
 	}
 
 }
