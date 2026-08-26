@@ -865,7 +865,71 @@ namespace Object {
 		}
 	}
 
+	// Генерация одного анимированного протуберанца
+	// time: 0..1 (0 – окружность у поверхности, 1 – прямая линия)
+	// starPos: позиция звезды (в мировых единицах, как в NewStar)
+	// starRadius: радиус звезды (в тех же единицах)
+	void GenerateProminence(float time, const float4& starPos)
+	{
+		// Масштаб как у существующих лучей (до умножения на 40)
+		float r_start = 2.0f;      // точка на поверхности (можно варьировать)
+		float rayLength = 3.0f;    // длина луча
+		int pointCount = 10;       // число точек
 
+		// Случайные углы (seed уже установлен снаружи)
+		float yaw = ((float)rand() / RAND_MAX) * XM_2PI;
+		float pitch = ((float)rand() / RAND_MAX) * XM_PI;
+		XMMATRIX rotation = XMMatrixRotationRollPitchYaw(pitch, yaw, 0.0f);
+
+		XMVECTOR normal = XMVector3TransformNormal(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), rotation);
+		XMVECTOR tangent = XMVector3TransformNormal(XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), rotation);
+		XMVECTOR bitangent = XMVector3Cross(normal, tangent);
+
+		NewLine();
+
+		// Якорь на поверхности
+		XMVECTOR anchor = XMVectorSet(
+			starPos.x + XMVectorGetX(normal) * r_start,
+			starPos.y + XMVectorGetY(normal) * r_start,
+			starPos.z + XMVectorGetZ(normal) * r_start,
+			1.0f
+		);
+		AddPointToLine({
+			(int)(XMVectorGetX(anchor) * 40.0f),
+			(int)(XMVectorGetY(anchor) * 40.0f),
+			(int)(XMVectorGetZ(anchor) * 40.0f)
+			});
+
+		// Остальные точки
+		for (int i = 1; i < pointCount; ++i)
+		{
+			float t = (float)i / (float)(pointCount - 1);
+
+			// Конечная точка на прямой
+			XMVECTOR finalPos = XMVectorAdd(anchor, XMVectorScale(normal, t * rayLength));
+
+			// Начальная точка на кольце
+			float angle = (float)i / pointCount * XM_2PI;
+			float smallRadius = 0.5f; // радиус петли (в тех же единицах)
+			XMVECTOR offset = XMVectorAdd(
+				XMVectorScale(tangent, cosf(angle) * smallRadius),
+				XMVectorScale(bitangent, sinf(angle) * smallRadius)
+			);
+			XMVECTOR startPos = XMVectorAdd(anchor, offset);
+
+			// Интерполяция
+			float eased = time * time * (3.0f - 2.0f * time);
+			XMVECTOR currentPos = XMVectorLerp(startPos, finalPos, eased);
+
+			AddPointToLine({
+				(int)(XMVectorGetX(currentPos) * 40.0f),
+				(int)(XMVectorGetY(currentPos) * 40.0f),
+				(int)(XMVectorGetZ(currentPos) * 40.0f)
+				});
+		}
+
+		smoothStarline(starLineList.line[currentLine]);
+	}
 
 	void initPatches(float pathTime)
 	{
@@ -1041,51 +1105,64 @@ namespace Object {
 
 		// Большой внешний цикл — хаотично рассыпаем 100 прямых лазерных штрихов
 
-for (int j = 0; j < 2; j++)
-{
-	NewLine();
+		for (int j = 0; j < 2; j++)
+		{
+			NewLine();
 
-	// Прямая линия из 5 точек. Для идеального лерпа этого достаточно, лол
-	// сплайн Катмулла-Рома прорисует её как ровную световую струну
-	int g = 5;
+			// Прямая линия из 5 точек. Для идеального лерпа этого достаточно, лол
+			// сплайн Катмулла-Рома прорисует её как ровную световую струну
+			int g = 5;
 
-	// Случайный масштаб (расстояние от центра звезды до начала луча)
-	float randScale = (float)rand() / RAND_MAX;
-	float r_start = (3.0f + (randScale * 10.0f) / 7.0f) * 0.35f;
+			// Случайный масштаб (расстояние от центра звезды до начала луча)
+			float randScale = (float)rand() / RAND_MAX;
+			float r_start = (3.0f + (randScale * 10.0f) / 7.0f) * 0.35f;
 
-	// Длина самого лазерного штриха (в твоих пропорциях, например, небольшая фиксированная длина)
-	float rayLength = 3.2f;
-	float r_end = r_start + rayLength;
+			// Длина самого лазерного штриха (в твоих пропорциях, например, небольшая фиксированная длина)
+			float rayLength = 3.2f;
+			float r_end = r_start + rayLength;
 
-	// Рандомный разворот всей линии целиком по двум осям (Yaw и Pitch)
-	float yaw = ((float)rand() / RAND_MAX) * XM_2PI; // Поворот вокруг Y
-	float pitch = ((float)rand() / RAND_MAX) * XM_PI;  // Наклон вокруг X
+			// Рандомный разворот всей линии целиком по двум осям (Yaw и Pitch)
+			float yaw = ((float)rand() / RAND_MAX) * XM_2PI; // Поворот вокруг Y
+			float pitch = ((float)rand() / RAND_MAX) * XM_PI;  // Наклон вокруг X
 
-	XMMATRIX finalRotation = XMMatrixRotationRollPitchYaw(pitch, yaw, 0.0f);
+			XMMATRIX finalRotation = XMMatrixRotationRollPitchYaw(pitch, yaw, 0.0f);
 
-	for (int i = 0; i < g; i++)
-	{
-		// t строго от 0.0 (начало штриха) до 1.0 (конец штриха)
-		float t = (float)i / (float)(g - 1);
+			for (int i = 0; i < g; i++)
+			{
+				// t строго от 0.0 (начало штриха) до 1.0 (конец штриха)
+				float t = (float)i / (float)(g - 1);
 
-		// ЧЕСТНЫЙ ЛЕРП: линия абсолютно прямая и направлена строго вдоль оси Y наружу
-		float x_raw = 0.0f;
-		float y_raw = r_start + (r_end - r_start) * t;
-		float z_raw = 0.0f;
+				// ЧЕСТНЫЙ ЛЕРП: линия абсолютно прямая и направлена строго вдоль оси Y наружу
+				float x_raw = 0.0f;
+				float y_raw = r_start + (r_end - r_start) * t;
+				float z_raw = 0.0f;
 
-		XMVECTOR basePoint = XMVectorSet(x_raw, y_raw, z_raw, 1.0f);
+				XMVECTOR basePoint = XMVectorSet(x_raw, y_raw, z_raw, 1.0f);
 
-		// Поворачиваем всю прямую линию одинаково
-		XMVECTOR rotatedPoint = XMVector3Transform(basePoint, finalRotation);
+				// Поворачиваем всю прямую линию одинаково
+				XMVECTOR rotatedPoint = XMVector3Transform(basePoint, finalRotation);
 
-		// ТВОЙ ИСХОДНЫЙ МАСШТАБ (* 40)
-		int _x = (int)(XMVectorGetX(rotatedPoint) * 40.0f);
-		int _y = (int)(XMVectorGetY(rotatedPoint) * 40.0f);
-		int _z = (int)(XMVectorGetZ(rotatedPoint) * 40.0f);
+				// ТВОЙ ИСХОДНЫЙ МАСШТАБ (* 40)
+				int _x = (int)(XMVectorGetX(rotatedPoint) * 40.0f);
+				int _y = (int)(XMVectorGetY(rotatedPoint) * 40.0f);
+				int _z = (int)(XMVectorGetZ(rotatedPoint) * 40.0f);
 
-		AddPointToLine({ _x, _y, _z });
-	}
-}
+				AddPointToLine({ _x, _y, _z });
+			}
+		}
+
+		// В начале initPatches или прямо перед циклом протуберанцев
+		double currentTimeMs = timer::GetCounter(); // миллисекунды
+		float durationMs = 40000.0f;                // 60 секунд
+		float normalizedTime = fmod((float)currentTimeMs, durationMs) / durationMs; // зациклено 0..1
+		// или без зацикливания:
+		// float normalizedTime = std::clamp((float)currentTimeMs / durationMs, 0.0f, 1.0f);
+
+		for (int i = 0; i < 10; ++i)
+		{
+			srand(1000 + i);
+			GenerateProminence(normalizedTime, float4{ 0,0,0,0 });
+		}
 			
 		//------------end user space---------------
 		//-----------------------------------------
