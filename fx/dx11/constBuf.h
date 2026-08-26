@@ -687,6 +687,7 @@ namespace ConstBuf
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 4 Бег
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 5 Падение
 			gltfAnim::LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Остановка
+			gltfAnim::LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
 
 			gltfAnim::scene.animations[0].isPlaying = false;
 
@@ -704,6 +705,8 @@ namespace ConstBuf
 
 			gltfAnim::scene.animations[6].speed = 0.0f;
 			gltfAnim::scene.animations[6].weight = 10000.0f;
+
+			gltfAnim::scene.animations[7].weight = 10000.0f;
 		}
 			else
 		{
