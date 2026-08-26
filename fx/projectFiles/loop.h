@@ -38,7 +38,8 @@ struct inputController_ {
 		float yaw = 0.0f;
 		float pitch = 0.0f;
 		float sensitivity = 0.0015f;
-		bool isInitialized = false;  
+		bool isInitialized = false;
+		float skeletonYaw = 0.0f;
 
 		void processInput()
 		{
