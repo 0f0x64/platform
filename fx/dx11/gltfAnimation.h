@@ -58,6 +58,13 @@ namespace gltfAnim
 		int currentAnimation = 0;
 		//float currentTime = 0.0f;
 		XMMATRIX bonePalette[BoneLimit];
+
+		// LookAt state. Values are supplied by inputController.
+		float lookYawTarget = 0.0f;
+		float lookYawCurrent = 0.0f;
+		float lookPitchTarget = 0.0f;
+		float lookPitchCurrent = 0.0f;
+		bool lookAtEnabled = true;
 	};
 
 	inline Scene scene;
