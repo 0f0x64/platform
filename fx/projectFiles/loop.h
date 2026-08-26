@@ -115,6 +115,8 @@ struct inputController_ {
 
 			int frames = 30;
 
+			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[7];
+
 			if (fabs(diff) > PI / 2.f && !animStarted)
 			{
 				animStarted = true;
@@ -123,10 +125,7 @@ struct inputController_ {
 				diffStored = diff;
 				frame = 0;
 
-				ConstBuf::gltfAnim::scene.animations[6].speed = 0;
-				ConstBuf::gltfAnim::scene.animations[6].weight = 1000;
-
-				ConstBuf::gltfAnim::PlayAnimation(6);
+				ConstBuf::gltfAnim::PlayAnimation(7, 0);
 
 				if (diff > 0)
 					Log("right\n");
@@ -152,7 +151,7 @@ struct inputController_ {
 
 				heroRotateAngleAnim = 0;
 
-				ConstBuf::gltfAnim::StopAnimation(6);
+				ConstBuf::gltfAnim::StopAnimation(7, 0);
 			}
 
 			if (!animStarted)
@@ -172,9 +171,7 @@ struct inputController_ {
 				if (diffStored < 0)
 					fr = 1 - fr;
 
-				ConstBuf::gltfAnim::scene.animations[6].currentTime =
-					(1 - fr) *
-					ConstBuf::gltfAnim::scene.animations[6].duration;
+				clip.currentTime = (1 - fr) * clip.duration;
 
 				heroRotateAngleAnim = PI * fr;
 

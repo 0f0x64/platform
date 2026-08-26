@@ -706,7 +706,8 @@ namespace ConstBuf
 			gltfAnim::scene.animations[6].speed = 0.0f;
 			gltfAnim::scene.animations[6].weight = 10000.0f;
 
-			gltfAnim::scene.animations[7].weight = 10000.0f;
+			gltfAnim::scene.animations[7].speed = 0.0f;
+			gltfAnim::scene.animations[7].weight = 10000000.0f;
 		}
 			else
 		{
