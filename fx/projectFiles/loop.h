@@ -85,6 +85,8 @@ struct inputController_ {
 		//	return result;
 		//}
 
+		float heroRotateAngleAnim = 0;
+
 		XMMATRIX getLookMatrix(
 			XMMATRIX rowMajorRot,
 			XMVECTOR HeroRealUp,
