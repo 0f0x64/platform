@@ -676,20 +676,36 @@ struct hero_ {
 		{
 			float dt = deltaTime / (1. / 6.);
 			speed *= pow(autoBrake, dt);
+			float absSpeed = fabsf(speed);
 			// ћ€гкое зануление совсем маленькой скорости, чтобы персонаж не полз бесконечно
-			if (fabsf(speed) < 0.001f) speed = 0.0f;
+			if (absSpeed < 0.001f) speed = 0.0f;
+
+			if (absSpeed > 0.1f) {
+				ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[6];
+
+				clip.currentTime = (1 - absSpeed / maxSpeed) * clip.duration;
+
+				ConstBuf::gltfAnim::PlayAnimation(6);
+			}
+			else {
+				ConstBuf::gltfAnim::StopAnimation(6);
+			}
+		}
+		else {
+			ConstBuf::gltfAnim::StopAnimation(6);
 		}
 
 		// ∆есткий зажим скорости в максимальные рамки
 		speed = clamp(speed, -maxSpeed, maxSpeed);
+		float absSpeed = fabsf(speed);
 
 		// Ћогика включени€ анимаций ходьбы и бега
-		if (fabsf(speed) > 0.1f) {
-			float weight = min(max(fabsf(speed) - 5.0f, 0.0f) / 12.0f, 1.0f);
+		if (absSpeed > 0.1f) {
+			float weight = min(max(absSpeed - 5.0f, 0.0f) / 12.0f, 1.0f);
 			ConstBuf::gltfAnim::scene.animations[4].weight = weight;
 			ConstBuf::gltfAnim::scene.animations[3].weight = 1 - weight;
 
-			float animSpeed = pow(fabsf(speed) / 12.0f, 0.25f);
+			float animSpeed = pow(absSpeed / 12.0f, 0.25f);
 			ConstBuf::gltfAnim::scene.animations[4].speed = animSpeed;
 			ConstBuf::gltfAnim::scene.animations[3].speed = animSpeed;
 

@@ -694,7 +694,6 @@ namespace ConstBuf
 
 			gltfAnim::scene.animations[2].speed = 0.0f;
 			gltfAnim::scene.animations[2].weight = 10000.0f;
-			//gltfAnim::scene.animations[2].realWeight = 0.5f;
 
 			gltfAnim::scene.animations[3].looped = true;
 
@@ -704,6 +703,7 @@ namespace ConstBuf
 			gltfAnim::scene.animations[5].speed = 0.1f;
 
 			gltfAnim::scene.animations[6].speed = 0.0f;
+			gltfAnim::scene.animations[6].weight = 10000.0f;
 		}
 			else
 		{
