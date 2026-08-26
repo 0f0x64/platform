@@ -71,16 +71,122 @@ struct inputController_ {
 			}
 		}
 
-		XMMATRIX getLookMatrix(XMMATRIX rowMajorRot, XMVECTOR HeroRealUp, float deltaTime, float heroChangeDirSpeed)
-		{
+		//XMMATRIX getLookMatrix(XMMATRIX rowMajorRot, XMVECTOR HeroRealUp, float deltaTime, float heroChangeDirSpeed)
+		//{
 
+		//	static float yawInner = yaw;
+
+		//	float targetA = -::std::round(yaw / PI) * PI;// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
+
+		//	yawInner = lerp(yawInner, targetA, pow(min(deltaTime * heroChangeDirSpeed, 1.), 1.5));
+		//	XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, yawInner);
+		//	XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
+
+		//	return result;
+		//}
+
+		XMMATRIX getLookMatrix(
+			XMMATRIX rowMajorRot,
+			XMVECTOR HeroRealUp,
+			float deltaTime,
+			float heroChangeDirSpeed)
+		{
+			static bool animStarted = false;
 			static float yawInner = yaw;
 
-			float targetA = -::std::round(yaw / PI) * PI;// Разворот матрицы целиком на 180 градусов при переходе камеры через ноль
+			float targetA =
+				-std::round(yaw / PI) * PI;
 
-			yawInner = lerp(yawInner, targetA, pow(min(deltaTime * heroChangeDirSpeed, 1.), 1.5));
-			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, yawInner);
-			XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
+			// Разворот матрицы целиком на 180 градусов
+			// при переходе камеры через ноль
+			float diff = targetA - yawInner;
+
+			skeletonYaw =
+				atan2f(
+					sinf(yaw - yawInner),
+					cosf(yaw - yawInner));
+
+			static float diffStored = diff;
+			static float frame = 0;
+			static float lastTargetA = targetA;
+
+			int frames = 30;
+
+			if (fabs(diff) > PI / 2.f && !animStarted)
+			{
+				animStarted = true;
+				ConstBuf::gltfAnim::SetLookAtEnabled(false);
+				ConstBuf::gltfAnim::ResetLookAtPose();
+				diffStored = diff;
+				frame = 0;
+
+				ConstBuf::gltfAnim::scene.animations[6].speed = 0;
+				ConstBuf::gltfAnim::scene.animations[6].weight = 1000;
+
+				ConstBuf::gltfAnim::PlayAnimation(6);
+
+				if (diff > 0)
+					Log("right\n");
+
+				if (diff < 0)
+					Log("left\n");
+
+				if (diff < 0)
+					lastTargetA = targetA;
+			}
+
+			if (frame >= frames && animStarted)
+			{
+				animStarted = false;
+
+				lastTargetA = targetA;
+				yawInner = targetA;
+
+				skeletonYaw = 0.0f;
+
+				ConstBuf::gltfAnim::ResetLookAtPose();
+				ConstBuf::gltfAnim::SetLookAtEnabled(true);
+
+				heroRotateAngleAnim = 0;
+
+				ConstBuf::gltfAnim::StopAnimation(6);
+			}
+
+			if (!animStarted)
+			{
+				ConstBuf::gltfAnim::SetLookAtYaw(skeletonYaw);
+				ConstBuf::gltfAnim::SetLookAtPitch(pitch);
+				ConstBuf::gltfAnim::SetLookAtEnabled(true);
+			}
+
+			if (animStarted)
+			{
+				float fr = frame / (float)frames;
+
+				// ConstBuf::gltfAnim::scene.animations[6].currentTime =
+				//     fr * ConstBuf::gltfAnim::scene.animations[6].duration;
+
+				if (diffStored < 0)
+					fr = 1 - fr;
+
+				ConstBuf::gltfAnim::scene.animations[6].currentTime =
+					(1 - fr) *
+					ConstBuf::gltfAnim::scene.animations[6].duration;
+
+				heroRotateAngleAnim = PI * fr;
+
+				frame++;
+			}
+
+			XMMATRIX reverseRot =
+				XMMatrixRotationAxis(
+					HeroRealUp,
+					lastTargetA);
+
+			XMMATRIX result =
+				XMMatrixMultiply(
+					rowMajorRot,
+					reverseRot);
 
 			return result;
 		}
