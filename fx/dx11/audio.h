@@ -46,6 +46,18 @@ namespace Audio
 		WAVEFORMATEX format;
 	};
 
+	struct VoiceController {
+		IXAudio2SourceVoice* voice;
+		int soundIndex;
+		bool isLooping;
+		float volume;
+
+		VoiceController() : voice(nullptr), soundIndex(-1), isLooping(false), volume(1.0f) {}
+		VoiceController(IXAudio2SourceVoice* v, int idx, bool loop, float vol)
+			: voice(v), soundIndex(idx), isLooping(loop), volume(vol) {
+		}
+	};
+
 	struct OggMemoryFile {
 		const BYTE* data;
 		size_t size;
@@ -63,7 +75,7 @@ namespace Audio
 	soundDesc Sounds[max_audio];
 	std::unordered_map<std::string, int> SoundName;
 
-	std::list<IXAudio2SourceVoice*> activeVoices;
+	std::list<VoiceController> activeVoices;
 
 	int soundsCount;
 
@@ -157,9 +169,9 @@ namespace Audio
 
 	void Release() {
 		// Сначала уничтожаем все активные голоса
-		for (auto& voice : activeVoices) {
-			if (voice) {
-				voice->DestroyVoice();
+		for (auto& voiceController : activeVoices) {
+			if (voiceController.voice) {
+				voiceController.voice->DestroyVoice();
 			}
 		}
 		activeVoices.clear();
@@ -181,7 +193,7 @@ namespace Audio
 		}
 	};
 
-	IXAudio2SourceVoice* Play(int soundIndex) {
+	IXAudio2SourceVoice* Play(int soundIndex, bool loop = false, float volume = 1.0f) {
 		if (soundIndex < 0 || soundIndex >= soundsCount) return nullptr;
 
 		soundDesc& sound = Sounds[soundIndex];
@@ -192,9 +204,16 @@ namespace Audio
 		if (FAILED(hr)) return nullptr;
 
 		XAUDIO2_BUFFER voiceBuffer = {};
-		voiceBuffer.pAudioData = sound.data.data();   // указатель на данные в массиве
+		voiceBuffer.pAudioData = sound.data.data();
 		voiceBuffer.AudioBytes = (UINT32)sound.data.size();
 		voiceBuffer.Flags = XAUDIO2_END_OF_STREAM;
+
+		// Если зациклено, устанавливаем флаг
+		if (loop) {
+			voiceBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+			voiceBuffer.LoopBegin = 0;
+			voiceBuffer.LoopLength = 0;
+		}
 
 		hr = pVoice->SubmitSourceBuffer(&voiceBuffer);
 		if (FAILED(hr)) {
@@ -202,42 +221,120 @@ namespace Audio
 			return nullptr;
 		}
 
+		// Устанавливаем громкость
+		if (volume < 0.0f) volume = 0.0f;
+		if (volume > 1.0f) volume = 1.0f;
+		pVoice->SetVolume(volume);
+
 		pVoice->Start(0);
-		activeVoices.push_back(pVoice);
+
+		// Сохраняем контроллер
+		activeVoices.push_back(VoiceController(pVoice, soundIndex, loop, volume));
 
 		return pVoice;
-	};
+	}
 
-	IXAudio2SourceVoice* Play(const std::string& name) {
+	IXAudio2SourceVoice* Play(const std::string& name, bool loop = false, float volume = 1.0f) {
 		auto it = SoundName.find(name);
 		if (it != SoundName.end()) {
-			return Play(it->second);
+			return Play(it->second, loop, volume);
 		}
-
 		return nullptr;
-	};
+	}
+
+	void Pause(IXAudio2SourceVoice* pVoice) {
+		if (pVoice) {
+			pVoice->Stop(0);
+		}
+	}
+
+	void Resume(IXAudio2SourceVoice* pVoice) {
+		if (pVoice) {
+			pVoice->Start(0);
+		}
+	}
+
+	void Stop(IXAudio2SourceVoice* pVoice) {
+		if (pVoice) {
+			pVoice->Stop(0);
+		}
+	}
+
+	void Stop(const std::string& name) {
+		auto it = SoundName.find(name);
+		if (it == SoundName.end()) return;
+
+		int soundIndex = it->second;
+		for (auto& controller : activeVoices) {
+			if (controller.voice) {
+				controller.voice->Stop(0);
+			}
+		}
+	}
+
+	void StopAll() {
+		for (auto& controller : activeVoices) {
+			if (controller.voice) {
+				controller.voice->Stop(0);
+				controller.voice->DestroyVoice();
+				controller.voice = nullptr;
+			}
+		}
+		activeVoices.clear();
+	}
+
+	void SetVolume(IXAudio2SourceVoice* pVoice, float volume) {
+		if (pVoice) {
+			if (volume < 0.0f) volume = 0.0f;
+			if (volume > 1.0f) volume = 1.0f;
+
+			pVoice->SetVolume(volume);
+		}
+	}
+
+	void SetVolume(const std::string& name, float volume) {
+		auto it = SoundName.find(name);
+		if (it == SoundName.end()) return;
+
+		int soundIndex = it->second;
+		for (auto& controller : activeVoices) {
+			if (controller.voice) {
+				SetVolume(controller.voice, volume);
+			}
+		}
+	}
+
+	float GetVolume(IXAudio2SourceVoice* pVoice) {
+		if (!pVoice) return 0.0f;
+		float volume;
+		pVoice->GetVolume(&volume);
+		return volume;
+	}
 
 	void DeleteVoice(IXAudio2SourceVoice* pVoice) {
 		pVoice->DestroyVoice();
 	};
 
 	bool IsPlaying(IXAudio2SourceVoice* pVoice) {
+		if (!pVoice) return false;
 		XAUDIO2_VOICE_STATE state;
 		pVoice->GetState(&state);
 		return state.BuffersQueued > 0;
-	};
+	}
 
 	void UpdateVoices() {
 		for (auto it = activeVoices.begin(); it != activeVoices.end(); ) {
-			if (!IsPlaying(*it)) {
-				DeleteVoice(*it);
+			if (!it->voice || !IsPlaying(it->voice)) {
+				if (it->voice) {
+					it->voice->DestroyVoice();
+				}
 				it = activeVoices.erase(it);
 			}
 			else {
 				++it;
 			}
 		}
-	};
+	}
 
 	void LoadWavFile(const std::string name, const char* filename) {
 		if (soundsCount >= max_audio) {
