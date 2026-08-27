@@ -744,6 +744,7 @@ struct hero_ {
 
 	}
 
+	bool brakingSound = false;
 	void ProcessMove(float deltaTime)
 	{
 		if (jump || gravity.mode) {
@@ -754,7 +755,7 @@ struct hero_ {
 			return;
 		}
 
-		bool pressingMove = false;
+		bool pressingMove = true;
 		
 		if (inputController.isForwardPressed())
 		{
@@ -786,6 +787,11 @@ struct hero_ {
 			// ћ€гкое зануление совсем маленькой скорости, чтобы персонаж не полз бесконечно
 			if (absSpeed < 0.001f) speed = 0.0f;
 
+			if (!brakingSound) {
+				brakingSound = true;
+				dx11::Audio::Play("Braking");
+			}
+
 			if (absSpeed > 0.1f) {
 				ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[6];
 
@@ -799,6 +805,7 @@ struct hero_ {
 		}
 		else {
 			ConstBuf::gltfAnim::StopAnimation(6);
+			brakingSound = false;
 		}
 
 		// ∆есткий зажим скорости в максимальные рамки
@@ -2241,9 +2248,7 @@ namespace Loop
 		if (!loadedSounds) {
 			loadedSounds = true;
 
-			dx11::Audio::LoadOggFile("demotivation", "..//fx//projectFiles//demotivation.ogg");
-
-			dx11::Audio::Play("demotivation");
+			dx11::Audio::LoadWavFile("Braking", "..//fx//projectFiles//BrakingSFX.wav");
 		}
 
 		cmdCounter = precalcOfs;
