@@ -744,7 +744,8 @@ struct hero_ {
 
 	}
 
-	bool brakingSound = false;
+	bool brakingSound = true;
+	float stepTime = 0.0f;
 	void ProcessMove(float deltaTime)
 	{
 		if (jump || gravity.mode) {
@@ -755,7 +756,7 @@ struct hero_ {
 			return;
 		}
 
-		bool pressingMove = true;
+		bool pressingMove = false;
 		
 		if (inputController.isForwardPressed())
 		{
@@ -813,7 +814,7 @@ struct hero_ {
 		float absSpeed = fabsf(speed);
 
 		// Логика включения анимаций ходьбы и бега
-		if (absSpeed > 0.1f) {
+		if (pressingMove && absSpeed > 0.1f) {
 			float weight = min(max(absSpeed - 5.0f, 0.0f) / 12.0f, 1.0f);
 			ConstBuf::gltfAnim::scene.animations[4].weight = weight;
 			ConstBuf::gltfAnim::scene.animations[3].weight = 1 - weight;
@@ -826,12 +827,20 @@ struct hero_ {
 			ConstBuf::gltfAnim::PlayAnimation(4);
 
 			ConstBuf::gltfAnim::StopAnimation(1);
+
+			stepTime += deltaTime;
+			if (stepTime > 0.37f / animSpeed) {
+				stepTime = 0.0f;
+				dx11::Audio::Play("Run");
+			}
 		}
 		else {
 			ConstBuf::gltfAnim::StopAnimation(3);
 			ConstBuf::gltfAnim::StopAnimation(4);
 
 			ConstBuf::gltfAnim::PlayAnimation(1);
+
+			stepTime = 0.0f;
 		}
 
 		// --- Логика вращения вокруг нити (A / D) ---
@@ -2249,6 +2258,7 @@ namespace Loop
 			loadedSounds = true;
 
 			dx11::Audio::LoadWavFile("Braking", "..//fx//projectFiles//BrakingSFX.wav");
+			dx11::Audio::LoadWavFile("Run", "..//fx//projectFiles//RunSFX.wav");
 		}
 
 		cmdCounter = precalcOfs;
