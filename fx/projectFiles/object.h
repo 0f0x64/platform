@@ -582,7 +582,7 @@ namespace Object {
 	const int smoothPointMAX = 3500;
 
 	struct starline {
-		float4 basePoint[10000];
+		float4 basePoint[4000];
 		float4 point[smoothPointMAX];
 		float4 upVector[smoothPointMAX];
 		int basePointCount = 0;
@@ -590,7 +590,7 @@ namespace Object {
 	};
 
 	struct {
-		starline line[200];
+		starline line[2000];
 		int lineCount = 0;
 	} starLineList;
 
@@ -603,7 +603,7 @@ namespace Object {
 		starLineList.lineCount = in.lineCount;
 	}
 
-	const int denom = 1;
+	const int denom = 100;
 
 	cmd(SetPointPosInLine, int line, int point, int x,int y, int z, int a)
 	{
@@ -638,7 +638,7 @@ namespace Object {
 		}
 
 		int stepsPerSegment = totalLength/50.;
-		if (stepsPerSegment < 2) stepsPerSegment = 2;
+		//if (stepsPerSegment < 2) stepsPerSegment = 2;
 
 		// Если исходных точек недостаточно для сглаживания или шаг некорректен
 		if (line.basePointCount < 2 || stepsPerSegment <= 0) {
@@ -865,7 +865,33 @@ namespace Object {
 		}
 	}
 
+	float2 GetJitteredSphereAngle(int j, int raysCount, float jitterAmount) {
+		// Золотое сечение для идеального распределения по спирали
+		const float phi = (1.0f + std::sqrt(5.0f)) / 2.0f;
+		const float angleIncrement = XM_2PI / phi;
 
+		// 1. Базовая регулярная точка на сфере (распределение Фибоначчи)
+		// Предотвращаем деление на ноль, если raysCount == 1
+		float t = (raysCount > 1) ? (float)j / (raysCount - 1) : 0.5f;
+		float baseZ = 1.0f - t * 2.0f;
+		float basePitch = std::acos(baseZ);
+		float baseYaw = j * angleIncrement;
+
+		// 2. Генерация случайного смещения (джиттеринга) вокруг базовой точки
+		float randDir = ((float)rand() / RAND_MAX) * XM_2PI; // Случайное направление сдвига
+		float randRadius = ((float)rand() / RAND_MAX) * jitterAmount; // Случайный радиус сдвига
+
+		// 3. Смещение координат
+		float finalYaw = baseYaw + randRadius * std::cos(randDir);
+		float finalPitch = basePitch + randRadius * std::sin(randDir);
+
+		// Коррекция углов, чтобы они не выходили за математические границы
+		finalPitch = std::fmax(0.0f, std::fmin(XM_PI, finalPitch));
+		finalYaw = std::fmod(finalYaw, XM_2PI);
+		if (finalYaw < 0.0f) finalYaw += XM_2PI;
+
+		return { finalYaw, finalPitch };
+	}
 
 	void initPatches(float pathTime)
 	{
@@ -904,12 +930,12 @@ namespace Object {
 		
 
 		NewLine();
-		AddPointToLine({ 0,-8,-16 });
-		AddPointToLine({ 100,-111,0 });
-		AddPointToLine({ 200,0,0 });
-		AddPointToLine({ 200,79,0 });
-		AddPointToLine({ 100,110,0 });
-		AddPointToLine({ 0,6,0 });
+		AddPointToLine({ 0,-800,-1600 });
+		AddPointToLine({ 3500,-11100,0 });
+		AddPointToLine({ 46400,0,0 });
+		AddPointToLine({ 20000,7900,0 });
+		AddPointToLine({ 10300,11000,0 });
+		AddPointToLine({ 0,600,0 });
 
 		/*NewLine();
 		AddPointToLine({ -39,-34,3 });
@@ -927,9 +953,9 @@ namespace Object {
 		AddPointToLine({ -3,31,11 });
 		AddPointToLine({ -33,16,13 });*/
 
-		NewStar({ 27,-63,21,263 });
+		NewStar({ 2700,-6300,2100,2630 });
 
-		NewStar({ 82,-99,3,56 });
+		NewStar({ 8200,-9900,300,560 });
 
 		/*
 		for (int j = 0; j < 10; j++)
@@ -1043,51 +1069,75 @@ namespace Object {
 
 		// Большой внешний цикл — хаотично рассыпаем 100 прямых лазерных штрихов
 
-/*for (int j = 0; j < 60; j++)
-{
-	NewLine();
+		/*
+		for (int l = 0; l < starLineList.lineCount; l++)
+		{
+			if (starLineList.line[l].basePointCount != 1) continue;
 
-	// Прямая линия из 5 точек. Для идеального лерпа этого достаточно,
-	// сплайн Катмулла-Рома прорисует её как ровную световую струну
-	int g = 5;
+			int raysCount = 140;
+			for (int j = 0; j < raysCount; j++)
+			{
+				NewLine();
 
-	// Случайный масштаб (расстояние от центра звезды до начала луча)
-	float randScale = (float)rand() / RAND_MAX;
-	float r_start = (3.0f + (randScale * 10.0f) / 7.0f) * 0.35f;
+				// Прямая линия из 5 точек. Для идеального лерпа этого достаточно,
+				// сплайн Катмулла-Рома прорисует её как ровную световую струну
+				
 
-	// Длина самого лазерного штриха (в твоих пропорциях, например, небольшая фиксированная длина)
-	float rayLength = 3.2f;
-	float r_end = r_start + rayLength;
+				// Случайный масштаб (расстояние от центра звезды до начала луча)
+				float randScale = (float)rand() / RAND_MAX;
+				float r_start = (3.0f + (randScale * 10.0f) / 7.0f) * 0.35f;
+				r_start = starLineList.line[l].basePoint[0].w * denom;
 
-	// Рандомный разворот всей линии целиком по двум осям (Yaw и Pitch)
-	float yaw = ((float)rand() / RAND_MAX) * XM_2PI; // Поворот вокруг Y
-	float pitch = ((float)rand() / RAND_MAX) * XM_PI;  // Наклон вокруг X
+				// Длина самого лазерного штриха (в твоих пропорциях, например, небольшая фиксированная длина)
+				float rayLength = 4111.2f;
+				float r_end = r_start + rayLength;
 
-	XMMATRIX finalRotation = XMMatrixRotationRollPitchYaw(pitch, yaw, 0.0f);
+				int g = 5;
 
-	for (int i = 0; i < g; i++)
-	{
-		// t строго от 0.0 (начало штриха) до 1.0 (конец штриха)
-		float t = (float)i / (float)(g - 1);
+				// Рандомный разворот всей линии целиком по двум осям (Yaw и Pitch)
+				float yaw = ((float)rand() / RAND_MAX) * XM_2PI; // Поворот вокруг Y
+				float pitch = ((float)rand() / RAND_MAX) * XM_PI;  // Наклон вокруг X
 
-		// ЧЕСТНЫЙ ЛЕРП: линия абсолютно прямая и направлена строго вдоль оси Y наружу
-		float x_raw = 0.0f;
-		float y_raw = r_start + (r_end - r_start) * t;
-		float z_raw = 0.0f;
+				auto yp = GetJitteredSphereAngle(j, raysCount, 0);
+				yaw = yp.x;
+				pitch = yp.y;
 
-		XMVECTOR basePoint = XMVectorSet(x_raw, y_raw, z_raw, 1.0f);
+				//yaw = XM_2PI* j / (float)raysCount;
+				//pitch = XM_PI * j / (float)raysCount;
+				//pitch = 0;
 
-		// Поворачиваем всю прямую линию одинаково
-		XMVECTOR rotatedPoint = XMVector3Transform(basePoint, finalRotation);
+				XMMATRIX finalRotation = XMMatrixRotationRollPitchYaw(pitch, yaw, 0.0f);
 
-		// ТВОЙ ИСХОДНЫЙ МАСШТАБ (* 40)
-		int _x = (int)(XMVectorGetX(rotatedPoint) * 40.0f);
-		int _y = (int)(XMVectorGetY(rotatedPoint) * 40.0f);
-		int _z = (int)(XMVectorGetZ(rotatedPoint) * 40.0f);
+				for (int i = 0; i < g; i++)
+				{
+					// t строго от 0.0 (начало штриха) до 1.0 (конец штриха)
+					float t = (float)i / (float)(g - 1);
 
-		AddPointToLine({ _x, _y, _z });
-	}
-}*/			
+					// ЧЕСТНЫЙ ЛЕРП: линия абсолютно прямая и направлена строго вдоль оси Y наружу
+					float x_raw = 0.0f;
+					float y_raw = r_start + (r_end - r_start) * t;
+					float z_raw = 0;
+
+					XMVECTOR basePoint = XMVectorSet(x_raw, y_raw, z_raw, 1.0f);
+
+					// Поворачиваем всю прямую линию одинаково
+					XMVECTOR rotatedPoint = XMVector3Transform(basePoint, finalRotation);
+
+					// ТВОЙ ИСХОДНЫЙ МАСШТАБ (* 40)
+					int _x = (int)XMVectorGetX(rotatedPoint);
+					int _y = (int)XMVectorGetY(rotatedPoint);
+					int _z = (int)XMVectorGetZ(rotatedPoint);
+
+					_x += starLineList.line[l].basePoint->x * denom;
+					_y += starLineList.line[l].basePoint->y * denom;
+					_z += starLineList.line[l].basePoint->z * denom;
+
+
+						AddPointToLine({ _x, _y, _z });
+				}
+			}
+		}*/
+
 		//------------end user space---------------
 		//-----------------------------------------
 
@@ -1159,7 +1209,9 @@ namespace Object {
 				},
 			};
 
-			vs::maze.params.particlesCount = in.count;
+			//vs::maze.params.particlesCount = in.count;
+			int count = starLineList.line[i].pointCount * 10000.;
+			vs::maze.params.particlesCount = count/ in.skipper;
 			vs::maze.params.basePointsCount = starLineList.line[i].pointCount;
 
 			for (int j = 0; j < starLineList.line[i].pointCount; j++)
@@ -1169,7 +1221,7 @@ namespace Object {
 
 			vs::maze.set();
 
-			Drawer::NullDrawer({ 1,in.count / in.skipper });
+			Drawer::NullDrawer({ 1,count / in.skipper });
 		}
 
 

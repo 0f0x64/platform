@@ -188,7 +188,7 @@ pos_color2 CalcParticles(uint qid,uint iid,float4 grid)
      }
 
 
-    pos*=PosRad.w/10.;
+    pos*=PosRad.w;
     float3 pos0 = pos;    
 
     pos.xyz+=PosRad.xyz;

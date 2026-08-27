@@ -577,6 +577,7 @@ namespace paramEdit {
 			}
 			else
 			{
+		
 				switch (c->param[i].size)
 				{
 				case 1:
