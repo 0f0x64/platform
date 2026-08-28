@@ -568,6 +568,10 @@ struct hero_ {
 			landingTimer = 0;
 		}
 		else {
+			if (ConstBuf::gltfAnim::scene.animations[5].isPlaying) {
+				dx11::Audio::Play("Landing");
+			}
+
 			ConstBuf::gltfAnim::StopAnimation(5);
 		}
 
@@ -780,7 +784,7 @@ struct hero_ {
 		}
 
 		// Если ни одна кнопка движения не нажата — плавно тормозим (автобрейк)
-		if (!pressingMove)
+		if (!pressingMove && !gravity.mode)
 		{
 			float dt = deltaTime / (1. / 6.);
 			speed *= pow(autoBrake, dt);
@@ -831,7 +835,9 @@ struct hero_ {
 			stepTime += deltaTime;
 			if (stepTime > 0.37f / animSpeed) {
 				stepTime = 0.0f;
-				dx11::Audio::Play("Run");
+				if (!ConstBuf::gltfAnim::scene.animations[2].isPlaying) {
+					dx11::Audio::Play("Step");
+				}
 			}
 		}
 		else {
@@ -2259,6 +2265,9 @@ namespace Loop
 
 			dx11::Audio::LoadWavFile("Braking", "..//fx//projectFiles//BrakingSFX.wav");
 			dx11::Audio::LoadWavFile("Run", "..//fx//projectFiles//RunSFX.wav");
+
+			dx11::Audio::LoadOggFile("Landing", "..//fx//projectFiles//Landing.ogg");
+			dx11::Audio::LoadOggFile("Step", "..//fx//projectFiles//Step.ogg");
 		}
 
 		cmdCounter = precalcOfs;
