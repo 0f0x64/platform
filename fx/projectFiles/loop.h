@@ -710,6 +710,8 @@ struct hero_ {
 				gravity.progress = 0.0f;
 
 				speed *= airSpeedAmp;
+
+				dx11::Audio::Play("Jump");
 			}
 			else
 			{
@@ -794,7 +796,7 @@ struct hero_ {
 
 			if (!brakingSound) {
 				brakingSound = true;
-				dx11::Audio::Play("Braking");
+				dx11::Audio::Play("Braking", false, 0.5f);
 			}
 
 			if (absSpeed > 0.1f) {
@@ -836,7 +838,7 @@ struct hero_ {
 			if (stepTime > 0.37f / animSpeed) {
 				stepTime = 0.0f;
 				if (!ConstBuf::gltfAnim::scene.animations[2].isPlaying) {
-					dx11::Audio::Play("Step");
+					dx11::Audio::Play("Step", false, 0.5f);
 				}
 			}
 		}
@@ -2268,6 +2270,7 @@ namespace Loop
 
 			dx11::Audio::LoadOggFile("Landing", "..//fx//projectFiles//Landing.ogg");
 			dx11::Audio::LoadOggFile("Step", "..//fx//projectFiles//Step.ogg");
+			dx11::Audio::LoadOggFile("Jump", "..//fx//projectFiles//Jump.ogg");
 		}
 
 		cmdCounter = precalcOfs;
