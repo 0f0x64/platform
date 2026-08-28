@@ -753,6 +753,7 @@ struct hero_ {
 	bool brakingSound = true;
 	float stepTime = 0.0f;
 	IXAudio2SourceVoice* glideVoice;
+	IXAudio2SourceVoice* idleVoice;
 
 	void ProcessMove(float deltaTime)
 	{
@@ -822,6 +823,7 @@ struct hero_ {
 		float absSpeed = fabsf(speed);
 
 		dx11::Audio::SetVolume(glideVoice, absSpeed / maxSpeed);
+		dx11::Audio::SetVolume(idleVoice, 1 - min(absSpeed / 4.0f, 1.0f));
 
 		// Логика включения анимаций ходьбы и бега
 		if (pressingMove && absSpeed > 0.1f) {
@@ -2276,8 +2278,10 @@ namespace Loop
 			dx11::Audio::LoadOggFile("Step", "..//fx//projectFiles//Step.ogg");
 			dx11::Audio::LoadOggFile("Jump", "..//fx//projectFiles//Jump.ogg");
 			dx11::Audio::LoadOggFile("Glide", "..//fx//projectFiles//Glide.ogg");
+			dx11::Audio::LoadOggFile("Character", "..//fx//projectFiles//Character.ogg");
 
-			hero.glideVoice = dx11::Audio::Play("Glide", true);
+			hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
+			hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
 		}
 
 		cmdCounter = precalcOfs;
