@@ -752,6 +752,8 @@ struct hero_ {
 
 	bool brakingSound = true;
 	float stepTime = 0.0f;
+	IXAudio2SourceVoice* glideVoice;
+
 	void ProcessMove(float deltaTime)
 	{
 		if (jump || gravity.mode) {
@@ -818,6 +820,8 @@ struct hero_ {
 		// Жесткий зажим скорости в максимальные рамки
 		speed = clamp(speed, -maxSpeed, maxSpeed);
 		float absSpeed = fabsf(speed);
+
+		dx11::Audio::SetVolume(glideVoice, absSpeed / maxSpeed);
 
 		// Логика включения анимаций ходьбы и бега
 		if (pressingMove && absSpeed > 0.1f) {
@@ -2271,6 +2275,9 @@ namespace Loop
 			dx11::Audio::LoadOggFile("Landing", "..//fx//projectFiles//Landing.ogg");
 			dx11::Audio::LoadOggFile("Step", "..//fx//projectFiles//Step.ogg");
 			dx11::Audio::LoadOggFile("Jump", "..//fx//projectFiles//Jump.ogg");
+			dx11::Audio::LoadOggFile("Glide", "..//fx//projectFiles//Glide.ogg");
+
+			hero.glideVoice = dx11::Audio::Play("Glide", true);
 		}
 
 		cmdCounter = precalcOfs;
