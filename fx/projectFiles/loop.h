@@ -770,13 +770,21 @@ struct hero_ {
 		if (inputController.isForwardPressed())
 		{
 			// ѕлавный разгон вперед с учетом знака камеры
-			speed += accel * sign(speedFactor)*deltaTime;
-
-			if (sign(speed) != sign(speedFactor))
+			if (sign(speed) == -1.0f * sign(speedFactor) && fabsf(speed) > 0.2f)
 			{
+				float dt = deltaTime / (1. / 6.);
+				speed *= pow(autoBrake, dt);
+
+				if (!brakingSound) {
+					brakingSound = true;
+					dx11::Audio::Play("Braking", false, 0.5f);
+				}
+				ConstBuf::gltfAnim::PlayAnimation(6);
+			}
+			else {
 				speed += accel * sign(speedFactor) * deltaTime;
-				float dt = deltaTime / (1. / 600.);
-				//speed *= pow(autoBrake, dt);//double force for reverse
+
+				ConstBuf::gltfAnim::StopAnimation(6);
 			}
 
 			pressingMove = true;
@@ -784,38 +792,60 @@ struct hero_ {
 		if (inputController.isBackwardPressed())
 		{
 			// ѕлавный разгон назад с учетом знака камеры
-			speed -= accel * sign(speedFactor)*deltaTime;
+			if (sign(speed) == sign(speedFactor) && fabsf(speed) > 0.2f)
+			{
+				float dt = deltaTime / (1. / 6.);
+				speed *= pow(autoBrake, dt);
+
+				if (!brakingSound) {
+					brakingSound = true;
+					dx11::Audio::Play("Braking", false, 0.5f);
+				}
+				ConstBuf::gltfAnim::PlayAnimation(6);
+			}
+			else {
+				speed -= accel * sign(speedFactor) * deltaTime;
+
+				ConstBuf::gltfAnim::StopAnimation(6);
+			}
+
 			pressingMove = true;
 		}
 
 		// ≈сли ни одна кнопка движени€ не нажата Ч плавно тормозим (автобрейк)
 		if (!pressingMove && !gravity.mode)
 		{
-			float dt = deltaTime / (1. / 6.);
-			speed *= pow(autoBrake, dt);
+			brakingSound = false;
+			ConstBuf::gltfAnim::StopAnimation(6);
+
+			float newSpeed = speed - accel * sign(speed) * deltaTime;
+			if (sign(speed) == sign(newSpeed)) {
+				speed = newSpeed;
+			}
+			else {
+				speed = 0.0f;
+			}
+
 			float absSpeed = fabsf(speed);
 			// ћ€гкое зануление совсем маленькой скорости, чтобы персонаж не полз бесконечно
 			if (absSpeed < 0.001f) speed = 0.0f;
 
-			if (!brakingSound) {
-				brakingSound = true;
-				dx11::Audio::Play("Braking", false, 0.5f);
-			}
-
 			if (absSpeed > 0.1f) {
-				ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[6];
+				ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[8];
 
 				clip.currentTime = (1 - absSpeed / maxSpeed) * clip.duration;
 
-				ConstBuf::gltfAnim::PlayAnimation(6);
+				ConstBuf::gltfAnim::PlayAnimation(8);
 			}
 			else {
-				ConstBuf::gltfAnim::StopAnimation(6);
+				ConstBuf::gltfAnim::StopAnimation(8);
 			}
 		}
 		else {
-			ConstBuf::gltfAnim::StopAnimation(6);
-			brakingSound = false;
+			ConstBuf::gltfAnim::StopAnimation(8);
+
+			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[6];
+			clip.currentTime = (1 - fabsf(speed) / maxSpeed) * clip.duration;
 		}
 
 		// ∆есткий зажим скорости в максимальные рамки
