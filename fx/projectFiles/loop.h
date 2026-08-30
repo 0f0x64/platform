@@ -852,7 +852,12 @@ struct hero_ {
 		speed = clamp(speed, -maxSpeed, maxSpeed);
 		float absSpeed = fabsf(speed);
 
-		dx11::Audio::SetVolume(glideVoice, absSpeed / maxSpeed);
+		if (ConstBuf::gltfAnim::scene.animations[8].isPlaying) {
+			dx11::Audio::SetVolume(glideVoice, absSpeed / maxSpeed);
+		}
+		else {
+			dx11::Audio::SetVolume(glideVoice, 0.0f);
+		}
 		dx11::Audio::SetVolume(idleVoice, 1 - min(absSpeed / 4.0f, 1.0f));
 
 		// Логика включения анимаций ходьбы и бега
