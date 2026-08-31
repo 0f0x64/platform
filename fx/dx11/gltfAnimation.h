@@ -14,6 +14,7 @@
 namespace gltfAnim
 {
 	static const int BoneLimit = 256;
+	static constexpr float DefaultBlendTime = 0.35f;
 
 	struct AnimationChannel
 	{
@@ -686,7 +687,7 @@ namespace gltfAnim
 
 	/////////////////////////////////////////////////////
 
-	inline void PlayAnimation(int id, float time = 0.2f) {
+	inline void PlayAnimation(int id, float time = DefaultBlendTime) {
 		AnimationClip& clip = scene.animations[id];
 
 		if (clip.isPlaying)
@@ -699,7 +700,7 @@ namespace gltfAnim
 		interp::Animate(clip.realWeight, 1.0f, time);
 	}
 
-	inline void StopAnimation(int id, float time = 0.2f) {
+	inline void StopAnimation(int id, float time = DefaultBlendTime) {
 		AnimationClip& clip = scene.animations[id];
 
 		if (!clip.isPlaying)
@@ -773,7 +774,8 @@ namespace gltfAnim
 				}
 			}
 
-			const float effectiveWeight = clip.weight * clamp(clip.realWeight, 0.0f, 1.0f);
+			const float blendWeight = clamp(clip.weight, 0.0f, 1.0f);
+			const float effectiveWeight = blendWeight * clamp(clip.realWeight, 0.0f, 1.0f);
 			if (effectiveWeight <= 0.0f)
 			{
 				continue;
