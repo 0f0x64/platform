@@ -748,6 +748,18 @@ namespace gltfAnim
 
 		::std::vector<float> jointWeightSum(scene.joints.size(), 0.0f);
 
+		struct OverridePose
+		{
+			float priority = 0.0f;
+			float blend = 0.0f;
+			::std::vector<XMVECTOR> scale;
+			::std::vector<XMVECTOR> rotation;
+			::std::vector<XMVECTOR> translation;
+			::std::vector<bool> animated;
+		};
+
+		::std::vector<OverridePose> overridePoses;
+
 		// Проходим по всем клипам
 		for (size_t i = 0; i < scene.animations.size(); i++)
 		{
@@ -774,11 +786,25 @@ namespace gltfAnim
 				}
 			}
 
-			const float blendWeight = clamp(clip.weight, 0.0f, 1.0f);
-			const float effectiveWeight = blendWeight * clamp(clip.realWeight, 0.0f, 1.0f);
-			if (effectiveWeight <= 0.0f)
+			const float realWeight = clamp(clip.realWeight, 0.0f, 1.0f);
+			const bool isOverride = clip.weight > 1.0f;
+			const float effectiveWeight = clip.weight * realWeight;
+			if (realWeight <= 0.0f)
 			{
 				continue;
+			}
+
+			OverridePose* overridePose = nullptr;
+			if (isOverride)
+			{
+				overridePoses.emplace_back();
+				overridePose = &overridePoses.back();
+				overridePose->priority = clip.weight;
+				overridePose->blend = realWeight;
+				overridePose->scale.assign(scene.joints.size(), XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f));
+				overridePose->rotation.assign(scene.joints.size(), XMQuaternionIdentity());
+				overridePose->translation.assign(scene.joints.size(), XMVectorZero());
+				overridePose->animated.assign(scene.joints.size(), false);
 			}
 
 			// Для каждого joint в этом клипе
@@ -857,6 +883,15 @@ namespace gltfAnim
 
 				if (animated)
 				{
+					if (isOverride)
+					{
+						overridePose->scale[jointIdx] = scale;
+						overridePose->rotation[jointIdx] = rotation;
+						overridePose->translation[jointIdx] = translation;
+						overridePose->animated[jointIdx] = true;
+						continue;
+					}
+
 					// Взвешенное смешивание
 					if (!jointAnimated[jointIdx])
 					{
@@ -875,6 +910,53 @@ namespace gltfAnim
 						jointWeightSum[jointIdx] += effectiveWeight;
 					}
 				}
+			}
+		}
+
+		// Большие веса в этом проекте задают приоритет override-анимаций.
+		// Применяем их после базового бленда: priority задаёт порядок,
+		// а realWeight — плавную силу влияния.
+		::std::stable_sort(overridePoses.begin(), overridePoses.end(),
+			[](const OverridePose& a, const OverridePose& b)
+			{
+				return a.priority < b.priority;
+			});
+
+		for (const OverridePose& pose : overridePoses)
+		{
+			for (size_t jointIdx = 0; jointIdx < scene.joints.size(); ++jointIdx)
+			{
+				if (!pose.animated[jointIdx])
+				{
+					continue;
+				}
+
+				if (!jointAnimated[jointIdx])
+				{
+					XMVECTOR currentScale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+					XMVECTOR currentRotation = XMQuaternionIdentity();
+					XMVECTOR currentTranslation = XMVectorZero();
+					const bool decomposed = XMMatrixDecompose(
+						&currentScale,
+						&currentRotation,
+						&currentTranslation,
+						XMLoadFloat4x4(&scene.joints[jointIdx].local));
+					if (!decomposed)
+					{
+						currentScale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+						currentRotation = XMQuaternionIdentity();
+						currentTranslation = XMVectorZero();
+					}
+
+					accumScale[jointIdx] = currentScale;
+					accumRotation[jointIdx] = currentRotation;
+					accumTranslation[jointIdx] = currentTranslation;
+					jointAnimated[jointIdx] = true;
+				}
+
+				accumScale[jointIdx] = XMVectorLerp(accumScale[jointIdx], pose.scale[jointIdx], pose.blend);
+				accumRotation[jointIdx] = XMQuaternionSlerp(accumRotation[jointIdx], pose.rotation[jointIdx], pose.blend);
+				accumTranslation[jointIdx] = XMVectorLerp(accumTranslation[jointIdx], pose.translation[jointIdx], pose.blend);
 			}
 		}
 
