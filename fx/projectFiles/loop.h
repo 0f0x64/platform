@@ -97,56 +97,61 @@ struct inputController_ {
 			static bool animStarted = false;
 			static float yawInner = yaw;
 
-			float targetA =
-				-std::round(yaw / PI) * PI;
+			const float mouseDiff = atan2f(
+				sinf(yaw - yawInner),
+				cosf(yaw - yawInner));
+			float diff = mouseDiff >= 0.0f ? -PI : PI;
+			float targetA = yawInner + diff;
 
 			// Разворот матрицы целиком на 180 градусов
 			// при переходе камеры через ноль
-			float diff = targetA - yawInner;
-
-			skeletonYaw =
-				atan2f(
-					sinf(yaw - yawInner),
-					cosf(yaw - yawInner));
+			skeletonYaw = mouseDiff;
 
 			static float diffStored = diff;
-			static float frame = 0;
-			static float lastTargetA = targetA;
+			static float frame = 0.0f;
+			static float lastTargetA = yaw;
+			static float turnStartA = yaw;
+			static float turnTargetA = yaw;
+			static float turnLookStart = 0.0f;
+			static float turnLookTarget = 0.0f;
 
-			int frames = 30;
+			const float turnThreshold = XMConvertToRadians(110.0f);
+			const int frames = 30;
 
 			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[7];
 
-			if (fabs(diff) > PI / 2.f && !animStarted)
+			if (fabs(mouseDiff) > turnThreshold && !animStarted)
 			{
 				animStarted = true;
-				ConstBuf::gltfAnim::SetLookAtEnabled(false);
-				ConstBuf::gltfAnim::ResetLookAtPose();
 				diffStored = diff;
-				frame = 0;
+				frame = 0.0f;
+				turnStartA = yawInner;
+				turnTargetA = targetA;
+				lastTargetA = turnStartA;
+				turnLookStart = mouseDiff;
+				turnLookTarget = turnLookStart;
 
+				clip.speed = 0.0f;
+				clip.weight = 1000.0f;
 				ConstBuf::gltfAnim::PlayAnimation(7, 0);
 
-				if (diff > 0)
+				if (mouseDiff < 0)
 					Log("right\n");
 
-				if (diff < 0)
+				if (mouseDiff >= 0)
 					Log("left\n");
 
-				if (diff < 0)
-					lastTargetA = targetA;
 			}
 
 			if (frame >= frames && animStarted)
 			{
 				animStarted = false;
 
-				lastTargetA = targetA;
-				yawInner = targetA;
-
-				skeletonYaw = 0.0f;
-
-				ConstBuf::gltfAnim::ResetLookAtPose();
+				lastTargetA = turnTargetA;
+				yawInner = turnTargetA;
+				skeletonYaw = atan2f(
+					sinf(yaw - yawInner),
+					cosf(yaw - yawInner));
 				ConstBuf::gltfAnim::SetLookAtEnabled(true);
 
 				heroRotateAngleAnim = 0;
@@ -154,29 +159,46 @@ struct inputController_ {
 				ConstBuf::gltfAnim::StopAnimation(7, 0);
 			}
 
-			if (!animStarted)
-			{
-				ConstBuf::gltfAnim::SetLookAtYaw(skeletonYaw);
-				ConstBuf::gltfAnim::SetLookAtPitch(pitch);
-				ConstBuf::gltfAnim::SetLookAtEnabled(true);
-			}
-
 			if (animStarted)
 			{
-				float fr = frame / (float)frames;
+				float progress = clamp(frame / static_cast<float>(frames), 0.0f, 1.0f);
+				const float turnFr = progress * progress * (3.0f - 2.0f * progress);
+				lastTargetA = turnStartA + (turnTargetA - turnStartA) * turnFr;
 
-				// ConstBuf::gltfAnim::scene.animations[6].currentTime =
-				//     fr * ConstBuf::gltfAnim::scene.animations[6].duration;
+				const float desiredLook = atan2f(
+					sinf(yaw - turnTargetA),
+					cosf(yaw - turnTargetA));
+				float lookDiff = desiredLook - turnLookStart;
+				if (lookDiff > PI)
+					lookDiff -= 2.0f * PI;
+				else if (lookDiff < -PI)
+					lookDiff += 2.0f * PI;
+				turnLookTarget = turnLookStart + lookDiff;
+				skeletonYaw = turnLookStart +
+					(turnLookTarget - turnLookStart) * turnFr;
 
-				if (diffStored < 0)
-					fr = 1 - fr;
+				float animationProgress = progress;
+				if (turnTargetA < turnStartA)
+					animationProgress = 1.0f - animationProgress;
+				clip.currentTime = (1.0f - animationProgress) * clip.duration;
+				heroRotateAngleAnim = PI * animationProgress;
+				frame += 1.0f;
 
-				clip.currentTime = (1 - fr) * clip.duration;
-
-				heroRotateAngleAnim = PI * fr;
-
-				frame++;
+				if (frame >= static_cast<float>(frames))
+				{
+					animStarted = false;
+					lastTargetA = turnTargetA;
+					yawInner = turnTargetA;
+					skeletonYaw = atan2f(
+						sinf(yaw - yawInner),
+						cosf(yaw - yawInner));
+					ConstBuf::gltfAnim::StopAnimation(7, 0);
+				}
 			}
+
+			ConstBuf::gltfAnim::SetLookAtYaw(skeletonYaw);
+			ConstBuf::gltfAnim::SetLookAtPitch(pitch);
+			ConstBuf::gltfAnim::SetLookAtEnabled(true);
 
 			XMMATRIX reverseRot =
 				XMMatrixRotationAxis(
