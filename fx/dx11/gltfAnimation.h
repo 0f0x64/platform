@@ -408,7 +408,7 @@ namespace gltfAnim
 		float hipsWeight = 0.20f;
 
 		float maxPitch = XM_PIDIV4;
-		float maxYaw = XM_PIDIV2 * 0.85f;//было 0.75f
+		float maxYaw = XMConvertToRadians(72.0f);
 
 		bool resolved = false;
 
@@ -513,176 +513,94 @@ namespace gltfAnim
 			return;
 
 		lookAtConfig.Resolve(scene.joints);
+		if (lookAtConfig.headIdx < 0 ||
+			lookAtConfig.headIdx >= static_cast<int>(scene.joints.size()))
+		{
+			return;
+		}
 
-		const float smoothSpeed = 18.0f;
+		scene.lookYawTarget = std::clamp(
+			scene.lookYawTarget,
+			-lookAtConfig.maxYaw,
+			lookAtConfig.maxYaw);
+		scene.lookPitchTarget = std::clamp(
+			scene.lookPitchTarget,
+			-lookAtConfig.maxPitch,
+			lookAtConfig.maxPitch);
 
-		const float t =
-			1.0f -
-			expf(-smoothSpeed * deltaTime);
+		scene.lookYawCurrent = scene.lookYawTarget;
+		scene.lookPitchCurrent = scene.lookPitchTarget;
 
+		::std::vector<int> chain;
+		int jointIdx = lookAtConfig.headIdx;
+		while (jointIdx >= 0 && jointIdx < static_cast<int>(scene.joints.size()))
+		{
+			chain.push_back(jointIdx);
+			if (jointIdx == lookAtConfig.hipsIdx)
+				break;
+			jointIdx = scene.joints[jointIdx].parent;
+		}
 
-		// =========================================================
-		// Плавное движение yaw
-		// =========================================================
+		if (chain.empty())
+			return;
 
-		float yawDiff =
-			scene.lookYawTarget -
-			scene.lookYawCurrent;
+		const float lastIndex = static_cast<float>(chain.size() - 1);
+		const float bodyFollowPower = 0.55f;
 
-		// Кратчайший путь через -PI / +PI
-		yawDiff =
-			atan2f(
-				sinf(yawDiff),
-				cosf(yawDiff));
+		for (int chainIndex = static_cast<int>(chain.size()) - 1;
+			chainIndex >= 0;
+			--chainIndex)
+		{
+			jointIdx = chain[chainIndex];
 
-		scene.lookYawCurrent +=
-			yawDiff * t;
+			const float linearPosition = lastIndex > 0.0f
+				? 1.0f - static_cast<float>(chainIndex) / lastIndex
+				: 1.0f;
+			const float position = powf(linearPosition, bodyFollowPower);
+			const float parentLinearPosition = chainIndex + 1 < static_cast<int>(chain.size())
+				? 1.0f - static_cast<float>(chainIndex + 1) / lastIndex
+				: 0.0f;
+			const float parentPosition = powf(parentLinearPosition, bodyFollowPower);
+			const float segmentWeight = position - parentPosition;
 
+			XMMATRIX local = XMLoadFloat4x4(&scene.joints[jointIdx].local);
+			XMVECTOR scale;
+			XMVECTOR rotation;
+			XMVECTOR translation;
+			if (!XMMatrixDecompose(&scale, &rotation, &translation, local))
+				continue;
 
-		// =========================================================
-		// Плавное движение pitch
-		// =========================================================
+			const float yaw = -scene.lookYawTarget * segmentWeight;
+			const float pitch = scene.lookPitchTarget * segmentWeight;
+			XMVECTOR qYaw = XMQuaternionRotationAxis(
+				XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), yaw);
+			XMVECTOR qPitch = XMQuaternionRotationAxis(
+				XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), pitch);
+			XMVECTOR delta = XMQuaternionNormalize(XMQuaternionMultiply(qYaw, qPitch));
+			XMVECTOR newRotation = XMQuaternionNormalize(
+				XMQuaternionMultiply(rotation, delta));
 
-		scene.lookPitchCurrent +=
-			(scene.lookPitchTarget -
-				scene.lookPitchCurrent) * t;
+			XMMATRIX newLocal =
+				XMMatrixScalingFromVector(scale) *
+				XMMatrixRotationQuaternion(newRotation) *
+				XMMatrixTranslationFromVector(translation);
+			XMStoreFloat4x4(&scene.joints[jointIdx].local, newLocal);
+		}
+	}
 
+	inline bool IsLookAtUpperBodyJoint(int jointIndex)
+	{
+		lookAtConfig.Resolve(scene.joints);
 
-		// =========================================================
-		// Ограничения
-		// =========================================================
+		int current = lookAtConfig.headIdx;
+		while (current >= 0 && current < static_cast<int>(scene.joints.size()))
+		{
+			if (current == jointIndex)
+				return true;
+			current = scene.joints[current].parent;
+		}
 
-		scene.lookYawCurrent =
-			std::clamp(
-				scene.lookYawCurrent,
-				-lookAtConfig.maxYaw,
-				lookAtConfig.maxYaw);
-
-		scene.lookPitchCurrent =
-			std::clamp(
-				scene.lookPitchCurrent,
-				-lookAtConfig.maxPitch,
-				lookAtConfig.maxPitch);
-
-
-		// =========================================================
-		// Применение вращения к кости
-		// =========================================================
-
-		auto ApplyToJoint =
-			[&](int jointIdx, float weight)
-			{
-				if (jointIdx < 0 ||
-					jointIdx >=
-					static_cast<int>(scene.joints.size()))
-				{
-					return;
-				}
-
-
-				// Берём текущую локальную позу,
-				// уже полученную после animation blending.
-				XMMATRIX local =
-					XMLoadFloat4x4(
-						&scene.joints[jointIdx].local);
-
-
-				XMVECTOR scale;
-				XMVECTOR rotation;
-				XMVECTOR translation;
-
-
-				if (!XMMatrixDecompose(
-					&scale,
-					&rotation,
-					&translation,
-					local))
-				{
-					return;
-				}
-
-
-				const float y =
-					-scene.lookYawCurrent *
-					weight;
-
-				const float p =
-					scene.lookPitchCurrent *
-					weight;
-
-
-				// Yaw вокруг локальной Y
-				XMVECTOR qYaw =
-					XMQuaternionRotationAxis(
-						XMVectorSet(
-							0.0f,
-							1.0f,
-							0.0f,
-							0.0f),
-						y);
-
-
-				// Pitch вокруг локальной X
-				XMVECTOR qPitch =
-					XMQuaternionRotationAxis(
-						XMVectorSet(
-							1.0f,
-							0.0f,
-							0.0f,
-							0.0f),
-						p);
-
-
-				XMVECTOR delta =
-					XMQuaternionNormalize(
-						XMQuaternionMultiply(
-							qYaw,
-							qPitch));
-
-
-				XMVECTOR newRotation =
-					XMQuaternionNormalize(
-						XMQuaternionMultiply(
-							rotation,
-							delta));
-
-
-				XMMATRIX newLocal =
-					XMMatrixScalingFromVector(
-						scale) *
-					XMMatrixRotationQuaternion(
-						newRotation) *
-					XMMatrixTranslationFromVector(
-						translation);
-
-
-				XMStoreFloat4x4(
-					&scene.joints[jointIdx].local,
-					newLocal);
-			};
-
-
-		// =========================================================
-		// Цепочка:
-		//
-		// таз → торс → шея → голова
-		// =========================================================
-
-		ApplyToJoint(
-			lookAtConfig.hipsIdx,
-			lookAtConfig.hipsWeight);
-
-		ApplyToJoint(
-			lookAtConfig.spineIdx,
-			lookAtConfig.spineWeight);
-
-		ApplyToJoint(
-			lookAtConfig.neckIdx,
-			lookAtConfig.neckWeight);
-
-		ApplyToJoint(
-			lookAtConfig.headIdx,
-			lookAtConfig.headWeight);
+		return false;
 	}
 
 	/////////////////////////////////////////////////////
@@ -810,6 +728,11 @@ namespace gltfAnim
 			// Для каждого joint в этом клипе
 			for (size_t jointIdx = 0; jointIdx < scene.joints.size(); ++jointIdx)
 			{
+				if (i == 7 && IsLookAtUpperBodyJoint(static_cast<int>(jointIdx)))
+				{
+					continue;
+				}
+
 				// Декомпозируем текущую локальную матрицу
 				XMVECTOR scale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 				XMVECTOR rotation = XMQuaternionIdentity();
@@ -980,6 +903,7 @@ namespace gltfAnim
 			XMStoreFloat4x4(&scene.joints[jointIdx].local, local);
 		}
 
+		ApplyLookAtRotation(deltaTime);
 		UpdateGlobalPose();
 		BuildBonePalette();
 	}
