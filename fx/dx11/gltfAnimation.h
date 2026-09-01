@@ -636,6 +636,8 @@ namespace gltfAnim
 			return;
 		}*/
 
+		ResetToBindPose();
+
 		if (scene.animations.empty() || scene.joints.empty())
 		{
 			BuildBonePalette();
