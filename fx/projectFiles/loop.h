@@ -2338,8 +2338,11 @@ namespace Loop
 			dx11::Audio::LoadOggFile("Glide", "..//fx//projectFiles//Glide.ogg");
 			dx11::Audio::LoadOggFile("Character", "..//fx//projectFiles//Character.ogg");
 
+			dx11::Audio::LoadOggFile("Music", "..//fx//projectFiles//Music.ogg");
+
 			hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
 			hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
+			dx11::Audio::Play("Music", true, 0.5f);
 		}
 
 		cmdCounter = precalcOfs;
