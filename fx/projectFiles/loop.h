@@ -852,7 +852,7 @@ struct hero_ {
 		speed = clamp(speed, -maxSpeed, maxSpeed);
 		float absSpeed = fabsf(speed);
 
-		if (ConstBuf::gltfAnim::scene.animations[8].isPlaying) {
+		if (ConstBuf::gltfAnim::scene.animations[8].isPlaying || ConstBuf::gltfAnim::scene.animations[2].isPlaying) {
 			dx11::Audio::SetVolume(glideVoice, absSpeed / maxSpeed);
 		}
 		else {

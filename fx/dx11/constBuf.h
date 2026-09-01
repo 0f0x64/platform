@@ -695,7 +695,7 @@ namespace ConstBuf
 			gltfAnim::scene.animations[1].looped = true;
 
 			gltfAnim::scene.animations[2].speed = 0.0f;
-			gltfAnim::scene.animations[2].weight = 10000.0f;
+			gltfAnim::scene.animations[2].weight = 100000.0f;
 
 			gltfAnim::scene.animations[3].looped = true;
 
