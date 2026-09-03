@@ -1,3 +1,5 @@
+#include <complex>
+
 float distance(const float4& p1, const float4& p2) {
 	float dx = p2.x - p1.x;
 	float dy = p2.y - p1.y;
@@ -865,69 +867,114 @@ namespace Object {
 		}
 	}
 
+	// ------------------------------------------------------------
+	// Комплексные вычисления кривой (Desmos-формулы)
+	// ------------------------------------------------------------
+	using Complex = std::complex<float>;
+
+	// f0(t) = 1 / sqrt(t - i/0.15) * exp(pi i / 4)
+	Complex ComputeF0(float t) {
+		Complex denominator(t, -1.0f / 0.15f);   // t - i/0.15
+		Complex sqrt_val = std::sqrt(denominator);
+		Complex f0 = 1.0f / sqrt_val;
+		const float cos_pi4 = 0.70710678f;
+		const float sin_pi4 = 0.70710678f;
+		f0 *= Complex(cos_pi4, sin_pi4);         // exp(i pi/4)
+		return f0;
+	}
+
+	// f(t) = f0(t) - imag(f0(100)) * i
+	Complex ComputeF(float t) {
+		Complex f0 = ComputeF0(t);
+		Complex f0_100 = ComputeF0(100.0f);
+		float imag_100 = f0_100.imag();
+		return f0 - Complex(0.0f, imag_100);
+	}
+
+	// Применение поворота комплексного числа (для e^{± l π/6 i})
+	Complex ApplyComplexRotation(Complex z, float angle) {
+		float cos_a = cosf(angle);
+		float sin_a = sinf(angle);
+		return Complex(z.real() * cos_a - z.imag() * sin_a,
+			z.real() * sin_a + z.imag() * cos_a);
+	}
+
+	// P1(t, l_sq)
+	Complex ComputeP1(float t, float l_sq) {
+		Complex f = ComputeF(t);
+		Complex p1 = f * (1.0f - l_sq);
+		Complex linear_term = Complex(0.0f, (t + 130.0f) / 80.0f * l_sq); // i * linear
+		return p1 + linear_term;
+	}
+
+	// P2(t, l_sq)
+	Complex ComputeP2(float t, float l_sq) {
+		Complex f = ComputeF(t);
+		Complex p2 = f * (1.0f - l_sq);
+		Complex linear_term = Complex(0.0f, (t + 5.0f) / 5.0f * l_sq);
+		return p2 + linear_term;
+	}
+
+	// P3(t, l_sq)
+	Complex ComputeP3(float t, float l_sq) {
+		Complex f = ComputeF(t);
+		Complex p3 = f * (1.0f - l_sq);
+		Complex linear_term = Complex(0.0f, (130.0f - t) / 80.0f * l_sq);
+		return p3 + linear_term;
+	}
+
+	// Преобразование комплексного числа z = a + b i в 3D-точку
+	// путём умножения кватерниона q = a + b i на j.
+	// Результат: (0, a, b) в координатах (i, j, k).
+	XMVECTOR ComplexTo3D(Complex z) {
+		float a = z.real();  // вещественная часть
+		float b = z.imag();  // коэффициент при i
+		return XMVectorSet(0.0f, a, b, 0.0f);
+	}
+
 	// Генерация одного анимированного протуберанца
 	// time: 0..1 (0 – окружность у поверхности, 1 – прямая линия)
 	// starPos: позиция звезды (в мировых единицах, как в NewStar)
 	// starRadius: радиус звезды (в тех же единицах)
-	void GenerateProminence(float time, const float4& starPos)
+	void GenerateProminenceBranch(float l, int branchType, float t_start, float t_end, int numPoints,
+		const XMMATRIX& worldRot, const float4& starPos, float starRadius)
 	{
-		// Масштаб как у существующих лучей (до умножения на 40)
-		float r_start = 2.0f;      // точка на поверхности (можно варьировать)
-		float rayLength = 3.0f;    // длина луча
-		int pointCount = 10;       // число точек
-
-		// Случайные углы (seed уже установлен снаружи)
-		float yaw = ((float)rand() / RAND_MAX) * XM_2PI;
-		float pitch = ((float)rand() / RAND_MAX) * XM_PI;
-		XMMATRIX rotation = XMMatrixRotationRollPitchYaw(pitch, yaw, 0.0f);
-
-		XMVECTOR normal = XMVector3TransformNormal(XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), rotation);
-		XMVECTOR tangent = XMVector3TransformNormal(XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), rotation);
-		XMVECTOR bitangent = XMVector3Cross(normal, tangent);
-
+		if (numPoints < 2) numPoints = 2;
 		NewLine();
 
-		// Якорь на поверхности
-		XMVECTOR anchor = XMVectorSet(
-			starPos.x + XMVectorGetX(normal) * r_start,
-			starPos.y + XMVectorGetY(normal) * r_start,
-			starPos.z + XMVectorGetZ(normal) * r_start,
-			1.0f
-		);
-		AddPointToLine({
-			(int)(XMVectorGetX(anchor) * 40.0f),
-			(int)(XMVectorGetY(anchor) * 40.0f),
-			(int)(XMVectorGetZ(anchor) * 40.0f)
-			});
+		// Локальное смещение (радиус звезды в единицах до масштаба *40)
+		float starRadiusLocal = starRadius / 40.0f;
+		XMVECTOR offsetLocal = XMVectorSet(starRadiusLocal, 0, 0, 0); // вдоль локальной оси X
 
-		// Остальные точки
-		for (int i = 1; i < pointCount; ++i)
-		{
-			float t = (float)i / (float)(pointCount - 1);
+		float l_sq = l * l;
+		for (int i = 0; i < numPoints; ++i) {
+			float t = t_start + (t_end - t_start) * (float)i / (numPoints - 1);
+			Complex z;
+			switch (branchType) {
+			case 0: // общая кривая f(t) при l <= 0
+				z = ComputeF(t);
+				z *= std::pow(100.0f, -l_sq);   // масштаб 100^{-l^2}
+				break;
+			case 1: // P1
+				z = ComputeP1(t, l_sq);
+				z = ApplyComplexRotation(z, l * (PI / 6.0f));  // e^{+ l π/6 i}
+				break;
+			case 2: // P2
+				z = ComputeP2(t, l_sq);
+				break;
+			case 3: // P3
+				z = ComputeP3(t, l_sq);
+				z = ApplyComplexRotation(z, -l * (PI / 6.0f)); // e^{- l π/6 i}
+				break;
+			}
 
-			// Конечная точка на прямой
-			XMVECTOR finalPos = XMVectorAdd(anchor, XMVectorScale(normal, t * rayLength));
-
-			// Начальная точка на кольце
-			float angle = (float)i / pointCount * XM_2PI;
-			float smallRadius = 0.5f; // радиус петли (в тех же единицах)
-			XMVECTOR offset = XMVectorAdd(
-				XMVectorScale(tangent, cosf(angle) * smallRadius),
-				XMVectorScale(bitangent, sinf(angle) * smallRadius)
-			);
-			XMVECTOR startPos = XMVectorAdd(anchor, offset);
-
-			// Интерполяция
-			float eased = time * time * (3.0f - 2.0f * time);
-			XMVECTOR currentPos = XMVectorLerp(startPos, finalPos, eased);
-
-			AddPointToLine({
-				(int)(XMVectorGetX(currentPos) * 40.0f),
-				(int)(XMVectorGetY(currentPos) * 40.0f),
-				(int)(XMVectorGetZ(currentPos) * 40.0f)
-				});
+			XMVECTOR point = ComplexTo3D(z);
+			point = point + offsetLocal;                       // смещаем на радиус
+			point = XMVector3TransformNormal(point, worldRot); // поворачиваем
+			point = point * 40.0f;                             // масштабируем
+			point = point + XMVectorSet(starPos.x, starPos.y, starPos.z, 0); // позиция звезды
+			AddPoint(V2F(point));
 		}
-
 		smoothStarline(starLineList.line[currentLine]);
 	}
 
@@ -1151,19 +1198,31 @@ namespace Object {
 			}
 		}
 
-		// В начале initPatches или прямо перед циклом протуберанцев
-		double currentTimeMs = timer::GetCounter(); // миллисекунды
-		float durationMs = 40000.0f;                // 60 секунд
-		float normalizedTime = fmod((float)currentTimeMs, durationMs) / durationMs; // зациклено 0..1
-		// или без зацикливания:
-		// float normalizedTime = std::clamp((float)currentTimeMs / durationMs, 0.0f, 1.0f);
+		// --- Анимация протуберанца ---
+		// Вычисляем параметр l (от -1 до 1) на основе времени
+		double timeMs = timer::GetCounter();            // миллисекунды
+		const float periodMs = 120000.0f;               // полный цикл 120 сек
+		float phase = fmod((float)timeMs, periodMs) / periodMs;  // 0..1
+		float l = -cos(2 * PI * phase);                 // плавно -1 -> 1 -> -1
 
-		for (int i = 0; i < 10; ++i)
-		{
-			srand(1000 + i);
-			GenerateProminence(normalizedTime, float4{ 0,0,0,0 });
+		// Сферические углы для теста
+		float theta = DegreesToRadians(45.0f);  // азимут вокруг Y
+		float phi = DegreesToRadians(60.0f);    // полярный угол
+
+		// Глобальная матрица поворота (pitch=phi, yaw=theta, roll=0)
+		XMMATRIX worldRot = XMMatrixRotationRollPitchYaw(phi, theta, 0.0f);
+
+		float4 starPos = { 0,0,0,0 };
+		float starRadius = 306.0f;
+		if (l <= 0.0f) {
+			GenerateProminenceBranch(l, 0, -100, 100, 200, worldRot, starPos, starRadius);
 		}
-			
+		else {
+			GenerateProminenceBranch(l, 1, -100, -3, 80, worldRot, starPos, starRadius);
+			GenerateProminenceBranch(l, 2, -3, 3, 30, worldRot, starPos, starRadius);
+			GenerateProminenceBranch(l, 3, 3, 100, 80, worldRot, starPos, starRadius);
+		}
+
 		//------------end user space---------------
 		//-----------------------------------------
 
