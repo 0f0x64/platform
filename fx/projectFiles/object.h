@@ -927,9 +927,9 @@ namespace Object {
 	// путём умножения кватерниона q = a + b i на j.
 	// Результат: (0, a, b) в координатах (i, j, k).
 	XMVECTOR ComplexTo3D(Complex z) {
-		float a = z.real();  // вещественная часть
-		float b = z.imag();  // коэффициент при i
-		return XMVectorSet(0.0f, a, b, 0.0f);
+		float a = z.real();  // радиальное направление (локальная ось X)
+		float b = z.imag();  // касательное направление (локальная ось Y)
+		return XMVectorSet(b, 0.0f, a, 0.0f);
 	}
 
 	// Генерация одного анимированного протуберанца
@@ -1206,14 +1206,14 @@ namespace Object {
 		float l = -cos(2 * PI * phase);                 // плавно -1 -> 1 -> -1
 
 		// Сферические углы для теста
-		float theta = DegreesToRadians(45.0f);  // азимут вокруг Y
-		float phi = DegreesToRadians(60.0f);    // полярный угол
+		float theta = DegreesToRadians(-45.0f);  // азимут вокруг Y
+		float phi = DegreesToRadians(45.0f);    // полярный угол
 
 		// Глобальная матрица поворота (pitch=phi, yaw=theta, roll=0)
 		XMMATRIX worldRot = XMMatrixRotationRollPitchYaw(phi, theta, 0.0f);
 
 		float4 starPos = { 0,0,0,0 };
-		float starRadius = 306.0f;
+		float starRadius = 27.0f;   // радиус = 0 => смещение отсутствует
 		if (l <= 0.0f) {
 			GenerateProminenceBranch(l, 0, -100, 100, 200, worldRot, starPos, starRadius);
 		}
