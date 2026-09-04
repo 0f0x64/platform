@@ -2395,24 +2395,21 @@ namespace Object {
 		
 	}
 
-
-	
-	
-
-
 	cmd(Girl, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil)
 	{
 		reflect;
 
 		//Object::Capri({ .quality = 1 });
+		int ParticleBudget = 5;
+		int ParticleCount = 5000000; //100%
 
 		int pillars_cnt2 = 2000 * 1000;
 
-		int pillars_cnt = 3725442 / in.quality;
-		int outerSpace_cnt = 6853 / in.quality;
-		int neutronStar_cnt = 279620 / in.quality;
-		int galaxy_cnt = 182361 / in.quality;
-
+		int pillars_cnt = ParticleCount * 0.8894 / ParticleBudget / in.quality; //88.94% = 3725442
+		int outerSpace_cnt = ParticleCount * 0.0016 / ParticleBudget / in.quality; //0.16% = 6853
+		int neutronStar_cnt = ParticleCount * 0.066 / ParticleBudget / in.quality; //6.6% = 279620
+		int galaxy_cnt = ParticleCount * 0.043 / ParticleBudget / in.quality; //4.3% = 182361
+		// 41943 = 1%
 		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
 
