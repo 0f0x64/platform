@@ -542,8 +542,12 @@ struct hero_ {
 			int range = 20;
 			pos = getRandVector4() * range;
 			startAirDistance = length3(V2F(pos));
-			int startLine = rand()% Object::starLineList.lineCount;
-			int startPoint = rand() % (Object::starLineList.line[startLine].pointCount-2)+1;
+			//int startLine = rand()% Object::starLineList.lineCount;
+			//int startPoint = rand() % (Object::starLineList.line[startLine].pointCount-2)+1;
+
+			int startLine = 0;
+			//int startPoint = 1;
+			
 			float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
 			pos += F2V(destPoint);
 			gravity.mode = true;

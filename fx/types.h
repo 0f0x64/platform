@@ -53,7 +53,7 @@ int GetEnumValue(int typeIndex, const char* id)
 
 int getEnumCount(int typeIndex)
 {
-	if (typeIndex < 0) return -1;
+	if (typeIndex < 0 || typeIndex >= 255) return -1;
 
 	return typeDesc[typeIndex].enumCount;
 }
@@ -65,7 +65,7 @@ bool isType(const char* t1, const char* t2)
 
 bool isTypeEnum(int typeIndex)
 {
-	if (typeIndex < 0) return false;
+	if (typeIndex < 0 || typeIndex >= 255) return false;
 
 	return typeDesc[typeIndex].enumCount != 0 ? true : false;
 }
