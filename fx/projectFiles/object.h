@@ -582,6 +582,7 @@ namespace Object {
 	const int smoothPointMAX = 3500;
 
 	struct starline {
+		float4 baseColor;
 		float4 basePoint[4000];
 		float4 point[smoothPointMAX];
 		float4 upVector[smoothPointMAX];
@@ -800,7 +801,7 @@ namespace Object {
 		starLineList.lineCount = currentLine+1;
 	}
 
-	cmd(NewStar, int x, int y, int z, int rad)
+	cmd(NewStar, int x, int y, int z, int rad, int r, int g, int b, int brightness)
 	{
 		reflect;
 
@@ -808,6 +809,7 @@ namespace Object {
 		currentPoint = 0;
 		starLineList.lineCount = currentLine + 1;
 
+		starLineList.line[currentLine].baseColor = float4(in.r / 100.f, in.g / 100.f, in.b / 100.f, in.brightness / 100.f );
 		starLineList.line[currentLine].basePoint[0] = float4(in.x / (float)denom, in.y / (float)denom, in.z / (float)denom, in.rad / (float)denom);
 		starLineList.line[currentLine].basePointCount = 1;
 		
@@ -953,9 +955,35 @@ namespace Object {
 		AddPointToLine({ -3,31,11 });
 		AddPointToLine({ -33,16,13 });*/
 
-		NewStar({ 2700,-6300,2100,2630 });
+		NewStar({ 
+			.x =3700,
+			.y =-6300,
+			.z = 2100,
+			.rad = 2630, 
+			.r = 100,
+			.g = 0,
+			.b = 0,
+			.brightness = 100 });
 
-		NewStar({ 8200,-9900,300,560 });
+		NewStar({
+			.x = -7420,
+			.y = -6300,
+			.z = 2100,
+			.rad = 2630,
+			.r = 0,
+			.g = 100,
+			.b = 0,
+			.brightness = 100 });
+
+		NewStar({
+			.x = 2700,
+			.y = -6300,
+			.z = -8100,
+			.rad = 2630,
+			.r = 0,
+			.g = 0,
+			.b = 100,
+			.brightness = 100 });
 
 		/*
 		for (int j = 0; j < 10; j++)
@@ -1305,12 +1333,13 @@ namespace Object {
 					.gY = gY,
 					.mode = (int)in.mode,
 					.skipper = 0,
-					.base_color = float4(in.r / 100.,in.g / 100.,in.b / 100.,1),
+					.base_color = starLineList.line[i].baseColor,
 					.PosRad = float4(sd.x,sd.y,sd.z,w),
 					.triMode = (int)in.tMode
 				},
 			};
-			
+
+		
 			vs::star.set();
 
 			if (in.tMode == triMode::on) {

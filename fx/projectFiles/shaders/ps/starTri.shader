@@ -157,14 +157,15 @@ float cellTex = saturate(cells3D(noise3(p_disk*7) * .4) * 0.08) * diskZone * 3;
     float3 centerColor = finalPlasma*114;
     float3 edgeGlow    =  coronaZone * finalPlasma * 113.5;
     edgeGlow=max(edgeGlow,0)*saturate(1-diskZone*8);
-    float3 finalColor = (centerColor + edgeGlow) * 222.0 * input.color.rgb;
+    float3 finalColor = (centerColor + edgeGlow) * 222.0 ;
     float coronaMask = saturate(pow(edgeFade,2));
     coronaMask=pow(.5+.5*cos(edgeFade*PI-.766),81)*10;
     coronaMask*=1-saturate(diskZone);
-    finalColor+=pow(coronaMask,.8)*22222*(input.color+1);
+    finalColor+=pow(coronaMask,.8)*22222;
 
     float alphaMask = diskZone + coronaTex * 13.0;
     finalColor*=alphaMask;
+     finalColor *= input.color.rgb*input.color.a;
 
     return float4(finalColor / 22222.0, saturate(alphaMask)); 
 } 
