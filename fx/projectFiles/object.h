@@ -48,9 +48,25 @@ float4 cross(const float4& a, const float4& b) {
 
 namespace Object {
 
+#define BoneLimit 256
+
 	struct mesh {
 		bool loaded = false;
+
+		::std::vector<ConstBuf::gltfAnim::Joint> joints;
+		::std::vector<ConstBuf::gltfAnim::AnimationClip> animations;
+		::std::vector<XMFLOAT4X4> bindLocal;
+		::std::string modelPath;
+		::std::string animationPath;
 		float4 modelCenterScale = float4(0, 0, 0, 0);
+		XMMATRIX bonePalette[BoneLimit];
+
+		// LookAt state. Values are supplied by inputController.
+		float lookYawTarget = 0.0f;
+		float lookYawCurrent = 0.0f;
+		float lookPitchTarget = 0.0f;
+		float lookPitchCurrent = 0.0f;
+		bool lookAtEnabled = true;
 
 		ConstBuf::vertex* vArray = nullptr;
 		ConstBuf::index* iArray = nullptr;
@@ -94,6 +110,113 @@ namespace Object {
 		void BindSB(int slot)
 		{
 			context->VSSetShaderResources(slot, 1, &pSB_SRV[slot]);
+		}
+
+		inline bool ReadAnimations(ConstBuf::cgltf_data* data, bool replaceExisting = true, bool remapToCurrentSkeleton = false)
+		{
+			if (replaceExisting)
+			{
+				animations.clear();
+			}
+
+			const size_t oldCount = animations.size();
+
+			for (ConstBuf::cgltf_size ai = 0; ai < data->animations_count; ++ai)
+			{
+				ConstBuf::cgltf_animation& src = data->animations[ai];
+				ConstBuf::gltfAnim::AnimationClip clip;
+				clip.name = src.name ? src.name : "";
+
+				for (ConstBuf::cgltf_size ci = 0; ci < src.channels_count; ++ci)
+				{
+					ConstBuf::cgltf_animation_channel& srcChannel = src.channels[ci];
+					if (!srcChannel.sampler || !srcChannel.target_node)
+					{
+						continue;
+					}
+
+					ConstBuf::cgltf_animation_sampler& sampler = *srcChannel.sampler;
+					if (!sampler.input || !sampler.output)
+					{
+						continue;
+					}
+
+					ConstBuf::gltfAnim::AnimationChannel channel;
+					if (remapToCurrentSkeleton)
+					{
+						channel.joint = ConstBuf::gltfAnim::ResolveAnimationTargetJoint(data, srcChannel.target_node, true);
+					}
+					else
+					{
+						channel.joint = ConstBuf::gltfAnim::ResolveAnimationTargetJoint(data, srcChannel.target_node, false);
+					}
+					if (channel.joint < 0)
+					{
+						continue;
+					}
+					channel.path = srcChannel.target_path;
+					channel.times.resize(sampler.input->count);
+
+					for (ConstBuf::cgltf_size i = 0; i < sampler.input->count; ++i)
+					{
+						float value = 0.0f;
+						ConstBuf::cgltf_accessor_read_float(sampler.input, i, &value, 1);
+						channel.times[i] = value;
+						clip.duration = (::std::max)(clip.duration, value);
+					}
+
+					const bool isRotation = channel.path == ConstBuf::cgltf_animation_path_type_rotation;
+					const bool isCubicSpline = sampler.interpolation == ConstBuf::cgltf_interpolation_type_cubic_spline;
+					channel.values.resize(channel.times.size());
+					for (size_t i = 0; i < channel.times.size(); ++i)
+					{
+						ConstBuf::cgltf_size sampleIndex = isCubicSpline ? static_cast<ConstBuf::cgltf_size>(i * 3 + 1) : static_cast<ConstBuf::cgltf_size>(i);
+						if (sampleIndex >= sampler.output->count) sampleIndex = sampler.output->count - 1;
+
+						float values[4]{ 0.0f, 0.0f, 0.0f, isRotation ? 1.0f : 0.0f };
+						ConstBuf::cgltf_accessor_read_float(sampler.output, sampleIndex, values, isRotation ? 4 : 3);
+						channel.values[i] = XMFLOAT4(values[0], values[1], values[2], values[3]);
+					}
+
+					clip.channels.push_back(::std::move(channel));
+				}
+
+				if (!clip.channels.empty())
+				{
+					animations.push_back(::std::move(clip));
+				}
+			}
+
+			const bool added = animations.size() > oldCount;
+			if (added)
+			{
+				int animId = static_cast<int>(oldCount);
+
+				ConstBuf::gltfAnim::AnimationClip& clip = animations[animId];
+				clip.currentTime = 0.0f;
+				ConstBuf::gltfAnim::ResetToBindPose();
+				ConstBuf::gltfAnim::BuildBonePalette();
+			}
+			return added;
+		}
+
+		inline bool LoadAnimationFile(const char* path, bool remapToCurrentSkeleton = true)
+		{
+			ConstBuf::cgltf_options opts{};
+			ConstBuf::cgltf_data* data = nullptr;
+
+			if (ConstBuf::cgltf_parse_file(&opts, path, &data) != ConstBuf::cgltf_result_success)
+				return false;
+
+			if (ConstBuf::cgltf_load_buffers(&opts, data, path) != ConstBuf::cgltf_result_success)
+			{
+				ConstBuf::cgltf_free(data);
+				return false;
+			}
+
+			bool added = ReadAnimations(data, false, remapToCurrentSkeleton);
+			ConstBuf::cgltf_free(data);
+			return added;
 		}
 
 		void LoadObj(const char* name)
@@ -141,38 +264,6 @@ namespace Object {
 
 				loaded = true;
 				Log("GLTF model loaded successfully\n");
-
-				ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
-				ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
-				ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 3 Ходьба
-				ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 4 Бег
-				ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 5 Падение
-				ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
-				ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
-				ConstBuf::gltfAnim::LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
-
-				ConstBuf::gltfAnim::scene.animations[0].isPlaying = false;
-
-				ConstBuf::gltfAnim::scene.animations[1].looped = true;
-
-				ConstBuf::gltfAnim::scene.animations[2].speed = 0.0f;
-				ConstBuf::gltfAnim::scene.animations[2].weight = 100000.0f;
-
-				ConstBuf::gltfAnim::scene.animations[3].looped = true;
-
-				ConstBuf::gltfAnim::scene.animations[4].looped = true;
-
-				ConstBuf::gltfAnim::scene.animations[5].looped = true;
-				ConstBuf::gltfAnim::scene.animations[5].speed = 0.1f;
-
-				ConstBuf::gltfAnim::scene.animations[6].speed = 0.0f;
-				ConstBuf::gltfAnim::scene.animations[6].weight = 10000.0f;
-
-				ConstBuf::gltfAnim::scene.animations[7].speed = 0.0f;
-				ConstBuf::gltfAnim::scene.animations[7].weight = 10000000.0f;
-
-				ConstBuf::gltfAnim::scene.animations[8].speed = 0.0f;
-				ConstBuf::gltfAnim::scene.animations[8].weight = 10000.0f;
 			}
 			else
 			{
@@ -515,7 +606,7 @@ namespace Object {
 		psModeSet(mode);
 		float zm = zoom / 100. + 1;
 
-		float4 centerScale = ConstBuf::gltfAnim::scene.modelCenterScale;
+		float4 centerScale = (obj && obj->loaded) ? obj->modelCenterScale : ConstBuf::gltfAnim::scene.modelCenterScale;
 		uint32_t triCnt = (obj && obj->loaded) ? obj->triangleCount : ConstBuf::triangleCount;
 
 		vs::girl = {
