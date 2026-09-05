@@ -56,8 +56,8 @@ namespace Object {
 		::std::vector<ConstBuf::gltfAnim::Joint> joints;
 		::std::vector<ConstBuf::gltfAnim::AnimationClip> animations;
 		::std::vector<XMFLOAT4X4> bindLocal;
-		::std::string modelPath;
-		::std::string animationPath;
+		//::std::string modelPath;
+		//::std::string animationPath;
 		float4 modelCenterScale = float4(0, 0, 0, 0);
 		XMMATRIX bonePalette[BoneLimit];
 
@@ -219,11 +219,239 @@ namespace Object {
 			return added;
 		}
 
+		bool LoadObjToPointersGLTF(const ::std::string& filename, ConstBuf::vertex** outVertices, ConstBuf::index** outIndices)
+		{
+			ConstBuf::cgltf_options options = { 0 };
+			ConstBuf::cgltf_data* data = NULL;
+			ConstBuf::cgltf_result result = cgltf_parse_file(&options, filename.c_str(), &data);
+
+			if (result == ConstBuf::cgltf_result_success)
+			{
+
+				result = cgltf_load_buffers(&options, data, filename.c_str());
+				if (result != ConstBuf::cgltf_result_success) {
+					return false;
+				}
+
+				ConstBuf::gltfAnim::ReadSkeleton(data);
+				ConstBuf::gltfAnim::ReadAnimations(data);
+
+				vertexCount = 0;
+				triangleCount = 0;
+
+				for (size_t i = 0; i < data->meshes_count; ++i) {
+					ConstBuf::cgltf_mesh* mesh = &data->meshes[i];
+
+					for (size_t j = 0; j < mesh->primitives_count; ++j) {
+						ConstBuf::cgltf_primitive* prim = &mesh->primitives[j];
+
+						// Ищем атрибут позиции для подсчета вершин
+						for (size_t k = 0; k < prim->attributes_count; ++k) {
+							if (prim->attributes[k].type == ConstBuf::cgltf_attribute_type_position) {
+								vertexCount += prim->attributes[k].data->count;
+								break;
+							}
+						}
+						// Считаем индексы
+						if (prim->indices) {
+							triangleCount += (uint32_t)(prim->indices->count / 3);
+						}
+						else {
+							for (size_t k = 0; k < prim->attributes_count; ++k) {
+								if (prim->attributes[k].type == ConstBuf::cgltf_attribute_type_position) {
+									triangleCount += (uint32_t)(prim->attributes[k].data->count / 3);
+									break;
+								}
+							}
+						}
+					}
+				}
+
+
+				// 2. Выделение памяти по вашему шаблону
+				if (*outVertices) {
+					delete[] * outVertices;
+					*outVertices = nullptr;
+				}
+				if (*outIndices) {
+					delete[] * outIndices;
+					*outIndices = nullptr;
+				}
+
+				if (vertexCount == 0) return false;
+
+				*outVertices = new ConstBuf::vertex[vertexCount];
+				if (triangleCount > 0) {
+					*outIndices = new ConstBuf::index[triangleCount];
+				}
+
+				// 3. Второй проход: заполнение массивов данные
+
+				size_t vertexOffset = 0;
+				size_t indexOffset = 0;
+
+				for (size_t i = 0; i < data->meshes_count; ++i)
+				{
+					ConstBuf::cgltf_mesh* mesh = &data->meshes[i];
+
+					for (size_t j = 0; j < mesh->primitives_count; ++j) {
+						ConstBuf::cgltf_primitive* prim = &mesh->primitives[j];
+						size_t prim_vertex_count = 0;
+
+
+
+						// --- Чтение вершин (Позиции) ---
+						for (size_t k = 0; k < prim->attributes_count; ++k) {
+							if (prim->attributes[k].type == ConstBuf::cgltf_attribute_type_position) {
+								ConstBuf::cgltf_accessor* acc = prim->attributes[k].data;
+								prim_vertex_count = acc->count;
+
+								for (size_t v = 0; v < prim_vertex_count; ++v) {
+									ConstBuf::gltfAnim::FillSkinDefaults((*outVertices)[vertexOffset + v]);
+									float position_element[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+									// Безопасная функция cgltf сама учитывает stride, offset, sparse данные и тип компонента
+									if (cgltf_accessor_read_float(acc, v, position_element, 4)) {
+										(*outVertices)[vertexOffset + v].position = float4{
+											position_element[0],
+											position_element[1],
+											position_element[2],
+											(float)i
+										};
+									}
+									else {
+										// Если не удалось прочитать, пишем нули во избежание мусора
+										(*outVertices)[vertexOffset + v].position = float4{ 0.0f, 0.0f, 0.0f, 1.0f };
+									}
+								}
+								break;
+							}
+						}
+
+						// --- Skinning data ---
+						for (size_t k = 0; k < prim->attributes_count; ++k) {
+							ConstBuf::cgltf_attribute* attr = &prim->attributes[k];
+							if (attr->type == ConstBuf::cgltf_attribute_type_joints) {
+								ConstBuf::cgltf_accessor* acc = attr->data;
+								for (size_t v = 0; v < acc->count && v < prim_vertex_count; ++v) {
+									ConstBuf::cgltf_uint joints[4] = { 0, 0, 0, 0 };
+									if (cgltf_accessor_read_uint(acc, v, joints, 4)) {
+										XMUINT4 mapped(0, 0, 0, 0);
+										for (int c = 0; c < 4; ++c) {
+											uint32_t jointIndex = joints[c];
+											if (data->skins_count > 0 && jointIndex < data->skins[0].joints_count) {
+												jointIndex = ConstBuf::gltfAnim::NodeIndex(data, data->skins[0].joints[jointIndex]);
+											}
+											if (c == 0) mapped.x = jointIndex; else if (c == 1) mapped.y = jointIndex; else if (c == 2) mapped.z = jointIndex; else mapped.w = jointIndex;
+										}
+										(*outVertices)[vertexOffset + v].joints = mapped;
+									}
+								}
+							}
+							else if (attr->type == ConstBuf::cgltf_attribute_type_weights) {
+								ConstBuf::cgltf_accessor* acc = attr->data;
+								for (size_t v = 0; v < acc->count && v < prim_vertex_count; ++v) {
+									float weights[4] = { 1.0f, 0.0f, 0.0f, 0.0f };
+									if (ConstBuf::cgltf_accessor_read_float(acc, v, weights, 4)) {
+										float sum = weights[0] + weights[1] + weights[2] + weights[3];
+										if (sum > 0.000001f) {
+											weights[0] /= sum;
+											weights[1] /= sum;
+											weights[2] /= sum;
+											weights[3] /= sum;
+										}
+										(*outVertices)[vertexOffset + v].weights = XMFLOAT4(weights[0], weights[1], weights[2], weights[3]);
+									}
+								}
+							}
+						}
+						// --- Чтение индексов ---
+						if (prim->indices) {
+							ConstBuf::cgltf_accessor* acc = prim->indices;
+							char* buffer_base = (char*)acc->buffer_view->buffer->data;
+							size_t total_offset = acc->buffer_view->offset + acc->offset;
+							void* index_ptr = (void*)(buffer_base + total_offset);
+
+							size_t stride = acc->buffer_view->stride;
+
+							for (size_t idx = 0; idx < acc->count; ++idx) {
+								uint32_t raw_index = 0;
+
+								// Определение типа индекса (16-бит или 32-бит)
+								if (acc->component_type == ConstBuf::cgltf_component_type_r_16u) {
+									size_t current_stride = stride ? stride : sizeof(uint16_t);
+									raw_index = *(uint16_t*)((char*)index_ptr + idx * current_stride);
+								}
+								else if (acc->component_type == ConstBuf::cgltf_component_type_r_32u) {
+									size_t current_stride = stride ? stride : sizeof(uint32_t);
+									raw_index = *(uint32_t*)((char*)index_ptr + idx * current_stride);
+								}
+								else if (acc->component_type == ConstBuf::cgltf_component_type_r_8u) {
+									size_t current_stride = stride ? stride : sizeof(uint8_t);
+									raw_index = *(uint8_t*)((char*)index_ptr + idx * current_stride);
+								}
+
+								// Смещение индекса с учетом уже добавленных вершин из прошлых примитивов
+								uint32_t final_index = raw_index + (uint32_t)vertexOffset;
+
+								// Запись в вашу структуру float4 (как указано в ТЗ)
+								if (idx % 3 == 0) (*outIndices)[indexOffset / 3 + idx / 3].index.x = (float)final_index;
+								if (idx % 3 == 1) (*outIndices)[indexOffset / 3 + idx / 3].index.y = (float)final_index;
+								if (idx % 3 == 2) (*outIndices)[indexOffset / 3 + idx / 3].index.z = (float)final_index;
+								(*outIndices)[indexOffset / 3 + idx / 3].index.w = 0;
+							}
+							indexOffset += acc->count;
+						}
+						else if (prim_vertex_count >= 3) {
+							for (size_t tri = 0; tri < prim_vertex_count / 3; ++tri) {
+								(*outIndices)[indexOffset / 3 + tri].index = float4{
+									(float)(vertexOffset + tri * 3 + 0),
+									(float)(vertexOffset + tri * 3 + 1),
+									(float)(vertexOffset + tri * 3 + 2),
+									0.0f
+								};
+							}
+							indexOffset += (prim_vertex_count / 3) * 3;
+						}
+
+						// Сдвигаем глобальный офсет вершин для следующего примитива
+						vertexOffset += prim_vertex_count;
+
+					}
+				}
+
+
+
+				ConstBuf::cgltf_free(data);
+			}
+			else {
+				switch (result) {
+				case ConstBuf::cgltf_result_file_not_found:
+					Log("cgltf error: file not found: %s\n", filename.c_str());
+					break;
+				case ConstBuf::cgltf_result_io_error:
+					Log("cgltf error: IO error reading: %s\n", filename.c_str());
+					break;
+				case ConstBuf::cgltf_result_invalid_json:
+					Log("cgltf error: invalid JSON in: %s\n", filename.c_str());
+					break;
+				case ConstBuf::cgltf_result_invalid_gltf:
+					Log("cgltf error: invalid glTF in: %s\n", filename.c_str());
+					break;
+				default:
+					Log("cgltf error: unknown error %d for: %s\n", filename.c_str());
+					break;
+				}
+			}
+
+			return result == ConstBuf::cgltf_result_success && vertexCount > 0 && triangleCount > 0;
+		}
+
 		void LoadObj(const char* name)
 		{
 			if (loaded) return;
 
-			if (ConstBuf::LoadObjToPointersGLTF(name, &vArray, &iArray, vertexCount, triangleCount))
+			if (LoadObjToPointersGLTF(name, &vArray, &iArray))
 			{
 				ConstBuf::gltfAnim::scene.modelPath = name ? name : "";
 				ConstBuf::gltfAnim::scene.animationPath.clear();
