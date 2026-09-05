@@ -825,6 +825,42 @@ namespace Object {
 			BindSB(1);
 		}
 
+		inline void SetLookAtYaw(float yaw)
+		{
+			ConstBuf::gltfAnim::lookAtConfig.Resolve(joints);
+
+			lookYawTarget =
+				std::clamp(
+					yaw,
+					-ConstBuf::gltfAnim::lookAtConfig.maxYaw,
+					ConstBuf::gltfAnim::lookAtConfig.maxYaw);
+		}
+
+		inline void SetLookAtPitch(float pitch)
+		{
+			ConstBuf::gltfAnim::lookAtConfig.Resolve(joints);
+
+			lookPitchTarget =
+				std::clamp(
+					pitch,
+					-ConstBuf::gltfAnim::lookAtConfig.maxPitch,
+					ConstBuf::gltfAnim::lookAtConfig.maxPitch);
+		}
+
+		inline void SetLookAtEnabled(bool enabled)
+		{
+			lookAtEnabled = enabled;
+		}
+
+		inline void ResetLookAtPose()
+		{
+			lookYawTarget = 0.0f;
+			lookYawCurrent = 0.0f;
+
+			lookPitchTarget = 0.0f;
+			lookPitchCurrent = 0.0f;
+		}
+
 		inline void ApplyLookAtRotation(float deltaTime)
 		{
 			if (!lookAtEnabled || joints.empty())

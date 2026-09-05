@@ -151,7 +151,7 @@ struct inputController_ {
 				skeletonYaw = atan2f(
 					sinf(yaw - yawInner),
 					cosf(yaw - yawInner));
-				ConstBuf::gltfAnim::SetLookAtEnabled(true);
+				mesh->SetLookAtEnabled(true);
 
 				heroRotateAngleAnim = 0;
 
@@ -195,9 +195,9 @@ struct inputController_ {
 				}
 			}
 
-			ConstBuf::gltfAnim::SetLookAtYaw(skeletonYaw);
-			ConstBuf::gltfAnim::SetLookAtPitch(pitch);
-			ConstBuf::gltfAnim::SetLookAtEnabled(true);
+			mesh->SetLookAtYaw(skeletonYaw);
+			mesh->SetLookAtPitch(pitch);
+			mesh->SetLookAtEnabled(true);
 
 			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, lastTargetA);
 
