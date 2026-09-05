@@ -2476,7 +2476,7 @@ namespace Loop
 			ConstBuf::LoadObj("..//fx//projectFiles//A-Pose.glb");
 			Object::MeshPtr = nullptr;
 
-			//hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
+			hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
 
 			sceneInitialized = true;
 			}
