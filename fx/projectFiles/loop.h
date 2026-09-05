@@ -132,8 +132,6 @@ struct inputController_ {
 				turnLookStart = mouseDiff;
 				turnLookTarget = turnLookStart;
 
-				clip.speed = 0.0f;
-				clip.weight = 1000.0f;
 				mesh->PlayAnimation(7, 0);
 
 				if (mouseDiff < 0)
@@ -201,15 +199,9 @@ struct inputController_ {
 			ConstBuf::gltfAnim::SetLookAtPitch(pitch);
 			ConstBuf::gltfAnim::SetLookAtEnabled(true);
 
-			XMMATRIX reverseRot =
-				XMMatrixRotationAxis(
-					HeroRealUp,
-					lastTargetA);
+			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, lastTargetA);
 
-			XMMATRIX result =
-				XMMatrixMultiply(
-					rowMajorRot,
-					reverseRot);
+			XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
 
 			return result;
 		}
