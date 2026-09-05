@@ -2485,39 +2485,39 @@ namespace Loop
 			if (!heroAnimsLoaded) {
 				heroAnimsLoaded = true;
 
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 0 Бездействие
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 1 Присяд
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 2 Ходьба
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 3 Бег
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 4 Падение
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 5 Торможение
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 6 Разворот через правое плечо
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 7 Скольжение
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 3 Ходьба
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 4 Бег
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 5 Падение
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
 
-				//hero.mesh->animations[0].isPlaying = false;
+				hero.mesh->animations[0].isPlaying = false;
 
-				hero.mesh->animations[0].looped = true;
+				hero.mesh->animations[1].looped = true;
 
-				hero.mesh->animations[1].speed = 0.0f;
-				hero.mesh->animations[1].weight = 100000.0f;
-
-				hero.mesh->animations[2].looped = true;
+				hero.mesh->animations[2].speed = 0.0f;
+				hero.mesh->animations[2].weight = 100000.0f;
 
 				hero.mesh->animations[3].looped = true;
 
 				hero.mesh->animations[4].looped = true;
-				hero.mesh->animations[4].speed = 0.1f;
 
-				hero.mesh->animations[5].speed = 0.0f;
-				hero.mesh->animations[5].weight = 10000.0f;
+				hero.mesh->animations[5].looped = true;
+				hero.mesh->animations[5].speed = 0.1f;
 
 				hero.mesh->animations[6].speed = 0.0f;
-				hero.mesh->animations[6].weight = 10000000.0f;
+				hero.mesh->animations[6].weight = 10000.0f;
 
 				hero.mesh->animations[7].speed = 0.0f;
-				hero.mesh->animations[7].weight = 10000.0f;
+				hero.mesh->animations[7].weight = 10000000.0f;
 
-				Log(std::to_string(ConstBuf::gltfAnim::scene.animations.size()).c_str());
+				hero.mesh->animations[8].speed = 0.0f;
+				hero.mesh->animations[8].weight = 10000.0f;
+
+				Log(std::to_string(hero.mesh->animations.size()).c_str());
 				Log("\n");
 			}
 

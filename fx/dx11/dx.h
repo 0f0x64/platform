@@ -31,6 +31,15 @@ namespace dx11
 			#endif	
 		}
 
+		void Log(std::string message, const char* title = NULL)
+		{
+			#if EditMode
+				OutputDebugString(message.c_str());
+			#else	
+				MessageBox(hWnd, message, title, MB_OK);
+			#endif	
+		}
+
 		#define LogIfError(text)  if (FAILED(hr)) { Log(text); return; } 
 		#define LogBlobIfError if (FAILED(hr)) { char title[10];_itoa(n,title,10); Log((char*)pErrorBlob->GetBufferPointer(), title); }
 

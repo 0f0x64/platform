@@ -413,6 +413,8 @@ namespace Audio
 		file.read((char*)sound.data.data(), waveDataHeader.subChunkSize);
 
 		file.close();
+
+		Log("Wav file " + name + " loaded successfully\n");
 	};
 
 	void LoadOggFile(const std::string& name, const char* filename) {
@@ -502,5 +504,7 @@ namespace Audio
 		sound.format.nBlockAlign = numChannels * bitsPerSample / 8;
 		sound.format.nAvgBytesPerSec = sampleRate * sound.format.nBlockAlign;
 		sound.format.cbSize = 0;
+
+		Log("Ogg file " + name + " loaded successfully\n");
 	};
 }
