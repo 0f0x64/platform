@@ -2348,13 +2348,14 @@ namespace Loop
 			dx11::Audio::Play("Music", true, 0.5f);
 		}
 
+
 		cmdCounter = precalcOfs;
 		frameConst();
 		
-			
 			//
 
 			Object::initPatches(hero.pathControl.Time);
+
 
 			if (GetActiveWindow() == hWnd && gameCam)
 			{
