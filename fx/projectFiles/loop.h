@@ -2297,6 +2297,8 @@ namespace Loop
 		gameCamera.rotInertion = in.rotInertion / denom;
 	}
 
+	Object::mesh* testSphere = new Object::mesh;
+
 	void scene3()
 	{
 		SetHeroParams({
@@ -2515,10 +2517,9 @@ namespace Loop
 
 				hero.mesh->animations[8].speed = 0.0f;
 				hero.mesh->animations[8].weight = 10000.0f;
-
-				Log(std::to_string(hero.mesh->animations.size()).c_str());
-				Log("\n");
 			}
+
+			testSphere->LoadObj("..//fx//projectFiles//Sphere.glb");
 
 			sceneInitialized = true;
 			}
@@ -2528,6 +2529,22 @@ namespace Loop
 
 			Object::Mesh({
 					.obj = hero.mesh,
+					.quality = 1,
+					.xPos = (int)(p.x),
+					.yPos = (int)(p.y),
+					.zPos = (int)(p.z),
+					.brightness = 9,
+					.tickness = 4,
+					.stencil = switcher::on,
+					.zoom = -75,
+					.onLineOfs = (int)hero.yOffset,
+					.jumpCharge = 100
+				});
+
+			p = V2F((hero.pos + XMVectorSet(0, 1, 0, 0)) * 10000.);
+
+			Object::Mesh({
+					.obj = testSphere,
 					.quality = 1,
 					.xPos = (int)(p.x),
 					.yPos = (int)(p.y),
