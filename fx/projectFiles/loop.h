@@ -2466,18 +2466,11 @@ namespace Loop
 
 			RenderTarget::Set({ texture::pBuf,0 });
 
-			//
-			//Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
-			//Object::MeshPtr = &Object::HeroMesh;
-
-			//ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
-			//Object::MeshPtr = nullptr;
 
 			// --- «¿√–”« ¿ ÃŒƒ≈À» --- //
 			static bool sceneInitialized = false;
 			if (!sceneInitialized)
 			{
-			//ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
 			ConstBuf::LoadObj("..//fx//projectFiles//A-Pose.glb");
 			Object::MeshPtr = nullptr;
 

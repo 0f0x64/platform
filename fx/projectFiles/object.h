@@ -48,6 +48,144 @@ float4 cross(const float4& a, const float4& b) {
 
 namespace Object {
 
+	struct mesh {
+		bool loaded = false;
+
+		ID3D11Buffer* pSBuffer[2];
+		ID3D11ShaderResourceView* pSB_SRV[2];
+
+		void CreateSB(int slot, int size, int count, auto& data)
+		{
+
+			if (pSBuffer[slot]) { pSBuffer[slot]->Release(); pSBuffer[slot] = nullptr; }
+			if (pSB_SRV[slot]) { pSB_SRV[slot]->Release(); pSB_SRV[slot] = nullptr; }
+
+
+			D3D11_SUBRESOURCE_DATA initData = {};
+			initData.pSysMem = data;
+
+			D3D11_BUFFER_DESC bufferDesc = {};
+			bufferDesc.ByteWidth = size * count;
+			bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+			bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE; // Для чтения в шейдере
+			bufferDesc.CPUAccessFlags = 0;
+			bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+			bufferDesc.StructureByteStride = size; // Обязательно для Structured Buffer
+
+			HRESULT hr = device->CreateBuffer(&bufferDesc, &initData, &pSBuffer[slot]);
+
+			// 2. Создаем Shader Resource View (SRV)
+			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+			srvDesc.Format = DXGI_FORMAT_UNKNOWN; // Всегда UNKNOWN для Structured Buffer
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+			srvDesc.Buffer.FirstElement = 0;
+			srvDesc.Buffer.NumElements = count;
+
+			HRESULT hr2 = device->CreateShaderResourceView(pSBuffer[slot], &srvDesc, &pSB_SRV[slot]);
+		}
+
+		void BindSB(int slot)
+		{
+			context->VSSetShaderResources(slot, 1, &pSB_SRV[slot]);
+		}
+
+		void LoadObj(const char* name)
+		{
+			if (loaded) return;
+
+			ConstBuf::vertex* vArray;
+			ConstBuf::index* iArray;
+
+			uint32_t vertexCount = 0;
+			uint32_t triangleCount = 0;
+
+			if (ConstBuf::LoadObjToPointersGLTF(name, &vArray, &iArray, vertexCount, triangleCount))
+			{
+				ConstBuf::gltfAnim::scene.modelPath = name ? name : "";
+				ConstBuf::gltfAnim::scene.animationPath.clear();
+				ConstBuf::gltfAnim::scene.status = "Model loaded";
+				if (vertexCount > 0)
+				{
+					float xMax = vArray[0].position.x;
+					float xMin = vArray[0].position.x;
+					float yMax = vArray[0].position.y;
+					float yMin = vArray[0].position.y;
+					float zMax = vArray[0].position.z;
+					float zMin = vArray[0].position.z;
+
+					for (int i = 1; i < vertexCount; i++)
+					{
+						xMax = max(xMax, vArray[i].position.x);
+						xMin = min(xMin, vArray[i].position.x);
+						yMax = max(yMax, vArray[i].position.y);
+						yMin = min(yMin, vArray[i].position.y);
+						zMax = max(zMax, vArray[i].position.z);
+						zMin = min(zMin, vArray[i].position.z);
+					}
+
+					float xCenter = (xMax + xMin) / 2.0f;
+					float yCenter = (yMax + yMin) / 2.0f;
+					float zCenter = (zMax + zMin) / 2.0f;
+					float xSize = xMax - xMin;
+					float ySize = yMax - yMin;
+					float zSize = zMax - zMin;
+					float maxSize = max(max(xSize, ySize), zSize);
+					float scale = maxSize > 0.00001f ? (4.0f / maxSize) : 1.0f;
+
+					ConstBuf::gltfAnim::scene.modelCenterScale = float4(xCenter, yCenter, zCenter, scale);
+				}
+
+				CreateSB(0, sizeof(ConstBuf::vertex), vertexCount, vArray);
+				CreateSB(1, sizeof(ConstBuf::index), triangleCount, iArray);
+
+				loaded = true;
+				Log("GLTF model loaded successfully\n");
+
+				//gltfAnim::LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
+				//gltfAnim::LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
+				//gltfAnim::LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 3 Ходьба
+				//gltfAnim::LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 4 Бег
+				//gltfAnim::LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 5 Падение
+				//gltfAnim::LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
+				//gltfAnim::LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
+				//gltfAnim::LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
+
+				//gltfAnim::scene.animations[0].isPlaying = false;
+
+				//gltfAnim::scene.animations[1].looped = true;
+
+				//gltfAnim::scene.animations[2].speed = 0.0f;
+				//gltfAnim::scene.animations[2].weight = 100000.0f;
+
+				//gltfAnim::scene.animations[3].looped = true;
+
+				//gltfAnim::scene.animations[4].looped = true;
+
+				//gltfAnim::scene.animations[5].looped = true;
+				//gltfAnim::scene.animations[5].speed = 0.1f;
+
+				//gltfAnim::scene.animations[6].speed = 0.0f;
+				//gltfAnim::scene.animations[6].weight = 10000.0f;
+
+				//gltfAnim::scene.animations[7].speed = 0.0f;
+				//gltfAnim::scene.animations[7].weight = 10000000.0f;
+
+				//gltfAnim::scene.animations[8].speed = 0.0f;
+				//gltfAnim::scene.animations[8].weight = 10000.0f;
+			}
+			else
+			{
+				ConstBuf::gltfAnim::scene.status = "Model load failed";
+				Log("GLTF model load failed\n");
+			}
+		}
+
+		void LoadToShaders() {
+			BindSB(0);
+			BindSB(1);
+		}
+	};
+
 	cmd(Show, 
 		texture geometry,
 		texture normals,
