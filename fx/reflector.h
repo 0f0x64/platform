@@ -236,7 +236,7 @@ void ConstBufReflector(string shaderName, string inPath, ofstream& ofile, sType 
 				samplersCounter++;
 			}
 
-			std:string cbText;
+			std::string cbText;
 
 			res = s.find(cb);
 			if (found)

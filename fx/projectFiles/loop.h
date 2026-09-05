@@ -92,7 +92,8 @@ struct inputController_ {
 			XMMATRIX rowMajorRot,
 			XMVECTOR HeroRealUp,
 			float deltaTime,
-			float heroChangeDirSpeed)
+			float heroChangeDirSpeed,
+			Object::mesh* mesh)
 		{
 			static bool animStarted = false;
 			static float yawInner = yaw;
@@ -118,7 +119,7 @@ struct inputController_ {
 			const float turnThreshold = XMConvertToRadians(110.0f);
 			const int frames = 30;
 
-			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[7];
+			ConstBuf::gltfAnim::AnimationClip& clip = mesh->animations[7];
 
 			if (fabs(mouseDiff) > turnThreshold && !animStarted)
 			{
@@ -131,9 +132,7 @@ struct inputController_ {
 				turnLookStart = mouseDiff;
 				turnLookTarget = turnLookStart;
 
-				clip.speed = 0.0f;
-				clip.weight = 1000.0f;
-				ConstBuf::gltfAnim::PlayAnimation(7, 0);
+				mesh->PlayAnimation(7, 0);
 
 				if (mouseDiff < 0)
 					Log("right\n");
@@ -152,11 +151,11 @@ struct inputController_ {
 				skeletonYaw = atan2f(
 					sinf(yaw - yawInner),
 					cosf(yaw - yawInner));
-				ConstBuf::gltfAnim::SetLookAtEnabled(true);
+				mesh->SetLookAtEnabled(true);
 
 				heroRotateAngleAnim = 0;
 
-				ConstBuf::gltfAnim::StopAnimation(7, 0);
+				mesh->StopAnimation(7, 0);
 			}
 
 			if (animStarted)
@@ -192,23 +191,17 @@ struct inputController_ {
 					skeletonYaw = atan2f(
 						sinf(yaw - yawInner),
 						cosf(yaw - yawInner));
-					ConstBuf::gltfAnim::StopAnimation(7, 0);
+					mesh->StopAnimation(7, 0);
 				}
 			}
 
-			ConstBuf::gltfAnim::SetLookAtYaw(skeletonYaw);
-			ConstBuf::gltfAnim::SetLookAtPitch(pitch);
-			ConstBuf::gltfAnim::SetLookAtEnabled(true);
+			mesh->SetLookAtYaw(skeletonYaw);
+			mesh->SetLookAtPitch(pitch);
+			mesh->SetLookAtEnabled(true);
 
-			XMMATRIX reverseRot =
-				XMMatrixRotationAxis(
-					HeroRealUp,
-					lastTargetA);
+			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, lastTargetA);
 
-			XMMATRIX result =
-				XMMatrixMultiply(
-					rowMajorRot,
-					reverseRot);
+			XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
 
 			return result;
 		}
@@ -252,6 +245,8 @@ inputController_ inputController;
 bool cameraFirstFrame = true;
 
 struct hero_ {
+
+	Object::mesh* mesh = new Object::mesh;
 
 	XMVECTOR pos = { 0.0f, 0.0f, 0.0f, 1.0f };
 	XMVECTOR posOnLine = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -586,15 +581,15 @@ struct hero_ {
 
 		if (gravity.mode)
 		{
-			ConstBuf::gltfAnim::PlayAnimation(5);
+			mesh->PlayAnimation(5);
 			landingTimer = 0;
 		}
 		else {
-			if (ConstBuf::gltfAnim::scene.animations[5].isPlaying) {
+			if (mesh->animations[5].isPlaying) {
 				dx11::Audio::Play("Landing");
 			}
 
-			ConstBuf::gltfAnim::StopAnimation(5);
+			mesh->StopAnimation(5);
 		}
 
 		float landindDur = .5;
@@ -610,15 +605,15 @@ struct hero_ {
 		}
 
 		//if (!gravity.mode && jumpChargeProgress != 1.0f) {
-			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[2];
+			ConstBuf::gltfAnim::AnimationClip& clip = mesh->animations[2];
 
 			clip.currentTime = (1 - jumpChargeProgress) * clip.duration;
 
 			if (jumpChargeProgress != 1.0f) {
-				ConstBuf::gltfAnim::PlayAnimation(2);
+				mesh->PlayAnimation(2);
 			}
 			else {
-				ConstBuf::gltfAnim::StopAnimation(2);
+				mesh->StopAnimation(2);
 			}
 		//}
 	}
@@ -780,9 +775,9 @@ struct hero_ {
 	void ProcessMove(float deltaTime)
 	{
 		if (jump || gravity.mode) {
-			ConstBuf::gltfAnim::StopAnimation(3);
-			ConstBuf::gltfAnim::StopAnimation(4);
-			ConstBuf::gltfAnim::StopAnimation(1);
+			mesh->StopAnimation(3);
+			mesh->StopAnimation(4);
+			mesh->StopAnimation(1);
 
 			return;
 		}
@@ -802,12 +797,12 @@ struct hero_ {
 					brakingSound = true;
 					dx11::Audio::Play("Braking", false, 0.5f);
 				}
-				ConstBuf::gltfAnim::PlayAnimation(6);
+				mesh->PlayAnimation(6);
 			}
 			else {
 				speed += accel * sign(speedFactor) * deltaTime;
 
-				ConstBuf::gltfAnim::StopAnimation(6);
+				mesh->StopAnimation(6);
 			}
 
 			pressingMove = true;
@@ -824,12 +819,12 @@ struct hero_ {
 					brakingSound = true;
 					dx11::Audio::Play("Braking", false, 0.5f);
 				}
-				ConstBuf::gltfAnim::PlayAnimation(6);
+				mesh->PlayAnimation(6);
 			}
 			else {
 				speed -= accel * sign(speedFactor) * deltaTime;
 
-				ConstBuf::gltfAnim::StopAnimation(6);
+				mesh->StopAnimation(6);
 			}
 
 			pressingMove = true;
@@ -839,7 +834,7 @@ struct hero_ {
 		if (!pressingMove && !gravity.mode)
 		{
 			brakingSound = false;
-			ConstBuf::gltfAnim::StopAnimation(6);
+			mesh->StopAnimation(6);
 
 			float newSpeed = speed - accel * sign(speed) * deltaTime;
 			if (sign(speed) == sign(newSpeed)) {
@@ -854,20 +849,20 @@ struct hero_ {
 			if (absSpeed < 0.001f) speed = 0.0f;
 
 			if (absSpeed > 0.1f) {
-				ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[8];
+				ConstBuf::gltfAnim::AnimationClip& clip = mesh->animations[8];
 
 				clip.currentTime = (1 - absSpeed / maxSpeed) * clip.duration;
 
-				ConstBuf::gltfAnim::PlayAnimation(8);
+				mesh->PlayAnimation(8);
 			}
 			else {
-				ConstBuf::gltfAnim::StopAnimation(8);
+				mesh->StopAnimation(8);
 			}
 		}
 		else {
-			ConstBuf::gltfAnim::StopAnimation(8);
+			mesh->StopAnimation(8);
 
-			ConstBuf::gltfAnim::AnimationClip& clip = ConstBuf::gltfAnim::scene.animations[6];
+			ConstBuf::gltfAnim::AnimationClip& clip = mesh->animations[6];
 			clip.currentTime = (1 - fabsf(speed) / maxSpeed) * clip.duration;
 		}
 
@@ -875,7 +870,7 @@ struct hero_ {
 		speed = clamp(speed, -maxSpeed, maxSpeed);
 		float absSpeed = fabsf(speed);
 
-		if (ConstBuf::gltfAnim::scene.animations[8].isPlaying || ConstBuf::gltfAnim::scene.animations[2].isPlaying) {
+		if (mesh->animations[8].isPlaying || mesh->animations[2].isPlaying) {
 			dx11::Audio::SetVolume(glideVoice, absSpeed / maxSpeed);
 		}
 		else {
@@ -886,31 +881,31 @@ struct hero_ {
 		// Логика включения анимаций ходьбы и бега
 		if (pressingMove && absSpeed > 0.1f) {
 			float weight = min(max(absSpeed - 5.0f, 0.0f) / 12.0f, 1.0f);
-			ConstBuf::gltfAnim::scene.animations[4].weight = weight;
-			ConstBuf::gltfAnim::scene.animations[3].weight = 1 - weight;
+			mesh->animations[4].weight = weight;
+			mesh->animations[3].weight = 1 - weight;
 
 			float animSpeed = pow(absSpeed / 12.0f, 0.25f);
-			ConstBuf::gltfAnim::scene.animations[4].speed = animSpeed;
-			ConstBuf::gltfAnim::scene.animations[3].speed = animSpeed;
+			mesh->animations[4].speed = animSpeed;
+			mesh->animations[3].speed = animSpeed;
 
-			ConstBuf::gltfAnim::PlayAnimation(3);
-			ConstBuf::gltfAnim::PlayAnimation(4);
+			mesh->PlayAnimation(3);
+			mesh->PlayAnimation(4);
 
-			ConstBuf::gltfAnim::StopAnimation(1);
+			mesh->StopAnimation(1);
 
 			stepTime += deltaTime;
 			if (stepTime > 0.37f / animSpeed) {
 				stepTime = 0.0f;
-				if (!ConstBuf::gltfAnim::scene.animations[2].isPlaying) {
+				if (!mesh->animations[2].isPlaying) {
 					dx11::Audio::Play("Step", false, 0.5f);
 				}
 			}
 		}
 		else {
-			ConstBuf::gltfAnim::StopAnimation(3);
-			ConstBuf::gltfAnim::StopAnimation(4);
+			mesh->StopAnimation(3);
+			mesh->StopAnimation(4);
 
-			ConstBuf::gltfAnim::PlayAnimation(1);
+			mesh->PlayAnimation(1);
 
 			stepTime = 0.0f;
 		}
@@ -1055,7 +1050,7 @@ struct hero_ {
 
 		//----------------
 
-		Object::heroWorld = inputController.mouse.getLookMatrix(finalAirRot, upVector, deltaTime, changeDirSpeed);
+		Object::heroWorld = inputController.mouse.getLookMatrix(finalAirRot, upVector, deltaTime, changeDirSpeed, mesh);
 		axisAngle = lerp(axisAngle, 0, blendStep);
 		axisAngleSpeed = lerp(axisAngleSpeed, 0, blendStep);
 		//hero.axisAngle = 0;
@@ -1140,7 +1135,7 @@ struct hero_ {
 		pos = XMVectorLerp(pCurrent, pNext, t);
 
 		Object::heroOnRails = getHeroOnRailsMatrix(heroForward, HeroRealUp, HeroRight);
-		Object::heroWorld = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime, changeDirSpeed);
+		Object::heroWorld = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime, changeDirSpeed, mesh);
 	}
 
 	struct {
@@ -2294,6 +2289,8 @@ namespace Loop
 		gameCamera.rotInertion = in.rotInertion / denom;
 	}
 
+	Object::mesh* testSphere = new Object::mesh;
+
 	void scene3()
 	{
 		SetHeroParams({
@@ -2345,13 +2342,14 @@ namespace Loop
 			dx11::Audio::Play("Music", true, 0.5f);
 		}
 
+
 		cmdCounter = precalcOfs;
 		frameConst();
 		
-			
 			//
 
 			Object::initPatches(hero.pathControl.Time);
+
 
 			if (GetActiveWindow() == hWnd && gameCam)
 			{
@@ -2466,20 +2464,54 @@ namespace Loop
 
 			RenderTarget::Set({ texture::pBuf,0 });
 
-			//
-			//Object::HeroMesh.Load("..//fx//projectFiles//hero.obj");
-			//Object::MeshPtr = &Object::HeroMesh;
-
-			//ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
-			//Object::MeshPtr = nullptr;
 
 			// --- ЗАГРУЗКА МОДЕЛИ --- //
 			static bool sceneInitialized = false;
 			if (!sceneInitialized)
 			{
-			//ConstBuf::LoadObj("..//fx//projectFiles//Landing_Misha.glb");
-			ConstBuf::LoadObj("..//fx//projectFiles//A-Pose.glb");
-			Object::MeshPtr = nullptr;
+			//ConstBuf::LoadObj("..//fx//projectFiles//A-Pose.glb");
+			//Object::MeshPtr = nullptr;
+
+			hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
+
+			static bool heroAnimsLoaded = false;
+			if (!heroAnimsLoaded) {
+				heroAnimsLoaded = true;
+
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 3 Ходьба
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 4 Бег
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 5 Падение
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
+
+				hero.mesh->animations[0].isPlaying = false;
+
+				hero.mesh->animations[1].looped = true;
+
+				hero.mesh->animations[2].speed = 0.0f;
+				hero.mesh->animations[2].weight = 100000.0f;
+
+				hero.mesh->animations[3].looped = true;
+
+				hero.mesh->animations[4].looped = true;
+
+				hero.mesh->animations[5].looped = true;
+				hero.mesh->animations[5].speed = 0.1f;
+
+				hero.mesh->animations[6].speed = 0.0f;
+				hero.mesh->animations[6].weight = 10000.0f;
+
+				hero.mesh->animations[7].speed = 0.0f;
+				hero.mesh->animations[7].weight = 10000000.0f;
+
+				hero.mesh->animations[8].speed = 0.0f;
+				hero.mesh->animations[8].weight = 10000.0f;
+			}
+
+			testSphere->LoadObj("..//fx//projectFiles//Sphere.glb");
 
 			sceneInitialized = true;
 			}
@@ -2488,6 +2520,23 @@ namespace Loop
 			float4 p = V2F(hero.pos * 10000.);
 
 			Object::Mesh({
+					.obj = hero.mesh,
+					.quality = 1,
+					.xPos = (int)(p.x),
+					.yPos = (int)(p.y),
+					.zPos = (int)(p.z),
+					.brightness = 9,
+					.tickness = 4,
+					.stencil = switcher::on,
+					.zoom = -75,
+					.onLineOfs = (int)hero.yOffset,
+					.jumpCharge = 100
+				});
+
+			p = V2F((hero.pos + XMVectorSet(0, 1, 0, 0)) * 10000.);
+
+			Object::Mesh({
+					.obj = testSphere,
 					.quality = 1,
 					.xPos = (int)(p.x),
 					.yPos = (int)(p.y),
