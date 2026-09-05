@@ -51,8 +51,14 @@ namespace Object {
 	struct mesh {
 		bool loaded = false;
 
-		ID3D11Buffer* pSBuffer[2];
-		ID3D11ShaderResourceView* pSB_SRV[2];
+		ConstBuf::vertex* vArray = nullptr;
+		ConstBuf::index* iArray = nullptr;
+
+		uint32_t vertexCount = 0;
+		uint32_t triangleCount = 0;
+
+		ID3D11Buffer* pSBuffer[2] = { nullptr, nullptr };
+		ID3D11ShaderResourceView* pSB_SRV[2] = { nullptr, nullptr };
 
 		void CreateSB(int slot, int size, int count, auto& data)
 		{
@@ -92,12 +98,6 @@ namespace Object {
 		void LoadObj(const char* name)
 		{
 			if (loaded) return;
-
-			ConstBuf::vertex* vArray;
-			ConstBuf::index* iArray;
-
-			uint32_t vertexCount = 0;
-			uint32_t triangleCount = 0;
 
 			if (ConstBuf::LoadObjToPointersGLTF(name, &vArray, &iArray, vertexCount, triangleCount))
 			{
@@ -501,10 +501,11 @@ namespace Object {
 	dx11::ConstBuf::sbObject HeroMesh;
 	dx11::ConstBuf::sbObject BossMesh;
 	dx11::ConstBuf::sbObject* MeshPtr = NULL;
+
 	XMMATRIX heroOnRails;
 	XMMATRIX heroWorld;
 
-	void ShowMesh(dx11::ConstBuf::sbObject* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom, int onLineOfs, int jumpCharge)
+	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom, int onLineOfs, int jumpCharge)
 	{
 
 		int gX = sqrt(count / skipper);
@@ -514,7 +515,7 @@ namespace Object {
 		float zm = zoom / 100. + 1;
 
 		float4 centerScale = ConstBuf::gltfAnim::scene.modelCenterScale;
-		uint32_t triCnt = obj ? obj->triangleCount : ConstBuf::triangleCount;
+		uint32_t triCnt = (obj && obj->loaded) ? obj->triangleCount : ConstBuf::triangleCount;
 
 		vs::girl = {
 			.params =
@@ -546,9 +547,8 @@ namespace Object {
 		dx11::ConstBuf::gltfAnim::Update(1.0f / FRAMES_PER_SECOND);
 		dx11::ConstBuf::gltfAnim::BindBones(dx11::context);
 
-		if (obj) {
-			obj->BindSB(0);
-			obj->BindSB(1);
+		if (obj && obj->loaded) {
+			obj->LoadToShaders();
 		}
 		else {
 			ConstBuf::BindSB(0);
@@ -570,7 +570,7 @@ namespace Object {
 		
 	}
 
-	cmd(Mesh, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs, int jumpCharge)
+	cmd(Mesh, mesh* obj, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs, int jumpCharge)
 	{
 		reflect;
 
@@ -585,8 +585,8 @@ namespace Object {
 		Culling::Set({ cullmode::off });
 		if (in.stencil == switcher::on)
 		{
-			uint32_t triCnt = MeshPtr ? MeshPtr->triangleCount : ConstBuf::triangleCount;
-			ShowMesh(MeshPtr, (int)triCnt,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs, in.jumpCharge);
+			uint32_t triCnt = (in.obj && in.obj->loaded) ? in.obj->triangleCount : ConstBuf::triangleCount;
+			ShowMesh(in.obj, (int)triCnt,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs, in.jumpCharge);
 		}
 
 		Culling::Set({ cullmode::off });
@@ -596,7 +596,7 @@ namespace Object {
 			.op = blendop::add
 			});
 
-		ShowMesh(MeshPtr, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom, in.onLineOfs, in.jumpCharge);
+		ShowMesh(in.obj, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom, in.onLineOfs, in.jumpCharge);
 	}
 
 #endif

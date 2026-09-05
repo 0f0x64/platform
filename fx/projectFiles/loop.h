@@ -253,6 +253,8 @@ bool cameraFirstFrame = true;
 
 struct hero_ {
 
+	Object::mesh* mesh = new Object::mesh;
+
 	XMVECTOR pos = { 0.0f, 0.0f, 0.0f, 1.0f };
 	XMVECTOR posOnLine = { 0.0f, 0.0f, 0.0f, 1.0f };
 	XMVECTOR forwardVector = { 0.0f, 0.0f, 1.0f, 0.0f };
@@ -2474,6 +2476,8 @@ namespace Loop
 			ConstBuf::LoadObj("..//fx//projectFiles//A-Pose.glb");
 			Object::MeshPtr = nullptr;
 
+			//hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
+
 			sceneInitialized = true;
 			}
 			// ----- //
@@ -2481,6 +2485,7 @@ namespace Loop
 			float4 p = V2F(hero.pos * 10000.);
 
 			Object::Mesh({
+					.obj = hero.mesh,
 					.quality = 1,
 					.xPos = (int)(p.x),
 					.yPos = (int)(p.y),
