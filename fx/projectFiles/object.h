@@ -936,45 +936,84 @@ namespace Object {
 	// time: 0..1 (0 – окружность у поверхности, 1 – прямая линия)
 	// starPos: позиция звезды (в мировых единицах, как в NewStar)
 	// starRadius: радиус звезды (в тех же единицах)
-	void GenerateProminenceBranch(float l, int branchType, float t_start, float t_end, int numPoints,
-		const XMMATRIX& worldRot, const float4& starPos, float starRadius)
+	void GenerateProminenceBranch(
+		float l,                       // параметр анимации (-1..1)
+		int branchType,                // 1,2,3 – тип ветви
+		float t_start, float t_end,    // диапазон параметра t
+		int numPoints,                 // количество точек
+		const XMMATRIX& worldRot,      // глобальная ориентация протуберанца на сфере
+		const float4& starPos,         // позиция звезды
+		float starRadius,              // радиус звезды
+		float beamYaw,                 // конечный индивидуальный поворот луча (вокруг локальной оси Y)
+		float beamPitch,               // конечный индивидуальный наклон луча (вокруг локальной оси X)
+		float offsetX,                 // конечное смещение по локальной оси Y (вверх)
+		float offsetY,                 // конечное смещение по локальной оси Z (вправо)
+		float tangentRoll)             // поворот всего протуберанца вокруг своей оси (касательной плоскости)
 	{
 		if (numPoints < 2) numPoints = 2;
 		NewLine();
 
-		// Локальное смещение (радиус звезды в единицах до масштаба *40)
+		// Коэффициент плавного включения индивидуальных параметров (кроме tangentRoll)
+		float morph = clamp(l, 0.0f, 1.0f);   // 0 при l<=0, 1 при l>=1
+
+		// Эффективные значения с учётом morph
 		float starRadiusLocal = starRadius / 40.0f;
-		XMVECTOR offsetLocal = XMVectorSet(starRadiusLocal, 0, 0, 0); // вдоль локальной оси X
+		float effOffsetX = offsetX * morph;
+		float effOffsetY = offsetY * morph;
+		XMVECTOR offsetLocal = XMVectorSet(starRadiusLocal, effOffsetX, effOffsetY, 0.0f);
+
+		float effectiveBeamYaw = beamYaw * morph;
+		float effectiveBeamPitch = beamPitch * morph;
+
+		// Матрицы с учётом morph
+		XMMATRIX beamRot = XMMatrixRotationRollPitchYaw(effectiveBeamPitch, effectiveBeamYaw, 0.0f);
+		// Итоговая матрица без tangentRoll, т.к. его применяем отдельно к точке
+		XMMATRIX finalRot = XMMatrixMultiply(beamRot, worldRot);
+
+		// Матрица поворота вокруг собственной оси
+		XMMATRIX rollMat = XMMatrixRotationX(tangentRoll);
 
 		float l_sq = l * l;
-		for (int i = 0; i < numPoints; ++i) {
-			float t = t_start + (t_end - t_start) * (float)i / (numPoints - 1);
+		for (int i = 0; i < numPoints; ++i)
+		{
+			float t = t_start + (t_end - t_start) * (float)i / (float)(numPoints - 1);
 			Complex z;
-			switch (branchType) {
-			case 0: // общая кривая f(t) при l <= 0
+
+			if (l <= 0.0f)
+			{
+				// Фаза рождения: все ветви одинаковы
 				z = ComputeF(t);
-				z *= std::pow(100.0f, -l_sq);   // масштаб 100^{-l^2}
-				break;
-			case 1: // P1
-				z = ComputeP1(t, l_sq);
-				z = ApplyComplexRotation(z, l * (PI / 6.0f));  // e^{+ l π/6 i}
-				break;
-			case 2: // P2
-				z = ComputeP2(t, l_sq);
-				break;
-			case 3: // P3
-				z = ComputeP3(t, l_sq);
-				z = ApplyComplexRotation(z, -l * (PI / 6.0f)); // e^{- l π/6 i}
-				break;
+				z *= std::pow(100.0f, -l_sq);
+			}
+			else
+			{
+				// Фаза разделения: индивидуальные формулы
+				switch (branchType)
+				{
+				case 1:
+					z = ComputeP1(t, l_sq);
+					z = ApplyComplexRotation(z, l * (PI / 6.0f));
+					break;
+				case 2:
+					z = ComputeP2(t, l_sq);
+					break;
+				case 3:
+					z = ComputeP3(t, l_sq);
+					z = ApplyComplexRotation(z, -l * (PI / 6.0f));
+					break;
+				}
 			}
 
 			XMVECTOR point = ComplexTo3D(z);
-			point = point + offsetLocal;                       // смещаем на радиус
-			point = XMVector3TransformNormal(point, worldRot); // поворачиваем
-			point = point * 40.0f;                             // масштабируем
-			point = point + XMVectorSet(starPos.x, starPos.y, starPos.z, 0); // позиция звезды
+			// Вращаем вокруг собственной оси (касательной плоскости)
+			point = XMVector3TransformNormal(point, rollMat);
+			point = point + offsetLocal;
+			point = XMVector3TransformNormal(point, finalRot);
+			point = point * 40.0f;
+			point = point + XMVectorSet(starPos.x, starPos.y, starPos.z, 0.0f);
 			AddPoint(V2F(point));
 		}
+
 		smoothStarline(starLineList.line[currentLine]);
 	}
 
@@ -1199,29 +1238,61 @@ namespace Object {
 		}
 
 		// --- Анимация протуберанца ---
-		// Вычисляем параметр l (от -1 до 1) на основе времени
-		double timeMs = timer::GetCounter();            // миллисекунды
-		const float periodMs = 120000.0f;               // полный цикл 120 сек
-		float phase = fmod((float)timeMs, periodMs) / periodMs;  // 0..1
-		float l = -cos(2 * PI * phase);                 // плавно -1 -> 1 -> -1
+		double timeMs = timer::GetCounter();
+		const float periodMs = 80000.0f;
+		float phase = fmod((float)timeMs, periodMs) / periodMs;
+		float l = -cos(2 * PI * phase);
 
-		// Сферические углы для теста
-		float theta = DegreesToRadians(-45.0f);  // азимут вокруг Y
-		float phi = DegreesToRadians(45.0f);    // полярный угол
-
-		// Глобальная матрица поворота (pitch=phi, yaw=theta, roll=0)
+		float theta = DegreesToRadians(-45.0f);
+		float phi = DegreesToRadians(45.0f);
 		XMMATRIX worldRot = XMMatrixRotationRollPitchYaw(phi, theta, 0.0f);
 
 		float4 starPos = { 0,0,0,0 };
-		float starRadius = 27.0f;   // радиус = 0 => смещение отсутствует
-		if (l <= 0.0f) {
-			GenerateProminenceBranch(l, 0, -100, 100, 200, worldRot, starPos, starRadius);
-		}
-		else {
-			GenerateProminenceBranch(l, 1, -100, -3, 80, worldRot, starPos, starRadius);
-			GenerateProminenceBranch(l, 2, -3, 3, 30, worldRot, starPos, starRadius);
-			GenerateProminenceBranch(l, 3, 3, 100, 80, worldRot, starPos, starRadius);
-		}
+		float starRadius = 30.6f;
+
+		// Углы поворота каждого луча вокруг локальной оси Y (в радианах).
+		// Значения задают **конечное** горизонтальное расхождение лучей (при l = 1).
+		// При l <= 0 (фаза рождения) эти углы равны нулю, плавно нарастая до конечных.
+		// [0] – первый луч (P1), [1] – второй (P2), [2] – третий (P3).
+		// Отрицательное значение – поворот влево, положительное – вправо.
+		float beamYaw[3] = { -0.15f, 0.0f,  0.15f };  // веер: левый, центральный, правый
+
+		// Углы наклона каждого луча вокруг локальной оси X (в радианах).
+		// Задают **конечное** вертикальное отклонение лучей.
+		// Положительное значение – наклон вверх, отрицательное – вниз.
+		// Сейчас нули: лучи лежат в одной плоскости (нет вертикального веера).
+		float beamPitch[3] = { 0.0f, 0.0f, 0.0f };
+
+		// Смещение начала каждого луча вдоль локальной оси Y (вверх/вниз) в касательной плоскости.
+		// Конечные значения (при l = 1). В фазе рождения смещения равны нулю.
+		// Единицы – до масштабирования на 40 (внутри функции делится на 40).
+		// Сейчас нули: основания всех трёх лучей совпадают в одной точке.
+		float offsetX[3] = { 0.0f, 0.0f, 0.0f };
+
+		// Смещение начала каждого луча вдоль локальной оси Z (вправо/влево) в касательной плоскости.
+		// Аналогично offsetX, но по другой касательной оси.
+		// Нули – основания не разнесены по касательной.
+		float offsetY[3] = { 0.0f, 0.0f, 0.0f };
+
+		// Общий поворот всей конструкции протуберанца вокруг собственной оси
+		// (радиального направления от звезды). В отличие от beamYaw/beamPitch/offset,
+		// применяется **сразу** и не зависит от фазы рождения.
+		// Позволяет вращать весь веер лучей в касательной плоскости.
+		// Может быть задан как функция от l или времени для эффекта вращения.
+		float tangentRoll = PI;  // вращение вокруг собственной оси в течение всей анимации
+
+		float INLPOW = 0.5;
+		float INLAMPL = 3.0;
+		float l_neg = (l < 0) ? pow(-l, INLPOW) : 0.0f;
+
+		GenerateProminenceBranch(l, 1, -100.0f, -3.0f + INLAMPL * l_neg, 80,
+			worldRot, starPos, starRadius, beamYaw[0], beamPitch[0], offsetX[0], offsetY[0], tangentRoll);
+
+		GenerateProminenceBranch(l, 2, -3.0f - INLAMPL * l_neg, 3.0f + INLAMPL * l_neg, 30,
+			worldRot, starPos, starRadius, beamYaw[1], beamPitch[1], offsetX[1], offsetY[1], tangentRoll);
+
+		GenerateProminenceBranch(l, 3, 3.0f - INLAMPL * l_neg, 100.0f, 80,
+			worldRot, starPos, starRadius, beamYaw[2], beamPitch[2], offsetX[2], offsetY[2], tangentRoll);
 
 		//------------end user space---------------
 		//-----------------------------------------
