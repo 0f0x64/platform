@@ -357,6 +357,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="projectFiles\collision.h" />
     <ClInclude Include="dx11\audio.h" />
     <ClInclude Include="dx11\blend.h" />
     <ClInclude Include="dx11\camera.h" />
