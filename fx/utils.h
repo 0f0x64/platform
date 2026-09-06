@@ -69,3 +69,13 @@ float4 getRandFloat4()
 	};
 }
 
+float length(float4 vec)
+{
+	return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z + vec.w * vec.w);
+}
+
+//float4 normalize(float4 vec)
+//{
+//	float len = length(vec);
+//	return float4(vec.x / len, vec.y / len, vec.z / len, vec.w / len);
+//}

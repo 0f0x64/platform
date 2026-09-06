@@ -29,6 +29,7 @@ XMVECTOR getRandVector4()
 #include "camera.h"
 #include "cubemap.h"
 #include "object.h"
+#include "collision.h"
 
 
 
