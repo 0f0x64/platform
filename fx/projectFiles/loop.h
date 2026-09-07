@@ -31,6 +31,7 @@ XMVECTOR getRandVector4()
 #include "object.h"
 #include "collision.h"
 #include "enemies/enemySystem.h"
+#include "enemies/enemyRenderer.h"
 
 
 
@@ -1338,6 +1339,7 @@ namespace Loop
 
 	bool isPrecalc = false;
 	Enemies::EnemySystem enemySystem;
+	Enemies::EnemyRenderer enemyRenderer;
 
 	Enemies::Position ToEnemyPosition(XMVECTOR value)
 	{
@@ -2297,8 +2299,6 @@ namespace Loop
 		gameCamera.rotInertion = in.rotInertion / denom;
 	}
 
-	Object::mesh* testSphere = new Object::mesh;
-
 	void scene3()
 	{
 		SetHeroParams({
@@ -2531,7 +2531,7 @@ namespace Loop
 					hero.mesh->animations[8].weight = 10000.0f;
 				}
 
-				testSphere->LoadObj("..//fx//projectFiles//Sphere.glb");
+				enemyRenderer.Load();
 
 				hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
 				hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
@@ -2540,6 +2540,8 @@ namespace Loop
 				sceneInitialized = true;
 			}
 			// ----- //
+
+			enemyRenderer.RenderDepth(enemySystem);
 
 			float4 p = V2F(hero.pos * 10000.);
 
@@ -2557,21 +2559,7 @@ namespace Loop
 					.jumpCharge = 100
 				});
 
-			p = V2F((hero.pos + XMVectorSet(0, 1, 0, 0)) * 10000.);
-
-			Object::Mesh({
-					.obj = testSphere,
-					.quality = 1,
-					.xPos = (int)(p.x),
-					.yPos = (int)(p.y),
-					.zPos = (int)(p.z),
-					.brightness = 9,
-					.tickness = 4,
-					.stencil = switcher::on,
-					.zoom = -75,
-					.onLineOfs = (int)hero.yOffset,
-					.jumpCharge = 100
-				});
+			enemyRenderer.RenderColor(enemySystem);
 
 			//.jumpCharge = (int)(hero.jumpChargeProgress*100.)
 

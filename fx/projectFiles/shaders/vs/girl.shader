@@ -11,6 +11,7 @@ cbuffer params : register(b0)
     int mode;
     int skipper;
     float4 base_color;
+    float4 colorMultiplier;
     float4 modelPos;
     float4 triCount;
     float4 brightness;
@@ -388,6 +389,7 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     
     p1.color.rgb*=brightness.rrr/100.;
     p1.color.rgb*=float3(1,2,3)/4;
+    p1.color.rgb*=colorMultiplier.rgb;
     //pos.y-=55*sin(time.x/12.)*c;
 
     if (mode==2)
