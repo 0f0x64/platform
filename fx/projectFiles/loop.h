@@ -2376,11 +2376,12 @@ namespace Loop
 
 			Object::initPatches(hero.pathControl.Time);
 
+			float deltaTime = processTimer();
 
 			if (GetActiveWindow() == hWnd && gameCam)
 			{
 
-				float deltaTime = processTimer();
+				//float deltaTime = processTimer();
 
 				inputController.mouse.processInput();
 
@@ -2563,7 +2564,8 @@ namespace Loop
 					.stencil = switcher::on,
 					.zoom = -75,
 					.onLineOfs = (int)hero.yOffset,
-					.jumpCharge = 100
+					.jumpCharge = 100,
+					.deltaTime = deltaTime
 				});
 
 			/*p = V2F((hero.pos + XMVectorSet(0, 1, 0, 0)) * 10000.);
@@ -2579,7 +2581,8 @@ namespace Loop
 					.stencil = switcher::on,
 					.zoom = -75,
 					.onLineOfs = (int)hero.yOffset,
-					.jumpCharge = 100
+					.jumpCharge = 100,
+					.deltaTime = deltaTime
 				});*/
 
 

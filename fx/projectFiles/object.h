@@ -1586,7 +1586,7 @@ namespace Object {
 	XMMATRIX heroOnRails;
 	XMMATRIX heroWorld;
 
-	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom, int onLineOfs, int jumpCharge)
+	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom, int onLineOfs, int jumpCharge, float deltaTime)
 	{
 
 		int gX = sqrt(count / skipper);
@@ -1626,16 +1626,13 @@ namespace Object {
 		vs::girl.set();
 
 		if (obj && obj->loaded) {
-			obj->Update(1.0f / FRAMES_PER_SECOND);
+			obj->Update(deltaTime); // 1.0f / FRAMES_PER_SECOND
 			obj->BindBones(dx11::context);
-
-			//dx11::ConstBuf::gltfAnim::Update(1.0f / FRAMES_PER_SECOND);
-			//dx11::ConstBuf::gltfAnim::BindBones(dx11::context);
 
 			obj->LoadToShaders();
 		}
 		else {
-			dx11::ConstBuf::gltfAnim::Update(1.0f / FRAMES_PER_SECOND);
+			dx11::ConstBuf::gltfAnim::Update(deltaTime); // 1.0f / FRAMES_PER_SECOND
 			dx11::ConstBuf::gltfAnim::BindBones(dx11::context);
 
 			ConstBuf::BindSB(0);
@@ -1657,7 +1654,7 @@ namespace Object {
 		
 	}
 
-	cmd(Mesh, mesh* obj, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs, int jumpCharge)
+	cmd(Mesh, mesh* obj, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs, int jumpCharge, float deltaTime)
 	{
 		reflect;
 
@@ -1673,7 +1670,7 @@ namespace Object {
 		if (in.stencil == switcher::on)
 		{
 			uint32_t triCnt = (in.obj && in.obj->loaded) ? in.obj->triangleCount : ConstBuf::triangleCount;
-			ShowMesh(in.obj, (int)triCnt,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs, in.jumpCharge);
+			ShowMesh(in.obj, (int)triCnt,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs, in.jumpCharge, in.deltaTime);
 		}
 
 		Culling::Set({ cullmode::off });
@@ -1683,7 +1680,7 @@ namespace Object {
 			.op = blendop::add
 			});
 
-		ShowMesh(in.obj, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom, in.onLineOfs, in.jumpCharge);
+		ShowMesh(in.obj, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom, in.onLineOfs, in.jumpCharge, in.deltaTime);
 	}
 
 #endif
