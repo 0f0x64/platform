@@ -120,29 +120,6 @@ namespace collision
 	}
 
 
-    RaycastResult Raycast(const RayInfo& ray)
-    {
-        RaycastResult closestHit;
-
-        for (SphereCollider* collider : colliders) {
-            RaycastResult hit;
-
-            if (!ray.touchableOnly || collider->isTouchable)
-            {
-                if (raycast_sphere(ray, collider, hit) && hit.distance < closestHit.distance) {
-                    closestHit.hit = true;
-                    closestHit.distance = hit.distance;
-                    closestHit.position = hit.position;
-                    closestHit.normal = hit.normal;
-                    closestHit.collider = collider;
-                    //closestHit.entity = entity;
-                }
-            }
-        }
-
-        return closestHit;
-    }
-
 
     bool raycast_sphere(const RayInfo& ray, const SphereCollider* collider, RaycastResult& hit)
     {
@@ -187,23 +164,16 @@ namespace collision
         return true;
     }
 
-
-    RaycastResult Spherecast(const SphereCastInfo& sphereCast)
+    RaycastResult Raycast(const RayInfo& ray)
     {
         RaycastResult closestHit;
-    
-        // Нормализуем направление для точных вычислений
-        float4 direction = normalize(sphereCast.direction);
-    
+
         for (SphereCollider* collider : colliders) {
             RaycastResult hit;
-    
-            // Проверяем, активен ли коллайдер и подходит ли по фильтру
-            if (!sphereCast.touchableOnly || collider->isTouchable)
+
+            if (!ray.touchableOnly || collider->isTouchable)
             {
-                // Используем новый метод проверки пересечения сферы со сферой
-                if (spherecast_sphere(sphereCast, collider, hit)
-                    && hit.distance < closestHit.distance) {
+                if (raycast_sphere(ray, collider, hit) && hit.distance < closestHit.distance) {
                     closestHit.hit = true;
                     closestHit.distance = hit.distance;
                     closestHit.position = hit.position;
@@ -213,9 +183,11 @@ namespace collision
                 }
             }
         }
-    
+
         return closestHit;
     }
+
+
     
     bool spherecast_sphere(const SphereCastInfo& sphereCast, const SphereCollider* collider, RaycastResult& hit)
     {
@@ -268,5 +240,34 @@ namespace collision
         hit.normal = normal;
     
         return true;
+    }
+
+    RaycastResult Spherecast(const SphereCastInfo& sphereCast)
+    {
+        RaycastResult closestHit;
+
+        // Нормализуем направление для точных вычислений
+        float4 direction = normalize(sphereCast.direction);
+
+        for (SphereCollider* collider : colliders) {
+            RaycastResult hit;
+
+            // Проверяем, активен ли коллайдер и подходит ли по фильтру
+            if (!sphereCast.touchableOnly || collider->isTouchable)
+            {
+                // Используем новый метод проверки пересечения сферы со сферой
+                if (spherecast_sphere(sphereCast, collider, hit)
+                    && hit.distance < closestHit.distance) {
+                    closestHit.hit = true;
+                    closestHit.distance = hit.distance;
+                    closestHit.position = hit.position;
+                    closestHit.normal = hit.normal;
+                    closestHit.collider = collider;
+                    //closestHit.entity = entity;
+                }
+            }
+        }
+
+        return closestHit;
     }
 }
