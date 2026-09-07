@@ -173,6 +173,9 @@
     <ClInclude Include="projectFiles\enemies\enemy.h">
       <Filter>Source Files\projectFiles\enemies</Filter>
     </ClInclude>
+    <ClInclude Include="projectFiles\enemies\enemySystem.h">
+      <Filter>Source Files\projectFiles\enemies</Filter>
+    </ClInclude>
     <ClInclude Include="projectFiles\object.h">
       <Filter>Source Files\projectFiles</Filter>
     </ClInclude>

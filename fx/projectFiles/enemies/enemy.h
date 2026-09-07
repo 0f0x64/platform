@@ -17,6 +17,10 @@ namespace Enemies
 		using UpdateCallback = std::function<void(Enemy&, float)>;
 
 		Position position;
+		Position movementCenter;
+		Position movementTarget;
+		float movementRadius = 0.65f;
+		float movementSpeed = 0.2f;
 		InitializeCallback initializeCallback;
 		UpdateCallback updateCallback;
 

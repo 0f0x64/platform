@@ -30,6 +30,7 @@ XMVECTOR getRandVector4()
 #include "cubemap.h"
 #include "object.h"
 #include "collision.h"
+#include "enemies/enemySystem.h"
 
 
 
@@ -1336,6 +1337,12 @@ namespace Loop
 {
 
 	bool isPrecalc = false;
+	Enemies::EnemySystem enemySystem;
+
+	Enemies::Position ToEnemyPosition(XMVECTOR value)
+	{
+		return { XMVectorGetX(value), XMVectorGetY(value), XMVectorGetZ(value) };
+	}
 
 	void Precalc()
 	{
@@ -2349,6 +2356,12 @@ namespace Loop
 
 			Object::initPatches(hero.pathControl.Time);
 
+			if (!enemySystem.IsInitialized())
+			{
+				enemySystem.Reset(ToEnemyPosition(hero.pos),
+					ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+			}
+
 
 			if (GetActiveWindow() == hWnd && gameCam)
 			{
@@ -2357,7 +2370,13 @@ namespace Loop
 
 				inputController.mouse.processInput();
 
+				const bool initialEnemySpawn = hero.firstRun;
 				hero.Respawn();
+				if (initialEnemySpawn)
+				{
+					enemySystem.Reset(ToEnemyPosition(hero.pos),
+						ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+				}
 
 				const float FIXED_DT = 1.0f / 60.0f; // Строго 16.66 мс для физики
 				static float accumulator = 0.0f;
@@ -2386,6 +2405,7 @@ namespace Loop
 
 					hero.processLanding(FIXED_DT);
 
+					enemySystem.Update(FIXED_DT);
 					gameCamera.Update(FIXED_DT);
 
 					accumulator -= FIXED_DT;
