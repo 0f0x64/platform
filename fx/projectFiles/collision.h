@@ -65,7 +65,12 @@ namespace collision
         //Entity* entity;
     };
 
-    SphereCollider* CreateSphereCollider() { }
+    SphereCollider* CreateSphereCollider()
+    {
+        SphereCollider* collider = new SphereCollider;
+        colliders.push_back(collider);
+        return collider;
+    }
 
 	CollisionResult sphere_vs_sphere(
 		const float4 pos1, const float radius1,
