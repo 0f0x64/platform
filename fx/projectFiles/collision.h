@@ -72,6 +72,25 @@ namespace collision
         return collider;
     }
 
+    void UpdateColliders()
+    {
+        for (size_t i = 0; i < colliders.size(); )
+        {
+            SphereCollider* collider = colliders[i];
+            if (!collider)
+            {
+                delete collider;
+
+                colliders[i] = colliders.back();
+                colliders.pop_back();
+            }
+            else
+            {
+                i++;
+            }
+        }
+    }
+
 	CollisionResult sphere_vs_sphere(
 		const float4 pos1, const float radius1,
 		const float4 pos2, const float radius2)

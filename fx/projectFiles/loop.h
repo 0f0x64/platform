@@ -2327,6 +2327,8 @@ namespace Loop
 		if (!loadedSounds) {
 			loadedSounds = true;
 
+			collision::CreateSphereCollider();
+
 			dx11::Audio::LoadWavFile("Braking", "..//fx//projectFiles//BrakingSFX.wav");
 			dx11::Audio::LoadWavFile("Run", "..//fx//projectFiles//RunSFX.wav");
 
@@ -2394,6 +2396,7 @@ namespace Loop
 				}
 
 				ConstBuf::interp::UpdateTweens(deltaTime);
+				collision::UpdateColliders();
 
 				float alpha = accumulator / FIXED_DT;
 				alpha = ::std::clamp(alpha, 0.0f, 1.0f);
