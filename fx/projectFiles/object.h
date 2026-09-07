@@ -941,900 +941,1186 @@ namespace Object {
 
 
 		// ============================================================
-		// УЧАСТОК 1 — ГЕОМЕТРИЧЕСКИ РАЗВЁРНУТЫЙ
-		// Масштаб всех координат: ×100
-		// ============================================================
-
-
-		// ============================================================
-		// Л1 — бывшая последняя линия
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ -200,     0,  1900 });
-		AddPointToLine({ 300,  2800, 2200 });
-		AddPointToLine({ 800,  5300, 2600 });
-		AddPointToLine({ 1000,  7800, 3000 });
-		AddPointToLine({ 800, 10300, 3400 });
-		AddPointToLine({ 300, 12800, 3500 });
-		AddPointToLine({ -200, 15300, 3200 });
-		AddPointToLine({ -600, 17800, 2700 });
-		AddPointToLine({ -800, 20300, 2100 });
-		AddPointToLine({ -400, 26300, 1600 });
-
-		NewLine();
-		AddPointToLine({ 0, 25200, 1500 });
-		AddPointToLine({ 500, 27500, 1900 });
-		AddPointToLine({ 900, 29800, 2400 });
-		AddPointToLine({ 1000, 32300, 2900 });
-		AddPointToLine({ 600, 34800, 3100 });
-		AddPointToLine({ 100, 37300, 2800 });
-		AddPointToLine({ -300, 39800, 2300 });
-		AddPointToLine({ -500, 42300, 1700 });
-		AddPointToLine({ -100, 44800, 1300 });
-		AddPointToLine({ 100, 52000, 1500 });
-
-		NewLine();
-		AddPointToLine({ 200, 48600, 1300 });
-		AddPointToLine({ 900, 51700, 1800 });
-		AddPointToLine({ 900, 54300, 2400 });
-		AddPointToLine({ 500, 56800, 2900 });
-		AddPointToLine({ 0, 59300, 3100 });
-		AddPointToLine({ -400, 61800, 2900 });
-		AddPointToLine({ -600, 64300, 2400 });
-		AddPointToLine({ -500, 66800, 1800 });
-		AddPointToLine({ 200, 71600, 2100 });
-		AddPointToLine({ -100, 71900,-2200 });
-
-		NewLine();
-		AddPointToLine({ 3800, 74800,  700 });
-		AddPointToLine({ -300, 71300,  900 });
-		AddPointToLine({ -700, 74900, 1400 });
-		AddPointToLine({ -800, 77200, 2000 });
-		AddPointToLine({ -300, 79000, 2500 });
-		AddPointToLine({ 300, 82100, 2700 });
-		AddPointToLine({ 800, 83800, 2500 });
-		AddPointToLine({ 1100, 86300, 2100 });
-		AddPointToLine({ 1000, 88600, 1600 });
-		AddPointToLine({ 700, 91300, 1100 });
-		AddPointToLine({ 200, 93800,  700 });
-		AddPointToLine({ -100, 96400,  500 });
-
-		NewLine();
-		AddPointToLine({ -600,  98300,  700 });
-		AddPointToLine({ -800, 100800, 1100 });
-		AddPointToLine({ -500, 103300, 1500 });
-		AddPointToLine({ 0, 105800, 1700 });
-		AddPointToLine({ 500, 108300, 1600 });
-		AddPointToLine({ 800, 110800, 1300 });
-		AddPointToLine({ 900, 113300,  900 });
-		AddPointToLine({ 800, 115800,  500 });
-		AddPointToLine({ 600, 118300,  200 });
-		AddPointToLine({ 500, 120200,    0 });
-
-
-		// ============================================================
-		// Л2 — бывшие 3 линии
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ -600, 46900, 1600 });
-		AddPointToLine({ -800, 49300, 2100 });
-		AddPointToLine({ -600, 51800, 2700 });
-		AddPointToLine({ -200, 54300, 3200 });
-		AddPointToLine({ 300, 56800, 3500 });
-		AddPointToLine({ 700, 59300, 3400 });
-		AddPointToLine({ 700, 61800, 3000 });
-		AddPointToLine({ 400, 64300, 2400 });
-		AddPointToLine({ -100, 66800, 1800 });
-		AddPointToLine({ -400, 69600, 1400 });
-
-		NewLine();
-		AddPointToLine({ -2700, 73400, 1500 });
-		AddPointToLine({ -800, 73200, 1900 });
-		AddPointToLine({ -400, 75300, 2500 });
-		AddPointToLine({ 100, 78500, 3000 });
-		AddPointToLine({ 500, 81300, 3200 });
-		AddPointToLine({ 700, 83800, 3000 });
-		AddPointToLine({ 400, 86300, 2600 });
-		AddPointToLine({ 0, 88800, 2100 });
-		AddPointToLine({ -400, 91300, 1600 });
-		AddPointToLine({ -500, 93900, 1200 });
-
-		NewLine();
-		AddPointToLine({ -100, 95900, 1000 });
-		AddPointToLine({ 400, 98300, 1200 });
-		AddPointToLine({ 800,100800, 1600 });
-		AddPointToLine({ 900,103300, 2000 });
-		AddPointToLine({ 700,105800, 2200 });
-		AddPointToLine({ 313,108300, 2100 });
-		AddPointToLine({ -55,110907, 1743 });
-		AddPointToLine({ 447,116218, 1492 });
-		AddPointToLine({ -525,121806, -120 });
-		AddPointToLine({ -582,123584,  2184 });
-		AddPointToLine({ 1786,123906, 1616 });
-
-
-		// ============================================================
-		// Л3
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ -800, 48500, 1900 });
-		AddPointToLine({ -900, 51300, 2400 });
-		AddPointToLine({ -800, 53800, 2900 });
-		AddPointToLine({ -400, 56300, 3400 });
-		AddPointToLine({ 100, 58800, 3600 });
-		AddPointToLine({ 500, 61300, 3400 });
-		AddPointToLine({ 700, 63800, 2900 });
-		AddPointToLine({ 600, 66300, 2300 });
-		AddPointToLine({ 300, 68800, 1800 });
-		AddPointToLine({ -100, 71300, 1500 });
-
-		NewLine();
-		AddPointToLine({ -800, 73200, 1800 });
-		AddPointToLine({ -900, 75800, 2300 });
-		AddPointToLine({ -500, 78300, 2800 });
-		AddPointToLine({ 0, 80800, 3100 });
-		AddPointToLine({ 400, 83300, 2900 });
-		AddPointToLine({ 600, 85800, 2500 });
-		AddPointToLine({ 500, 88300, 2000 });
-		AddPointToLine({ 100, 90800, 1500 });
-		AddPointToLine({ -300, 93300, 1000 });
-		AddPointToLine({ -600, 96000,  700 });
-
-		NewLine();
-		AddPointToLine({ -700, 98300,  800 });
-		AddPointToLine({ -600,100800, 1200 });
-		AddPointToLine({ -300,103300, 1600 });
-		AddPointToLine({ 100,105800, 1800 });
-		AddPointToLine({ 400,108300, 1700 });
-		AddPointToLine({ 500,110800, 1400 });
-		AddPointToLine({ 300,113300, 1000 });
-		AddPointToLine({ -100,115800,  600 });
-		AddPointToLine({ -400,118300,  300 });
-		AddPointToLine({ -731,119353,    5550 });
-
-
-		// ============================================================
-		// Л4
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ -700, 73800, 1400 });
-		AddPointToLine({ -900, 76300, 1900 });
-		AddPointToLine({ -500, 78800, 2400 });
-		AddPointToLine({ 0, 81300, 2600 });
-		AddPointToLine({ 500, 83800, 2300 });
-		AddPointToLine({ 800, 86300, 1900 });
-		AddPointToLine({ 900, 88800, 1400 });
-		AddPointToLine({ 700, 91300,  900 });
-		AddPointToLine({ 400, 93800,  500 });
-		AddPointToLine({ 100, 96300,  200 });
-
-		NewLine();
-		AddPointToLine({ -400, 98300,  400 });
-		AddPointToLine({ -800,100800,  800 });
-		AddPointToLine({ -900,103300, 1200 });
-		AddPointToLine({ -700,105800, 1400 });
-		AddPointToLine({ -300,108300, 1300 });
-		AddPointToLine({ 0,110800, 1000 });
-		AddPointToLine({ 300,113300,  600 });
-		AddPointToLine({ 500,115800,  200 });
-		AddPointToLine({ 500,118300, -100 });
-		AddPointToLine({ 85,120000, -7048 });
-
-
-		// ============================================================
-		// Л5
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ -500, 73800,    0 });
-		AddPointToLine({ -400, 76300,  300 });
-		AddPointToLine({ -200, 78800,  500 });
-		AddPointToLine({ 100, 81300,  500 });
-		AddPointToLine({ 400, 83800,  300 });
-		AddPointToLine({ 500, 86300, -100 });
-		AddPointToLine({ 300, 88800, -400 });
-		AddPointToLine({ -100, 91300, -500 });
-		AddPointToLine({ -400, 93800, -300 });
-		AddPointToLine({ -500, 96300,  100 });
-
-		NewLine();
-		AddPointToLine({ -300, 98300,  400 });
-		AddPointToLine({ 0,100800,  500 });
-		AddPointToLine({ 300,103300,  400 });
-		AddPointToLine({ 500,105800,  200 });
-		AddPointToLine({ 500,108300, -100 });
-		AddPointToLine({ 228,110382, -353 });
-		AddPointToLine({ -320,113200, -435 });
-		AddPointToLine({ -125,114519, -453 });
-		AddPointToLine({ -755,115517,  817 });
-		AddPointToLine({ -10033,110800,  564 });
-
-
-		// ============================================================
-		// УЧАСТОК 2
-		// ============================================================
-
-
-		// ============================================================
-		// Л1 — 0°
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ -561,124300,1900 });
-		AddPointToLine({ 1019,124256,1900 });
-		AddPointToLine({ 2315,124000,1900 });
-		AddPointToLine({ 3300,123700,1900 });
-		AddPointToLine({ 4100,123300,1900 });
-		AddPointToLine({ 4800,122800,1900 });
-		AddPointToLine({ 5400,122200,1900 });
-		AddPointToLine({ 5800,121500,1900 });
-		AddPointToLine({ 6000,120800,1900 });
-
-		NewLine();
-		AddPointToLine({ 2993,120800,1900 });
-		AddPointToLine({ 8400,121000,2300 });
-		AddPointToLine({ 10000,120900,2500 });
-		AddPointToLine({ 11500,120700,2200 });
-		AddPointToLine({ 13000,120900,1800 });
-		AddPointToLine({ 14200,120800,1700 });
-
-		NewLine();
-		AddPointToLine({ 14787,120800,1900 });
-		AddPointToLine({ 16200,120600,1500 });
-		AddPointToLine({ 17800,120700,1300 });
-		AddPointToLine({ 19400,121000,1600 });
-		AddPointToLine({ 20900,120900,2100 });
-		AddPointToLine({ 22300,120700,2300 });
-
-		NewLine();
-		AddPointToLine({ 23000,120800,2200 });
-		AddPointToLine({ 24500,121000,2500 });
-		AddPointToLine({ 26100,121100,2600 });
-		AddPointToLine({ 27700,120900,2300 });
-		AddPointToLine({ 29300,120600,1800 });
-		AddPointToLine({ 30700,120800,1500 });
-
-		NewLine();
-		AddPointToLine({ 31400,120900,1700 });
-		AddPointToLine({ 33000,121100,1400 });
-		AddPointToLine({ 34600,121000,1200 });
-		AddPointToLine({ 36200,120800,1500 });
-		AddPointToLine({ 37900,120600,2000 });
-		AddPointToLine({ 39600,120900,2300 });
-		AddPointToLine({ 41300,120800,2100 });
-
-
-		// ============================================================
-		// Л2 — 90°
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 136,124299,1946 });
-		AddPointToLine({ 800,124200,2310 });
-		AddPointToLine({ 1500,124000,2725 });
-		AddPointToLine({ 2200,123700,3006 });
-		AddPointToLine({ 2900,123300,3235 });
-		AddPointToLine({ 3600,122800,3393 });
-		AddPointToLine({ 4200,122200,3500 });
-		AddPointToLine({ 4600,121500,3500 });
-		AddPointToLine({ 4800,120800,3500 });
-
-		NewLine();
-		AddPointToLine({ 4900,120900,3500 });
-		AddPointToLine({ 7200,121100,3100 });
-		AddPointToLine({ 8800,121000,2900 });
-		AddPointToLine({ 10400,120800,3200 });
-		AddPointToLine({ 12000,120600,3700 });
-		AddPointToLine({ 13400,120900,3900 });
-
-		NewLine();
-		AddPointToLine({ 14000,120900,3700 });
-		AddPointToLine({ 15500,120700,3300 });
-		AddPointToLine({ 17100,120800,3000 });
-		AddPointToLine({ 18700,121000,3300 });
-		AddPointToLine({ 20300,120900,3800 });
-		AddPointToLine({ 21800,120700,4000 });
-
-		NewLine();
-		AddPointToLine({ 22500,120800,3700 });
-		AddPointToLine({ 24000,121000,3200 });
-		AddPointToLine({ 25600,121100,2900 });
-		AddPointToLine({ 27200,120900,3200 });
-		AddPointToLine({ 28800,120600,3700 });
-		AddPointToLine({ 30400,120800,4000 });
-
-		NewLine();
-		AddPointToLine({ 31100,120900,3700 });
-		AddPointToLine({ 32700,121100,3300 });
-		AddPointToLine({ 34300,121000,3000 });
-		AddPointToLine({ 35900,120800,3300 });
-		AddPointToLine({ 37500,120600,3800 });
-		AddPointToLine({ 39200,120900,4000 });
-		AddPointToLine({ 40900,120800,3700 });
-
-
-		// ============================================================
-		// Л3 — 180°
-		// ============================================================
-
-		
-
-		NewLine();
-		AddPointToLine({ 4300,120800,1900 });
-		AddPointToLine({ 5700,121000,1500 });
-		AddPointToLine({ 7300,120900,1200 });
-		AddPointToLine({ 8900,120700,1500 });
-		AddPointToLine({ 10500,120900,2000 });
-		AddPointToLine({ 11900,120800,2300 });
-
-		NewLine();
-		AddPointToLine({ 12600,120800,2100 });
-		AddPointToLine({ 14100,120600,2500 });
-		AddPointToLine({ 15700,120700,2700 });
-		AddPointToLine({ 17300,120900,2400 });
-		AddPointToLine({ 18900,121000,1800 });
-		AddPointToLine({ 20400,120800,1500 });
-
-		NewLine();
-		AddPointToLine({ 21100,120900,1700 });
-		AddPointToLine({ 22600,121100,2200 });
-		AddPointToLine({ 24200,121000,2600 });
-		AddPointToLine({ 25800,120800,2400 });
-		AddPointToLine({ 27400,120600,1800 });
-		AddPointToLine({ 29000,120800,1400 });
-
-		NewLine();
-		AddPointToLine({ 29700,120900,1600 });
-		AddPointToLine({ 31300,121100,1200 });
-		AddPointToLine({ 32900,121000,1000 });
-		AddPointToLine({ 34500,120800,1400 });
-		AddPointToLine({ 36100,120600,2000 });
-		AddPointToLine({ 37700,120800,2400 });
-		AddPointToLine({ 39400,120900,2100 });
-
-
-		// ============================================================
-		// Л4 — 270°
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 173,124300, 1900 });
-		AddPointToLine({ 800,124200, 1448 });
-		AddPointToLine({ 1500,124000, 993 });
-		AddPointToLine({ 2200,123700, 675 });
-		AddPointToLine({ 2900,123300, 443 });
-		AddPointToLine({ 3600,122800, 300 });
-		AddPointToLine({ 4200,122200, 300 });
-		AddPointToLine({ 4600,121500, 300 });
-		AddPointToLine({ 4800,120800, 300 });
-
-		NewLine();
-		AddPointToLine({ 4600,120900, 300 });
-		AddPointToLine({ 7200,121100, 700 });
-		AddPointToLine({ 8800,121000, 900 });
-		AddPointToLine({ 10400,120800, 600 });
-		AddPointToLine({ 12000,120600, 100 });
-		AddPointToLine({ 13400,120900,-100 });
-
-		NewLine();
-		AddPointToLine({ 14000,120900, 100 });
-		AddPointToLine({ 15500,120700, 500 });
-		AddPointToLine({ 17100,120800, 800 });
-		AddPointToLine({ 18700,121000, 500 });
-		AddPointToLine({ 20300,120900,   0 });
-		AddPointToLine({ 21800,120700,-300 });
-
-		NewLine();
-		AddPointToLine({ 22500,120800, 100 });
-		AddPointToLine({ 24000,121000, 600 });
-		AddPointToLine({ 25600,121100, 900 });
-		AddPointToLine({ 27200,120900, 500 });
-		AddPointToLine({ 28800,120600,   0 });
-		AddPointToLine({ 30400,120800,-300 });
-
-		NewLine();
-		AddPointToLine({ 31100,120900, 100 });
-		AddPointToLine({ 32700,121100, 500 });
-		AddPointToLine({ 34300,121000, 800 });
-		AddPointToLine({ 35900,120800, 500 });
-		AddPointToLine({ 37500,120600,   0 });
-		AddPointToLine({ 39200,120900,-300 });
-		AddPointToLine({ 40900,120800,   0 });
-
-
-		// ============================================================
-		// УЧАСТОК 3
-		// ============================================================
-
-
-		// ============================================================
-		// ЛИНИЯ 1
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 38405,120782, 276 });
-		AddPointToLine({ 41979,120800,  138 });
-		AddPointToLine({ 43921,120800,-1000 });
-		AddPointToLine({ 50613,120800,-3400 });
-		AddPointToLine({ 56700,120800, 1800 });
-
-		NewLine();
-		AddPointToLine({ 41300,120800, 1900 });
-		AddPointToLine({ 43100,120600, 3100 });
-		AddPointToLine({ 44500,120300, 4400 });
-		AddPointToLine({ 44300,120400, 5700 });
-		AddPointToLine({ 43800,120700, 6900 });
-		AddPointToLine({ 42300,121000, 8200 });
-		AddPointToLine({ 39800,121200, 9400 });
-		AddPointToLine({ 38900,121100,10900 });
-		AddPointToLine({ 39300,120500,12400 });
-
-		NewLine();
-		AddPointToLine({ 38800,121100,11900 });
-		AddPointToLine({ 39300,120700,13400 });
-		AddPointToLine({ 41300,120200,14900 });
-		AddPointToLine({ 43300,120400,16400 });
-		AddPointToLine({ 44300,121100,17900 });
-		AddPointToLine({ 42800,121400,19400 });
-		AddPointToLine({ 40100,121300,20900 });
-		AddPointToLine({ 39100,120800,22200 });
-		AddPointToLine({ 39500,120200,23600 });
-
-		NewLine();
-		AddPointToLine({ 38500,120700,22600 });
-		AddPointToLine({ 39500,120400,24100 });
-		AddPointToLine({ 42300,120100,25600 });
-		AddPointToLine({ 44000,120500,27100 });
-		AddPointToLine({ 43800,121100,28600 });
-		AddPointToLine({ 41800,121400,30100 });
-		AddPointToLine({ 38800,121200,31600 });
-		AddPointToLine({ 38500,120800,32900 });
-		AddPointToLine({ 40300,120200,34100 });
-
-		NewLine();
-		AddPointToLine({ 38300,120600,33100 });
-		AddPointToLine({ 39500,120300,34600 });
-		AddPointToLine({ 43100,120200,36100 });
-		AddPointToLine({ 44300,120800,37600 });
-		AddPointToLine({ 42800,121400,39100 });
-		AddPointToLine({ 39800,121400,40600 });
-		AddPointToLine({ 38300,120900,42100 });
-		AddPointToLine({ 38800,120500,43400 });
-		AddPointToLine({ 42300,120100,44600 });
-
-		NewLine();
-		AddPointToLine({ 40100,120300,43700 });
-		AddPointToLine({ 42900,120100,45200 });
-		AddPointToLine({ 44900,120400,46700 });
-		AddPointToLine({ 44600,121000,48200 });
-		AddPointToLine({ 42100,121500,49700 });
-		AddPointToLine({ 39600,121200,51200 });
-		AddPointToLine({ 39100,120600,52700 });
-		AddPointToLine({ 40100,120300,54000 });
-		AddPointToLine({ 41100,120200,55200 });
-
-		NewLine();
-		AddPointToLine({ 41100,120200,54200 });
-		AddPointToLine({ 42900,120300,55700 });
-		AddPointToLine({ 45100,120800,57200 });
-		AddPointToLine({ 44100,121300,58700 });
-		AddPointToLine({ 40600,121300,60200 });
-		AddPointToLine({ 40900,120900,61500 });
-		AddPointToLine({ 42100,120300,62700 });
-
-
-		// ============================================================
-		// ЛИНИЯ 2
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 41300,120800,1900 });
-		AddPointToLine({ 39500,121000,3400 });
-		AddPointToLine({ 38300,121300,4900 });
-		AddPointToLine({ 39100,121400,6400 });
-		AddPointToLine({ 41800,121100,7900 });
-		AddPointToLine({ 43500,120700,9400 });
-		AddPointToLine({ 43500,120300,10900 });
-		AddPointToLine({ 42300,120200,12100 });
-		AddPointToLine({ 41300,120300,12900 });
-
-		NewLine();
-		AddPointToLine({ 43500,120300,11900 });
-		AddPointToLine({ 41800,120300,13400 });
-		AddPointToLine({ 39100,120600,14900 });
-		AddPointToLine({ 38300,121100,16400 });
-		AddPointToLine({ 39800,121400,17900 });
-		AddPointToLine({ 42500,121300,19400 });
-		AddPointToLine({ 44300,120800,20900 });
-		AddPointToLine({ 43800,120400,22200 });
-		AddPointToLine({ 42300,120300,23400 });
-
-		NewLine();
-		AddPointToLine({ 39800,120200,22400 });
-		AddPointToLine({ 38800,120300,23900 });
-		AddPointToLine({ 38300,120600,25400 });
-		AddPointToLine({ 39300,121100,26900 });
-		AddPointToLine({ 42300,121500,28400 });
-		AddPointToLine({ 44100,121100,29900 });
-		AddPointToLine({ 43500,120300,31400 });
-		AddPointToLine({ 41800,120100,32700 });
-		AddPointToLine({ 40800,120100,33900 });
-
-		NewLine();
-		AddPointToLine({ 38500,120500,32900 });
-		AddPointToLine({ 38300,120800,34400 });
-		AddPointToLine({ 38800,121100,35900 });
-		AddPointToLine({ 41300,121500,37400 });
-		AddPointToLine({ 43800,121200,38900 });
-		AddPointToLine({ 44300,120600,40400 });
-		AddPointToLine({ 42300,120200,41900 });
-		AddPointToLine({ 40300,120200,43200 });
-		AddPointToLine({ 39300,120300,44400 });
-
-		NewLine();
-		AddPointToLine({ 38300,120900,43400 });
-		AddPointToLine({ 38800,121300,44900 });
-		AddPointToLine({ 39800,121400,46400 });
-		AddPointToLine({ 41800,121200,47900 });
-		AddPointToLine({ 44300,120800,49400 });
-		AddPointToLine({ 43100,120300,50900 });
-		AddPointToLine({ 40100,120200,52400 });
-		AddPointToLine({ 38800,120400,53700 });
-		AddPointToLine({ 38300,120700,54900 });
-
-		NewLine();
-		AddPointToLine({ 38300,120700,53900 });
-		AddPointToLine({ 39800,121100,55400 });
-		AddPointToLine({ 42300,121500,56900 });
-		AddPointToLine({ 44300,121200,58400 });
-		AddPointToLine({ 44800,120700,59900 });
-		AddPointToLine({ 43300,120300,60900 });
-		AddPointToLine({ 41300,120300,61900 });
-
-
-		// ============================================================
-		// ЛИНИЯ 3
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 41300,120800,1900 });
-		AddPointToLine({ 42500,121300,3500 });
-		AddPointToLine({ 43800,121300,5100 });
-		AddPointToLine({ 44300,120900,6700 });
-		AddPointToLine({ 42700,120500,8400 });
-		AddPointToLine({ 40100,120300,10100 });
-		AddPointToLine({ 37800,120600,11400 });
-		AddPointToLine({ 38500,120900,12600 });
-		AddPointToLine({ 39700,121200,13500 });
-
-		NewLine();
-		AddPointToLine({ 38400,120600,12500 });
-		AddPointToLine({ 39700,121000,13400 });
-		AddPointToLine({ 42200,121400,15100 });
-		AddPointToLine({ 44100,120900,16400 });
-		AddPointToLine({ 44400,120200,18100 });
-		AddPointToLine({ 41900,120300,19400 });
-		AddPointToLine({ 39100,120800,21100 });
-		AddPointToLine({ 38200,121000,22400 });
-		AddPointToLine({ 40600,121500,24100 });
-
-		NewLine();
-		AddPointToLine({ 38300,121200,23100 });
-		AddPointToLine({ 40600,121400,23900 });
-		AddPointToLine({ 43600,121100,25600 });
-		AddPointToLine({ 44700,120300,26900 });
-		AddPointToLine({ 43000,120100,28600 });
-		AddPointToLine({ 40100,120600,29900 });
-		AddPointToLine({ 38200,121300,31600 });
-		AddPointToLine({ 38900,121600,32700 });
-		AddPointToLine({ 40600,121200,34100 });
-
-		NewLine();
-		AddPointToLine({ 38300,120900,33100 });
-		AddPointToLine({ 41000,121300,34600 });
-		AddPointToLine({ 44300,121000,35900 });
-		AddPointToLine({ 43000,120100,37600 });
-		AddPointToLine({ 40100,120000,38900 });
-		AddPointToLine({ 38300,120700,40600 });
-		AddPointToLine({ 39900,121600,41900 });
-		AddPointToLine({ 42700,121500,43400 });
-		AddPointToLine({ 43300,120900,44600 });
-
-		NewLine();
-		AddPointToLine({ 44300,120700,43700 });
-		AddPointToLine({ 43100,120100,45200 });
-		AddPointToLine({ 41500,120000,46500 });
-		AddPointToLine({ 39400,120700,48200 });
-		AddPointToLine({ 38300,121400,49500 });
-		AddPointToLine({ 40700,121700,51200 });
-		AddPointToLine({ 43700,121200,52500 });
-		AddPointToLine({ 44600,120500,54000 });
-		AddPointToLine({ 44000,120300,55200 });
-
-		NewLine();
-		AddPointToLine({ 42300,120000,54200 });
-		AddPointToLine({ 40900,120400,55000 });
-		AddPointToLine({ 39000,121000,56700 });
-		AddPointToLine({ 38200,121600,58000 });
-		AddPointToLine({ 40300,121300,59700 });
-		AddPointToLine({ 42600,120600,60800 });
-		AddPointToLine({ 41300,120300,62100 });
-
-
-		// ============================================================
-// ЛИНИЯ 2 — РАНДОМИЗИРОВАННАЯ
-// Поворот на 90° относительно предыдущего варианта
-// Начальная точка сохранена
+// A -> B
+// Рваные / плавающие нити
 // ============================================================
 
-// 2A
+
+// ------------------------------------------------------------
+// НИТЬ 1
+// ------------------------------------------------------------
+
 		NewLine();
-		AddPointToLine({ 55096,120800,  643 });
-		AddPointToLine({ 57945,121063,  3158 });
-		AddPointToLine({ 61155,121000,  2154 });
-		AddPointToLine({ 61791,121600,   669 });
-		AddPointToLine({ 61084,121200, -2443 });
-		AddPointToLine({ 60094,120500, -5271 });
-		AddPointToLine({ 60872,120000, -6615 });
-		AddPointToLine({ 62993,120600, -6473 });
-		AddPointToLine({ 64480,120100, -6120 });
+		AddPointToLine({ 31500, 25000, 25000 });
+		AddPointToLine({ 32500, 25800, 26300 });
+		AddPointToLine({ 33200, 27500, 27800 });
+		AddPointToLine({ 32500, 29200, 29500 });
+		AddPointToLine({ 30700, 30500, 31300 });
+		AddPointToLine({ 29000, 31800, 32900 });
+		AddPointToLine({ 28200, 33700, 34500 });
+		AddPointToLine({ 29100, 35400, 36100 });
+		AddPointToLine({ 31000, 36700, 37500 });
+		AddPointToLine({ 33000, 38200, 38900 });
+		AddPointToLine({ 34200, 40100, 40200 });
+		AddPointToLine({ 33300, 41800, 41600 });
 
 
-		// 2B
+		// ------------------------------------------------------------
+		// НИТЬ 2
+		// ------------------------------------------------------------
+
 		NewLine();
-		AddPointToLine({ 62352,120400, -6827 });
-		AddPointToLine({ 64478,120000, -6827 });
-		AddPointToLine({ 67094,120700, -6049 });
-		AddPointToLine({ 69428,121400, -6120 });
-		AddPointToLine({ 69428,121700, -7958 });
-		AddPointToLine({ 68579,121100,-11211 });
-		AddPointToLine({ 67731,120600,-13898 });
-		AddPointToLine({ 69074,120100,-14676 });
-		AddPointToLine({ 74731,120600,-10009 });
+		AddPointToLine({ 30500, 25500, 24500 });
+		AddPointToLine({ 31300, 27000, 25800 });
+		AddPointToLine({ 32000, 28600, 27600 });
+		AddPointToLine({ 31100, 30200, 29300 });
+		AddPointToLine({ 29400, 31700, 31000 });
+		AddPointToLine({ 27500, 32900, 32600 });
+		AddPointToLine({ 26500, 34700, 34100 });
+		AddPointToLine({ 27200, 36500, 35700 });
+		AddPointToLine({ 29000, 37800, 37400 });
+		AddPointToLine({ 31200, 39400, 39100 });
+		AddPointToLine({ 32500, 41200, 40700 });
 
 
-		// 2C
+		// ------------------------------------------------------------
+		// НИТЬ 3
+		// ------------------------------------------------------------
+
 		NewLine();
-		AddPointToLine({ 72520,120300,-11494 });
-		AddPointToLine({ 74519,120100,-11635 });
-		AddPointToLine({ 75792,120900,-12201 });
-		AddPointToLine({ 76075,121600,-14322 });
-		AddPointToLine({ 74943,121400,-17292 });
-		AddPointToLine({ 74519,120700,-20120 });
-		AddPointToLine({ 76004,120000,-20474 });
-		AddPointToLine({ 78620,120400,-19979 });
-		AddPointToLine({ 84320,120200,-17979 });
+		AddPointToLine({ 29500, 26500, 25800 });
+		AddPointToLine({ 30000, 28000, 27100 });
+		AddPointToLine({ 29700, 29600, 28600 });
+		AddPointToLine({ 28300, 31000, 30200 });
+		AddPointToLine({ 26500, 32500, 31900 });
+		AddPointToLine({ 24800, 34000, 33400 });
+		AddPointToLine({ 24000, 35800, 35000 });
+		AddPointToLine({ 24800, 37400, 36800 });
+		AddPointToLine({ 26500, 38900, 38200 });
+		AddPointToLine({ 28500, 40500, 39800 });
+		AddPointToLine({ 30000, 42200, 41400 });
 
 
-		// 2D
+		// ------------------------------------------------------------
+		// НИТЬ 4
+		// ------------------------------------------------------------
+
 		NewLine();
-		AddPointToLine({ 80531,120200,-20070 });
-		AddPointToLine({ 81944,120400,-17777 });
-		AddPointToLine({ 82156,121600,-20969 });
-		AddPointToLine({ 81237,121300,-23727 });
-		AddPointToLine({ 80742,120700,-26626 });
-		AddPointToLine({ 81944,120100,-27262 });
-		AddPointToLine({ 84560,120000,-27050 });
-		AddPointToLine({ 86681,120600,-26484 });
-		AddPointToLine({ 88290,121300,-26838 });
+		AddPointToLine({ 32000, 27000, 26500 });
+		AddPointToLine({ 33500, 28500, 27800 });
+		AddPointToLine({ 34200, 30200, 29400 });
+		AddPointToLine({ 33500, 31800, 31100 });
+		AddPointToLine({ 31500, 33100, 32700 });
+		AddPointToLine({ 29200, 34600, 34200 });
+		AddPointToLine({ 27800, 36500, 35800 });
+		AddPointToLine({ 28600, 38300, 37400 });
+		AddPointToLine({ 30500, 39700, 39100 });
+		AddPointToLine({ 32700, 41400, 40700 });
+		AddPointToLine({ 34000, 43000, 42300 });
 
 
-		// 2E
+		// ------------------------------------------------------------
+		// НИТЬ 5
+		// ------------------------------------------------------------
+
 		NewLine();
-		AddPointToLine({ 87459,121000,-26272 });
-		AddPointToLine({ 88378,121600,-27191 });
-		AddPointToLine({ 88661,121300,-29313 });
-		AddPointToLine({ 88025,120900,-31788 });
-		AddPointToLine({ 88025,120400,-34192 });
-		AddPointToLine({ 89793,120000,-34262 });
-		AddPointToLine({ 92904,120500,-33555 });
-		AddPointToLine({ 95449,120200,-32848 });
-		AddPointToLine({ 95622,120953,-34333 });
+		AddPointToLine({ 33500, 29000, 27500 });
+		AddPointToLine({ 34800, 30500, 28700 });
+		AddPointToLine({ 35200, 32200, 30100 });
+		AddPointToLine({ 34100, 33700, 31800 });
+		AddPointToLine({ 32000, 35100, 33500 });
+		AddPointToLine({ 29800, 36700, 35000 });
+		AddPointToLine({ 28500, 38600, 36700 });
+		AddPointToLine({ 29500, 40200, 38200 });
+		AddPointToLine({ 31700, 41800, 39800 });
+		AddPointToLine({ 33800, 43500, 41400 });
 
 
-		// 2F
+		// ------------------------------------------------------------
+		// НИТЬ 6
+		// ------------------------------------------------------------
+
 		NewLine();
-		AddPointToLine({ 95491,120700,-33202 });
-		AddPointToLine({ 95237,121400,-35182 });
-		AddPointToLine({ 94742,121600,-38081 });
-		AddPointToLine({ 94389,120900,-40273 });
-		AddPointToLine({ 95944,120200,-41121 });
-		AddPointToLine({ 97854,120100,-40626 });
-		AddPointToLine({ 99126,120300,-40626 });
+		AddPointToLine({ 34500, 31500, 28500 });
+		AddPointToLine({ 36000, 33000, 29900 });
+		AddPointToLine({ 36500, 34700, 31400 });
+		AddPointToLine({ 35500, 36300, 33000 });
+		AddPointToLine({ 33300, 37800, 34600 });
+		AddPointToLine({ 31000, 39400, 36100 });
+		AddPointToLine({ 30000, 41200, 37800 });
+		AddPointToLine({ 31200, 42900, 39400 });
+		AddPointToLine({ 33500, 44500, 41000 });
+		AddPointToLine({ 35800, 45900, 42600 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 7
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 35000, 34000, 30000 });
+		AddPointToLine({ 36500, 35500, 31500 });
+		AddPointToLine({ 37200, 37200, 33100 });
+		AddPointToLine({ 36500, 38900, 34800 });
+		AddPointToLine({ 34500, 40500, 36500 });
+		AddPointToLine({ 32300, 42100, 38200 });
+		AddPointToLine({ 31500, 43900, 39900 });
+		AddPointToLine({ 33000, 45500, 41400 });
+		AddPointToLine({ 35200, 47000, 42900 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 8
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 36000, 36500, 31500 });
+		AddPointToLine({ 37800, 38000, 32900 });
+		AddPointToLine({ 38600, 39700, 34500 });
+		AddPointToLine({ 37800, 41400, 36200 });
+		AddPointToLine({ 35500, 43000, 38000 });
+		AddPointToLine({ 33300, 44600, 39700 });
+		AddPointToLine({ 32700, 46300, 41400 });
+		AddPointToLine({ 34200, 47800, 43000 });
+		AddPointToLine({ 36500, 49200, 44500 });
 
 
 		// ============================================================
-// СПИРАЛЬНАЯ ВОРОНКА — НИТЬ 1
+		// РАЗРЫВ
+		// Здесь специально нет соединения.
+		// ============================================================
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 9
+		// После разрыва нити снова начинают сходиться.
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 37500, 50000, 45500 });
+		AddPointToLine({ 39000, 51500, 46800 });
+		AddPointToLine({ 39800, 53000, 48200 });
+		AddPointToLine({ 39000, 54500, 49700 });
+		AddPointToLine({ 37200, 55800, 51200 });
+		AddPointToLine({ 35000, 57000, 52700 });
+		AddPointToLine({ 34200, 58500, 54200 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 10
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 39000, 50500, 46200 });
+		AddPointToLine({ 40700, 52000, 47600 });
+		AddPointToLine({ 41500, 53600, 49100 });
+		AddPointToLine({ 40700, 55200, 50700 });
+		AddPointToLine({ 38800, 56600, 52300 });
+		AddPointToLine({ 36500, 58000, 53800 });
+		AddPointToLine({ 35500, 59500, 55300 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 11
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 40500, 51500, 47000 });
+		AddPointToLine({ 42200, 53100, 48400 });
+		AddPointToLine({ 43000, 54800, 50000 });
+		AddPointToLine({ 42100, 56400, 51600 });
+		AddPointToLine({ 40200, 57900, 53200 });
+		AddPointToLine({ 38000, 59300, 54700 });
+		AddPointToLine({ 37000, 60800, 56200 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 12
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 42000, 52500, 47800 });
+		AddPointToLine({ 43800, 54100, 49200 });
+		AddPointToLine({ 44700, 55800, 50700 });
+		AddPointToLine({ 43800, 57500, 52300 });
+		AddPointToLine({ 41800, 59000, 53900 });
+		AddPointToLine({ 39500, 60500, 55400 });
+		AddPointToLine({ 38500, 62000, 56900 });
+
+
+		// ============================================================
+		// ПОДХОД К B
+		// Нити постепенно собираются возле B,
+		// но не входят в саму звезду.
+		// ============================================================
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 13
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 44000, 59500, 55000 });
+		AddPointToLine({ 45500, 61000, 56500 });
+		AddPointToLine({ 47200, 62500, 58000 });
+		AddPointToLine({ 49000, 64000, 59500 });
+		AddPointToLine({ 51000, 65500, 61000 });
+		AddPointToLine({ 53500, 67000, 62500 });
+		AddPointToLine({ 56000, 68500, 64000 });
+		AddPointToLine({ 59000, 70000, 65500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 14
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 45500, 60500, 55800 });
+		AddPointToLine({ 47000, 62000, 57400 });
+		AddPointToLine({ 48800, 63600, 58900 });
+		AddPointToLine({ 50800, 65100, 60400 });
+		AddPointToLine({ 53200, 66600, 62000 });
+		AddPointToLine({ 55800, 68100, 63500 });
+		AddPointToLine({ 58500, 69500, 65000 });
+		AddPointToLine({ 61000, 70800, 66400 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 15
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 47000, 61500, 56500 });
+		AddPointToLine({ 48600, 63100, 58000 });
+		AddPointToLine({ 50500, 64700, 59600 });
+		AddPointToLine({ 52700, 66200, 61200 });
+		AddPointToLine({ 55000, 67700, 62800 });
+		AddPointToLine({ 57500, 69100, 64400 });
+		AddPointToLine({ 60000, 70400, 65800 });
+		AddPointToLine({ 62500, 71600, 67000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 16
+		// Последний короткий кусок перед B.
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 63500, 70000, 66500 });
+		AddPointToLine({ 65000, 70700, 67500 });
+		AddPointToLine({ 66500, 71400, 68400 });
+		AddPointToLine({ 68000, 72000, 69400 });
+		AddPointToLine({ 69500, 72400, 70500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 17
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 64500, 69000, 67000 });
+		AddPointToLine({ 66000, 69800, 68000 });
+		AddPointToLine({ 67500, 70600, 69200 });
+		AddPointToLine({ 69000, 71300, 70400 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 18
+		// Обход B сбоку.
+		// Не заходим в радиус звезды.
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 65000, 68000, 69000 });
+		AddPointToLine({ 66800, 69200, 70500 });
+		AddPointToLine({ 68500, 70400, 71800 });
+		AddPointToLine({ 70000, 71500, 73000 });
+		AddPointToLine({ 71500, 72200, 74400 });
+
+		// ============================================================
+// ROUTE A -> C
+// Рваные / плавающие нити
 // ============================================================
 
-		NewLine();
-		AddPointToLine({ 110031,120865,-41757 });
-		AddPointToLine({ 107066,119923,-44355 });
-		AddPointToLine({ 100149,121496,-45426 });
-		AddPointToLine({ 99526,122000,-46526 });
-		AddPointToLine({ 101226,122600,-46826 });
-		AddPointToLine({ 102926,123200,-46326 });
-		AddPointToLine({ 104226,123800,-45026 });
-		AddPointToLine({ 104826,124400,-43426 });
-		AddPointToLine({ 104426,125000,-41826 });
-		AddPointToLine({ 103226,125600,-40526 });
-		AddPointToLine({ 101626,126200,-39926 });
-		AddPointToLine({ 99926,126800,-40126 });
-		AddPointToLine({ 98626,127400,-41126 });
-		AddPointToLine({ 97926,128000,-42526 });
-		AddPointToLine({ 98126,128600,-44026 });
-		AddPointToLine({ 99226,129200,-45126 });
-		AddPointToLine({ 100726,129800,-45626 });
-		AddPointToLine({ 102226,130400,-45226 });
-		AddPointToLine({ 103226,131000,-44126 });
-		AddPointToLine({ 103426,131600,-42726 });
-		AddPointToLine({ 102626,132200,-41626 });
-		AddPointToLine({ 101326,132800,-41026 });
-		AddPointToLine({ 100026,133400,-41226 });
-		AddPointToLine({ 99226,134000,-42126 });
-		AddPointToLine({ 99326,134600,-43226 });
-		AddPointToLine({ 100126,135200,-44126 });
-		AddPointToLine({ 101226,135800,-44426 });
-		AddPointToLine({ 102126,136400,-43926 });
-		AddPointToLine({ 102426,137000,-43026 });
-		AddPointToLine({ 101926,137600,-42326 });
-		AddPointToLine({ 101026,138200,-42126 });
-		AddPointToLine({ 100326,138800,-42726 });
-		AddPointToLine({ 100226,139500,-43426 });
 
-
-		// ============================================================
-		// СПИРАЛЬНАЯ ВОРОНКА — НИТЬ 2
-		// ============================================================
+// ------------------------------------------------------------
+// НИТЬ 1
+// ------------------------------------------------------------
 
 		NewLine();
-		AddPointToLine({ 96626,121000,-42226 });
-		AddPointToLine({ 98026,121100,-41226 });
-		AddPointToLine({ 99726,121400,-40726 });
-		AddPointToLine({ 101526,121900,-41026 });
-		AddPointToLine({ 102926,122500,-42126 });
-		AddPointToLine({ 103826,123100,-43626 });
-		AddPointToLine({ 103626,123700,-45326 });
-		AddPointToLine({ 102426,124300,-46526 });
-		AddPointToLine({ 100726,124900,-46826 });
-		AddPointToLine({ 99126,125500,-46326 });
-		AddPointToLine({ 98026,126100,-45026 });
-		AddPointToLine({ 97826,126700,-43526 });
-		AddPointToLine({ 98626,127300,-42126 });
-		AddPointToLine({ 99926,127900,-41426 });
-		AddPointToLine({ 101326,128500,-41626 });
-		AddPointToLine({ 102226,129100,-42626 });
-		AddPointToLine({ 102326,129700,-43926 });
-		AddPointToLine({ 101526,130300,-44926 });
-		AddPointToLine({ 100326,130900,-45326 });
-		AddPointToLine({ 99326,131500,-44826 });
-		AddPointToLine({ 98926,132100,-43826 });
-		AddPointToLine({ 99426,132700,-42726 });
-		AddPointToLine({ 100426,133300,-42126 });
-		AddPointToLine({ 101426,133900,-42426 });
-		AddPointToLine({ 101926,134500,-43326 });
-		AddPointToLine({ 101426,135100,-44126 });
-		AddPointToLine({ 100526,135700,-44426 });
-		AddPointToLine({ 99826,136300,-43926 });
-		AddPointToLine({ 99726,136900,-43226 });
-		AddPointToLine({ 100226,137500,-42626 });
-		AddPointToLine({ 100926,138100,-42526 });
-		AddPointToLine({ 101326,138700,-43026 });
-		AddPointToLine({ 101026,139300,-43426 });
+		AddPointToLine({ 31500, 24500, 24500 });
+		AddPointToLine({ 33000, 25800, 26000 });
+		AddPointToLine({ 34500, 27500, 27800 });
+		AddPointToLine({ 36000, 29200, 29500 });
+		AddPointToLine({ 37000, 31000, 31000 });
+		AddPointToLine({ 36500, 32800, 32500 });
+		AddPointToLine({ 35000, 34500, 33800 });
+		AddPointToLine({ 33500, 36000, 35000 });
 
 
-		// ============================================================
-		// СПИРАЛЬНАЯ ВОРОНКА — НИТЬ 3
-		// ============================================================
+		// ------------------------------------------------------------
+		// НИТЬ 2
+		// ------------------------------------------------------------
 
 		NewLine();
-		AddPointToLine({ 95626,120300,-41126 });
-		AddPointToLine({ 98226,121200,-41626 });
-		AddPointToLine({ 99926,121500,-41026 });
-		AddPointToLine({ 101326,122000,-43126 });
-		AddPointToLine({ 101926,122600,-44626 });
-		AddPointToLine({ 101426,123200,-45926 });
-		AddPointToLine({ 100126,123800,-46526 });
-		AddPointToLine({ 98626,124400,-46226 });
-		AddPointToLine({ 97626,125000,-45026 });
-		AddPointToLine({ 97426,125600,-43526 });
-		AddPointToLine({ 98126,126200,-42126 });
-		AddPointToLine({ 99426,126800,-41326 });
-		AddPointToLine({ 100826,127400,-41426 });
-		AddPointToLine({ 101726,128000,-42426 });
-		AddPointToLine({ 101826,128600,-43726 });
-		AddPointToLine({ 101026,129200,-44826 });
-		AddPointToLine({ 99926,129800,-45226 });
-		AddPointToLine({ 98926,130400,-44726 });
-		AddPointToLine({ 98426,131000,-43726 });
-		AddPointToLine({ 98826,131600,-42726 });
-		AddPointToLine({ 99826,132200,-42126 });
-		AddPointToLine({ 100826,132800,-42326 });
-		AddPointToLine({ 101426,133400,-43226 });
-		AddPointToLine({ 101126,134000,-44126 });
-		AddPointToLine({ 100226,134600,-44526 });
-		AddPointToLine({ 99526,135200,-44126 });
-		AddPointToLine({ 99326,135800,-43326 });
-		AddPointToLine({ 99826,136400,-42726 });
-		AddPointToLine({ 100526,137000,-42626 });
-		AddPointToLine({ 101026,137600,-43126 });
-		AddPointToLine({ 100926,138200,-43726 });
-		AddPointToLine({ 100426,138800,-44026 });
-		AddPointToLine({ 100226,139300,-43426 });
+		AddPointToLine({ 32500, 25000, 25000 });
+		AddPointToLine({ 34200, 26800, 26800 });
+		AddPointToLine({ 35800, 28500, 28600 });
+		AddPointToLine({ 37200, 30200, 30400 });
+		AddPointToLine({ 37800, 32000, 32100 });
+		AddPointToLine({ 37000, 33800, 33500 });
+		AddPointToLine({ 35200, 35500, 34900 });
+		AddPointToLine({ 33800, 37200, 36300 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 3
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 30500, 25800, 24800 });
+		AddPointToLine({ 31800, 27600, 26500 });
+		AddPointToLine({ 33200, 29400, 28200 });
+		AddPointToLine({ 34500, 31200, 30000 });
+		AddPointToLine({ 34800, 33000, 31700 });
+		AddPointToLine({ 33800, 34800, 33400 });
+		AddPointToLine({ 32200, 36600, 35000 });
+		AddPointToLine({ 31500, 38400, 36600 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 4
+		// Более глубокий изгиб
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 29500, 26500, 25500 });
+		AddPointToLine({ 30700, 28500, 27200 });
+		AddPointToLine({ 32000, 30500, 29000 });
+		AddPointToLine({ 32500, 32500, 30800 });
+		AddPointToLine({ 31800, 34500, 32500 });
+		AddPointToLine({ 30000, 36500, 34200 });
+		AddPointToLine({ 28800, 38500, 35800 });
+		AddPointToLine({ 29500, 40500, 37500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 5
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 34000, 27000, 25800 });
+		AddPointToLine({ 35500, 29000, 27600 });
+		AddPointToLine({ 37000, 31000, 29500 });
+		AddPointToLine({ 38200, 33000, 31300 });
+		AddPointToLine({ 37800, 35000, 33000 });
+		AddPointToLine({ 36200, 37000, 34600 });
+		AddPointToLine({ 34500, 39000, 36300 });
+		AddPointToLine({ 33800, 41000, 38000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 6
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 35000, 29000, 26500 });
+		AddPointToLine({ 36500, 31000, 28400 });
+		AddPointToLine({ 38000, 33000, 30300 });
+		AddPointToLine({ 39200, 35000, 32100 });
+		AddPointToLine({ 38800, 37000, 33900 });
+		AddPointToLine({ 37200, 39000, 35700 });
+		AddPointToLine({ 35500, 41000, 37500 });
+		AddPointToLine({ 34800, 43000, 39300 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 7
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 36000, 30500, 27200 });
+		AddPointToLine({ 37500, 32500, 29000 });
+		AddPointToLine({ 39000, 34500, 30900 });
+		AddPointToLine({ 40200, 36500, 32800 });
+		AddPointToLine({ 39800, 38500, 34600 });
+		AddPointToLine({ 38200, 40500, 36500 });
+		AddPointToLine({ 36500, 42500, 38400 });
+		AddPointToLine({ 35800, 44500, 40200 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 8
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 37000, 32000, 28000 });
+		AddPointToLine({ 38800, 34000, 29900 });
+		AddPointToLine({ 40200, 36000, 31900 });
+		AddPointToLine({ 41500, 38000, 33900 });
+		AddPointToLine({ 41000, 40000, 35900 });
+		AddPointToLine({ 39400, 42000, 37900 });
+		AddPointToLine({ 37800, 44000, 39900 });
+		AddPointToLine({ 37200, 46000, 41800 });
+
+
+		// ------------------------------------------------------------
+		// РАЗРЫВ
+		// ------------------------------------------------------------
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 9
+		// Выход из нижней части маршрута
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 38500, 47500, 43000 });
+		AddPointToLine({ 40200, 48800, 44200 });
+		AddPointToLine({ 42200, 50000, 45400 });
+		AddPointToLine({ 44200, 50800, 46600 });
+		AddPointToLine({ 46200, 51000, 47800 });
+		AddPointToLine({ 48000, 50500, 49000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 10
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 37500, 48500, 43500 });
+		AddPointToLine({ 39200, 49800, 44800 });
+		AddPointToLine({ 41200, 51000, 46100 });
+		AddPointToLine({ 43300, 51800, 47400 });
+		AddPointToLine({ 45400, 52000, 48800 });
+		AddPointToLine({ 47500, 51500, 50100 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 11
+		// Волна вверх
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 39500, 49000, 44000 });
+		AddPointToLine({ 41500, 50500, 45300 });
+		AddPointToLine({ 43800, 51700, 46800 });
+		AddPointToLine({ 46200, 52200, 48300 });
+		AddPointToLine({ 48500, 51800, 49800 });
+		AddPointToLine({ 50700, 50800, 51300 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 12
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 41000, 50000, 44500 });
+		AddPointToLine({ 43000, 51500, 45900 });
+		AddPointToLine({ 45200, 52500, 47500 });
+		AddPointToLine({ 47500, 52800, 49000 });
+		AddPointToLine({ 49800, 52200, 50500 });
+		AddPointToLine({ 52000, 51000, 52000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 13
+		// Начинаем сильно уходить вправо
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 44000, 52500, 45500 });
+		AddPointToLine({ 46000, 53200, 47000 });
+		AddPointToLine({ 48200, 53500, 48500 });
+		AddPointToLine({ 50500, 53000, 50000 });
+		AddPointToLine({ 52800, 51800, 51500 });
+		AddPointToLine({ 55000, 50000, 53000 });
+		AddPointToLine({ 57000, 48000, 54500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 14
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 45500, 53500, 46200 });
+		AddPointToLine({ 47800, 54200, 47800 });
+		AddPointToLine({ 50200, 54000, 49500 });
+		AddPointToLine({ 52500, 53000, 51000 });
+		AddPointToLine({ 54800, 51200, 52800 });
+		AddPointToLine({ 57000, 49200, 54600 });
+		AddPointToLine({ 59200, 47500, 56300 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 15
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 47000, 54500, 47000 });
+		AddPointToLine({ 49200, 55000, 48600 });
+		AddPointToLine({ 51500, 54500, 50200 });
+		AddPointToLine({ 53800, 53200, 51800 });
+		AddPointToLine({ 56000, 51200, 53600 });
+		AddPointToLine({ 58200, 49000, 55500 });
+		AddPointToLine({ 60400, 47200, 57400 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 16
+		// Волна перед C
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 49000, 55500, 47800 });
+		AddPointToLine({ 51200, 55800, 49200 });
+		AddPointToLine({ 53500, 55000, 50700 });
+		AddPointToLine({ 55700, 53500, 52500 });
+		AddPointToLine({ 58000, 51500, 54300 });
+		AddPointToLine({ 60200, 49500, 56000 });
+		AddPointToLine({ 62500, 47800, 57800 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 17
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 51000, 56000, 48500 });
+		AddPointToLine({ 53200, 56200, 50000 });
+		AddPointToLine({ 55500, 55500, 51600 });
+		AddPointToLine({ 57800, 54000, 53200 });
+		AddPointToLine({ 60000, 52000, 54800 });
+		AddPointToLine({ 62200, 50000, 56400 });
+		AddPointToLine({ 64500, 48200, 58000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 18
+		// Последняя длинная нить
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 53500, 56500, 49200 });
+		AddPointToLine({ 55700, 56500, 50700 });
+		AddPointToLine({ 58000, 55800, 52200 });
+		AddPointToLine({ 60200, 54500, 53700 });
+		AddPointToLine({ 62500, 52800, 55200 });
+		AddPointToLine({ 64700, 50800, 56800 });
+		AddPointToLine({ 67000, 49000, 58200 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 19
+		// Подход к C
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 62500, 51500, 57500 });
+		AddPointToLine({ 64500, 50000, 58200 });
+		AddPointToLine({ 66500, 48500, 59000 });
+		AddPointToLine({ 68500, 47200, 49500 });
+		AddPointToLine({ 70500, 46500, 50000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 20
+		// Подход к C с нижней стороны
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 64000, 52500, 57000 });
+		AddPointToLine({ 66000, 51000, 58000 });
+		AddPointToLine({ 68000, 49500, 59000 });
+		AddPointToLine({ 70000, 48200, 50000 });
+		AddPointToLine({ 72000, 47500, 51000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 21
+		// Обход звезды C
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 69000, 45500, 50500 });
+		AddPointToLine({ 71000, 45000, 50000 });
+		AddPointToLine({ 73000, 45200, 49500 });
+		AddPointToLine({ 75000, 46000, 49000 });
+		AddPointToLine({ 77000, 47200, 48500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 22
+		// Ещё один короткий обход C
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 70500, 44500, 51500 });
+		AddPointToLine({ 72500, 44200, 51000 });
+		AddPointToLine({ 74500, 44800, 50500 });
+		AddPointToLine({ 76500, 46000, 50000 });
+
+		// ============================================================
+// РАЗВИЛКА A -> C
+// Ветка от середины маршрута A-C -> D
+// ============================================================
+
+
+// ============================================================
+// ЦЕНТР РАЗВИЛКИ
+// Ответвление начинается примерно здесь:
+// {50000, 52000, 49000}
+// ============================================================
+
+
+// ------------------------------------------------------------
+// НИТЬ 1
+// Основная ветка вверх к D
+// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 48500, 50500, 47500 });
+		AddPointToLine({ 49200, 51800, 48800 });
+		AddPointToLine({ 50000, 53200, 50200 });
+		AddPointToLine({ 51200, 54500, 51800 });
+		AddPointToLine({ 52500, 55700, 53500 });
+		AddPointToLine({ 53500, 57000, 55300 });
+		AddPointToLine({ 53200, 58500, 57000 });
+		AddPointToLine({ 52000, 60000, 59000 });
+		AddPointToLine({ 50800, 61500, 61000 });
+		AddPointToLine({ 51200, 62800, 63200 });
+		AddPointToLine({ 52500, 63800, 65200 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 2
+		// Чуть левее основной
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 47800, 51000, 46800 });
+		AddPointToLine({ 48200, 52400, 48200 });
+		AddPointToLine({ 48800, 53900, 49600 });
+		AddPointToLine({ 49800, 55300, 51200 });
+		AddPointToLine({ 50800, 56700, 53000 });
+		AddPointToLine({ 51200, 58200, 55000 });
+		AddPointToLine({ 50500, 59600, 57200 });
+		AddPointToLine({ 49500, 61000, 59500 });
+		AddPointToLine({ 49700, 62300, 61800 });
+		AddPointToLine({ 51000, 63500, 64000 });
+		AddPointToLine({ 52500, 64500, 66000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 3
+		// Более сильный изгиб влево
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 47200, 51500, 47000 });
+		AddPointToLine({ 46800, 53000, 48200 });
+		AddPointToLine({ 47200, 54500, 49700 });
+		AddPointToLine({ 48200, 56000, 51200 });
+		AddPointToLine({ 49000, 57500, 53000 });
+		AddPointToLine({ 48500, 59000, 55000 });
+		AddPointToLine({ 47500, 60500, 57000 });
+		AddPointToLine({ 47800, 62000, 59200 });
+		AddPointToLine({ 49000, 63300, 61500 });
+		AddPointToLine({ 50500, 64300, 63800 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 4
+		// Правый изгиб
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 49500, 51000, 48000 });
+		AddPointToLine({ 50500, 52400, 49300 });
+		AddPointToLine({ 52000, 53800, 50800 });
+		AddPointToLine({ 53500, 55000, 52500 });
+		AddPointToLine({ 54800, 56300, 54500 });
+		AddPointToLine({ 55000, 57800, 56500 });
+		AddPointToLine({ 54200, 59300, 58500 });
+		AddPointToLine({ 53000, 60800, 60500 });
+		AddPointToLine({ 52500, 62200, 62500 });
+		AddPointToLine({ 53500, 63500, 64500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 5
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 50200, 51500, 48500 });
+		AddPointToLine({ 51500, 52900, 50000 });
+		AddPointToLine({ 53000, 54300, 51500 });
+		AddPointToLine({ 54200, 55700, 53200 });
+		AddPointToLine({ 55000, 57200, 55000 });
+		AddPointToLine({ 54500, 58700, 56800 });
+		AddPointToLine({ 53500, 60200, 58700 });
+		AddPointToLine({ 52800, 61700, 60700 });
+		AddPointToLine({ 53500, 63100, 63000 });
+		AddPointToLine({ 54800, 64200, 65000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 6
+		// Волнистая центральная
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 49000, 52500, 48500 });
+		AddPointToLine({ 50000, 54000, 50000 });
+		AddPointToLine({ 51500, 55400, 51700 });
+		AddPointToLine({ 52500, 56800, 53500 });
+		AddPointToLine({ 52000, 58300, 55200 });
+		AddPointToLine({ 50500, 59800, 57000 });
+		AddPointToLine({ 49800, 61200, 59000 });
+		AddPointToLine({ 50500, 62600, 61300 });
+		AddPointToLine({ 52000, 63800, 63800 });
+		AddPointToLine({ 53500, 64600, 65800 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 7
+		// Самая левая нить
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 46500, 52000, 47500 });
+		AddPointToLine({ 45500, 53500, 48800 });
+		AddPointToLine({ 45800, 55000, 50200 });
+		AddPointToLine({ 46800, 56500, 51800 });
+		AddPointToLine({ 47500, 58000, 53500 });
+		AddPointToLine({ 46800, 59500, 55300 });
+		AddPointToLine({ 46200, 61000, 57200 });
+		AddPointToLine({ 47000, 62400, 59400 });
+		AddPointToLine({ 48500, 63700, 61500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 8
+		// Правая крайняя нить
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 50500, 52500, 49000 });
+		AddPointToLine({ 52000, 53800, 50500 });
+		AddPointToLine({ 53800, 55100, 52300 });
+		AddPointToLine({ 55500, 56400, 54200 });
+		AddPointToLine({ 56500, 57800, 56200 });
+		AddPointToLine({ 56000, 59300, 58200 });
+		AddPointToLine({ 54800, 60700, 60200 });
+		AddPointToLine({ 54500, 62100, 62200 });
+		AddPointToLine({ 55500, 63400, 64200 });
 
 
 		// ============================================================
-		// ПРОДОЛЖЕНИЕ ВТОРОЙ ШИРОКОЙ ЛИНИИ
+		// РАЗРЫВ
+		// Нити не соединяются в одну сплошную трубу.
 		// ============================================================
 
-		// 2E
+
+		// ------------------------------------------------------------
+		// НИТЬ 9
+		// Продолжение после разрыва
+		// ------------------------------------------------------------
+
 		NewLine();
-		AddPointToLine({ 109826,120700,-41526 });
-		AddPointToLine({ 111126,121300,-41526 });
-		AddPointToLine({ 112826,121000,-42826 });
-		AddPointToLine({ 114126,120600,-45026 });
-		AddPointToLine({ 115826,120100,-46726 });
-		AddPointToLine({ 117126,119700,-45526 });
-		AddPointToLine({ 118826,120200,-42826 });
-		AddPointToLine({ 120126,119900,-40526 });
-		AddPointToLine({ 121326,120100,-41426 });
+		AddPointToLine({ 48500, 54500, 51000 });
+		AddPointToLine({ 49200, 55800, 52500 });
+		AddPointToLine({ 50000, 57100, 54200 });
+		AddPointToLine({ 50800, 58400, 56000 });
+		AddPointToLine({ 51500, 59700, 57800 });
+		AddPointToLine({ 52000, 61000, 59800 });
+		AddPointToLine({ 51800, 62200, 61800 });
 
-		// 2F
+
+		// ------------------------------------------------------------
+		// НИТЬ 10
+		// ------------------------------------------------------------
+
 		NewLine();
-		AddPointToLine({ 120326,120400,-40826 });
-		AddPointToLine({ 121626,121100,-42326 });
-		AddPointToLine({ 123326,121300,-44726 });
-		AddPointToLine({ 124626,120600,-46526 });
-		AddPointToLine({ 126326,119900,-46026 });
-		AddPointToLine({ 127326,119800,-44326 });
-		AddPointToLine({ 128226,120000,-43426 });
+		AddPointToLine({ 49500, 54800, 51500 });
+		AddPointToLine({ 50500, 56200, 53000 });
+		AddPointToLine({ 51500, 57600, 54600 });
+		AddPointToLine({ 52200, 59000, 56200 });
+		AddPointToLine({ 52500, 60400, 58000 });
+		AddPointToLine({ 52200, 61800, 60200 });
+		AddPointToLine({ 53000, 63200, 62500 });
 
-		//развилка
-		NewStar({
-			.x = 50000,
-			.y = 120700,
-			.z = 4001,
-			.rad = 6630,
-			.r = 0,
-			.g = 4,
-			.b = 100,
-			.brightness = 100 });
 
-		// спиралька
-		NewStar({
-			.x = 100000,
-			.y = 143700,
-			.z = -44001,
-			.rad = 3630,
-			.r = 100,
-			.g = 100,
-			.b = 0,
-			.brightness = 100 });
+		// ------------------------------------------------------------
+		// НИТЬ 11
+		// Изгиб вправо, затем обратно
+		// ------------------------------------------------------------
 
-		NewStar({
-			.x = 100000,
-			.y = 127700,
-			.z = -44001,
-			.rad = 1630,
-			.r = 100,
-			.g = 0,
-			.b = 0,
-			.brightness = 100 });
+		NewLine();
+		AddPointToLine({ 50500, 55000, 52000 });
+		AddPointToLine({ 52000, 56400, 53800 });
+		AddPointToLine({ 53500, 57800, 55500 });
+		AddPointToLine({ 54500, 59200, 57000 });
+		AddPointToLine({ 54200, 60600, 58800 });
+		AddPointToLine({ 53200, 62000, 60700 });
+		AddPointToLine({ 53000, 63300, 62800 });
 
-		//участок 1-2
-		NewStar({
-			.x = 1900,
-			.y = 121000,
-			.z = 1820,
-			.rad = 3621,
-			.r = 100,
-			.g = 100,
-			.b = 0,
-			.brightness = 100 });
+
+		// ------------------------------------------------------------
+		// НИТЬ 12
+		// Более глубокая волна
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 47500, 55200, 51500 });
+		AddPointToLine({ 48000, 56700, 53200 });
+		AddPointToLine({ 47800, 58200, 55000 });
+		AddPointToLine({ 47000, 59700, 56800 });
+		AddPointToLine({ 47500, 61200, 58700 });
+		AddPointToLine({ 48800, 62600, 60800 });
+		AddPointToLine({ 50500, 63800, 63000 });
+
+
+		// ============================================================
+		// ПОДХОД К D
+		// ============================================================
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 13
+		// Обход D слева
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 49500, 61500, 60000 });
+		AddPointToLine({ 49000, 62500, 62000 });
+		AddPointToLine({ 49500, 63600, 64200 });
+		AddPointToLine({ 50500, 64500, 66200 });
+		AddPointToLine({ 51800, 65100, 68000 });
+		AddPointToLine({ 53200, 65400, 69200 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 14
+		// Обход D справа
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 52500, 61500, 60500 });
+		AddPointToLine({ 53500, 62600, 62500 });
+		AddPointToLine({ 54800, 63600, 64500 });
+		AddPointToLine({ 56000, 64400, 66200 });
+		AddPointToLine({ 57000, 65000, 67800 });
+		AddPointToLine({ 56500, 65500, 69300 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 15
+		// Последняя короткая нить перед D
+		// Не попадает в центр звезды.
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 51500, 63500, 65000 });
+		AddPointToLine({ 52200, 64200, 66500 });
+		AddPointToLine({ 53000, 64800, 68000 });
+		AddPointToLine({ 54000, 65100, 69400 });
+		AddPointToLine({ 55000, 65000, 70500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 16
+		// Ещё один короткий обход
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 53500, 63000, 65500 });
+		AddPointToLine({ 54500, 63800, 67000 });
+		AddPointToLine({ 55700, 64500, 68500 });
+		AddPointToLine({ 57000, 65000, 69800 });
+
+		// ============================================================
+// ROUTE D -> E
+// Рваные / плавающие нити
+// ============================================================
+
+
+// ------------------------------------------------------------
+// НИТЬ 1
+// Выход из D
+// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 53500, 65000, 70000 });
+		AddPointToLine({ 54200, 66200, 71200 });
+		AddPointToLine({ 53800, 67600, 72800 });
+		AddPointToLine({ 52500, 69000, 74500 });
+		AddPointToLine({ 51000, 70300, 76000 });
+		AddPointToLine({ 49500, 71600, 77500 });
+		AddPointToLine({ 48000, 73000, 79000 });
+		AddPointToLine({ 46500, 74400, 80800 });
+		AddPointToLine({ 45000, 75800, 82500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 2
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 52500, 65500, 70800 });
+		AddPointToLine({ 53000, 67000, 72000 });
+		AddPointToLine({ 52300, 68400, 73700 });
+		AddPointToLine({ 50800, 69800, 75200 });
+		AddPointToLine({ 49200, 71100, 76800 });
+		AddPointToLine({ 47500, 72500, 78500 });
+		AddPointToLine({ 45800, 73900, 80200 });
+		AddPointToLine({ 44200, 75400, 81800 });
+		AddPointToLine({ 42500, 76800, 83500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 3
+		// Сильнее уходит влево
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 51500, 65800, 71500 });
+		AddPointToLine({ 51000, 67200, 72800 });
+		AddPointToLine({ 49800, 68600, 74200 });
+		AddPointToLine({ 48000, 70000, 75800 });
+		AddPointToLine({ 46000, 71300, 77500 });
+		AddPointToLine({ 44200, 72700, 79200 });
+		AddPointToLine({ 42500, 74100, 81000 });
+		AddPointToLine({ 40800, 75600, 82800 });
+		AddPointToLine({ 39200, 77100, 84500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 4
+		// Верхняя волна
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 54000, 66000, 70500 });
+		AddPointToLine({ 54800, 67500, 72000 });
+		AddPointToLine({ 54500, 69000, 73800 });
+		AddPointToLine({ 53500, 70400, 75400 });
+		AddPointToLine({ 51800, 71800, 77000 });
+		AddPointToLine({ 50000, 73100, 78700 });
+		AddPointToLine({ 48000, 74500, 80500 });
+		AddPointToLine({ 46200, 75900, 82300 });
+		AddPointToLine({ 44500, 77300, 84000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 5
+		// Нижняя волна
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 51000, 66500, 70000 });
+		AddPointToLine({ 49800, 67900, 71600 });
+		AddPointToLine({ 48200, 69400, 73300 });
+		AddPointToLine({ 46300, 70800, 75000 });
+		AddPointToLine({ 44500, 72200, 76700 });
+		AddPointToLine({ 43000, 73700, 78400 });
+		AddPointToLine({ 41400, 75200, 80200 });
+		AddPointToLine({ 39800, 76800, 82000 });
+		AddPointToLine({ 38000, 78200, 83800 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 6
+		// Волна вправо-влево
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 52000, 67000, 71000 });
+		AddPointToLine({ 52600, 68400, 72500 });
+		AddPointToLine({ 52000, 69800, 74100 });
+		AddPointToLine({ 50500, 71200, 75800 });
+		AddPointToLine({ 48800, 72600, 77500 });
+		AddPointToLine({ 47000, 74000, 79200 });
+		AddPointToLine({ 45200, 75500, 81000 });
+		AddPointToLine({ 43500, 77000, 82700 });
+		AddPointToLine({ 41800, 78500, 84400 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 7
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 50000, 67500, 70500 });
+		AddPointToLine({ 48800, 69000, 72000 });
+		AddPointToLine({ 47200, 70400, 73800 });
+		AddPointToLine({ 45500, 71900, 75500 });
+		AddPointToLine({ 43800, 73400, 77300 });
+		AddPointToLine({ 42000, 74900, 79100 });
+		AddPointToLine({ 40300, 76400, 80900 });
+		AddPointToLine({ 38600, 77900, 82700 });
+		AddPointToLine({ 37000, 79400, 84400 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 8
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 54500, 68000, 71200 });
+		AddPointToLine({ 55000, 69500, 72800 });
+		AddPointToLine({ 54200, 71000, 74600 });
+		AddPointToLine({ 52800, 72400, 76300 });
+		AddPointToLine({ 51000, 73800, 78000 });
+		AddPointToLine({ 49200, 75200, 79800 });
+		AddPointToLine({ 47500, 76700, 81600 });
+		AddPointToLine({ 45800, 78200, 83300 });
+		AddPointToLine({ 44000, 79700, 85000 });
+
+
+		// ============================================================
+		// РАЗРЫВ
+		// ============================================================
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 9
+		// Продолжение после разрыва
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 43000, 79000, 84000 });
+		AddPointToLine({ 41200, 80000, 85500 });
+		AddPointToLine({ 39500, 81000, 86800 });
+		AddPointToLine({ 37800, 81900, 88000 });
+		AddPointToLine({ 36000, 82800, 89100 });
+		AddPointToLine({ 34200, 83700, 90200 });
+		AddPointToLine({ 32500, 84600, 91200 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 10
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 44500, 79500, 84500 });
+		AddPointToLine({ 42800, 80600, 86000 });
+		AddPointToLine({ 41000, 81700, 87300 });
+		AddPointToLine({ 39200, 82700, 88600 });
+		AddPointToLine({ 37400, 83700, 89800 });
+		AddPointToLine({ 35500, 84700, 91000 });
+		AddPointToLine({ 33800, 85700, 92000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 11
+		// Сильная волна
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 42000, 80200, 85000 });
+		AddPointToLine({ 40500, 81500, 86400 });
+		AddPointToLine({ 39000, 82800, 87800 });
+		AddPointToLine({ 37200, 84000, 89200 });
+		AddPointToLine({ 35000, 85100, 90500 });
+		AddPointToLine({ 33000, 86100, 91600 });
+		AddPointToLine({ 31200, 87000, 92500 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 12
+		// Более верхняя траектория
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 44000, 80500, 85000 });
+		AddPointToLine({ 42500, 81800, 86600 });
+		AddPointToLine({ 40800, 83100, 88200 });
+		AddPointToLine({ 39000, 84300, 89800 });
+		AddPointToLine({ 37000, 85500, 91200 });
+		AddPointToLine({ 35000, 86600, 92400 });
+		AddPointToLine({ 33000, 87700, 93400 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 13
+		// Начинаем обход E
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 36000, 85000, 90000 });
+		AddPointToLine({ 34200, 86200, 91200 });
+		AddPointToLine({ 32500, 87300, 92200 });
+		AddPointToLine({ 30800, 88300, 93000 });
+		AddPointToLine({ 29200, 89100, 93600 });
+		AddPointToLine({ 27500, 89700, 94000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 14
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 34500, 84500, 89500 });
+		AddPointToLine({ 32800, 85800, 90800 });
+		AddPointToLine({ 31000, 87000, 91900 });
+		AddPointToLine({ 29200, 88100, 92900 });
+		AddPointToLine({ 27500, 89000, 93700 });
+		AddPointToLine({ 25800, 89700, 94200 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 15
+		// Верхний обход звезды E
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 33000, 85500, 90500 });
+		AddPointToLine({ 31200, 86800, 91800 });
+		AddPointToLine({ 29400, 87900, 93000 });
+		AddPointToLine({ 27600, 88800, 94000 });
+		AddPointToLine({ 25800, 89400, 94700 });
+		AddPointToLine({ 24000, 89600, 95200 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 16
+		// Нижний обход E
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 32000, 86500, 90000 });
+		AddPointToLine({ 30200, 87700, 91400 });
+		AddPointToLine({ 28400, 88800, 92600 });
+		AddPointToLine({ 26600, 89700, 93600 });
+		AddPointToLine({ 24800, 90300, 94400 });
+		AddPointToLine({ 23000, 90600, 95000 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 17
+		// Короткая нить перед E
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 28000, 88000, 92500 });
+		AddPointToLine({ 26200, 88900, 93600 });
+		AddPointToLine({ 24500, 89500, 94500 });
+		AddPointToLine({ 22800, 89900, 95200 });
+
+
+		// ------------------------------------------------------------
+		// НИТЬ 18
+		// Последний подход к E
+		// Не входит в центр звезды.
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 30000, 89500, 92500 });
+		AddPointToLine({ 28200, 90100, 93500 });
+		AddPointToLine({ 26400, 90500, 94300 });
+		AddPointToLine({ 24600, 90800, 95000 });
+		AddPointToLine({ 22800, 90900, 95500 });
 
 		/*NewLine();
 		AddPointToLine({ -39,-34,3 });
@@ -1852,35 +2138,73 @@ namespace Object {
 		AddPointToLine({ -3,31,11 });
 		AddPointToLine({ -33,16,13 });*/
 
-		NewStar({ 
-			.x =3700,
-			.y =-6300,
-			.z = 2100,
-			.rad = 2630, 
-			.r = 100,
-			.g = 0,
-			.b = 0,
-			.brightness = 100 });
+		// ============================================================
+// STARS
+// ============================================================
 
+// A — нижняя левая
 		NewStar({
-			.x = -7420,
-			.y = -6300,
-			.z = 2100,
-			.rad = 2630,
+			.x = 30000,
+			.y = 23000,
+			.z = 23000,
+			.rad = 6630,
 			.r = 0,
-			.g = 100,
-			.b = 0,
-			.brightness = 100 });
-
-		NewStar({
-			.x = 2700,
-			.y = -6300,
-			.z = -8100,
-			.rad = 2630,
-			.r = 0,
-			.g = 0,
+			.g = 4,
 			.b = 100,
-			.brightness = 100 });
+			.brightness = 100
+			});
+
+
+		// B — выше A, левее D
+		NewStar({
+			.x = 36000,
+			.y = 52000,
+			.z = 60000,
+			.rad = 6630,
+			.r = 0,
+			.g = 4,
+			.b = 100,
+			.brightness = 100
+			});
+
+
+		// D — выше и правее B
+		NewStar({
+			.x = 52000,
+			.y = 65000,
+			.z = 72000,
+			.rad = 6630,
+			.r = 0,
+			.g = 4,
+			.b = 100,
+			.brightness = 100
+			});
+
+
+		// E — самая высокая и левая
+		NewStar({
+			.x = 15000,
+			.y = 90000,
+			.z = 95000,
+			.rad = 6630,
+			.r = 0,
+			.g = 4,
+			.b = 100,
+			.brightness = 100
+			});
+
+
+		// C — справа и значительно ниже D
+		NewStar({
+			.x = 85000,
+			.y = 48000,
+			.z = 48000,
+			.rad = 6630,
+			.r = 0,
+			.g = 4,
+			.b = 100,
+			.brightness = 100
+			});
 
 		/*
 		for (int j = 0; j < 10; j++)
