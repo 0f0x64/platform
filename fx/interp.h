@@ -16,7 +16,13 @@ namespace interp {
         EaseOutCubic,
         EaseInOutCubic,
         EaseOutElastic,
-        EaseOutBounce
+        EaseOutBounce,
+        EaseInCirc,
+        EaseOutCirc,
+        EaseInOutCirc,
+        EaseInExpo,
+        EaseOutExpo,
+        EaseInOutExpo
     };
 
     inline float EaseCurve(Curve curve, float t) {
@@ -53,6 +59,29 @@ namespace interp {
                 return 7.5625f * t * t + 0.984375f;
             }
         }
+        case Curve::EaseInCirc:
+            return 1 - sqrtf(1 - t * t);
+
+        case Curve::EaseOutCirc:
+            return sqrtf(1 - powf(t - 1, 2));
+
+        case Curve::EaseInOutCirc:
+            return t < 0.5f
+                ? (1 - sqrtf(1 - 4 * t * t)) * 0.5f
+                : (sqrtf(1 - powf(-2 * t + 2, 2)) + 1) * 0.5f;
+
+        case Curve::EaseInExpo:
+            return t == 0 ? 0 : powf(2, 10 * (t - 1));
+
+        case Curve::EaseOutExpo:
+            return t == 1 ? 1 : 1 - powf(2, -10 * t);
+
+        case Curve::EaseInOutExpo:
+            if (t == 0) return 0;
+            if (t == 1) return 1;
+            return t < 0.5f
+                ? powf(2, 20 * t - 10) * 0.5f
+                : (2 - powf(2, -20 * t + 10)) * 0.5f;
         default: return t;
         }
     }

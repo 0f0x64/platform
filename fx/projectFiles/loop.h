@@ -229,6 +229,16 @@ struct inputController_ {
 		return GetAsyncKeyState('A');
 	}
 
+	bool isLMBPressed()
+	{
+		return GetAsyncKeyState(VK_LBUTTON);
+	}
+
+	bool isRMBPressed()
+	{
+		return GetAsyncKeyState(VK_RBUTTON);
+	}
+
 	bool jumpKeyIsDown = false;
 	double jumpKeyDownTime = 0.0;
 	double jumpKeyUpTime = 0.0;
@@ -244,6 +254,7 @@ inputController_ inputController;
 
 
 bool cameraFirstFrame = true;
+float fov = 110;
 
 struct hero_ {
 
@@ -1163,7 +1174,21 @@ struct hero_ {
 
 	} pathControl;
 
-	
+	bool aiming = false;
+	void ProcessAttack() {
+		if (inputController.isLMBPressed()) {
+			if (!aiming) {
+				aiming = true;
+				ConstBuf::interp::Animate(fov, 60, 1.5f, ConstBuf::interp::Curve::EaseOutExpo);
+			}
+		}
+		else {
+			if (aiming) {
+				aiming = false;
+				ConstBuf::interp::Animate(fov, 110, 1.5f, ConstBuf::interp::Curve::EaseOutExpo);
+			}
+		}
+	}
 };
 
 hero_ hero;
@@ -2290,7 +2315,7 @@ namespace Loop
 		gameCamera.rotInertion = in.rotInertion / denom;
 	}
 
-	Object::mesh* testSphere = new Object::mesh;
+	//Object::mesh* testSphere = new Object::mesh;
 
 	void scene3()
 	{
@@ -2314,6 +2339,8 @@ namespace Loop
 			.posInertion = 1400,
 			.rotInertion = 1000
 			});
+
+		gameCamera.lensAngle = fov;
 
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
@@ -2373,6 +2400,8 @@ namespace Loop
 					hero.pathControl.Process();
 					hero.ProcessMove(FIXED_DT); 
 					hero.ProcessJump(FIXED_DT); 
+
+					hero.ProcessAttack();
 
 					if (hero.gravity.mode)
 					{
@@ -2511,7 +2540,7 @@ namespace Loop
 					hero.mesh->animations[8].weight = 10000.0f;
 				}
 
-				testSphere->LoadObj("..//fx//projectFiles//Sphere.glb");
+				//testSphere->LoadObj("..//fx//projectFiles//Sphere.glb");
 
 				hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
 				hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
@@ -2537,7 +2566,7 @@ namespace Loop
 					.jumpCharge = 100
 				});
 
-			p = V2F((hero.pos + XMVectorSet(0, 1, 0, 0)) * 10000.);
+			/*p = V2F((hero.pos + XMVectorSet(0, 1, 0, 0)) * 10000.);
 
 			Object::Mesh({
 					.obj = testSphere,
@@ -2551,7 +2580,10 @@ namespace Loop
 					.zoom = -75,
 					.onLineOfs = (int)hero.yOffset,
 					.jumpCharge = 100
-				});
+				});*/
+
+
+
 
 			//.jumpCharge = (int)(hero.jumpChargeProgress*100.)
 
