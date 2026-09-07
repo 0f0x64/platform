@@ -2327,7 +2327,7 @@ namespace Loop
 		if (!loadedSounds) {
 			loadedSounds = true;
 
-			//collision::CreateSphereCollider();
+			collision::CreateSphereCollider();
 
 			dx11::Audio::LoadWavFile("Braking", "..//fx//projectFiles//BrakingSFX.wav");
 			dx11::Audio::LoadWavFile("Run", "..//fx//projectFiles//RunSFX.wav");
@@ -2339,10 +2339,6 @@ namespace Loop
 			dx11::Audio::LoadOggFile("Character", "..//fx//projectFiles//Character.ogg");
 
 			dx11::Audio::LoadOggFile("Music", "..//fx//projectFiles//Music.ogg");
-
-			hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
-			hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
-			dx11::Audio::Play("Music", true, 0.5f);
 		}
 
 
@@ -2396,7 +2392,7 @@ namespace Loop
 				}
 
 				ConstBuf::interp::UpdateTweens(deltaTime);
-				//collision::UpdateColliders();
+				collision::UpdateColliders();
 
 				float alpha = accumulator / FIXED_DT;
 				alpha = ::std::clamp(alpha, 0.0f, 1.0f);
@@ -2473,51 +2469,55 @@ namespace Loop
 			static bool sceneInitialized = false;
 			if (!sceneInitialized)
 			{
-			//ConstBuf::LoadObj("..//fx//projectFiles//A-Pose.glb");
-			//Object::MeshPtr = nullptr;
+				//ConstBuf::LoadObj("..//fx//projectFiles//A-Pose.glb");
+				//Object::MeshPtr = nullptr;
 
-			hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
+				hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
 
-			static bool heroAnimsLoaded = false;
-			if (!heroAnimsLoaded) {
-				heroAnimsLoaded = true;
+				static bool heroAnimsLoaded = false;
+				if (!heroAnimsLoaded) {
+					heroAnimsLoaded = true;
 
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 3 Ходьба
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 4 Бег
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 5 Падение
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 3 Ходьба
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 4 Бег
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 5 Падение
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
 
-				hero.mesh->animations[0].isPlaying = false;
+					hero.mesh->animations[0].isPlaying = false;
 
-				hero.mesh->animations[1].looped = true;
+					hero.mesh->animations[1].looped = true;
 
-				hero.mesh->animations[2].speed = 0.0f;
-				hero.mesh->animations[2].weight = 100000.0f;
+					hero.mesh->animations[2].speed = 0.0f;
+					hero.mesh->animations[2].weight = 100000.0f;
 
-				hero.mesh->animations[3].looped = true;
+					hero.mesh->animations[3].looped = true;
 
-				hero.mesh->animations[4].looped = true;
+					hero.mesh->animations[4].looped = true;
 
-				hero.mesh->animations[5].looped = true;
-				hero.mesh->animations[5].speed = 0.1f;
+					hero.mesh->animations[5].looped = true;
+					hero.mesh->animations[5].speed = 0.1f;
 
-				hero.mesh->animations[6].speed = 0.0f;
-				hero.mesh->animations[6].weight = 10000.0f;
+					hero.mesh->animations[6].speed = 0.0f;
+					hero.mesh->animations[6].weight = 10000.0f;
 
-				hero.mesh->animations[7].speed = 0.0f;
-				hero.mesh->animations[7].weight = 10000000.0f;
+					hero.mesh->animations[7].speed = 0.0f;
+					hero.mesh->animations[7].weight = 10000000.0f;
 
-				hero.mesh->animations[8].speed = 0.0f;
-				hero.mesh->animations[8].weight = 10000.0f;
-			}
+					hero.mesh->animations[8].speed = 0.0f;
+					hero.mesh->animations[8].weight = 10000.0f;
+				}
 
-			testSphere->LoadObj("..//fx//projectFiles//Sphere.glb");
+				testSphere->LoadObj("..//fx//projectFiles//Sphere.glb");
 
-			sceneInitialized = true;
+				hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
+				hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
+				dx11::Audio::Play("Music", true, 0.3f);
+
+				sceneInitialized = true;
 			}
 			// ----- //
 

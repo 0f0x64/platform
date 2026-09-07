@@ -767,7 +767,12 @@ namespace Object {
 
 		void LoadObj(const char* name)
 		{
-			if (loaded) return;
+			if (loaded) {
+				Log("Error while loading model ");
+				Log(name);
+				Log(". This buffer is already loaded\n");
+				return;
+			};
 
 			if (LoadObjToPointersGLTF(name, &vArray, &iArray))
 			{
@@ -811,12 +816,16 @@ namespace Object {
 				CreateBoneBuffer(device);
 
 				loaded = true;
-				Log("GLTF model loaded successfully\n");
+				Log("GLTF model ");
+				Log(name);
+				Log(" loaded successfully\n");
 			}
 			else
 			{
 				ConstBuf::gltfAnim::scene.status = "Model load failed";
-				Log("GLTF model load failed\n");
+				Log("GLTF model ");
+				Log(name);
+				Log(" load failed\n");
 			}
 		}
 

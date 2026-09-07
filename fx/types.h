@@ -197,11 +197,6 @@ struct float3 { float x; float y; float z; };
 struct float4 {
 	float x; float y; float z; float w;
 
-    // Êîíñòğóêòîğû
-    float4() : x(0), y(0), z(0), w(0) {}
-    float4(float v) : x(v), y(v), z(v), w(v) {}
-    float4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
-
     // ===== ÑËÎÆÅÍÈÅ =====
     // float4 + float4
     float4 operator+(const float4& other) const {
