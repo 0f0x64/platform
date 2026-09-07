@@ -69,7 +69,7 @@ float4 getRandFloat4()
 	};
 }
 
-float length(float4 vec)
+float length(const float4& vec)
 {
 	return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z + vec.w * vec.w);
 }
@@ -79,3 +79,16 @@ float length(float4 vec)
 //	float len = length(vec);
 //	return float4(vec.x / len, vec.y / len, vec.z / len, vec.w / len);
 //}
+
+inline float dot(const float4& a, const float4& b) {
+	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+}
+
+inline float4 cross3(const float4& a, const float4& b) {
+	return float4(
+		a.y * b.z - a.z * b.y,
+		a.z * b.x - a.x * b.z,
+		a.x * b.y - a.y * b.x,
+		0.0f  // w обнуляется
+	);
+}

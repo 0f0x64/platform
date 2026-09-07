@@ -1,5 +1,14 @@
 namespace collision
 {
+    struct SphereCollider
+    {
+        float4 position = float4();
+        float radius = 1.0f;
+        bool isTouchable = true;
+    };
+
+    std::vector<SphereCollider*> colliders;
+
 	struct CollisionResult {
 		float4 position = float4();
 		float4 normal = float4(0, 1, 0, 0);
@@ -7,59 +16,54 @@ namespace collision
 		bool collided = false;
 	};
 
-    //struct RayInfo {
-    //    float4 origin;
-    //    float4 direction;
-    //    bool touchableOnly;
+    struct RayInfo {
+        float4 origin;
+        float4 direction;
+        bool touchableOnly;
 
-    //    RayInfo()
-    //    {
-    //        origin = float4();
-    //        direction = float4();
-    //        touchableOnly = false;
-    //    }
+        RayInfo()
+        {
+            origin = float4();
+            direction = float4();
+            touchableOnly = false;
+        }
 
-    //    RayInfo(float4 Origin, float4 Direction, bool TouchableOnly)
-    //        : origin(Origin), direction(Direction), touchableOnly(TouchableOnly)
-    //    {
-    //    }
-    //};
+        RayInfo(float4 Origin, float4 Direction, bool TouchableOnly)
+            : origin(Origin), direction(Direction), touchableOnly(TouchableOnly)
+        {
+        }
+    };
 
-    //struct SphereCastInfo {
-    //    float4 origin;
-    //    float4 direction;
-    //    float radius;           // Радиус сферы для SphereCast
-    //    float maxDistance;      // Максимальная дистанция
-    //    bool touchableOnly;
+    struct SphereCastInfo {
+        float4 origin;
+        float4 direction;
+        float radius;           // Радиус сферы для SphereCast
+        float maxDistance;      // Максимальная дистанция
+        bool touchableOnly;
 
-    //    SphereCastInfo()
-    //    {
-    //        origin = float4();
-    //        direction = float4();
-    //        radius = 0.5f;
-    //        maxDistance = 100.0f;
-    //        touchableOnly = false;
-    //    }
+        SphereCastInfo()
+        {
+            origin = float4();
+            direction = float4();
+            radius = 0.5f;
+            maxDistance = 100.0f;
+            touchableOnly = false;
+        }
 
-    //    SphereCastInfo(float4 Origin, float4 Direction, float Radius, float MaxDistance, bool TouchableOnly = false)
-    //        : origin(Origin), direction(Direction), radius(Radius), maxDistance(MaxDistance), touchableOnly(TouchableOnly)
-    //    {
-    //    }
-    //};
+        SphereCastInfo(float4 Origin, float4 Direction, float Radius, float MaxDistance, bool TouchableOnly = false)
+            : origin(Origin), direction(Direction), radius(Radius), maxDistance(MaxDistance), touchableOnly(TouchableOnly)
+        {
+        }
+    };
 
-    //struct RaycastResult {
-    //    bool hit = false;
-    //    float distance = INFINITY;
-    //    float4 position;
-    //    float4 normal;
-    //    Entity* entity;
-    //};
-
-    //struct SphereCollider
-    //{
-    //    float radius = 1.0f;
-    //    bool isTouchable = true;
-    //};
+    struct RaycastResult {
+        bool hit = false;
+        float distance = INFINITY;
+        float4 position;
+        float4 normal;
+        SphereCollider* collider;
+        //Entity* entity;
+    };
 
 	CollisionResult sphere_vs_sphere(
 		const float4 pos1, const float radius1,
@@ -90,164 +94,160 @@ namespace collision
 	}
 
 
-    //RaycastResult Raycast(const RayInfo& ray)
-    //{
-    //    RaycastResult closestHit;
-    //    const std::vector<Entity*>& entities = entityStorage->GetEntitiesWithComponent<SphereCollider>();
+    RaycastResult Raycast(const RayInfo& ray)
+    {
+        RaycastResult closestHit;
 
-    //    for (Entity* entity : entities) {
-    //        RaycastResult hit;
+        for (SphereCollider* collider : colliders) {
+            RaycastResult hit;
 
-    //        SphereCollider* sphereCollider = entity->GetComponent<SphereCollider>();
-    //        if (sphereCollider != nullptr && sphereCollider->active
-    //            && CollisionFilter::collisionTable[(int)sphereCollider->collisionGroup][(int)ray.collisionGroup]
-    //            && (!ray.touchableOnly || sphereCollider->isTouchable))
-    //        {
-    //            if (raycast_sphere(ray, GetWorldTransform(entity), sphereCollider, hit) && hit.distance < closestHit.distance) {
-    //                closestHit.hit = true;
-    //                closestHit.distance = hit.distance;
-    //                closestHit.position = hit.position;
-    //                closestHit.normal = hit.normal;
-    //                closestHit.collider = sphereCollider;
-    //                closestHit.entity = entity;
-    //            }
-    //        }
-    //    }
+            if (!ray.touchableOnly || collider->isTouchable)
+            {
+                if (raycast_sphere(ray, collider, hit) && hit.distance < closestHit.distance) {
+                    closestHit.hit = true;
+                    closestHit.distance = hit.distance;
+                    closestHit.position = hit.position;
+                    closestHit.normal = hit.normal;
+                    closestHit.collider = collider;
+                    //closestHit.entity = entity;
+                }
+            }
+        }
 
-    //    return closestHit;
-    //}
+        return closestHit;
+    }
 
 
-    //bool raycast_sphere(const RayInfo& ray, const Transform transform, const SphereCollider* sphere, RaycastResult& hit)
-    //{
-    //    float4 oc = ray.origin - transform.position;
+    bool raycast_sphere(const RayInfo& ray, const SphereCollider* collider, RaycastResult& hit)
+    {
+        float4 oc = float4(ray.origin.x - collider->position.x, ray.origin.y - collider->position.y, ray.origin.z - collider->position.z, 0);
 
-    //    // Квадратное уравнение для пересечения луча и сферы
-    //    float a = ray.direction.dot(ray.direction);
-    //    float b = 2.0f * oc.dot(ray.direction);
-    //    float c = oc.dot(oc) - sphere->radius * sphere->radius;
+        // Квадратное уравнение для пересечения луча и сферы
+        float a = dot(ray.direction, ray.direction);
+        float b = 2.0f * dot(oc, ray.direction);
+        float c = dot(oc, oc) - collider->radius * collider->radius;
 
-    //    float discriminant = b * b - 4 * a * c;
+        float discriminant = b * b - 4 * a * c;
 
-    //    if (discriminant < 0) {
-    //        hit.hit = false;
-    //        return false;
-    //    }
+        if (discriminant < 0) {
+            hit.hit = false;
+            return false;
+        }
 
-    //    float sqrtDiscriminant = sqrt(discriminant);
-    //    float t1 = (-b - sqrtDiscriminant) / (2 * a);
-    //    float t2 = (-b + sqrtDiscriminant) / (2 * a);
+        float sqrtDiscriminant = sqrt(discriminant);
+        float t1 = (-b - sqrtDiscriminant) / (2 * a);
+        float t2 = (-b + sqrtDiscriminant) / (2 * a);
 
-    //    // Выбираем ближайшее положительное пересечение
-    //    float distance = ray.direction.magnitude();
-    //    float t = -1.0f;
-    //    if (t1 > 0 && t1 <= distance) {
-    //        t = t1;
-    //    }
-    //    else if (t2 > 0 && t2 <= distance) {
-    //        t = t2;
-    //    }
+        // Выбираем ближайшее положительное пересечение
+        float distance = length(ray.direction);
+        float t = -1.0f;
+        if (t1 > 0 && t1 <= distance) {
+            t = t1;
+        }
+        else if (t2 > 0 && t2 <= distance) {
+            t = t2;
+        }
 
-    //    if (t < 0) {
-    //        hit.hit = false;
-    //        return false;
-    //    }
+        if (t < 0) {
+            hit.hit = false;
+            return false;
+        }
 
-    //    hit.hit = true;
-    //    hit.distance = t;
-    //    hit.position = ray.origin + ray.direction * t;
-    //    hit.normal = (hit.position - transform.position).normalized();
+        hit.hit = true;
+        hit.distance = t;
+        hit.position = ray.origin + ray.direction * t;
+        hit.normal = normalize(hit.position - collider->position);
 
-    //    return true;
-    //}
+        return true;
+    }
 
 
-    //RaycastResult Spherecast(const SphereCastInfo& sphereCast)
-    //{
-    //    RaycastResult closestHit;
-    //    const std::vector<Entity*>& entities = entityStorage->GetEntitiesWithComponent<SphereCollider>();
-
-    //    // Нормализуем направление для точных вычислений
-    //    float4 direction = sphereCast.direction.normalized();
-
-    //    for (Entity* entity : entities) {
-    //        RaycastResult hit;
-    //        SphereCollider* sphereCollider = entity->GetComponent<SphereCollider>();
-
-    //        // Проверяем, активен ли коллайдер и подходит ли по фильтру
-    //        if (sphereCollider != nullptr && sphereCollider->active
-    //            && CollisionFilter::collisionTable[(int)sphereCollider->collisionGroup][(int)sphereCast.collisionGroup]
-    //            && (!sphereCast.touchableOnly || sphereCollider->isTouchable))
-    //        {
-    //            // Используем новый метод проверки пересечения сферы со сферой
-    //            if (spherecast_sphere(sphereCast, GetWorldTransform(entity), sphereCollider, hit)
-    //                && hit.distance < closestHit.distance) {
-    //                closestHit.hit = true;
-    //                closestHit.distance = hit.distance;
-    //                closestHit.position = hit.position;
-    //                closestHit.normal = hit.normal;
-    //                closestHit.collider = sphereCollider;
-    //                closestHit.entity = entity;
-    //            }
-    //        }
-    //    }
-
-    //    return closestHit;
-    //}
-
-    //bool spherecast_sphere(const SphereCastInfo& sphereCast,
-    //    const Transform& transform,
-    //    const SphereCollider* sphere,
-    //    RaycastResult& hit)
-    //{
-    //    // Вектор от центра сферы-цели до начала сферы-луча
-    //    float4 oc = sphereCast.origin - transform.position;
-    //    float4 direction = sphereCast.direction.normalized();
-
-    //    // Суммарный радиус (сфера луча + сфера цели)
-    //    float combinedRadius = sphereCast.radius + sphere->radius;
-    //    float maxDistance = sphereCast.maxDistance;
-
-    //    // Квадратное уравнение для пересечения сферы и луча с учетом радиуса сферы-луча
-    //    float a = direction.dot(direction); // Всегда 1 если нормализовано
-    //    float b = 2.0f * oc.dot(direction);
-    //    float c = oc.dot(oc) - combinedRadius * combinedRadius;
-
-    //    float discriminant = b * b - 4 * a * c;
-
-    //    if (discriminant < 0) {
-    //        hit.hit = false;
-    //        return false;
-    //    }
-
-    //    float sqrtDiscriminant = sqrt(discriminant);
-    //    float t1 = (-b - sqrtDiscriminant) / (2 * a);
-    //    float t2 = (-b + sqrtDiscriminant) / (2 * a);
-
-    //    // Выбираем ближайшее положительное пересечение, но не дальше maxDistance
-    //    float t = -1.0f;
-    //    if (t1 > 0 && t1 <= maxDistance) {
-    //        t = t1;
-    //    }
-    //    else if (t2 > 0 && t2 <= maxDistance) {
-    //        t = t2;
-    //    }
-
-    //    if (t < 0) {
-    //        hit.hit = false;
-    //        return false;
-    //    }
-    //    // Вычисляем точку пересечения
-    //    float4 hitPoint = sphereCast.origin + direction * t;
-
-    //    // Вычисляем нормаль (от центра цели к точке попадания)
-    //    float4 normal = (hitPoint - transform.position).normalized();
-
-    //    hit.hit = true;
-    //    hit.distance = t;
-    //    hit.position = hitPoint;
-    //    hit.normal = normal;
-
-    //    return true;
-    //}
+    RaycastResult Spherecast(const SphereCastInfo& sphereCast)
+    {
+        RaycastResult closestHit;
+        const std::vector<Entity*>& entities = entityStorage->GetEntitiesWithComponent<SphereCollider>();
+    
+        // Нормализуем направление для точных вычислений
+        float4 direction = sphereCast.direction.normalized();
+    
+        for (Entity* entity : entities) {
+            RaycastResult hit;
+            SphereCollider* sphereCollider = entity->GetComponent<SphereCollider>();
+    
+            // Проверяем, активен ли коллайдер и подходит ли по фильтру
+            if (sphereCollider != nullptr && sphereCollider->active
+                && CollisionFilter::collisionTable[(int)sphereCollider->collisionGroup][(int)sphereCast.collisionGroup]
+                && (!sphereCast.touchableOnly || sphereCollider->isTouchable))
+            {
+                // Используем новый метод проверки пересечения сферы со сферой
+                if (spherecast_sphere(sphereCast, GetWorldTransform(entity), sphereCollider, hit)
+                    && hit.distance < closestHit.distance) {
+                    closestHit.hit = true;
+                    closestHit.distance = hit.distance;
+                    closestHit.position = hit.position;
+                    closestHit.normal = hit.normal;
+                    closestHit.collider = sphereCollider;
+                    closestHit.entity = entity;
+                }
+            }
+        }
+    
+        return closestHit;
+    }
+    
+    bool spherecast_sphere(const SphereCastInfo& sphereCast,
+        const Transform& transform,
+        const SphereCollider* sphere,
+        RaycastResult& hit)
+    {
+        // Вектор от центра сферы-цели до начала сферы-луча
+        float4 oc = sphereCast.origin - transform.position;
+        float4 direction = sphereCast.direction.normalized();
+    
+        // Суммарный радиус (сфера луча + сфера цели)
+        float combinedRadius = sphereCast.radius + sphere->radius;
+        float maxDistance = sphereCast.maxDistance;
+    
+        // Квадратное уравнение для пересечения сферы и луча с учетом радиуса сферы-луча
+        float a = direction.dot(direction); // Всегда 1 если нормализовано
+        float b = 2.0f * oc.dot(direction);
+        float c = oc.dot(oc) - combinedRadius * combinedRadius;
+    
+        float discriminant = b * b - 4 * a * c;
+    
+        if (discriminant < 0) {
+            hit.hit = false;
+            return false;
+        }
+    
+        float sqrtDiscriminant = sqrt(discriminant);
+        float t1 = (-b - sqrtDiscriminant) / (2 * a);
+        float t2 = (-b + sqrtDiscriminant) / (2 * a);
+    
+        // Выбираем ближайшее положительное пересечение, но не дальше maxDistance
+        float t = -1.0f;
+        if (t1 > 0 && t1 <= maxDistance) {
+            t = t1;
+        }
+        else if (t2 > 0 && t2 <= maxDistance) {
+            t = t2;
+        }
+    
+        if (t < 0) {
+            hit.hit = false;
+            return false;
+        }
+        // Вычисляем точку пересечения
+        float4 hitPoint = sphereCast.origin + direction * t;
+    
+        // Вычисляем нормаль (от центра цели к точке попадания)
+        float4 normal = (hitPoint - transform.position).normalized();
+    
+        hit.hit = true;
+        hit.distance = t;
+        hit.position = hitPoint;
+        hit.normal = normal;
+    
+        return true;
+    }
 }

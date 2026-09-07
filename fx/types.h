@@ -193,7 +193,123 @@ typedef unsigned char pStr;
 
 struct float2 { float x; float y; };
 struct float3 { float x; float y; float z; };
-struct float4 { float x; float y; float z; float w; };
+
+struct float4 {
+	float x; float y; float z; float w;
+
+    // Конструкторы
+    float4() : x(0), y(0), z(0), w(0) {}
+    float4(float v) : x(v), y(v), z(v), w(v) {}
+    float4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+
+    // ===== СЛОЖЕНИЕ =====
+    // float4 + float4
+    float4 operator+(const float4& other) const {
+        return float4(x + other.x, y + other.y, z + other.z, w + other.w);
+    }
+
+    // float4 += float4
+    float4& operator+=(const float4& other) {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+        w += other.w;
+        return *this;
+    }
+
+    // ===== ВЫЧИТАНИЕ =====
+    // float4 - float4
+    float4 operator-(const float4& other) const {
+        return float4(x - other.x, y - other.y, z - other.z, w - other.w);
+    }
+
+    // float4 -= float4
+    float4& operator-=(const float4& other) {
+        x -= other.x;
+        y -= other.y;
+        z -= other.z;
+        w -= other.w;
+        return *this;
+    }
+
+    // Унарный минус
+    float4 operator-() const {
+        return float4(-x, -y, -z, -w);
+    }
+
+    // ===== УМНОЖЕНИЕ НА float4 =====
+    // float4 * float4 (покомпонентно)
+    float4 operator*(const float4& other) const {
+        return float4(x * other.x, y * other.y, z * other.z, w * other.w);
+    }
+
+    // float4 *= float4
+    float4& operator*=(const float4& other) {
+        x *= other.x;
+        y *= other.y;
+        z *= other.z;
+        w *= other.w;
+        return *this;
+    }
+
+    // ===== УМНОЖЕНИЕ НА float =====
+    // float4 * float
+    float4 operator*(float scalar) const {
+        return float4(x * scalar, y * scalar, z * scalar, w * scalar);
+    }
+
+    // float4 *= float
+    float4& operator*=(float scalar) {
+        x *= scalar;
+        y *= scalar;
+        z *= scalar;
+        w *= scalar;
+        return *this;
+    }
+
+    // ===== ДЕЛЕНИЕ НА float4 =====
+    // float4 / float4 (покомпонентно)
+    float4 operator/(const float4& other) const {
+        return float4(x / other.x, y / other.y, z / other.z, w / other.w);
+    }
+
+    // float4 /= float4
+    float4& operator/=(const float4& other) {
+        x /= other.x;
+        y /= other.y;
+        z /= other.z;
+        w /= other.w;
+        return *this;
+    }
+
+    // ===== ДЕЛЕНИЕ НА float =====
+    // float4 / float
+    float4 operator/(float scalar) const {
+        float inv = 1.0f / scalar;
+        return float4(x * inv, y * inv, z * inv, w * inv);
+    }
+
+    // float4 /= float
+    float4& operator/=(float scalar) {
+        float inv = 1.0f / scalar;
+        x *= inv;
+        y *= inv;
+        z *= inv;
+        w *= inv;
+        return *this;
+    }
+};
+
+// float * float4
+inline float4 operator*(float scalar, const float4& v) {
+    return v * scalar;
+}
+
+// float / float4 (деление скаляра на вектор - покомпонентно)
+inline float4 operator/(float scalar, const float4& v) {
+    return float4(scalar / v.x, scalar / v.y, scalar / v.z, scalar / v.w);
+}
+
 struct int2 { int x; int y; };
 struct int3 { int x; int y; int z; };
 struct int4 { int x; int y; int z; int w; };
