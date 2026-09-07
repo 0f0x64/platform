@@ -16,6 +16,9 @@
     <Filter Include="Source Files\projectFiles">
       <UniqueIdentifier>{48d34976-4b74-47cc-95fa-1381348bf0e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\projectFiles\enemies">
+      <UniqueIdentifier>{c7c13f6c-3aa0-4c0c-8b10-d35fb6b457a2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files\generated">
       <UniqueIdentifier>{5d051027-66fd-480c-ba4d-8a03f468ba02}</UniqueIdentifier>
     </Filter>
@@ -166,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="projectFiles\cubemap.h">
       <Filter>Source Files\projectFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\enemies\enemy.h">
+      <Filter>Source Files\projectFiles\enemies</Filter>
     </ClInclude>
     <ClInclude Include="projectFiles\object.h">
       <Filter>Source Files\projectFiles</Filter>
