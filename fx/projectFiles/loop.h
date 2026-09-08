@@ -1064,7 +1064,7 @@ struct hero_ {
 
 		//----------------
 
-		Object::heroWorld = inputController.mouse.getLookMatrix(finalAirRot, upVector, deltaTime, changeDirSpeed, mesh);
+		mesh->model = inputController.mouse.getLookMatrix(finalAirRot, upVector, deltaTime, changeDirSpeed, mesh);
 		axisAngle = lerp(axisAngle, 0, blendStep);
 		axisAngleSpeed = lerp(axisAngleSpeed, 0, blendStep);
 		//hero.axisAngle = 0;
@@ -1149,7 +1149,7 @@ struct hero_ {
 		pos = XMVectorLerp(pCurrent, pNext, t);
 
 		Object::heroOnRails = getHeroOnRailsMatrix(heroForward, HeroRealUp, HeroRight);
-		Object::heroWorld = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime, changeDirSpeed, mesh);
+		mesh->model = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime, changeDirSpeed, mesh);
 	}
 
 	struct {
@@ -2571,7 +2571,7 @@ namespace Loop
 			}
 			// ----- //
 
-			enemyRenderer.RenderDepth(enemySystem);
+			enemyRenderer.RenderDepth(enemySystem, deltaTime);
 
 			float4 p = V2F(hero.pos * 10000.);
 
@@ -2590,11 +2590,11 @@ namespace Loop
 					.deltaTime = deltaTime
 				});
 
-			enemyRenderer.RenderColor(enemySystem);
+			enemyRenderer.RenderColor(enemySystem, deltaTime);
 
 			//.jumpCharge = (int)(hero.jumpChargeProgress*100.)
 
-			//Object::heroWorld = XMMatrixTranspose(XMMatrixIdentity());
+			//hero.mesh->model = XMMatrixTranspose(XMMatrixIdentity());
 
 			/*Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
 			Object::MeshPtr = &Object::BossMesh;

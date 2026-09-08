@@ -69,6 +69,9 @@ namespace Object {
 		float lookPitchCurrent = 0.0f;
 		bool lookAtEnabled = true;
 
+		XMMATRIX model = XMMatrixIdentity();
+		float4 colorTint = { 1.0f, 1.0f, 1.0f, 1.0f };
+
 		ConstBuf::vertex* vArray = nullptr;
 		ConstBuf::index* iArray = nullptr;
 
@@ -1601,12 +1604,13 @@ namespace Object {
 		vs::girl = {
 			.params =
 			{
-				.model = heroWorld,
+				.model = obj->model,
 				.gX = gX,
 				.gY = gY,
 				.mode = (int)mode,
 				.skipper = skipper,
 				.base_color = float4(r / 100.,g / 100.,b / 100.,1),
+				.colorMultiplier = obj->colorTint,
 				.modelPos = float4(xPos / 10000.,yPos / 10000.,zPos / 10000.,0),
 				.triCount = float4(triCnt,0,0,0),
 				.brightness = float4(brightness,0,0,0),
@@ -1626,13 +1630,13 @@ namespace Object {
 		vs::girl.set();
 
 		if (obj && obj->loaded) {
-			obj->Update(deltaTime); // 1.0f / FRAMES_PER_SECOND
+			obj->Update(deltaTime); // prev: 1.0f / FRAMES_PER_SECOND
 			obj->BindBones(dx11::context);
 
 			obj->LoadToShaders();
 		}
 		else {
-			dx11::ConstBuf::gltfAnim::Update(deltaTime); // 1.0f / FRAMES_PER_SECOND
+			dx11::ConstBuf::gltfAnim::Update(deltaTime); // prev: 1.0f / FRAMES_PER_SECOND
 			dx11::ConstBuf::gltfAnim::BindBones(dx11::context);
 
 			ConstBuf::BindSB(0);
