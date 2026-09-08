@@ -1188,6 +1188,19 @@ struct hero_ {
 			if (aiming) {
 				aiming = false;
 				ConstBuf::interp::Animate(fov, 110, 1.5f, ConstBuf::interp::Curve::EaseOutExpo);
+
+				collision::RayInfo ray = collision::RayInfo();
+				ray.origin = float4();
+				ray.direction = float4(0, 1, 0, 0);
+
+				collision::RaycastResult result = collision::Raycast(ray);
+
+				if (result.hit) {
+					Log("Attack hit\n");
+				}
+				else {
+					Log("Attack miss\n");
+				}
 			}
 		}
 	}

@@ -16,6 +16,8 @@ namespace Enemies
 		using InitializeCallback = std::function<void(Enemy&)>;
 		using UpdateCallback = std::function<void(Enemy&, float)>;
 
+		collision::SphereCollider* collider;
+
 		Position position;
 		Position movementCenter;
 		Position movementTarget;
@@ -26,6 +28,7 @@ namespace Enemies
 
 		void Initialize()
 		{
+			collider = collision::CreateSphereCollider();
 			if (initializeCallback) initializeCallback(*this);
 		}
 
