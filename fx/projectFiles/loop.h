@@ -539,7 +539,7 @@ struct hero_ {
 			cameraFirstFrame = true;
 			srand(timer::frameBeginTime);
 			firstRun = false;
-			int range = 20;
+			int range = 2;
 			pos = getRandVector4() * range;
 			startAirDistance = length3(V2F(pos));
 			//int startLine = rand()% Object::starLineList.lineCount;
@@ -549,6 +549,9 @@ struct hero_ {
 			int startPoint = 1;
 			
 			float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
+			
+			destPoint = { 25700 /100., 28500 / 100., 27200 / 100. };
+			
 			pos += F2V(destPoint);
 			gravity.mode = true;
 			gravity.progress = 0.0f;

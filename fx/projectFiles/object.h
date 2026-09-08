@@ -1082,7 +1082,7 @@ namespace Object {
 		AddPointToLine({ 33300, 44600, 39700 });
 		AddPointToLine({ 32700, 46300, 41400 });
 		AddPointToLine({ 34200, 47800, 43000 });
-		AddPointToLine({ 36500, 49200, 44500 });
+		AddPointToLine({ 36958, 49071, 44941 });
 
 
 		// ============================================================
@@ -1248,10 +1248,10 @@ namespace Object {
 // ------------------------------------------------------------
 
 		NewLine();
-		AddPointToLine({ 31500, 24500, 24500 });
-		AddPointToLine({ 33000, 25800, 26000 });
-		AddPointToLine({ 34500, 27500, 27800 });
-		AddPointToLine({ 36000, 29200, 29500 });
+		AddPointToLine({ 31442, 15000, 24500 });
+		AddPointToLine({ 35131, 19000, 26000 });
+		AddPointToLine({ 35500, 24500, 27800 });
+		AddPointToLine({ 36000, 27200, 29500 });
 		AddPointToLine({ 37000, 31000, 31000 });
 		AddPointToLine({ 36500, 32800, 32500 });
 		AddPointToLine({ 35000, 34500, 33800 });
@@ -1263,9 +1263,9 @@ namespace Object {
 		// ------------------------------------------------------------
 
 		NewLine();
-		AddPointToLine({ 32500, 25000, 25000 });
-		AddPointToLine({ 34200, 26800, 26800 });
-		AddPointToLine({ 35800, 28500, 28600 });
+		AddPointToLine({ 32536, 29700, 25000 });
+		AddPointToLine({ 34200, 28800, 26800 });
+		AddPointToLine({ 35800, 28200, 28600 });
 		AddPointToLine({ 37200, 30200, 30400 });
 		AddPointToLine({ 37800, 32000, 32100 });
 		AddPointToLine({ 37000, 33800, 33500 });
@@ -1278,8 +1278,8 @@ namespace Object {
 		// ------------------------------------------------------------
 
 		NewLine();
-		AddPointToLine({ 30500, 25800, 24800 });
-		AddPointToLine({ 31800, 27600, 26500 });
+		AddPointToLine({ 30502, 30504, 24800 });
+		AddPointToLine({ 31800, 29664, 26500 });
 		AddPointToLine({ 33200, 29400, 28200 });
 		AddPointToLine({ 34500, 31200, 30000 });
 		AddPointToLine({ 34800, 33000, 31700 });
@@ -1294,8 +1294,8 @@ namespace Object {
 		// ------------------------------------------------------------
 
 		NewLine();
-		AddPointToLine({ 29500, 26500, 25500 });
-		AddPointToLine({ 30700, 28500, 27200 });
+		AddPointToLine({ 21976, 26500, 25500 });
+		AddPointToLine({ 25700, 28500, 27200 });
 		AddPointToLine({ 32000, 30500, 29000 });
 		AddPointToLine({ 32500, 32500, 30800 });
 		AddPointToLine({ 31800, 34500, 32500 });
