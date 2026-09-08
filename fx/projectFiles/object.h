@@ -951,9 +951,9 @@ namespace Object {
 // ------------------------------------------------------------
 
 		NewLine();
-		AddPointToLine({ 31500, 25000, 25000 });
-		AddPointToLine({ 32500, 25800, 26300 });
-		AddPointToLine({ 33200, 27500, 27800 });
+		AddPointToLine({ 36864, 24900, 25014 });
+		AddPointToLine({ 35723, 26003, 26497 });
+		AddPointToLine({ 32376, 27669, 27800 });
 		AddPointToLine({ 32500, 29200, 29500 });
 		AddPointToLine({ 30700, 30500, 31300 });
 		AddPointToLine({ 29000, 31800, 32900 });
@@ -970,10 +970,10 @@ namespace Object {
 		// ------------------------------------------------------------
 
 		NewLine();
-		AddPointToLine({ 30500, 25500, 24500 });
-		AddPointToLine({ 31300, 27000, 25800 });
-		AddPointToLine({ 32000, 28600, 27600 });
-		AddPointToLine({ 31100, 30200, 29300 });
+		AddPointToLine({ 31732, 29658, 24500 });
+		AddPointToLine({ 31309, 29471, 25800 });
+		AddPointToLine({ 32000, 29600, 27600 });
+		AddPointToLine({ 31100, 31200, 29300 });
 		AddPointToLine({ 29400, 31700, 31000 });
 		AddPointToLine({ 27500, 32900, 32600 });
 		AddPointToLine({ 26500, 34700, 34100 });
@@ -988,10 +988,10 @@ namespace Object {
 		// ------------------------------------------------------------
 
 		NewLine();
-		AddPointToLine({ 29500, 26500, 25800 });
-		AddPointToLine({ 30000, 28000, 27100 });
-		AddPointToLine({ 29700, 29600, 28600 });
-		AddPointToLine({ 28300, 31000, 30200 });
+		AddPointToLine({ 27455, 17460, 25800 });
+		AddPointToLine({ 28000, 18000, 28100 });
+		AddPointToLine({ 30700, 23600, 30600 });
+		AddPointToLine({ 28300, 32000, 30200 });
 		AddPointToLine({ 26500, 32500, 31900 });
 		AddPointToLine({ 24800, 34000, 33400 });
 		AddPointToLine({ 24000, 35800, 35000 });
@@ -1507,20 +1507,46 @@ namespace Object {
 		AddPointToLine({ 60200, 54500, 53700 });
 		AddPointToLine({ 62500, 52800, 55200 });
 		AddPointToLine({ 64700, 50800, 56800 });
-		AddPointToLine({ 67000, 49000, 58200 });
+		AddPointToLine({ 67000, 49000, 58201 });
 
 
 		// ------------------------------------------------------------
-		// НИТЬ 19
-		// Подход к C
-		// ------------------------------------------------------------
+// НИТЬ 19
+// Подход к C — верхняя плавная группа
+// ------------------------------------------------------------
 
 		NewLine();
 		AddPointToLine({ 62500, 51500, 57500 });
-		AddPointToLine({ 64500, 50000, 58200 });
-		AddPointToLine({ 66500, 48500, 59000 });
-		AddPointToLine({ 68500, 47200, 49500 });
-		AddPointToLine({ 70500, 46500, 50000 });
+		AddPointToLine({ 63200, 50800, 57800 });
+		AddPointToLine({ 63900, 50100, 58150 });
+		AddPointToLine({ 64600, 49400, 58350 });
+		AddPointToLine({ 65300, 48700, 58400 });
+		AddPointToLine({ 66000, 48100, 58200 });
+		AddPointToLine({ 66700, 47600, 57700 });
+		AddPointToLine({ 67400, 47300, 56800 });
+		AddPointToLine({ 68100, 47200, 55600 });
+		AddPointToLine({ 68800, 47300, 54400 });
+		AddPointToLine({ 69500, 47500, 53200 });
+		AddPointToLine({ 70200, 47700, 52100 });
+		AddPointToLine({ 70900, 47800, 51300 });
+		AddPointToLine({ 71600, 47600, 50800 });
+
+
+		NewLine();
+		AddPointToLine({ 60500, 49500, 55500 });
+		AddPointToLine({ 61200, 48800, 55800 });
+		AddPointToLine({ 61900, 48100, 56150 });
+		AddPointToLine({ 62600, 47400, 56350 });
+		AddPointToLine({ 63300, 46800, 56300 });
+		AddPointToLine({ 64000, 46200, 56000 });
+		AddPointToLine({ 64700, 45700, 55300 });
+		AddPointToLine({ 65400, 45300, 54400 });
+		AddPointToLine({ 66100, 45100, 53300 });
+		AddPointToLine({ 66800, 45000, 52200 });
+		AddPointToLine({ 67500, 45100, 51200 });
+		AddPointToLine({ 68200, 45300, 50400 });
+		AddPointToLine({ 68900, 45500, 49900 });
+		AddPointToLine({ 69600, 45700, 49700 });
 
 
 		// ------------------------------------------------------------
@@ -1530,10 +1556,20 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 64000, 52500, 57000 });
-		AddPointToLine({ 66000, 51000, 58000 });
-		AddPointToLine({ 68000, 49500, 59000 });
-		AddPointToLine({ 70000, 48200, 50000 });
-		AddPointToLine({ 72000, 47500, 51000 });
+		AddPointToLine({ 64700, 51800, 57400 });
+		AddPointToLine({ 65400, 51100, 57800 });
+		AddPointToLine({ 66100, 50400, 58100 });
+		AddPointToLine({ 66800, 49800, 58200 });
+		AddPointToLine({ 67500, 49200, 58000 });
+		AddPointToLine({ 68200, 48700, 57400 });
+		AddPointToLine({ 68900, 48300, 56600 });
+		AddPointToLine({ 69600, 48000, 55600 });
+		AddPointToLine({ 70300, 47800, 54500 });
+		AddPointToLine({ 71000, 47800, 53400 });
+		AddPointToLine({ 71700, 48000, 52400 });
+		AddPointToLine({ 72400, 48300, 51600 });
+		AddPointToLine({ 73100, 48700, 51100 });
+		AddPointToLine({ 73800, 49100, 50800 });
 
 
 		// ------------------------------------------------------------
@@ -1543,22 +1579,55 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 69000, 45500, 50500 });
-		AddPointToLine({ 71000, 45000, 50000 });
-		AddPointToLine({ 73000, 45200, 49500 });
-		AddPointToLine({ 75000, 46000, 49000 });
-		AddPointToLine({ 77000, 47200, 48500 });
-
-
-		// ------------------------------------------------------------
-		// НИТЬ 22
-		// Ещё один короткий обход C
-		// ------------------------------------------------------------
+		AddPointToLine({ 69600, 45300, 50450 });
+		AddPointToLine({ 70200, 45000, 50300 });
+		AddPointToLine({ 70800, 44600, 50100 });
+		AddPointToLine({ 71400, 44300, 49850 });
+		AddPointToLine({ 72000, 44100, 49600 });
+		AddPointToLine({ 72600, 44150, 49350 });
+		AddPointToLine({ 73200, 44400, 49100 });
+		AddPointToLine({ 73800, 44800, 48900 });
+		AddPointToLine({ 74400, 45300, 48700 });
+		AddPointToLine({ 75000, 45800, 48550 });
+		AddPointToLine({ 75600, 46200, 48400 });
+		AddPointToLine({ 76200, 46500, 48300 });
+		AddPointToLine({ 76800, 46800, 48350 });
+		AddPointToLine({ 77400, 47200, 48500 });
 
 		NewLine();
-		AddPointToLine({ 70500, 44500, 51500 });
-		AddPointToLine({ 72500, 44200, 51000 });
-		AddPointToLine({ 74500, 44800, 50500 });
-		AddPointToLine({ 76500, 46000, 50000 });
+		AddPointToLine({ 69000, 46100, 51200 });
+		AddPointToLine({ 69600, 45900, 51100 });
+		AddPointToLine({ 70200, 45600, 50950 });
+		AddPointToLine({ 70800, 45200, 50700 });
+		AddPointToLine({ 71400, 44900, 50450 });
+		AddPointToLine({ 72000, 44700, 50200 });
+		AddPointToLine({ 72600, 44750, 49900 });
+		AddPointToLine({ 73200, 45000, 49650 });
+		AddPointToLine({ 73800, 45400, 49400 });
+		AddPointToLine({ 74400, 45900, 49200 });
+		AddPointToLine({ 75000, 46400, 49050 });
+		AddPointToLine({ 75600, 46800, 48900 });
+		AddPointToLine({ 76200, 47100, 48800 });
+		AddPointToLine({ 76800, 47400, 48850 });
+		AddPointToLine({ 77400, 47800, 49000 });
+
+		NewLine();
+		AddPointToLine({ 69000, 46700, 51900 });
+		AddPointToLine({ 69600, 46500, 51800 });
+		AddPointToLine({ 70200, 46200, 51650 });
+		AddPointToLine({ 70800, 45800, 51400 });
+		AddPointToLine({ 71400, 45500, 51150 });
+		AddPointToLine({ 72000, 45300, 50900 });
+		AddPointToLine({ 72600, 45350, 50650 });
+		AddPointToLine({ 73200, 45600, 50400 });
+		AddPointToLine({ 73800, 46000, 50150 });
+		AddPointToLine({ 74400, 46500, 49900 });
+		AddPointToLine({ 75000, 47000, 49750 });
+		AddPointToLine({ 75600, 47400, 49600 });
+		AddPointToLine({ 76200, 47700, 49500 });
+		AddPointToLine({ 76800, 48000, 49550 });
+		AddPointToLine({ 77400, 48400, 49700 });
+
 
 		// ============================================================
 // РАЗВИЛКА A -> C
@@ -2170,9 +2239,9 @@ namespace Object {
 
 		// D — выше и правее B
 		NewStar({
-			.x = 52000,
-			.y = 65000,
-			.z = 72000,
+			.x = 51876,
+			.y = 74141,
+			.z = 67000,
 			.rad = 6630,
 			.r = 0,
 			.g = 4,
