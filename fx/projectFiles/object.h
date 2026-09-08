@@ -1586,7 +1586,14 @@ namespace Object {
 	XMMATRIX heroOnRails;
 	XMMATRIX heroWorld;
 
-	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom, int onLineOfs, int jumpCharge, float deltaTime)
+	struct MeshDrawOptions
+	{
+		XMMATRIX model = XMMatrixIdentity();
+		float4 tint = { 1.0f, 1.0f, 1.0f, 1.0f };
+		bool advanceAnimation = true;
+	};
+
+	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom, int onLineOfs, int jumpCharge, const MeshDrawOptions* options = nullptr, float deltaTime = 0.0f)
 	{
 
 		int gX = sqrt(count / skipper);
@@ -1601,12 +1608,13 @@ namespace Object {
 		vs::girl = {
 			.params =
 			{
-				.model = heroWorld,
+				.model = options ? options->model : heroWorld,
 				.gX = gX,
 				.gY = gY,
 				.mode = (int)mode,
 				.skipper = skipper,
 				.base_color = float4(r / 100.,g / 100.,b / 100.,1),
+				.colorMultiplier = options ? options->tint : float4(1, 1, 1, 1),
 				.modelPos = float4(xPos/10000.,yPos / 10000.,zPos / 10000.,0),
 				.triCount = float4(triCnt,0,0,0),
 				.brightness = float4(brightness,0,0,0),
@@ -1626,7 +1634,7 @@ namespace Object {
 		vs::girl.set();
 
 		if (obj && obj->loaded) {
-			obj->Update(deltaTime); // 1.0f / FRAMES_PER_SECOND
+			if (!options || options->advanceAnimation) obj->Update(deltaTime); // 1.0f / FRAMES_PER_SECOND
 			obj->BindBones(dx11::context);
 
 			obj->LoadToShaders();
