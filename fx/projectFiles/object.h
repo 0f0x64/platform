@@ -1587,7 +1587,7 @@ namespace Object {
 	dx11::ConstBuf::sbObject* MeshPtr = NULL;
 
 	XMMATRIX heroOnRails;
-	XMMATRIX heroWorld;
+	//XMMATRIX heroWorld;
 
 	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness, int zoom, int onLineOfs, int jumpCharge, float deltaTime)
 	{

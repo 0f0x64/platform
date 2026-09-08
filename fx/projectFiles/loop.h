@@ -1026,7 +1026,7 @@ struct hero_ {
 
 		XMVECTOR targetQuat = XMQuaternionRotationMatrix(targetAirMatrix);
 
-		// 7. Извлекаем текущую ориентацию из Object::heroWorld (чистый Row-Major без Transpose!)
+		// 7. Извлекаем текущую ориентацию из hero.mesh->model (чистый Row-Major без Transpose!)
 		XMMATRIX currentWorldRow = Object::heroOnRails;
 		currentWorldRow.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f); // Зануляем позицию для честного Decompose
 
