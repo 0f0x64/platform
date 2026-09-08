@@ -1586,14 +1586,7 @@ namespace Object {
 	XMMATRIX heroOnRails;
 	XMMATRIX heroWorld;
 
-	struct MeshDrawOptions
-	{
-		XMMATRIX model = XMMatrixIdentity();
-		float4 tint = { 1.0f, 1.0f, 1.0f, 1.0f };
-		bool advanceAnimation = true;
-	};
-
-	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom, int onLineOfs, int jumpCharge, const MeshDrawOptions* options = nullptr, float deltaTime = 0.0f)
+	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness, int zoom, int onLineOfs, int jumpCharge, float deltaTime)
 	{
 
 		int gX = sqrt(count / skipper);
@@ -1608,20 +1601,19 @@ namespace Object {
 		vs::girl = {
 			.params =
 			{
-				.model = options ? options->model : heroWorld,
+				.model = heroWorld,
 				.gX = gX,
 				.gY = gY,
 				.mode = (int)mode,
 				.skipper = skipper,
 				.base_color = float4(r / 100.,g / 100.,b / 100.,1),
-				.colorMultiplier = options ? options->tint : float4(1, 1, 1, 1),
-				.modelPos = float4(xPos/10000.,yPos / 10000.,zPos / 10000.,0),
+				.modelPos = float4(xPos / 10000.,yPos / 10000.,zPos / 10000.,0),
 				.triCount = float4(triCnt,0,0,0),
 				.brightness = float4(brightness,0,0,0),
 				.tickness = float4(tickness,0,0,0),
 				.modelCenterScale = centerScale,
 				.zoom = float4(zm,zm,zm,1),
-				.onLineOfs = (float)onLineOfs/1000.f,
+				.onLineOfs = (float)onLineOfs / 1000.f,
 				.jumpCharge = (float)jumpCharge / 100.f,
 			},
 		};
@@ -1634,7 +1626,7 @@ namespace Object {
 		vs::girl.set();
 
 		if (obj && obj->loaded) {
-			if (!options || options->advanceAnimation) obj->Update(deltaTime); // 1.0f / FRAMES_PER_SECOND
+			obj->Update(deltaTime); // 1.0f / FRAMES_PER_SECOND
 			obj->BindBones(dx11::context);
 
 			obj->LoadToShaders();
@@ -1659,7 +1651,7 @@ namespace Object {
 			Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 		}
 
-		
+
 	}
 
 	cmd(Mesh, mesh* obj, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs, int jumpCharge, float deltaTime)
