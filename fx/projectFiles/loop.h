@@ -1222,6 +1222,27 @@ struct hero_ {
 			}
 		}
 	}
+
+	bool blocking = false;
+	void ProcessDefense()
+	{
+		if (inputController.isRMBPressed()) {
+			if (!blocking) {
+				blocking = true;
+
+				mesh->PlayAnimation(11);
+				mesh->PlayAnimation(12);
+			}
+		}
+		else {
+			if (blocking) {
+				blocking = false;
+
+				mesh->StopAnimation(11);
+				mesh->StopAnimation(12);
+			}
+		}
+	}
 };
 
 hero_ hero;
@@ -2453,6 +2474,7 @@ namespace Loop
 					hero.ProcessJump(FIXED_DT); 
 
 					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
+					hero.ProcessDefense();
 
 					if (hero.gravity.mode)
 					{
@@ -2569,6 +2591,8 @@ namespace Loop
 					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
 					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_holding.glb", true); // 9 Удержание лука
 					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_shot.glb", true); // 10 Выстрел из лука
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Start_Aspid.glb", true); // 11 Начало блока
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Hold_Aspid.glb", true); // 12 Удержание блока
 
 					hero.mesh->animations[0].isPlaying = false;
 
@@ -2598,6 +2622,12 @@ namespace Loop
 					hero.mesh->animations[9].looped = true;
 
 					hero.mesh->animations[10].weight = 100000000.0f;
+
+					hero.mesh->animations[11].weight = 1000000000.0f;
+
+					hero.mesh->animations[12].weight = 100000000.0f;
+					hero.mesh->animations[12].speed = 0.5f;
+					hero.mesh->animations[12].looped = true;
 				}
 
 				enemyRenderer.Load();
