@@ -1177,30 +1177,45 @@ struct hero_ {
 	} pathControl;
 
 	bool aiming = false;
+	float bowCharge = 0.0f;
 	void ProcessAttack() {
 		if (inputController.isLMBPressed()) {
 			if (!aiming) {
 				aiming = true;
+
 				ConstBuf::interp::Animate(fov, 60, 1.5f, ConstBuf::interp::Curve::EaseOutExpo);
+				ConstBuf::interp::Animate(bowCharge, 1.0f, 1.5f);
+
+				mesh->PlayAnimation(9);
 			}
 		}
 		else {
 			if (aiming) {
 				aiming = false;
+
 				ConstBuf::interp::Animate(fov, 110, 1.5f, ConstBuf::interp::Curve::EaseOutExpo);
 
-				collision::RayInfo ray = collision::RayInfo();
-				ray.origin = float4();
-				ray.direction = float4(0, 1, 0, 0);
+				mesh->StopAnimation(9);
 
-				collision::RaycastResult result = collision::Raycast(ray);
+				if (bowCharge >= 0.35f) {
+					mesh->PlayAnimation(10, 0.1f);
 
-				if (result.hit) {
-					Log("Attack hit\n");
+					collision::RayInfo ray = collision::RayInfo();
+					ray.origin = float4();
+					ray.direction = float4(0, 1, 0, 0);
+
+					collision::RaycastResult result = collision::Raycast(ray);
+
+					if (result.hit) {
+						Log("Attack hit\n");
+					}
+					else {
+						Log("Attack miss\n");
+					}
 				}
-				else {
-					Log("Attack miss\n");
-				}
+
+				ConstBuf::interp::DeleteExistingTween(bowCharge);
+				bowCharge = 0.0f;
 			}
 		}
 	}
@@ -2549,6 +2564,8 @@ namespace Loop
 					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
 					hero.mesh->LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
 					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_holding.glb", true); // 9 Удержание лука
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_shot.glb", true); // 10 Выстрел из лука
 
 					hero.mesh->animations[0].isPlaying = false;
 
@@ -2572,6 +2589,12 @@ namespace Loop
 
 					hero.mesh->animations[8].speed = 0.0f;
 					hero.mesh->animations[8].weight = 10000.0f;
+
+					hero.mesh->animations[9].weight = 100000000.0f;
+					hero.mesh->animations[9].speed = 0.25f;
+					hero.mesh->animations[9].looped = true;
+
+					hero.mesh->animations[10].weight = 100000000.0f;
 				}
 
 				enemyRenderer.Load();

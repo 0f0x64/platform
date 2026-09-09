@@ -1061,7 +1061,7 @@ namespace Object {
 					{
 						clip.currentTime = clamp(clip.currentTime, 0.0f, clip.duration);
 						StopAnimation(i);
-						continue;
+						//continue;
 					}
 				}
 

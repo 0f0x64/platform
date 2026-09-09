@@ -196,10 +196,8 @@ namespace interp {
     static ::std::vector<::std::unique_ptr<ITween>> _activeTweens;
 
 
-    template<typename T, typename U>
-    Tween<T>& CreateTween(T& target, const U& endValue, double duration, Curve curve = Curve::Linear) {
-
-        // Searching for existing tween with this target
+    template<typename T>
+    void DeleteExistingTween(T& target) {
         auto it = ::std::find_if(_activeTweens.begin(), _activeTweens.end(),
             [&target](const ::std::unique_ptr<ITween>& tween) {
                 if (tween->GetTypeInfo() != typeid(T)) {
@@ -211,6 +209,12 @@ namespace interp {
         if (it != _activeTweens.end()) {
             _activeTweens.erase(it);
         }
+    }
+
+    template<typename T, typename U>
+    Tween<T>& CreateTween(T& target, const U& endValue, double duration, Curve curve = Curve::Linear) {
+
+        DeleteExistingTween(target);
 
         auto tween = ::std::make_unique<Tween<T>>(&target, static_cast<T>(endValue), duration, curve);
         Tween<T>& ref = *tween;
