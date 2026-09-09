@@ -980,7 +980,7 @@ namespace Object {
 		AddPointToLine({ 27200, 36500, 35700 });
 		AddPointToLine({ 29000, 37800, 37400 });
 		AddPointToLine({ 31200, 39400, 39100 });
-		AddPointToLine({ 32500, 41200, 40700 });
+		AddPointToLine({ 32500, 41201, 40700 });
 
 
 		// ------------------------------------------------------------
@@ -1050,7 +1050,7 @@ namespace Object {
 		AddPointToLine({ 30000, 41200, 37800 });
 		AddPointToLine({ 31200, 42900, 39400 });
 		AddPointToLine({ 33500, 44500, 41000 });
-		AddPointToLine({ 35800, 45900, 42600 });
+		AddPointToLine({ 39222, 48534, 43538 });
 
 
 		// ------------------------------------------------------------
@@ -1393,7 +1393,7 @@ namespace Object {
 		AddPointToLine({ 41200, 51000, 46100 });
 		AddPointToLine({ 43300, 51800, 47400 });
 		AddPointToLine({ 45400, 52000, 48800 });
-		AddPointToLine({ 47500, 51500, 50100 });
+		AddPointToLine({ 47506, 51500, 50100 });
 
 
 		// ------------------------------------------------------------
@@ -2036,8 +2036,8 @@ namespace Object {
 		// ------------------------------------------------------------
 
 		NewLine();
-		AddPointToLine({ 54500, 68000, 71200 });
-		AddPointToLine({ 55000, 69500, 72800 });
+		AddPointToLine({ 54500, 67193, 71200 });
+		AddPointToLine({ 55000, 69026, 72800 });
 		AddPointToLine({ 54200, 71000, 74600 });
 		AddPointToLine({ 52800, 72400, 76300 });
 		AddPointToLine({ 51000, 73800, 78000 });
@@ -2217,9 +2217,9 @@ namespace Object {
 			.y = 23000,
 			.z = 23000,
 			.rad = 6630,
-			.r = 100,
+			.r = 0,
 			.g = 100,
-			.b = 100,
+			.b = 0,
 			.brightness = 100
 			});
 
@@ -2230,9 +2230,9 @@ namespace Object {
 			.y = 52000,
 			.z = 60000,
 			.rad = 6630,
-			.r = 0,
-			.g = 100,
-			.b = 0,
+			.r = 100,
+			.g = 0,
+			.b = 100,
 			.brightness = 100
 			});
 
@@ -2257,8 +2257,8 @@ namespace Object {
 			.z = 95000,
 			.rad = 6630,
 			.r = 100,
-			.g = 0,
-			.b = 100,
+			.g = 100,
+			.b = 0,
 			.brightness = 100
 			});
 
