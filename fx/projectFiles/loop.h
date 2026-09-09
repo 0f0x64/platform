@@ -1200,11 +1200,14 @@ struct hero_ {
 				if (bowCharge >= 0.35f) {
 					mesh->PlayAnimation(10, 0.1f);
 
-					Log(std::to_string(camPos.x) + " " + std::to_string(camPos.y) + " " + std::to_string(camPos.z) + "\n");
-					Log(std::to_string(camForward.x) + " " + std::to_string(camForward.y) + " " + std::to_string(camForward.z) + "\n");
-
 					collision::RayInfo ray = collision::RayInfo(camPos, camForward * 100, false);
 					collision::RaycastResult result = collision::Raycast(ray);
+
+					float4 heroPos = V2F(pos);
+					float4 direction = result.hit ? normalize(result.position - heroPos) : camForward;
+
+					ray = collision::RayInfo(heroPos, direction * 100, false);
+					result = collision::Raycast(ray);
 
 					if (result.hit) {
 						Log("Attack hit\n");
