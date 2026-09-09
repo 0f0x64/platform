@@ -34,6 +34,10 @@ namespace Enemies
 
 		void Update(float deltaTime)
 		{
+			collider->position.x = position.x;
+			collider->position.y = position.y;
+			collider->position.z = position.z;
+
 			if (deltaTime > 0.0f && updateCallback) updateCallback(*this, deltaTime);
 		}
 	};

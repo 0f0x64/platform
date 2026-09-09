@@ -1178,7 +1178,7 @@ struct hero_ {
 
 	bool aiming = false;
 	float bowCharge = 0.0f;
-	void ProcessAttack() {
+	void ProcessAttack(float4 camPos, float4 camForward) {
 		if (inputController.isLMBPressed()) {
 			if (!aiming) {
 				aiming = true;
@@ -1200,10 +1200,10 @@ struct hero_ {
 				if (bowCharge >= 0.35f) {
 					mesh->PlayAnimation(10, 0.1f);
 
-					collision::RayInfo ray = collision::RayInfo();
-					ray.origin = float4();
-					ray.direction = float4(0, 1, 0, 0);
+					Log(std::to_string(camPos.x) + " " + std::to_string(camPos.y) + " " + std::to_string(camPos.z) + "\n");
+					Log(std::to_string(camForward.x) + " " + std::to_string(camForward.y) + " " + std::to_string(camForward.z) + "\n");
 
+					collision::RayInfo ray = collision::RayInfo(camPos, camForward * 100, false);
 					collision::RaycastResult result = collision::Raycast(ray);
 
 					if (result.hit) {
@@ -2449,7 +2449,7 @@ namespace Loop
 					hero.ProcessMove(FIXED_DT); 
 					hero.ProcessJump(FIXED_DT); 
 
-					hero.ProcessAttack();
+					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
 
 					if (hero.gravity.mode)
 					{
