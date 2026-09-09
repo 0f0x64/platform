@@ -69,6 +69,9 @@ namespace Object {
 		float lookPitchCurrent = 0.0f;
 		bool lookAtEnabled = true;
 
+		XMMATRIX model = XMMatrixIdentity();
+		float4 colorTint = { 1.0f, 1.0f, 1.0f, 1.0f };
+
 		ConstBuf::vertex* vArray = nullptr;
 		ConstBuf::index* iArray = nullptr;
 
@@ -1058,7 +1061,7 @@ namespace Object {
 					{
 						clip.currentTime = clamp(clip.currentTime, 0.0f, clip.duration);
 						StopAnimation(i);
-						continue;
+						//continue;
 					}
 				}
 
@@ -1584,16 +1587,9 @@ namespace Object {
 	dx11::ConstBuf::sbObject* MeshPtr = NULL;
 
 	XMMATRIX heroOnRails;
-	XMMATRIX heroWorld;
+	//XMMATRIX heroWorld;
 
-	struct MeshDrawOptions
-	{
-		XMMATRIX model = XMMatrixIdentity();
-		float4 tint = { 1.0f, 1.0f, 1.0f, 1.0f };
-		bool advanceAnimation = true;
-	};
-
-	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness,int zoom, int onLineOfs, int jumpCharge, const MeshDrawOptions* options = nullptr)
+	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness, int zoom, int onLineOfs, int jumpCharge, float deltaTime)
 	{
 
 		int gX = sqrt(count / skipper);
@@ -1608,20 +1604,20 @@ namespace Object {
 		vs::girl = {
 			.params =
 			{
-				.model = options ? options->model : heroWorld,
+				.model = obj->model,
 				.gX = gX,
 				.gY = gY,
 				.mode = (int)mode,
 				.skipper = skipper,
 				.base_color = float4(r / 100.,g / 100.,b / 100.,1),
-				.colorMultiplier = options ? options->tint : float4(1, 1, 1, 1),
-				.modelPos = float4(xPos/10000.,yPos / 10000.,zPos / 10000.,0),
+				.colorMultiplier = obj->colorTint,
+				.modelPos = float4(xPos / 10000.,yPos / 10000.,zPos / 10000.,0),
 				.triCount = float4(triCnt,0,0,0),
 				.brightness = float4(brightness,0,0,0),
 				.tickness = float4(tickness,0,0,0),
 				.modelCenterScale = centerScale,
 				.zoom = float4(zm,zm,zm,1),
-				.onLineOfs = (float)onLineOfs/1000.f,
+				.onLineOfs = (float)onLineOfs / 1000.f,
 				.jumpCharge = (float)jumpCharge / 100.f,
 			},
 		};
@@ -1634,16 +1630,13 @@ namespace Object {
 		vs::girl.set();
 
 		if (obj && obj->loaded) {
-			if (!options || options->advanceAnimation) obj->Update(1.0f / FRAMES_PER_SECOND);
+			obj->Update(deltaTime); // prev: 1.0f / FRAMES_PER_SECOND
 			obj->BindBones(dx11::context);
-
-			//dx11::ConstBuf::gltfAnim::Update(1.0f / FRAMES_PER_SECOND);
-			//dx11::ConstBuf::gltfAnim::BindBones(dx11::context);
 
 			obj->LoadToShaders();
 		}
 		else {
-			dx11::ConstBuf::gltfAnim::Update(1.0f / FRAMES_PER_SECOND);
+			dx11::ConstBuf::gltfAnim::Update(deltaTime); // prev: 1.0f / FRAMES_PER_SECOND
 			dx11::ConstBuf::gltfAnim::BindBones(dx11::context);
 
 			ConstBuf::BindSB(0);
@@ -1662,10 +1655,10 @@ namespace Object {
 			Drawer::NullDrawer({ 1,(int)gX * (int)gY });
 		}
 
-		
+
 	}
 
-	cmd(Mesh, mesh* obj, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs, int jumpCharge)
+	cmd(Mesh, mesh* obj, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs, int jumpCharge, float deltaTime)
 	{
 		reflect;
 
@@ -1681,7 +1674,7 @@ namespace Object {
 		if (in.stencil == switcher::on)
 		{
 			uint32_t triCnt = (in.obj && in.obj->loaded) ? in.obj->triangleCount : ConstBuf::triangleCount;
-			ShowMesh(in.obj, (int)triCnt,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs, in.jumpCharge);
+			ShowMesh(in.obj, (int)triCnt,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs, in.jumpCharge, in.deltaTime);
 		}
 
 		Culling::Set({ cullmode::off });
@@ -1691,10 +1684,27 @@ namespace Object {
 			.op = blendop::add
 			});
 
-		ShowMesh(in.obj, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom, in.onLineOfs, in.jumpCharge);
+		ShowMesh(in.obj, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom, in.onLineOfs, in.jumpCharge, in.deltaTime);
 	}
 
 #endif
+
+	/*cmd(RayHit, int xStartPos, int yStartPos, int zStartPos, int xEndPos, int yEndPos, int zEndPos)
+	{
+		reflect;
+
+		vs::Nebula2 = {
+			.params = {
+				.pos1 = float4(in.xStartPos / 10000., in.yStartPos / 10000., in.zStartPos / 10000., 0),
+				.pos2 = float4(in.xEndPos / 10000., in.yEndPos / 10000., in.zEndPos / 10000., 0)
+			},
+		};
+
+		vs::Nebula2.set();
+
+		Drawer::NullDrawer({ 1, 1 });
+
+	}*/
 
 	cmd(ScorpBall, int count, int skipper, pMode mode, int r, int g, int b)
 	{

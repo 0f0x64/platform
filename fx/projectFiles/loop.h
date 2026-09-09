@@ -231,6 +231,16 @@ struct inputController_ {
 		return GetAsyncKeyState('A');
 	}
 
+	bool isLMBPressed()
+	{
+		return GetAsyncKeyState(VK_LBUTTON);
+	}
+
+	bool isRMBPressed()
+	{
+		return GetAsyncKeyState(VK_RBUTTON);
+	}
+
 	bool jumpKeyIsDown = false;
 	double jumpKeyDownTime = 0.0;
 	double jumpKeyUpTime = 0.0;
@@ -246,6 +256,7 @@ inputController_ inputController;
 
 
 bool cameraFirstFrame = true;
+float fov = 110;
 
 struct hero_ {
 
@@ -1015,7 +1026,7 @@ struct hero_ {
 
 		XMVECTOR targetQuat = XMQuaternionRotationMatrix(targetAirMatrix);
 
-		// 7. Извлекаем текущую ориентацию из Object::heroWorld (чистый Row-Major без Transpose!)
+		// 7. Извлекаем текущую ориентацию из hero.mesh->model (чистый Row-Major без Transpose!)
 		XMMATRIX currentWorldRow = Object::heroOnRails;
 		currentWorldRow.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f); // Зануляем позицию для честного Decompose
 
@@ -1053,7 +1064,7 @@ struct hero_ {
 
 		//----------------
 
-		Object::heroWorld = inputController.mouse.getLookMatrix(finalAirRot, upVector, deltaTime, changeDirSpeed, mesh);
+		mesh->model = inputController.mouse.getLookMatrix(finalAirRot, upVector, deltaTime, changeDirSpeed, mesh);
 		axisAngle = lerp(axisAngle, 0, blendStep);
 		axisAngleSpeed = lerp(axisAngleSpeed, 0, blendStep);
 		//hero.axisAngle = 0;
@@ -1138,7 +1149,7 @@ struct hero_ {
 		pos = XMVectorLerp(pCurrent, pNext, t);
 
 		Object::heroOnRails = getHeroOnRailsMatrix(heroForward, HeroRealUp, HeroRight);
-		Object::heroWorld = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime, changeDirSpeed, mesh);
+		mesh->model = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime, changeDirSpeed, mesh);
 	}
 
 	struct {
@@ -1165,7 +1176,73 @@ struct hero_ {
 
 	} pathControl;
 
-	
+	bool aiming = false;
+	float bowCharge = 0.0f;
+	void ProcessAttack(float4 camPos, float4 camForward) {
+		if (inputController.isLMBPressed()) {
+			if (!aiming) {
+				aiming = true;
+
+				ConstBuf::interp::Animate(fov, 60, 1.5f, ConstBuf::interp::Curve::EaseOutExpo);
+				ConstBuf::interp::Animate(bowCharge, 1.0f, 1.5f);
+
+				mesh->PlayAnimation(9);
+			}
+		}
+		else {
+			if (aiming) {
+				aiming = false;
+
+				ConstBuf::interp::Animate(fov, 110, 1.5f, ConstBuf::interp::Curve::EaseOutExpo);
+
+				mesh->StopAnimation(9);
+
+				if (bowCharge >= 0.35f) {
+					mesh->PlayAnimation(10, 0.1f);
+
+					collision::RayInfo ray = collision::RayInfo(camPos, camForward * 100, false);
+					collision::RaycastResult result = collision::Raycast(ray);
+
+					float4 heroPos = V2F(pos);
+					float4 direction = result.hit ? normalize(result.position - heroPos) : camForward;
+
+					ray = collision::RayInfo(heroPos, direction * 100, false);
+					result = collision::Raycast(ray);
+
+					if (result.hit) {
+						Log("Attack hit\n");
+					}
+					else {
+						Log("Attack miss\n");
+					}
+				}
+
+				ConstBuf::interp::DeleteExistingTween(bowCharge);
+				bowCharge = 0.0f;
+			}
+		}
+	}
+
+	bool blocking = false;
+	void ProcessDefense()
+	{
+		if (inputController.isRMBPressed()) {
+			if (!blocking) {
+				blocking = true;
+
+				mesh->PlayAnimation(11);
+				mesh->PlayAnimation(12);
+			}
+		}
+		else {
+			if (blocking) {
+				blocking = false;
+
+				mesh->StopAnimation(11);
+				mesh->StopAnimation(12);
+			}
+		}
+	}
 };
 
 hero_ hero;
@@ -2322,6 +2399,8 @@ namespace Loop
 			.rotInertion = 1000
 			});
 
+		gameCamera.lensAngle = fov;
+
 		BasicCam::camPass = false;
 		BasicCam::camCounter = 0;
 
@@ -2361,12 +2440,13 @@ namespace Loop
 				enemySystem.Reset(ToEnemyPosition(hero.pos),
 					ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
 			}
+			float deltaTime = processTimer();
 
 
 			if (GetActiveWindow() == hWnd && gameCam)
 			{
 
-				float deltaTime = processTimer();
+				//float deltaTime = processTimer();
 
 				inputController.mouse.processInput();
 
@@ -2392,6 +2472,9 @@ namespace Loop
 					hero.pathControl.Process();
 					hero.ProcessMove(FIXED_DT); 
 					hero.ProcessJump(FIXED_DT); 
+
+					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
+					hero.ProcessDefense();
 
 					if (hero.gravity.mode)
 					{
@@ -2506,6 +2589,10 @@ namespace Loop
 					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
 					hero.mesh->LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
 					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_holding.glb", true); // 9 Удержание лука
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_shot.glb", true); // 10 Выстрел из лука
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Start_Aspid.glb", true); // 11 Начало блока
+					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Hold_Aspid.glb", true); // 12 Удержание блока
 
 					hero.mesh->animations[0].isPlaying = false;
 
@@ -2529,6 +2616,18 @@ namespace Loop
 
 					hero.mesh->animations[8].speed = 0.0f;
 					hero.mesh->animations[8].weight = 10000.0f;
+
+					hero.mesh->animations[9].weight = 100000000.0f;
+					hero.mesh->animations[9].speed = 0.25f;
+					hero.mesh->animations[9].looped = true;
+
+					hero.mesh->animations[10].weight = 100000000.0f;
+
+					hero.mesh->animations[11].weight = 1000000000.0f;
+
+					hero.mesh->animations[12].weight = 100000000.0f;
+					hero.mesh->animations[12].speed = 0.5f;
+					hero.mesh->animations[12].looped = true;
 				}
 
 				enemyRenderer.Load();
@@ -2541,7 +2640,7 @@ namespace Loop
 			}
 			// ----- //
 
-			enemyRenderer.RenderDepth(enemySystem);
+			enemyRenderer.RenderDepth(enemySystem, deltaTime);
 
 			float4 p = V2F(hero.pos * 10000.);
 
@@ -2556,14 +2655,15 @@ namespace Loop
 					.stencil = switcher::on,
 					.zoom = -75,
 					.onLineOfs = (int)hero.yOffset,
-					.jumpCharge = 100
+					.jumpCharge = 100,
+					.deltaTime = deltaTime
 				});
 
-			enemyRenderer.RenderColor(enemySystem);
+			enemyRenderer.RenderColor(enemySystem, deltaTime);
 
 			//.jumpCharge = (int)(hero.jumpChargeProgress*100.)
 
-			//Object::heroWorld = XMMatrixTranspose(XMMatrixIdentity());
+			//hero.mesh->model = XMMatrixTranspose(XMMatrixIdentity());
 
 			/*Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
 			Object::MeshPtr = &Object::BossMesh;

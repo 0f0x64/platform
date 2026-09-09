@@ -18,18 +18,18 @@ namespace Enemies
 			mesh_.Update(0.0f);
 		}
 
-		void RenderDepth(const EnemySystem& system)
+		void RenderDepth(const EnemySystem& system, float deltaTime)
 		{
 			if (!mesh_.loaded || !system.IsInitialized()) return;
 			SetPassState(true);
-			for (const Enemy& enemy : system.Items()) Draw(enemy, true);
+			for (const Enemy& enemy : system.Items()) Draw(enemy, true, deltaTime);
 		}
 
-		void RenderColor(const EnemySystem& system)
+		void RenderColor(const EnemySystem& system, float deltaTime)
 		{
 			if (!mesh_.loaded || !system.IsInitialized()) return;
 			SetPassState(false);
-			for (const Enemy& enemy : system.Items()) Draw(enemy, false);
+			for (const Enemy& enemy : system.Items()) Draw(enemy, false, deltaTime);
 		}
 
 	private:
@@ -50,7 +50,7 @@ namespace Enemies
 			Culling::Set({ cullmode::off });
 		}
 
-		void Draw(const Enemy& enemy, bool depthPass)
+		void Draw(const Enemy& enemy, bool depthPass, float deltaTime)
 		{
 			if (enemy.movementRadius <= 0.0f) return;
 			constexpr float PositionUnits = 10000.0f;
@@ -58,16 +58,16 @@ namespace Enemies
 			constexpr float ZoomPercent = 100.0f;
 			const int zoom = static_cast<int>(std::lround(
 				(enemy.movementRadius / NormalizedMeshRadius - 1.0f) * ZoomPercent));
-			Object::MeshDrawOptions options;
-			options.model = XMMatrixIdentity();
-			options.tint = { 3.0f, 0.45f, 0.15f, 1.0f };
-			options.advanceAnimation = false;
+
+			mesh_.model = XMMatrixIdentity();
+			mesh_.colorTint = { 3.0f, 0.45f, 0.15f, 1.0f };
+
 			Object::ShowMesh(&mesh_, depthPass ? static_cast<int>(mesh_.triangleCount) : ParticleCount,
 				1, Object::pMode::point, 100, 100, 100, depthPass ? Object::triMode::on : Object::triMode::off,
 				static_cast<int>(enemy.position.x * PositionUnits),
 				static_cast<int>(enemy.position.y * PositionUnits),
 				static_cast<int>(enemy.position.z * PositionUnits),
-				Brightness, Thickness, zoom, 0, 100, &options);
+				Brightness, Thickness, zoom, 0, 100, deltaTime);
 		}
 
 		static constexpr int ParticleCount = 50000;
