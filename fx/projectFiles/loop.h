@@ -550,7 +550,7 @@ struct hero_ {
 			
 			float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
 			
-			destPoint = { 25455 /100., 15806 / 100., 25800 / 100. };
+			//destPoint = { 25455 /100., 15806 / 100., 25800 / 100. };
 			
 			pos += F2V(destPoint);
 			gravity.mode = true;

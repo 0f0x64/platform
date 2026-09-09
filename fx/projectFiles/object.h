@@ -2217,8 +2217,8 @@ namespace Object {
 			.y = 23000,
 			.z = 23000,
 			.rad = 6630,
-			.r = 0,
-			.g = 4,
+			.r = 100,
+			.g = 100,
 			.b = 100,
 			.brightness = 100
 			});
@@ -2231,8 +2231,8 @@ namespace Object {
 			.z = 60000,
 			.rad = 6630,
 			.r = 0,
-			.g = 4,
-			.b = 100,
+			.g = 100,
+			.b = 0,
 			.brightness = 100
 			});
 
@@ -2243,9 +2243,9 @@ namespace Object {
 			.y = 74141,
 			.z = 67000,
 			.rad = 6630,
-			.r = 0,
-			.g = 4,
-			.b = 100,
+			.r = 100,
+			.g = 0,
+			.b = 0,
 			.brightness = 100
 			});
 
@@ -2256,8 +2256,8 @@ namespace Object {
 			.y = 90000,
 			.z = 95000,
 			.rad = 6630,
-			.r = 0,
-			.g = 4,
+			.r = 100,
+			.g = 0,
 			.b = 100,
 			.brightness = 100
 			});
@@ -2270,7 +2270,7 @@ namespace Object {
 			.z = 48000,
 			.rad = 6630,
 			.r = 0,
-			.g = 4,
+			.g = 0,
 			.b = 100,
 			.brightness = 100
 			});
