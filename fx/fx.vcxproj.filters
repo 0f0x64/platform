@@ -230,6 +230,9 @@
     <ClInclude Include="dx11\audio.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="projectFiles\collision.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">
@@ -388,6 +391,12 @@
       <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
     </None>
     <None Include="packages.config" />
+    <None Include="projectFiles\shaders\vs\line.shader">
+      <Filter>Source Files\projectFiles\shadersSource\vs</Filter>
+    </None>
+    <None Include="projectFiles\shaders\ps\color.shader">
+      <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Object Include="projectFiles\hero.obj">

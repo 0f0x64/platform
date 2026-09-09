@@ -1689,22 +1689,28 @@ namespace Object {
 
 #endif
 
-	/*cmd(RayHit, int xStartPos, int yStartPos, int zStartPos, int xEndPos, int yEndPos, int zEndPos)
+	cmd(RayHit, int xStartPos, int yStartPos, int zStartPos, int xEndPos, int yEndPos, int zEndPos)
 	{
 		reflect;
 
-		vs::Nebula2 = {
+		vs::line = {
 			.params = {
 				.pos1 = float4(in.xStartPos / 10000., in.yStartPos / 10000., in.zStartPos / 10000., 0),
 				.pos2 = float4(in.xEndPos / 10000., in.yEndPos / 10000., in.zEndPos / 10000., 0)
 			},
 		};
 
-		vs::Nebula2.set();
+		ps::color = {
+			.params = {
+				.color = float4(1, 0, 0, 1)
+			}
+		};
+
+		vs::line.set();
+		ps::color.set();
 
 		Drawer::NullDrawer({ 1, 1 });
-
-	}*/
+	}
 
 	cmd(ScorpBall, int count, int skipper, pMode mode, int r, int g, int b)
 	{

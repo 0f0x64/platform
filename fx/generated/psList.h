@@ -1,6 +1,7 @@
 Shader(basic)
 Shader(basicLow)
 Shader(cat)
+Shader(color)
 Shader(cubemapCreator)
 Shader(cubeMapViewer)
 Shader(genNormals)
