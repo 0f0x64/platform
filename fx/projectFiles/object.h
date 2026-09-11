@@ -1693,17 +1693,18 @@ namespace Object {
 	{
 		reflect;
 
+		Culling::Set({ cullmode::off });
+		DepthBuf::Mode({ depthmode::readonly });
+		BlendMode::Set({
+			.mode = blendmode::on,
+			.op = blendop::add
+			});
+
 		vs::line = {
 			.params = {
 				.pos1 = float4(in.xStartPos / 10000., in.yStartPos / 10000., in.zStartPos / 10000., 0),
 				.pos2 = float4(in.xEndPos / 10000., in.yEndPos / 10000., in.zEndPos / 10000., 0)
 			},
-		};
-
-		ps::color = {
-			.params = {
-				.color = float4(1, 0, 0, 1)
-			}
 		};
 
 		vs::line.set();

@@ -1179,6 +1179,7 @@ struct hero_ {
 
 	} pathControl;
 
+	std::vector<std::pair<float4, float4>> rays;
 	bool aiming = false;
 	float bowCharge = 0.0f;
 	void ProcessAttack(float4 camPos, float4 camForward) {
@@ -1218,6 +1219,8 @@ struct hero_ {
 					else {
 						Log("Attack miss\n");
 					}
+
+					rays.push_back({ ray.origin, result.position });
 				}
 
 				ConstBuf::interp::DeleteExistingTween(bowCharge);
@@ -2434,266 +2437,278 @@ namespace Loop
 		cmdCounter = precalcOfs;
 		frameConst();
 		
-			//
+		//
 
-			Object::initPatches(hero.pathControl.Time);
+		Object::initPatches(hero.pathControl.Time);
 
-			if (!enemySystem.IsInitialized())
+		if (!enemySystem.IsInitialized())
+		{
+			enemySystem.Reset(ToEnemyPosition(hero.pos),
+				ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+		}
+		float deltaTime = processTimer();
+
+
+		if (GetActiveWindow() == hWnd && gameCam)
+		{
+
+			//float deltaTime = processTimer();
+
+			inputController.mouse.processInput();
+
+			const bool initialEnemySpawn = hero.firstRun;
+			hero.Respawn();
+			if (initialEnemySpawn)
 			{
 				enemySystem.Reset(ToEnemyPosition(hero.pos),
 					ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
 			}
-			float deltaTime = processTimer();
 
+			const float FIXED_DT = 1.0f / 60.0f; // Строго 16.66 мс для физики
+			static float accumulator = 0.0f;
+			static float smoothedCameraDT = FIXED_DT;
+			const float EMA_SMOOTH_FACTOR = 0.15f; // Коэффициент фильтра времени
 
-			if (GetActiveWindow() == hWnd && gameCam)
-			{
+			accumulator += deltaTime;
 
-				//float deltaTime = processTimer();
+			if (accumulator > 0.1f) accumulator = 0.1f;
 
-				inputController.mouse.processInput();
+			while (accumulator >= FIXED_DT) {
 
-				const bool initialEnemySpawn = hero.firstRun;
-				hero.Respawn();
-				if (initialEnemySpawn)
+				hero.pathControl.Process();
+				hero.ProcessMove(FIXED_DT); 
+				hero.ProcessJump(FIXED_DT); 
+
+				hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
+				hero.ProcessDefense();
+
+				if (hero.gravity.mode)
 				{
-					enemySystem.Reset(ToEnemyPosition(hero.pos),
-						ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+					hero.ProcessGravity(FIXED_DT);
+					hero.OrientHeroTowardsLineInAir(FIXED_DT);
+				}
+				else
+				{
+					hero.UpdateHeroOnLine(FIXED_DT);
 				}
 
-				const float FIXED_DT = 1.0f / 60.0f; // Строго 16.66 мс для физики
-				static float accumulator = 0.0f;
-				static float smoothedCameraDT = FIXED_DT;
-				const float EMA_SMOOTH_FACTOR = 0.15f; // Коэффициент фильтра времени
+				hero.processLanding(FIXED_DT);
 
-				accumulator += deltaTime;
+				enemySystem.Update(FIXED_DT);
+				gameCamera.Update(FIXED_DT);
 
-				if (accumulator > 0.1f) accumulator = 0.1f;
-
-				while (accumulator >= FIXED_DT) {
-
-					hero.pathControl.Process();
-					hero.ProcessMove(FIXED_DT); 
-					hero.ProcessJump(FIXED_DT); 
-
-					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
-					hero.ProcessDefense();
-
-					if (hero.gravity.mode)
-					{
-						hero.ProcessGravity(FIXED_DT);
-						hero.OrientHeroTowardsLineInAir(FIXED_DT);
-					}
-					else
-					{
-						hero.UpdateHeroOnLine(FIXED_DT);
-					}
-
-					hero.processLanding(FIXED_DT);
-
-					enemySystem.Update(FIXED_DT);
-					gameCamera.Update(FIXED_DT);
-
-					accumulator -= FIXED_DT;
-				}
-
-				ConstBuf::interp::UpdateTweens(deltaTime);
-				collision::UpdateColliders();
-
-				float alpha = accumulator / FIXED_DT;
-				alpha = ::std::clamp(alpha, 0.0f, 1.0f);
-				//TODO: implement characters and camera matrix interpolation (render only)
+				accumulator -= FIXED_DT;
 			}
 
-			if (!isPrecalc)
-			{
-				Precalc();
+			ConstBuf::interp::UpdateTweens(deltaTime);
+			collision::UpdateColliders();
+
+			float alpha = accumulator / FIXED_DT;
+			alpha = ::std::clamp(alpha, 0.0f, 1.0f);
+			//TODO: implement characters and camera matrix interpolation (render only)
+		}
+
+		if (!isPrecalc)
+		{
+			Precalc();
+		}
+
+		cmdCounter = precalcOfs;
+		frameConst();
+
+
+		//---------
+		//RENDERING
+		//---------
+
+		InputAsm::Set({ topology::triList });
+		BlendMode::Set({
+			.mode = blendmode::on,
+			.op = blendop::add
+			});
+		DepthBuf::Mode({ depthmode::off });
+		Culling::Set({ cullmode::back });
+
+		//cameraMan::run({});
+
+		int Dur = 20;
+		int t = timer::timeCursor / SAMPLES_IN_FRAME / FRAMES_PER_SECOND / Dur;
+
+		BasicCam::camCounter = 0;
+		BasicCam::setCamKey({
+			.camTime = 0 * SAMPLES_IN_FRAME * FRAMES_PER_SECOND * Dur,
+			.camType = keyType::set,
+			.eye_x = 43,
+			.eye_y = -52,
+			.eye_z = 1000,
+			.at_x = 0,
+			.at_y = 0,
+			.at_z = 0,
+			.up_x = 0,
+			.up_y = 100,
+			.up_z = 0,
+			.angle = 100,
+			.sType = sliderType::follow,
+			.slide_x = 0,
+			.slide_y = 0,
+			.slide_z = 0,
+			.axisType = camAxis::global,
+			.fly_x = -18,
+			.fly_y = 0,
+			.fly_z = 0,
+			.jitter = 0
+			});
+
+		if (!gameCam) BasicCam::processCam();
+
+		RenderTarget::Set({ texture::pBuf,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+		DepthBuf::Clear({});
+
+		RenderTarget::Set({ texture::pBufMid,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		RenderTarget::Set({ texture::pBufLow,0 });
+		RenderTarget::Clear({ 0,0,0,0 });
+
+		RenderTarget::Set({ texture::pBuf,0 });
+
+
+		// --- ЗАГРУЗКА МОДЕЛИ --- //
+		static bool sceneInitialized = false;
+		if (!sceneInitialized)
+		{
+			//ConstBuf::LoadObj("..//fx//projectFiles//A-Pose.glb");
+			//Object::MeshPtr = nullptr;
+
+			hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
+
+			static bool heroAnimsLoaded = false;
+			if (!heroAnimsLoaded) {
+				heroAnimsLoaded = true;
+
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 3 Ходьба
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 4 Бег
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 5 Падение
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_holding.glb", true); // 9 Удержание лука
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_shot.glb", true); // 10 Выстрел из лука
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Start_Aspid.glb", true); // 11 Начало блока
+				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Hold_Aspid.glb", true); // 12 Удержание блока
+
+				hero.mesh->animations[0].isPlaying = false;
+
+				hero.mesh->animations[1].looped = true;
+
+				hero.mesh->animations[2].speed = 0.0f;
+				hero.mesh->animations[2].weight = 100000.0f;
+
+				hero.mesh->animations[3].looped = true;
+
+				hero.mesh->animations[4].looped = true;
+
+				hero.mesh->animations[5].looped = true;
+				hero.mesh->animations[5].speed = 0.1f;
+
+				hero.mesh->animations[6].speed = 0.0f;
+				hero.mesh->animations[6].weight = 10000.0f;
+
+				hero.mesh->animations[7].speed = 0.0f;
+				hero.mesh->animations[7].weight = 10000000.0f;
+
+				hero.mesh->animations[8].speed = 0.0f;
+				hero.mesh->animations[8].weight = 10000.0f;
+
+				hero.mesh->animations[9].weight = 100000000.0f;
+				hero.mesh->animations[9].speed = 0.25f;
+				hero.mesh->animations[9].looped = true;
+
+				hero.mesh->animations[10].weight = 100000000.0f;
+
+				hero.mesh->animations[11].weight = 1000000000.0f;
+
+				hero.mesh->animations[12].weight = 100000000.0f;
+				hero.mesh->animations[12].speed = 0.5f;
+				hero.mesh->animations[12].looped = true;
 			}
 
-			cmdCounter = precalcOfs;
-			frameConst();
+			enemyRenderer.Load();
 
+			hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
+			hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
+			dx11::Audio::Play("Music", true, 0.3f);
 
-			//---------
-			//RENDERING
-			//---------
+			sceneInitialized = true;
+		}
+		// ----- //
 
-			InputAsm::Set({ topology::triList });
-			BlendMode::Set({
-				.mode = blendmode::on,
-				.op = blendop::add
-				});
-			DepthBuf::Mode({ depthmode::off });
-			Culling::Set({ cullmode::back });
+		enemyRenderer.RenderDepth(enemySystem, deltaTime);
 
-			//cameraMan::run({});
+		float4 p = V2F(hero.pos * 10000.);
 
-			int Dur = 20;
-			int t = timer::timeCursor / SAMPLES_IN_FRAME / FRAMES_PER_SECOND / Dur;
+		Object::Mesh({
+				.obj = hero.mesh,
+				.quality = 1,
+				.xPos = (int)(p.x),
+				.yPos = (int)(p.y),
+				.zPos = (int)(p.z),
+				.brightness = 9,
+				.tickness = 4,
+				.stencil = switcher::on,
+				.zoom = -75,
+				.onLineOfs = (int)hero.yOffset,
+				.jumpCharge = 100,
+				.deltaTime = deltaTime
+			});
 
-			BasicCam::camCounter = 0;
-			BasicCam::setCamKey({
-				.camTime = 0 * SAMPLES_IN_FRAME * FRAMES_PER_SECOND * Dur,
-				.camType = keyType::set,
-				.eye_x = 43,
-				.eye_y = -52,
-				.eye_z = 1000,
-				.at_x = 0,
-				.at_y = 0,
-				.at_z = 0,
-				.up_x = 0,
-				.up_y = 100,
-				.up_z = 0,
-				.angle = 100,
-				.sType = sliderType::follow,
-				.slide_x = 0,
-				.slide_y = 0,
-				.slide_z = 0,
-				.axisType = camAxis::global,
-				.fly_x = -18,
-				.fly_y = 0,
-				.fly_z = 0,
-				.jitter = 0
-				});
+		enemyRenderer.RenderColor(enemySystem, deltaTime);
 
-			if (!gameCam) BasicCam::processCam();
+		//.jumpCharge = (int)(hero.jumpChargeProgress*100.)
 
-			RenderTarget::Set({ texture::pBuf,0 });
-			RenderTarget::Clear({ 0,0,0,0 });
-			DepthBuf::Clear({});
+		//hero.mesh->model = XMMatrixTranspose(XMMatrixIdentity());
 
-			RenderTarget::Set({ texture::pBufMid,0 });
-			RenderTarget::Clear({ 0,0,0,0 });
+		/*Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
+		Object::MeshPtr = &Object::BossMesh;
+		Object::Mesh({
+			.quality = 1,
+			.xPos = 0,
+			.yPos = 0,
+			.zPos = 0,
+			.brightness = 114,
+			.tickness = 2,
+			.stencil = switcher::on,
+			.zoom = 100
+			});*/
+				
 
-			RenderTarget::Set({ texture::pBufLow,0 });
-			RenderTarget::Clear({ 0,0,0,0 });
-
-			RenderTarget::Set({ texture::pBuf,0 });
-
-
-			// --- ЗАГРУЗКА МОДЕЛИ --- //
-			static bool sceneInitialized = false;
-			if (!sceneInitialized)
-			{
-				//ConstBuf::LoadObj("..//fx//projectFiles//A-Pose.glb");
-				//Object::MeshPtr = nullptr;
-
-				hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
-
-				static bool heroAnimsLoaded = false;
-				if (!heroAnimsLoaded) {
-					heroAnimsLoaded = true;
-
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 3 Ходьба
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 4 Бег
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 5 Падение
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_holding.glb", true); // 9 Удержание лука
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_shot.glb", true); // 10 Выстрел из лука
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Start_Aspid.glb", true); // 11 Начало блока
-					hero.mesh->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Hold_Aspid.glb", true); // 12 Удержание блока
-
-					hero.mesh->animations[0].isPlaying = false;
-
-					hero.mesh->animations[1].looped = true;
-
-					hero.mesh->animations[2].speed = 0.0f;
-					hero.mesh->animations[2].weight = 100000.0f;
-
-					hero.mesh->animations[3].looped = true;
-
-					hero.mesh->animations[4].looped = true;
-
-					hero.mesh->animations[5].looped = true;
-					hero.mesh->animations[5].speed = 0.1f;
-
-					hero.mesh->animations[6].speed = 0.0f;
-					hero.mesh->animations[6].weight = 10000.0f;
-
-					hero.mesh->animations[7].speed = 0.0f;
-					hero.mesh->animations[7].weight = 10000000.0f;
-
-					hero.mesh->animations[8].speed = 0.0f;
-					hero.mesh->animations[8].weight = 10000.0f;
-
-					hero.mesh->animations[9].weight = 100000000.0f;
-					hero.mesh->animations[9].speed = 0.25f;
-					hero.mesh->animations[9].looped = true;
-
-					hero.mesh->animations[10].weight = 100000000.0f;
-
-					hero.mesh->animations[11].weight = 1000000000.0f;
-
-					hero.mesh->animations[12].weight = 100000000.0f;
-					hero.mesh->animations[12].speed = 0.5f;
-					hero.mesh->animations[12].looped = true;
-				}
-
-				enemyRenderer.Load();
-
-				hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
-				hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
-				dx11::Audio::Play("Music", true, 0.3f);
-
-				sceneInitialized = true;
-			}
-			// ----- //
-
-			enemyRenderer.RenderDepth(enemySystem, deltaTime);
-
-			float4 p = V2F(hero.pos * 10000.);
-
-			Object::Mesh({
-					.obj = hero.mesh,
-					.quality = 1,
-					.xPos = (int)(p.x),
-					.yPos = (int)(p.y),
-					.zPos = (int)(p.z),
-					.brightness = 9,
-					.tickness = 4,
-					.stencil = switcher::on,
-					.zoom = -75,
-					.onLineOfs = (int)hero.yOffset,
-					.jumpCharge = 100,
-					.deltaTime = deltaTime
-				});
-
-			enemyRenderer.RenderColor(enemySystem, deltaTime);
-
-			//.jumpCharge = (int)(hero.jumpChargeProgress*100.)
-
-			//hero.mesh->model = XMMatrixTranspose(XMMatrixIdentity());
-
-			/*Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
-			Object::MeshPtr = &Object::BossMesh;
-			Object::Mesh({
+		Object::hero_pos = V2F(hero.pos);
+			
+		Object::Girl({
 				.quality = 1,
 				.xPos = 0,
 				.yPos = 0,
 				.zPos = 0,
-				.brightness = 114,
+				.brightness = 19,
 				.tickness = 2,
-				.stencil = switcher::on,
-				.zoom = 100
-				});*/
-				
+				.stencil = switcher::on
+			});
 
-			Object::hero_pos = V2F(hero.pos);
-			
-			Object::Girl({
-					.quality = 1,
-					.xPos = 0,
-					.yPos = 0,
-					.zPos = 0,
-					.brightness = 19,
-					.tickness = 2,
-					.stencil = switcher::on
-				});
 
+		for (std::pair<float4, float4>& ray : hero.rays) {
+			Object::RayHit({
+				.xStartPos = (int)(ray.first.x * 10000.),
+				.yStartPos = (int)(ray.first.y * 10000.),
+				.zStartPos = (int)(ray.first.z * 10000.),
+
+				.xEndPos = (int)(ray.second.x * 10000.),
+				.yEndPos = (int)(ray.second.y * 10000.),
+				.zEndPos = (int)(ray.second.z * 10000.),
+			});
+		}
 
 
 		Compose();

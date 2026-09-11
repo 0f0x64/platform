@@ -21,91 +21,42 @@ float quantize2(float x, float q)
 
 pos_color CalcParticles(uint qid,uint iid,float4 grid)
 {
-     qid *= skipper;
-     iid *= skipper;
-     float t=time.x*.004;
-     uint inStars = 1232*1213;
-     if (mode==1||iid%inStars==0)
-     {
-        t=0;
-     }
-
-    //pillars instances
-
-
-    //calc
-    float3 pos = pillar3(qid,iid,grid.xy,0,t,0);
-    float3 pos2=pos;
-    
-    //scatter
-    
-    //color
     pos_color p;
-    p.color.a=1;
-    p.color.rgb = noise3_u(pos*14*float3(12,55,112))/31+float3(1,3,5)/52;
-    
-    //p.color*=.5;
-//    p.color*=base_color*(pow(length(pos)/16,4)+.1);
-    //p.color*=1+sin(grid.x*PI*8);
-    p.color=lerp(p.color,p.color.bgra,sin(length(pos)));
-//    p.color=lerp(p.color,base_color/144,1-saturate(pow(length(pos)/6,11)));
-//pos+=noise(pos/12)*12-6;
-//pos*=.75;
-// 1. Извлекаем векторы осей из первых трех строк матрицы view
-    
+    p.color = float4(1, 0, 0, 1); // статичный красный
+    p.sz = 2;
 
-     
-    if (mode==1)
-    {
-        float s=hash(iid)*33+11;
-        s=noise(iid)*62+11;
-        //s*=1.5;
-        p.pos=transform(pos,grid.zw,s);
-        p.color*=.7;
-        p.sz=172;
-    }
-    else
-    {
-        p.pos = transform(pos,grid.zw,1.1);
-       //p.color=-noise(pos*.3+12)*.04+.02;;
-       // p.color +=min(0,sign(1./noise(-pos2*.2-2.6)))/91.;
-         p.sz=2;
-         p.color*=2;
+    // grid.z — торец (0 у pos1, 1 у pos2), grid.w — сторона (0/1)
+    float t = grid.z;
+    float side = grid.w * 2.0 - 1.0;
 
-/*         if (iid%inStars==0)
-         {
-              p.pos = transform_unisize(pos,grid.zw,75.5);
-               p.sz=2;
-               p.color*=2;
-         } 
-         */
-    }
-      /*    if (iid==0)
-         {
-              p.pos = transform(0,grid.zw,16.5);
-               p.sz=2;
-               p.color*=(float4(5,-.1,-1,1));
-               p.color*=10;
-         }*/
-  
-         
+    // Концы отрезка в мире
+    float3 worldA = pos1.xyz;
+    float3 worldB = pos2.xyz;
 
-    //density compensation
-    if (mode==0)
-    {
-    p.color*=1*saturate(p.pos.w/11);
-    //p.color*=0;
+    // Центр текущего торца
+    float3 worldPos = lerp(worldA, worldB, t);
 
-    }
+    // Направление отрезка в мире
+    float3 dirWorld = worldB - worldA;
 
-    if (mode==1)
-    {
-    //p.color*=.3*saturate(21/p.pos.w);
-    //p.color*=1*saturate(p.pos.w/1);
-    //p.color=.02;
-    }
-    
-   // p.color/=min(pow(p.pos.w,.5)*.1+1.5,5);
+    // Переводим в view-space
+    float3 posView = mul(float4(worldPos, 1.0), view[0]).xyz;
+    float3 dirView = mul(float4(dirWorld, 0.0), view[0]).xyz;
+
+    // Перпендикуляр к направлению в плоскости XY view-space
+    float2 dirXY = dirView.xy;
+    float2 perpXY = (dot(dirXY, dirXY) > 1e-8)
+        ? normalize(float2(-dirXY.y, dirXY.x))
+        : float2(1.0, 0.0);
+
+    // Полуширина линии в view-space (мировые единицы)
+    float halfWidth = 0.05;
+
+    posView.xy += perpXY * halfWidth * side;
+
+    // Проекция
+    p.pos = mul(float4(posView, 1.0), proj[0]);
+
     return p;
 }
 

@@ -820,15 +820,10 @@ namespace ps{
 
 struct { 
 
-struct 
-{
-float4 color;
-} params;
+struct {} params;
 
 void set () {
 Shaders::pShader(3);
-context->UpdateSubresource(dx11::Shaders::PS[3].params, 0, NULL, &params, 0, 0);
-context->PSSetConstantBuffers(0, 1, &dx11::Shaders::PS[3].params);
 }
 
 } color;
