@@ -21,7 +21,7 @@ float quantize2(float x, float q)
     return floor(x*q)/q;
 }
 
-pos_color CalcParticles(uint qid,uint iid,float4 grid)
+pos_color CalcParticles(uint qid, uint iid, float4 grid)
 {
     pos_color p;
     p.color = float4(1, 0, 0, 1); // статичный красный

@@ -1689,7 +1689,7 @@ namespace Object {
 
 #endif
 
-	cmd(RayHit, int xStartPos, int yStartPos, int zStartPos, int xEndPos, int yEndPos, int zEndPos)
+	cmd(RayHit, float4 pos1, float4 pos2)
 	{
 		reflect;
 
@@ -1704,8 +1704,8 @@ namespace Object {
 			.params = {
 				.gX = 1,
 				.gY = 1,
-				.pos1 = float4(in.xStartPos / 10000., in.yStartPos / 10000., in.zStartPos / 10000., 0),
-				.pos2 = float4(in.xEndPos / 10000., in.yEndPos / 10000., in.zEndPos / 10000., 0)
+				.pos1 = in.pos1,
+				.pos2 = in.pos2
 			},
 		};
 

@@ -2667,6 +2667,13 @@ namespace Loop
 
 		enemyRenderer.RenderColor(enemySystem, deltaTime);
 
+		for (std::pair<float4, float4>& ray : hero.rays) {
+			Object::RayHit({
+				.pos1 = ray.first,
+				.pos2 = ray.second
+				});
+		}
+
 		//.jumpCharge = (int)(hero.jumpChargeProgress*100.)
 
 		//hero.mesh->model = XMMatrixTranspose(XMMatrixIdentity());
@@ -2696,19 +2703,6 @@ namespace Loop
 				.tickness = 2,
 				.stencil = switcher::on
 			});
-
-
-		for (std::pair<float4, float4>& ray : hero.rays) {
-			Object::RayHit({
-				.xStartPos = (int)(ray.first.x * 10000.),
-				.yStartPos = (int)(ray.first.y * 10000.),
-				.zStartPos = (int)(ray.first.z * 10000.),
-
-				.xEndPos = (int)(ray.second.x * 10000.),
-				.yEndPos = (int)(ray.second.y * 10000.),
-				.zEndPos = (int)(ray.second.z * 10000.),
-			});
-		}
 
 
 		Compose();

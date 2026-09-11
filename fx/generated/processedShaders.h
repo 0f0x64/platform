@@ -1650,7 +1650,7 @@ const char* line =
 "    return floor(x*q)/q;\n"
 "}\n"
 "\n"
-"pos_color CalcParticles(uint qid,uint iid,float4 grid)\n"
+"pos_color CalcParticles(uint qid, uint iid, float4 grid)\n"
 "{\n"
 "    pos_color p;\n"
 "    p.color = float4(1, 0, 0, 1); // статичный красный\n"
@@ -5303,7 +5303,8 @@ const char* color =
 "\n"
 "float4 PS(VS_OUTPUT_PARTICLE input, bool isFrontFace : SV_IsFrontFace) : SV_Target\n"
 "{\n"
-"    return input.color;\n"
+"    //return input.color;\n"
+"    return float4(1, 0, 0, 1);\n"
 "}\n"
 ;
 
@@ -6316,7 +6317,7 @@ const char* particleVS_main2 =
 "    float4 grid = getGridInst(vID,iID,gX,gY); \n"
 "    pos_color p = CalcParticles(vID,iID,grid);\n"
 "    \n"
-"    VS_OUTPUT_PARTICLE output = { p.pos,grid.zw, p.color, p.sz};\n"
+"    VS_OUTPUT_PARTICLE output = { p.pos, grid.zw, p.color, p.sz};\n"
 "    return output;\n"
 "\n"
 "}\n"
