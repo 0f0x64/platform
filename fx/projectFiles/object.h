@@ -1702,6 +1702,8 @@ namespace Object {
 
 		vs::line = {
 			.params = {
+				.gX = 1,
+				.gY = 1,
 				.pos1 = float4(in.xStartPos / 10000., in.yStartPos / 10000., in.zStartPos / 10000., 0),
 				.pos2 = float4(in.xEndPos / 10000., in.yEndPos / 10000., in.zEndPos / 10000., 0)
 			},

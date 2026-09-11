@@ -251,6 +251,8 @@ struct {
 
 struct 
 {
+int gX;
+int gY;
 float4 pos1;
 float4 pos2;
 } params;

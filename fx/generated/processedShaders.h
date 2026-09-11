@@ -1634,6 +1634,8 @@ const char* line =
 "\n"
 "cbuffer params : register(b0)\n"
 "{\n"
+"    int gX;\n"
+"    int gY;\n"
 "    float4 pos1;\n"
 "    float4 pos2;\n"
 "}\n"
