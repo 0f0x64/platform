@@ -714,6 +714,9 @@ struct hero_ {
 		if (dead)
 			return;
 
+		if (blocking)
+			return;
+
 		if (invulnerabilityTimer > 0.0f)
 			return;
 
