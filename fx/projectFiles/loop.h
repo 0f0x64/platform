@@ -2788,7 +2788,8 @@ namespace Loop
 
 		float4 p = V2F(hero.pos * 10000.);
 
-		Object::Mesh({
+		if (!hero.dead) {
+			Object::Mesh({
 				.obj = hero.mesh,
 				.quality = 1,
 				.xPos = (int)(p.x),
@@ -2801,7 +2802,8 @@ namespace Loop
 				.onLineOfs = (int)hero.yOffset,
 				.jumpCharge = 100,
 				.deltaTime = deltaTime
-			});
+				});
+		}
 
 		enemyRenderer.RenderColor(enemySystem, deltaTime);
 
