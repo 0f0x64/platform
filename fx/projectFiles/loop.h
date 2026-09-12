@@ -714,8 +714,10 @@ struct hero_ {
 		if (dead)
 			return;
 
-		if (blocking)
+		if (blocking) {
+			Log("Damage blocked\n");
 			return;
+		}
 
 		if (invulnerabilityTimer > 0.0f)
 			return;
