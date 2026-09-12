@@ -261,6 +261,22 @@ float fov = 110;
 struct hero_ {
 
 	Object::mesh* mesh = new Object::mesh;
+	
+	//
+	collision::SphereCollider* collider = []()
+		{
+			collision::SphereCollider* c = collision::CreateSphereCollider();
+			c->radius = 0.65f;
+			return c;
+		}();
+
+	float maxHealth = 100.0f;
+	float health = 100.0f;
+
+	float invulnerabilityTimer = 0.0f;
+
+	bool dead = false;
+	//
 
 	XMVECTOR pos = { 0.0f, 0.0f, 0.0f, 1.0f };
 	XMVECTOR posOnLine = { 0.0f, 0.0f, 0.0f, 1.0f };
