@@ -1689,21 +1689,24 @@ namespace Object {
 
 #endif
 
-	cmd(RayHit, int xStartPos, int yStartPos, int zStartPos, int xEndPos, int yEndPos, int zEndPos)
+	cmd(RayHit, float4 pos1, float4 pos2)
 	{
 		reflect;
 
+		Culling::Set({ cullmode::off });
+		DepthBuf::Mode({ depthmode::readonly });
+		BlendMode::Set({
+			.mode = blendmode::on,
+			.op = blendop::add
+			});
+
 		vs::line = {
 			.params = {
-				.pos1 = float4(in.xStartPos / 10000., in.yStartPos / 10000., in.zStartPos / 10000., 0),
-				.pos2 = float4(in.xEndPos / 10000., in.yEndPos / 10000., in.zEndPos / 10000., 0)
+				.gX = 1,
+				.gY = 1,
+				.pos1 = in.pos1,
+				.pos2 = in.pos2
 			},
-		};
-
-		ps::color = {
-			.params = {
-				.color = float4(1, 0, 0, 1)
-			}
 		};
 
 		vs::line.set();
