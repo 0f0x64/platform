@@ -652,6 +652,19 @@ struct hero_ {
 	{
 		if (firstRun || ((!firstRun) && GetAsyncKeyState('R')))
 		{
+			if (dead)
+			{
+				dead = false;
+
+				health = maxHealth;
+				invulnerabilityTimer = 0.0f;
+
+				if (collider)
+				{
+					collider->isTouchable = true;
+				}
+			}
+
 			if (!firstRun)
 			{
 				while (GetAsyncKeyState('R')) { Sleep(16); };
