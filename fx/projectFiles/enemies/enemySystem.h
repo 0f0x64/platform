@@ -54,7 +54,7 @@ namespace Enemies
 					value.position = spawn;
 					value.movementCenter = spawn;
 					value.movementTarget = spawn;
-				};
+					};
 				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
 				enemy.updateCallback = [this](Enemy& value, float dt) { UpdateWander(value, dt); };
@@ -67,6 +67,27 @@ namespace Enemies
 			if (!initialized_ || !std::isfinite(deltaTime) || deltaTime <= 0.0f) return;
 			for (Enemy& enemy : enemies_) enemy.Update(deltaTime);
 		}
+
+		// для спавна противника перед игроком.
+		void SetEnemyPosition(std::size_t index, Position position)
+		{
+			if (index >= Count)
+				return;
+
+			Enemy& enemy = enemies_[index];
+
+			enemy.position = position;
+			enemy.movementCenter = position;
+			enemy.movementTarget = position;
+
+			if (enemy.collider)
+			{
+				enemy.collider->position.x = position.x;
+				enemy.collider->position.y = position.y;
+				enemy.collider->position.z = position.z;
+			}
+		}
+		//
 
 	private:
 		Position RandomTarget(const Enemy& enemy)
@@ -117,4 +138,5 @@ namespace Enemies
 		std::mt19937 random_{ DefaultSeed };
 		bool initialized_ = false;
 	};
+
 }
