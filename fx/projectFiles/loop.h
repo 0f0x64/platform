@@ -722,7 +722,7 @@ struct hero_ {
 		if (health < 0.0f)
 			health = 0.0f;
 
-		invulnerabilityTimer = 0.75f;
+		invulnerabilityTimer = 1.0f;
 
 		Log("PLAYER DAMAGE. NEW HEALTH: " + std::to_string(health) + " \n");
 
