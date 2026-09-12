@@ -2430,6 +2430,54 @@ namespace Loop
 	}
 
 
+	void CheckPlayerEnemyCollisions()
+	{
+		if (hero.dead)
+			return;
+
+		if (!hero.collider)
+			return;
+
+		if (hero.invulnerabilityTimer > 0.0f)
+			return;
+
+		const float playerX = hero.collider->position.x;
+		const float playerY = hero.collider->position.y;
+		const float playerZ = hero.collider->position.z;
+
+		const auto& enemies = enemySystem.Items();
+
+		for (const Enemies::Enemy& enemy : enemies)
+		{
+			if (!enemy.collider)
+				continue;
+
+			if (!enemy.collider->isTouchable)
+				continue;
+
+			// Enemy::Update() обновляет collider ДО движения врага,
+			// поэтому здесь синхронизируем его с актуальной позицией.
+			enemy.collider->position.x = enemy.position.x;
+			enemy.collider->position.y = enemy.position.y;
+			enemy.collider->position.z = enemy.position.z;
+
+			collision::CollisionResult result =
+				collision::sphere_vs_sphere(
+					hero.collider->position,
+					hero.collider->radius,
+					enemy.collider->position,
+					enemy.collider->radius
+				);
+
+			if (result.collided)
+			{
+				hero.TakeDamage(25.0f);
+
+				// Только один враг наносит урон за один кадр.
+				break;
+			}
+		}
+	}
 
 
 	cmd(SetHeroParams, int accel, int maxSpeed, int autoBrake, int axisAngleAccel, int maxAxisSpeed, int changeDirSpeed,
