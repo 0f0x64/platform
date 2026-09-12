@@ -2621,6 +2621,15 @@ namespace Loop
 
 				hero.processLanding(FIXED_DT);
 
+				// NEW
+				hero.UpdateCollider();
+				hero.UpdateDamageState(FIXED_DT);
+
+				enemySystem.Update(FIXED_DT);
+
+				// NEW
+				CheckPlayerEnemyCollisions();
+
 				enemySystem.Update(FIXED_DT);
 				gameCamera.Update(FIXED_DT);
 
