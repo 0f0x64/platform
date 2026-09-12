@@ -722,9 +722,9 @@ struct hero_ {
 		if (health < 0.0f)
 			health = 0.0f;
 
-		invulnerabilityTimer = 0.5f;
+		invulnerabilityTimer = 0.75f;
 
-		Log("PLAYER DAMAGE " + std::to_string(damage) + " \n");
+		Log("PLAYER DAMAGE. NEW HEALTH: " + std::to_string(health) + " \n");
 
 		if (health <= 0.0f)
 		{
@@ -2471,7 +2471,7 @@ namespace Loop
 
 			if (result.collided)
 			{
-				hero.TakeDamage(25.0f);
+				hero.TakeDamage(15.0f);
 
 				// “олько один враг наносит урон за один кадр.
 				break;
