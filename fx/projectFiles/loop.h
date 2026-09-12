@@ -697,7 +697,57 @@ struct hero_ {
 
 	}
 	
+	//
+	void UpdateCollider()
+	{
+		if (!collider)
+			return;
 
+		collider->position.x = XMVectorGetX(pos);
+		collider->position.y = XMVectorGetY(pos);
+		collider->position.z = XMVectorGetZ(pos);
+		collider->position.w = 1.0f;
+	}
+
+	void TakeDamage(float damage)
+	{
+		if (dead)
+			return;
+
+		if (invulnerabilityTimer > 0.0f)
+			return;
+
+		health -= damage;
+
+		if (health < 0.0f)
+			health = 0.0f;
+
+		invulnerabilityTimer = 0.5f;
+
+		Log("PLAYER DAMAGE " + std::to_string(damage) + " \n");
+
+		if (health <= 0.0f)
+		{
+			dead = true;
+
+			if (collider)
+				collider->isTouchable = false;
+
+			Log("PLAYER DEAD\n");
+		}
+	}
+
+	void UpdateDamageState(float deltaTime)
+	{
+		if (invulnerabilityTimer > 0.0f)
+		{
+			invulnerabilityTimer -= deltaTime;
+
+			if (invulnerabilityTimer < 0.0f)
+				invulnerabilityTimer = 0.0f;
+		}
+	}
+	//
 
 	void ProcessJump(float deltaTime)
 	{
