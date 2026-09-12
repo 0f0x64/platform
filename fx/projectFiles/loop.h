@@ -2602,24 +2602,26 @@ namespace Loop
 
 			while (accumulator >= FIXED_DT) {
 
-				hero.pathControl.Process();
-				hero.ProcessMove(FIXED_DT); 
-				hero.ProcessJump(FIXED_DT); 
+				if (!hero.dead) {
+					hero.pathControl.Process();
+					hero.ProcessMove(FIXED_DT);
+					hero.ProcessJump(FIXED_DT);
 
-				hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
-				hero.ProcessDefense();
+					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
+					hero.ProcessDefense();
 
-				if (hero.gravity.mode)
-				{
-					hero.ProcessGravity(FIXED_DT);
-					hero.OrientHeroTowardsLineInAir(FIXED_DT);
+					if (hero.gravity.mode)
+					{
+						hero.ProcessGravity(FIXED_DT);
+						hero.OrientHeroTowardsLineInAir(FIXED_DT);
+					}
+					else
+					{
+						hero.UpdateHeroOnLine(FIXED_DT);
+					}
+
+					hero.processLanding(FIXED_DT);
 				}
-				else
-				{
-					hero.UpdateHeroOnLine(FIXED_DT);
-				}
-
-				hero.processLanding(FIXED_DT);
 
 				// NEW
 				hero.UpdateCollider();
