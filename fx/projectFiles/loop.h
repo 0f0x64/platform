@@ -2779,6 +2779,7 @@ namespace Loop
 				hero.mesh->animations[10].weight = 100000000.0f;
 
 				hero.mesh->animations[11].weight = 1000000000.0f;
+				hero.mesh->animations[11].speed = 0.5f;
 
 				hero.mesh->animations[12].weight = 100000000.0f;
 				hero.mesh->animations[12].speed = 0.5f;
