@@ -267,6 +267,7 @@ struct hero_ {
 		{
 			collision::SphereCollider* c = collision::CreateSphereCollider();
 			c->radius = 0.65f;
+			c->collisionGroup = collision::CollisionGroup::Player;
 			return c;
 		}();
 
@@ -1293,13 +1294,13 @@ struct hero_ {
 				if (bowCharge >= 0.35f) {
 					mesh->PlayAnimation(10, 0.1f);
 
-					collision::RayInfo ray = collision::RayInfo(camPos, camForward * 100, false);
+					collision::RayInfo ray = collision::RayInfo(camPos, camForward * 100, collision::CollisionGroup::Player, false);
 					collision::RaycastResult result = collision::Raycast(ray);
 
 					float4 heroPos = V2F(pos);
 					float4 direction = result.hit ? normalize(result.position - heroPos) : camForward;
 
-					ray = collision::RayInfo(heroPos, direction * 100, false);
+					ray = collision::RayInfo(heroPos, direction * 100, collision::CollisionGroup::Player, false);
 					result = collision::Raycast(ray);
 
 					if (result.hit) {

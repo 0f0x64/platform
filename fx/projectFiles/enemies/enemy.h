@@ -29,6 +29,8 @@ namespace Enemies
 		void Initialize()
 		{
 			collider = collision::CreateSphereCollider();
+			collider->collisionGroup = collision::CollisionGroup::Enemy;
+
 			if (initializeCallback) initializeCallback(*this);
 		}
 
