@@ -2581,8 +2581,8 @@ namespace Loop
 
 		if (!enemySystem.IsInitialized())
 		{
-			enemySystem.Reset(ToEnemyPosition(hero.pos),
-				ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+			//enemySystem.Reset(ToEnemyPosition(hero.pos), ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+			enemySystem.ResetRandomOnLines();
 		}
 		float deltaTime = processTimer();
 
@@ -2598,8 +2598,8 @@ namespace Loop
 			hero.Respawn();
 			if (initialEnemySpawn)
 			{
-				enemySystem.Reset(ToEnemyPosition(hero.pos),
-					ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+				//enemySystem.Reset(ToEnemyPosition(hero.pos), ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+				enemySystem.ResetRandomOnLines();
 			}
 
 			const float FIXED_DT = 1.0f / 60.0f; // Строго 16.66 мс для физики
