@@ -37,7 +37,7 @@ struct ParamDesc {
 
 };
 
-ParamDesc cmdParamDesc[2000];
+ParamDesc cmdParamDesc[5000];
 
 bool paramsAreLoaded = false;
 

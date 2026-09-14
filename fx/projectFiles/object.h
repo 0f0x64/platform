@@ -991,8 +991,14 @@ namespace Object {
 
 
 // ============================================================
+// ДЕРЕВО — РОВНАЯ НАРУЖНАЯ ПОВЕРХНОСТЬ
+// 36 продольных жил, шаг 10°
+// Все линии находятся на одном радиусе 4300 от центральной оси.
+// Y = высота. Линии распределены равномерно по окружности.
+// ============================================================
+
+// ============================================================
 // ПОВЕРХНОСТЬ 0°
-// Правая сторона ствола
 // ============================================================
 
 		NewLine();
@@ -1067,8 +1073,382 @@ namespace Object {
 
 
 		// ============================================================
+		// ПОВЕРХНОСТЬ 10°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 59235, 30000, 52290 });
+		AddPointToLine({ 59639, 31250, 52487 });
+		AddPointToLine({ 60041, 32500, 52681 });
+		AddPointToLine({ 60440, 33750, 52870 });
+		AddPointToLine({ 60835, 35000, 53055 });
+
+		NewLine();
+		AddPointToLine({ 60929, 35300, 53098 });
+		AddPointToLine({ 61343, 36640, 53289 });
+		AddPointToLine({ 61748, 37980, 53473 });
+		AddPointToLine({ 62142, 39320, 53651 });
+		AddPointToLine({ 62522, 40660, 53821 });
+		AddPointToLine({ 62889, 42000, 53983 });
+
+		NewLine();
+		AddPointToLine({ 62968, 42300, 54018 });
+		AddPointToLine({ 63304, 43600, 54165 });
+		AddPointToLine({ 63623, 44900, 54305 });
+		AddPointToLine({ 63924, 46200, 54435 });
+		AddPointToLine({ 64205, 47500, 54557 });
+
+		NewLine();
+		AddPointToLine({ 64267, 47800, 54584 });
+		AddPointToLine({ 64530, 49140, 54698 });
+		AddPointToLine({ 64769, 50480, 54802 });
+		AddPointToLine({ 64984, 51820, 54895 });
+		AddPointToLine({ 65173, 53160, 54978 });
+		AddPointToLine({ 65336, 54500, 55050 });
+
+		NewLine();
+		AddPointToLine({ 65369, 54800, 55064 });
+		AddPointToLine({ 65490, 56040, 55119 });
+		AddPointToLine({ 65587, 57280, 55164 });
+		AddPointToLine({ 65660, 58520, 55199 });
+		AddPointToLine({ 65708, 59760, 55225 });
+		AddPointToLine({ 65732, 61000, 55241 });
+
+		NewLine();
+		AddPointToLine({ 65734, 61300, 55243 });
+		AddPointToLine({ 65726, 62640, 55247 });
+		AddPointToLine({ 65689, 63980, 55239 });
+		AddPointToLine({ 65623, 65320, 55219 });
+		AddPointToLine({ 65528, 66660, 55189 });
+		AddPointToLine({ 65406, 68000, 55146 });
+
+		NewLine();
+		AddPointToLine({ 65375, 68300, 55135 });
+		AddPointToLine({ 65232, 69540, 55084 });
+		AddPointToLine({ 65066, 70780, 55023 });
+		AddPointToLine({ 64878, 72020, 54953 });
+		AddPointToLine({ 64668, 73260, 54874 });
+		AddPointToLine({ 64438, 74500, 54786 });
+
+		NewLine();
+		AddPointToLine({ 64379, 74800, 54763 });
+		AddPointToLine({ 64103, 76140, 54655 });
+		AddPointToLine({ 63806, 77480, 54538 });
+		AddPointToLine({ 63488, 78820, 54410 });
+		AddPointToLine({ 63151, 80160, 54274 });
+		AddPointToLine({ 62797, 81500, 54128 });
+
+		NewLine();
+		AddPointToLine({ 62715, 81800, 54094 });
+		AddPointToLine({ 62256, 83440, 53902 });
+		AddPointToLine({ 61777, 85080, 53698 });
+		AddPointToLine({ 61281, 86720, 53482 });
+		AddPointToLine({ 60772, 88360, 53256 });
+		AddPointToLine({ 60252, 90000, 53021 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 20°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 59041, 30000, 53014 });
+		AddPointToLine({ 59445, 31250, 53211 });
+		AddPointToLine({ 59847, 32500, 53405 });
+		AddPointToLine({ 60246, 33750, 53594 });
+		AddPointToLine({ 60641, 35000, 53779 });
+
+		NewLine();
+		AddPointToLine({ 60735, 35300, 53822 });
+		AddPointToLine({ 61149, 36640, 54013 });
+		AddPointToLine({ 61554, 37980, 54197 });
+		AddPointToLine({ 61948, 39320, 54375 });
+		AddPointToLine({ 62328, 40660, 54545 });
+		AddPointToLine({ 62695, 42000, 54707 });
+
+		NewLine();
+		AddPointToLine({ 62774, 42300, 54742 });
+		AddPointToLine({ 63110, 43600, 54889 });
+		AddPointToLine({ 63429, 44900, 55029 });
+		AddPointToLine({ 63730, 46200, 55159 });
+		AddPointToLine({ 64011, 47500, 55281 });
+
+		NewLine();
+		AddPointToLine({ 64073, 47800, 55308 });
+		AddPointToLine({ 64336, 49140, 55422 });
+		AddPointToLine({ 64575, 50480, 55526 });
+		AddPointToLine({ 64790, 51820, 55619 });
+		AddPointToLine({ 64979, 53160, 55702 });
+		AddPointToLine({ 65142, 54500, 55774 });
+
+		NewLine();
+		AddPointToLine({ 65175, 54800, 55788 });
+		AddPointToLine({ 65296, 56040, 55843 });
+		AddPointToLine({ 65393, 57280, 55888 });
+		AddPointToLine({ 65466, 58520, 55923 });
+		AddPointToLine({ 65514, 59760, 55949 });
+		AddPointToLine({ 65538, 61000, 55965 });
+
+		NewLine();
+		AddPointToLine({ 65540, 61300, 55967 });
+		AddPointToLine({ 65532, 62640, 55971 });
+		AddPointToLine({ 65495, 63980, 55963 });
+		AddPointToLine({ 65429, 65320, 55943 });
+		AddPointToLine({ 65334, 66660, 55913 });
+		AddPointToLine({ 65212, 68000, 55870 });
+
+		NewLine();
+		AddPointToLine({ 65181, 68300, 55859 });
+		AddPointToLine({ 65038, 69540, 55808 });
+		AddPointToLine({ 64872, 70780, 55747 });
+		AddPointToLine({ 64684, 72020, 55677 });
+		AddPointToLine({ 64474, 73260, 55598 });
+		AddPointToLine({ 64244, 74500, 55510 });
+
+		NewLine();
+		AddPointToLine({ 64185, 74800, 55487 });
+		AddPointToLine({ 63909, 76140, 55379 });
+		AddPointToLine({ 63612, 77480, 55262 });
+		AddPointToLine({ 63294, 78820, 55134 });
+		AddPointToLine({ 62957, 80160, 54998 });
+		AddPointToLine({ 62603, 81500, 54852 });
+
+		NewLine();
+		AddPointToLine({ 62521, 81800, 54818 });
+		AddPointToLine({ 62062, 83440, 54626 });
+		AddPointToLine({ 61583, 85080, 54422 });
+		AddPointToLine({ 61087, 86720, 54206 });
+		AddPointToLine({ 60578, 88360, 53980 });
+		AddPointToLine({ 60058, 90000, 53745 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 30°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 58724, 30000, 53693 });
+		AddPointToLine({ 59128, 31250, 53890 });
+		AddPointToLine({ 59530, 32500, 54084 });
+		AddPointToLine({ 59929, 33750, 54273 });
+		AddPointToLine({ 60324, 35000, 54458 });
+
+		NewLine();
+		AddPointToLine({ 60418, 35300, 54501 });
+		AddPointToLine({ 60832, 36640, 54692 });
+		AddPointToLine({ 61237, 37980, 54876 });
+		AddPointToLine({ 61631, 39320, 55054 });
+		AddPointToLine({ 62011, 40660, 55224 });
+		AddPointToLine({ 62378, 42000, 55386 });
+
+		NewLine();
+		AddPointToLine({ 62457, 42300, 55421 });
+		AddPointToLine({ 62793, 43600, 55568 });
+		AddPointToLine({ 63112, 44900, 55708 });
+		AddPointToLine({ 63413, 46200, 55838 });
+		AddPointToLine({ 63694, 47500, 55960 });
+
+		NewLine();
+		AddPointToLine({ 63756, 47800, 55987 });
+		AddPointToLine({ 64019, 49140, 56101 });
+		AddPointToLine({ 64258, 50480, 56205 });
+		AddPointToLine({ 64473, 51820, 56298 });
+		AddPointToLine({ 64662, 53160, 56381 });
+		AddPointToLine({ 64825, 54500, 56453 });
+
+		NewLine();
+		AddPointToLine({ 64858, 54800, 56467 });
+		AddPointToLine({ 64979, 56040, 56522 });
+		AddPointToLine({ 65076, 57280, 56567 });
+		AddPointToLine({ 65149, 58520, 56602 });
+		AddPointToLine({ 65197, 59760, 56628 });
+		AddPointToLine({ 65221, 61000, 56644 });
+
+		NewLine();
+		AddPointToLine({ 65223, 61300, 56646 });
+		AddPointToLine({ 65215, 62640, 56650 });
+		AddPointToLine({ 65178, 63980, 56642 });
+		AddPointToLine({ 65112, 65320, 56622 });
+		AddPointToLine({ 65017, 66660, 56592 });
+		AddPointToLine({ 64895, 68000, 56549 });
+
+		NewLine();
+		AddPointToLine({ 64864, 68300, 56538 });
+		AddPointToLine({ 64721, 69540, 56487 });
+		AddPointToLine({ 64555, 70780, 56426 });
+		AddPointToLine({ 64367, 72020, 56356 });
+		AddPointToLine({ 64157, 73260, 56277 });
+		AddPointToLine({ 63927, 74500, 56189 });
+
+		NewLine();
+		AddPointToLine({ 63868, 74800, 56166 });
+		AddPointToLine({ 63592, 76140, 56058 });
+		AddPointToLine({ 63295, 77480, 55941 });
+		AddPointToLine({ 62977, 78820, 55813 });
+		AddPointToLine({ 62640, 80160, 55677 });
+		AddPointToLine({ 62286, 81500, 55531 });
+
+		NewLine();
+		AddPointToLine({ 62204, 81800, 55497 });
+		AddPointToLine({ 61745, 83440, 55305 });
+		AddPointToLine({ 61266, 85080, 55101 });
+		AddPointToLine({ 60770, 86720, 54885 });
+		AddPointToLine({ 60261, 88360, 54659 });
+		AddPointToLine({ 59741, 90000, 54424 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 40°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 58294, 30000, 54307 });
+		AddPointToLine({ 58698, 31250, 54504 });
+		AddPointToLine({ 59100, 32500, 54698 });
+		AddPointToLine({ 59499, 33750, 54887 });
+		AddPointToLine({ 59894, 35000, 55072 });
+
+		NewLine();
+		AddPointToLine({ 59988, 35300, 55115 });
+		AddPointToLine({ 60402, 36640, 55306 });
+		AddPointToLine({ 60807, 37980, 55490 });
+		AddPointToLine({ 61201, 39320, 55668 });
+		AddPointToLine({ 61581, 40660, 55838 });
+		AddPointToLine({ 61948, 42000, 56000 });
+
+		NewLine();
+		AddPointToLine({ 62027, 42300, 56035 });
+		AddPointToLine({ 62363, 43600, 56182 });
+		AddPointToLine({ 62682, 44900, 56322 });
+		AddPointToLine({ 62983, 46200, 56452 });
+		AddPointToLine({ 63264, 47500, 56574 });
+
+		NewLine();
+		AddPointToLine({ 63326, 47800, 56601 });
+		AddPointToLine({ 63589, 49140, 56715 });
+		AddPointToLine({ 63828, 50480, 56819 });
+		AddPointToLine({ 64043, 51820, 56912 });
+		AddPointToLine({ 64232, 53160, 56995 });
+		AddPointToLine({ 64395, 54500, 57067 });
+
+		NewLine();
+		AddPointToLine({ 64428, 54800, 57081 });
+		AddPointToLine({ 64549, 56040, 57136 });
+		AddPointToLine({ 64646, 57280, 57181 });
+		AddPointToLine({ 64719, 58520, 57216 });
+		AddPointToLine({ 64767, 59760, 57242 });
+		AddPointToLine({ 64791, 61000, 57258 });
+
+		NewLine();
+		AddPointToLine({ 64793, 61300, 57260 });
+		AddPointToLine({ 64785, 62640, 57264 });
+		AddPointToLine({ 64748, 63980, 57256 });
+		AddPointToLine({ 64682, 65320, 57236 });
+		AddPointToLine({ 64587, 66660, 57206 });
+		AddPointToLine({ 64465, 68000, 57163 });
+
+		NewLine();
+		AddPointToLine({ 64434, 68300, 57152 });
+		AddPointToLine({ 64291, 69540, 57101 });
+		AddPointToLine({ 64125, 70780, 57040 });
+		AddPointToLine({ 63937, 72020, 56970 });
+		AddPointToLine({ 63727, 73260, 56891 });
+		AddPointToLine({ 63497, 74500, 56803 });
+
+		NewLine();
+		AddPointToLine({ 63438, 74800, 56780 });
+		AddPointToLine({ 63162, 76140, 56672 });
+		AddPointToLine({ 62865, 77480, 56555 });
+		AddPointToLine({ 62547, 78820, 56427 });
+		AddPointToLine({ 62210, 80160, 56291 });
+		AddPointToLine({ 61856, 81500, 56145 });
+
+		NewLine();
+		AddPointToLine({ 61774, 81800, 56111 });
+		AddPointToLine({ 61315, 83440, 55919 });
+		AddPointToLine({ 60836, 85080, 55715 });
+		AddPointToLine({ 60340, 86720, 55499 });
+		AddPointToLine({ 59831, 88360, 55273 });
+		AddPointToLine({ 59311, 90000, 55038 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 50°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 57764, 30000, 54837 });
+		AddPointToLine({ 58168, 31250, 55034 });
+		AddPointToLine({ 58570, 32500, 55228 });
+		AddPointToLine({ 58969, 33750, 55417 });
+		AddPointToLine({ 59364, 35000, 55602 });
+
+		NewLine();
+		AddPointToLine({ 59458, 35300, 55645 });
+		AddPointToLine({ 59872, 36640, 55836 });
+		AddPointToLine({ 60277, 37980, 56020 });
+		AddPointToLine({ 60671, 39320, 56198 });
+		AddPointToLine({ 61051, 40660, 56368 });
+		AddPointToLine({ 61418, 42000, 56530 });
+
+		NewLine();
+		AddPointToLine({ 61497, 42300, 56565 });
+		AddPointToLine({ 61833, 43600, 56712 });
+		AddPointToLine({ 62152, 44900, 56852 });
+		AddPointToLine({ 62453, 46200, 56982 });
+		AddPointToLine({ 62734, 47500, 57104 });
+
+		NewLine();
+		AddPointToLine({ 62796, 47800, 57131 });
+		AddPointToLine({ 63059, 49140, 57245 });
+		AddPointToLine({ 63298, 50480, 57349 });
+		AddPointToLine({ 63513, 51820, 57442 });
+		AddPointToLine({ 63702, 53160, 57525 });
+		AddPointToLine({ 63865, 54500, 57597 });
+
+		NewLine();
+		AddPointToLine({ 63898, 54800, 57611 });
+		AddPointToLine({ 64019, 56040, 57666 });
+		AddPointToLine({ 64116, 57280, 57711 });
+		AddPointToLine({ 64189, 58520, 57746 });
+		AddPointToLine({ 64237, 59760, 57772 });
+		AddPointToLine({ 64261, 61000, 57788 });
+
+		NewLine();
+		AddPointToLine({ 64263, 61300, 57790 });
+		AddPointToLine({ 64255, 62640, 57794 });
+		AddPointToLine({ 64218, 63980, 57786 });
+		AddPointToLine({ 64152, 65320, 57766 });
+		AddPointToLine({ 64057, 66660, 57736 });
+		AddPointToLine({ 63935, 68000, 57693 });
+
+		NewLine();
+		AddPointToLine({ 63904, 68300, 57682 });
+		AddPointToLine({ 63761, 69540, 57631 });
+		AddPointToLine({ 63595, 70780, 57570 });
+		AddPointToLine({ 63407, 72020, 57500 });
+		AddPointToLine({ 63197, 73260, 57421 });
+		AddPointToLine({ 62967, 74500, 57333 });
+
+		NewLine();
+		AddPointToLine({ 62908, 74800, 57310 });
+		AddPointToLine({ 62632, 76140, 57202 });
+		AddPointToLine({ 62335, 77480, 57085 });
+		AddPointToLine({ 62017, 78820, 56957 });
+		AddPointToLine({ 61680, 80160, 56821 });
+		AddPointToLine({ 61326, 81500, 56675 });
+
+		NewLine();
+		AddPointToLine({ 61244, 81800, 56641 });
+		AddPointToLine({ 60785, 83440, 56449 });
+		AddPointToLine({ 60306, 85080, 56245 });
+		AddPointToLine({ 59810, 86720, 56029 });
+		AddPointToLine({ 59301, 88360, 55803 });
+		AddPointToLine({ 58781, 90000, 55568 });
+
+
+		// ============================================================
 		// ПОВЕРХНОСТЬ 60°
-		// Передняя правая сторона
 		// ============================================================
 
 		NewLine();
@@ -1083,20 +1463,20 @@ namespace Object {
 		AddPointToLine({ 59258, 36640, 56266 });
 		AddPointToLine({ 59663, 37980, 56450 });
 		AddPointToLine({ 60057, 39320, 56628 });
-		AddPointToLine({ 60437, 40660, 56797 });
-		AddPointToLine({ 60804, 42000, 56959 });
+		AddPointToLine({ 60437, 40660, 56798 });
+		AddPointToLine({ 60804, 42000, 56960 });
 
 		NewLine();
 		AddPointToLine({ 60883, 42300, 56995 });
 		AddPointToLine({ 61219, 43600, 57142 });
-		AddPointToLine({ 61538, 44900, 57281 });
+		AddPointToLine({ 61538, 44900, 57282 });
 		AddPointToLine({ 61839, 46200, 57412 });
 		AddPointToLine({ 62120, 47500, 57534 });
 
 		NewLine();
 		AddPointToLine({ 62182, 47800, 57561 });
 		AddPointToLine({ 62445, 49140, 57675 });
-		AddPointToLine({ 62684, 50480, 57778 });
+		AddPointToLine({ 62684, 50480, 57779 });
 		AddPointToLine({ 62899, 51820, 57872 });
 		AddPointToLine({ 63088, 53160, 57955 });
 		AddPointToLine({ 63251, 54500, 58027 });
@@ -1123,7 +1503,7 @@ namespace Object {
 		AddPointToLine({ 62981, 70780, 58000 });
 		AddPointToLine({ 62793, 72020, 57930 });
 		AddPointToLine({ 62583, 73260, 57851 });
-		AddPointToLine({ 62353, 74500, 57762 });
+		AddPointToLine({ 62353, 74500, 57763 });
 
 		NewLine();
 		AddPointToLine({ 62294, 74800, 57740 });
@@ -1139,12 +1519,386 @@ namespace Object {
 		AddPointToLine({ 59692, 85080, 56675 });
 		AddPointToLine({ 59196, 86720, 56459 });
 		AddPointToLine({ 58687, 88360, 56233 });
-		AddPointToLine({ 58167, 90000, 55997 });
+		AddPointToLine({ 58167, 90000, 55998 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 70°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 56471, 30000, 55584 });
+		AddPointToLine({ 56875, 31250, 55781 });
+		AddPointToLine({ 57277, 32500, 55975 });
+		AddPointToLine({ 57676, 33750, 56164 });
+		AddPointToLine({ 58071, 35000, 56349 });
+
+		NewLine();
+		AddPointToLine({ 58165, 35300, 56392 });
+		AddPointToLine({ 58579, 36640, 56583 });
+		AddPointToLine({ 58984, 37980, 56767 });
+		AddPointToLine({ 59378, 39320, 56945 });
+		AddPointToLine({ 59758, 40660, 57115 });
+		AddPointToLine({ 60125, 42000, 57277 });
+
+		NewLine();
+		AddPointToLine({ 60204, 42300, 57312 });
+		AddPointToLine({ 60540, 43600, 57459 });
+		AddPointToLine({ 60859, 44900, 57599 });
+		AddPointToLine({ 61160, 46200, 57729 });
+		AddPointToLine({ 61441, 47500, 57851 });
+
+		NewLine();
+		AddPointToLine({ 61503, 47800, 57878 });
+		AddPointToLine({ 61766, 49140, 57992 });
+		AddPointToLine({ 62005, 50480, 58096 });
+		AddPointToLine({ 62220, 51820, 58189 });
+		AddPointToLine({ 62409, 53160, 58272 });
+		AddPointToLine({ 62572, 54500, 58344 });
+
+		NewLine();
+		AddPointToLine({ 62605, 54800, 58358 });
+		AddPointToLine({ 62726, 56040, 58413 });
+		AddPointToLine({ 62823, 57280, 58458 });
+		AddPointToLine({ 62896, 58520, 58493 });
+		AddPointToLine({ 62944, 59760, 58519 });
+		AddPointToLine({ 62968, 61000, 58535 });
+
+		NewLine();
+		AddPointToLine({ 62970, 61300, 58537 });
+		AddPointToLine({ 62962, 62640, 58541 });
+		AddPointToLine({ 62925, 63980, 58533 });
+		AddPointToLine({ 62859, 65320, 58513 });
+		AddPointToLine({ 62764, 66660, 58483 });
+		AddPointToLine({ 62642, 68000, 58440 });
+
+		NewLine();
+		AddPointToLine({ 62611, 68300, 58429 });
+		AddPointToLine({ 62468, 69540, 58378 });
+		AddPointToLine({ 62302, 70780, 58317 });
+		AddPointToLine({ 62114, 72020, 58247 });
+		AddPointToLine({ 61904, 73260, 58168 });
+		AddPointToLine({ 61674, 74500, 58080 });
+
+		NewLine();
+		AddPointToLine({ 61615, 74800, 58057 });
+		AddPointToLine({ 61339, 76140, 57949 });
+		AddPointToLine({ 61042, 77480, 57832 });
+		AddPointToLine({ 60724, 78820, 57704 });
+		AddPointToLine({ 60387, 80160, 57568 });
+		AddPointToLine({ 60033, 81500, 57422 });
+
+		NewLine();
+		AddPointToLine({ 59951, 81800, 57388 });
+		AddPointToLine({ 59492, 83440, 57196 });
+		AddPointToLine({ 59013, 85080, 56992 });
+		AddPointToLine({ 58517, 86720, 56776 });
+		AddPointToLine({ 58008, 88360, 56550 });
+		AddPointToLine({ 57488, 90000, 56315 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 80°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 55747, 30000, 55778 });
+		AddPointToLine({ 56151, 31250, 55975 });
+		AddPointToLine({ 56553, 32500, 56169 });
+		AddPointToLine({ 56952, 33750, 56358 });
+		AddPointToLine({ 57347, 35000, 56543 });
+
+		NewLine();
+		AddPointToLine({ 57441, 35300, 56586 });
+		AddPointToLine({ 57855, 36640, 56777 });
+		AddPointToLine({ 58260, 37980, 56961 });
+		AddPointToLine({ 58654, 39320, 57139 });
+		AddPointToLine({ 59034, 40660, 57309 });
+		AddPointToLine({ 59401, 42000, 57471 });
+
+		NewLine();
+		AddPointToLine({ 59480, 42300, 57506 });
+		AddPointToLine({ 59816, 43600, 57653 });
+		AddPointToLine({ 60135, 44900, 57793 });
+		AddPointToLine({ 60436, 46200, 57923 });
+		AddPointToLine({ 60717, 47500, 58045 });
+
+		NewLine();
+		AddPointToLine({ 60779, 47800, 58072 });
+		AddPointToLine({ 61042, 49140, 58186 });
+		AddPointToLine({ 61281, 50480, 58290 });
+		AddPointToLine({ 61496, 51820, 58383 });
+		AddPointToLine({ 61685, 53160, 58466 });
+		AddPointToLine({ 61848, 54500, 58538 });
+
+		NewLine();
+		AddPointToLine({ 61881, 54800, 58552 });
+		AddPointToLine({ 62002, 56040, 58607 });
+		AddPointToLine({ 62099, 57280, 58652 });
+		AddPointToLine({ 62172, 58520, 58687 });
+		AddPointToLine({ 62220, 59760, 58713 });
+		AddPointToLine({ 62244, 61000, 58729 });
+
+		NewLine();
+		AddPointToLine({ 62246, 61300, 58731 });
+		AddPointToLine({ 62238, 62640, 58735 });
+		AddPointToLine({ 62201, 63980, 58727 });
+		AddPointToLine({ 62135, 65320, 58707 });
+		AddPointToLine({ 62040, 66660, 58677 });
+		AddPointToLine({ 61918, 68000, 58634 });
+
+		NewLine();
+		AddPointToLine({ 61887, 68300, 58623 });
+		AddPointToLine({ 61744, 69540, 58572 });
+		AddPointToLine({ 61578, 70780, 58511 });
+		AddPointToLine({ 61390, 72020, 58441 });
+		AddPointToLine({ 61180, 73260, 58362 });
+		AddPointToLine({ 60950, 74500, 58274 });
+
+		NewLine();
+		AddPointToLine({ 60891, 74800, 58251 });
+		AddPointToLine({ 60615, 76140, 58143 });
+		AddPointToLine({ 60318, 77480, 58026 });
+		AddPointToLine({ 60000, 78820, 57898 });
+		AddPointToLine({ 59663, 80160, 57762 });
+		AddPointToLine({ 59309, 81500, 57616 });
+
+		NewLine();
+		AddPointToLine({ 59227, 81800, 57582 });
+		AddPointToLine({ 58768, 83440, 57390 });
+		AddPointToLine({ 58289, 85080, 57186 });
+		AddPointToLine({ 57793, 86720, 56970 });
+		AddPointToLine({ 57284, 88360, 56744 });
+		AddPointToLine({ 56764, 90000, 56509 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 90°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 55000, 30000, 55843 });
+		AddPointToLine({ 55404, 31250, 56040 });
+		AddPointToLine({ 55806, 32500, 56234 });
+		AddPointToLine({ 56205, 33750, 56423 });
+		AddPointToLine({ 56600, 35000, 56608 });
+
+		NewLine();
+		AddPointToLine({ 56694, 35300, 56651 });
+		AddPointToLine({ 57108, 36640, 56842 });
+		AddPointToLine({ 57513, 37980, 57026 });
+		AddPointToLine({ 57907, 39320, 57204 });
+		AddPointToLine({ 58287, 40660, 57374 });
+		AddPointToLine({ 58654, 42000, 57536 });
+
+		NewLine();
+		AddPointToLine({ 58733, 42300, 57571 });
+		AddPointToLine({ 59069, 43600, 57718 });
+		AddPointToLine({ 59388, 44900, 57858 });
+		AddPointToLine({ 59689, 46200, 57988 });
+		AddPointToLine({ 59970, 47500, 58110 });
+
+		NewLine();
+		AddPointToLine({ 60032, 47800, 58137 });
+		AddPointToLine({ 60295, 49140, 58251 });
+		AddPointToLine({ 60534, 50480, 58355 });
+		AddPointToLine({ 60749, 51820, 58448 });
+		AddPointToLine({ 60938, 53160, 58531 });
+		AddPointToLine({ 61101, 54500, 58603 });
+
+		NewLine();
+		AddPointToLine({ 61134, 54800, 58617 });
+		AddPointToLine({ 61255, 56040, 58672 });
+		AddPointToLine({ 61352, 57280, 58717 });
+		AddPointToLine({ 61425, 58520, 58752 });
+		AddPointToLine({ 61473, 59760, 58778 });
+		AddPointToLine({ 61497, 61000, 58794 });
+
+		NewLine();
+		AddPointToLine({ 61499, 61300, 58796 });
+		AddPointToLine({ 61491, 62640, 58800 });
+		AddPointToLine({ 61454, 63980, 58792 });
+		AddPointToLine({ 61388, 65320, 58772 });
+		AddPointToLine({ 61293, 66660, 58742 });
+		AddPointToLine({ 61171, 68000, 58699 });
+
+		NewLine();
+		AddPointToLine({ 61140, 68300, 58688 });
+		AddPointToLine({ 60997, 69540, 58637 });
+		AddPointToLine({ 60831, 70780, 58576 });
+		AddPointToLine({ 60643, 72020, 58506 });
+		AddPointToLine({ 60433, 73260, 58427 });
+		AddPointToLine({ 60203, 74500, 58339 });
+
+		NewLine();
+		AddPointToLine({ 60144, 74800, 58316 });
+		AddPointToLine({ 59868, 76140, 58208 });
+		AddPointToLine({ 59571, 77480, 58091 });
+		AddPointToLine({ 59253, 78820, 57963 });
+		AddPointToLine({ 58916, 80160, 57827 });
+		AddPointToLine({ 58562, 81500, 57681 });
+
+		NewLine();
+		AddPointToLine({ 58480, 81800, 57647 });
+		AddPointToLine({ 58021, 83440, 57455 });
+		AddPointToLine({ 57542, 85080, 57251 });
+		AddPointToLine({ 57046, 86720, 57035 });
+		AddPointToLine({ 56537, 88360, 56809 });
+		AddPointToLine({ 56017, 90000, 56574 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 100°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 54253, 30000, 55778 });
+		AddPointToLine({ 54657, 31250, 55975 });
+		AddPointToLine({ 55059, 32500, 56169 });
+		AddPointToLine({ 55458, 33750, 56358 });
+		AddPointToLine({ 55853, 35000, 56543 });
+
+		NewLine();
+		AddPointToLine({ 55947, 35300, 56586 });
+		AddPointToLine({ 56361, 36640, 56777 });
+		AddPointToLine({ 56766, 37980, 56961 });
+		AddPointToLine({ 57160, 39320, 57139 });
+		AddPointToLine({ 57540, 40660, 57309 });
+		AddPointToLine({ 57907, 42000, 57471 });
+
+		NewLine();
+		AddPointToLine({ 57986, 42300, 57506 });
+		AddPointToLine({ 58322, 43600, 57653 });
+		AddPointToLine({ 58641, 44900, 57793 });
+		AddPointToLine({ 58942, 46200, 57923 });
+		AddPointToLine({ 59223, 47500, 58045 });
+
+		NewLine();
+		AddPointToLine({ 59285, 47800, 58072 });
+		AddPointToLine({ 59548, 49140, 58186 });
+		AddPointToLine({ 59787, 50480, 58290 });
+		AddPointToLine({ 60002, 51820, 58383 });
+		AddPointToLine({ 60191, 53160, 58466 });
+		AddPointToLine({ 60354, 54500, 58538 });
+
+		NewLine();
+		AddPointToLine({ 60387, 54800, 58552 });
+		AddPointToLine({ 60508, 56040, 58607 });
+		AddPointToLine({ 60605, 57280, 58652 });
+		AddPointToLine({ 60678, 58520, 58687 });
+		AddPointToLine({ 60726, 59760, 58713 });
+		AddPointToLine({ 60750, 61000, 58729 });
+
+		NewLine();
+		AddPointToLine({ 60752, 61300, 58731 });
+		AddPointToLine({ 60744, 62640, 58735 });
+		AddPointToLine({ 60707, 63980, 58727 });
+		AddPointToLine({ 60641, 65320, 58707 });
+		AddPointToLine({ 60546, 66660, 58677 });
+		AddPointToLine({ 60424, 68000, 58634 });
+
+		NewLine();
+		AddPointToLine({ 60393, 68300, 58623 });
+		AddPointToLine({ 60250, 69540, 58572 });
+		AddPointToLine({ 60084, 70780, 58511 });
+		AddPointToLine({ 59896, 72020, 58441 });
+		AddPointToLine({ 59686, 73260, 58362 });
+		AddPointToLine({ 59456, 74500, 58274 });
+
+		NewLine();
+		AddPointToLine({ 59397, 74800, 58251 });
+		AddPointToLine({ 59121, 76140, 58143 });
+		AddPointToLine({ 58824, 77480, 58026 });
+		AddPointToLine({ 58506, 78820, 57898 });
+		AddPointToLine({ 58169, 80160, 57762 });
+		AddPointToLine({ 57815, 81500, 57616 });
+
+		NewLine();
+		AddPointToLine({ 57733, 81800, 57582 });
+		AddPointToLine({ 57274, 83440, 57390 });
+		AddPointToLine({ 56795, 85080, 57186 });
+		AddPointToLine({ 56299, 86720, 56970 });
+		AddPointToLine({ 55790, 88360, 56744 });
+		AddPointToLine({ 55270, 90000, 56509 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 110°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 53529, 30000, 55584 });
+		AddPointToLine({ 53933, 31250, 55781 });
+		AddPointToLine({ 54335, 32500, 55975 });
+		AddPointToLine({ 54734, 33750, 56164 });
+		AddPointToLine({ 55129, 35000, 56349 });
+
+		NewLine();
+		AddPointToLine({ 55223, 35300, 56392 });
+		AddPointToLine({ 55637, 36640, 56583 });
+		AddPointToLine({ 56042, 37980, 56767 });
+		AddPointToLine({ 56436, 39320, 56945 });
+		AddPointToLine({ 56816, 40660, 57115 });
+		AddPointToLine({ 57183, 42000, 57277 });
+
+		NewLine();
+		AddPointToLine({ 57262, 42300, 57312 });
+		AddPointToLine({ 57598, 43600, 57459 });
+		AddPointToLine({ 57917, 44900, 57599 });
+		AddPointToLine({ 58218, 46200, 57729 });
+		AddPointToLine({ 58499, 47500, 57851 });
+
+		NewLine();
+		AddPointToLine({ 58561, 47800, 57878 });
+		AddPointToLine({ 58824, 49140, 57992 });
+		AddPointToLine({ 59063, 50480, 58096 });
+		AddPointToLine({ 59278, 51820, 58189 });
+		AddPointToLine({ 59467, 53160, 58272 });
+		AddPointToLine({ 59630, 54500, 58344 });
+
+		NewLine();
+		AddPointToLine({ 59663, 54800, 58358 });
+		AddPointToLine({ 59784, 56040, 58413 });
+		AddPointToLine({ 59881, 57280, 58458 });
+		AddPointToLine({ 59954, 58520, 58493 });
+		AddPointToLine({ 60002, 59760, 58519 });
+		AddPointToLine({ 60026, 61000, 58535 });
+
+		NewLine();
+		AddPointToLine({ 60028, 61300, 58537 });
+		AddPointToLine({ 60020, 62640, 58541 });
+		AddPointToLine({ 59983, 63980, 58533 });
+		AddPointToLine({ 59917, 65320, 58513 });
+		AddPointToLine({ 59822, 66660, 58483 });
+		AddPointToLine({ 59700, 68000, 58440 });
+
+		NewLine();
+		AddPointToLine({ 59669, 68300, 58429 });
+		AddPointToLine({ 59526, 69540, 58378 });
+		AddPointToLine({ 59360, 70780, 58317 });
+		AddPointToLine({ 59172, 72020, 58247 });
+		AddPointToLine({ 58962, 73260, 58168 });
+		AddPointToLine({ 58732, 74500, 58080 });
+
+		NewLine();
+		AddPointToLine({ 58673, 74800, 58057 });
+		AddPointToLine({ 58397, 76140, 57949 });
+		AddPointToLine({ 58100, 77480, 57832 });
+		AddPointToLine({ 57782, 78820, 57704 });
+		AddPointToLine({ 57445, 80160, 57568 });
+		AddPointToLine({ 57091, 81500, 57422 });
+
+		NewLine();
+		AddPointToLine({ 57009, 81800, 57388 });
+		AddPointToLine({ 56550, 83440, 57196 });
+		AddPointToLine({ 56071, 85080, 56992 });
+		AddPointToLine({ 55575, 86720, 56776 });
+		AddPointToLine({ 55066, 88360, 56550 });
+		AddPointToLine({ 54546, 90000, 56315 });
 
 
 		// ============================================================
 		// ПОВЕРХНОСТЬ 120°
-		// Передняя левая сторона
 		// ============================================================
 
 		NewLine();
@@ -1159,20 +1913,20 @@ namespace Object {
 		AddPointToLine({ 54958, 36640, 56266 });
 		AddPointToLine({ 55363, 37980, 56450 });
 		AddPointToLine({ 55757, 39320, 56628 });
-		AddPointToLine({ 56137, 40660, 56797 });
-		AddPointToLine({ 56504, 42000, 56959 });
+		AddPointToLine({ 56137, 40660, 56798 });
+		AddPointToLine({ 56504, 42000, 56960 });
 
 		NewLine();
 		AddPointToLine({ 56583, 42300, 56995 });
 		AddPointToLine({ 56919, 43600, 57142 });
-		AddPointToLine({ 57238, 44900, 57281 });
+		AddPointToLine({ 57238, 44900, 57282 });
 		AddPointToLine({ 57539, 46200, 57412 });
 		AddPointToLine({ 57820, 47500, 57534 });
 
 		NewLine();
 		AddPointToLine({ 57882, 47800, 57561 });
 		AddPointToLine({ 58145, 49140, 57675 });
-		AddPointToLine({ 58384, 50480, 57778 });
+		AddPointToLine({ 58384, 50480, 57779 });
 		AddPointToLine({ 58599, 51820, 57872 });
 		AddPointToLine({ 58788, 53160, 57955 });
 		AddPointToLine({ 58951, 54500, 58027 });
@@ -1199,7 +1953,7 @@ namespace Object {
 		AddPointToLine({ 58681, 70780, 58000 });
 		AddPointToLine({ 58493, 72020, 57930 });
 		AddPointToLine({ 58283, 73260, 57851 });
-		AddPointToLine({ 58053, 74500, 57762 });
+		AddPointToLine({ 58053, 74500, 57763 });
 
 		NewLine();
 		AddPointToLine({ 57994, 74800, 57740 });
@@ -1215,12 +1969,386 @@ namespace Object {
 		AddPointToLine({ 55392, 85080, 56675 });
 		AddPointToLine({ 54896, 86720, 56459 });
 		AddPointToLine({ 54387, 88360, 56233 });
-		AddPointToLine({ 53867, 90000, 55997 });
+		AddPointToLine({ 53867, 90000, 55998 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 130°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 52236, 30000, 54837 });
+		AddPointToLine({ 52640, 31250, 55034 });
+		AddPointToLine({ 53042, 32500, 55228 });
+		AddPointToLine({ 53441, 33750, 55417 });
+		AddPointToLine({ 53836, 35000, 55602 });
+
+		NewLine();
+		AddPointToLine({ 53930, 35300, 55645 });
+		AddPointToLine({ 54344, 36640, 55836 });
+		AddPointToLine({ 54749, 37980, 56020 });
+		AddPointToLine({ 55143, 39320, 56198 });
+		AddPointToLine({ 55523, 40660, 56368 });
+		AddPointToLine({ 55890, 42000, 56530 });
+
+		NewLine();
+		AddPointToLine({ 55969, 42300, 56565 });
+		AddPointToLine({ 56305, 43600, 56712 });
+		AddPointToLine({ 56624, 44900, 56852 });
+		AddPointToLine({ 56925, 46200, 56982 });
+		AddPointToLine({ 57206, 47500, 57104 });
+
+		NewLine();
+		AddPointToLine({ 57268, 47800, 57131 });
+		AddPointToLine({ 57531, 49140, 57245 });
+		AddPointToLine({ 57770, 50480, 57349 });
+		AddPointToLine({ 57985, 51820, 57442 });
+		AddPointToLine({ 58174, 53160, 57525 });
+		AddPointToLine({ 58337, 54500, 57597 });
+
+		NewLine();
+		AddPointToLine({ 58370, 54800, 57611 });
+		AddPointToLine({ 58491, 56040, 57666 });
+		AddPointToLine({ 58588, 57280, 57711 });
+		AddPointToLine({ 58661, 58520, 57746 });
+		AddPointToLine({ 58709, 59760, 57772 });
+		AddPointToLine({ 58733, 61000, 57788 });
+
+		NewLine();
+		AddPointToLine({ 58735, 61300, 57790 });
+		AddPointToLine({ 58727, 62640, 57794 });
+		AddPointToLine({ 58690, 63980, 57786 });
+		AddPointToLine({ 58624, 65320, 57766 });
+		AddPointToLine({ 58529, 66660, 57736 });
+		AddPointToLine({ 58407, 68000, 57693 });
+
+		NewLine();
+		AddPointToLine({ 58376, 68300, 57682 });
+		AddPointToLine({ 58233, 69540, 57631 });
+		AddPointToLine({ 58067, 70780, 57570 });
+		AddPointToLine({ 57879, 72020, 57500 });
+		AddPointToLine({ 57669, 73260, 57421 });
+		AddPointToLine({ 57439, 74500, 57333 });
+
+		NewLine();
+		AddPointToLine({ 57380, 74800, 57310 });
+		AddPointToLine({ 57104, 76140, 57202 });
+		AddPointToLine({ 56807, 77480, 57085 });
+		AddPointToLine({ 56489, 78820, 56957 });
+		AddPointToLine({ 56152, 80160, 56821 });
+		AddPointToLine({ 55798, 81500, 56675 });
+
+		NewLine();
+		AddPointToLine({ 55716, 81800, 56641 });
+		AddPointToLine({ 55257, 83440, 56449 });
+		AddPointToLine({ 54778, 85080, 56245 });
+		AddPointToLine({ 54282, 86720, 56029 });
+		AddPointToLine({ 53773, 88360, 55803 });
+		AddPointToLine({ 53253, 90000, 55568 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 140°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 51706, 30000, 54307 });
+		AddPointToLine({ 52110, 31250, 54504 });
+		AddPointToLine({ 52512, 32500, 54698 });
+		AddPointToLine({ 52911, 33750, 54887 });
+		AddPointToLine({ 53306, 35000, 55072 });
+
+		NewLine();
+		AddPointToLine({ 53400, 35300, 55115 });
+		AddPointToLine({ 53814, 36640, 55306 });
+		AddPointToLine({ 54219, 37980, 55490 });
+		AddPointToLine({ 54613, 39320, 55668 });
+		AddPointToLine({ 54993, 40660, 55838 });
+		AddPointToLine({ 55360, 42000, 56000 });
+
+		NewLine();
+		AddPointToLine({ 55439, 42300, 56035 });
+		AddPointToLine({ 55775, 43600, 56182 });
+		AddPointToLine({ 56094, 44900, 56322 });
+		AddPointToLine({ 56395, 46200, 56452 });
+		AddPointToLine({ 56676, 47500, 56574 });
+
+		NewLine();
+		AddPointToLine({ 56738, 47800, 56601 });
+		AddPointToLine({ 57001, 49140, 56715 });
+		AddPointToLine({ 57240, 50480, 56819 });
+		AddPointToLine({ 57455, 51820, 56912 });
+		AddPointToLine({ 57644, 53160, 56995 });
+		AddPointToLine({ 57807, 54500, 57067 });
+
+		NewLine();
+		AddPointToLine({ 57840, 54800, 57081 });
+		AddPointToLine({ 57961, 56040, 57136 });
+		AddPointToLine({ 58058, 57280, 57181 });
+		AddPointToLine({ 58131, 58520, 57216 });
+		AddPointToLine({ 58179, 59760, 57242 });
+		AddPointToLine({ 58203, 61000, 57258 });
+
+		NewLine();
+		AddPointToLine({ 58205, 61300, 57260 });
+		AddPointToLine({ 58197, 62640, 57264 });
+		AddPointToLine({ 58160, 63980, 57256 });
+		AddPointToLine({ 58094, 65320, 57236 });
+		AddPointToLine({ 57999, 66660, 57206 });
+		AddPointToLine({ 57877, 68000, 57163 });
+
+		NewLine();
+		AddPointToLine({ 57846, 68300, 57152 });
+		AddPointToLine({ 57703, 69540, 57101 });
+		AddPointToLine({ 57537, 70780, 57040 });
+		AddPointToLine({ 57349, 72020, 56970 });
+		AddPointToLine({ 57139, 73260, 56891 });
+		AddPointToLine({ 56909, 74500, 56803 });
+
+		NewLine();
+		AddPointToLine({ 56850, 74800, 56780 });
+		AddPointToLine({ 56574, 76140, 56672 });
+		AddPointToLine({ 56277, 77480, 56555 });
+		AddPointToLine({ 55959, 78820, 56427 });
+		AddPointToLine({ 55622, 80160, 56291 });
+		AddPointToLine({ 55268, 81500, 56145 });
+
+		NewLine();
+		AddPointToLine({ 55186, 81800, 56111 });
+		AddPointToLine({ 54727, 83440, 55919 });
+		AddPointToLine({ 54248, 85080, 55715 });
+		AddPointToLine({ 53752, 86720, 55499 });
+		AddPointToLine({ 53243, 88360, 55273 });
+		AddPointToLine({ 52723, 90000, 55038 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 150°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 51276, 30000, 53693 });
+		AddPointToLine({ 51680, 31250, 53890 });
+		AddPointToLine({ 52082, 32500, 54084 });
+		AddPointToLine({ 52481, 33750, 54273 });
+		AddPointToLine({ 52876, 35000, 54458 });
+
+		NewLine();
+		AddPointToLine({ 52970, 35300, 54501 });
+		AddPointToLine({ 53384, 36640, 54692 });
+		AddPointToLine({ 53789, 37980, 54876 });
+		AddPointToLine({ 54183, 39320, 55054 });
+		AddPointToLine({ 54563, 40660, 55224 });
+		AddPointToLine({ 54930, 42000, 55386 });
+
+		NewLine();
+		AddPointToLine({ 55009, 42300, 55421 });
+		AddPointToLine({ 55345, 43600, 55568 });
+		AddPointToLine({ 55664, 44900, 55708 });
+		AddPointToLine({ 55965, 46200, 55838 });
+		AddPointToLine({ 56246, 47500, 55960 });
+
+		NewLine();
+		AddPointToLine({ 56308, 47800, 55987 });
+		AddPointToLine({ 56571, 49140, 56101 });
+		AddPointToLine({ 56810, 50480, 56205 });
+		AddPointToLine({ 57025, 51820, 56298 });
+		AddPointToLine({ 57214, 53160, 56381 });
+		AddPointToLine({ 57377, 54500, 56453 });
+
+		NewLine();
+		AddPointToLine({ 57410, 54800, 56467 });
+		AddPointToLine({ 57531, 56040, 56522 });
+		AddPointToLine({ 57628, 57280, 56567 });
+		AddPointToLine({ 57701, 58520, 56602 });
+		AddPointToLine({ 57749, 59760, 56628 });
+		AddPointToLine({ 57773, 61000, 56644 });
+
+		NewLine();
+		AddPointToLine({ 57775, 61300, 56646 });
+		AddPointToLine({ 57767, 62640, 56650 });
+		AddPointToLine({ 57730, 63980, 56642 });
+		AddPointToLine({ 57664, 65320, 56622 });
+		AddPointToLine({ 57569, 66660, 56592 });
+		AddPointToLine({ 57447, 68000, 56549 });
+
+		NewLine();
+		AddPointToLine({ 57416, 68300, 56538 });
+		AddPointToLine({ 57273, 69540, 56487 });
+		AddPointToLine({ 57107, 70780, 56426 });
+		AddPointToLine({ 56919, 72020, 56356 });
+		AddPointToLine({ 56709, 73260, 56277 });
+		AddPointToLine({ 56479, 74500, 56189 });
+
+		NewLine();
+		AddPointToLine({ 56420, 74800, 56166 });
+		AddPointToLine({ 56144, 76140, 56058 });
+		AddPointToLine({ 55847, 77480, 55941 });
+		AddPointToLine({ 55529, 78820, 55813 });
+		AddPointToLine({ 55192, 80160, 55677 });
+		AddPointToLine({ 54838, 81500, 55531 });
+
+		NewLine();
+		AddPointToLine({ 54756, 81800, 55497 });
+		AddPointToLine({ 54297, 83440, 55305 });
+		AddPointToLine({ 53818, 85080, 55101 });
+		AddPointToLine({ 53322, 86720, 54885 });
+		AddPointToLine({ 52813, 88360, 54659 });
+		AddPointToLine({ 52293, 90000, 54424 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 160°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 50959, 30000, 53014 });
+		AddPointToLine({ 51363, 31250, 53211 });
+		AddPointToLine({ 51765, 32500, 53405 });
+		AddPointToLine({ 52164, 33750, 53594 });
+		AddPointToLine({ 52559, 35000, 53779 });
+
+		NewLine();
+		AddPointToLine({ 52653, 35300, 53822 });
+		AddPointToLine({ 53067, 36640, 54013 });
+		AddPointToLine({ 53472, 37980, 54197 });
+		AddPointToLine({ 53866, 39320, 54375 });
+		AddPointToLine({ 54246, 40660, 54545 });
+		AddPointToLine({ 54613, 42000, 54707 });
+
+		NewLine();
+		AddPointToLine({ 54692, 42300, 54742 });
+		AddPointToLine({ 55028, 43600, 54889 });
+		AddPointToLine({ 55347, 44900, 55029 });
+		AddPointToLine({ 55648, 46200, 55159 });
+		AddPointToLine({ 55929, 47500, 55281 });
+
+		NewLine();
+		AddPointToLine({ 55991, 47800, 55308 });
+		AddPointToLine({ 56254, 49140, 55422 });
+		AddPointToLine({ 56493, 50480, 55526 });
+		AddPointToLine({ 56708, 51820, 55619 });
+		AddPointToLine({ 56897, 53160, 55702 });
+		AddPointToLine({ 57060, 54500, 55774 });
+
+		NewLine();
+		AddPointToLine({ 57093, 54800, 55788 });
+		AddPointToLine({ 57214, 56040, 55843 });
+		AddPointToLine({ 57311, 57280, 55888 });
+		AddPointToLine({ 57384, 58520, 55923 });
+		AddPointToLine({ 57432, 59760, 55949 });
+		AddPointToLine({ 57456, 61000, 55965 });
+
+		NewLine();
+		AddPointToLine({ 57458, 61300, 55967 });
+		AddPointToLine({ 57450, 62640, 55971 });
+		AddPointToLine({ 57413, 63980, 55963 });
+		AddPointToLine({ 57347, 65320, 55943 });
+		AddPointToLine({ 57252, 66660, 55913 });
+		AddPointToLine({ 57130, 68000, 55870 });
+
+		NewLine();
+		AddPointToLine({ 57099, 68300, 55859 });
+		AddPointToLine({ 56956, 69540, 55808 });
+		AddPointToLine({ 56790, 70780, 55747 });
+		AddPointToLine({ 56602, 72020, 55677 });
+		AddPointToLine({ 56392, 73260, 55598 });
+		AddPointToLine({ 56162, 74500, 55510 });
+
+		NewLine();
+		AddPointToLine({ 56103, 74800, 55487 });
+		AddPointToLine({ 55827, 76140, 55379 });
+		AddPointToLine({ 55530, 77480, 55262 });
+		AddPointToLine({ 55212, 78820, 55134 });
+		AddPointToLine({ 54875, 80160, 54998 });
+		AddPointToLine({ 54521, 81500, 54852 });
+
+		NewLine();
+		AddPointToLine({ 54439, 81800, 54818 });
+		AddPointToLine({ 53980, 83440, 54626 });
+		AddPointToLine({ 53501, 85080, 54422 });
+		AddPointToLine({ 53005, 86720, 54206 });
+		AddPointToLine({ 52496, 88360, 53980 });
+		AddPointToLine({ 51976, 90000, 53745 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 170°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 50765, 30000, 52290 });
+		AddPointToLine({ 51169, 31250, 52487 });
+		AddPointToLine({ 51571, 32500, 52681 });
+		AddPointToLine({ 51970, 33750, 52870 });
+		AddPointToLine({ 52365, 35000, 53055 });
+
+		NewLine();
+		AddPointToLine({ 52459, 35300, 53098 });
+		AddPointToLine({ 52873, 36640, 53289 });
+		AddPointToLine({ 53278, 37980, 53473 });
+		AddPointToLine({ 53672, 39320, 53651 });
+		AddPointToLine({ 54052, 40660, 53821 });
+		AddPointToLine({ 54419, 42000, 53983 });
+
+		NewLine();
+		AddPointToLine({ 54498, 42300, 54018 });
+		AddPointToLine({ 54834, 43600, 54165 });
+		AddPointToLine({ 55153, 44900, 54305 });
+		AddPointToLine({ 55454, 46200, 54435 });
+		AddPointToLine({ 55735, 47500, 54557 });
+
+		NewLine();
+		AddPointToLine({ 55797, 47800, 54584 });
+		AddPointToLine({ 56060, 49140, 54698 });
+		AddPointToLine({ 56299, 50480, 54802 });
+		AddPointToLine({ 56514, 51820, 54895 });
+		AddPointToLine({ 56703, 53160, 54978 });
+		AddPointToLine({ 56866, 54500, 55050 });
+
+		NewLine();
+		AddPointToLine({ 56899, 54800, 55064 });
+		AddPointToLine({ 57020, 56040, 55119 });
+		AddPointToLine({ 57117, 57280, 55164 });
+		AddPointToLine({ 57190, 58520, 55199 });
+		AddPointToLine({ 57238, 59760, 55225 });
+		AddPointToLine({ 57262, 61000, 55241 });
+
+		NewLine();
+		AddPointToLine({ 57264, 61300, 55243 });
+		AddPointToLine({ 57256, 62640, 55247 });
+		AddPointToLine({ 57219, 63980, 55239 });
+		AddPointToLine({ 57153, 65320, 55219 });
+		AddPointToLine({ 57058, 66660, 55189 });
+		AddPointToLine({ 56936, 68000, 55146 });
+
+		NewLine();
+		AddPointToLine({ 56905, 68300, 55135 });
+		AddPointToLine({ 56762, 69540, 55084 });
+		AddPointToLine({ 56596, 70780, 55023 });
+		AddPointToLine({ 56408, 72020, 54953 });
+		AddPointToLine({ 56198, 73260, 54874 });
+		AddPointToLine({ 55968, 74500, 54786 });
+
+		NewLine();
+		AddPointToLine({ 55909, 74800, 54763 });
+		AddPointToLine({ 55633, 76140, 54655 });
+		AddPointToLine({ 55336, 77480, 54538 });
+		AddPointToLine({ 55018, 78820, 54410 });
+		AddPointToLine({ 54681, 80160, 54274 });
+		AddPointToLine({ 54327, 81500, 54128 });
+
+		NewLine();
+		AddPointToLine({ 54245, 81800, 54094 });
+		AddPointToLine({ 53786, 83440, 53902 });
+		AddPointToLine({ 53307, 85080, 53698 });
+		AddPointToLine({ 52811, 86720, 53482 });
+		AddPointToLine({ 52302, 88360, 53256 });
+		AddPointToLine({ 51782, 90000, 53021 });
 
 
 		// ============================================================
 		// ПОВЕРХНОСТЬ 180°
-		// Левая сторона ствола
 		// ============================================================
 
 		NewLine();
@@ -1295,13 +2423,387 @@ namespace Object {
 
 
 		// ============================================================
+		// ПОВЕРХНОСТЬ 190°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 50765, 30000, 50796 });
+		AddPointToLine({ 51169, 31250, 50993 });
+		AddPointToLine({ 51571, 32500, 51187 });
+		AddPointToLine({ 51970, 33750, 51376 });
+		AddPointToLine({ 52365, 35000, 51561 });
+
+		NewLine();
+		AddPointToLine({ 52459, 35300, 51604 });
+		AddPointToLine({ 52873, 36640, 51795 });
+		AddPointToLine({ 53278, 37980, 51979 });
+		AddPointToLine({ 53672, 39320, 52157 });
+		AddPointToLine({ 54052, 40660, 52327 });
+		AddPointToLine({ 54419, 42000, 52489 });
+
+		NewLine();
+		AddPointToLine({ 54498, 42300, 52524 });
+		AddPointToLine({ 54834, 43600, 52671 });
+		AddPointToLine({ 55153, 44900, 52811 });
+		AddPointToLine({ 55454, 46200, 52941 });
+		AddPointToLine({ 55735, 47500, 53063 });
+
+		NewLine();
+		AddPointToLine({ 55797, 47800, 53090 });
+		AddPointToLine({ 56060, 49140, 53204 });
+		AddPointToLine({ 56299, 50480, 53308 });
+		AddPointToLine({ 56514, 51820, 53401 });
+		AddPointToLine({ 56703, 53160, 53484 });
+		AddPointToLine({ 56866, 54500, 53556 });
+
+		NewLine();
+		AddPointToLine({ 56899, 54800, 53570 });
+		AddPointToLine({ 57020, 56040, 53625 });
+		AddPointToLine({ 57117, 57280, 53670 });
+		AddPointToLine({ 57190, 58520, 53705 });
+		AddPointToLine({ 57238, 59760, 53731 });
+		AddPointToLine({ 57262, 61000, 53747 });
+
+		NewLine();
+		AddPointToLine({ 57264, 61300, 53749 });
+		AddPointToLine({ 57256, 62640, 53753 });
+		AddPointToLine({ 57219, 63980, 53745 });
+		AddPointToLine({ 57153, 65320, 53725 });
+		AddPointToLine({ 57058, 66660, 53695 });
+		AddPointToLine({ 56936, 68000, 53652 });
+
+		NewLine();
+		AddPointToLine({ 56905, 68300, 53641 });
+		AddPointToLine({ 56762, 69540, 53590 });
+		AddPointToLine({ 56596, 70780, 53529 });
+		AddPointToLine({ 56408, 72020, 53459 });
+		AddPointToLine({ 56198, 73260, 53380 });
+		AddPointToLine({ 55968, 74500, 53292 });
+
+		NewLine();
+		AddPointToLine({ 55909, 74800, 53269 });
+		AddPointToLine({ 55633, 76140, 53161 });
+		AddPointToLine({ 55336, 77480, 53044 });
+		AddPointToLine({ 55018, 78820, 52916 });
+		AddPointToLine({ 54681, 80160, 52780 });
+		AddPointToLine({ 54327, 81500, 52634 });
+
+		NewLine();
+		AddPointToLine({ 54245, 81800, 52600 });
+		AddPointToLine({ 53786, 83440, 52408 });
+		AddPointToLine({ 53307, 85080, 52204 });
+		AddPointToLine({ 52811, 86720, 51988 });
+		AddPointToLine({ 52302, 88360, 51762 });
+		AddPointToLine({ 51782, 90000, 51527 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 200°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 50959, 30000, 50072 });
+		AddPointToLine({ 51363, 31250, 50269 });
+		AddPointToLine({ 51765, 32500, 50463 });
+		AddPointToLine({ 52164, 33750, 50652 });
+		AddPointToLine({ 52559, 35000, 50837 });
+
+		NewLine();
+		AddPointToLine({ 52653, 35300, 50880 });
+		AddPointToLine({ 53067, 36640, 51071 });
+		AddPointToLine({ 53472, 37980, 51255 });
+		AddPointToLine({ 53866, 39320, 51433 });
+		AddPointToLine({ 54246, 40660, 51603 });
+		AddPointToLine({ 54613, 42000, 51765 });
+
+		NewLine();
+		AddPointToLine({ 54692, 42300, 51800 });
+		AddPointToLine({ 55028, 43600, 51947 });
+		AddPointToLine({ 55347, 44900, 52087 });
+		AddPointToLine({ 55648, 46200, 52217 });
+		AddPointToLine({ 55929, 47500, 52339 });
+
+		NewLine();
+		AddPointToLine({ 55991, 47800, 52366 });
+		AddPointToLine({ 56254, 49140, 52480 });
+		AddPointToLine({ 56493, 50480, 52584 });
+		AddPointToLine({ 56708, 51820, 52677 });
+		AddPointToLine({ 56897, 53160, 52760 });
+		AddPointToLine({ 57060, 54500, 52832 });
+
+		NewLine();
+		AddPointToLine({ 57093, 54800, 52846 });
+		AddPointToLine({ 57214, 56040, 52901 });
+		AddPointToLine({ 57311, 57280, 52946 });
+		AddPointToLine({ 57384, 58520, 52981 });
+		AddPointToLine({ 57432, 59760, 53007 });
+		AddPointToLine({ 57456, 61000, 53023 });
+
+		NewLine();
+		AddPointToLine({ 57458, 61300, 53025 });
+		AddPointToLine({ 57450, 62640, 53029 });
+		AddPointToLine({ 57413, 63980, 53021 });
+		AddPointToLine({ 57347, 65320, 53001 });
+		AddPointToLine({ 57252, 66660, 52971 });
+		AddPointToLine({ 57130, 68000, 52928 });
+
+		NewLine();
+		AddPointToLine({ 57099, 68300, 52917 });
+		AddPointToLine({ 56956, 69540, 52866 });
+		AddPointToLine({ 56790, 70780, 52805 });
+		AddPointToLine({ 56602, 72020, 52735 });
+		AddPointToLine({ 56392, 73260, 52656 });
+		AddPointToLine({ 56162, 74500, 52568 });
+
+		NewLine();
+		AddPointToLine({ 56103, 74800, 52545 });
+		AddPointToLine({ 55827, 76140, 52437 });
+		AddPointToLine({ 55530, 77480, 52320 });
+		AddPointToLine({ 55212, 78820, 52192 });
+		AddPointToLine({ 54875, 80160, 52056 });
+		AddPointToLine({ 54521, 81500, 51910 });
+
+		NewLine();
+		AddPointToLine({ 54439, 81800, 51876 });
+		AddPointToLine({ 53980, 83440, 51684 });
+		AddPointToLine({ 53501, 85080, 51480 });
+		AddPointToLine({ 53005, 86720, 51264 });
+		AddPointToLine({ 52496, 88360, 51038 });
+		AddPointToLine({ 51976, 90000, 50803 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 210°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 51276, 30000, 49393 });
+		AddPointToLine({ 51680, 31250, 49590 });
+		AddPointToLine({ 52082, 32500, 49784 });
+		AddPointToLine({ 52481, 33750, 49973 });
+		AddPointToLine({ 52876, 35000, 50158 });
+
+		NewLine();
+		AddPointToLine({ 52970, 35300, 50201 });
+		AddPointToLine({ 53384, 36640, 50392 });
+		AddPointToLine({ 53789, 37980, 50576 });
+		AddPointToLine({ 54183, 39320, 50754 });
+		AddPointToLine({ 54563, 40660, 50924 });
+		AddPointToLine({ 54930, 42000, 51086 });
+
+		NewLine();
+		AddPointToLine({ 55009, 42300, 51121 });
+		AddPointToLine({ 55345, 43600, 51268 });
+		AddPointToLine({ 55664, 44900, 51408 });
+		AddPointToLine({ 55965, 46200, 51538 });
+		AddPointToLine({ 56246, 47500, 51660 });
+
+		NewLine();
+		AddPointToLine({ 56308, 47800, 51687 });
+		AddPointToLine({ 56571, 49140, 51801 });
+		AddPointToLine({ 56810, 50480, 51905 });
+		AddPointToLine({ 57025, 51820, 51998 });
+		AddPointToLine({ 57214, 53160, 52081 });
+		AddPointToLine({ 57377, 54500, 52153 });
+
+		NewLine();
+		AddPointToLine({ 57410, 54800, 52167 });
+		AddPointToLine({ 57531, 56040, 52222 });
+		AddPointToLine({ 57628, 57280, 52267 });
+		AddPointToLine({ 57701, 58520, 52302 });
+		AddPointToLine({ 57749, 59760, 52328 });
+		AddPointToLine({ 57773, 61000, 52344 });
+
+		NewLine();
+		AddPointToLine({ 57775, 61300, 52346 });
+		AddPointToLine({ 57767, 62640, 52350 });
+		AddPointToLine({ 57730, 63980, 52342 });
+		AddPointToLine({ 57664, 65320, 52322 });
+		AddPointToLine({ 57569, 66660, 52292 });
+		AddPointToLine({ 57447, 68000, 52249 });
+
+		NewLine();
+		AddPointToLine({ 57416, 68300, 52238 });
+		AddPointToLine({ 57273, 69540, 52187 });
+		AddPointToLine({ 57107, 70780, 52126 });
+		AddPointToLine({ 56919, 72020, 52056 });
+		AddPointToLine({ 56709, 73260, 51977 });
+		AddPointToLine({ 56479, 74500, 51889 });
+
+		NewLine();
+		AddPointToLine({ 56420, 74800, 51866 });
+		AddPointToLine({ 56144, 76140, 51758 });
+		AddPointToLine({ 55847, 77480, 51641 });
+		AddPointToLine({ 55529, 78820, 51513 });
+		AddPointToLine({ 55192, 80160, 51377 });
+		AddPointToLine({ 54838, 81500, 51231 });
+
+		NewLine();
+		AddPointToLine({ 54756, 81800, 51197 });
+		AddPointToLine({ 54297, 83440, 51005 });
+		AddPointToLine({ 53818, 85080, 50801 });
+		AddPointToLine({ 53322, 86720, 50585 });
+		AddPointToLine({ 52813, 88360, 50359 });
+		AddPointToLine({ 52293, 90000, 50124 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 220°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 51706, 30000, 48779 });
+		AddPointToLine({ 52110, 31250, 48976 });
+		AddPointToLine({ 52512, 32500, 49170 });
+		AddPointToLine({ 52911, 33750, 49359 });
+		AddPointToLine({ 53306, 35000, 49544 });
+
+		NewLine();
+		AddPointToLine({ 53400, 35300, 49587 });
+		AddPointToLine({ 53814, 36640, 49778 });
+		AddPointToLine({ 54219, 37980, 49962 });
+		AddPointToLine({ 54613, 39320, 50140 });
+		AddPointToLine({ 54993, 40660, 50310 });
+		AddPointToLine({ 55360, 42000, 50472 });
+
+		NewLine();
+		AddPointToLine({ 55439, 42300, 50507 });
+		AddPointToLine({ 55775, 43600, 50654 });
+		AddPointToLine({ 56094, 44900, 50794 });
+		AddPointToLine({ 56395, 46200, 50924 });
+		AddPointToLine({ 56676, 47500, 51046 });
+
+		NewLine();
+		AddPointToLine({ 56738, 47800, 51073 });
+		AddPointToLine({ 57001, 49140, 51187 });
+		AddPointToLine({ 57240, 50480, 51291 });
+		AddPointToLine({ 57455, 51820, 51384 });
+		AddPointToLine({ 57644, 53160, 51467 });
+		AddPointToLine({ 57807, 54500, 51539 });
+
+		NewLine();
+		AddPointToLine({ 57840, 54800, 51553 });
+		AddPointToLine({ 57961, 56040, 51608 });
+		AddPointToLine({ 58058, 57280, 51653 });
+		AddPointToLine({ 58131, 58520, 51688 });
+		AddPointToLine({ 58179, 59760, 51714 });
+		AddPointToLine({ 58203, 61000, 51730 });
+
+		NewLine();
+		AddPointToLine({ 58205, 61300, 51732 });
+		AddPointToLine({ 58197, 62640, 51736 });
+		AddPointToLine({ 58160, 63980, 51728 });
+		AddPointToLine({ 58094, 65320, 51708 });
+		AddPointToLine({ 57999, 66660, 51678 });
+		AddPointToLine({ 57877, 68000, 51635 });
+
+		NewLine();
+		AddPointToLine({ 57846, 68300, 51624 });
+		AddPointToLine({ 57703, 69540, 51573 });
+		AddPointToLine({ 57537, 70780, 51512 });
+		AddPointToLine({ 57349, 72020, 51442 });
+		AddPointToLine({ 57139, 73260, 51363 });
+		AddPointToLine({ 56909, 74500, 51275 });
+
+		NewLine();
+		AddPointToLine({ 56850, 74800, 51252 });
+		AddPointToLine({ 56574, 76140, 51144 });
+		AddPointToLine({ 56277, 77480, 51027 });
+		AddPointToLine({ 55959, 78820, 50899 });
+		AddPointToLine({ 55622, 80160, 50763 });
+		AddPointToLine({ 55268, 81500, 50617 });
+
+		NewLine();
+		AddPointToLine({ 55186, 81800, 50583 });
+		AddPointToLine({ 54727, 83440, 50391 });
+		AddPointToLine({ 54248, 85080, 50187 });
+		AddPointToLine({ 53752, 86720, 49971 });
+		AddPointToLine({ 53243, 88360, 49745 });
+		AddPointToLine({ 52723, 90000, 49510 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 230°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 52236, 30000, 48249 });
+		AddPointToLine({ 52640, 31250, 48446 });
+		AddPointToLine({ 53042, 32500, 48640 });
+		AddPointToLine({ 53441, 33750, 48829 });
+		AddPointToLine({ 53836, 35000, 49014 });
+
+		NewLine();
+		AddPointToLine({ 53930, 35300, 49057 });
+		AddPointToLine({ 54344, 36640, 49248 });
+		AddPointToLine({ 54749, 37980, 49432 });
+		AddPointToLine({ 55143, 39320, 49610 });
+		AddPointToLine({ 55523, 40660, 49780 });
+		AddPointToLine({ 55890, 42000, 49942 });
+
+		NewLine();
+		AddPointToLine({ 55969, 42300, 49977 });
+		AddPointToLine({ 56305, 43600, 50124 });
+		AddPointToLine({ 56624, 44900, 50264 });
+		AddPointToLine({ 56925, 46200, 50394 });
+		AddPointToLine({ 57206, 47500, 50516 });
+
+		NewLine();
+		AddPointToLine({ 57268, 47800, 50543 });
+		AddPointToLine({ 57531, 49140, 50657 });
+		AddPointToLine({ 57770, 50480, 50761 });
+		AddPointToLine({ 57985, 51820, 50854 });
+		AddPointToLine({ 58174, 53160, 50937 });
+		AddPointToLine({ 58337, 54500, 51009 });
+
+		NewLine();
+		AddPointToLine({ 58370, 54800, 51023 });
+		AddPointToLine({ 58491, 56040, 51078 });
+		AddPointToLine({ 58588, 57280, 51123 });
+		AddPointToLine({ 58661, 58520, 51158 });
+		AddPointToLine({ 58709, 59760, 51184 });
+		AddPointToLine({ 58733, 61000, 51200 });
+
+		NewLine();
+		AddPointToLine({ 58735, 61300, 51202 });
+		AddPointToLine({ 58727, 62640, 51206 });
+		AddPointToLine({ 58690, 63980, 51198 });
+		AddPointToLine({ 58624, 65320, 51178 });
+		AddPointToLine({ 58529, 66660, 51148 });
+		AddPointToLine({ 58407, 68000, 51105 });
+
+		NewLine();
+		AddPointToLine({ 58376, 68300, 51094 });
+		AddPointToLine({ 58233, 69540, 51043 });
+		AddPointToLine({ 58067, 70780, 50982 });
+		AddPointToLine({ 57879, 72020, 50912 });
+		AddPointToLine({ 57669, 73260, 50833 });
+		AddPointToLine({ 57439, 74500, 50745 });
+
+		NewLine();
+		AddPointToLine({ 57380, 74800, 50722 });
+		AddPointToLine({ 57104, 76140, 50614 });
+		AddPointToLine({ 56807, 77480, 50497 });
+		AddPointToLine({ 56489, 78820, 50369 });
+		AddPointToLine({ 56152, 80160, 50233 });
+		AddPointToLine({ 55798, 81500, 50087 });
+
+		NewLine();
+		AddPointToLine({ 55716, 81800, 50053 });
+		AddPointToLine({ 55257, 83440, 49861 });
+		AddPointToLine({ 54778, 85080, 49657 });
+		AddPointToLine({ 54282, 86720, 49441 });
+		AddPointToLine({ 53773, 88360, 49215 });
+		AddPointToLine({ 53253, 90000, 48980 });
+
+
+		// ============================================================
 		// ПОВЕРХНОСТЬ 240°
-		// Задняя левая сторона
 		// ============================================================
 
 		NewLine();
 		AddPointToLine({ 52850, 30000, 47819 });
-		AddPointToLine({ 53254, 31250, 48017 });
+		AddPointToLine({ 53254, 31250, 48016 });
 		AddPointToLine({ 53656, 32500, 48210 });
 		AddPointToLine({ 54055, 33750, 48399 });
 		AddPointToLine({ 54450, 35000, 48584 });
@@ -1341,12 +2843,12 @@ namespace Object {
 		AddPointToLine({ 59349, 61300, 50772 });
 		AddPointToLine({ 59341, 62640, 50776 });
 		AddPointToLine({ 59304, 63980, 50768 });
-		AddPointToLine({ 59238, 65320, 50749 });
+		AddPointToLine({ 59238, 65320, 50748 });
 		AddPointToLine({ 59143, 66660, 50718 });
-		AddPointToLine({ 59021, 68000, 50676 });
+		AddPointToLine({ 59021, 68000, 50675 });
 
 		NewLine();
-		AddPointToLine({ 58990, 68300, 50665 });
+		AddPointToLine({ 58990, 68300, 50664 });
 		AddPointToLine({ 58847, 69540, 50613 });
 		AddPointToLine({ 58681, 70780, 50552 });
 		AddPointToLine({ 58493, 72020, 50482 });
@@ -1371,13 +2873,387 @@ namespace Object {
 
 
 		// ============================================================
+		// ПОВЕРХНОСТЬ 250°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 53529, 30000, 47502 });
+		AddPointToLine({ 53933, 31250, 47699 });
+		AddPointToLine({ 54335, 32500, 47893 });
+		AddPointToLine({ 54734, 33750, 48082 });
+		AddPointToLine({ 55129, 35000, 48267 });
+
+		NewLine();
+		AddPointToLine({ 55223, 35300, 48310 });
+		AddPointToLine({ 55637, 36640, 48501 });
+		AddPointToLine({ 56042, 37980, 48685 });
+		AddPointToLine({ 56436, 39320, 48863 });
+		AddPointToLine({ 56816, 40660, 49033 });
+		AddPointToLine({ 57183, 42000, 49195 });
+
+		NewLine();
+		AddPointToLine({ 57262, 42300, 49230 });
+		AddPointToLine({ 57598, 43600, 49377 });
+		AddPointToLine({ 57917, 44900, 49517 });
+		AddPointToLine({ 58218, 46200, 49647 });
+		AddPointToLine({ 58499, 47500, 49769 });
+
+		NewLine();
+		AddPointToLine({ 58561, 47800, 49796 });
+		AddPointToLine({ 58824, 49140, 49910 });
+		AddPointToLine({ 59063, 50480, 50014 });
+		AddPointToLine({ 59278, 51820, 50107 });
+		AddPointToLine({ 59467, 53160, 50190 });
+		AddPointToLine({ 59630, 54500, 50262 });
+
+		NewLine();
+		AddPointToLine({ 59663, 54800, 50276 });
+		AddPointToLine({ 59784, 56040, 50331 });
+		AddPointToLine({ 59881, 57280, 50376 });
+		AddPointToLine({ 59954, 58520, 50411 });
+		AddPointToLine({ 60002, 59760, 50437 });
+		AddPointToLine({ 60026, 61000, 50453 });
+
+		NewLine();
+		AddPointToLine({ 60028, 61300, 50455 });
+		AddPointToLine({ 60020, 62640, 50459 });
+		AddPointToLine({ 59983, 63980, 50451 });
+		AddPointToLine({ 59917, 65320, 50431 });
+		AddPointToLine({ 59822, 66660, 50401 });
+		AddPointToLine({ 59700, 68000, 50358 });
+
+		NewLine();
+		AddPointToLine({ 59669, 68300, 50347 });
+		AddPointToLine({ 59526, 69540, 50296 });
+		AddPointToLine({ 59360, 70780, 50235 });
+		AddPointToLine({ 59172, 72020, 50165 });
+		AddPointToLine({ 58962, 73260, 50086 });
+		AddPointToLine({ 58732, 74500, 49998 });
+
+		NewLine();
+		AddPointToLine({ 58673, 74800, 49975 });
+		AddPointToLine({ 58397, 76140, 49867 });
+		AddPointToLine({ 58100, 77480, 49750 });
+		AddPointToLine({ 57782, 78820, 49622 });
+		AddPointToLine({ 57445, 80160, 49486 });
+		AddPointToLine({ 57091, 81500, 49340 });
+
+		NewLine();
+		AddPointToLine({ 57009, 81800, 49306 });
+		AddPointToLine({ 56550, 83440, 49114 });
+		AddPointToLine({ 56071, 85080, 48910 });
+		AddPointToLine({ 55575, 86720, 48694 });
+		AddPointToLine({ 55066, 88360, 48468 });
+		AddPointToLine({ 54546, 90000, 48233 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 260°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 54253, 30000, 47308 });
+		AddPointToLine({ 54657, 31250, 47505 });
+		AddPointToLine({ 55059, 32500, 47699 });
+		AddPointToLine({ 55458, 33750, 47888 });
+		AddPointToLine({ 55853, 35000, 48073 });
+
+		NewLine();
+		AddPointToLine({ 55947, 35300, 48116 });
+		AddPointToLine({ 56361, 36640, 48307 });
+		AddPointToLine({ 56766, 37980, 48491 });
+		AddPointToLine({ 57160, 39320, 48669 });
+		AddPointToLine({ 57540, 40660, 48839 });
+		AddPointToLine({ 57907, 42000, 49001 });
+
+		NewLine();
+		AddPointToLine({ 57986, 42300, 49036 });
+		AddPointToLine({ 58322, 43600, 49183 });
+		AddPointToLine({ 58641, 44900, 49323 });
+		AddPointToLine({ 58942, 46200, 49453 });
+		AddPointToLine({ 59223, 47500, 49575 });
+
+		NewLine();
+		AddPointToLine({ 59285, 47800, 49602 });
+		AddPointToLine({ 59548, 49140, 49716 });
+		AddPointToLine({ 59787, 50480, 49820 });
+		AddPointToLine({ 60002, 51820, 49913 });
+		AddPointToLine({ 60191, 53160, 49996 });
+		AddPointToLine({ 60354, 54500, 50068 });
+
+		NewLine();
+		AddPointToLine({ 60387, 54800, 50082 });
+		AddPointToLine({ 60508, 56040, 50137 });
+		AddPointToLine({ 60605, 57280, 50182 });
+		AddPointToLine({ 60678, 58520, 50217 });
+		AddPointToLine({ 60726, 59760, 50243 });
+		AddPointToLine({ 60750, 61000, 50259 });
+
+		NewLine();
+		AddPointToLine({ 60752, 61300, 50261 });
+		AddPointToLine({ 60744, 62640, 50265 });
+		AddPointToLine({ 60707, 63980, 50257 });
+		AddPointToLine({ 60641, 65320, 50237 });
+		AddPointToLine({ 60546, 66660, 50207 });
+		AddPointToLine({ 60424, 68000, 50164 });
+
+		NewLine();
+		AddPointToLine({ 60393, 68300, 50153 });
+		AddPointToLine({ 60250, 69540, 50102 });
+		AddPointToLine({ 60084, 70780, 50041 });
+		AddPointToLine({ 59896, 72020, 49971 });
+		AddPointToLine({ 59686, 73260, 49892 });
+		AddPointToLine({ 59456, 74500, 49804 });
+
+		NewLine();
+		AddPointToLine({ 59397, 74800, 49781 });
+		AddPointToLine({ 59121, 76140, 49673 });
+		AddPointToLine({ 58824, 77480, 49556 });
+		AddPointToLine({ 58506, 78820, 49428 });
+		AddPointToLine({ 58169, 80160, 49292 });
+		AddPointToLine({ 57815, 81500, 49146 });
+
+		NewLine();
+		AddPointToLine({ 57733, 81800, 49112 });
+		AddPointToLine({ 57274, 83440, 48920 });
+		AddPointToLine({ 56795, 85080, 48716 });
+		AddPointToLine({ 56299, 86720, 48500 });
+		AddPointToLine({ 55790, 88360, 48274 });
+		AddPointToLine({ 55270, 90000, 48039 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 270°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 55000, 30000, 47243 });
+		AddPointToLine({ 55404, 31250, 47440 });
+		AddPointToLine({ 55806, 32500, 47634 });
+		AddPointToLine({ 56205, 33750, 47823 });
+		AddPointToLine({ 56600, 35000, 48008 });
+
+		NewLine();
+		AddPointToLine({ 56694, 35300, 48051 });
+		AddPointToLine({ 57108, 36640, 48242 });
+		AddPointToLine({ 57513, 37980, 48426 });
+		AddPointToLine({ 57907, 39320, 48604 });
+		AddPointToLine({ 58287, 40660, 48774 });
+		AddPointToLine({ 58654, 42000, 48936 });
+
+		NewLine();
+		AddPointToLine({ 58733, 42300, 48971 });
+		AddPointToLine({ 59069, 43600, 49118 });
+		AddPointToLine({ 59388, 44900, 49258 });
+		AddPointToLine({ 59689, 46200, 49388 });
+		AddPointToLine({ 59970, 47500, 49510 });
+
+		NewLine();
+		AddPointToLine({ 60032, 47800, 49537 });
+		AddPointToLine({ 60295, 49140, 49651 });
+		AddPointToLine({ 60534, 50480, 49755 });
+		AddPointToLine({ 60749, 51820, 49848 });
+		AddPointToLine({ 60938, 53160, 49931 });
+		AddPointToLine({ 61101, 54500, 50003 });
+
+		NewLine();
+		AddPointToLine({ 61134, 54800, 50017 });
+		AddPointToLine({ 61255, 56040, 50072 });
+		AddPointToLine({ 61352, 57280, 50117 });
+		AddPointToLine({ 61425, 58520, 50152 });
+		AddPointToLine({ 61473, 59760, 50178 });
+		AddPointToLine({ 61497, 61000, 50194 });
+
+		NewLine();
+		AddPointToLine({ 61499, 61300, 50196 });
+		AddPointToLine({ 61491, 62640, 50200 });
+		AddPointToLine({ 61454, 63980, 50192 });
+		AddPointToLine({ 61388, 65320, 50172 });
+		AddPointToLine({ 61293, 66660, 50142 });
+		AddPointToLine({ 61171, 68000, 50099 });
+
+		NewLine();
+		AddPointToLine({ 61140, 68300, 50088 });
+		AddPointToLine({ 60997, 69540, 50037 });
+		AddPointToLine({ 60831, 70780, 49976 });
+		AddPointToLine({ 60643, 72020, 49906 });
+		AddPointToLine({ 60433, 73260, 49827 });
+		AddPointToLine({ 60203, 74500, 49739 });
+
+		NewLine();
+		AddPointToLine({ 60144, 74800, 49716 });
+		AddPointToLine({ 59868, 76140, 49608 });
+		AddPointToLine({ 59571, 77480, 49491 });
+		AddPointToLine({ 59253, 78820, 49363 });
+		AddPointToLine({ 58916, 80160, 49227 });
+		AddPointToLine({ 58562, 81500, 49081 });
+
+		NewLine();
+		AddPointToLine({ 58480, 81800, 49047 });
+		AddPointToLine({ 58021, 83440, 48855 });
+		AddPointToLine({ 57542, 85080, 48651 });
+		AddPointToLine({ 57046, 86720, 48435 });
+		AddPointToLine({ 56537, 88360, 48209 });
+		AddPointToLine({ 56017, 90000, 47974 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 280°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 55747, 30000, 47308 });
+		AddPointToLine({ 56151, 31250, 47505 });
+		AddPointToLine({ 56553, 32500, 47699 });
+		AddPointToLine({ 56952, 33750, 47888 });
+		AddPointToLine({ 57347, 35000, 48073 });
+
+		NewLine();
+		AddPointToLine({ 57441, 35300, 48116 });
+		AddPointToLine({ 57855, 36640, 48307 });
+		AddPointToLine({ 58260, 37980, 48491 });
+		AddPointToLine({ 58654, 39320, 48669 });
+		AddPointToLine({ 59034, 40660, 48839 });
+		AddPointToLine({ 59401, 42000, 49001 });
+
+		NewLine();
+		AddPointToLine({ 59480, 42300, 49036 });
+		AddPointToLine({ 59816, 43600, 49183 });
+		AddPointToLine({ 60135, 44900, 49323 });
+		AddPointToLine({ 60436, 46200, 49453 });
+		AddPointToLine({ 60717, 47500, 49575 });
+
+		NewLine();
+		AddPointToLine({ 60779, 47800, 49602 });
+		AddPointToLine({ 61042, 49140, 49716 });
+		AddPointToLine({ 61281, 50480, 49820 });
+		AddPointToLine({ 61496, 51820, 49913 });
+		AddPointToLine({ 61685, 53160, 49996 });
+		AddPointToLine({ 61848, 54500, 50068 });
+
+		NewLine();
+		AddPointToLine({ 61881, 54800, 50082 });
+		AddPointToLine({ 62002, 56040, 50137 });
+		AddPointToLine({ 62099, 57280, 50182 });
+		AddPointToLine({ 62172, 58520, 50217 });
+		AddPointToLine({ 62220, 59760, 50243 });
+		AddPointToLine({ 62244, 61000, 50259 });
+
+		NewLine();
+		AddPointToLine({ 62246, 61300, 50261 });
+		AddPointToLine({ 62238, 62640, 50265 });
+		AddPointToLine({ 62201, 63980, 50257 });
+		AddPointToLine({ 62135, 65320, 50237 });
+		AddPointToLine({ 62040, 66660, 50207 });
+		AddPointToLine({ 61918, 68000, 50164 });
+
+		NewLine();
+		AddPointToLine({ 61887, 68300, 50153 });
+		AddPointToLine({ 61744, 69540, 50102 });
+		AddPointToLine({ 61578, 70780, 50041 });
+		AddPointToLine({ 61390, 72020, 49971 });
+		AddPointToLine({ 61180, 73260, 49892 });
+		AddPointToLine({ 60950, 74500, 49804 });
+
+		NewLine();
+		AddPointToLine({ 60891, 74800, 49781 });
+		AddPointToLine({ 60615, 76140, 49673 });
+		AddPointToLine({ 60318, 77480, 49556 });
+		AddPointToLine({ 60000, 78820, 49428 });
+		AddPointToLine({ 59663, 80160, 49292 });
+		AddPointToLine({ 59309, 81500, 49146 });
+
+		NewLine();
+		AddPointToLine({ 59227, 81800, 49112 });
+		AddPointToLine({ 58768, 83440, 48920 });
+		AddPointToLine({ 58289, 85080, 48716 });
+		AddPointToLine({ 57793, 86720, 48500 });
+		AddPointToLine({ 57284, 88360, 48274 });
+		AddPointToLine({ 56764, 90000, 48039 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 290°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 56471, 30000, 47502 });
+		AddPointToLine({ 56875, 31250, 47699 });
+		AddPointToLine({ 57277, 32500, 47893 });
+		AddPointToLine({ 57676, 33750, 48082 });
+		AddPointToLine({ 58071, 35000, 48267 });
+
+		NewLine();
+		AddPointToLine({ 58165, 35300, 48310 });
+		AddPointToLine({ 58579, 36640, 48501 });
+		AddPointToLine({ 58984, 37980, 48685 });
+		AddPointToLine({ 59378, 39320, 48863 });
+		AddPointToLine({ 59758, 40660, 49033 });
+		AddPointToLine({ 60125, 42000, 49195 });
+
+		NewLine();
+		AddPointToLine({ 60204, 42300, 49230 });
+		AddPointToLine({ 60540, 43600, 49377 });
+		AddPointToLine({ 60859, 44900, 49517 });
+		AddPointToLine({ 61160, 46200, 49647 });
+		AddPointToLine({ 61441, 47500, 49769 });
+
+		NewLine();
+		AddPointToLine({ 61503, 47800, 49796 });
+		AddPointToLine({ 61766, 49140, 49910 });
+		AddPointToLine({ 62005, 50480, 50014 });
+		AddPointToLine({ 62220, 51820, 50107 });
+		AddPointToLine({ 62409, 53160, 50190 });
+		AddPointToLine({ 62572, 54500, 50262 });
+
+		NewLine();
+		AddPointToLine({ 62605, 54800, 50276 });
+		AddPointToLine({ 62726, 56040, 50331 });
+		AddPointToLine({ 62823, 57280, 50376 });
+		AddPointToLine({ 62896, 58520, 50411 });
+		AddPointToLine({ 62944, 59760, 50437 });
+		AddPointToLine({ 62968, 61000, 50453 });
+
+		NewLine();
+		AddPointToLine({ 62970, 61300, 50455 });
+		AddPointToLine({ 62962, 62640, 50459 });
+		AddPointToLine({ 62925, 63980, 50451 });
+		AddPointToLine({ 62859, 65320, 50431 });
+		AddPointToLine({ 62764, 66660, 50401 });
+		AddPointToLine({ 62642, 68000, 50358 });
+
+		NewLine();
+		AddPointToLine({ 62611, 68300, 50347 });
+		AddPointToLine({ 62468, 69540, 50296 });
+		AddPointToLine({ 62302, 70780, 50235 });
+		AddPointToLine({ 62114, 72020, 50165 });
+		AddPointToLine({ 61904, 73260, 50086 });
+		AddPointToLine({ 61674, 74500, 49998 });
+
+		NewLine();
+		AddPointToLine({ 61615, 74800, 49975 });
+		AddPointToLine({ 61339, 76140, 49867 });
+		AddPointToLine({ 61042, 77480, 49750 });
+		AddPointToLine({ 60724, 78820, 49622 });
+		AddPointToLine({ 60387, 80160, 49486 });
+		AddPointToLine({ 60033, 81500, 49340 });
+
+		NewLine();
+		AddPointToLine({ 59951, 81800, 49306 });
+		AddPointToLine({ 59492, 83440, 49114 });
+		AddPointToLine({ 59013, 85080, 48910 });
+		AddPointToLine({ 58517, 86720, 48694 });
+		AddPointToLine({ 58008, 88360, 48468 });
+		AddPointToLine({ 57488, 90000, 48233 });
+
+
+		// ============================================================
 		// ПОВЕРХНОСТЬ 300°
-		// Задняя правая сторона
 		// ============================================================
 
 		NewLine();
 		AddPointToLine({ 57150, 30000, 47819 });
-		AddPointToLine({ 57554, 31250, 48017 });
+		AddPointToLine({ 57554, 31250, 48016 });
 		AddPointToLine({ 57956, 32500, 48210 });
 		AddPointToLine({ 58355, 33750, 48399 });
 		AddPointToLine({ 58750, 35000, 48584 });
@@ -1417,12 +3293,12 @@ namespace Object {
 		AddPointToLine({ 63649, 61300, 50772 });
 		AddPointToLine({ 63641, 62640, 50776 });
 		AddPointToLine({ 63604, 63980, 50768 });
-		AddPointToLine({ 63538, 65320, 50749 });
+		AddPointToLine({ 63538, 65320, 50748 });
 		AddPointToLine({ 63443, 66660, 50718 });
-		AddPointToLine({ 63321, 68000, 50676 });
+		AddPointToLine({ 63321, 68000, 50675 });
 
 		NewLine();
-		AddPointToLine({ 63290, 68300, 50665 });
+		AddPointToLine({ 63290, 68300, 50664 });
 		AddPointToLine({ 63147, 69540, 50613 });
 		AddPointToLine({ 62981, 70780, 50552 });
 		AddPointToLine({ 62793, 72020, 50482 });
@@ -1445,699 +3321,84 @@ namespace Object {
 		AddPointToLine({ 58687, 88360, 48785 });
 		AddPointToLine({ 58167, 90000, 48550 });
 
-		// ============================================================
-// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 20°
-// Между 0° и 60°
-// ============================================================
-
-		NewLine();
-		AddPointToLine({ 59041, 30000, 53014 });
-		AddPointToLine({ 59445, 31250, 53211 });
-		AddPointToLine({ 59847, 32500, 53405 });
-		AddPointToLine({ 60246, 33750, 53594 });
-		AddPointToLine({ 60641, 35000, 53779 });
-
-		NewLine();
-		AddPointToLine({ 60735, 35300, 53822 });
-		AddPointToLine({ 61554, 37980, 54197 });
-		AddPointToLine({ 61948, 39320, 54375 });
-		AddPointToLine({ 62328, 40660, 54545 });
-		AddPointToLine({ 62695, 42000, 54707 });
-
-		NewLine();
-		AddPointToLine({ 62774, 42300, 54742 });
-		AddPointToLine({ 63110, 43600, 54889 });
-		AddPointToLine({ 63429, 44900, 55029 });
-		AddPointToLine({ 63730, 46200, 55159 });
-		AddPointToLine({ 64011, 47500, 55281 });
-
-		NewLine();
-		AddPointToLine({ 64073, 47800, 55308 });
-		AddPointToLine({ 64575, 50480, 55526 });
-		AddPointToLine({ 64790, 51820, 55619 });
-		AddPointToLine({ 64979, 53160, 55702 });
-		AddPointToLine({ 65142, 54500, 55774 });
-
-		NewLine();
-		AddPointToLine({ 65175, 54800, 55788 });
-		AddPointToLine({ 65393, 57280, 55888 });
-		AddPointToLine({ 65466, 58520, 55923 });
-		AddPointToLine({ 65514, 59760, 55949 });
-		AddPointToLine({ 65538, 61000, 55965 });
-
-		NewLine();
-		AddPointToLine({ 65540, 61300, 55967 });
-		AddPointToLine({ 65495, 63980, 55963 });
-		AddPointToLine({ 65429, 65320, 55943 });
-		AddPointToLine({ 65334, 66660, 55913 });
-		AddPointToLine({ 65212, 68000, 55870 });
-
-		NewLine();
-		AddPointToLine({ 65181, 68300, 55859 });
-		AddPointToLine({ 64872, 70780, 55747 });
-		AddPointToLine({ 64684, 72020, 55677 });
-		AddPointToLine({ 64474, 73260, 55598 });
-		AddPointToLine({ 64244, 74500, 55510 });
-
-		NewLine();
-		AddPointToLine({ 64185, 74800, 55487 });
-		AddPointToLine({ 63612, 77480, 55262 });
-		AddPointToLine({ 63294, 78820, 55134 });
-		AddPointToLine({ 62957, 80160, 54998 });
-		AddPointToLine({ 62603, 81500, 54852 });
-
-		NewLine();
-		AddPointToLine({ 62521, 81800, 54818 });
-		AddPointToLine({ 61583, 85080, 54422 });
-		AddPointToLine({ 61087, 86720, 54206 });
-		AddPointToLine({ 60578, 88360, 53980 });
-		AddPointToLine({ 60058, 90000, 53745 });
-
 
 		// ============================================================
-		// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 40°
-		// Между 0° и 60°
+		// ПОВЕРХНОСТЬ 310°
 		// ============================================================
 
 		NewLine();
-		AddPointToLine({ 58294, 30000, 54307 });
-		AddPointToLine({ 58698, 31250, 54504 });
-		AddPointToLine({ 59100, 32500, 54698 });
-		AddPointToLine({ 59499, 33750, 54887 });
-		AddPointToLine({ 59894, 35000, 55072 });
+		AddPointToLine({ 57764, 30000, 48249 });
+		AddPointToLine({ 58168, 31250, 48446 });
+		AddPointToLine({ 58570, 32500, 48640 });
+		AddPointToLine({ 58969, 33750, 48829 });
+		AddPointToLine({ 59364, 35000, 49014 });
 
 		NewLine();
-		AddPointToLine({ 59988, 35300, 55115 });
-		AddPointToLine({ 60807, 37980, 55490 });
-		AddPointToLine({ 61201, 39320, 55668 });
-		AddPointToLine({ 61581, 40660, 55838 });
-		AddPointToLine({ 61948, 42000, 56000 });
+		AddPointToLine({ 59458, 35300, 49057 });
+		AddPointToLine({ 59872, 36640, 49248 });
+		AddPointToLine({ 60277, 37980, 49432 });
+		AddPointToLine({ 60671, 39320, 49610 });
+		AddPointToLine({ 61051, 40660, 49780 });
+		AddPointToLine({ 61418, 42000, 49942 });
 
 		NewLine();
-		AddPointToLine({ 62027, 42300, 56035 });
-		AddPointToLine({ 62363, 43600, 56182 });
-		AddPointToLine({ 62682, 44900, 56322 });
-		AddPointToLine({ 62983, 46200, 56452 });
-		AddPointToLine({ 63264, 47500, 56574 });
+		AddPointToLine({ 61497, 42300, 49977 });
+		AddPointToLine({ 61833, 43600, 50124 });
+		AddPointToLine({ 62152, 44900, 50264 });
+		AddPointToLine({ 62453, 46200, 50394 });
+		AddPointToLine({ 62734, 47500, 50516 });
 
 		NewLine();
-		AddPointToLine({ 63326, 47800, 56601 });
-		AddPointToLine({ 63828, 50480, 56819 });
-		AddPointToLine({ 64043, 51820, 56912 });
-		AddPointToLine({ 64232, 53160, 56995 });
-		AddPointToLine({ 64395, 54500, 57067 });
+		AddPointToLine({ 62796, 47800, 50543 });
+		AddPointToLine({ 63059, 49140, 50657 });
+		AddPointToLine({ 63298, 50480, 50761 });
+		AddPointToLine({ 63513, 51820, 50854 });
+		AddPointToLine({ 63702, 53160, 50937 });
+		AddPointToLine({ 63865, 54500, 51009 });
 
 		NewLine();
-		AddPointToLine({ 64428, 54800, 57081 });
-		AddPointToLine({ 64646, 57280, 57181 });
-		AddPointToLine({ 64719, 58520, 57216 });
-		AddPointToLine({ 64767, 59760, 57242 });
-		AddPointToLine({ 64791, 61000, 57258 });
+		AddPointToLine({ 63898, 54800, 51023 });
+		AddPointToLine({ 64019, 56040, 51078 });
+		AddPointToLine({ 64116, 57280, 51123 });
+		AddPointToLine({ 64189, 58520, 51158 });
+		AddPointToLine({ 64237, 59760, 51184 });
+		AddPointToLine({ 64261, 61000, 51200 });
 
 		NewLine();
-		AddPointToLine({ 64793, 61300, 57260 });
-		AddPointToLine({ 64748, 63980, 57256 });
-		AddPointToLine({ 64682, 65320, 57236 });
-		AddPointToLine({ 64587, 66660, 57206 });
-		AddPointToLine({ 64465, 68000, 57163 });
+		AddPointToLine({ 64263, 61300, 51202 });
+		AddPointToLine({ 64255, 62640, 51206 });
+		AddPointToLine({ 64218, 63980, 51198 });
+		AddPointToLine({ 64152, 65320, 51178 });
+		AddPointToLine({ 64057, 66660, 51148 });
+		AddPointToLine({ 63935, 68000, 51105 });
 
 		NewLine();
-		AddPointToLine({ 64434, 68300, 57152 });
-		AddPointToLine({ 64125, 70780, 57040 });
-		AddPointToLine({ 63937, 72020, 56970 });
-		AddPointToLine({ 63727, 73260, 56891 });
-		AddPointToLine({ 63497, 74500, 56803 });
+		AddPointToLine({ 63904, 68300, 51094 });
+		AddPointToLine({ 63761, 69540, 51043 });
+		AddPointToLine({ 63595, 70780, 50982 });
+		AddPointToLine({ 63407, 72020, 50912 });
+		AddPointToLine({ 63197, 73260, 50833 });
+		AddPointToLine({ 62967, 74500, 50745 });
 
 		NewLine();
-		AddPointToLine({ 63438, 74800, 56780 });
-		AddPointToLine({ 62865, 77480, 56555 });
-		AddPointToLine({ 62547, 78820, 56427 });
-		AddPointToLine({ 62210, 80160, 56291 });
-		AddPointToLine({ 61856, 81500, 56145 });
+		AddPointToLine({ 62908, 74800, 50722 });
+		AddPointToLine({ 62632, 76140, 50614 });
+		AddPointToLine({ 62335, 77480, 50497 });
+		AddPointToLine({ 62017, 78820, 50369 });
+		AddPointToLine({ 61680, 80160, 50233 });
+		AddPointToLine({ 61326, 81500, 50087 });
 
 		NewLine();
-		AddPointToLine({ 61774, 81800, 56111 });
-		AddPointToLine({ 60836, 85080, 55715 });
-		AddPointToLine({ 60340, 86720, 55499 });
-		AddPointToLine({ 59831, 88360, 55273 });
-		AddPointToLine({ 59311, 90000, 55038 });
-
-
-		// ============================================================
-		// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 80°
-		// Между 60° и 120°
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 55747, 30000, 55778 });
-		AddPointToLine({ 56151, 31250, 55975 });
-		AddPointToLine({ 56553, 32500, 56169 });
-		AddPointToLine({ 56952, 33750, 56358 });
-		AddPointToLine({ 57347, 35000, 56543 });
-
-		NewLine();
-		AddPointToLine({ 57441, 35300, 56586 });
-		AddPointToLine({ 58260, 37980, 56961 });
-		AddPointToLine({ 58654, 39320, 57139 });
-		AddPointToLine({ 59034, 40660, 57309 });
-		AddPointToLine({ 59401, 42000, 57471 });
-
-		NewLine();
-		AddPointToLine({ 59480, 42300, 57506 });
-		AddPointToLine({ 59816, 43600, 57653 });
-		AddPointToLine({ 60135, 44900, 57793 });
-		AddPointToLine({ 60436, 46200, 57923 });
-		AddPointToLine({ 60717, 47500, 58045 });
-
-		NewLine();
-		AddPointToLine({ 60779, 47800, 58072 });
-		AddPointToLine({ 61281, 50480, 58290 });
-		AddPointToLine({ 61496, 51820, 58383 });
-		AddPointToLine({ 61685, 53160, 58466 });
-		AddPointToLine({ 61848, 54500, 58538 });
-
-		NewLine();
-		AddPointToLine({ 61881, 54800, 58552 });
-		AddPointToLine({ 62099, 57280, 58652 });
-		AddPointToLine({ 62172, 58520, 58687 });
-		AddPointToLine({ 62220, 59760, 58713 });
-		AddPointToLine({ 62244, 61000, 58729 });
-
-		NewLine();
-		AddPointToLine({ 62246, 61300, 58731 });
-		AddPointToLine({ 62201, 63980, 58727 });
-		AddPointToLine({ 62135, 65320, 58707 });
-		AddPointToLine({ 62040, 66660, 58677 });
-		AddPointToLine({ 61918, 68000, 58634 });
-
-		NewLine();
-		AddPointToLine({ 61887, 68300, 58623 });
-		AddPointToLine({ 61578, 70780, 58511 });
-		AddPointToLine({ 61390, 72020, 58441 });
-		AddPointToLine({ 61180, 73260, 58362 });
-		AddPointToLine({ 60950, 74500, 58274 });
-
-		NewLine();
-		AddPointToLine({ 60891, 74800, 58251 });
-		AddPointToLine({ 60318, 77480, 58026 });
-		AddPointToLine({ 60000, 78820, 57898 });
-		AddPointToLine({ 59663, 80160, 57762 });
-		AddPointToLine({ 59309, 81500, 57616 });
-
-		NewLine();
-		AddPointToLine({ 59227, 81800, 57582 });
-		AddPointToLine({ 58289, 85080, 57186 });
-		AddPointToLine({ 57793, 86720, 56970 });
-		AddPointToLine({ 57284, 88360, 56744 });
-		AddPointToLine({ 56764, 90000, 56509 });
+		AddPointToLine({ 61244, 81800, 50053 });
+		AddPointToLine({ 60785, 83440, 49861 });
+		AddPointToLine({ 60306, 85080, 49657 });
+		AddPointToLine({ 59810, 86720, 49441 });
+		AddPointToLine({ 59301, 88360, 49215 });
+		AddPointToLine({ 58781, 90000, 48980 });
 
 
 		// ============================================================
-		// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 100°
-		// Между 60° и 120°
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 54253, 30000, 55778 });
-		AddPointToLine({ 54657, 31250, 55975 });
-		AddPointToLine({ 55059, 32500, 56169 });
-		AddPointToLine({ 55458, 33750, 56358 });
-		AddPointToLine({ 55853, 35000, 56543 });
-
-		NewLine();
-		AddPointToLine({ 55947, 35300, 56586 });
-		AddPointToLine({ 56766, 37980, 56961 });
-		AddPointToLine({ 57160, 39320, 57139 });
-		AddPointToLine({ 57540, 40660, 57309 });
-		AddPointToLine({ 57907, 42000, 57471 });
-
-		NewLine();
-		AddPointToLine({ 57986, 42300, 57506 });
-		AddPointToLine({ 58322, 43600, 57653 });
-		AddPointToLine({ 58641, 44900, 57793 });
-		AddPointToLine({ 58942, 46200, 57923 });
-		AddPointToLine({ 59223, 47500, 58045 });
-
-		NewLine();
-		AddPointToLine({ 59285, 47800, 58072 });
-		AddPointToLine({ 59787, 50480, 58290 });
-		AddPointToLine({ 60002, 51820, 58383 });
-		AddPointToLine({ 60191, 53160, 58466 });
-		AddPointToLine({ 60354, 54500, 58538 });
-
-		NewLine();
-		AddPointToLine({ 60387, 54800, 58552 });
-		AddPointToLine({ 60605, 57280, 58652 });
-		AddPointToLine({ 60678, 58520, 58687 });
-		AddPointToLine({ 60726, 59760, 58713 });
-		AddPointToLine({ 60750, 61000, 58729 });
-
-		NewLine();
-		AddPointToLine({ 60752, 61300, 58731 });
-		AddPointToLine({ 60707, 63980, 58727 });
-		AddPointToLine({ 60641, 65320, 58707 });
-		AddPointToLine({ 60546, 66660, 58677 });
-		AddPointToLine({ 60424, 68000, 58634 });
-
-		NewLine();
-		AddPointToLine({ 60393, 68300, 58623 });
-		AddPointToLine({ 60084, 70780, 58511 });
-		AddPointToLine({ 59896, 72020, 58441 });
-		AddPointToLine({ 59686, 73260, 58362 });
-		AddPointToLine({ 59456, 74500, 58274 });
-
-		NewLine();
-		AddPointToLine({ 59397, 74800, 58251 });
-		AddPointToLine({ 58824, 77480, 58026 });
-		AddPointToLine({ 58506, 78820, 57898 });
-		AddPointToLine({ 58169, 80160, 57762 });
-		AddPointToLine({ 57815, 81500, 57616 });
-
-		NewLine();
-		AddPointToLine({ 57733, 81800, 57582 });
-		AddPointToLine({ 56795, 85080, 57186 });
-		AddPointToLine({ 56299, 86720, 56970 });
-		AddPointToLine({ 55790, 88360, 56744 });
-		AddPointToLine({ 55270, 90000, 56509 });
-
-
-		// ============================================================
-		// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 140°
-		// Между 120° и 180°
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 50959, 30000, 53014 });
-		AddPointToLine({ 51363, 31250, 53211 });
-		AddPointToLine({ 51765, 32500, 53405 });
-		AddPointToLine({ 52164, 33750, 53594 });
-		AddPointToLine({ 52559, 35000, 53779 });
-
-		NewLine();
-		AddPointToLine({ 52653, 35300, 53822 });
-		AddPointToLine({ 53472, 37980, 54197 });
-		AddPointToLine({ 53866, 39320, 54375 });
-		AddPointToLine({ 54246, 40660, 54545 });
-		AddPointToLine({ 54613, 42000, 54707 });
-
-		NewLine();
-		AddPointToLine({ 54692, 42300, 54742 });
-		AddPointToLine({ 55028, 43600, 54889 });
-		AddPointToLine({ 55347, 44900, 55029 });
-		AddPointToLine({ 55648, 46200, 55159 });
-		AddPointToLine({ 55929, 47500, 55281 });
-
-		NewLine();
-		AddPointToLine({ 55991, 47800, 55308 });
-		AddPointToLine({ 56493, 50480, 55526 });
-		AddPointToLine({ 56708, 51820, 55619 });
-		AddPointToLine({ 56897, 53160, 55702 });
-		AddPointToLine({ 57060, 54500, 55774 });
-
-		NewLine();
-		AddPointToLine({ 57093, 54800, 55788 });
-		AddPointToLine({ 57311, 57280, 55888 });
-		AddPointToLine({ 57384, 58520, 55923 });
-		AddPointToLine({ 57432, 59760, 55949 });
-		AddPointToLine({ 57456, 61000, 55965 });
-
-		NewLine();
-		AddPointToLine({ 57458, 61300, 55967 });
-		AddPointToLine({ 57413, 63980, 55963 });
-		AddPointToLine({ 57347, 65320, 55943 });
-		AddPointToLine({ 57252, 66660, 55913 });
-		AddPointToLine({ 57130, 68000, 55870 });
-
-		NewLine();
-		AddPointToLine({ 57099, 68300, 55859 });
-		AddPointToLine({ 56790, 70780, 55747 });
-		AddPointToLine({ 56602, 72020, 55677 });
-		AddPointToLine({ 56392, 73260, 55598 });
-		AddPointToLine({ 56162, 74500, 55510 });
-
-		NewLine();
-		AddPointToLine({ 56103, 74800, 55487 });
-		AddPointToLine({ 55530, 77480, 55262 });
-		AddPointToLine({ 55212, 78820, 55134 });
-		AddPointToLine({ 54875, 80160, 54998 });
-		AddPointToLine({ 54521, 81500, 54852 });
-
-		NewLine();
-		AddPointToLine({ 54439, 81800, 54818 });
-		AddPointToLine({ 53501, 85080, 54422 });
-		AddPointToLine({ 53005, 86720, 54206 });
-		AddPointToLine({ 52496, 88360, 53980 });
-		AddPointToLine({ 51976, 90000, 53745 });
-
-
-		// ============================================================
-		// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 160°
-		// Между 120° и 180°
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 50157, 30000, 53014 });
-		AddPointToLine({ 50561, 31250, 53211 });
-		AddPointToLine({ 50963, 32500, 53405 });
-		AddPointToLine({ 51362, 33750, 53594 });
-		AddPointToLine({ 51757, 35000, 53779 });
-
-		NewLine();
-		AddPointToLine({ 51851, 35300, 53822 });
-		AddPointToLine({ 52670, 37980, 54197 });
-		AddPointToLine({ 53064, 39320, 54375 });
-		AddPointToLine({ 53444, 40660, 54545 });
-		AddPointToLine({ 53811, 42000, 54707 });
-
-		NewLine();
-		AddPointToLine({ 53890, 42300, 54742 });
-		AddPointToLine({ 54226, 43600, 54889 });
-		AddPointToLine({ 54545, 44900, 55029 });
-		AddPointToLine({ 54846, 46200, 55159 });
-		AddPointToLine({ 55127, 47500, 55281 });
-
-		NewLine();
-		AddPointToLine({ 55189, 47800, 55308 });
-		AddPointToLine({ 55691, 50480, 55526 });
-		AddPointToLine({ 55906, 51820, 55619 });
-		AddPointToLine({ 56095, 53160, 55702 });
-		AddPointToLine({ 56258, 54500, 55774 });
-
-		NewLine();
-		AddPointToLine({ 56291, 54800, 55788 });
-		AddPointToLine({ 56509, 57280, 55888 });
-		AddPointToLine({ 56582, 58520, 55923 });
-		AddPointToLine({ 56630, 59760, 55949 });
-		AddPointToLine({ 56654, 61000, 55965 });
-
-		NewLine();
-		AddPointToLine({ 56656, 61300, 55967 });
-		AddPointToLine({ 56611, 63980, 55963 });
-		AddPointToLine({ 56545, 65320, 55943 });
-		AddPointToLine({ 56450, 66660, 55913 });
-		AddPointToLine({ 56328, 68000, 55870 });
-
-		NewLine();
-		AddPointToLine({ 56297, 68300, 55859 });
-		AddPointToLine({ 55988, 70780, 55747 });
-		AddPointToLine({ 55800, 72020, 55677 });
-		AddPointToLine({ 55590, 73260, 55598 });
-		AddPointToLine({ 55360, 74500, 55510 });
-
-		NewLine();
-		AddPointToLine({ 55301, 74800, 55487 });
-		AddPointToLine({ 54728, 77480, 55262 });
-		AddPointToLine({ 54410, 78820, 55134 });
-		AddPointToLine({ 54073, 80160, 54998 });
-		AddPointToLine({ 53719, 81500, 54852 });
-
-		NewLine();
-		AddPointToLine({ 53637, 81800, 54818 });
-		AddPointToLine({ 52699, 85080, 54422 });
-		AddPointToLine({ 52203, 86720, 54206 });
-		AddPointToLine({ 51694, 88360, 53980 });
-		AddPointToLine({ 51174, 90000, 53745 });
-
-
-		// ============================================================
-		// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 200°
-		// Между 180° и 240°
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 50157, 30000, 50072 });
-		AddPointToLine({ 50561, 31250, 50269 });
-		AddPointToLine({ 50963, 32500, 50463 });
-		AddPointToLine({ 51362, 33750, 50652 });
-		AddPointToLine({ 51757, 35000, 50837 });
-
-		NewLine();
-		AddPointToLine({ 51851, 35300, 50880 });
-		AddPointToLine({ 52670, 37980, 51255 });
-		AddPointToLine({ 53064, 39320, 51433 });
-		AddPointToLine({ 53444, 40660, 51603 });
-		AddPointToLine({ 53811, 42000, 51765 });
-
-		NewLine();
-		AddPointToLine({ 53890, 42300, 51800 });
-		AddPointToLine({ 54226, 43600, 51947 });
-		AddPointToLine({ 54545, 44900, 52087 });
-		AddPointToLine({ 54846, 46200, 52217 });
-		AddPointToLine({ 55127, 47500, 52339 });
-
-		NewLine();
-		AddPointToLine({ 55189, 47800, 52366 });
-		AddPointToLine({ 55691, 50480, 52584 });
-		AddPointToLine({ 55906, 51820, 52677 });
-		AddPointToLine({ 56095, 53160, 52760 });
-		AddPointToLine({ 56258, 54500, 52832 });
-
-		NewLine();
-		AddPointToLine({ 56291, 54800, 52846 });
-		AddPointToLine({ 56509, 57280, 52946 });
-		AddPointToLine({ 56582, 58520, 52981 });
-		AddPointToLine({ 56630, 59760, 53007 });
-		AddPointToLine({ 56654, 61000, 53023 });
-
-		NewLine();
-		AddPointToLine({ 56656, 61300, 53025 });
-		AddPointToLine({ 56611, 63980, 53021 });
-		AddPointToLine({ 56545, 65320, 53001 });
-		AddPointToLine({ 56450, 66660, 52971 });
-		AddPointToLine({ 56328, 68000, 52928 });
-
-		NewLine();
-		AddPointToLine({ 56297, 68300, 52917 });
-		AddPointToLine({ 55988, 70780, 52805 });
-		AddPointToLine({ 55800, 72020, 52735 });
-		AddPointToLine({ 55590, 73260, 52656 });
-		AddPointToLine({ 55360, 74500, 52568 });
-
-		NewLine();
-		AddPointToLine({ 55301, 74800, 52545 });
-		AddPointToLine({ 54728, 77480, 52320 });
-		AddPointToLine({ 54410, 78820, 52192 });
-		AddPointToLine({ 54073, 80160, 52056 });
-		AddPointToLine({ 53719, 81500, 51910 });
-
-		NewLine();
-		AddPointToLine({ 53637, 81800, 51876 });
-		AddPointToLine({ 52699, 85080, 51480 });
-		AddPointToLine({ 52203, 86720, 51264 });
-		AddPointToLine({ 51694, 88360, 51038 });
-		AddPointToLine({ 51174, 90000, 50803 });
-
-
-		// ============================================================
-		// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 220°
-		// Между 180° и 240°
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 50959, 30000, 48779 });
-		AddPointToLine({ 51363, 31250, 48976 });
-		AddPointToLine({ 51765, 32500, 49170 });
-		AddPointToLine({ 52164, 33750, 49359 });
-		AddPointToLine({ 52559, 35000, 49544 });
-
-		NewLine();
-		AddPointToLine({ 52653, 35300, 49587 });
-		AddPointToLine({ 53472, 37980, 49962 });
-		AddPointToLine({ 53866, 39320, 50140 });
-		AddPointToLine({ 54246, 40660, 50310 });
-		AddPointToLine({ 54613, 42000, 50472 });
-
-		NewLine();
-		AddPointToLine({ 54692, 42300, 50507 });
-		AddPointToLine({ 55028, 43600, 50654 });
-		AddPointToLine({ 55347, 44900, 50794 });
-		AddPointToLine({ 55648, 46200, 50924 });
-		AddPointToLine({ 55929, 47500, 51046 });
-
-		NewLine();
-		AddPointToLine({ 55991, 47800, 51073 });
-		AddPointToLine({ 56493, 50480, 51291 });
-		AddPointToLine({ 56708, 51820, 51384 });
-		AddPointToLine({ 56897, 53160, 51467 });
-		AddPointToLine({ 57060, 54500, 51539 });
-
-		NewLine();
-		AddPointToLine({ 57093, 54800, 51553 });
-		AddPointToLine({ 57311, 57280, 51653 });
-		AddPointToLine({ 57384, 58520, 51688 });
-		AddPointToLine({ 57432, 59760, 51714 });
-		AddPointToLine({ 57456, 61000, 51730 });
-
-		NewLine();
-		AddPointToLine({ 57458, 61300, 51732 });
-		AddPointToLine({ 57413, 63980, 51728 });
-		AddPointToLine({ 57347, 65320, 51708 });
-		AddPointToLine({ 57252, 66660, 51678 });
-		AddPointToLine({ 57130, 68000, 51635 });
-
-		NewLine();
-		AddPointToLine({ 57099, 68300, 51624 });
-		AddPointToLine({ 56790, 70780, 51512 });
-		AddPointToLine({ 56602, 72020, 51442 });
-		AddPointToLine({ 56392, 73260, 51363 });
-		AddPointToLine({ 56162, 74500, 51275 });
-
-		NewLine();
-		AddPointToLine({ 56103, 74800, 51252 });
-		AddPointToLine({ 55530, 77480, 51027 });
-		AddPointToLine({ 55212, 78820, 50899 });
-		AddPointToLine({ 54875, 80160, 50763 });
-		AddPointToLine({ 54521, 81500, 50617 });
-
-		NewLine();
-		AddPointToLine({ 54439, 81800, 50583 });
-		AddPointToLine({ 53501, 85080, 50187 });
-		AddPointToLine({ 53005, 86720, 49971 });
-		AddPointToLine({ 52496, 88360, 49745 });
-		AddPointToLine({ 51976, 90000, 49510 });
-
-
-		// ============================================================
-		// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 260°
-		// Между 240° и 300°
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 54253, 30000, 47308 });
-		AddPointToLine({ 54657, 31250, 47505 });
-		AddPointToLine({ 55059, 32500, 47699 });
-		AddPointToLine({ 55458, 33750, 47888 });
-		AddPointToLine({ 55853, 35000, 48073 });
-
-		NewLine();
-		AddPointToLine({ 55947, 35300, 48116 });
-		AddPointToLine({ 56766, 37980, 48491 });
-		AddPointToLine({ 57160, 39320, 48669 });
-		AddPointToLine({ 57540, 40660, 48839 });
-		AddPointToLine({ 57907, 42000, 49001 });
-
-		NewLine();
-		AddPointToLine({ 57986, 42300, 49036 });
-		AddPointToLine({ 58322, 43600, 49183 });
-		AddPointToLine({ 58641, 44900, 49323 });
-		AddPointToLine({ 58942, 46200, 49453 });
-		AddPointToLine({ 59223, 47500, 49575 });
-
-		NewLine();
-		AddPointToLine({ 59285, 47800, 49602 });
-		AddPointToLine({ 59787, 50480, 49820 });
-		AddPointToLine({ 60002, 51820, 49913 });
-		AddPointToLine({ 60191, 53160, 49996 });
-		AddPointToLine({ 60354, 54500, 50068 });
-
-		NewLine();
-		AddPointToLine({ 60387, 54800, 50082 });
-		AddPointToLine({ 60605, 57280, 50182 });
-		AddPointToLine({ 60678, 58520, 50217 });
-		AddPointToLine({ 60726, 59760, 50243 });
-		AddPointToLine({ 60750, 61000, 50259 });
-
-		NewLine();
-		AddPointToLine({ 60752, 61300, 50261 });
-		AddPointToLine({ 60707, 63980, 50257 });
-		AddPointToLine({ 60641, 65320, 50237 });
-		AddPointToLine({ 60546, 66660, 50207 });
-		AddPointToLine({ 60424, 68000, 50164 });
-
-		NewLine();
-		AddPointToLine({ 60393, 68300, 50153 });
-		AddPointToLine({ 60084, 70780, 50041 });
-		AddPointToLine({ 59896, 72020, 49971 });
-		AddPointToLine({ 59686, 73260, 49892 });
-		AddPointToLine({ 59456, 74500, 49804 });
-
-		NewLine();
-		AddPointToLine({ 59397, 74800, 49781 });
-		AddPointToLine({ 58824, 77480, 49556 });
-		AddPointToLine({ 58506, 78820, 49428 });
-		AddPointToLine({ 58169, 80160, 49292 });
-		AddPointToLine({ 57815, 81500, 49146 });
-
-		NewLine();
-		AddPointToLine({ 57733, 81800, 49112 });
-		AddPointToLine({ 56795, 85080, 48716 });
-		AddPointToLine({ 56299, 86720, 48500 });
-		AddPointToLine({ 55790, 88360, 48274 });
-		AddPointToLine({ 55270, 90000, 48039 });
-
-
-		// ============================================================
-		// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 280°
-		// Между 240° и 300°
-		// ============================================================
-
-		NewLine();
-		AddPointToLine({ 55747, 30000, 47308 });
-		AddPointToLine({ 56151, 31250, 47505 });
-		AddPointToLine({ 56553, 32500, 47699 });
-		AddPointToLine({ 56952, 33750, 47888 });
-		AddPointToLine({ 57347, 35000, 48073 });
-
-		NewLine();
-		AddPointToLine({ 57441, 35300, 48116 });
-		AddPointToLine({ 58260, 37980, 48491 });
-		AddPointToLine({ 58654, 39320, 48669 });
-		AddPointToLine({ 59034, 40660, 48839 });
-		AddPointToLine({ 59401, 42000, 49001 });
-
-		NewLine();
-		AddPointToLine({ 59480, 42300, 49036 });
-		AddPointToLine({ 59816, 43600, 49183 });
-		AddPointToLine({ 60135, 44900, 49323 });
-		AddPointToLine({ 60436, 46200, 49453 });
-		AddPointToLine({ 60717, 47500, 49575 });
-
-		NewLine();
-		AddPointToLine({ 60779, 47800, 49602 });
-		AddPointToLine({ 61281, 50480, 49820 });
-		AddPointToLine({ 61496, 51820, 49913 });
-		AddPointToLine({ 61685, 53160, 49996 });
-		AddPointToLine({ 61848, 54500, 50068 });
-
-		NewLine();
-		AddPointToLine({ 61881, 54800, 50082 });
-		AddPointToLine({ 62099, 57280, 50182 });
-		AddPointToLine({ 62172, 58520, 50217 });
-		AddPointToLine({ 62220, 59760, 50243 });
-		AddPointToLine({ 62244, 61000, 50259 });
-
-		NewLine();
-		AddPointToLine({ 62246, 61300, 50261 });
-		AddPointToLine({ 62201, 63980, 50257 });
-		AddPointToLine({ 62135, 65320, 50237 });
-		AddPointToLine({ 62040, 66660, 50207 });
-		AddPointToLine({ 61918, 68000, 50164 });
-
-		NewLine();
-		AddPointToLine({ 61887, 68300, 50153 });
-		AddPointToLine({ 61578, 70780, 50041 });
-		AddPointToLine({ 61390, 72020, 49971 });
-		AddPointToLine({ 61180, 73260, 49892 });
-		AddPointToLine({ 60950, 74500, 49804 });
-
-		NewLine();
-		AddPointToLine({ 60891, 74800, 49781 });
-		AddPointToLine({ 60318, 77480, 49556 });
-		AddPointToLine({ 60000, 78820, 49428 });
-		AddPointToLine({ 59663, 80160, 49292 });
-		AddPointToLine({ 59309, 81500, 49146 });
-
-		NewLine();
-		AddPointToLine({ 59227, 81800, 49112 });
-		AddPointToLine({ 58289, 85080, 48716 });
-		AddPointToLine({ 57793, 86720, 48500 });
-		AddPointToLine({ 57284, 88360, 48274 });
-		AddPointToLine({ 56764, 90000, 48039 });
-
-
-		// ============================================================
-		// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 320°
-		// Между 300° и 0°
+		// ПОВЕРХНОСТЬ 320°
 		// ============================================================
 
 		NewLine();
@@ -2149,6 +3410,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 59988, 35300, 49587 });
+		AddPointToLine({ 60402, 36640, 49778 });
 		AddPointToLine({ 60807, 37980, 49962 });
 		AddPointToLine({ 61201, 39320, 50140 });
 		AddPointToLine({ 61581, 40660, 50310 });
@@ -2163,6 +3425,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 63326, 47800, 51073 });
+		AddPointToLine({ 63589, 49140, 51187 });
 		AddPointToLine({ 63828, 50480, 51291 });
 		AddPointToLine({ 64043, 51820, 51384 });
 		AddPointToLine({ 64232, 53160, 51467 });
@@ -2170,6 +3433,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 64428, 54800, 51553 });
+		AddPointToLine({ 64549, 56040, 51608 });
 		AddPointToLine({ 64646, 57280, 51653 });
 		AddPointToLine({ 64719, 58520, 51688 });
 		AddPointToLine({ 64767, 59760, 51714 });
@@ -2177,6 +3441,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 64793, 61300, 51732 });
+		AddPointToLine({ 64785, 62640, 51736 });
 		AddPointToLine({ 64748, 63980, 51728 });
 		AddPointToLine({ 64682, 65320, 51708 });
 		AddPointToLine({ 64587, 66660, 51678 });
@@ -2184,6 +3449,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 64434, 68300, 51624 });
+		AddPointToLine({ 64291, 69540, 51573 });
 		AddPointToLine({ 64125, 70780, 51512 });
 		AddPointToLine({ 63937, 72020, 51442 });
 		AddPointToLine({ 63727, 73260, 51363 });
@@ -2191,6 +3457,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 63438, 74800, 51252 });
+		AddPointToLine({ 63162, 76140, 51144 });
 		AddPointToLine({ 62865, 77480, 51027 });
 		AddPointToLine({ 62547, 78820, 50899 });
 		AddPointToLine({ 62210, 80160, 50763 });
@@ -2198,6 +3465,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 61774, 81800, 50583 });
+		AddPointToLine({ 61315, 83440, 50391 });
 		AddPointToLine({ 60836, 85080, 50187 });
 		AddPointToLine({ 60340, 86720, 49971 });
 		AddPointToLine({ 59831, 88360, 49745 });
@@ -2205,8 +3473,82 @@ namespace Object {
 
 
 		// ============================================================
-		// ДОПОЛНИТЕЛЬНАЯ ПОВЕРХНОСТЬ 340°
-		// Между 300° и 0°
+		// ПОВЕРХНОСТЬ 330°
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 58724, 30000, 49393 });
+		AddPointToLine({ 59128, 31250, 49590 });
+		AddPointToLine({ 59530, 32500, 49784 });
+		AddPointToLine({ 59929, 33750, 49973 });
+		AddPointToLine({ 60324, 35000, 50158 });
+
+		NewLine();
+		AddPointToLine({ 60418, 35300, 50201 });
+		AddPointToLine({ 60832, 36640, 50392 });
+		AddPointToLine({ 61237, 37980, 50576 });
+		AddPointToLine({ 61631, 39320, 50754 });
+		AddPointToLine({ 62011, 40660, 50924 });
+		AddPointToLine({ 62378, 42000, 51086 });
+
+		NewLine();
+		AddPointToLine({ 62457, 42300, 51121 });
+		AddPointToLine({ 62793, 43600, 51268 });
+		AddPointToLine({ 63112, 44900, 51408 });
+		AddPointToLine({ 63413, 46200, 51538 });
+		AddPointToLine({ 63694, 47500, 51660 });
+
+		NewLine();
+		AddPointToLine({ 63756, 47800, 51687 });
+		AddPointToLine({ 64019, 49140, 51801 });
+		AddPointToLine({ 64258, 50480, 51905 });
+		AddPointToLine({ 64473, 51820, 51998 });
+		AddPointToLine({ 64662, 53160, 52081 });
+		AddPointToLine({ 64825, 54500, 52153 });
+
+		NewLine();
+		AddPointToLine({ 64858, 54800, 52167 });
+		AddPointToLine({ 64979, 56040, 52222 });
+		AddPointToLine({ 65076, 57280, 52267 });
+		AddPointToLine({ 65149, 58520, 52302 });
+		AddPointToLine({ 65197, 59760, 52328 });
+		AddPointToLine({ 65221, 61000, 52344 });
+
+		NewLine();
+		AddPointToLine({ 65223, 61300, 52346 });
+		AddPointToLine({ 65215, 62640, 52350 });
+		AddPointToLine({ 65178, 63980, 52342 });
+		AddPointToLine({ 65112, 65320, 52322 });
+		AddPointToLine({ 65017, 66660, 52292 });
+		AddPointToLine({ 64895, 68000, 52249 });
+
+		NewLine();
+		AddPointToLine({ 64864, 68300, 52238 });
+		AddPointToLine({ 64721, 69540, 52187 });
+		AddPointToLine({ 64555, 70780, 52126 });
+		AddPointToLine({ 64367, 72020, 52056 });
+		AddPointToLine({ 64157, 73260, 51977 });
+		AddPointToLine({ 63927, 74500, 51889 });
+
+		NewLine();
+		AddPointToLine({ 63868, 74800, 51866 });
+		AddPointToLine({ 63592, 76140, 51758 });
+		AddPointToLine({ 63295, 77480, 51641 });
+		AddPointToLine({ 62977, 78820, 51513 });
+		AddPointToLine({ 62640, 80160, 51377 });
+		AddPointToLine({ 62286, 81500, 51231 });
+
+		NewLine();
+		AddPointToLine({ 62204, 81800, 51197 });
+		AddPointToLine({ 61745, 83440, 51005 });
+		AddPointToLine({ 61266, 85080, 50801 });
+		AddPointToLine({ 60770, 86720, 50585 });
+		AddPointToLine({ 60261, 88360, 50359 });
+		AddPointToLine({ 59741, 90000, 50124 });
+
+
+		// ============================================================
+		// ПОВЕРХНОСТЬ 340°
 		// ============================================================
 
 		NewLine();
@@ -2218,6 +3560,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 60735, 35300, 50880 });
+		AddPointToLine({ 61149, 36640, 51071 });
 		AddPointToLine({ 61554, 37980, 51255 });
 		AddPointToLine({ 61948, 39320, 51433 });
 		AddPointToLine({ 62328, 40660, 51603 });
@@ -2232,6 +3575,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 64073, 47800, 52366 });
+		AddPointToLine({ 64336, 49140, 52480 });
 		AddPointToLine({ 64575, 50480, 52584 });
 		AddPointToLine({ 64790, 51820, 52677 });
 		AddPointToLine({ 64979, 53160, 52760 });
@@ -2239,6 +3583,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 65175, 54800, 52846 });
+		AddPointToLine({ 65296, 56040, 52901 });
 		AddPointToLine({ 65393, 57280, 52946 });
 		AddPointToLine({ 65466, 58520, 52981 });
 		AddPointToLine({ 65514, 59760, 53007 });
@@ -2246,6 +3591,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 65540, 61300, 53025 });
+		AddPointToLine({ 65532, 62640, 53029 });
 		AddPointToLine({ 65495, 63980, 53021 });
 		AddPointToLine({ 65429, 65320, 53001 });
 		AddPointToLine({ 65334, 66660, 52971 });
@@ -2253,6 +3599,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 65181, 68300, 52917 });
+		AddPointToLine({ 65038, 69540, 52866 });
 		AddPointToLine({ 64872, 70780, 52805 });
 		AddPointToLine({ 64684, 72020, 52735 });
 		AddPointToLine({ 64474, 73260, 52656 });
@@ -2260,6 +3607,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 64185, 74800, 52545 });
+		AddPointToLine({ 63909, 76140, 52437 });
 		AddPointToLine({ 63612, 77480, 52320 });
 		AddPointToLine({ 63294, 78820, 52192 });
 		AddPointToLine({ 62957, 80160, 52056 });
@@ -2267,6 +3615,7 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 62521, 81800, 51876 });
+		AddPointToLine({ 62062, 83440, 51684 });
 		AddPointToLine({ 61583, 85080, 51480 });
 		AddPointToLine({ 61087, 86720, 51264 });
 		AddPointToLine({ 60578, 88360, 51038 });
@@ -2274,358 +3623,1783 @@ namespace Object {
 
 
 		// ============================================================
-		// КОРНИ — ПРОДОЛЖЕНИЕ ТРУБЫ НАРУЖУ
-		// ============================================================
-
-		// Корень влево
-		NewLine();
-		AddPointToLine({ 48000, 30000, 48000 });
-		AddPointToLine({ 44500, 29500, 46500 });
-		AddPointToLine({ 41000, 30000, 44000 });
-		AddPointToLine({ 37500, 29000, 45500 });
-		AddPointToLine({ 34000, 30000, 43000 });
-		AddPointToLine({ 30500, 29200, 45000 });
-		AddPointToLine({ 27000, 30000, 43000 });
-
-
-		// Корень вправо
-		NewLine();
-		AddPointToLine({ 60000, 30000, 48500 });
-		AddPointToLine({ 63500, 29500, 50000 });
-		AddPointToLine({ 67000, 30000, 52500 });
-		AddPointToLine({ 70500, 29000, 50500 });
-		AddPointToLine({ 74000, 30000, 53000 });
-		AddPointToLine({ 77500, 29200, 51000 });
-		AddPointToLine({ 81000, 30000, 53500 });
-
-
-		// Корень назад
-		NewLine();
-		AddPointToLine({ 52000, 30000, 45500 });
-		AddPointToLine({ 50000, 29200, 42000 });
-		AddPointToLine({ 47500, 30000, 39000 });
-		AddPointToLine({ 45500, 29000, 36000 });
-		AddPointToLine({ 43000, 30000, 33500 });
-
-
-		// Корень вперед
-		NewLine();
-		AddPointToLine({ 57000, 30000, 54500 });
-		AddPointToLine({ 59500, 29200, 57500 });
-		AddPointToLine({ 62000, 30000, 61000 });
-		AddPointToLine({ 65000, 29000, 64000 });
-		AddPointToLine({ 68000, 30000, 66500 });
-
-
-		// ============================================================
-		// БОЛЬШАЯ ЛЕВАЯ ВЕТВЬ
+		// ПОВЕРХНОСТЬ 350°
 		// ============================================================
 
 		NewLine();
-		AddPointToLine({ 47000, 55000, 54000 });
-		AddPointToLine({ 43500, 56000, 52500 });
-		AddPointToLine({ 40000, 57500, 53500 });
-		AddPointToLine({ 36500, 59000, 56000 });
-		AddPointToLine({ 33000, 58500, 54500 });
-		AddPointToLine({ 29500, 60000, 52000 });
-		AddPointToLine({ 26000, 59000, 53500 });
-		AddPointToLine({ 22500, 61000, 51500 });
+		AddPointToLine({ 59235, 30000, 50796 });
+		AddPointToLine({ 59639, 31250, 50993 });
+		AddPointToLine({ 60041, 32500, 51187 });
+		AddPointToLine({ 60440, 33750, 51376 });
+		AddPointToLine({ 60835, 35000, 51561 });
 
-
-		// Жила вокруг левой ветви
 		NewLine();
-		AddPointToLine({ 46500, 54500, 55500 });
-		AddPointToLine({ 43000, 55500, 55000 });
-		AddPointToLine({ 39500, 57000, 56500 });
-		AddPointToLine({ 36000, 58000, 58500 });
-		AddPointToLine({ 32500, 57500, 57500 });
-		AddPointToLine({ 29000, 59000, 55500 });
-		AddPointToLine({ 25500, 58500, 57000 });
+		AddPointToLine({ 60929, 35300, 51604 });
+		AddPointToLine({ 61343, 36640, 51795 });
+		AddPointToLine({ 61748, 37980, 51979 });
+		AddPointToLine({ 62142, 39320, 52157 });
+		AddPointToLine({ 62522, 40660, 52327 });
+		AddPointToLine({ 62889, 42000, 52489 });
+
+		NewLine();
+		AddPointToLine({ 62968, 42300, 52524 });
+		AddPointToLine({ 63304, 43600, 52671 });
+		AddPointToLine({ 63623, 44900, 52811 });
+		AddPointToLine({ 63924, 46200, 52941 });
+		AddPointToLine({ 64205, 47500, 53063 });
+
+		NewLine();
+		AddPointToLine({ 64267, 47800, 53090 });
+		AddPointToLine({ 64530, 49140, 53204 });
+		AddPointToLine({ 64769, 50480, 53308 });
+		AddPointToLine({ 64984, 51820, 53401 });
+		AddPointToLine({ 65173, 53160, 53484 });
+		AddPointToLine({ 65336, 54500, 53556 });
+
+		NewLine();
+		AddPointToLine({ 65369, 54800, 53570 });
+		AddPointToLine({ 65490, 56040, 53625 });
+		AddPointToLine({ 65587, 57280, 53670 });
+		AddPointToLine({ 65660, 58520, 53705 });
+		AddPointToLine({ 65708, 59760, 53731 });
+		AddPointToLine({ 65732, 61000, 53747 });
+
+		NewLine();
+		AddPointToLine({ 65734, 61300, 53749 });
+		AddPointToLine({ 65726, 62640, 53753 });
+		AddPointToLine({ 65689, 63980, 53745 });
+		AddPointToLine({ 65623, 65320, 53725 });
+		AddPointToLine({ 65528, 66660, 53695 });
+		AddPointToLine({ 65406, 68000, 53652 });
+
+		NewLine();
+		AddPointToLine({ 65375, 68300, 53641 });
+		AddPointToLine({ 65232, 69540, 53590 });
+		AddPointToLine({ 65066, 70780, 53529 });
+		AddPointToLine({ 64878, 72020, 53459 });
+		AddPointToLine({ 64668, 73260, 53380 });
+		AddPointToLine({ 64438, 74500, 53292 });
+
+		NewLine();
+		AddPointToLine({ 64379, 74800, 53269 });
+		AddPointToLine({ 64103, 76140, 53161 });
+		AddPointToLine({ 63806, 77480, 53044 });
+		AddPointToLine({ 63488, 78820, 52916 });
+		AddPointToLine({ 63151, 80160, 52780 });
+		AddPointToLine({ 62797, 81500, 52634 });
+
+		NewLine();
+		AddPointToLine({ 62715, 81800, 52600 });
+		AddPointToLine({ 62256, 83440, 52408 });
+		AddPointToLine({ 61777, 85080, 52204 });
+		AddPointToLine({ 61281, 86720, 51988 });
+		AddPointToLine({ 60772, 88360, 51762 });
+		AddPointToLine({ 60252, 90000, 51527 });
 
 
 		// ============================================================
-		// ВЕТКИ ЛЕВОЙ КРОНЫ
-		// ============================================================
+// КОРНИ — НЕБОЛЬШИЕ ИЗОГНУТЫЕ ТРУБЫ
+// 4 корня, по 6 продольных жил на каждой трубе
+// Радиус корней: 750
+// Каждая жила имеет 5 точек
+// ============================================================
 
+// Корень ЛЕВЫЙ, жила 0°
 		NewLine();
-		AddPointToLine({ 36500, 59000, 56000 });
-		AddPointToLine({ 33500, 61500, 57500 });
-		AddPointToLine({ 30500, 63500, 56000 });
-		AddPointToLine({ 27500, 65000, 58000 });
-		AddPointToLine({ 24500, 67000, 56500 });
-		AddPointToLine({ 21500, 66500, 58500 });
+		AddPointToLine({ 53795, 30000, 50811 });
+		AddPointToLine({ 50335, 29400, 49329 });
+		AddPointToLine({ 46868, 30200, 47346 });
+		AddPointToLine({ 42391, 28900, 44860 });
+		AddPointToLine({ 37835, 29700, 41829 });
+		AddPointToLine({ 33000, 29200, 41000 });
 
+		// Корень ЛЕВЫЙ, жила 60°
 		NewLine();
-		AddPointToLine({ 33000, 58500, 54500 });
-		AddPointToLine({ 30500, 56000, 52000 });
-		AddPointToLine({ 28000, 54000, 53500 });
-		AddPointToLine({ 25000, 52500, 51500 });
-		AddPointToLine({ 22000, 53500, 53000 });
+		AddPointToLine({ 53648, 30357, 51155 });
+		AddPointToLine({ 50168, 29757, 49665 });
+		AddPointToLine({ 46684, 30557, 47673 });
+		AddPointToLine({ 42196, 29257, 45180 });
+		AddPointToLine({ 37668, 30057, 42165 });
+		AddPointToLine({ 33000, 29200, 41000 });
 
+		// Корень ЛЕВЫЙ, жила 120°
 		NewLine();
-		AddPointToLine({ 30000, 60000, 52000 });
-		AddPointToLine({ 27500, 61500, 50000 });
-		AddPointToLine({ 25000, 60500, 48000 });
-		AddPointToLine({ 22500, 62000, 46500 });
-		AddPointToLine({ 19500, 61000, 48000 });
+		AddPointToLine({ 53352, 30357, 51845 });
+		AddPointToLine({ 49832, 29757, 50335 });
+		AddPointToLine({ 46316, 30557, 48327 });
+		AddPointToLine({ 41804, 29257, 45820 });
+		AddPointToLine({ 37332, 30057, 42835 });
+		AddPointToLine({ 33000, 29200, 41000 });
 
-
-		// ============================================================
-		// БОЛЬШАЯ ПРАВАЯ ВЕТВЬ
-		// ============================================================
-
+		// Корень ЛЕВЫЙ, жила 180°
 		NewLine();
-		AddPointToLine({ 59000, 60000, 55500 });
-		AddPointToLine({ 62500, 61000, 58000 });
-		AddPointToLine({ 66000, 62500, 59500 });
-		AddPointToLine({ 70000, 61500, 58000 });
-		AddPointToLine({ 74000, 63500, 60000 });
-		AddPointToLine({ 78000, 62500, 58000 });
-		AddPointToLine({ 82000, 64500, 59500 });
-		AddPointToLine({ 85500, 63500, 58000 });
+		AddPointToLine({ 53205, 30000, 52189 });
+		AddPointToLine({ 49665, 29400, 50671 });
+		AddPointToLine({ 46132, 30200, 48654 });
+		AddPointToLine({ 41609, 28900, 46140 });
+		AddPointToLine({ 37165, 29700, 43171 });
+		AddPointToLine({ 33000, 29200, 41000 });
 
-
-		// Вторая жила правой ветви
+		// Корень ЛЕВЫЙ, жила 240°
 		NewLine();
-		AddPointToLine({ 60000, 59500, 53500 });
-		AddPointToLine({ 63500, 60500, 56000 });
-		AddPointToLine({ 67000, 61500, 57500 });
-		AddPointToLine({ 71000, 60500, 56000 });
-		AddPointToLine({ 75000, 62500, 58000 });
-		AddPointToLine({ 79000, 61500, 56000 });
-		AddPointToLine({ 83000, 63500, 57500 });
+		AddPointToLine({ 53352, 29643, 51845 });
+		AddPointToLine({ 49832, 29043, 50335 });
+		AddPointToLine({ 46316, 29843, 48327 });
+		AddPointToLine({ 41804, 28543, 45820 });
+		AddPointToLine({ 37332, 29343, 42835 });
+		AddPointToLine({ 33000, 29200, 41000 });
 
-
-		// ============================================================
-		// ВЕТКИ ПРАВОЙ КРОНЫ
-		// ============================================================
-
+		// Корень ЛЕВЫЙ, жила 300°
 		NewLine();
-		AddPointToLine({ 70000, 61500, 58000 });
-		AddPointToLine({ 72500, 64000, 60000 });
-		AddPointToLine({ 75000, 66000, 58500 });
-		AddPointToLine({ 78000, 67500, 60500 });
-		AddPointToLine({ 81000, 69000, 59000 });
-		AddPointToLine({ 84000, 68500, 61000 });
+		AddPointToLine({ 53648, 29643, 51155 });
+		AddPointToLine({ 50168, 29043, 49665 });
+		AddPointToLine({ 46684, 29843, 47673 });
+		AddPointToLine({ 42196, 28543, 45180 });
+		AddPointToLine({ 37668, 29343, 42165 });
+		AddPointToLine({ 33000, 29200, 41000 });
 
+		// Корень ПРАВЫЙ, жила 0°
 		NewLine();
-		AddPointToLine({ 74000, 63500, 60000 });
-		AddPointToLine({ 76000, 61000, 62500 });
-		AddPointToLine({ 78500, 59500, 61000 });
-		AddPointToLine({ 81500, 60500, 63000 });
-		AddPointToLine({ 84500, 59000, 61500 });
-		AddPointToLine({ 87500, 60500, 63500 });
+		AddPointToLine({ 57205, 30000, 52189 });
+		AddPointToLine({ 60628, 29500, 53651 });
+		AddPointToLine({ 64394, 30200, 56242 });
+		AddPointToLine({ 67901, 28800, 54743 });
+		AddPointToLine({ 71953, 29700, 57249 });
+		AddPointToLine({ 76000, 29100, 54500 });
 
+		// Корень ПРАВЫЙ, жила 60°
 		NewLine();
-		AddPointToLine({ 78000, 62500, 58000 });
-		AddPointToLine({ 80500, 65000, 56000 });
-		AddPointToLine({ 83000, 66500, 57500 });
-		AddPointToLine({ 85500, 68000, 55500 });
-		AddPointToLine({ 88500, 67000, 57000 });
+		AddPointToLine({ 57352, 30357, 51845 });
+		AddPointToLine({ 60814, 29857, 53326 });
+		AddPointToLine({ 64447, 30557, 55871 });
+		AddPointToLine({ 67950, 29157, 54372 });
+		AddPointToLine({ 71977, 30057, 56874 });
+		AddPointToLine({ 76000, 29100, 54500 });
 
-
-		// ============================================================
-		// ЦЕНТРАЛЬНАЯ ВЕТВЬ ВВЕРХ
-		// ============================================================
-
+		// Корень ПРАВЫЙ, жила 120°
 		NewLine();
-		AddPointToLine({ 52000, 70000, 55000 });
-		AddPointToLine({ 50500, 73500, 53500 });
-		AddPointToLine({ 51500, 77000, 52000 });
-		AddPointToLine({ 54000, 80500, 53500 });
-		AddPointToLine({ 56500, 84000, 55500 });
-		AddPointToLine({ 57500, 87500, 54000 });
-		AddPointToLine({ 56500, 91000, 51500 });
-		AddPointToLine({ 54500, 94500, 53000 });
+		AddPointToLine({ 57648, 30357, 51155 });
+		AddPointToLine({ 61186, 29857, 52674 });
+		AddPointToLine({ 64553, 30557, 55129 });
+		AddPointToLine({ 68050, 29157, 53628 });
+		AddPointToLine({ 72023, 30057, 56126 });
+		AddPointToLine({ 76000, 29100, 54500 });
 
-
-		// Вторая линия центральной верхушки
+		// Корень ПРАВЫЙ, жила 180°
 		NewLine();
-		AddPointToLine({ 54000, 70000, 52000 });
-		AddPointToLine({ 55000, 73500, 50000 });
-		AddPointToLine({ 56500, 77000, 51000 });
-		AddPointToLine({ 58500, 80500, 53500 });
-		AddPointToLine({ 60000, 84000, 56000 });
-		AddPointToLine({ 59500, 87500, 54500 });
-		AddPointToLine({ 58000, 91000, 52000 });
-		AddPointToLine({ 56000, 94500, 54000 });
+		AddPointToLine({ 57795, 30000, 50811 });
+		AddPointToLine({ 61372, 29500, 52349 });
+		AddPointToLine({ 64606, 30200, 54758 });
+		AddPointToLine({ 68099, 28800, 53257 });
+		AddPointToLine({ 72047, 29700, 55751 });
+		AddPointToLine({ 76000, 29100, 54500 });
 
-
-		// ============================================================
-		// ВЕРХНЯЯ ЛЕВАЯ ВЕТВЬ
-		// ============================================================
-
+		// Корень ПРАВЫЙ, жила 240°
 		NewLine();
-		AddPointToLine({ 51000, 76000, 57500 });
-		AddPointToLine({ 47500, 77500, 55500 });
-		AddPointToLine({ 44000, 79000, 53500 });
-		AddPointToLine({ 40500, 80500, 55000 });
-		AddPointToLine({ 37000, 79500, 53000 });
-		AddPointToLine({ 33500, 81500, 55000 });
-		AddPointToLine({ 30000, 80500, 53500 });
+		AddPointToLine({ 57648, 29643, 51155 });
+		AddPointToLine({ 61186, 29143, 52674 });
+		AddPointToLine({ 64553, 29843, 55129 });
+		AddPointToLine({ 68050, 28443, 53628 });
+		AddPointToLine({ 72023, 29343, 56126 });
+		AddPointToLine({ 76000, 29100, 54500 });
 
-
-		// Ветка от неё
+		// Корень ПРАВЫЙ, жила 300°
 		NewLine();
-		AddPointToLine({ 40500, 80500, 55000 });
-		AddPointToLine({ 38000, 83000, 57000 });
-		AddPointToLine({ 35000, 84500, 55500 });
-		AddPointToLine({ 32000, 86500, 57500 });
-		AddPointToLine({ 29000, 85500, 56000 });
+		AddPointToLine({ 57352, 29643, 51845 });
+		AddPointToLine({ 60814, 29143, 53326 });
+		AddPointToLine({ 64447, 29843, 55871 });
+		AddPointToLine({ 67950, 28443, 54372 });
+		AddPointToLine({ 71977, 29343, 56874 });
+		AddPointToLine({ 76000, 29100, 54500 });
 
 
-		// Ещё одна
+		// Корень НАЗАД, жила 0°
 		NewLine();
-		AddPointToLine({ 37000, 79500, 53000 });
-		AddPointToLine({ 34500, 77500, 51000 });
-		AddPointToLine({ 32000, 76500, 52500 });
-		AddPointToLine({ 29000, 77500, 50500 });
-		AddPointToLine({ 26000, 76500, 52000 });
+		AddPointToLine({ 54151, 30000, 48628 });
+		AddPointToLine({ 52151, 29400, 45128 });
+		AddPointToLine({ 50131, 30200, 41594 });
+		AddPointToLine({ 47610, 28900, 38064 });
+		AddPointToLine({ 45094, 29700, 34543 });
+		AddPointToLine({ 42000, 29200, 32000 });
 
-
-		// ============================================================
-		// ВЕРХНЯЯ ПРАВАЯ ВЕТВЬ
-		// ============================================================
-
+		// Корень НАЗАД, жила 60°
 		NewLine();
-		AddPointToLine({ 57000, 80000, 54500 });
-		AddPointToLine({ 60500, 81500, 56000 });
-		AddPointToLine({ 64000, 83000, 58000 });
-		AddPointToLine({ 67500, 82000, 56500 });
-		AddPointToLine({ 71000, 84000, 58500 });
-		AddPointToLine({ 74500, 83000, 56500 });
-		AddPointToLine({ 78000, 85000, 58500 });
-		AddPointToLine({ 81500, 84000, 57000 });
+		AddPointToLine({ 53826, 30357, 48814 });
+		AddPointToLine({ 51826, 29757, 45314 });
+		AddPointToLine({ 49815, 30557, 41797 });
+		AddPointToLine({ 47305, 29257, 38282 });
+		AddPointToLine({ 44797, 30057, 34771 });
+		AddPointToLine({ 42000, 29200, 32000 });
 
-
-		// Ветка от правой
+		// Корень НАЗАД, жила 120°
 		NewLine();
-		AddPointToLine({ 67500, 82000, 56500 });
-		AddPointToLine({ 70000, 79500, 59000 });
-		AddPointToLine({ 73000, 78000, 57500 });
-		AddPointToLine({ 76000, 79000, 60000 });
-		AddPointToLine({ 79000, 77500, 58000 });
-		AddPointToLine({ 82000, 78500, 59500 });
+		AddPointToLine({ 53174, 30357, 49186 });
+		AddPointToLine({ 51174, 29757, 45686 });
+		AddPointToLine({ 49185, 30557, 42203 });
+		AddPointToLine({ 46695, 29257, 38718 });
+		AddPointToLine({ 44203, 30057, 35229 });
+		AddPointToLine({ 42000, 29200, 32000 });
 
-
-		// Ещё одна правая
+		// Корень НАЗАД, жила 180°
 		NewLine();
-		AddPointToLine({ 74500, 83000, 56500 });
-		AddPointToLine({ 77000, 85500, 55000 });
-		AddPointToLine({ 80000, 87000, 57000 });
-		AddPointToLine({ 83000, 86500, 55000 });
-		AddPointToLine({ 86000, 88000, 56500 });
+		AddPointToLine({ 52849, 30000, 49372 });
+		AddPointToLine({ 50849, 29400, 45872 });
+		AddPointToLine({ 48869, 30200, 42406 });
+		AddPointToLine({ 46390, 28900, 38936 });
+		AddPointToLine({ 43906, 29700, 35457 });
+		AddPointToLine({ 42000, 29200, 32000 });
 
-
-		// ============================================================
-		// ВЕРХУШКА — РАЗВЕТВЛЕНИЕ
-		// ============================================================
-
-		// Влево
+		// Корень НАЗАД, жила 240°
 		NewLine();
-		AddPointToLine({ 56000, 91000, 51500 });
-		AddPointToLine({ 53000, 92500, 50000 });
-		AddPointToLine({ 50000, 94000, 51000 });
-		AddPointToLine({ 47000, 95500, 49500 });
-		AddPointToLine({ 44000, 95000, 51000 });
-		AddPointToLine({ 41000, 97000, 49500 });
+		AddPointToLine({ 53174, 29643, 49186 });
+		AddPointToLine({ 51174, 29043, 45686 });
+		AddPointToLine({ 49185, 29843, 42203 });
+		AddPointToLine({ 46695, 28543, 38718 });
+		AddPointToLine({ 44203, 29343, 35229 });
+		AddPointToLine({ 42000, 29200, 32000 });
 
-		// Вправо
+		// Корень НАЗАД, жила 300°
 		NewLine();
-		AddPointToLine({ 57500, 91000, 54000 });
-		AddPointToLine({ 60500, 92500, 55500 });
-		AddPointToLine({ 63500, 94000, 54000 });
-		AddPointToLine({ 66500, 93000, 56500 });
-		AddPointToLine({ 69500, 95000, 55000 });
-		AddPointToLine({ 72500, 94000, 57000 });
+		AddPointToLine({ 53826, 29643, 48814 });
+		AddPointToLine({ 51826, 29043, 45314 });
+		AddPointToLine({ 49815, 29843, 41797 });
+		AddPointToLine({ 47305, 28543, 38282 });
+		AddPointToLine({ 44797, 29343, 34771 });
+		AddPointToLine({ 42000, 29200, 32000 });
 
-
-		// ============================================================
-		// ТОНКИЕ ВЕТКИ НА ВЕРХУШКЕ
-		// ============================================================
-
+		// Корень ВПЕРЕД, жила 0°
 		NewLine();
-		AddPointToLine({ 47000, 95500, 49500 });
-		AddPointToLine({ 44500, 97500, 48000 });
-		AddPointToLine({ 42000, 99000, 49500 });
-		AddPointToLine({ 39500, 98500, 47500 });
+		AddPointToLine({ 56890, 30000, 54436 });
+		AddPointToLine({ 59390, 29400, 57936 });
+		AddPointToLine({ 61927, 30200, 61484 });
+		AddPointToLine({ 64949, 28900, 64509 });
+		AddPointToLine({ 67970, 29700, 68030 });
+		AddPointToLine({ 71500, 29200, 70000 });
 
+		// Корень ВПЕРЕД, жила 60°
 		NewLine();
-		AddPointToLine({ 50000, 94000, 51000 });
-		AddPointToLine({ 48500, 96500, 53000 });
-		AddPointToLine({ 46500, 98000, 51500 });
-		AddPointToLine({ 44500, 99500, 53000 });
+		AddPointToLine({ 57195, 30357, 54218 });
+		AddPointToLine({ 59695, 29757, 57718 });
+		AddPointToLine({ 62214, 30557, 61242 });
+		AddPointToLine({ 65224, 29257, 64254 });
+		AddPointToLine({ 68235, 30057, 67765 });
+		AddPointToLine({ 71500, 29200, 70000 });
 
+		// Корень ВПЕРЕД, жила 120°
 		NewLine();
-		AddPointToLine({ 66500, 93000, 56500 });
-		AddPointToLine({ 69000, 95500, 58500 });
-		AddPointToLine({ 71500, 97000, 57000 });
-		AddPointToLine({ 74000, 96500, 59000 });
+		AddPointToLine({ 57805, 30357, 53782 });
+		AddPointToLine({ 60305, 29757, 57282 });
+		AddPointToLine({ 62786, 30557, 60758 });
+		AddPointToLine({ 65776, 29257, 63746 });
+		AddPointToLine({ 68765, 30057, 67235 });
+		AddPointToLine({ 71500, 29200, 70000 });
 
+		// Корень ВПЕРЕД, жила 180°
 		NewLine();
-		AddPointToLine({ 60500, 92500, 55500 });
-		AddPointToLine({ 62000, 95000, 53000 });
-		AddPointToLine({ 64500, 97000, 54500 });
-		AddPointToLine({ 67000, 98500, 52500 });
+		AddPointToLine({ 58110, 30000, 53564 });
+		AddPointToLine({ 60610, 29400, 57064 });
+		AddPointToLine({ 63073, 30200, 60516 });
+		AddPointToLine({ 66051, 28900, 63491 });
+		AddPointToLine({ 69030, 29700, 66970 });
+		AddPointToLine({ 71500, 29200, 70000 });
 
-
-		// ============================================================
-		// ОЧЕНЬ ТОНКИЕ КОНЦЫ
-		// ============================================================
-
+		// Корень ВПЕРЕД, жила 240°
 		NewLine();
-		AddPointToLine({ 41000, 97000, 49500 });
-		AddPointToLine({ 38500, 98500, 51000 });
-		AddPointToLine({ 36000, 98000, 49500 });
+		AddPointToLine({ 57805, 29643, 53782 });
+		AddPointToLine({ 60305, 29043, 57282 });
+		AddPointToLine({ 62786, 29843, 60758 });
+		AddPointToLine({ 65776, 28543, 63746 });
+		AddPointToLine({ 68765, 29343, 67235 });
+		AddPointToLine({ 71500, 29200, 70000 });
 
+		// Корень ВПЕРЕД, жила 300°
 		NewLine();
-		AddPointToLine({ 44500, 99500, 53000 });
-		AddPointToLine({ 42000, 101000, 54500 });
-		AddPointToLine({ 39500, 100000, 53000 });
-
-		NewLine();
-		AddPointToLine({ 74000, 96500, 59000 });
-		AddPointToLine({ 76500, 98500, 57500 });
-		AddPointToLine({ 79000, 98000, 59000 });
-
-		NewLine();
-		AddPointToLine({ 67000, 98500, 52500 });
-		AddPointToLine({ 69500, 100500, 54000 });
-		AddPointToLine({ 72000, 100000, 52500 });
-
-
-
+		AddPointToLine({ 57195, 29643, 54218 });
+		AddPointToLine({ 59695, 29043, 57718 });
+		AddPointToLine({ 62214, 29843, 61242 });
+		AddPointToLine({ 65224, 28543, 64254 });
+		AddPointToLine({ 68235, 29343, 67765 });
+		AddPointToLine({ 71500, 29200, 70000 });
 
 
 		// ============================================================
-		// ЕЩЁ НЕСКОЛЬКО КОРОТКИХ ЖИЛ — КОРНИ
+// НОВЫЕ ВЕТВИ ДЕРЕВА — ВО ВСЕ СТОРОНЫ
+// Каждая ветвь = труба из 6 жил
+// Радиус трубы около 750
+// Ветви выходят непосредственно с поверхности ствола
+// ============================================================
+
+// ============================================================
+// ВЕТВЬ 01 — ПРАВАЯ, С ПОДЪЕМОМ ВВЕРХ
+// ============================================================
+
+		NewLine();
+		AddPointToLine({ 65797, 61000, 54494 });
+		AddPointToLine({ 68000, 62500, 55200 });
+		AddPointToLine({ 70500, 64500, 56000 });
+		AddPointToLine({ 73500, 66000, 54800 });
+		AddPointToLine({ 76500, 68500, 56500 });
+		AddPointToLine({ 80000, 70000, 55000 });
+
+		NewLine();
+		AddPointToLine({ 65900, 61650, 55100 });
+		AddPointToLine({ 68100, 63150, 55800 });
+		AddPointToLine({ 70600, 65150, 56600 });
+		AddPointToLine({ 73600, 66650, 55400 });
+		AddPointToLine({ 76600, 69150, 57100 });
+		AddPointToLine({ 80100, 70650, 55600 });
+
+		NewLine();
+		AddPointToLine({ 65900, 61650, 53850 });
+		AddPointToLine({ 68100, 63150, 54450 });
+		AddPointToLine({ 70600, 65150, 55150 });
+		AddPointToLine({ 73600, 66650, 53350 });
+		AddPointToLine({ 76600, 69150, 55050 });
+		AddPointToLine({ 80100, 70650, 53550 });
+
+		NewLine();
+		AddPointToLine({ 65797, 61000, 53744 });
+		AddPointToLine({ 68000, 62500, 54450 });
+		AddPointToLine({ 70500, 64500, 55250 });
+		AddPointToLine({ 73500, 66000, 54050 });
+		AddPointToLine({ 76500, 68500, 55750 });
+		AddPointToLine({ 80000, 70000, 54250 });
+
+		NewLine();
+		AddPointToLine({ 65694, 60350, 53850 });
+		AddPointToLine({ 67900, 61850, 54550 });
+		AddPointToLine({ 70400, 63850, 55350 });
+		AddPointToLine({ 73400, 65350, 54150 });
+		AddPointToLine({ 76400, 67850, 55850 });
+		AddPointToLine({ 79900, 69350, 54350 });
+
+		NewLine();
+		AddPointToLine({ 65694, 60350, 55100 });
+		AddPointToLine({ 67900, 61850, 55800 });
+		AddPointToLine({ 70400, 63850, 56600 });
+		AddPointToLine({ 73400, 65350, 55400 });
+		AddPointToLine({ 76400, 67850, 57100 });
+		AddPointToLine({ 79900, 69350, 55600 });
+
+
+		// ============================================================
+		// ВЕТВЬ 02 — ЛЕВАЯ, С ПОДЪЕМОМ
 		// ============================================================
 
 		NewLine();
-		AddPointToLine({ 49000, 30500, 47500 });
-		AddPointToLine({ 45500, 29500, 45000 });
-		AddPointToLine({ 42000, 30500, 42000 });
-		AddPointToLine({ 39000, 29500, 40000 });
-		AddPointToLine({ 36000, 30500, 39000 });
+		AddPointToLine({ 56871, 68000, 54399 });
+		AddPointToLine({ 54500, 69500, 53500 });
+		AddPointToLine({ 52000, 71500, 52800 });
+		AddPointToLine({ 49000, 73500, 54000 });
+		AddPointToLine({ 45500, 75000, 52000 });
+		AddPointToLine({ 42000, 77500, 53500 });
 
 		NewLine();
-		AddPointToLine({ 58500, 30500, 48000 });
-		AddPointToLine({ 62000, 29500, 49000 });
-		AddPointToLine({ 65500, 30500, 51500 });
-		AddPointToLine({ 69000, 29500, 50000 });
-		AddPointToLine({ 72500, 30500, 52000 });
+		AddPointToLine({ 56974, 68650, 55100 });
+		AddPointToLine({ 54600, 70150, 54200 });
+		AddPointToLine({ 52100, 72150, 53500 });
+		AddPointToLine({ 49100, 74150, 54700 });
+		AddPointToLine({ 45600, 75650, 52700 });
+		AddPointToLine({ 42100, 78150, 54200 });
 
 		NewLine();
-		AddPointToLine({ 51000, 30500, 52500 });
-		AddPointToLine({ 48000, 29500, 55000 });
-		AddPointToLine({ 45000, 30500, 57500 });
-		AddPointToLine({ 42000, 29500, 59000 });
+		AddPointToLine({ 56974, 68650, 53700 });
+		AddPointToLine({ 54600, 70150, 52800 });
+		AddPointToLine({ 52100, 72150, 52100 });
+		AddPointToLine({ 49100, 74150, 53300 });
+		AddPointToLine({ 45600, 75650, 51300 });
+		AddPointToLine({ 42100, 78150, 52800 });
 
 		NewLine();
-		AddPointToLine({ 57000, 30500, 53000 });
-		AddPointToLine({ 60000, 29500, 55500 });
-		AddPointToLine({ 63000, 30500, 58000 });
-		AddPointToLine({ 66000, 29500, 60000 });
+		AddPointToLine({ 56871, 68000, 53649 });
+		AddPointToLine({ 54500, 69500, 52750 });
+		AddPointToLine({ 52000, 71500, 52050 });
+		AddPointToLine({ 49000, 73500, 53250 });
+		AddPointToLine({ 45500, 75000, 51250 });
+		AddPointToLine({ 42000, 77500, 52750 });
+
+		NewLine();
+		AddPointToLine({ 56768, 67350, 53700 });
+		AddPointToLine({ 54400, 68850, 52800 });
+		AddPointToLine({ 51900, 70850, 52100 });
+		AddPointToLine({ 48900, 72850, 53300 });
+		AddPointToLine({ 45400, 74350, 51300 });
+		AddPointToLine({ 41900, 76850, 52800 });
+
+		NewLine();
+		AddPointToLine({ 56768, 67350, 55100 });
+		AddPointToLine({ 54400, 68850, 54200 });
+		AddPointToLine({ 51900, 70850, 53500 });
+		AddPointToLine({ 48900, 72850, 54700 });
+		AddPointToLine({ 45400, 74350, 52700 });
+		AddPointToLine({ 41900, 76850, 54200 });
+
+
+		// ============================================================
+		// ВЕТВЬ 03 — ПРЯМО ВПЕРЕД ПО Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 61171, 68000, 58699 });
+		AddPointToLine({ 61500, 69500, 61500 });
+		AddPointToLine({ 61000, 71500, 64500 });
+		AddPointToLine({ 62000, 73500, 67500 });
+		AddPointToLine({ 60500, 75500, 70500 });
+		AddPointToLine({ 61500, 78000, 73500 });
+
+		NewLine();
+		AddPointToLine({ 61800, 68000, 58900 });
+		AddPointToLine({ 62200, 69500, 61700 });
+		AddPointToLine({ 61700, 71500, 64700 });
+		AddPointToLine({ 62700, 73500, 67700 });
+		AddPointToLine({ 61200, 75500, 70700 });
+		AddPointToLine({ 62200, 78000, 73700 });
+
+		NewLine();
+		AddPointToLine({ 60500, 68000, 58900 });
+		AddPointToLine({ 60800, 69500, 61700 });
+		AddPointToLine({ 60300, 71500, 64700 });
+		AddPointToLine({ 61300, 73500, 67700 });
+		AddPointToLine({ 59800, 75500, 70700 });
+		AddPointToLine({ 60800, 78000, 73700 });
+
+		NewLine();
+		AddPointToLine({ 61171, 68000, 57949 });
+		AddPointToLine({ 61500, 69500, 60750 });
+		AddPointToLine({ 61000, 71500, 63750 });
+		AddPointToLine({ 62000, 73500, 66750 });
+		AddPointToLine({ 60500, 75500, 69750 });
+		AddPointToLine({ 61500, 78000, 72750 });
+
+		NewLine();
+		AddPointToLine({ 61842, 68000, 57900 });
+		AddPointToLine({ 62200, 69500, 60700 });
+		AddPointToLine({ 61700, 71500, 63700 });
+		AddPointToLine({ 62700, 73500, 66700 });
+		AddPointToLine({ 61200, 75500, 69700 });
+		AddPointToLine({ 62200, 78000, 72700 });
+
+		NewLine();
+		AddPointToLine({ 60500, 68000, 57900 });
+		AddPointToLine({ 60800, 69500, 60700 });
+		AddPointToLine({ 60300, 71500, 63700 });
+		AddPointToLine({ 61300, 73500, 66700 });
+		AddPointToLine({ 59800, 75500, 69700 });
+		AddPointToLine({ 60800, 78000, 72700 });
+
+
+		// ============================================================
+		// ВЕТВЬ 04 — НАЗАД ПО Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 61497, 61000, 50194 });
+		AddPointToLine({ 62000, 62500, 47500 });
+		AddPointToLine({ 61500, 64500, 44500 });
+		AddPointToLine({ 62500, 66500, 42000 });
+		AddPointToLine({ 61000, 68500, 39000 });
+		AddPointToLine({ 62000, 71000, 36000 });
+
+		NewLine();
+		AddPointToLine({ 62247, 61000, 50294 });
+		AddPointToLine({ 62750, 62500, 47600 });
+		AddPointToLine({ 62250, 64500, 44600 });
+		AddPointToLine({ 63250, 66500, 42100 });
+		AddPointToLine({ 61750, 68500, 39100 });
+		AddPointToLine({ 62750, 71000, 36100 });
+
+		NewLine();
+		AddPointToLine({ 60747, 61000, 50294 });
+		AddPointToLine({ 61250, 62500, 47600 });
+		AddPointToLine({ 60750, 64500, 44600 });
+		AddPointToLine({ 61750, 66500, 42100 });
+		AddPointToLine({ 60250, 68500, 39100 });
+		AddPointToLine({ 61250, 71000, 36100 });
+
+		NewLine();
+		AddPointToLine({ 61497, 61000, 49444 });
+		AddPointToLine({ 62000, 62500, 46750 });
+		AddPointToLine({ 61500, 64500, 43750 });
+		AddPointToLine({ 62500, 66500, 41250 });
+		AddPointToLine({ 61000, 68500, 38250 });
+		AddPointToLine({ 62000, 71000, 35250 });
+
+		NewLine();
+		AddPointToLine({ 60747, 61000, 49444 });
+		AddPointToLine({ 61250, 62500, 46750 });
+		AddPointToLine({ 60750, 64500, 43750 });
+		AddPointToLine({ 61750, 66500, 41250 });
+		AddPointToLine({ 60250, 68500, 38250 });
+		AddPointToLine({ 61250, 71000, 35250 });
+
+		NewLine();
+		AddPointToLine({ 62247, 61000, 49444 });
+		AddPointToLine({ 62750, 62500, 46750 });
+		AddPointToLine({ 62250, 64500, 43750 });
+		AddPointToLine({ 63250, 66500, 41250 });
+		AddPointToLine({ 61750, 68500, 38250 });
+		AddPointToLine({ 62750, 71000, 35250 });
+
+
+		// ============================================================
+		// ВЕТВЬ 05 — ДИАГОНАЛЬ ВПРАВО + Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 64791, 74500, 56803 });
+		AddPointToLine({ 67000, 75500, 59000 });
+		AddPointToLine({ 69500, 77500, 61500 });
+		AddPointToLine({ 72500, 79000, 64000 });
+		AddPointToLine({ 75500, 81000, 66000 });
+		AddPointToLine({ 79000, 82500, 68500 });
+
+		NewLine();
+		AddPointToLine({ 65400, 75000, 57000 });
+		AddPointToLine({ 67600, 76000, 59700 });
+		AddPointToLine({ 70100, 78000, 62200 });
+		AddPointToLine({ 73100, 79500, 64700 });
+		AddPointToLine({ 76100, 81500, 66700 });
+		AddPointToLine({ 79600, 83000, 69200 });
+
+		NewLine();
+		AddPointToLine({ 64182, 75000, 57000 });
+		AddPointToLine({ 66400, 76000, 58300 });
+		AddPointToLine({ 68900, 78000, 60800 });
+		AddPointToLine({ 71900, 79500, 63300 });
+		AddPointToLine({ 74900, 81500, 65300 });
+		AddPointToLine({ 78400, 83000, 67800 });
+
+		NewLine();
+		AddPointToLine({ 64791, 74500, 56053 });
+		AddPointToLine({ 67000, 75500, 58250 });
+		AddPointToLine({ 69500, 77500, 60750 });
+		AddPointToLine({ 72500, 79000, 63250 });
+		AddPointToLine({ 75500, 81000, 65250 });
+		AddPointToLine({ 79000, 82500, 67750 });
+
+		NewLine();
+		AddPointToLine({ 64182, 74000, 56100 });
+		AddPointToLine({ 66400, 75000, 58400 });
+		AddPointToLine({ 68900, 77000, 60900 });
+		AddPointToLine({ 71900, 78500, 63400 });
+		AddPointToLine({ 74900, 80500, 65400 });
+		AddPointToLine({ 78400, 82000, 67900 });
+
+		NewLine();
+		AddPointToLine({ 65400, 74000, 56100 });
+		AddPointToLine({ 67600, 75000, 58400 });
+		AddPointToLine({ 70100, 77000, 60900 });
+		AddPointToLine({ 73100, 78500, 63400 });
+		AddPointToLine({ 76100, 80500, 65400 });
+		AddPointToLine({ 79600, 82000, 67900 });
+
+
+		// ============================================================
+		// ВЕТВЬ 06 — ДИАГОНАЛЬ ВЛЕВО + Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 57877, 74500, 56803 });
+		AddPointToLine({ 55500, 76000, 59000 });
+		AddPointToLine({ 53000, 78000, 61500 });
+		AddPointToLine({ 50000, 79500, 64000 });
+		AddPointToLine({ 47000, 81500, 66000 });
+		AddPointToLine({ 43500, 83000, 68500 });
+
+		NewLine();
+		AddPointToLine({ 58480, 75000, 57000 });
+		AddPointToLine({ 56100, 76500, 59700 });
+		AddPointToLine({ 53600, 78500, 62200 });
+		AddPointToLine({ 50600, 80000, 64700 });
+		AddPointToLine({ 47600, 82000, 66700 });
+		AddPointToLine({ 44100, 83500, 69200 });
+
+		NewLine();
+		AddPointToLine({ 57274, 75000, 57000 });
+		AddPointToLine({ 54900, 76500, 58300 });
+		AddPointToLine({ 52400, 78500, 60800 });
+		AddPointToLine({ 49400, 80000, 63300 });
+		AddPointToLine({ 46400, 82000, 65300 });
+		AddPointToLine({ 42900, 83500, 67800 });
+
+		NewLine();
+		AddPointToLine({ 57877, 74500, 56053 });
+		AddPointToLine({ 55500, 76000, 58250 });
+		AddPointToLine({ 53000, 78000, 60750 });
+		AddPointToLine({ 50000, 79500, 63250 });
+		AddPointToLine({ 47000, 81500, 65250 });
+		AddPointToLine({ 43500, 83000, 67750 });
+
+		NewLine();
+		AddPointToLine({ 57274, 74000, 56100 });
+		AddPointToLine({ 54900, 75500, 58400 });
+		AddPointToLine({ 52400, 77500, 60900 });
+		AddPointToLine({ 49400, 79000, 63400 });
+		AddPointToLine({ 46400, 81000, 65400 });
+		AddPointToLine({ 42900, 82500, 67900 });
+
+		NewLine();
+		AddPointToLine({ 58480, 74000, 56100 });
+		AddPointToLine({ 56100, 75500, 58400 });
+		AddPointToLine({ 53600, 77500, 60900 });
+		AddPointToLine({ 50600, 79000, 63400 });
+		AddPointToLine({ 47600, 81000, 65400 });
+		AddPointToLine({ 44100, 82500, 67900 });
+
+
+		// ============================================================
+		// ВЕТВЬ 07 — ДИАГОНАЛЬ ВПРАВО -Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 61856, 81500, 56145 });
+		AddPointToLine({ 64500, 82500, 54000 });
+		AddPointToLine({ 67500, 84500, 51500 });
+		AddPointToLine({ 70500, 86000, 49000 });
+		AddPointToLine({ 73500, 88000, 47000 });
+		AddPointToLine({ 77000, 89500, 44500 });
+
+		NewLine();
+		AddPointToLine({ 62459, 82000, 56800 });
+		AddPointToLine({ 65100, 83000, 54700 });
+		AddPointToLine({ 68100, 85000, 52200 });
+		AddPointToLine({ 71100, 86500, 49700 });
+		AddPointToLine({ 74100, 88500, 47700 });
+		AddPointToLine({ 77600, 90000, 45200 });
+
+		NewLine();
+		AddPointToLine({ 61253, 82000, 56800 });
+		AddPointToLine({ 63900, 83000, 53300 });
+		AddPointToLine({ 66900, 85000, 50800 });
+		AddPointToLine({ 69900, 86500, 48300 });
+		AddPointToLine({ 72900, 88500, 46300 });
+		AddPointToLine({ 76400, 90000, 43800 });
+
+		NewLine();
+		AddPointToLine({ 61856, 81500, 55295 });
+		AddPointToLine({ 64500, 82500, 53250 });
+		AddPointToLine({ 67500, 84500, 50750 });
+		AddPointToLine({ 70500, 86000, 48250 });
+		AddPointToLine({ 73500, 88000, 46250 });
+		AddPointToLine({ 77000, 89500, 43750 });
+
+		NewLine();
+		AddPointToLine({ 61253, 81000, 55300 });
+		AddPointToLine({ 63900, 82000, 53300 });
+		AddPointToLine({ 66900, 84000, 50800 });
+		AddPointToLine({ 69900, 85500, 48300 });
+		AddPointToLine({ 72900, 87500, 46300 });
+		AddPointToLine({ 76400, 89000, 43800 });
+
+		NewLine();
+		AddPointToLine({ 62459, 81000, 55300 });
+		AddPointToLine({ 65100, 82000, 53300 });
+		AddPointToLine({ 68100, 84000, 50800 });
+		AddPointToLine({ 71100, 85500, 48300 });
+		AddPointToLine({ 74100, 87500, 46300 });
+		AddPointToLine({ 77600, 89000, 43800 });
+
+
+		// ============================================================
+		// ВЕТВЬ 08 — ДИАГОНАЛЬ ВЛЕВО -Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 55268, 81500, 50617 });
+		AddPointToLine({ 53000, 82500, 48500 });
+		AddPointToLine({ 50500, 84500, 46000 });
+		AddPointToLine({ 47500, 86000, 43500 });
+		AddPointToLine({ 44500, 88000, 41500 });
+		AddPointToLine({ 41000, 89500, 39000 });
+
+		NewLine();
+		AddPointToLine({ 55871, 82000, 51270 });
+		AddPointToLine({ 53600, 83000, 49150 });
+		AddPointToLine({ 51100, 85000, 46650 });
+		AddPointToLine({ 48100, 86500, 44150 });
+		AddPointToLine({ 45100, 88500, 42150 });
+		AddPointToLine({ 41600, 90000, 39650 });
+
+		NewLine();
+		AddPointToLine({ 54665, 82000, 51270 });
+		AddPointToLine({ 52400, 83000, 47850 });
+		AddPointToLine({ 49900, 85000, 45350 });
+		AddPointToLine({ 46900, 86500, 42850 });
+		AddPointToLine({ 43900, 88500, 40850 });
+		AddPointToLine({ 40400, 90000, 38350 });
+
+		NewLine();
+		AddPointToLine({ 55268, 81500, 49867 });
+		AddPointToLine({ 53000, 82500, 47750 });
+		AddPointToLine({ 50500, 84500, 45250 });
+		AddPointToLine({ 47500, 86000, 42750 });
+		AddPointToLine({ 44500, 88000, 40750 });
+		AddPointToLine({ 41000, 89500, 38250 });
+
+		NewLine();
+		AddPointToLine({ 54665, 81000, 49900 });
+		AddPointToLine({ 52400, 82000, 47800 });
+		AddPointToLine({ 49900, 84000, 45300 });
+		AddPointToLine({ 46900, 85500, 42800 });
+		AddPointToLine({ 43900, 87500, 40800 });
+		AddPointToLine({ 40400, 89000, 38300 });
+
+		NewLine();
+		AddPointToLine({ 55871, 81000, 49900 });
+		AddPointToLine({ 53600, 82000, 47800 });
+		AddPointToLine({ 51100, 84000, 45300 });
+		AddPointToLine({ 48100, 85500, 42800 });
+		AddPointToLine({ 45100, 87500, 40800 });
+		AddPointToLine({ 41600, 89000, 38300 });
+
+
+		// ============================================================
+		// ВЕТВЬ 09 — ВВЕРХ И ВПРАВО
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 64503, 74500, 54039 });
+		AddPointToLine({ 66500, 76500, 55500 });
+		AddPointToLine({ 69000, 79000, 56500 });
+		AddPointToLine({ 71500, 81500, 55000 });
+		AddPointToLine({ 74000, 84500, 57000 });
+		AddPointToLine({ 76500, 87500, 55500 });
+		AddPointToLine({ 78500, 90500, 57500 });
+
+		NewLine();
+		AddPointToLine({ 65050, 75000, 54700 });
+		AddPointToLine({ 67050, 77000, 56200 });
+		AddPointToLine({ 69550, 79500, 57200 });
+		AddPointToLine({ 72050, 82000, 55700 });
+		AddPointToLine({ 74550, 85000, 57700 });
+		AddPointToLine({ 77050, 88000, 56200 });
+		AddPointToLine({ 79050, 91000, 58200 });
+
+		NewLine();
+		AddPointToLine({ 63956, 75000, 54700 });
+		AddPointToLine({ 65950, 77000, 54800 });
+		AddPointToLine({ 68450, 79500, 55800 });
+		AddPointToLine({ 70950, 82000, 54300 });
+		AddPointToLine({ 73450, 85000, 56300 });
+		AddPointToLine({ 75950, 88000, 54800 });
+		AddPointToLine({ 77950, 91000, 56800 });
+
+		NewLine();
+		AddPointToLine({ 64503, 74500, 53289 });
+		AddPointToLine({ 66500, 76500, 54750 });
+		AddPointToLine({ 69000, 79000, 55750 });
+		AddPointToLine({ 71500, 81500, 54250 });
+		AddPointToLine({ 74000, 84500, 56250 });
+		AddPointToLine({ 76500, 87500, 54750 });
+		AddPointToLine({ 78500, 90500, 56750 });
+
+		NewLine();
+		AddPointToLine({ 63956, 74000, 53300 });
+		AddPointToLine({ 65950, 76000, 54800 });
+		AddPointToLine({ 68450, 78500, 55800 });
+		AddPointToLine({ 70950, 81000, 54300 });
+		AddPointToLine({ 73450, 84000, 56300 });
+		AddPointToLine({ 75950, 87000, 54800 });
+		AddPointToLine({ 77950, 90000, 56800 });
+
+		NewLine();
+		AddPointToLine({ 65050, 74000, 53300 });
+		AddPointToLine({ 67050, 76000, 54800 });
+		AddPointToLine({ 69550, 78500, 55800 });
+		AddPointToLine({ 72050, 81000, 54300 });
+		AddPointToLine({ 74550, 84000, 56300 });
+		AddPointToLine({ 77050, 87000, 54800 });
+		AddPointToLine({ 79050, 90000, 56800 });
+
+
+		// ============================================================
+		// ВЕТВЬ 10 — ВВЕРХ И ВЛЕВО
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 55903, 74500, 54039 });
+		AddPointToLine({ 54000, 76500, 52500 });
+		AddPointToLine({ 51500, 79000, 53500 });
+		AddPointToLine({ 49000, 81500, 52000 });
+		AddPointToLine({ 46500, 84500, 54000 });
+		AddPointToLine({ 44000, 87500, 52500 });
+		AddPointToLine({ 41500, 90500, 54500 });
+
+		NewLine();
+		AddPointToLine({ 56450, 75000, 54700 });
+		AddPointToLine({ 54550, 77000, 53200 });
+		AddPointToLine({ 52050, 79500, 54200 });
+		AddPointToLine({ 49550, 82000, 52700 });
+		AddPointToLine({ 47050, 85000, 54700 });
+		AddPointToLine({ 44550, 88000, 53200 });
+		AddPointToLine({ 42050, 91000, 55200 });
+
+		NewLine();
+		AddPointToLine({ 55356, 75000, 54700 });
+		AddPointToLine({ 53450, 77000, 51800 });
+		AddPointToLine({ 50950, 79500, 52800 });
+		AddPointToLine({ 48450, 82000, 51300 });
+		AddPointToLine({ 45950, 85000, 53300 });
+		AddPointToLine({ 43450, 88000, 51800 });
+		AddPointToLine({ 40950, 91000, 53800 });
+
+		NewLine();
+		AddPointToLine({ 55903, 74500, 53289 });
+		AddPointToLine({ 54000, 76500, 51750 });
+		AddPointToLine({ 51500, 79000, 52750 });
+		AddPointToLine({ 49000, 81500, 51250 });
+		AddPointToLine({ 46500, 84500, 53250 });
+		AddPointToLine({ 44000, 87500, 51750 });
+		AddPointToLine({ 41500, 90500, 53750 });
+
+		NewLine();
+		AddPointToLine({ 55356, 74000, 53300 });
+		AddPointToLine({ 53450, 76000, 51800 });
+		AddPointToLine({ 50950, 78500, 52800 });
+		AddPointToLine({ 48450, 81000, 51300 });
+		AddPointToLine({ 45950, 84000, 53300 });
+		AddPointToLine({ 43450, 87000, 51800 });
+		AddPointToLine({ 40950, 90000, 53800 });
+
+		NewLine();
+		AddPointToLine({ 56450, 74000, 53300 });
+		AddPointToLine({ 54550, 76000, 51800 });
+		AddPointToLine({ 52050, 78500, 52800 });
+		AddPointToLine({ 49550, 81000, 51300 });
+		AddPointToLine({ 47050, 84000, 53300 });
+		AddPointToLine({ 44550, 87000, 51800 });
+		AddPointToLine({ 42050, 90000, 53800 });
+
+		// ============================================================
+// НОВЫЕ ВЕТВИ ДЕРЕВА — ВО ВСЕ СТОРОНЫ
+// Каждая ветвь = труба из 6 жил
+// Радиус трубы около 750
+// Ветви выходят непосредственно с поверхности ствола
+// ============================================================
+
+// ============================================================
+// ВЕТВЬ 01 — ПРАВАЯ, С ПОДЪЕМОМ ВВЕРХ
+// ============================================================
+
+		NewLine();
+		AddPointToLine({ 65797, 61000, 54494 });
+		AddPointToLine({ 68000, 62500, 55200 });
+		AddPointToLine({ 70500, 64500, 56000 });
+		AddPointToLine({ 73500, 66000, 54800 });
+		AddPointToLine({ 76500, 68500, 56500 });
+		AddPointToLine({ 80000, 70000, 55000 });
+
+		NewLine();
+		AddPointToLine({ 65900, 61650, 55100 });
+		AddPointToLine({ 68100, 63150, 55800 });
+		AddPointToLine({ 70600, 65150, 56600 });
+		AddPointToLine({ 73600, 66650, 55400 });
+		AddPointToLine({ 76600, 69150, 57100 });
+		AddPointToLine({ 80100, 70650, 55600 });
+
+		NewLine();
+		AddPointToLine({ 65900, 61650, 53850 });
+		AddPointToLine({ 68100, 63150, 54450 });
+		AddPointToLine({ 70600, 65150, 55150 });
+		AddPointToLine({ 73600, 66650, 53350 });
+		AddPointToLine({ 76600, 69150, 55050 });
+		AddPointToLine({ 80100, 70650, 53550 });
+
+		NewLine();
+		AddPointToLine({ 65797, 61000, 53744 });
+		AddPointToLine({ 68000, 62500, 54450 });
+		AddPointToLine({ 70500, 64500, 55250 });
+		AddPointToLine({ 73500, 66000, 54050 });
+		AddPointToLine({ 76500, 68500, 55750 });
+		AddPointToLine({ 80000, 70000, 54250 });
+
+		NewLine();
+		AddPointToLine({ 65694, 60350, 53850 });
+		AddPointToLine({ 67900, 61850, 54550 });
+		AddPointToLine({ 70400, 63850, 55350 });
+		AddPointToLine({ 73400, 65350, 54150 });
+		AddPointToLine({ 76400, 67850, 55850 });
+		AddPointToLine({ 79900, 69350, 54350 });
+
+		NewLine();
+		AddPointToLine({ 65694, 60350, 55100 });
+		AddPointToLine({ 67900, 61850, 55800 });
+		AddPointToLine({ 70400, 63850, 56600 });
+		AddPointToLine({ 73400, 65350, 55400 });
+		AddPointToLine({ 76400, 67850, 57100 });
+		AddPointToLine({ 79900, 69350, 55600 });
+
+
+		// ============================================================
+		// ВЕТВЬ 02 — ЛЕВАЯ, С ПОДЪЕМОМ
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 56871, 68000, 54399 });
+		AddPointToLine({ 54500, 69500, 53500 });
+		AddPointToLine({ 52000, 71500, 52800 });
+		AddPointToLine({ 49000, 73500, 54000 });
+		AddPointToLine({ 45500, 75000, 52000 });
+		AddPointToLine({ 42000, 77500, 53500 });
+
+		NewLine();
+		AddPointToLine({ 56974, 68650, 55100 });
+		AddPointToLine({ 54600, 70150, 54200 });
+		AddPointToLine({ 52100, 72150, 53500 });
+		AddPointToLine({ 49100, 74150, 54700 });
+		AddPointToLine({ 45600, 75650, 52700 });
+		AddPointToLine({ 42100, 78150, 54200 });
+
+		NewLine();
+		AddPointToLine({ 56974, 68650, 53700 });
+		AddPointToLine({ 54600, 70150, 52800 });
+		AddPointToLine({ 52100, 72150, 52100 });
+		AddPointToLine({ 49100, 74150, 53300 });
+		AddPointToLine({ 45600, 75650, 51300 });
+		AddPointToLine({ 42100, 78150, 52800 });
+
+		NewLine();
+		AddPointToLine({ 56871, 68000, 53649 });
+		AddPointToLine({ 54500, 69500, 52750 });
+		AddPointToLine({ 52000, 71500, 52050 });
+		AddPointToLine({ 49000, 73500, 53250 });
+		AddPointToLine({ 45500, 75000, 51250 });
+		AddPointToLine({ 42000, 77500, 52750 });
+
+		NewLine();
+		AddPointToLine({ 56768, 67350, 53700 });
+		AddPointToLine({ 54400, 68850, 52800 });
+		AddPointToLine({ 51900, 70850, 52100 });
+		AddPointToLine({ 48900, 72850, 53300 });
+		AddPointToLine({ 45400, 74350, 51300 });
+		AddPointToLine({ 41900, 76850, 52800 });
+
+		NewLine();
+		AddPointToLine({ 56768, 67350, 55100 });
+		AddPointToLine({ 54400, 68850, 54200 });
+		AddPointToLine({ 51900, 70850, 53500 });
+		AddPointToLine({ 48900, 72850, 54700 });
+		AddPointToLine({ 45400, 74350, 52700 });
+		AddPointToLine({ 41900, 76850, 54200 });
+
+
+		// ============================================================
+		// ВЕТВЬ 03 — ПРЯМО ВПЕРЕД ПО Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 61171, 68000, 58699 });
+		AddPointToLine({ 61500, 69500, 61500 });
+		AddPointToLine({ 61000, 71500, 64500 });
+		AddPointToLine({ 62000, 73500, 67500 });
+		AddPointToLine({ 60500, 75500, 70500 });
+		AddPointToLine({ 61500, 78000, 73500 });
+
+		NewLine();
+		AddPointToLine({ 61800, 68000, 58900 });
+		AddPointToLine({ 62200, 69500, 61700 });
+		AddPointToLine({ 61700, 71500, 64700 });
+		AddPointToLine({ 62700, 73500, 67700 });
+		AddPointToLine({ 61200, 75500, 70700 });
+		AddPointToLine({ 62200, 78000, 73700 });
+
+		NewLine();
+		AddPointToLine({ 60500, 68000, 58900 });
+		AddPointToLine({ 60800, 69500, 61700 });
+		AddPointToLine({ 60300, 71500, 64700 });
+		AddPointToLine({ 61300, 73500, 67700 });
+		AddPointToLine({ 59800, 75500, 70700 });
+		AddPointToLine({ 60800, 78000, 73700 });
+
+		NewLine();
+		AddPointToLine({ 61171, 68000, 57949 });
+		AddPointToLine({ 61500, 69500, 60750 });
+		AddPointToLine({ 61000, 71500, 63750 });
+		AddPointToLine({ 62000, 73500, 66750 });
+		AddPointToLine({ 60500, 75500, 69750 });
+		AddPointToLine({ 61500, 78000, 72750 });
+
+		NewLine();
+		AddPointToLine({ 61842, 68000, 57900 });
+		AddPointToLine({ 62200, 69500, 60700 });
+		AddPointToLine({ 61700, 71500, 63700 });
+		AddPointToLine({ 62700, 73500, 66700 });
+		AddPointToLine({ 61200, 75500, 69700 });
+		AddPointToLine({ 62200, 78000, 72700 });
+
+		NewLine();
+		AddPointToLine({ 60500, 68000, 57900 });
+		AddPointToLine({ 60800, 69500, 60700 });
+		AddPointToLine({ 60300, 71500, 63700 });
+		AddPointToLine({ 61300, 73500, 66700 });
+		AddPointToLine({ 59800, 75500, 69700 });
+		AddPointToLine({ 60800, 78000, 72700 });
+
+
+		// ============================================================
+		// ВЕТВЬ 04 — НАЗАД ПО Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 61497, 61000, 50194 });
+		AddPointToLine({ 62000, 62500, 47500 });
+		AddPointToLine({ 61500, 64500, 44500 });
+		AddPointToLine({ 62500, 66500, 42000 });
+		AddPointToLine({ 61000, 68500, 39000 });
+		AddPointToLine({ 62000, 71000, 36000 });
+
+		NewLine();
+		AddPointToLine({ 62247, 61000, 50294 });
+		AddPointToLine({ 62750, 62500, 47600 });
+		AddPointToLine({ 62250, 64500, 44600 });
+		AddPointToLine({ 63250, 66500, 42100 });
+		AddPointToLine({ 61750, 68500, 39100 });
+		AddPointToLine({ 62750, 71000, 36100 });
+
+		NewLine();
+		AddPointToLine({ 60747, 61000, 50294 });
+		AddPointToLine({ 61250, 62500, 47600 });
+		AddPointToLine({ 60750, 64500, 44600 });
+		AddPointToLine({ 61750, 66500, 42100 });
+		AddPointToLine({ 60250, 68500, 39100 });
+		AddPointToLine({ 61250, 71000, 36100 });
+
+		NewLine();
+		AddPointToLine({ 61497, 61000, 49444 });
+		AddPointToLine({ 62000, 62500, 46750 });
+		AddPointToLine({ 61500, 64500, 43750 });
+		AddPointToLine({ 62500, 66500, 41250 });
+		AddPointToLine({ 61000, 68500, 38250 });
+		AddPointToLine({ 62000, 71000, 35250 });
+
+		NewLine();
+		AddPointToLine({ 60747, 61000, 49444 });
+		AddPointToLine({ 61250, 62500, 46750 });
+		AddPointToLine({ 60750, 64500, 43750 });
+		AddPointToLine({ 61750, 66500, 41250 });
+		AddPointToLine({ 60250, 68500, 38250 });
+		AddPointToLine({ 61250, 71000, 35250 });
+
+		NewLine();
+		AddPointToLine({ 62247, 61000, 49444 });
+		AddPointToLine({ 62750, 62500, 46750 });
+		AddPointToLine({ 62250, 64500, 43750 });
+		AddPointToLine({ 63250, 66500, 41250 });
+		AddPointToLine({ 61750, 68500, 38250 });
+		AddPointToLine({ 62750, 71000, 35250 });
+
+
+		// ============================================================
+		// ВЕТВЬ 05 — ДИАГОНАЛЬ ВПРАВО + Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 64791, 74500, 56803 });
+		AddPointToLine({ 67000, 75500, 59000 });
+		AddPointToLine({ 69500, 77500, 61500 });
+		AddPointToLine({ 72500, 79000, 64000 });
+		AddPointToLine({ 75500, 81000, 66000 });
+		AddPointToLine({ 79000, 82500, 68500 });
+
+		NewLine();
+		AddPointToLine({ 65400, 75000, 57000 });
+		AddPointToLine({ 67600, 76000, 59700 });
+		AddPointToLine({ 70100, 78000, 62200 });
+		AddPointToLine({ 73100, 79500, 64700 });
+		AddPointToLine({ 76100, 81500, 66700 });
+		AddPointToLine({ 79600, 83000, 69200 });
+
+		NewLine();
+		AddPointToLine({ 64182, 75000, 57000 });
+		AddPointToLine({ 66400, 76000, 58300 });
+		AddPointToLine({ 68900, 78000, 60800 });
+		AddPointToLine({ 71900, 79500, 63300 });
+		AddPointToLine({ 74900, 81500, 65300 });
+		AddPointToLine({ 78400, 83000, 67800 });
+
+		NewLine();
+		AddPointToLine({ 64791, 74500, 56053 });
+		AddPointToLine({ 67000, 75500, 58250 });
+		AddPointToLine({ 69500, 77500, 60750 });
+		AddPointToLine({ 72500, 79000, 63250 });
+		AddPointToLine({ 75500, 81000, 65250 });
+		AddPointToLine({ 79000, 82500, 67750 });
+
+		NewLine();
+		AddPointToLine({ 64182, 74000, 56100 });
+		AddPointToLine({ 66400, 75000, 58400 });
+		AddPointToLine({ 68900, 77000, 60900 });
+		AddPointToLine({ 71900, 78500, 63400 });
+		AddPointToLine({ 74900, 80500, 65400 });
+		AddPointToLine({ 78400, 82000, 67900 });
+
+		NewLine();
+		AddPointToLine({ 65400, 74000, 56100 });
+		AddPointToLine({ 67600, 75000, 58400 });
+		AddPointToLine({ 70100, 77000, 60900 });
+		AddPointToLine({ 73100, 78500, 63400 });
+		AddPointToLine({ 76100, 80500, 65400 });
+		AddPointToLine({ 79600, 82000, 67900 });
+
+
+		// ============================================================
+		// ВЕТВЬ 06 — ДИАГОНАЛЬ ВЛЕВО + Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 57877, 74500, 56803 });
+		AddPointToLine({ 55500, 76000, 59000 });
+		AddPointToLine({ 53000, 78000, 61500 });
+		AddPointToLine({ 50000, 79500, 64000 });
+		AddPointToLine({ 47000, 81500, 66000 });
+		AddPointToLine({ 43500, 83000, 68500 });
+
+		NewLine();
+		AddPointToLine({ 58480, 75000, 57000 });
+		AddPointToLine({ 56100, 76500, 59700 });
+		AddPointToLine({ 53600, 78500, 62200 });
+		AddPointToLine({ 50600, 80000, 64700 });
+		AddPointToLine({ 47600, 82000, 66700 });
+		AddPointToLine({ 44100, 83500, 69200 });
+
+		NewLine();
+		AddPointToLine({ 57274, 75000, 57000 });
+		AddPointToLine({ 54900, 76500, 58300 });
+		AddPointToLine({ 52400, 78500, 60800 });
+		AddPointToLine({ 49400, 80000, 63300 });
+		AddPointToLine({ 46400, 82000, 65300 });
+		AddPointToLine({ 42900, 83500, 67800 });
+
+		NewLine();
+		AddPointToLine({ 57877, 74500, 56053 });
+		AddPointToLine({ 55500, 76000, 58250 });
+		AddPointToLine({ 53000, 78000, 60750 });
+		AddPointToLine({ 50000, 79500, 63250 });
+		AddPointToLine({ 47000, 81500, 65250 });
+		AddPointToLine({ 43500, 83000, 67750 });
+
+		NewLine();
+		AddPointToLine({ 57274, 74000, 56100 });
+		AddPointToLine({ 54900, 75500, 58400 });
+		AddPointToLine({ 52400, 77500, 60900 });
+		AddPointToLine({ 49400, 79000, 63400 });
+		AddPointToLine({ 46400, 81000, 65400 });
+		AddPointToLine({ 42900, 82500, 67900 });
+
+		NewLine();
+		AddPointToLine({ 58480, 74000, 56100 });
+		AddPointToLine({ 56100, 75500, 58400 });
+		AddPointToLine({ 53600, 77500, 60900 });
+		AddPointToLine({ 50600, 79000, 63400 });
+		AddPointToLine({ 47600, 81000, 65400 });
+		AddPointToLine({ 44100, 82500, 67900 });
+
+
+		// ============================================================
+		// ВЕТВЬ 07 — ДИАГОНАЛЬ ВПРАВО -Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 61856, 81500, 56145 });
+		AddPointToLine({ 64500, 82500, 54000 });
+		AddPointToLine({ 67500, 84500, 51500 });
+		AddPointToLine({ 70500, 86000, 49000 });
+		AddPointToLine({ 73500, 88000, 47000 });
+		AddPointToLine({ 77000, 89500, 44500 });
+
+		NewLine();
+		AddPointToLine({ 62459, 82000, 56800 });
+		AddPointToLine({ 65100, 83000, 54700 });
+		AddPointToLine({ 68100, 85000, 52200 });
+		AddPointToLine({ 71100, 86500, 49700 });
+		AddPointToLine({ 74100, 88500, 47700 });
+		AddPointToLine({ 77600, 90000, 45200 });
+
+		NewLine();
+		AddPointToLine({ 61253, 82000, 56800 });
+		AddPointToLine({ 63900, 83000, 53300 });
+		AddPointToLine({ 66900, 85000, 50800 });
+		AddPointToLine({ 69900, 86500, 48300 });
+		AddPointToLine({ 72900, 88500, 46300 });
+		AddPointToLine({ 76400, 90000, 43800 });
+
+		NewLine();
+		AddPointToLine({ 61856, 81500, 55295 });
+		AddPointToLine({ 64500, 82500, 53250 });
+		AddPointToLine({ 67500, 84500, 50750 });
+		AddPointToLine({ 70500, 86000, 48250 });
+		AddPointToLine({ 73500, 88000, 46250 });
+		AddPointToLine({ 77000, 89500, 43750 });
+
+		NewLine();
+		AddPointToLine({ 61253, 81000, 55300 });
+		AddPointToLine({ 63900, 82000, 53300 });
+		AddPointToLine({ 66900, 84000, 50800 });
+		AddPointToLine({ 69900, 85500, 48300 });
+		AddPointToLine({ 72900, 87500, 46300 });
+		AddPointToLine({ 76400, 89000, 43800 });
+
+		NewLine();
+		AddPointToLine({ 62459, 81000, 55300 });
+		AddPointToLine({ 65100, 82000, 53300 });
+		AddPointToLine({ 68100, 84000, 50800 });
+		AddPointToLine({ 71100, 85500, 48300 });
+		AddPointToLine({ 74100, 87500, 46300 });
+		AddPointToLine({ 77600, 89000, 43800 });
+
+
+		// ============================================================
+		// ВЕТВЬ 08 — ДИАГОНАЛЬ ВЛЕВО -Z
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 55268, 81500, 50617 });
+		AddPointToLine({ 53000, 82500, 48500 });
+		AddPointToLine({ 50500, 84500, 46000 });
+		AddPointToLine({ 47500, 86000, 43500 });
+		AddPointToLine({ 44500, 88000, 41500 });
+		AddPointToLine({ 41000, 89500, 39000 });
+
+		NewLine();
+		AddPointToLine({ 55871, 82000, 51270 });
+		AddPointToLine({ 53600, 83000, 49150 });
+		AddPointToLine({ 51100, 85000, 46650 });
+		AddPointToLine({ 48100, 86500, 44150 });
+		AddPointToLine({ 45100, 88500, 42150 });
+		AddPointToLine({ 41600, 90000, 39650 });
+
+		NewLine();
+		AddPointToLine({ 54665, 82000, 51270 });
+		AddPointToLine({ 52400, 83000, 47850 });
+		AddPointToLine({ 49900, 85000, 45350 });
+		AddPointToLine({ 46900, 86500, 42850 });
+		AddPointToLine({ 43900, 88500, 40850 });
+		AddPointToLine({ 40400, 90000, 38350 });
+
+		NewLine();
+		AddPointToLine({ 55268, 81500, 49867 });
+		AddPointToLine({ 53000, 82500, 47750 });
+		AddPointToLine({ 50500, 84500, 45250 });
+		AddPointToLine({ 47500, 86000, 42750 });
+		AddPointToLine({ 44500, 88000, 40750 });
+		AddPointToLine({ 41000, 89500, 38250 });
+
+		NewLine();
+		AddPointToLine({ 54665, 81000, 49900 });
+		AddPointToLine({ 52400, 82000, 47800 });
+		AddPointToLine({ 49900, 84000, 45300 });
+		AddPointToLine({ 46900, 85500, 42800 });
+		AddPointToLine({ 43900, 87500, 40800 });
+		AddPointToLine({ 40400, 89000, 38300 });
+
+		NewLine();
+		AddPointToLine({ 55871, 81000, 49900 });
+		AddPointToLine({ 53600, 82000, 47800 });
+		AddPointToLine({ 51100, 84000, 45300 });
+		AddPointToLine({ 48100, 85500, 42800 });
+		AddPointToLine({ 45100, 87500, 40800 });
+		AddPointToLine({ 41600, 89000, 38300 });
+
+
+		// ============================================================
+		// ВЕТВЬ 09 — ВВЕРХ И ВПРАВО
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 64503, 74500, 54039 });
+		AddPointToLine({ 66500, 76500, 55500 });
+		AddPointToLine({ 69000, 79000, 56500 });
+		AddPointToLine({ 71500, 81500, 55000 });
+		AddPointToLine({ 74000, 84500, 57000 });
+		AddPointToLine({ 76500, 87500, 55500 });
+		AddPointToLine({ 78500, 90500, 57500 });
+
+		NewLine();
+		AddPointToLine({ 65050, 75000, 54700 });
+		AddPointToLine({ 67050, 77000, 56200 });
+		AddPointToLine({ 69550, 79500, 57200 });
+		AddPointToLine({ 72050, 82000, 55700 });
+		AddPointToLine({ 74550, 85000, 57700 });
+		AddPointToLine({ 77050, 88000, 56200 });
+		AddPointToLine({ 79050, 91000, 58200 });
+
+		NewLine();
+		AddPointToLine({ 63956, 75000, 54700 });
+		AddPointToLine({ 65950, 77000, 54800 });
+		AddPointToLine({ 68450, 79500, 55800 });
+		AddPointToLine({ 70950, 82000, 54300 });
+		AddPointToLine({ 73450, 85000, 56300 });
+		AddPointToLine({ 75950, 88000, 54800 });
+		AddPointToLine({ 77950, 91000, 56800 });
+
+		NewLine();
+		AddPointToLine({ 64503, 74500, 53289 });
+		AddPointToLine({ 66500, 76500, 54750 });
+		AddPointToLine({ 69000, 79000, 55750 });
+		AddPointToLine({ 71500, 81500, 54250 });
+		AddPointToLine({ 74000, 84500, 56250 });
+		AddPointToLine({ 76500, 87500, 54750 });
+		AddPointToLine({ 78500, 90500, 56750 });
+
+		NewLine();
+		AddPointToLine({ 63956, 74000, 53300 });
+		AddPointToLine({ 65950, 76000, 54800 });
+		AddPointToLine({ 68450, 78500, 55800 });
+		AddPointToLine({ 70950, 81000, 54300 });
+		AddPointToLine({ 73450, 84000, 56300 });
+		AddPointToLine({ 75950, 87000, 54800 });
+		AddPointToLine({ 77950, 90000, 56800 });
+
+		NewLine();
+		AddPointToLine({ 65050, 74000, 53300 });
+		AddPointToLine({ 67050, 76000, 54800 });
+		AddPointToLine({ 69550, 78500, 55800 });
+		AddPointToLine({ 72050, 81000, 54300 });
+		AddPointToLine({ 74550, 84000, 56300 });
+		AddPointToLine({ 77050, 87000, 54800 });
+		AddPointToLine({ 79050, 90000, 56800 });
+
+
+		// ============================================================
+		// ВЕТВЬ 10 — ВВЕРХ И ВЛЕВО
+		// ============================================================
+
+		NewLine();
+		AddPointToLine({ 55903, 74500, 54039 });
+		AddPointToLine({ 54000, 76500, 52500 });
+		AddPointToLine({ 51500, 79000, 53500 });
+		AddPointToLine({ 49000, 81500, 52000 });
+		AddPointToLine({ 46500, 84500, 54000 });
+		AddPointToLine({ 44000, 87500, 52500 });
+		AddPointToLine({ 41500, 90500, 54500 });
+
+		NewLine();
+		AddPointToLine({ 56450, 75000, 54700 });
+		AddPointToLine({ 54550, 77000, 53200 });
+		AddPointToLine({ 52050, 79500, 54200 });
+		AddPointToLine({ 49550, 82000, 52700 });
+		AddPointToLine({ 47050, 85000, 54700 });
+		AddPointToLine({ 44550, 88000, 53200 });
+		AddPointToLine({ 42050, 91000, 55200 });
+
+		NewLine();
+		AddPointToLine({ 55356, 75000, 54700 });
+		AddPointToLine({ 53450, 77000, 51800 });
+		AddPointToLine({ 50950, 79500, 52800 });
+		AddPointToLine({ 48450, 82000, 51300 });
+		AddPointToLine({ 45950, 85000, 53300 });
+		AddPointToLine({ 43450, 88000, 51800 });
+		AddPointToLine({ 40950, 91000, 53800 });
+
+		NewLine();
+		AddPointToLine({ 55903, 74500, 53289 });
+		AddPointToLine({ 54000, 76500, 51750 });
+		AddPointToLine({ 51500, 79000, 52750 });
+		AddPointToLine({ 49000, 81500, 51250 });
+		AddPointToLine({ 46500, 84500, 53250 });
+		AddPointToLine({ 44000, 87500, 51750 });
+		AddPointToLine({ 41500, 90500, 53750 });
+
+		NewLine();
+		AddPointToLine({ 55356, 74000, 53300 });
+		AddPointToLine({ 53450, 76000, 51800 });
+		AddPointToLine({ 50950, 78500, 52800 });
+		AddPointToLine({ 48450, 81000, 51300 });
+		AddPointToLine({ 45950, 84000, 53300 });
+		AddPointToLine({ 43450, 87000, 51800 });
+		AddPointToLine({ 40950, 90000, 53800 });
+
+		NewLine();
+		AddPointToLine({ 56450, 74000, 53300 });
+		AddPointToLine({ 54550, 76000, 51800 });
+		AddPointToLine({ 52050, 78500, 52800 });
+		AddPointToLine({ 49550, 81000, 51300 });
+		AddPointToLine({ 47050, 84000, 53300 });
+		AddPointToLine({ 44550, 87000, 51800 });
+		AddPointToLine({ 42050, 90000, 53800 });
+
+
+		// ============================================================
+		// ДОПОЛНИТЕЛЬНЫЕ ОТВЕТВЛЕНИЯ ОТ СУЩЕСТВУЮЩИХ ВЕТОК
+		// Каждое ответвление — отдельная труба из 6 жил
+		// ============================================================
+
+
+		// ------------------------------------------------------------
+		// ОТВЕТВЛЕНИЕ 01 — от правой ветви, вверх и вправо
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 70500, 64500, 55250 });
+		AddPointToLine({ 72500, 66000, 57500 });
+		AddPointToLine({ 75000, 68500, 59000 });
+		AddPointToLine({ 77500, 70000, 61000 });
+		AddPointToLine({ 80000, 72000, 60000 });
+
+		NewLine();
+		AddPointToLine({ 71103, 65000, 55900 });
+		AddPointToLine({ 73103, 66500, 58200 });
+		AddPointToLine({ 75603, 69000, 59700 });
+		AddPointToLine({ 78103, 70500, 61700 });
+		AddPointToLine({ 80603, 72500, 60700 });
+
+		NewLine();
+		AddPointToLine({ 69897, 65000, 55900 });
+		AddPointToLine({ 71897, 66500, 58200 });
+		AddPointToLine({ 74397, 69000, 59700 });
+		AddPointToLine({ 76897, 70500, 61700 });
+		AddPointToLine({ 79397, 72500, 60700 });
+
+		NewLine();
+		AddPointToLine({ 70500, 64500, 54500 });
+		AddPointToLine({ 72500, 66000, 56800 });
+		AddPointToLine({ 75000, 68500, 58300 });
+		AddPointToLine({ 77500, 70000, 60300 });
+		AddPointToLine({ 80000, 72000, 59300 });
+
+		NewLine();
+		AddPointToLine({ 69897, 64000, 54500 });
+		AddPointToLine({ 71897, 65500, 56800 });
+		AddPointToLine({ 74397, 68000, 58300 });
+		AddPointToLine({ 76897, 69500, 60300 });
+		AddPointToLine({ 79397, 71500, 59300 });
+
+		NewLine();
+		AddPointToLine({ 71103, 64000, 55900 });
+		AddPointToLine({ 73103, 65500, 58200 });
+		AddPointToLine({ 75603, 68000, 59700 });
+		AddPointToLine({ 78103, 69500, 61700 });
+		AddPointToLine({ 80603, 71500, 60700 });
+
+
+		// ------------------------------------------------------------
+		// ОТВЕТВЛЕНИЕ 02 — от правой ветви, вниз и вправо
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 74000, 84500, 57000 });
+		AddPointToLine({ 76000, 86000, 54500 });
+		AddPointToLine({ 78500, 88500, 53000 });
+		AddPointToLine({ 81500, 90000, 54500 });
+		AddPointToLine({ 84500, 92000, 52500 });
+
+		NewLine();
+		AddPointToLine({ 74603, 85000, 57700 });
+		AddPointToLine({ 76603, 86500, 55200 });
+		AddPointToLine({ 79103, 89000, 53700 });
+		AddPointToLine({ 82103, 90500, 55200 });
+		AddPointToLine({ 85103, 92500, 53200 });
+
+		NewLine();
+		AddPointToLine({ 73397, 85000, 57700 });
+		AddPointToLine({ 75397, 86500, 55200 });
+		AddPointToLine({ 77897, 89000, 53700 });
+		AddPointToLine({ 80897, 90500, 55200 });
+		AddPointToLine({ 83897, 92500, 53200 });
+
+		NewLine();
+		AddPointToLine({ 74000, 84500, 56250 });
+		AddPointToLine({ 76000, 86000, 53750 });
+		AddPointToLine({ 78500, 88500, 52250 });
+		AddPointToLine({ 81500, 90000, 53750 });
+		AddPointToLine({ 84500, 92000, 50750 });
+
+		NewLine();
+		AddPointToLine({ 73397, 84000, 56250 });
+		AddPointToLine({ 75397, 85500, 53750 });
+		AddPointToLine({ 77897, 88000, 52250 });
+		AddPointToLine({ 80897, 89500, 53750 });
+		AddPointToLine({ 83897, 91500, 50750 });
+
+		NewLine();
+		AddPointToLine({ 74603, 84000, 57700 });
+		AddPointToLine({ 76603, 85500, 55200 });
+		AddPointToLine({ 79103, 88000, 53700 });
+		AddPointToLine({ 82103, 89500, 55200 });
+		AddPointToLine({ 85103, 91500, 53200 });
+
+
+		// ------------------------------------------------------------
+		// ОТВЕТВЛЕНИЕ 03 — от левой ветви, вверх и влево
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 49000, 73500, 54000 });
+		AddPointToLine({ 47000, 71500, 56000 });
+		AddPointToLine({ 44500, 69500, 54500 });
+		AddPointToLine({ 42000, 67500, 56500 });
+		AddPointToLine({ 39000, 66000, 55000 });
+
+		NewLine();
+		AddPointToLine({ 49603, 74000, 54700 });
+		AddPointToLine({ 47603, 72000, 56700 });
+		AddPointToLine({ 45103, 70000, 55200 });
+		AddPointToLine({ 42603, 68000, 57200 });
+		AddPointToLine({ 39603, 66500, 55700 });
+
+		NewLine();
+		AddPointToLine({ 48397, 74000, 54700 });
+		AddPointToLine({ 46397, 72000, 56700 });
+		AddPointToLine({ 43897, 70000, 55200 });
+		AddPointToLine({ 41397, 68000, 57200 });
+		AddPointToLine({ 38397, 66500, 55700 });
+
+		NewLine();
+		AddPointToLine({ 49000, 73500, 52500 });
+		AddPointToLine({ 47000, 71500, 54500 });
+		AddPointToLine({ 44500, 69500, 53000 });
+		AddPointToLine({ 42000, 67500, 55000 });
+		AddPointToLine({ 39000, 66000, 53500 });
+
+		NewLine();
+		AddPointToLine({ 48397, 73000, 52500 });
+		AddPointToLine({ 46397, 71000, 54500 });
+		AddPointToLine({ 43897, 69000, 53000 });
+		AddPointToLine({ 41397, 67000, 55000 });
+		AddPointToLine({ 38397, 65500, 53500 });
+
+		NewLine();
+		AddPointToLine({ 49603, 73000, 54700 });
+		AddPointToLine({ 47603, 71000, 56700 });
+		AddPointToLine({ 45103, 69000, 55200 });
+		AddPointToLine({ 42603, 67000, 57200 });
+		AddPointToLine({ 39603, 65500, 55700 });
+
+
+		// ------------------------------------------------------------
+		// ОТВЕТВЛЕНИЕ 04 — от левой ветви, вниз и влево
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 45500, 75000, 52000 });
+		AddPointToLine({ 43500, 77000, 50000 });
+		AddPointToLine({ 41000, 79000, 51500 });
+		AddPointToLine({ 38000, 81000, 49500 });
+		AddPointToLine({ 35000, 82500, 51000 });
+
+		NewLine();
+		AddPointToLine({ 46103, 75500, 52700 });
+		AddPointToLine({ 44103, 77500, 50700 });
+		AddPointToLine({ 41603, 79500, 52200 });
+		AddPointToLine({ 38603, 81500, 50200 });
+		AddPointToLine({ 35603, 83000, 51700 });
+
+		NewLine();
+		AddPointToLine({ 44897, 75500, 52700 });
+		AddPointToLine({ 42897, 77500, 50700 });
+		AddPointToLine({ 40397, 79500, 52200 });
+		AddPointToLine({ 37397, 81500, 50200 });
+		AddPointToLine({ 34397, 83000, 51700 });
+
+		NewLine();
+		AddPointToLine({ 45500, 75000, 50500 });
+		AddPointToLine({ 43500, 77000, 48500 });
+		AddPointToLine({ 41000, 79000, 50000 });
+		AddPointToLine({ 38000, 81000, 48000 });
+		AddPointToLine({ 35000, 82500, 49500 });
+
+		NewLine();
+		AddPointToLine({ 44897, 74500, 50500 });
+		AddPointToLine({ 42897, 76500, 48500 });
+		AddPointToLine({ 40397, 78500, 50000 });
+		AddPointToLine({ 37397, 80500, 48000 });
+		AddPointToLine({ 34397, 82000, 49500 });
+
+		NewLine();
+		AddPointToLine({ 46103, 74500, 52700 });
+		AddPointToLine({ 44103, 76500, 50700 });
+		AddPointToLine({ 41603, 78500, 52200 });
+		AddPointToLine({ 38603, 80500, 50200 });
+		AddPointToLine({ 35603, 82000, 51700 });
+
+
+		// ------------------------------------------------------------
+		// ОТВЕТВЛЕНИЕ 05 — от передней ветви, вверх по Z
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 61000, 71500, 64500 });
+		AddPointToLine({ 59000, 70000, 67000 });
+		AddPointToLine({ 57000, 68000, 69500 });
+		AddPointToLine({ 54500, 66500, 68000 });
+		AddPointToLine({ 52000, 65000, 70500 });
+
+		NewLine();
+		AddPointToLine({ 61603, 72000, 65200 });
+		AddPointToLine({ 59603, 70500, 67700 });
+		AddPointToLine({ 57603, 68500, 70200 });
+		AddPointToLine({ 55103, 67000, 68700 });
+		AddPointToLine({ 52603, 65500, 71200 });
+
+		NewLine();
+		AddPointToLine({ 60397, 72000, 65200 });
+		AddPointToLine({ 58397, 70500, 67700 });
+		AddPointToLine({ 56397, 68500, 70200 });
+		AddPointToLine({ 53897, 67000, 68700 });
+		AddPointToLine({ 51397, 65500, 71200 });
+
+		NewLine();
+		AddPointToLine({ 61000, 71500, 63000 });
+		AddPointToLine({ 59000, 70000, 65500 });
+		AddPointToLine({ 57000, 68000, 68000 });
+		AddPointToLine({ 54500, 66500, 66500 });
+		AddPointToLine({ 52000, 65000, 69000 });
+
+		NewLine();
+		AddPointToLine({ 60397, 71000, 63000 });
+		AddPointToLine({ 58397, 69500, 65500 });
+		AddPointToLine({ 56397, 67500, 68000 });
+		AddPointToLine({ 53897, 66000, 66500 });
+		AddPointToLine({ 51397, 64500, 69000 });
+
+		NewLine();
+		AddPointToLine({ 61603, 71000, 65200 });
+		AddPointToLine({ 59603, 69500, 67700 });
+		AddPointToLine({ 57603, 67500, 70200 });
+		AddPointToLine({ 55103, 66000, 68700 });
+		AddPointToLine({ 52603, 64500, 71200 });
+
+
+		// ------------------------------------------------------------
+		// ОТВЕТВЛЕНИЕ 06 — от передней ветви, вниз по Z
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 60500, 75500, 70500 });
+		AddPointToLine({ 62500, 77500, 73000 });
+		AddPointToLine({ 64500, 79500, 75000 });
+		AddPointToLine({ 67000, 81000, 73500 });
+		AddPointToLine({ 69500, 83000, 76000 });
+
+		NewLine();
+		AddPointToLine({ 61103, 76000, 71200 });
+		AddPointToLine({ 63103, 78000, 73700 });
+		AddPointToLine({ 65103, 80000, 75700 });
+		AddPointToLine({ 67603, 81500, 74200 });
+		AddPointToLine({ 70103, 83500, 76700 });
+
+		NewLine();
+		AddPointToLine({ 59897, 76000, 71200 });
+		AddPointToLine({ 61897, 78000, 73700 });
+		AddPointToLine({ 63897, 80000, 75700 });
+		AddPointToLine({ 66397, 81500, 74200 });
+		AddPointToLine({ 68897, 83500, 76700 });
+
+		NewLine();
+		AddPointToLine({ 60500, 75500, 69000 });
+		AddPointToLine({ 62500, 77500, 71500 });
+		AddPointToLine({ 64500, 79500, 73500 });
+		AddPointToLine({ 67000, 81000, 72000 });
+		AddPointToLine({ 69500, 83000, 74500 });
+
+		NewLine();
+		AddPointToLine({ 59897, 75000, 69000 });
+		AddPointToLine({ 61897, 77000, 71500 });
+		AddPointToLine({ 63897, 79000, 73500 });
+		AddPointToLine({ 66397, 80500, 72000 });
+		AddPointToLine({ 68897, 82500, 74500 });
+
+		NewLine();
+		AddPointToLine({ 61103, 75000, 71200 });
+		AddPointToLine({ 63103, 77000, 73700 });
+		AddPointToLine({ 65103, 79000, 75700 });
+		AddPointToLine({ 67603, 80500, 74200 });
+		AddPointToLine({ 70103, 82500, 76700 });
+
+
+		// ------------------------------------------------------------
+		// ОТВЕТВЛЕНИЕ 07 — от диагональной ветви, влево + вверх
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 69500, 77500, 61500 });
+		AddPointToLine({ 67500, 75500, 63500 });
+		AddPointToLine({ 65000, 73500, 62000 });
+		AddPointToLine({ 62500, 71500, 64500 });
+		AddPointToLine({ 59500, 70000, 63000 });
+
+		NewLine();
+		AddPointToLine({ 70103, 78000, 62200 });
+		AddPointToLine({ 68103, 76000, 64200 });
+		AddPointToLine({ 65603, 74000, 62700 });
+		AddPointToLine({ 63103, 72000, 65200 });
+		AddPointToLine({ 60103, 70500, 63700 });
+
+		NewLine();
+		AddPointToLine({ 68897, 78000, 62200 });
+		AddPointToLine({ 66897, 76000, 64200 });
+		AddPointToLine({ 64397, 74000, 62700 });
+		AddPointToLine({ 61897, 72000, 65200 });
+		AddPointToLine({ 58897, 70500, 63700 });
+
+		NewLine();
+		AddPointToLine({ 69500, 77500, 60000 });
+		AddPointToLine({ 67500, 75500, 62000 });
+		AddPointToLine({ 65000, 73500, 60500 });
+		AddPointToLine({ 62500, 71500, 63000 });
+		AddPointToLine({ 59500, 70000, 61500 });
+
+		NewLine();
+		AddPointToLine({ 68897, 77000, 60000 });
+		AddPointToLine({ 66897, 75000, 62000 });
+		AddPointToLine({ 64397, 73000, 60500 });
+		AddPointToLine({ 61897, 71000, 63000 });
+		AddPointToLine({ 58897, 69500, 61500 });
+
+		NewLine();
+		AddPointToLine({ 70103, 77000, 62200 });
+		AddPointToLine({ 68103, 75000, 64200 });
+		AddPointToLine({ 65603, 73000, 62700 });
+		AddPointToLine({ 63103, 71000, 65200 });
+		AddPointToLine({ 60103, 69500, 63700 });
+
+
+		// ------------------------------------------------------------
+		// ОТВЕТВЛЕНИЕ 08 — от нижней диагонали, вправо + вверх
+		// ------------------------------------------------------------
+
+		NewLine();
+		AddPointToLine({ 73500, 88000, 47000 });
+		AddPointToLine({ 75500, 86000, 45000 });
+		AddPointToLine({ 78000, 84500, 46500 });
+		AddPointToLine({ 81000, 83000, 44500 });
+		AddPointToLine({ 84000, 81500, 46000 });
+
+		NewLine();
+		AddPointToLine({ 74103, 88500, 47700 });
+		AddPointToLine({ 76103, 86500, 45700 });
+		AddPointToLine({ 78603, 85000, 47200 });
+		AddPointToLine({ 81603, 83500, 45200 });
+		AddPointToLine({ 84603, 82000, 46700 });
+
+		NewLine();
+		AddPointToLine({ 72897, 88500, 47700 });
+		AddPointToLine({ 74897, 86500, 45700 });
+		AddPointToLine({ 77397, 85000, 47200 });
+		AddPointToLine({ 80397, 83500, 45200 });
+		AddPointToLine({ 83397, 82000, 46700 });
+
+		NewLine();
+		AddPointToLine({ 73500, 88000, 45500 });
+		AddPointToLine({ 75500, 86000, 43500 });
+		AddPointToLine({ 78000, 84500, 45000 });
+		AddPointToLine({ 81000, 83000, 43000 });
+		AddPointToLine({ 84000, 81500, 44500 });
+
+		NewLine();
+		AddPointToLine({ 72897, 87500, 45500 });
+		AddPointToLine({ 74897, 85500, 43500 });
+		AddPointToLine({ 77397, 84000, 45000 });
+		AddPointToLine({ 80397, 82500, 43000 });
+		AddPointToLine({ 83397, 81000, 44500 });
+
+		NewLine();
+		AddPointToLine({ 74103, 87500, 47700 });
+		AddPointToLine({ 76103, 85500, 45700 });
+		AddPointToLine({ 78603, 84000, 47200 });
+		AddPointToLine({ 81603, 82500, 45200 });
+		AddPointToLine({ 84603, 81000, 46700 });
+
 		/*NewLine();
 		AddPointToLine({ -39,-34,3 });
 		AddPointToLine({ 100,0,10 });
