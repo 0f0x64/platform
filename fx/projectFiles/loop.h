@@ -1266,7 +1266,12 @@ struct hero_ {
 	std::vector<std::pair<float4, float4>> rays;
 	bool aiming = false;
 	float bowCharge = 0.0f;
+
+	bool blocking = false;
+
 	void ProcessAttack(float4 camPos, float4 camForward) {
+		if (blocking) return;
+
 		if (inputController.isLMBPressed()) {
 			if (!aiming) {
 				aiming = true;
@@ -1313,9 +1318,10 @@ struct hero_ {
 		}
 	}
 
-	bool blocking = false;
 	void ProcessDefense()
 	{
+		if (aiming) return;
+
 		if (inputController.isRMBPressed()) {
 			if (!blocking) {
 				blocking = true;
