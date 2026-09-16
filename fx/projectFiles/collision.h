@@ -59,13 +59,14 @@ namespace collision
         float4 direction;
         float radius;           // Радиус сферы для SphereCast
         float maxDistance;      // Максимальная дистанция
+        CollisionGroup collisionGroup;
         bool touchableOnly;
 
         SphereCastInfo()
         {
             origin = float4();
             direction = float4();
-            radius = 0.0f;
+            radius = 0.5f;
             maxDistance = 100.0f;
             collisionGroup = CollisionGroup::Player;
             touchableOnly = false;
@@ -108,6 +109,22 @@ namespace collision
             else
             {
                 i++;
+            }
+        }
+    }
+
+    void DestroySphereCollider(SphereCollider* collider)
+    {
+        if (!collider)
+            return;
+
+        for (size_t i = 0;i < colliders.size();++i)
+        {
+            if (colliders[i] == collider)
+            {
+                colliders[i] = colliders.back();
+                colliders.pop_back();
+                break;
             }
         }
     }

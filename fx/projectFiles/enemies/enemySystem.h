@@ -1,7 +1,7 @@
 #pragma once
 
 #include "enemy.h"
-#include <array>
+#include <vector>
 #include <cmath>
 #include <random>
 
@@ -30,11 +30,16 @@ namespace Enemies
 		EnemySystem& operator=(EnemySystem&&) = delete;
 
 		bool IsInitialized() const { return initialized_; }
-		const std::array<Enemy, Count>& Items() const { return enemies_; }
+		const std::vector<Enemy>& Items() const { return enemies_; }
 
 		void Reset(Position center, Position right, Position forward,
 			std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
 		{
+
+			for (Enemy& e : enemies_)
+				if (e.collider) { collision::DestroySphereCollider(e.collider);e.collider = nullptr; }
+			enemies_.clear();
+			enemies_.resize(Count);
 			random_.seed(seed);
 			for (std::size_t i = 0; i < Count; ++i)
 			{
@@ -142,12 +147,36 @@ namespace Enemies
 
 			if (enemy.collider)
 			{
+				enemy.collider->radius = 1;
 				enemy.collider->position.x = position.x;
 				enemy.collider->position.y = position.y;
 				enemy.collider->position.z = position.z;
+				enemy.collider->isTouchable = true;
 			}
 		}
-		//
+		void RemoveDead()
+		{
+			for (auto it = enemies_.begin();it != enemies_.end();)
+			{
+				if (!it->alive)
+				{
+					if (it->collider)
+					{
+						collision::DestroySphereCollider(it->collider);
+						it->collider = nullptr;
+					}
+					it = enemies_.erase(it);
+				}
+				else ++it;
+			}
+		}
+		Enemy* FindByCollider(collision::SphereCollider* col)
+		{
+			if (!col) return nullptr;
+			for (Enemy& e : enemies_)
+				if (e.collider == col) return &e;
+			return nullptr;
+		}
 
 	private:
 		Position RandomTarget(const Enemy& enemy)
@@ -194,7 +223,7 @@ namespace Enemies
 			enemy.position.z += delta.z * scale;
 		}
 
-		std::array<Enemy, Count> enemies_{};
+		std::vector<Enemy> enemies_{};
 		std::mt19937 random_{ DefaultSeed };
 		bool initialized_ = false;
 	};
