@@ -69,6 +69,10 @@ namespace Enemies
 
 		void ResetRandomOnLines(std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
 		{
+			for (Enemy& e : enemies_)
+				if (e.collider) { collision::DestroySphereCollider(e.collider);e.collider = nullptr; }
+			enemies_.clear();
+			enemies_.resize(Count);
 			random_.seed(seed);
 
 			// Соберём валидные линии заранее

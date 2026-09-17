@@ -1270,7 +1270,7 @@ struct hero_ {
 
 	bool blocking = false;
 
-	void ProcessAttack(float4 camPos, float4 camForward) {
+	void ProcessAttack(float4 camPos, float4 camForward, Enemies::EnemySystem& enemySystem) {
 		if (blocking) return;
 
 		if (inputController.isLMBPressed()) {
@@ -1304,7 +1304,18 @@ struct hero_ {
 					result = collision::Raycast(ray);
 
 					if (result.hit) {
-						Log("Attack hit\n");
+						Enemies::Enemy* enemy = enemySystem.FindByCollider(result.collider);
+
+						if (enemy && enemy->alive)
+						{
+							const float baseDamage = 20.0f;
+							const float chargeDamage = 70.0f;
+							float damage = baseDamage + (chargeDamage - baseDamage) * bowCharge;
+
+							enemy->TakeDamage(damage);
+							Log("Hit enemy, HP: " + std::to_string(enemy->health) + "\n");
+						}
+						else Log("Attack hit (not enemy)\n");
 					}
 					else {
 						Log("Attack miss\n");
@@ -2619,7 +2630,7 @@ namespace Loop
 					hero.ProcessMove(FIXED_DT);
 					hero.ProcessJump(FIXED_DT);
 
-					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
+					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))), enemySystem);
 					hero.ProcessDefense();
 
 					if (hero.gravity.mode)
