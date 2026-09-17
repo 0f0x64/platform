@@ -1062,7 +1062,7 @@ namespace Object {
 		// ============================================================
 
 		NewLine();
-		AddPointToLine({ 93000, 60000, 50000 });
+		AddPointToLine({ 95000, 61000, 50000 });
 		AddPointToLine({ 90000, 52000, 57500 });
 		AddPointToLine({ 93000, 44000, 65000 });
 		AddPointToLine({ 101000, 37000, 69000 });
