@@ -267,6 +267,7 @@ struct hero_ {
 		{
 			collision::SphereCollider* c = collision::CreateSphereCollider();
 			c->radius = 0.65f;
+			c->collisionGroup = collision::CollisionGroup::Player;
 			return c;
 		}();
 
@@ -716,12 +717,17 @@ struct hero_ {
 
 		if (blocking) {
 			Log("Damage blocked\n");
+			if (invulnerabilityTimer <= 0.0f) {
+				invulnerabilityTimer = 1.0f;
+				dx11::Audio::Play("Shield_hit", false, 1.0f);
+			}
 			return;
 		}
 
 		if (invulnerabilityTimer > 0.0f)
 			return;
 
+		dx11::Audio::Play("Player_hit", false, 1.0f);
 		health -= damage;
 
 		if (health < 0.0f)
@@ -872,6 +878,7 @@ struct hero_ {
 	float stepTime = 0.0f;
 	IXAudio2SourceVoice* glideVoice;
 	IXAudio2SourceVoice* idleVoice;
+	IXAudio2SourceVoice* bowstringVoice;
 
 	void ProcessMove(float deltaTime)
 	{
@@ -1269,13 +1276,16 @@ struct hero_ {
 
 	bool blocking = false;
 
-	void ProcessAttack(float4 camPos, float4 camForward) {
+	void ProcessAttack(float4 camPos, float4 camForward, Enemies::EnemySystem& enemySystem) {
+		dx11::Audio::SetVolume(bowstringVoice, bowCharge);
+
 		if (blocking) return;
 
 		if (inputController.isLMBPressed()) {
 			if (!aiming) {
 				aiming = true;
 
+				dx11::Audio::Play("Bow_draw", false, 1.0f);
 				ConstBuf::interp::Animate(fov, 60, 1.5f, ConstBuf::interp::Curve::EaseOutExpo);
 				ConstBuf::interp::Animate(bowCharge, 1.0f, 1.5f);
 
@@ -1291,19 +1301,31 @@ struct hero_ {
 				mesh->StopAnimation(9);
 
 				if (bowCharge >= 0.35f) {
+					dx11::Audio::Play("Bow_shoot", false, 1.0f);
 					mesh->PlayAnimation(10, 0.1f);
 
-					collision::RayInfo ray = collision::RayInfo(camPos, camForward * 100, false);
+					collision::RayInfo ray = collision::RayInfo(camPos, camForward * 100, collision::CollisionGroup::Player, false);
 					collision::RaycastResult result = collision::Raycast(ray);
 
 					float4 heroPos = V2F(pos);
 					float4 direction = result.hit ? normalize(result.position - heroPos) : camForward;
 
-					ray = collision::RayInfo(heroPos, direction * 100, false);
+					ray = collision::RayInfo(heroPos, direction * 100, collision::CollisionGroup::Player, false);
 					result = collision::Raycast(ray);
 
 					if (result.hit) {
-						Log("Attack hit\n");
+						Enemies::Enemy* enemy = enemySystem.FindByCollider(result.collider);
+
+						if (enemy && enemy->alive)
+						{
+							const float baseDamage = 20.0f;
+							const float chargeDamage = 70.0f;
+							float damage = baseDamage + (chargeDamage - baseDamage) * bowCharge;
+
+							enemy->TakeDamage(damage);
+							Log("Hit enemy, HP: " + std::to_string(enemy->health) + "\n");
+						}
+						else Log("Attack hit (not enemy)\n");
 					}
 					else {
 						Log("Attack miss\n");
@@ -2568,6 +2590,14 @@ namespace Loop
 			dx11::Audio::LoadOggFile("Glide", "..//fx//projectFiles//Glide.ogg");
 			dx11::Audio::LoadOggFile("Character", "..//fx//projectFiles//Character.ogg");
 
+			dx11::Audio::LoadOggFile("Swarm", "..//fx//projectFiles//Swarm.ogg");
+			dx11::Audio::LoadOggFile("Bow_shoot", "..//fx//projectFiles//Bow_shoot.ogg");
+			dx11::Audio::LoadOggFile("Player_hit", "..//fx//projectFiles//Player_hit.ogg");
+			dx11::Audio::LoadOggFile("Bow_draw", "..//fx//projectFiles//Bow_draw.ogg");
+			dx11::Audio::LoadOggFile("Swarm_hit", "..//fx//projectFiles//Swarm_hit.ogg");
+			dx11::Audio::LoadOggFile("Shield_hit", "..//fx//projectFiles//Shield_hit.ogg");
+			dx11::Audio::LoadOggFile("Bow_bowstring", "..//fx//projectFiles//Bow_bowstring.ogg");
+
 			dx11::Audio::LoadOggFile("Music", "..//fx//projectFiles//Music.ogg");
 		}
 
@@ -2581,8 +2611,8 @@ namespace Loop
 
 		if (!enemySystem.IsInitialized())
 		{
-			enemySystem.Reset(ToEnemyPosition(hero.pos),
-				ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+			//enemySystem.Reset(ToEnemyPosition(hero.pos), ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+			enemySystem.ResetRandomOnLines();
 		}
 		float deltaTime = processTimer();
 
@@ -2598,8 +2628,8 @@ namespace Loop
 			hero.Respawn();
 			if (initialEnemySpawn)
 			{
-				enemySystem.Reset(ToEnemyPosition(hero.pos),
-					ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+				//enemySystem.Reset(ToEnemyPosition(hero.pos), ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
+				enemySystem.ResetRandomOnLines();
 			}
 
 			const float FIXED_DT = 1.0f / 60.0f; // Строго 16.66 мс для физики
@@ -2618,7 +2648,7 @@ namespace Loop
 					hero.ProcessMove(FIXED_DT);
 					hero.ProcessJump(FIXED_DT);
 
-					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
+					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))), enemySystem);
 					hero.ProcessDefense();
 
 					if (hero.gravity.mode)
@@ -2779,6 +2809,7 @@ namespace Loop
 				hero.mesh->animations[10].weight = 100000000.0f;
 
 				hero.mesh->animations[11].weight = 1000000000.0f;
+				hero.mesh->animations[11].speed = 0.5f;
 
 				hero.mesh->animations[12].weight = 100000000.0f;
 				hero.mesh->animations[12].speed = 0.5f;
@@ -2790,6 +2821,7 @@ namespace Loop
 			hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
 			hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
 			dx11::Audio::Play("Music", true, 0.3f);
+			hero.bowstringVoice = dx11::Audio::Play("Bow_bowstring", true, 0.0f);
 
 			sceneInitialized = true;
 		}

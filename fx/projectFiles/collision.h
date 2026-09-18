@@ -1,10 +1,28 @@
 namespace collision
 {
+    enum class CollisionGroup
+    {
+        Player,
+        Enemy,
+    };
+
+#define T true
+#define F false
+
+    const bool collisionTable[2][2] = {
+        {F, T}, // Player
+        {T, F}, // Enemy
+    };
+
+#undef T
+#undef F
+
     struct SphereCollider
     {
         float4 position = float4();
         float radius = 1.0f;
         bool isTouchable = true;
+        CollisionGroup collisionGroup = CollisionGroup::Player;
     };
 
     std::vector<SphereCollider*> colliders;
@@ -19,17 +37,19 @@ namespace collision
     struct RayInfo {
         float4 origin;
         float4 direction;
+        CollisionGroup collisionGroup;
         bool touchableOnly;
 
         RayInfo()
         {
             origin = float4();
             direction = float4();
+            collisionGroup = CollisionGroup::Player;
             touchableOnly = false;
         }
 
-        RayInfo(float4 Origin, float4 Direction, bool TouchableOnly)
-            : origin(Origin), direction(Direction), touchableOnly(TouchableOnly)
+        RayInfo(float4 Origin, float4 Direction, CollisionGroup OnCollisionGroup, bool TouchableOnly)
+            : origin(Origin), direction(Direction), collisionGroup(OnCollisionGroup), touchableOnly(TouchableOnly)
         {
         }
     };
@@ -39,6 +59,7 @@ namespace collision
         float4 direction;
         float radius;           // Радиус сферы для SphereCast
         float maxDistance;      // Максимальная дистанция
+        CollisionGroup collisionGroup;
         bool touchableOnly;
 
         SphereCastInfo()
@@ -47,11 +68,12 @@ namespace collision
             direction = float4();
             radius = 0.5f;
             maxDistance = 100.0f;
+            collisionGroup = CollisionGroup::Player;
             touchableOnly = false;
         }
 
-        SphereCastInfo(float4 Origin, float4 Direction, float Radius, float MaxDistance, bool TouchableOnly = false)
-            : origin(Origin), direction(Direction), radius(Radius), maxDistance(MaxDistance), touchableOnly(TouchableOnly)
+        SphereCastInfo(float4 Origin, float4 Direction, float Radius, float MaxDistance, CollisionGroup OnCollisionGroup, bool TouchableOnly = false)
+            : origin(Origin), direction(Direction), radius(Radius), maxDistance(MaxDistance), collisionGroup(OnCollisionGroup), touchableOnly(TouchableOnly)
         {
         }
     };
@@ -87,6 +109,22 @@ namespace collision
             else
             {
                 i++;
+            }
+        }
+    }
+
+    void DestroySphereCollider(SphereCollider* collider)
+    {
+        if (!collider)
+            return;
+
+        for (size_t i = 0;i < colliders.size();++i)
+        {
+            if (colliders[i] == collider)
+            {
+                colliders[i] = colliders.back();
+                colliders.pop_back();
+                break;
             }
         }
     }
@@ -171,16 +209,19 @@ namespace collision
         for (SphereCollider* collider : colliders) {
             RaycastResult hit;
 
-            if (!ray.touchableOnly || collider->isTouchable)
-            {
-                if (raycast_sphere(ray, collider, hit) && hit.distance < closestHit.distance) {
-                    closestHit.hit = true;
-                    closestHit.distance = hit.distance;
-                    closestHit.position = hit.position;
-                    closestHit.normal = hit.normal;
-                    closestHit.collider = collider;
-                    //closestHit.entity = entity;
-                }
+            if (ray.touchableOnly && !collider->isTouchable)
+                continue;
+
+            if (!collisionTable[(int)collider->collisionGroup][(int)ray.collisionGroup])
+                continue;
+
+            if (raycast_sphere(ray, collider, hit) && hit.distance < closestHit.distance) {
+                closestHit.hit = true;
+                closestHit.distance = hit.distance;
+                closestHit.position = hit.position;
+                closestHit.normal = hit.normal;
+                closestHit.collider = collider;
+                //closestHit.entity = entity;
             }
         }
 
@@ -252,19 +293,21 @@ namespace collision
         for (SphereCollider* collider : colliders) {
             RaycastResult hit;
 
-            // Проверяем, активен ли коллайдер и подходит ли по фильтру
-            if (!sphereCast.touchableOnly || collider->isTouchable)
-            {
-                // Используем новый метод проверки пересечения сферы со сферой
-                if (spherecast_sphere(sphereCast, collider, hit)
-                    && hit.distance < closestHit.distance) {
-                    closestHit.hit = true;
-                    closestHit.distance = hit.distance;
-                    closestHit.position = hit.position;
-                    closestHit.normal = hit.normal;
-                    closestHit.collider = collider;
-                    //closestHit.entity = entity;
-                }
+            if (sphereCast.touchableOnly && !collider->isTouchable)
+                continue;
+
+            if (!collisionTable[(int)collider->collisionGroup][(int)sphereCast.collisionGroup])
+                continue;
+
+            // Используем новый метод проверки пересечения сферы со сферой
+            if (spherecast_sphere(sphereCast, collider, hit)
+                && hit.distance < closestHit.distance) {
+                closestHit.hit = true;
+                closestHit.distance = hit.distance;
+                closestHit.position = hit.position;
+                closestHit.normal = hit.normal;
+                closestHit.collider = collider;
+                //closestHit.entity = entity;
             }
         }
 

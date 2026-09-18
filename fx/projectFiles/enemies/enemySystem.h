@@ -1,7 +1,7 @@
 #pragma once
 
 #include "enemy.h"
-#include <array>
+#include <vector>
 #include <cmath>
 #include <random>
 
@@ -20,7 +20,7 @@ namespace Enemies
 	class EnemySystem
 	{
 	public:
-		static constexpr std::size_t Count = 10;
+		static constexpr std::size_t Count = 100;
 		static constexpr auto DefaultSeed = std::mt19937::default_seed;
 
 		EnemySystem() = default;
@@ -30,11 +30,16 @@ namespace Enemies
 		EnemySystem& operator=(EnemySystem&&) = delete;
 
 		bool IsInitialized() const { return initialized_; }
-		const std::array<Enemy, Count>& Items() const { return enemies_; }
+		const std::vector<Enemy>& Items() const { return enemies_; }
 
 		void Reset(Position center, Position right, Position forward,
 			std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
 		{
+
+			for (Enemy& e : enemies_)
+				if (e.collider) { collision::DestroySphereCollider(e.collider);e.collider = nullptr; }
+			enemies_.clear();
+			enemies_.resize(Count);
 			random_.seed(seed);
 			for (std::size_t i = 0; i < Count; ++i)
 			{
@@ -50,6 +55,70 @@ namespace Enemies
 				enemy.movementRadius = config.radius > 0.0f ? config.radius : 0.0f;
 				const float speed = config.baseSpeed + config.speedVariation * (i % 4);
 				enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
+				enemy.initializeCallback = [spawn](Enemy& value) {
+					value.position = spawn;
+					value.movementCenter = spawn;
+					value.movementTarget = spawn;
+					};
+				enemy.Initialize();
+				enemy.movementTarget = RandomTarget(enemy);
+				enemy.updateCallback = [this](Enemy& value, float dt) { UpdateWander(value, dt); };
+			}
+			initialized_ = true;
+		}
+
+		void ResetRandomOnLines(std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
+		{
+			for (Enemy& e : enemies_)
+				if (e.collider) { collision::DestroySphereCollider(e.collider);e.collider = nullptr; }
+			enemies_.clear();
+			enemies_.resize(Count);
+			random_.seed(seed);
+
+			// Соберём валидные линии заранее
+			std::vector<int> validLines;
+			validLines.reserve(Object::starLineList.lineCount);
+			for (int i = 0; i < Object::starLineList.lineCount; ++i)
+			{
+				const auto& line = Object::starLineList.line[i];
+				if (line.pointCount > 1)
+					validLines.push_back(i);
+			}
+
+			if (validLines.empty())
+			{
+				initialized_ = false;
+				return;
+			}
+
+			std::uniform_int_distribution<int> lineDist(0, (int)validLines.size() - 1);
+
+			for (std::size_t i = 0; i < Count; ++i)
+			{
+				Enemy& enemy = enemies_[i];
+				enemy = Enemy{};
+
+				const int lineIdx = validLines[lineDist(random_)];
+				const auto& line = Object::starLineList.line[lineIdx];
+
+				std::uniform_int_distribution<int> pointDist(0, line.pointCount - 1);
+				const int pointIdx = pointDist(random_);
+
+				const float4& p = line.point[pointIdx];
+				const float4& up = line.upVector[pointIdx];
+
+				const float spawnOffset = 0.5f;
+
+				Position spawn = {
+					p.x + up.x * spawnOffset,
+					p.y + up.y * spawnOffset,
+					p.z + up.z * spawnOffset
+				};
+
+				enemy.movementRadius = config.radius > 0.0f ? config.radius : 0.0f;
+				const float speed = config.baseSpeed + config.speedVariation * (i % 4);
+				enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
+
 				enemy.initializeCallback = [spawn](Enemy& value) {
 					value.position = spawn;
 					value.movementCenter = spawn;
@@ -82,12 +151,36 @@ namespace Enemies
 
 			if (enemy.collider)
 			{
+				enemy.collider->radius = 1;
 				enemy.collider->position.x = position.x;
 				enemy.collider->position.y = position.y;
 				enemy.collider->position.z = position.z;
+				enemy.collider->isTouchable = true;
 			}
 		}
-		//
+		void RemoveDead()
+		{
+			for (auto it = enemies_.begin();it != enemies_.end();)
+			{
+				if (!it->alive)
+				{
+					if (it->collider)
+					{
+						collision::DestroySphereCollider(it->collider);
+						it->collider = nullptr;
+					}
+					it = enemies_.erase(it);
+				}
+				else ++it;
+			}
+		}
+		Enemy* FindByCollider(collision::SphereCollider* col)
+		{
+			if (!col) return nullptr;
+			for (Enemy& e : enemies_)
+				if (e.collider == col) return &e;
+			return nullptr;
+		}
 
 	private:
 		Position RandomTarget(const Enemy& enemy)
@@ -134,7 +227,7 @@ namespace Enemies
 			enemy.position.z += delta.z * scale;
 		}
 
-		std::array<Enemy, Count> enemies_{};
+		std::vector<Enemy> enemies_{};
 		std::mt19937 random_{ DefaultSeed };
 		bool initialized_ = false;
 	};
