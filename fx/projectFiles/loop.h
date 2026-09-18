@@ -717,6 +717,10 @@ struct hero_ {
 
 		if (blocking) {
 			Log("Damage blocked\n");
+			if (invulnerabilityTimer <= 0.0f) {
+				invulnerabilityTimer = 1.0f;
+				dx11::Audio::Play("Shield_hit", false, 1.0f);
+			}
 			return;
 		}
 
