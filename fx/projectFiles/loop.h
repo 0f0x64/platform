@@ -878,6 +878,7 @@ struct hero_ {
 	float stepTime = 0.0f;
 	IXAudio2SourceVoice* glideVoice;
 	IXAudio2SourceVoice* idleVoice;
+	IXAudio2SourceVoice* bowstringVoice;
 
 	void ProcessMove(float deltaTime)
 	{
@@ -1276,12 +1277,15 @@ struct hero_ {
 	bool blocking = false;
 
 	void ProcessAttack(float4 camPos, float4 camForward, Enemies::EnemySystem& enemySystem) {
+		dx11::Audio::SetVolume(bowstringVoice, bowCharge);
+
 		if (blocking) return;
 
 		if (inputController.isLMBPressed()) {
 			if (!aiming) {
 				aiming = true;
 
+				dx11::Audio::Play("Bow_draw", false, 1.0f);
 				ConstBuf::interp::Animate(fov, 60, 1.5f, ConstBuf::interp::Curve::EaseOutExpo);
 				ConstBuf::interp::Animate(bowCharge, 1.0f, 1.5f);
 
@@ -2589,10 +2593,10 @@ namespace Loop
 			dx11::Audio::LoadOggFile("Swarm", "..//fx//projectFiles//Swarm.ogg");
 			dx11::Audio::LoadOggFile("Bow_shoot", "..//fx//projectFiles//Bow_shoot.ogg");
 			dx11::Audio::LoadOggFile("Player_hit", "..//fx//projectFiles//Player_hit.ogg");
-			dx11::Audio::LoadOggFile("Bowstring_draw", "..//fx//projectFiles//Bowstring_draw.ogg");
+			dx11::Audio::LoadOggFile("Bow_draw", "..//fx//projectFiles//Bow_draw.ogg");
 			dx11::Audio::LoadOggFile("Swarm_hit", "..//fx//projectFiles//Swarm_hit.ogg");
 			dx11::Audio::LoadOggFile("Shield_hit", "..//fx//projectFiles//Shield_hit.ogg");
-			dx11::Audio::LoadOggFile("Bowstring_bow", "..//fx//projectFiles//Bowstring_bow.ogg");
+			dx11::Audio::LoadOggFile("Bow_bowstring", "..//fx//projectFiles//Bow_bowstring.ogg");
 
 			dx11::Audio::LoadOggFile("Music", "..//fx//projectFiles//Music.ogg");
 		}
@@ -2817,6 +2821,7 @@ namespace Loop
 			hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
 			hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
 			dx11::Audio::Play("Music", true, 0.3f);
+			hero.bowstringVoice = dx11::Audio::Play("Bow_bowstring", true, 0.0f);
 
 			sceneInitialized = true;
 		}
