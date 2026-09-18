@@ -723,6 +723,7 @@ struct hero_ {
 		if (invulnerabilityTimer > 0.0f)
 			return;
 
+		dx11::Audio::Play("Player_hit", false, 1.0f);
 		health -= damage;
 
 		if (health < 0.0f)
@@ -1292,6 +1293,7 @@ struct hero_ {
 				mesh->StopAnimation(9);
 
 				if (bowCharge >= 0.35f) {
+					dx11::Audio::Play("Bow_shoot", false, 1.0f);
 					mesh->PlayAnimation(10, 0.1f);
 
 					collision::RayInfo ray = collision::RayInfo(camPos, camForward * 100, collision::CollisionGroup::Player, false);
@@ -2579,6 +2581,14 @@ namespace Loop
 			dx11::Audio::LoadOggFile("Jump", "..//fx//projectFiles//Jump.ogg");
 			dx11::Audio::LoadOggFile("Glide", "..//fx//projectFiles//Glide.ogg");
 			dx11::Audio::LoadOggFile("Character", "..//fx//projectFiles//Character.ogg");
+
+			dx11::Audio::LoadOggFile("Swarm", "..//fx//projectFiles//Swarm.ogg");
+			dx11::Audio::LoadOggFile("Bow_shoot", "..//fx//projectFiles//Bow_shoot.ogg");
+			dx11::Audio::LoadOggFile("Player_hit", "..//fx//projectFiles//Player_hit.ogg");
+			dx11::Audio::LoadOggFile("Bowstring_draw", "..//fx//projectFiles//Bowstring_draw.ogg");
+			dx11::Audio::LoadOggFile("Swarm_hit", "..//fx//projectFiles//Swarm_hit.ogg");
+			dx11::Audio::LoadOggFile("Shield_hit", "..//fx//projectFiles//Shield_hit.ogg");
+			dx11::Audio::LoadOggFile("Bowstring_bow", "..//fx//projectFiles//Bowstring_bow.ogg");
 
 			dx11::Audio::LoadOggFile("Music", "..//fx//projectFiles//Music.ogg");
 		}

@@ -47,9 +47,11 @@ namespace Enemies
 		{
 			if (deltaTime > 0.0f && updateCallback) updateCallback(*this, deltaTime);
 
-			collider->position.x = position.x;
-			collider->position.y = position.y;
-			collider->position.z = position.z;
+			if (collider) {
+				collider->position.x = position.x;
+				collider->position.y = position.y;
+				collider->position.z = position.z;
+			}
 
 			if (hitFlash > 0.0f)
 			{
@@ -69,7 +71,10 @@ namespace Enemies
 			{
 				health = 0.0f;
 				alive = false;
-				if (collider) collider->isTouchable = false;  // мёртвых не бьём рейкастом
+				if (collider) {
+					collision::DestroySphereCollider(collider);
+					collider = nullptr;
+				}
 			}
 		}
 	};
