@@ -2794,6 +2794,8 @@ namespace Object {
 
 	}
 
+	int starStencilTarget = 0;
+
 	cmd(AllStars, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode)
 	{
 		reflect;
