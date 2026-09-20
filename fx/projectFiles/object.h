@@ -1389,6 +1389,25 @@ namespace Object {
 		}
 	}
 
+	void psModeSet2(pMode mode)
+	{
+		switch (mode)
+		{
+		case pMode::point:
+		{
+			ps::basic2 = { .params = {.hilight = 0.f } };
+			ps::basic2.set();
+			break;
+		}
+		case pMode::glow:
+		{
+			ps::basicLow2 = { .params = {.hilight = 0.f } };
+			ps::basicLow2.set();
+			break;
+		}
+		}
+	}
+
 	void PillarsHand(int count, int skipper, pMode mode)
 	{
 		int gX = sqrt(count / skipper);
