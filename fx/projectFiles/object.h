@@ -937,26 +937,19 @@ namespace Object {
 	// starPos: позиция звезды (в мировых единицах, как в NewStar)
 	// starRadius: радиус звезды (в тех же единицах)
 	void GenerateProminenceBranch(
-		float l,                       // параметр анимации (-1..1)
-		int branchType,                // 1,2,3 – тип ветви
-		float t_start, float t_end,    // диапазон параметра t
-		int numPoints,                 // количество точек
-		const XMMATRIX& worldRot,      // глобальная ориентация протуберанца на сфере
-		const float4& starPos,         // позиция звезды
-		float starRadius,              // радиус звезды
-		float beamYaw,                 // конечный индивидуальный поворот луча (вокруг локальной оси Y)
-		float beamPitch,               // конечный индивидуальный наклон луча (вокруг локальной оси X)
-		float offsetX,                 // конечное смещение по локальной оси Y (вверх)
-		float offsetY,                 // конечное смещение по локальной оси Z (вправо)
-		float tangentRoll)             // поворот всего протуберанца вокруг своей оси (касательной плоскости)
+		float l, int branchType,
+		float t_start, float t_end, int numPoints,
+		const XMMATRIX& worldRot,
+		const float4& starPos, float starRadius,
+		float beamYaw, float beamPitch,
+		float offsetX, float offsetY,
+		float tangentRoll)
 	{
 		if (numPoints < 2) numPoints = 2;
 		NewLine();
 
-		// Коэффициент плавного включения индивидуальных параметров (кроме tangentRoll)
-		float morph = clamp(l, 0.0f, 1.0f);   // 0 при l<=0, 1 при l>=1
+		float morph = clamp(l, 0.0f, 1.0f);
 
-		// Эффективные значения с учётом morph
 		float starRadiusLocal = starRadius / 40.0f;
 		float effOffsetX = offsetX * morph;
 		float effOffsetY = offsetY * morph;
@@ -965,13 +958,13 @@ namespace Object {
 		float effectiveBeamYaw = beamYaw * morph;
 		float effectiveBeamPitch = beamPitch * morph;
 
-		// Матрицы с учётом morph
+		// Локальный наклон ветви (расхождение веера)
 		XMMATRIX beamRot = XMMatrixRotationRollPitchYaw(effectiveBeamPitch, effectiveBeamYaw, 0.0f);
-		// Итоговая матрица без tangentRoll, т.к. его применяем отдельно к точке
-		XMMATRIX finalRot = XMMatrixMultiply(beamRot, worldRot);
 
-		// Матрица поворота вокруг собственной оси
-		XMMATRIX rollMat = XMMatrixRotationX(tangentRoll);
+		// Мировая ось вращения — направление радиуса протуберанца
+		// (worldRot переводит локальный X в мир, что и есть радиальное направление)
+		XMVECTOR worldRadial = XMVector3Normalize(worldRot.r[0]);
+		XMVECTOR rollQ = XMQuaternionRotationAxis(worldRadial, tangentRoll);
 
 		float l_sq = l * l;
 		for (int i = 0; i < numPoints; ++i)
@@ -981,13 +974,11 @@ namespace Object {
 
 			if (l <= 0.0f)
 			{
-				// Фаза рождения: все ветви одинаковы
 				z = ComputeF(t);
 				z *= std::pow(100.0f, -l_sq);
 			}
 			else
 			{
-				// Фаза разделения: индивидуальные формулы
 				switch (branchType)
 				{
 				case 1:
@@ -1005,10 +996,10 @@ namespace Object {
 			}
 
 			XMVECTOR point = ComplexTo3D(z);
-			// Вращаем вокруг собственной оси (касательной плоскости)
-			point = XMVector3TransformNormal(point, rollMat);
 			point = point + offsetLocal;
-			point = XMVector3TransformNormal(point, finalRot);
+			point = XMVector3TransformNormal(point, beamRot);   // локальный наклон
+			point = XMVector3TransformNormal(point, worldRot);  // ориентация на сфере
+			point = XMVector3Rotate(point, rollQ);              // поворот вокруг оси протуберанца
 			point = point * 40.0f;
 			point = point + XMVectorSet(starPos.x, starPos.y, starPos.z, 0.0f);
 			AddPoint(V2F(point));
@@ -1255,7 +1246,7 @@ namespace Object {
 		// При l <= 0 (фаза рождения) эти углы равны нулю, плавно нарастая до конечных.
 		// [0] – первый луч (P1), [1] – второй (P2), [2] – третий (P3).
 		// Отрицательное значение – поворот влево, положительное – вправо.
-		float beamYaw[3] = { -0.15f, 0.0f,  0.15f };  // веер: левый, центральный, правый
+		float beamYaw[3] = { 0.0f, 0.0f,  0.0f };  // веер: левый, центральный, правый
 
 		// Углы наклона каждого луча вокруг локальной оси X (в радианах).
 		// Задают **конечное** вертикальное отклонение лучей.
@@ -1279,7 +1270,7 @@ namespace Object {
 		// применяется **сразу** и не зависит от фазы рождения.
 		// Позволяет вращать весь веер лучей в касательной плоскости.
 		// Может быть задан как функция от l или времени для эффекта вращения.
-		float tangentRoll = PI;  // вращение вокруг собственной оси в течение всей анимации
+		float tangentRoll = PI; //(PI*l*10);  // вращение вокруг собственной оси в течение всей анимации
 
 		float INLPOW = 0.5;
 		float INLAMPL = 3.0;
