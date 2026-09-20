@@ -2047,6 +2047,22 @@ namespace Object {
 		starLineList.lineCount = currentLine+1;
 	}
 
+	cmd(NewStar, int x, int y, int z, int rad, int r, int g, int b, int brightness)
+	{
+		reflect;
+
+		currentLine++;
+		currentPoint = 0;
+		starLineList.lineCount = currentLine + 1;
+
+		starLineList.line[currentLine].baseColor = float4(in.r / 100.f, in.g / 100.f, in.b / 100.f, in.brightness / 100.f);
+		starLineList.line[currentLine].basePoint[0] = float4(in.x / (float)denom, in.y / (float)denom, in.z / (float)denom, in.rad / (float)denom);
+		starLineList.line[currentLine].basePointCount = 1;
+
+		starLineList.line[currentLine].point[0] = starLineList.line[currentLine].basePoint[0];
+		starLineList.line[currentLine].pointCount = 1;
+	}
+
 	float4 gemini[] = {
 		// Pollux Line (Right Branch)
 		{  0.95f,  0.72f,  0.0f,  0.0f }, // Pollux
