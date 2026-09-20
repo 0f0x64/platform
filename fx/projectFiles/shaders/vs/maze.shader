@@ -12,7 +12,7 @@ cbuffer params : register(b0)
     int skipper;
     float4 heroPosition;
     float4 base_color;
-    float4 basePoint[1000];
+    float4 basePoint[3600];
     int particlesCount;
     int basePointsCount;
 
@@ -273,9 +273,9 @@ float3 pillar3(uint qid,uint iid,float2 grid,float a, float t, float h)
     //pos+=pow(num+(noise3(pos*11))/4,1);
     float i01 = iid/(float)particlesCount;
     float ic = pow(1-sin(i01*PI),54)*52;
-    pos+=noise3(pos*5)*ic;
-    if (i01<.005) pos = basePoint[0]+normalize(noise3(pos*22))*2.;
-    if (i01>.995) pos = basePoint[basePointsCount-1]+normalize(noise3(pos*22))*2.;
+    //pos+=noise3(pos*5)*ic;
+    //if (i01<.005) pos = basePoint[0]+normalize(noise3(pos*22))*2.;
+    //if (i01>.995) pos = basePoint[basePointsCount-1]+normalize(noise3(pos*22))*2.;
     //pos+=noise3(pos*3)*pow(distance(heroPosition,pos)/18.,5)*5;
 
     return pos;
@@ -291,7 +291,8 @@ float3 safe_frac_centered(float3 v)
 pos_color CalcParticles(uint qid,uint iid,float4 grid)
 {
      qid *= skipper;
-     iid *= skipper;
+     //iid *= skipper;
+     //iid=iid%particlesCount;
      float t=time.x*.004;
      uint inStars = 1232*1213;
      if (mode==1||iid%inStars==0)
@@ -313,10 +314,13 @@ pos_color CalcParticles(uint qid,uint iid,float4 grid)
     p.color.a=1;
     p.color.rgb = noise3_u(pos*14*float3(12,55,112))/31+float3(1,3,5)/52;
     
+    
     //p.color*=.5;
 //    p.color*=base_color*(pow(length(pos)/16,4)+.1);
     //p.color*=1+sin(grid.x*PI*8);
     p.color=lerp(p.color,p.color.bgra,sin(length(pos)));
+
+    p.color.rgb = float3(3,1,0)/25;
 //    p.color=lerp(p.color,base_color/144,1-saturate(pow(length(pos)/6,11)));
 //pos+=noise(pos/12)*12-6;
 //pos*=.75;
