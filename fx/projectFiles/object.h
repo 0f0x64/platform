@@ -3405,6 +3405,9 @@ namespace Object {
 		//hi
 		RenderTarget::Set({ texture::pBuf,0 });
 
+		starStencilTarget = 0;
+		AllStars({ 200000,1,pMode::point,1000,200,10,triMode::on });
+
 		vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
 		Maze({ 200000,1,pMode::point,1390,925,111 });
 
