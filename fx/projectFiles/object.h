@@ -1829,7 +1829,8 @@ namespace Object {
 	const int smoothPointMAX = 1000;
 
 	struct starline {
-		float4 basePoint[100];
+		float4 baseColor;
+		float4 basePoint[4000];
 		float4 point[smoothPointMAX];
 		float4 upVector[smoothPointMAX];
 		int basePointCount = 0;
@@ -1837,7 +1838,7 @@ namespace Object {
 	};
 
 	struct {
-		starline line[100];
+		starline line[2000];
 		int lineCount = 0;
 	} starLineList;
 
