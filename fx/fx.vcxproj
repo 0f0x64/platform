@@ -432,7 +432,23 @@
     <None Include="projectFiles\shaders\lib\particleVS_main2.shader" />
     <None Include="projectFiles\shaders\lib\utils.shader" />
     <None Include="projectFiles\shaders\ps\basic.shader" />
+    <None Include="projectFiles\shaders\ps\basic2.shader">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_no_minifier|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Relsease_standart_linker|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Reflector|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
     <None Include="projectFiles\shaders\ps\basicLow.shader" />
+    <None Include="projectFiles\shaders\ps\basicLow2.shader">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_no_minifier|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Relsease_standart_linker|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Reflector|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
     <None Include="projectFiles\shaders\ps\cat.shader" />
     <None Include="projectFiles\shaders\ps\color.shader">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Debug|Win32'">true</ExcludedFromBuild>
@@ -447,6 +463,14 @@
     <None Include="projectFiles\shaders\ps\obj1.shader" />
     <None Include="projectFiles\shaders\ps\cubeMapViewer.shader" />
     <None Include="projectFiles\shaders\ps\output.shader" />
+    <None Include="projectFiles\shaders\ps\starTri.shader">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_no_minifier|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Relsease_standart_linker|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Reflector|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
     <None Include="projectFiles\shaders\ui\ps\box_ps.shader" />
     <None Include="projectFiles\shaders\ui\ps\letter_ps.shader" />
     <None Include="projectFiles\shaders\ui\ps\lineDrawerUV_ps.shader" />
@@ -485,6 +509,14 @@
     <None Include="projectFiles\shaders\vs\scorpBall.shader" />
     <None Include="projectFiles\shaders\vs\simpleCube.shader" />
     <None Include="projectFiles\shaders\vs\space.shader" />
+    <None Include="projectFiles\shaders\vs\star.shader">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release_no_minifier|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Relsease_standart_linker|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Reflector|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Editor_Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </None>
     <None Include="projectFiles\shaders\vs\Tau.shader" />
     <None Include="projectFiles\shaders\vs\transporter.shader" />
     <None Include="projectFiles\shaders\vs\tree.shader" />
