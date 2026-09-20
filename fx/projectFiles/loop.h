@@ -678,21 +678,25 @@ struct hero_ {
 			firstRun = false;
 			int range = 2;
 			pos = getRandVector4() * range;
-
 			startAirDistance = length3(V2F(pos));
-			int startLine = rand()% Object::starLineList.lineCount;
-			int startPoint = rand() % (Object::starLineList.line[startLine].pointCount-2)+1;
+			//int startLine = rand()% Object::starLineList.lineCount;
+			//int startPoint = rand() % (Object::starLineList.line[startLine].pointCount-2)+1;
+
+			int startLine = 1;
+			int startPoint = 1;
+
 			float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
 
-			pos += F2V(destPoint);
+			//destPoint = { 25455 /100., 15806 / 100., 25800 / 100. };
 
+			pos += F2V(destPoint);
 			gravity.mode = true;
 			gravity.progress = 0.0f;
 
 			forwardVector = XMVECTOR{ 0,0,1 };
 			upVector = XMVECTOR{ 0,1,0 };
 			rightVector = XMVECTOR{ 1,0,0 };
-			
+
 			lastJumpAmpPercent = 1;
 		}
 

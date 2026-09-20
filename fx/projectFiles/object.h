@@ -3427,10 +3427,10 @@ namespace Object {
 		RenderTarget::Set({ texture::pBuf,0 });
 
 		starStencilTarget = 0;
-		AllStars({ 200000,1,pMode::point,1000,200,10,triMode::on });
+		AllStars({ 100000,1,pMode::point,1000,200,10,triMode::on });
 
 		vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
-		Maze({ 200000,1,pMode::point,1390,925,111 });
+		Maze({ 1000000,1,pMode::point,1390,925,111 });
 
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
 		//NeutronStar(neutronStar_cnt, 1, pMode::point);
