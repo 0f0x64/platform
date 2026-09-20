@@ -124,6 +124,14 @@ struct pos_color
     float sz;
 };
 
+struct pos_color2
+{
+    float4 pos;
+    float4 wpos;
+    float4 color;
+    float sz;
+};
+
 float hash_s(int qid)
 {
     return hash(qid)-.5;
