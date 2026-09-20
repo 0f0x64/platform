@@ -2775,6 +2775,111 @@ namespace Object {
 
 	}
 
+	cmd(AllStars, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode)
+	{
+		reflect;
+
+		int gX = sqrt(in.count / in.skipper);
+		int gY = sqrt(in.count / in.skipper);
+
+		if (in.tMode == triMode::on)
+		{
+			Culling::Set({ cullmode::front });
+			DepthBuf::Mode({ depthmode::off });
+
+			if (starStencilTarget == 2)
+			{
+				DepthBuf::Mode({ depthmode::off });
+			}
+
+			BlendMode::Set({
+				.mode = blendmode::on,
+				.op = blendop::add
+				});
+		}
+		else
+		{
+			psModeSet2(in.mode);
+
+			Culling::Set({ cullmode::off });
+			DepthBuf::Mode({ depthmode::readonly });
+			BlendMode::Set({
+				.mode = blendmode::on,
+				.op = blendop::add
+				});
+		}
+
+		for (int i = 0; i < starLineList.lineCount; i++)
+		{
+			if (starLineList.line[i].pointCount != 1) continue;//skip all paths
+
+			auto sd = starLineList.line[i].point[0];
+
+			int count = 500000;
+
+			int w = sd.w;
+			if (in.tMode == triMode::on)
+			{
+				gX = 64;
+				gY = 32;
+
+
+				if (starStencilTarget == 1)
+				{
+					//	w *= .975;
+				}
+
+				if (starStencilTarget == 2)
+				{
+					//w *= 1.15;
+				}
+
+				auto sd = starLineList.line[i].point[0];
+				ps::starTri.params = {
+						.PosRad = float4(sd.x,sd.y,sd.z,sd.w)
+
+				};
+
+				ps::starTri.set();
+
+			}
+
+			vs::star = {
+				.params = {
+					.model = XMMatrixTranspose(XMMatrixTranslation(0,0,0)),
+					.gX = gX,
+					.gY = gY,
+					.mode = (int)in.mode,
+					.skipper = 0,
+					.base_color = starLineList.line[i].baseColor,
+					.PosRad = float4(sd.x,sd.y,sd.z,w),
+					.triMode = (int)in.tMode
+				},
+			};
+
+
+			vs::star.set();
+
+			if (in.tMode == triMode::on) {
+				Drawer::NullDrawerTri({ gX * gY * 2, 1 });
+			}
+			else
+			{
+				Drawer::NullDrawer({ 1,in.count / in.skipper });
+			}
+
+		}
+
+		psModeSet(in.mode);
+
+		Culling::Set({ cullmode::off });
+		DepthBuf::Mode({ depthmode::readonly });
+		BlendMode::Set({
+			.mode = blendmode::on,
+			.op = blendop::add
+			});
+	}
+
 	cmd(Rocks, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
