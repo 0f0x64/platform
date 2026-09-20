@@ -1510,6 +1510,7 @@ gameCamera_ gameCamera;
 
 
 
+
 float processTimer()
 {
 	static double lastFrameTime = timer::frameBeginTime;
@@ -1539,6 +1540,26 @@ namespace Loop
 	Enemies::Position ToEnemyPosition(XMVECTOR value)
 	{
 		return { XMVectorGetX(value), XMVectorGetY(value), XMVectorGetZ(value) };
+	}
+
+
+	IXAudio2SourceVoice* musicVoice;
+	IXAudio2SourceVoice* swarmVoice;
+	void processAmbient()
+	{
+		float4 camPos = V2F(gameCamera.finalCameraEye);
+
+		float minDist = 20.f;
+		for (const Enemies::Enemy& enemy : enemySystem.Items()) {
+			if (!enemy.alive)
+				continue;
+
+			float dist = length(float4(enemy.position.x, enemy.position.y, enemy.position.z, 0) - camPos);
+			minDist = min(minDist, dist);
+		}
+
+		dx11::Audio::SetVolume(musicVoice, clamp((minDist - 10.f) / 10.f, 0.f, 1.f) * 0.3);
+		dx11::Audio::SetVolume(swarmVoice, 1.f - minDist / 20.f);
 	}
 
 	void Precalc()
@@ -2676,6 +2697,8 @@ namespace Loop
 				enemySystem.Update(FIXED_DT);
 				gameCamera.Update(FIXED_DT);
 
+				processAmbient();
+
 				accumulator -= FIXED_DT;
 			}
 
@@ -2820,8 +2843,9 @@ namespace Loop
 
 			hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
 			hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
-			dx11::Audio::Play("Music", true, 0.3f);
 			hero.bowstringVoice = dx11::Audio::Play("Bow_bowstring", true, 0.0f);
+			swarmVoice = dx11::Audio::Play("Swarm", true, 0.0f);
+			musicVoice = dx11::Audio::Play("Music", true, 0.3f);
 
 			sceneInitialized = true;
 		}
