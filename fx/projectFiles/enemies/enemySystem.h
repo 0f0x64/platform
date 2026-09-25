@@ -32,7 +32,7 @@ namespace Enemies
 		bool IsInitialized() const { return initialized_; }
 		const std::vector<Enemy>& Items() const { return enemies_; }
 
-		void Reset(Position center, Position right, Position forward,
+		void Reset(float4 center, float4 right, float4 forward,
 			std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
 		{
 
@@ -47,7 +47,7 @@ namespace Enemies
 				enemy = Enemy{};
 				const float lateral = (static_cast<float>(i) - (Count - 1) * 0.5f) * config.spacing;
 				const float depth = config.forwardDistance + (i % 2) * config.rowSpacing;
-				const Position spawn = {
+				const float4 spawn = {
 					center.x + right.x * lateral + forward.x * depth,
 					center.y + right.y * lateral + forward.y * depth,
 					center.z + right.z * lateral + forward.z * depth
@@ -109,7 +109,7 @@ namespace Enemies
 
 				const float spawnOffset = 0.5f;
 
-				Position spawn = {
+				float4 spawn = {
 					p.x + up.x * spawnOffset,
 					p.y + up.y * spawnOffset,
 					p.z + up.z * spawnOffset
@@ -138,7 +138,7 @@ namespace Enemies
 		}
 
 		// для спавна противника перед игроком.
-		void SetEnemyPosition(std::size_t index, Position position)
+		void SetEnemyPosition(std::size_t index, float4 position)
 		{
 			if (index >= Count)
 				return;
@@ -183,10 +183,10 @@ namespace Enemies
 		}
 
 	private:
-		Position RandomTarget(const Enemy& enemy)
+		float4 RandomTarget(const Enemy& enemy)
 		{
 			std::uniform_real_distribution<float> coordinate(-1.0f, 1.0f);
-			Position offset;
+			float4 offset;
 			float squaredLength;
 			do {
 				offset = { coordinate(random_), coordinate(random_), coordinate(random_) };
@@ -201,8 +201,8 @@ namespace Enemies
 
 		void SwarmUpdate(Enemy& enemy, float deltaTime)
 		{
-			constexpr float ArrivalDistance = 0.01f;
-			const Position delta = {
+			/*constexpr float ArrivalDistance = 0.01f;
+			const float4 delta = {
 				enemy.movementTarget.x - enemy.position.x,
 				enemy.movementTarget.y - enemy.position.y,
 				enemy.movementTarget.z - enemy.position.z
@@ -224,7 +224,13 @@ namespace Enemies
 			const float scale = step / distance;
 			enemy.position.x += delta.x * scale;
 			enemy.position.y += delta.y * scale;
-			enemy.position.z += delta.z * scale;
+			enemy.position.z += delta.z * scale;*/
+
+			constexpr float PlayerDetectDistance = 10.f;
+
+			/*if (length(hero.pos - enemy.position) < 5) {
+
+			}*/
 		}
 
 		std::vector<Enemy> enemies_{};

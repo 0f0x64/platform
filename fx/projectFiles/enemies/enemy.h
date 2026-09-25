@@ -4,13 +4,6 @@
 
 namespace Enemies
 {
-	struct Position
-	{
-		float x = 0.0f;
-		float y = 0.0f;
-		float z = 0.0f;
-	};
-
 	struct Enemy
 	{
 		using InitializeCallback = std::function<void(Enemy&)>;
@@ -18,9 +11,9 @@ namespace Enemies
 
 		collision::SphereCollider* collider;
 
-		Position position;
-		Position movementCenter;
-		Position movementTarget;
+		float4 position;
+		float4 movementCenter;
+		float4 movementTarget;
 		float movementRadius = 0.65f;
 		float movementSpeed = 0.2f;
 		InitializeCallback initializeCallback;

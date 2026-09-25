@@ -1541,7 +1541,7 @@ namespace Loop
 	Enemies::EnemySystem enemySystem;
 	Enemies::EnemyRenderer enemyRenderer;
 
-	Enemies::Position ToEnemyPosition(XMVECTOR value)
+	float4 ToEnemyPosition(XMVECTOR value)
 	{
 		return { XMVectorGetX(value), XMVectorGetY(value), XMVectorGetZ(value) };
 	}
