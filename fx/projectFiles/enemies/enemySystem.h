@@ -62,7 +62,7 @@ namespace Enemies
 					};
 				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, float dt) { UpdateWander(value, dt); };
+				enemy.updateCallback = [this](Enemy& value, float dt) { SwarmUpdate(value, dt); };
 			}
 			initialized_ = true;
 		}
@@ -126,7 +126,7 @@ namespace Enemies
 					};
 				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, float dt) { UpdateWander(value, dt); };
+				enemy.updateCallback = [this](Enemy& value, float dt) { SwarmUpdate(value, dt); };
 			}
 			initialized_ = true;
 		}
@@ -199,7 +199,7 @@ namespace Enemies
 			};
 		}
 
-		void UpdateWander(Enemy& enemy, float deltaTime)
+		void SwarmUpdate(Enemy& enemy, float deltaTime)
 		{
 			constexpr float ArrivalDistance = 0.01f;
 			const Position delta = {
