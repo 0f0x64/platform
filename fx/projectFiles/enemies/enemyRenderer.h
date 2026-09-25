@@ -9,10 +9,11 @@ namespace Enemies
 	public:
 		void Load()
 		{
-			mesh_.LoadObj("..//fx//projectFiles//Sphere.glb");
+			//mesh_.LoadObj("..//fx//projectFiles//Sphere.glb");
+			mesh_.LoadObj("..//fx//projectFiles//Swarm_idle.glb");
 			if (!mesh_.loaded)
 			{
-				Log("Enemy renderer: Sphere.glb failed to load; enemies cannot be displayed.\n");
+				Log("Enemy renderer: model failed to load; enemies cannot be displayed.\n");
 				return;
 			}
 			mesh_.Update(0.0f);
