@@ -293,6 +293,10 @@ struct float4 {
         w *= inv;
         return *this;
     }
+
+    bool operator==(const float4& other) const {
+        return (x == other.x && y == other.y && z == other.z && w == other.w);
+    }
 };
 
 // float * float4

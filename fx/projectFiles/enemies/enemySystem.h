@@ -199,6 +199,12 @@ namespace Enemies
 			};
 		}
 
+		float4 PointAroundPlayer(const float4& playerPos)
+		{
+			float4 direction = getRandomDirection();
+			return playerPos + direction * 2.f;
+		}
+
 		void SwarmUpdate(Enemy& enemy, collision::SphereCollider* heroCollider, float deltaTime)
 		{
 			/*constexpr float ArrivalDistance = 0.01f;
@@ -229,13 +235,34 @@ namespace Enemies
 			if (!heroCollider) return;
 
 			constexpr float PlayerDetectDistance = 10.f;
-			constexpr float moveSpeed = 1.f;
 
 			float4 vec = heroCollider->position - enemy.position;
-			if (length(vec) < PlayerDetectDistance) {
-				Log("Player detected\n");
+			if (length(vec) > PlayerDetectDistance)
+				return;
 
-				float4 step = normalize(vec) * moveSpeed * deltaTime;
+			Log("Player detected\n");
+
+			/*if (enemy.movementTarget == float4()) {
+				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
+			}*/
+				
+			float4 direction = enemy.movementTarget - enemy.position;
+			float distance = length(direction);
+
+			while (distance <= 0.01f) {
+				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
+				direction = enemy.movementTarget - enemy.position;
+				distance = length(direction);
+			}
+
+			float4 step = normalize(direction) * enemy.movementSpeed * deltaTime;
+
+			if (length(step) >= distance)
+			{
+				enemy.position = enemy.movementTarget;
+				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
+			}
+			else {
 				enemy.position += step;
 			}
 		}

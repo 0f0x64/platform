@@ -15,7 +15,7 @@ namespace Enemies
 		float4 movementCenter;
 		float4 movementTarget;
 		float movementRadius = 0.65f;
-		float movementSpeed = 0.2f;
+		float movementSpeed = 1.5f;
 		InitializeCallback initializeCallback;
 		UpdateCallback updateCallback;
 
@@ -23,6 +23,11 @@ namespace Enemies
 		float maxHealth = 100.0f;
 		float health = 100.0f;
 		bool  alive = true;
+
+		// === BEHAVIOR ===
+		const float chargeTime = 0.5f;
+		float charge = 0.0f;
+		bool isCharging = false;
 
 		// === Эффект вспышки при попадании ===
 		float hitFlash = 0.0f;   // 0..1, гаснет со временем
