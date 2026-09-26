@@ -25,7 +25,7 @@ namespace Enemies
 		bool  alive = true;
 
 		// === BEHAVIOR ===
-		const float chargeTime = 0.5f;
+		float chargeTime = 0.5f;
 		float charge = 0.0f;
 		bool isCharging = false;
 

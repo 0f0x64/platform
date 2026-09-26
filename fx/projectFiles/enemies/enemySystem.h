@@ -62,7 +62,7 @@ namespace Enemies
 					};
 				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* heroCollider, float dt) { SwarmUpdate(value, heroCollider, dt); };
+				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, float dt) { SwarmUpdate(value, hc, dt); };
 			}
 			initialized_ = true;
 		}
@@ -126,7 +126,7 @@ namespace Enemies
 					};
 				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* heroCollider, float dt) { SwarmUpdate(value, heroCollider, dt); };
+				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, float dt) { SwarmUpdate(value, hc, dt); };
 			}
 			initialized_ = true;
 		}
