@@ -7,7 +7,7 @@ namespace Enemies
 	struct Enemy
 	{
 		using InitializeCallback = std::function<void(Enemy&)>;
-		using UpdateCallback = std::function<void(Enemy&, float)>;
+		using UpdateCallback = std::function<void(Enemy&, collision::SphereCollider*, float)>;
 
 		collision::SphereCollider* collider;
 
@@ -36,9 +36,9 @@ namespace Enemies
 			if (initializeCallback) initializeCallback(*this);
 		}
 
-		void Update(float deltaTime)
+		void Update(float deltaTime, collision::SphereCollider* heroCollider)
 		{
-			if (deltaTime > 0.0f && updateCallback) updateCallback(*this, deltaTime);
+			if (deltaTime > 0.0f && updateCallback) updateCallback(*this, heroCollider, deltaTime);
 
 			if (collider) {
 				collider->position.x = position.x;

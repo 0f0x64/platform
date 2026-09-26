@@ -62,7 +62,7 @@ namespace Enemies
 					};
 				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, float dt) { SwarmUpdate(value, dt); };
+				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* heroCollider, float dt) { SwarmUpdate(value, heroCollider, dt); };
 			}
 			initialized_ = true;
 		}
@@ -126,15 +126,15 @@ namespace Enemies
 					};
 				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, float dt) { SwarmUpdate(value, dt); };
+				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* heroCollider, float dt) { SwarmUpdate(value, heroCollider, dt); };
 			}
 			initialized_ = true;
 		}
 
-		void Update(float deltaTime)
+		void Update(float deltaTime, collision::SphereCollider* heroCollider)
 		{
 			if (!initialized_ || !std::isfinite(deltaTime) || deltaTime <= 0.0f) return;
-			for (Enemy& enemy : enemies_) enemy.Update(deltaTime);
+			for (Enemy& enemy : enemies_) enemy.Update(deltaTime, heroCollider);
 		}
 
 		// для спавна противника перед игроком.
@@ -199,7 +199,7 @@ namespace Enemies
 			};
 		}
 
-		void SwarmUpdate(Enemy& enemy, float deltaTime)
+		void SwarmUpdate(Enemy& enemy, collision::SphereCollider* heroCollider, float deltaTime)
 		{
 			/*constexpr float ArrivalDistance = 0.01f;
 			const float4 delta = {
@@ -226,11 +226,18 @@ namespace Enemies
 			enemy.position.y += delta.y * scale;
 			enemy.position.z += delta.z * scale;*/
 
+			if (!heroCollider) return;
+
 			constexpr float PlayerDetectDistance = 10.f;
+			constexpr float moveSpeed = 1.f;
 
-			/*if (length(hero.pos - enemy.position) < 5) {
+			float4 vec = heroCollider->position - enemy.position;
+			if (length(vec) < PlayerDetectDistance) {
+				Log("Player detected\n");
 
-			}*/
+				float4 step = normalize(vec) * moveSpeed * deltaTime;
+				enemy.position += step;
+			}
 		}
 
 		std::vector<Enemy> enemies_{};
