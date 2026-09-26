@@ -262,6 +262,18 @@ namespace Enemies
 				if (enemy.charge >= enemy.chargeTime) {
 					enemy.charge = 0.f;
 					enemy.isCharging = false;
+
+					enemy.attackCollider->position = enemy.position;
+					collision::CollisionResult result =
+						collision::sphere_vs_sphere(
+							heroCollider->position,
+							heroCollider->radius,
+							enemy.collider->position,
+							enemy.collider->radius
+						);
+					if (result.collided) {
+
+					}
 				}
 				return;
 			}

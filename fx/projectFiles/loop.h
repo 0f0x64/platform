@@ -1308,13 +1308,13 @@ struct hero_ {
 					dx11::Audio::Play("Bow_shoot", false, 1.0f);
 					mesh->PlayAnimation(10, 0.1f);
 
-					collision::RayInfo ray = collision::RayInfo(camPos, camForward * 100, collision::CollisionGroup::Player, false);
+					collision::RayInfo ray = collision::RayInfo(camPos, camForward * 100, collision::CollisionGroup::Player, true);
 					collision::RaycastResult result = collision::Raycast(ray);
 
 					float4 heroPos = V2F(pos);
 					float4 direction = result.hit ? normalize(result.position - heroPos) : camForward;
 
-					ray = collision::RayInfo(heroPos, direction * 100, collision::CollisionGroup::Player, false);
+					ray = collision::RayInfo(heroPos, direction * 100, collision::CollisionGroup::Player, true);
 					result = collision::Raycast(ray);
 
 					if (result.hit) {
