@@ -10,12 +10,9 @@ namespace Enemies
 		using UpdateCallback = std::function<void(Enemy&, collision::SphereCollider*, float)>;
 
 		collision::SphereCollider* collider;
+		collision::SphereCollider* attackCollider;
 
 		float4 position;
-		float4 movementCenter;
-		float4 movementTarget;
-		float movementRadius = 0.65f;
-		float movementSpeed = 1.5f;
 		InitializeCallback initializeCallback;
 		UpdateCallback updateCallback;
 
@@ -25,7 +22,12 @@ namespace Enemies
 		bool  alive = true;
 
 		// === BEHAVIOR ===
-		float chargeTime = 0.5f;
+		float4 movementCenter;
+		float4 movementTarget;
+		float movementRadius = 0.65f;
+		float movementSpeed = 2.0f;
+
+		float chargeTime = 1.0f;
 		float charge = 0.0f;
 		bool isCharging = false;
 
@@ -37,6 +39,11 @@ namespace Enemies
 		{
 			collider = collision::CreateSphereCollider();
 			collider->collisionGroup = collision::CollisionGroup::Enemy;
+
+			attackCollider = collision::CreateSphereCollider();
+			attackCollider->collisionGroup = collision::CollisionGroup::Enemy;
+			attackCollider->isTouchable = false;
+			attackCollider->radius = 4.f;
 
 			if (initializeCallback) initializeCallback(*this);
 		}

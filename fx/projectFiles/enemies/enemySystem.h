@@ -54,7 +54,7 @@ namespace Enemies
 				};
 				enemy.movementRadius = config.radius > 0.0f ? config.radius : 0.0f;
 				const float speed = config.baseSpeed + config.speedVariation * (i % 4);
-				enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
+				//enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
 				enemy.initializeCallback = [spawn](Enemy& value) {
 					value.position = spawn;
 					value.movementCenter = spawn;
@@ -117,7 +117,7 @@ namespace Enemies
 
 				enemy.movementRadius = config.radius > 0.0f ? config.radius : 0.0f;
 				const float speed = config.baseSpeed + config.speedVariation * (i % 4);
-				enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
+				//enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
 
 				enemy.initializeCallback = [spawn](Enemy& value) {
 					value.position = spawn;
@@ -236,29 +236,54 @@ namespace Enemies
 
 			constexpr float PlayerDetectDistance = 10.f;
 
-			float4 vec = heroCollider->position - enemy.position;
-			if (length(vec) > PlayerDetectDistance)
+			if (length(heroCollider->position - enemy.position) > PlayerDetectDistance) {
+				if (enemy.position == enemy.movementCenter)
+					return;
+
+				enemy.movementTarget = enemy.movementCenter;
+
+				float4 direction = enemy.movementTarget - enemy.position;
+				float distance = length(direction);
+				float4 step = normalize(direction) * enemy.movementSpeed * deltaTime;
+
+				if (length(step) >= distance)
+				{
+					enemy.isCharging = true;
+					enemy.position = enemy.movementTarget;
+				}
+				else {
+					enemy.position += step;
+				}
 				return;
+			}
 
-			Log("Player detected\n");
+			if (enemy.isCharging) {
+				enemy.charge += deltaTime;
+				if (enemy.charge >= enemy.chargeTime) {
+					enemy.charge = 0.f;
+					enemy.isCharging = false;
+				}
+				return;
+			}
 
-			/*if (enemy.movementTarget == float4()) {
+			if (enemy.movementTarget == enemy.position) {
 				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
-			}*/
+			}
 				
 			float4 direction = enemy.movementTarget - enemy.position;
 			float distance = length(direction);
 
-			while (distance <= 0.01f) {
+			/*while (distance <= 0.01f) {
 				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
 				direction = enemy.movementTarget - enemy.position;
 				distance = length(direction);
-			}
+			}*/
 
 			float4 step = normalize(direction) * enemy.movementSpeed * deltaTime;
 
 			if (length(step) >= distance)
 			{
+				enemy.isCharging = true;
 				enemy.position = enemy.movementTarget;
 				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
 			}
