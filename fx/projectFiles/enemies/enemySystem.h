@@ -232,6 +232,7 @@ namespace Enemies
 			enemy.position.y += delta.y * scale;
 			enemy.position.z += delta.z * scale;*/
 
+			if (!enemy.alive) return;
 			if (!heroCollider) return;
 
 			constexpr float PlayerDetectDistance = 10.f;
