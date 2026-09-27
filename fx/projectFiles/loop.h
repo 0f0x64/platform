@@ -1281,13 +1281,31 @@ struct hero_ : AliveCreation {
 
 	} pathControl;
 
-	std::vector<std::pair<float4, float4>> rays;
+	//std::vector<std::pair<float4, float4>> rays;
 	bool aiming = false;
 	float bowCharge = 0.0f;
+	float arrowSpeed = 25.f;
+	float arrowMaxDistance = 100.f;
 
 	bool blocking = false;
 
-	void ProcessAttack(float4 camPos, float4 camForward, Enemies::EnemySystem& enemySystem) {
+	struct arrow {
+		float4 startPosition;
+		float4 position;
+		float4 direction;
+		float charge;
+
+		arrow()
+			: startPosition(float4()), position(float4()), direction(float4()), charge(0)
+		{}
+
+		arrow(float4 Position, float4 Direction, float Charge)
+			: startPosition(Position), position(Position), direction(Direction), charge(Charge)
+		{}
+	};
+	std::vector<arrow> arrows;
+
+	void ProcessAttack(float4 camPos, float4 camForward) {
 		dx11::Audio::SetVolume(bowstringVoice, bowCharge);
 
 		if (blocking) return;
@@ -1315,34 +1333,13 @@ struct hero_ : AliveCreation {
 					dx11::Audio::Play("Bow_shoot", false, 1.0f);
 					mesh->PlayAnimation(10, 0.1f);
 
-					collision::RayInfo ray = collision::RayInfo(camPos, camForward * 100, collision::CollisionGroup::Player, true);
+					collision::RayInfo ray = collision::RayInfo(camPos, camForward * arrowMaxDistance, collision::CollisionGroup::Player, true);
 					collision::RaycastResult result = collision::Raycast(ray);
 
 					float4 heroPos = V2F(pos);
 					float4 direction = result.hit ? normalize(result.position - heroPos) : camForward;
 
-					ray = collision::RayInfo(heroPos, direction * 100, collision::CollisionGroup::Player, true);
-					result = collision::Raycast(ray);
-
-					if (result.hit) {
-						Enemies::Enemy* enemy = enemySystem.FindByCollider(result.collider);
-
-						if (enemy && enemy->alive)
-						{
-							const float baseDamage = 20.0f;
-							const float chargeDamage = 70.0f;
-							float damage = baseDamage + (chargeDamage - baseDamage) * bowCharge;
-
-							enemy->TakeDamage(damage);
-							Log("Hit enemy, HP: " + std::to_string(enemy->health) + "\n");
-						}
-						else Log("Attack hit (not enemy)\n");
-					}
-					else {
-						Log("Attack miss\n");
-					}
-
-					rays.push_back({ ray.origin, result.position });
+					arrows.push_back(arrow(heroPos, direction, bowCharge));
 				}
 
 				ConstBuf::interp::DeleteExistingTween(bowCharge);
@@ -1369,6 +1366,45 @@ struct hero_ : AliveCreation {
 
 				mesh->StopAnimation(11);
 				mesh->StopAnimation(12);
+			}
+		}
+	}
+
+	void ProcessArrows(Enemies::EnemySystem& enemySystem, float deltaTime)
+	{
+		for (auto it = arrows.begin(); it != arrows.end(); ) {
+			arrow& Arrow = *it;
+
+			float4 step = Arrow.direction * arrowSpeed * deltaTime;
+
+			collision::SphereCastInfo ray = collision::SphereCastInfo(Arrow.position, step, 0.25f, length(step), collision::CollisionGroup::Player, true);
+			collision::RaycastResult result = collision::Spherecast(ray);
+
+			if (result.hit) {
+				Enemies::Enemy* enemy = enemySystem.FindByCollider(result.collider);
+
+				if (enemy && enemy->alive)
+				{
+					const float baseDamage = 20.0f;
+					const float chargeDamage = 70.0f;
+					float damage = baseDamage + (chargeDamage - baseDamage) * Arrow.charge;
+
+					enemy->TakeDamage(damage);
+					Log("Hit enemy, HP: " + std::to_string(enemy->health) + "\n");
+				}
+				else Log("Arrow hit (not enemy)\n");
+
+				it = arrows.erase(it);
+			}
+			else {
+				if (length(Arrow.position - Arrow.startPosition) < arrowMaxDistance) {
+					Arrow.position += step;
+					++it;
+				}
+				else {
+					Log("Arrow missed\n");
+					it = arrows.erase(it);
+				}
 			}
 		}
 	}
@@ -2680,8 +2716,9 @@ namespace Loop
 					hero.ProcessMove(FIXED_DT);
 					hero.ProcessJump(FIXED_DT);
 
-					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))), enemySystem);
+					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
 					hero.ProcessDefense();
+					hero.ProcessArrows(enemySystem, deltaTime);
 
 					if (hero.gravity.mode)
 					{
@@ -2885,12 +2922,12 @@ namespace Loop
 
 		enemyRenderer.RenderColor(enemySystem, deltaTime);
 
-		for (std::pair<float4, float4>& ray : hero.rays) {
+		/*for (std::pair<float4, float4>& ray : hero.rays) {
 			Object::RayHit({
 				.pos1 = ray.first,
 				.pos2 = ray.second
 				});
-		}
+		}*/
 
 		//.jumpCharge = (int)(hero.jumpChargeProgress*100.)
 
