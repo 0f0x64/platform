@@ -260,8 +260,10 @@ namespace Enemies
 
 			if (enemy.isCharging) {
 				enemy.charge += deltaTime;
+				enemy.colorCharge = enemy.charge / enemy.chargeTime;
 				if (enemy.charge >= enemy.chargeTime) {
 					enemy.charge = 0.f;
+					enemy.colorCharge = 3.f;
 					enemy.isCharging = false;
 
 					enemy.attackCollider->position = enemy.position;
@@ -269,14 +271,18 @@ namespace Enemies
 						collision::sphere_vs_sphere(
 							heroCollider->position,
 							heroCollider->radius,
-							enemy.collider->position,
-							enemy.collider->radius
+							enemy.attackCollider->position,
+							enemy.attackCollider->radius
 						);
 					if (result.collided) {
-						// TODOw
+						Log("Player got damaged\n");
 					}
 				}
 				return;
+			}
+
+			if (enemy.colorCharge > 0.f) {
+				enemy.colorCharge = max(enemy.colorCharge - deltaTime * 4.f, 0.f);
 			}
 
 			if (enemy.movementTarget == enemy.position) {

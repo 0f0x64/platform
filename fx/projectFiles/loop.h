@@ -2696,7 +2696,7 @@ namespace Loop
 				enemySystem.Update(FIXED_DT, hero.collider);
 
 				// NEW
-				CheckPlayerEnemyCollisions();
+				//CheckPlayerEnemyCollisions();
 
 				//enemySystem.Update(FIXED_DT, hero.collider);
 				gameCamera.Update(FIXED_DT);

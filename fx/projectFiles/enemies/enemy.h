@@ -27,9 +27,10 @@ namespace Enemies
 		float movementRadius = 0.65f;
 		float movementSpeed = 2.0f;
 
-		float chargeTime = 1.0f;
+		float chargeTime = 2.0f;
 		float charge = 0.0f;
 		bool isCharging = false;
+		float colorCharge = 0.0f;
 
 		// === Эффект вспышки при попадании ===
 		float hitFlash = 0.0f;   // 0..1, гаснет со временем
@@ -43,7 +44,7 @@ namespace Enemies
 			attackCollider = collision::CreateSphereCollider();
 			attackCollider->collisionGroup = collision::CollisionGroup::Enemy;
 			attackCollider->isTouchable = false;
-			attackCollider->radius = 4.f;
+			attackCollider->radius = 5.f;
 
 			if (initializeCallback) initializeCallback(*this);
 		}
