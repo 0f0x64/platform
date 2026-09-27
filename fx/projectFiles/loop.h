@@ -1305,7 +1305,7 @@ struct hero_ : AliveCreation {
 	};
 	std::vector<arrow> arrows;
 
-	void ProcessAttack(float4 camPos, float4 camForward, Enemies::EnemySystem& enemySystem) {
+	void ProcessAttack(float4 camPos, float4 camForward) {
 		dx11::Audio::SetVolume(bowstringVoice, bowCharge);
 
 		if (blocking) return;
@@ -2716,7 +2716,7 @@ namespace Loop
 					hero.ProcessMove(FIXED_DT);
 					hero.ProcessJump(FIXED_DT);
 
-					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))), enemySystem);
+					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
 					hero.ProcessDefense();
 					hero.ProcessArrows(enemySystem, deltaTime);
 
