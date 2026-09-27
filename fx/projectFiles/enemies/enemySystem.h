@@ -32,7 +32,7 @@ namespace Enemies
 		bool IsInitialized() const { return initialized_; }
 		const std::vector<Enemy>& Items() const { return enemies_; }
 
-		void Reset(Position center, Position right, Position forward,
+		void Reset(float4 center, float4 right, float4 forward,
 			std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
 		{
 
@@ -47,14 +47,14 @@ namespace Enemies
 				enemy = Enemy{};
 				const float lateral = (static_cast<float>(i) - (Count - 1) * 0.5f) * config.spacing;
 				const float depth = config.forwardDistance + (i % 2) * config.rowSpacing;
-				const Position spawn = {
+				const float4 spawn = {
 					center.x + right.x * lateral + forward.x * depth,
 					center.y + right.y * lateral + forward.y * depth,
 					center.z + right.z * lateral + forward.z * depth
 				};
 				enemy.movementRadius = config.radius > 0.0f ? config.radius : 0.0f;
 				const float speed = config.baseSpeed + config.speedVariation * (i % 4);
-				enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
+				//enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
 				enemy.initializeCallback = [spawn](Enemy& value) {
 					value.position = spawn;
 					value.movementCenter = spawn;
@@ -62,7 +62,7 @@ namespace Enemies
 					};
 				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, float dt) { SwarmUpdate(value, dt); };
+				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
 			}
 			initialized_ = true;
 		}
@@ -109,7 +109,7 @@ namespace Enemies
 
 				const float spawnOffset = 0.5f;
 
-				Position spawn = {
+				float4 spawn = {
 					p.x + up.x * spawnOffset,
 					p.y + up.y * spawnOffset,
 					p.z + up.z * spawnOffset
@@ -117,7 +117,7 @@ namespace Enemies
 
 				enemy.movementRadius = config.radius > 0.0f ? config.radius : 0.0f;
 				const float speed = config.baseSpeed + config.speedVariation * (i % 4);
-				enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
+				//enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
 
 				enemy.initializeCallback = [spawn](Enemy& value) {
 					value.position = spawn;
@@ -126,19 +126,19 @@ namespace Enemies
 					};
 				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, float dt) { SwarmUpdate(value, dt); };
+				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
 			}
 			initialized_ = true;
 		}
 
-		void Update(float deltaTime)
+		void Update(float deltaTime, collision::SphereCollider* heroCollider, AliveCreation& hro)
 		{
 			if (!initialized_ || !std::isfinite(deltaTime) || deltaTime <= 0.0f) return;
-			for (Enemy& enemy : enemies_) enemy.Update(deltaTime);
+			for (Enemy& enemy : enemies_) enemy.Update(deltaTime, heroCollider, hro);
 		}
 
 		// для спавна противника перед игроком.
-		void SetEnemyPosition(std::size_t index, Position position)
+		void SetEnemyPosition(std::size_t index, float4 position)
 		{
 			if (index >= Count)
 				return;
@@ -183,10 +183,10 @@ namespace Enemies
 		}
 
 	private:
-		Position RandomTarget(const Enemy& enemy)
+		float4 RandomTarget(const Enemy& enemy)
 		{
 			std::uniform_real_distribution<float> coordinate(-1.0f, 1.0f);
-			Position offset;
+			float4 offset;
 			float squaredLength;
 			do {
 				offset = { coordinate(random_), coordinate(random_), coordinate(random_) };
@@ -199,32 +199,90 @@ namespace Enemies
 			};
 		}
 
-		void SwarmUpdate(Enemy& enemy, float deltaTime)
+		float4 PointAroundPlayer(const float4& playerPos)
 		{
-			constexpr float ArrivalDistance = 0.01f;
-			const Position delta = {
-				enemy.movementTarget.x - enemy.position.x,
-				enemy.movementTarget.y - enemy.position.y,
-				enemy.movementTarget.z - enemy.position.z
-			};
-			const float squaredDistance = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
-			if (squaredDistance < ArrivalDistance * ArrivalDistance)
-			{
-				enemy.movementTarget = RandomTarget(enemy);
+			float4 direction = getRandomDirection();
+			return playerPos + direction * 2.f;
+		}
+
+		void SwarmUpdate(Enemy& enemy, collision::SphereCollider* heroCollider, AliveCreation& hero, float deltaTime)
+		{
+			if (!enemy.alive) return;
+			if (!heroCollider) return;
+
+			constexpr float PlayerDetectDistance = 10.f;
+
+			if (enemy.isCharging) {
+				enemy.charge += deltaTime;
+				enemy.colorCharge = enemy.charge / enemy.chargeTime;
+				if (enemy.charge >= enemy.chargeTime) {
+					enemy.charge = 0.f;
+					enemy.colorCharge = 3.f;
+					enemy.isCharging = false;
+
+					enemy.attackCollider->position = enemy.position;
+					collision::CollisionResult result =
+						collision::sphere_vs_sphere(
+							heroCollider->position,
+							heroCollider->radius,
+							enemy.attackCollider->position,
+							enemy.attackCollider->radius
+						);
+					if (result.collided) {
+						hero.TakeDamage(15.f);
+					}
+				}
 				return;
 			}
-			const float distance = std::sqrt(squaredDistance);
-			const float step = enemy.movementSpeed * deltaTime;
-			if (step >= distance)
+
+			if (enemy.colorCharge > 0.f) {
+				enemy.colorCharge = max(enemy.colorCharge - deltaTime * 4.f, 0.f);
+			}
+
+			if (length(heroCollider->position - enemy.position) > PlayerDetectDistance) {
+				if (enemy.position == enemy.movementCenter)
+					return;
+
+				enemy.movementTarget = enemy.movementCenter;
+
+				float4 direction = enemy.movementTarget - enemy.position;
+				float distance = length(direction);
+				float4 step = normalize(direction) * enemy.movementSpeed * deltaTime;
+
+				if (length(step) >= distance)
+				{
+					enemy.position = enemy.movementTarget;
+				}
+				else {
+					enemy.position += step;
+				}
+				return;
+			}
+
+			if (enemy.movementTarget == enemy.position) {
+				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
+			}
+				
+			float4 direction = enemy.movementTarget - enemy.position;
+			float distance = length(direction);
+
+			/*while (distance <= 0.01f) {
+				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
+				direction = enemy.movementTarget - enemy.position;
+				distance = length(direction);
+			}*/
+
+			float4 step = normalize(direction) * enemy.movementSpeed * deltaTime;
+
+			if (length(step) >= distance)
 			{
+				enemy.isCharging = true;
 				enemy.position = enemy.movementTarget;
-				enemy.movementTarget = RandomTarget(enemy);
-				return;
+				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
 			}
-			const float scale = step / distance;
-			enemy.position.x += delta.x * scale;
-			enemy.position.y += delta.y * scale;
-			enemy.position.z += delta.z * scale;
+			else {
+				enemy.position += step;
+			}
 		}
 
 		std::vector<Enemy> enemies_{};

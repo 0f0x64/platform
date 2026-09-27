@@ -92,3 +92,25 @@ inline float4 cross3(const float4& a, const float4& b) {
 		0.0f  // w обнуляется
 	);
 }
+
+float getRandomFloat(float min, float max) {
+	static ::std::random_device rd;
+	static ::std::mt19937 gen(rd());
+
+	return ::std::uniform_real_distribution<float>(min, max)(gen);
+}
+
+
+float4 getRandomDirection() {
+	float r1 = getRandomFloat(0.0f, 1.0f);
+	float r2 = getRandomFloat(0.0f, 1.0f);
+
+	float z = 2.0f * r1 - 1.0f;
+	float theta = 2.0f * dx11::XM_PI * r2;
+
+	float r = sqrtf(1.0f - z * z);
+	float x = r * cosf(theta);
+	float y = r * sinf(theta);
+
+	return float4(x, y, z, 0);
+}

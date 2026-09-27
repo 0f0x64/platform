@@ -4,25 +4,15 @@
 
 namespace Enemies
 {
-	struct Position
-	{
-		float x = 0.0f;
-		float y = 0.0f;
-		float z = 0.0f;
-	};
-
 	struct Enemy
 	{
 		using InitializeCallback = std::function<void(Enemy&)>;
-		using UpdateCallback = std::function<void(Enemy&, float)>;
+		using UpdateCallback = std::function<void(Enemy&, collision::SphereCollider*, AliveCreation&, float)>;
 
 		collision::SphereCollider* collider;
+		collision::SphereCollider* attackCollider;
 
-		Position position;
-		Position movementCenter;
-		Position movementTarget;
-		float movementRadius = 0.65f;
-		float movementSpeed = 0.2f;
+		float4 position;
 		InitializeCallback initializeCallback;
 		UpdateCallback updateCallback;
 
@@ -30,6 +20,19 @@ namespace Enemies
 		float maxHealth = 100.0f;
 		float health = 100.0f;
 		bool  alive = true;
+
+		// === BEHAVIOR ===
+		float attackRadius = 4.f;
+
+		float4 movementCenter;
+		float4 movementTarget;
+		float movementRadius = 0.65f;
+		float movementSpeed = 2.0f;
+
+		float chargeTime = 2.0f;
+		float charge = 0.0f;
+		bool isCharging = false;
+		float colorCharge = 0.0f;
 
 		// === Эффект вспышки при попадании ===
 		float hitFlash = 0.0f;   // 0..1, гаснет со временем
@@ -40,12 +43,17 @@ namespace Enemies
 			collider = collision::CreateSphereCollider();
 			collider->collisionGroup = collision::CollisionGroup::Enemy;
 
+			attackCollider = collision::CreateSphereCollider();
+			attackCollider->collisionGroup = collision::CollisionGroup::Enemy;
+			attackCollider->isTouchable = false;
+			attackCollider->radius = attackRadius;
+
 			if (initializeCallback) initializeCallback(*this);
 		}
 
-		void Update(float deltaTime)
+		void Update(float deltaTime, collision::SphereCollider* heroCollider, AliveCreation& hero)
 		{
-			if (deltaTime > 0.0f && updateCallback) updateCallback(*this, deltaTime);
+			if (deltaTime > 0.0f && updateCallback) updateCallback(*this, heroCollider, hero, deltaTime);
 
 			if (collider) {
 				collider->position.x = position.x;
