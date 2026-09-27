@@ -30,10 +30,17 @@ XMVECTOR getRandVector4()
 #include "cubemap.h"
 #include "object.h"
 #include "collision.h"
+
+
+struct AliveCreation {
+	float maxHealth = 100.0f;
+	float health = 100.0f;
+
+	virtual void TakeDamage(float damage) = 0;
+};
+
 #include "enemies/enemySystem.h"
 #include "enemies/enemyRenderer.h"
-
-
 
 struct inputController_ {
 	
@@ -258,7 +265,7 @@ inputController_ inputController;
 bool cameraFirstFrame = true;
 float fov = 110;
 
-struct hero_ {
+struct hero_ : AliveCreation {
 
 	Object::mesh* mesh = new Object::mesh;
 	
@@ -714,7 +721,7 @@ struct hero_ {
 		collider->position.w = 1.0f;
 	}
 
-	void TakeDamage(float damage)
+	void TakeDamage(float damage) override
 	{
 		if (dead)
 			return;
@@ -2693,7 +2700,7 @@ namespace Loop
 				hero.UpdateCollider();
 				hero.UpdateDamageState(FIXED_DT);
 
-				enemySystem.Update(FIXED_DT, hero.collider);
+				enemySystem.Update(FIXED_DT, hero.collider, hero);
 
 				// NEW
 				//CheckPlayerEnemyCollisions();

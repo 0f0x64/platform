@@ -62,7 +62,7 @@ namespace Enemies
 					};
 				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, float dt) { SwarmUpdate(value, hc, dt); };
+				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
 			}
 			initialized_ = true;
 		}
@@ -126,15 +126,15 @@ namespace Enemies
 					};
 				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, float dt) { SwarmUpdate(value, hc, dt); };
+				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
 			}
 			initialized_ = true;
 		}
 
-		void Update(float deltaTime, collision::SphereCollider* heroCollider)
+		void Update(float deltaTime, collision::SphereCollider* heroCollider, AliveCreation& hro)
 		{
 			if (!initialized_ || !std::isfinite(deltaTime) || deltaTime <= 0.0f) return;
-			for (Enemy& enemy : enemies_) enemy.Update(deltaTime, heroCollider);
+			for (Enemy& enemy : enemies_) enemy.Update(deltaTime, heroCollider, hro);
 		}
 
 		// для спавна противника перед игроком.
@@ -205,33 +205,8 @@ namespace Enemies
 			return playerPos + direction * 2.f;
 		}
 
-		void SwarmUpdate(Enemy& enemy, collision::SphereCollider* heroCollider, float deltaTime)
+		void SwarmUpdate(Enemy& enemy, collision::SphereCollider* heroCollider, AliveCreation& hero, float deltaTime)
 		{
-			/*constexpr float ArrivalDistance = 0.01f;
-			const float4 delta = {
-				enemy.movementTarget.x - enemy.position.x,
-				enemy.movementTarget.y - enemy.position.y,
-				enemy.movementTarget.z - enemy.position.z
-			};
-			const float squaredDistance = delta.x * delta.x + delta.y * delta.y + delta.z * delta.z;
-			if (squaredDistance < ArrivalDistance * ArrivalDistance)
-			{
-				enemy.movementTarget = RandomTarget(enemy);
-				return;
-			}
-			const float distance = std::sqrt(squaredDistance);
-			const float step = enemy.movementSpeed * deltaTime;
-			if (step >= distance)
-			{
-				enemy.position = enemy.movementTarget;
-				enemy.movementTarget = RandomTarget(enemy);
-				return;
-			}
-			const float scale = step / distance;
-			enemy.position.x += delta.x * scale;
-			enemy.position.y += delta.y * scale;
-			enemy.position.z += delta.z * scale;*/
-
 			if (!enemy.alive) return;
 			if (!heroCollider) return;
 
@@ -275,7 +250,7 @@ namespace Enemies
 							enemy.attackCollider->radius
 						);
 					if (result.collided) {
-						Log("Player got damaged\n");
+						hero.TakeDamage(15.f);
 					}
 				}
 				return;
