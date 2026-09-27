@@ -212,27 +212,6 @@ namespace Enemies
 
 			constexpr float PlayerDetectDistance = 10.f;
 
-			if (length(heroCollider->position - enemy.position) > PlayerDetectDistance) {
-				if (enemy.position == enemy.movementCenter)
-					return;
-
-				enemy.movementTarget = enemy.movementCenter;
-
-				float4 direction = enemy.movementTarget - enemy.position;
-				float distance = length(direction);
-				float4 step = normalize(direction) * enemy.movementSpeed * deltaTime;
-
-				if (length(step) >= distance)
-				{
-					enemy.isCharging = true;
-					enemy.position = enemy.movementTarget;
-				}
-				else {
-					enemy.position += step;
-				}
-				return;
-			}
-
 			if (enemy.isCharging) {
 				enemy.charge += deltaTime;
 				enemy.colorCharge = enemy.charge / enemy.chargeTime;
@@ -258,6 +237,27 @@ namespace Enemies
 
 			if (enemy.colorCharge > 0.f) {
 				enemy.colorCharge = max(enemy.colorCharge - deltaTime * 4.f, 0.f);
+			}
+
+			if (length(heroCollider->position - enemy.position) > PlayerDetectDistance) {
+				if (enemy.position == enemy.movementCenter)
+					return;
+
+				enemy.movementTarget = enemy.movementCenter;
+
+				float4 direction = enemy.movementTarget - enemy.position;
+				float distance = length(direction);
+				float4 step = normalize(direction) * enemy.movementSpeed * deltaTime;
+
+				if (length(step) >= distance)
+				{
+					enemy.isCharging = true;
+					enemy.position = enemy.movementTarget;
+				}
+				else {
+					enemy.position += step;
+				}
+				return;
 			}
 
 			if (enemy.movementTarget == enemy.position) {
