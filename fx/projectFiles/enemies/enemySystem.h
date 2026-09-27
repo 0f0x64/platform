@@ -251,7 +251,6 @@ namespace Enemies
 
 				if (length(step) >= distance)
 				{
-					enemy.isCharging = true;
 					enemy.position = enemy.movementTarget;
 				}
 				else {
