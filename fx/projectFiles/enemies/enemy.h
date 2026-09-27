@@ -22,6 +22,8 @@ namespace Enemies
 		bool  alive = true;
 
 		// === BEHAVIOR ===
+		float attackRadius = 4.f;
+
 		float4 movementCenter;
 		float4 movementTarget;
 		float movementRadius = 0.65f;
@@ -44,7 +46,7 @@ namespace Enemies
 			attackCollider = collision::CreateSphereCollider();
 			attackCollider->collisionGroup = collision::CollisionGroup::Enemy;
 			attackCollider->isTouchable = false;
-			attackCollider->radius = 5.f;
+			attackCollider->radius = attackRadius;
 
 			if (initializeCallback) initializeCallback(*this);
 		}
