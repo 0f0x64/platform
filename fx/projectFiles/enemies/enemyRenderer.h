@@ -9,8 +9,8 @@ namespace Enemies
 	public:
 		void Load()
 		{
-			mesh_.LoadObj("..//fx//projectFiles//Sphere.glb");
-			//mesh_.LoadObj("..//fx//projectFiles//Swarm_idle.glb");
+			//mesh_.LoadObj("..//fx//projectFiles//Sphere.glb");
+			mesh_.LoadObj("..//fx//projectFiles//Swarm_idle.glb");
 			if (!mesh_.loaded)
 			{
 				Log("Enemy renderer: model failed to load; enemies cannot be displayed.\n");
@@ -20,18 +20,18 @@ namespace Enemies
 			mesh_.Update(0.0f);
 		}
 
-		void RenderDepth(const EnemySystem& system, float deltaTime)
+		void RenderDepth(const EnemySystem& system, const float4& cameraPos, float deltaTime)
 		{
 			if (!mesh_.loaded || !system.IsInitialized()) return;
 			SetPassState(true);
-			for (const Enemy& enemy : system.Items()) Draw(enemy, true, deltaTime);
+			for (const Enemy& enemy : system.Items()) Draw(enemy, cameraPos, true, deltaTime);
 		}
 
-		void RenderColor(const EnemySystem& system, float deltaTime)
+		void RenderColor(const EnemySystem& system, const float4& cameraPos, float deltaTime)
 		{
 			if (!mesh_.loaded || !system.IsInitialized()) return;
 			SetPassState(false);
-			for (const Enemy& enemy : system.Items()) Draw(enemy, false, deltaTime);
+			for (const Enemy& enemy : system.Items()) Draw(enemy, cameraPos, false, deltaTime);
 		}
 
 	private:
@@ -52,10 +52,12 @@ namespace Enemies
 			Culling::Set({ cullmode::off });
 		}
 
-		void Draw(const Enemy& enemy, bool depthPass, float deltaTime)
+		void Draw(const Enemy& enemy, const float4& cameraPos, bool depthPass, float deltaTime)
 		{
 			if (!enemy.alive) return;
 			if (enemy.movementRadius <= 0.0f) return;
+			if (length(enemy.position - cameraPos) > 50.f) return; // Ограничение дистанции отрисовки (костыльное решение до frustum culling)
+
 			constexpr float PositionUnits = 10000.0f;
 			constexpr float NormalizedMeshRadius = 2.0f;
 			constexpr float ZoomPercent = 100.0f;

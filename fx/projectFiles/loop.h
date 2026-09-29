@@ -2899,7 +2899,7 @@ namespace Loop
 		}
 		// ----- //
 
-		enemyRenderer.RenderDepth(enemySystem, deltaTime);
+		enemyRenderer.RenderDepth(enemySystem, V2F(gameCamera.finalCameraEye), deltaTime);
 
 		float4 p = V2F(hero.pos * 10000.);
 
@@ -2920,7 +2920,7 @@ namespace Loop
 				});
 		}
 
-		enemyRenderer.RenderColor(enemySystem, deltaTime);
+		enemyRenderer.RenderColor(enemySystem, V2F(gameCamera.finalCameraEye), deltaTime);
 
 		/*for (std::pair<float4, float4>& ray : hero.rays) {
 			Object::RayHit({
