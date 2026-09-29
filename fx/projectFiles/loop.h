@@ -342,6 +342,29 @@ struct hero_ : AliveCreation {
 
 	float airSpeedAmp = 1.f;
 
+	static constexpr float RailCaptureMinRadius = 2.0f;
+	static constexpr float RailEndMinSpeedRatio = 0.4f;
+	static constexpr float RailEndBrakeDuration = 2.0f;
+	static constexpr float RailEndFlightDuration = 4.0f;
+	static constexpr float RailEndTurnDegreesPerSecond = 5.0f;
+	static constexpr float RailGeometryEpsilon = 0.000001f;
+	static constexpr float RailGeometryEpsilonSq = 0.000000000001f;
+	static constexpr float RailTargetScoreTolerance = 0.0001f;
+	static constexpr float RailForwardTolerance = 0.0001f;
+	static constexpr float RailCaptureConeCotangentSq = 3.0f;
+	static constexpr float RailCaptureMinAlignment = 0.5f;
+	static constexpr int RailCaptureSearchIterations = 20;
+
+	bool railEndBraking = false;
+	float railEndBrakeTime = 0.0f;
+	float railEndBrakeSpeed = 0.0f;
+	float railEndFlightTime = 0.0f;
+	float railEndStepConsumed = 0.0f;
+	int jumpSourceLine = -1;
+	bool railEndFlight = false;
+	int railEndTargetLine = -1;
+	XMVECTOR departureVelocity = XMVectorZero();
+
 	bool firstRun = true;
 	bool respawnInProgress = true;
 		
@@ -534,8 +557,518 @@ struct hero_ : AliveCreation {
 		return result;
 	}
 
-	void ProcessGravity(float deltaTime)
+	struct RailTargetScore
 	{
+		float missDistanceSq;
+		float alignment;
+		float forwardDistance;
+
+		bool IsBetterThan(const RailTargetScore& other) const
+		{
+			if (missDistanceSq < other.missDistanceSq - RailTargetScoreTolerance) return true;
+			if (fabsf(missDistanceSq - other.missDistanceSq) >= RailTargetScoreTolerance) return false;
+			if (alignment > other.alignment + RailTargetScoreTolerance) return true;
+			return fabsf(alignment - other.alignment) < RailTargetScoreTolerance && forwardDistance < other.forwardDistance;
+		}
+	};
+
+	struct RailLandingPoint
+	{
+		float pointIndex = -1.0f;
+		float distanceSq = 1e30f;
+		float alongPosition = 0.0f;
+		XMVECTOR position = XMVectorZero();
+		XMVECTOR tangent = XMVectorZero();
+		bool touching = false;
+		bool inFlightPlane = false;
+
+		bool IsBetterThan(const RailLandingPoint& other) const
+		{
+			if (other.pointIndex < 0.0f) return true;
+			if (touching != other.touching) return touching;
+			if (inFlightPlane != other.inFlightPlane) return inFlightPlane;
+			return distanceSq < other.distanceSq;
+		}
+	};
+
+	struct RailCaptureHit
+	{
+		int lineIndex = -1;
+		float pointIndex = 0.0f;
+		float time = 1.0f;
+		float distanceSq = 0.0f;
+		XMVECTOR position = XMVectorZero();
+	};
+
+	float GetRailContactRadius() const
+	{
+		return collider ? collider->radius : 0.65f;
+	}
+
+	static float FindClosestRailApproachTime(XMVECTOR travel, float travelLengthSq,
+		XMVECTOR segment, float segmentLengthSq, XMVECTOR offset)
+	{
+		float travelAlongSegment = XMVectorGetX(XMVector3Dot(travel, segment));
+		float travelAlongOffset = XMVectorGetX(XMVector3Dot(travel, offset));
+		float offsetAlongSegment = XMVectorGetX(XMVector3Dot(segment, offset));
+		float denominator = travelLengthSq * segmentLengthSq - travelAlongSegment * travelAlongSegment;
+		float time = denominator > 0.0f
+			? clamp((travelAlongSegment * offsetAlongSegment - segmentLengthSq * travelAlongOffset) / denominator, 0.0f, 1.0f)
+			: 0.0f;
+		float projection = (travelAlongSegment * time + offsetAlongSegment) / segmentLengthSq;
+		if (projection < 0.0f) time = clamp(-travelAlongOffset / travelLengthSq, 0.0f, 1.0f);
+		else if (projection > 1.0f) time = clamp((travelAlongSegment - travelAlongOffset) / travelLengthSq, 0.0f, 1.0f);
+		return time;
+	}
+
+	static bool TryFindRailCaptureTime(XMVECTOR travel, float travelLengthSq,
+		XMVECTOR segment, float segmentLengthSq, XMVECTOR offset, float radiusSq, float& hitTime)
+	{
+		float closestTime = travelLengthSq > RailGeometryEpsilonSq
+			? FindClosestRailApproachTime(travel, travelLengthSq, segment, segmentLengthSq, offset)
+			: 0.0f;
+		auto distanceAtTime = [&](float time) {
+			XMVECTOR relative = offset + travel * time;
+			float projection = clamp(XMVectorGetX(XMVector3Dot(relative, segment)) / segmentLengthSq, 0.0f, 1.0f);
+			return XMVectorGetX(XMVector3LengthSq(relative - segment * projection));
+		};
+		if (distanceAtTime(1.0f) < distanceAtTime(closestTime)) closestTime = 1.0f;
+		if (distanceAtTime(closestTime) > radiusSq) return false;
+		hitTime = 0.0f;
+		if (distanceAtTime(0.0f) <= radiusSq) return true;
+
+		float low = 0.0f;
+		float high = closestTime;
+		for (int step = 0; step < RailCaptureSearchIterations; ++step)
+		{
+			float middle = (low + high) * 0.5f;
+			if (distanceAtTime(middle) > radiusSq) low = middle;
+			else high = middle;
+		}
+		hitTime = high;
+		return true;
+	}
+
+	bool HasCloserRailProjection(int targetLine, XMVECTOR position, float distanceSq, float tolerance) const
+	{
+		const auto& line = Object::starLineList.line[targetLine];
+		for (int i = 0; i + 1 < line.pointCount; ++i)
+		{
+			XMVECTOR start = F2V(line.point[i]);
+			XMVECTOR segment = F2V(line.point[i + 1]) - start;
+			float lengthSq = XMVectorGetX(XMVector3LengthSq(segment));
+			if (lengthSq < RailGeometryEpsilonSq) continue;
+			float fraction = clamp(XMVectorGetX(XMVector3Dot(position - start, segment)) / lengthSq, 0.0f, 1.0f);
+			if (XMVectorGetX(XMVector3LengthSq(position - start - segment * fraction)) < distanceSq - tolerance)
+				return true;
+		}
+		return false;
+	}
+
+	void ReleaseRailEndTarget()
+	{
+		railEndTargetLine = -1;
+		gravity.progress = 0.0f;
+		gravity.acceleratedT = 0.0f;
+	}
+
+	bool GetRailEnd(int sourceLine, bool movingForward, XMVECTOR& endpoint, XMVECTOR& tangent)
+	{
+		if (sourceLine < 0 || sourceLine >= Object::starLineList.lineCount) return false;
+		const auto& line = Object::starLineList.line[sourceLine];
+		int last = line.pointCount - 1;
+		if (last < 1) return false;
+		endpoint = F2V(line.point[movingForward ? last : 0]);
+		for (int i = movingForward ? last - 1 : 0; i >= 0 && i < last; i += movingForward ? -1 : 1)
+		{
+			XMVECTOR segment = F2V(line.point[i + 1]) - F2V(line.point[i]);
+			if (XMVectorGetX(XMVector3LengthSq(segment)) > RailGeometryEpsilonSq)
+			{
+				tangent = XMVector3Normalize(segment);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void BeginRailEndFlight(XMVECTOR tangent)
+	{
+		railEndFlight = true;
+		railEndTargetLine = -1;
+		railEndFlightTime = 0.0f;
+		railEndStepConsumed = 0.0f;
+		railEndBraking = false;
+		jumpSourceLine = -1;
+		departureVelocity = tangent * speed;
+		lineTangent = tangent;
+		gravity.mode = true;
+		gravity.progress = 0.0f;
+		gravity.acceleratedT = 0.0f;
+		jump = false;
+		jumpHeight = 0.0f;
+		isCharging = false;
+		chargeTimer = 0.0f;
+		jumpChargeProgress = 1.0f;
+		lastJumpAmpPercent = 0.0f;
+		jumpProgress = 0.0f;
+		landingTimer = 0.0f;
+	}
+
+	bool TryStartRailEndFlightFromJump(XMVECTOR velocity, float deltaTime)
+	{
+		if (jumpSourceLine < 0 || fabsf(speed) <= maxSpeed * RailEndMinSpeedRatio) return false;
+		XMVECTOR endpoint, tangent;
+		if (!GetRailEnd(jumpSourceLine, speed > 0.0f, endpoint, tangent)) return false;
+		XMVECTOR outward = tangent * sign(speed);
+		XMVECTOR nextPos = pos + velocity * deltaTime;
+		float startProjection = XMVectorGetX(XMVector3Dot(pos - endpoint, outward));
+		float endProjection = XMVectorGetX(XMVector3Dot(nextPos - endpoint, outward));
+		if (endProjection < 0.0f || endProjection <= startProjection) return false;
+		float endDistanceSq = XMVectorGetX(XMVector3LengthSq(nextPos - endpoint));
+		if (HasCloserRailProjection(jumpSourceLine, nextPos, endDistanceSq, 0.00001f)) return false;
+		float jumpTime = clamp(-startProjection / (endProjection - startProjection), 0.0f, 1.0f) * deltaTime;
+		pos += velocity * jumpTime;
+		BeginRailEndFlight(tangent);
+		railEndStepConsumed = jumpTime;
+		return true;
+	}
+
+	void SteerRailEndFlight(float deltaTime, XMVECTOR cameraForward)
+	{
+		float flightSpeed = fabsf(speed);
+		if (flightSpeed < RailGeometryEpsilon || XMVectorGetX(XMVector3LengthSq(cameraForward)) < RailGeometryEpsilon) return;
+		XMVECTOR direction = XMVector3Normalize(departureVelocity);
+		XMVECTOR target = XMVector3Normalize(cameraForward);
+		float angle = acosf(clamp(XMVectorGetX(XMVector3Dot(direction, target)), -1.0f, 1.0f));
+		float turn = min(angle, DegreesToRadians(RailEndTurnDegreesPerSecond) * deltaTime);
+		if (turn <= 0.0f) return;
+		XMVECTOR axis = XMVector3Cross(direction, target);
+		if (XMVectorGetX(XMVector3LengthSq(axis)) < RailGeometryEpsilonSq)
+		{
+			axis = upVector - direction * XMVectorGetX(XMVector3Dot(upVector, direction));
+			if (XMVectorGetX(XMVector3LengthSq(axis)) < RailGeometryEpsilonSq)
+			{
+				XMVECTOR fallback = fabsf(XMVectorGetY(direction)) < 0.9f ? XMVectorSet(0, 1, 0, 0) : XMVectorSet(1, 0, 0, 0);
+				axis = fallback - direction * XMVectorGetX(XMVector3Dot(fallback, direction));
+			}
+		}
+		XMVECTOR rotation = XMQuaternionRotationAxis(XMVector3Normalize(axis), turn);
+		departureVelocity = XMVector3Normalize(XMVector3Rotate(direction, rotation)) * flightSpeed;
+	}
+
+	float GetRailEndCaptureRadius() const
+	{
+		float jumpDistance = max(jumpStartImpulse, 0.0f) / (60.0f * max(1.0f - jumpDeAccel, 0.0001f));
+		return max(RailCaptureMinRadius, 2.0f * jumpDistance);
+	}
+
+	int FindRailEndTargetLine(int& targetSegment) const
+	{
+		targetSegment = -1;
+		float flightSpeed = XMVectorGetX(XMVector3Length(departureVelocity));
+		if (flightSpeed < RailGeometryEpsilon) return -1;
+		XMVECTOR direction = departureVelocity / flightSpeed;
+		float radius = GetRailEndCaptureRadius();
+		float lookAhead = max(RailEndFlightDuration - railEndFlightTime, 0.0f) * flightSpeed;
+		if (lookAhead < RailGeometryEpsilon) return -1;
+		XMVECTOR travel = direction * lookAhead;
+		float travelLengthSq = lookAhead * lookAhead;
+		RailTargetScore bestScore = { radius * radius, -1.0f, 1e30f };
+		int bestLine = -1;
+		float endMargin = GetRailContactRadius();
+
+		for (int i = 0; i < Object::starLineList.lineCount; ++i)
+		{
+			const auto& line = Object::starLineList.line[i];
+			float lineLength = 0.0f;
+			for (int j = 0; j + 1 < line.pointCount; ++j)
+				lineLength += XMVectorGetX(XMVector3Length(F2V(line.point[j + 1]) - F2V(line.point[j])));
+			float segmentStart = 0.0f;
+			for (int j = 0; j + 1 < line.pointCount; ++j)
+			{
+				XMVECTOR start = F2V(line.point[j]);
+				XMVECTOR segment = F2V(line.point[j + 1]) - start;
+				float lengthSq = XMVectorGetX(XMVector3LengthSq(segment));
+				if (lengthSq < RailGeometryEpsilonSq) continue;
+				float length = sqrtf(lengthSq);
+				float alongStart = segmentStart;
+				segmentStart += length;
+				XMVECTOR tangent = segment / length;
+				float alignment = XMVectorGetX(XMVector3Dot(direction, tangent));
+				float startFraction = alignment < 0.0f ? clamp((endMargin - alongStart) / length, 0.0f, 1.0f) : 0.0f;
+				float endFraction = alignment > 0.0f ? clamp((lineLength - endMargin - alongStart) / length, 0.0f, 1.0f) : 1.0f;
+				if (endFraction <= startFraction) continue;
+				start += segment * startFraction;
+				segment *= endFraction - startFraction;
+				lengthSq = XMVectorGetX(XMVector3LengthSq(segment));
+				XMVECTOR offset = pos - start;
+				float time = FindClosestRailApproachTime(travel, travelLengthSq, segment, lengthSq, offset);
+				float travelAlongSegment = XMVectorGetX(XMVector3Dot(travel, segment));
+				float offsetAlongSegment = XMVectorGetX(XMVector3Dot(segment, offset));
+				float segmentFraction = clamp((travelAlongSegment * time + offsetAlongSegment) / lengthSq, 0.0f, 1.0f);
+				XMVECTOR projected = start + segment * segmentFraction;
+				float missSq = XMVectorGetX(XMVector3LengthSq(projected - pos - travel * time));
+				float aheadFraction = clamp(XMVectorGetX(XMVector3Dot(pos + travel - start, segment)) / lengthSq, 0.0f, 1.0f);
+				XMVECTOR aheadPoint = start + segment * aheadFraction;
+				float aheadTime = clamp(XMVectorGetX(XMVector3Dot(aheadPoint - pos, direction)) / lookAhead, 0.0f, 1.0f);
+				float aheadMissSq = XMVectorGetX(XMVector3LengthSq(aheadPoint - pos - travel * aheadTime));
+				if (aheadMissSq <= missSq + RailGeometryEpsilon)
+				{
+					projected = aheadPoint;
+					missSq = aheadMissSq;
+				}
+				float forward = XMVectorGetX(XMVector3Dot(projected - pos, direction));
+				bool behindFlight = forward <= RailForwardTolerance;
+				bool outsideCaptureRadius = missSq > radius * radius;
+				bool outsideForwardCone = missSq * RailCaptureConeCotangentSq > forward * forward;
+				if (behindFlight || outsideCaptureRadius || outsideForwardCone) continue;
+				float alignmentAbs = fabsf(alignment);
+				bool crossesFlight = alignmentAbs < RailCaptureMinAlignment;
+				bool missesContact = missSq > endMargin * endMargin;
+				if (crossesFlight && missesContact) continue;
+				RailTargetScore score = { missSq, alignmentAbs, forward };
+				if (bestLine < 0 || score.IsBetterThan(bestScore))
+				{
+					bestLine = i;
+					targetSegment = j;
+					bestScore = score;
+				}
+			}
+		}
+		return bestLine;
+	}
+
+	RailLandingPoint FindRailEndLandingPoint(float deltaTime, float& lineLength) const
+	{
+		XMVECTOR flightDirection = XMVector3Normalize(departureVelocity);
+		float contactRadius = GetRailContactRadius();
+		const auto& line = Object::starLineList.line[railEndTargetLine];
+		float previousAlongPosition = 0.0f;
+		for (int j = 0; j + 1 < line.pointCount && (float)j < pointIndex; ++j)
+			previousAlongPosition += XMVectorGetX(XMVector3Length(F2V(line.point[j + 1]) - F2V(line.point[j]))) * min(pointIndex - (float)j, 1.0f);
+		float maxAlongStep = 2.0f * GetRailEndCaptureRadius() + XMVectorGetX(XMVector3Length(departureVelocity)) * deltaTime;
+		RailLandingPoint best;
+		lineLength = 0.0f;
+		for (int j = 0; j + 1 < line.pointCount; ++j)
+		{
+			XMVECTOR start = F2V(line.point[j]);
+			XMVECTOR segment = F2V(line.point[j + 1]) - start;
+			float lengthSq = XMVectorGetX(XMVector3LengthSq(segment));
+			if (lengthSq < RailGeometryEpsilonSq) continue;
+			float length = sqrtf(lengthSq);
+			float segmentFraction = clamp(XMVectorGetX(XMVector3Dot(pos - start, segment)) / lengthSq, 0.0f, 1.0f);
+			XMVECTOR projected = start + segment * segmentFraction;
+			float distanceSq = XMVectorGetX(XMVector3LengthSq(pos - projected));
+			bool contact = distanceSq <= contactRadius * contactRadius;
+			bool inFlightPlane = false;
+			float forwardLength = XMVectorGetX(XMVector3Dot(segment, flightDirection));
+			if (!contact && fabsf(forwardLength) > RailGeometryEpsilon)
+			{
+				float planeFraction = XMVectorGetX(XMVector3Dot(pos - start, flightDirection)) / forwardLength;
+				if (planeFraction >= 0.0f && planeFraction <= 1.0f)
+				{
+					segmentFraction = planeFraction;
+					projected = start + segment * segmentFraction;
+					distanceSq = XMVectorGetX(XMVector3LengthSq(pos - projected));
+					inFlightPlane = true;
+				}
+			}
+			RailLandingPoint candidate;
+			candidate.pointIndex = (float)j + segmentFraction;
+			candidate.distanceSq = distanceSq;
+			candidate.alongPosition = lineLength + segmentFraction * length;
+			candidate.position = projected;
+			candidate.tangent = segment / length;
+			candidate.touching = contact;
+			candidate.inFlightPlane = inFlightPlane;
+			bool staysNearPreviousPoint = fabsf(candidate.alongPosition - previousAlongPosition) <= maxAlongStep;
+			if (staysNearPreviousPoint && candidate.IsBetterThan(best)) best = candidate;
+			lineLength += length;
+		}
+		return best;
+	}
+
+	void CompleteRailEndLanding(XMVECTOR position, float alongSpeed)
+	{
+		pos = position;
+		speed = alongSpeed;
+		gravity.mode = false;
+		gravity.progress = 0.0f;
+		gravity.acceleratedT = 1.0f;
+		railEndFlight = false;
+		railEndTargetLine = -1;
+		departureVelocity = XMVectorZero();
+		railEndFlightTime = 0.0f;
+		jumpSourceLine = -1;
+		respawnInProgress = false;
+		axisAngle = 0.0f;
+		axisAngleSpeed = 0.0f;
+	}
+
+	void ProcessRailEndLanding(float deltaTime)
+	{
+		if (railEndTargetLine < 0 || railEndTargetLine >= Object::starLineList.lineCount ||
+			Object::starLineList.line[railEndTargetLine].pointCount < 2)
+		{
+			ReleaseRailEndTarget();
+			return;
+		}
+
+		pos += departureVelocity * deltaTime;
+		float lineLength = 0.0f;
+		RailLandingPoint landing = FindRailEndLandingPoint(deltaTime, lineLength);
+		XMVECTOR flightDirection = XMVector3Normalize(departureVelocity);
+
+		float forwardOffset = XMVectorGetX(XMVector3Dot(landing.position - pos, flightDirection));
+		float alongSpeed = XMVectorGetX(XMVector3Dot(departureVelocity, landing.tangent));
+		bool targetBehindFlight = forwardOffset < -RailForwardTolerance && !landing.touching && !landing.inFlightPlane;
+		float offsetAlongRail = XMVectorGetX(XMVector3Dot(pos - landing.position, landing.tangent));
+		bool passedForwardEnd = alongSpeed > 0.0f && lineLength - landing.alongPosition < RailGeometryEpsilon && offsetAlongRail > 0.0f;
+		bool passedBackwardEnd = alongSpeed < 0.0f && landing.alongPosition < RailGeometryEpsilon && offsetAlongRail < 0.0f;
+		if (landing.pointIndex < 0.0f || targetBehindFlight || passedForwardEnd || passedBackwardEnd)
+		{
+			ReleaseRailEndTarget();
+			railEndFlightTime += deltaTime;
+			return;
+		}
+
+		lineIndex = railEndTargetLine;
+		pointIndex = landing.pointIndex;
+		posOnLine = landing.position;
+		landingUp = CalculateAndSpreadLandingUp(pos, landing.position, lineIndex, pointIndex);
+		float distance = sqrtf(landing.distanceSq);
+		startAirDistance = max(startAirDistance, max(distance, 0.001f));
+		gravity.progress += gravity.speed * deltaTime / max(distance, RailGeometryEpsilon);
+		if (landing.touching) gravity.progress = 1.0f;
+		float progress = clamp(gravity.progress, 0.0f, 1.0f);
+		gravity.acceleratedT = progress * progress;
+		pos = XMVectorLerp(pos, landing.position, gravity.acceleratedT);
+		if (gravity.acceleratedT <= 0.99f) return;
+
+		CompleteRailEndLanding(landing.position, alongSpeed);
+	}
+
+	RailCaptureHit FindRailEndCapture(float deltaTime) const
+	{
+		int preferredSegment = -1;
+		int preferredLine = FindRailEndTargetLine(preferredSegment);
+		const float captureRadius = GetRailEndCaptureRadius();
+		const float radiusSq = captureRadius * captureRadius;
+		const float endMargin = GetRailContactRadius();
+		XMVECTOR flightStart = pos;
+		XMVECTOR travel = departureVelocity * deltaTime;
+		float travelLengthSq = XMVectorGetX(XMVector3LengthSq(travel));
+		RailCaptureHit best;
+		best.distanceSq = radiusSq;
+
+		if (preferredLine < 0) return best;
+		const auto& line = Object::starLineList.line[preferredLine];
+		float lineLength = 0.0f;
+		float preferredStart = 0.0f;
+		float preferredEnd = 0.0f;
+		for (int j = 0; j + 1 < line.pointCount; ++j)
+		{
+			if (j == preferredSegment) preferredStart = lineLength;
+			lineLength += XMVectorGetX(XMVector3Length(F2V(line.point[j + 1]) - F2V(line.point[j])));
+			if (j == preferredSegment) preferredEnd = lineLength;
+		}
+
+		float distanceAlongLine = 0.0f;
+		for (int j = 0; j + 1 < line.pointCount; ++j)
+		{
+			XMVECTOR start = F2V(line.point[j]);
+			XMVECTOR segment = F2V(line.point[j + 1]) - start;
+			float segmentLength = XMVectorGetX(XMVector3Length(segment));
+			float segmentStart = distanceAlongLine;
+			distanceAlongLine += segmentLength;
+			if (distanceAlongLine < preferredStart - 2.0f * captureRadius || segmentStart > preferredEnd + 2.0f * captureRadius) continue;
+			if (segmentLength < RailGeometryEpsilon) continue;
+
+			float segmentLengthSq = segmentLength * segmentLength;
+			XMVECTOR offset = flightStart - start;
+			float hitTime;
+			if (!TryFindRailCaptureTime(travel, travelLengthSq, segment, segmentLengthSq, offset, radiusSq, hitTime)) continue;
+
+			XMVECTOR tangent = segment / segmentLength;
+			XMVECTOR hitPosition = flightStart + travel * hitTime;
+			float projection = XMVectorGetX(XMVector3Dot(hitPosition - start, tangent)) / segmentLength;
+			float alongSpeed = XMVectorGetX(XMVector3Dot(departureVelocity, tangent));
+			float segmentFraction = clamp(projection, 0.0f, 1.0f);
+			float alongPosition = segmentStart + segmentFraction * segmentLength;
+			if (alongPosition < preferredStart - 2.0f * captureRadius || alongPosition > preferredEnd + 2.0f * captureRadius) continue;
+			if ((alongSpeed > 0.0f && lineLength - alongPosition < endMargin) ||
+				(alongSpeed < 0.0f && alongPosition < endMargin)) continue;
+
+			XMVECTOR projected = start + segment * segmentFraction;
+			float distanceSq = XMVectorGetX(XMVector3LengthSq(projected - hitPosition));
+			bool leavingSegment = (projection < 0.0f && alongSpeed < 0.0f) || (projection > 1.0f && alongSpeed > 0.0f);
+			if (leavingSegment && HasCloserRailProjection(preferredLine, hitPosition, distanceSq, RailGeometryEpsilon)) continue;
+			if (best.lineIndex < 0 || hitTime < best.time || (hitTime == best.time && distanceSq < best.distanceSq))
+			{
+				best.time = hitTime;
+				best.distanceSq = distanceSq;
+				best.lineIndex = preferredLine;
+				best.pointIndex = (float)j + segmentFraction;
+				best.position = projected;
+			}
+		}
+		return best;
+	}
+
+	void ProcessRailEndGravity(float deltaTime)
+	{
+		if (railEndTargetLine >= 0)
+		{
+			ProcessRailEndLanding(deltaTime);
+			return;
+		}
+
+		RailCaptureHit hit = FindRailEndCapture(deltaTime);
+		pos += departureVelocity * deltaTime * hit.time;
+		railEndFlightTime += deltaTime * hit.time;
+		if (hit.lineIndex < 0) return;
+
+		railEndTargetLine = hit.lineIndex;
+		lineIndex = hit.lineIndex;
+		pointIndex = hit.pointIndex;
+		posOnLine = hit.position;
+		landingUp = CalculateAndSpreadLandingUp(pos, hit.position, lineIndex, pointIndex);
+		startAirDistance = max(sqrtf(hit.distanceSq), 0.001f);
+		ProcessRailEndLanding(deltaTime * (1.0f - hit.time));
+	}
+
+	void ProcessRailEndFlight(float deltaTime, XMVECTOR cameraForward)
+	{
+		float remainingStep = max(deltaTime - railEndStepConsumed, 0.0f);
+		railEndStepConsumed = 0.0f;
+		if (railEndTargetLine >= 0)
+		{
+			ProcessRailEndLanding(remainingStep);
+			return;
+		}
+		float flightStep = min(remainingStep, max(RailEndFlightDuration - railEndFlightTime, 0.0f));
+		SteerRailEndFlight(flightStep, cameraForward);
+		ProcessRailEndGravity(flightStep);
+		if (railEndFlight && railEndTargetLine >= 0 && remainingStep > flightStep)
+			ProcessRailEndLanding(remainingStep - flightStep);
+		bool flightExpired = railEndFlightTime >= RailEndFlightDuration - 0.00001f;
+		if (railEndFlight && railEndTargetLine < 0 && flightExpired)
+		{
+			dead = true;
+			health = 0.0f;
+			Log("Rail end flight expired\n");
+			Respawn(true);
+		}
+	}
+
+	void ProcessGravity(float deltaTime, XMVECTOR cameraForward = XMVectorZero())
+	{
+		if (railEndFlight)
+		{
+			ProcessRailEndFlight(deltaTime, cameraForward);
+			return;
+		}
+
 		float minDistance = 1e9f;
 		float4 bestProjPoint = { 0,0,0,0 };
 		int bestLineIndex = -1;
@@ -546,7 +1079,7 @@ struct hero_ : AliveCreation {
 		for (int i = 0; i < Object::starLineList.lineCount; i++)
 		{
 			// Проходим по отрезкам: от j до j+1
-			for (int j = 1; j < Object::starLineList.line[i].pointCount - 2; j++)
+			for (int j = 0; j + 1 < Object::starLineList.line[i].pointCount; j++)
 			{
 				float4 p1 = Object::starLineList.line[i].point[j];
 				float4 p2 = Object::starLineList.line[i].point[j + 1];
@@ -585,7 +1118,7 @@ struct hero_ : AliveCreation {
 			XMVECTOR distVector = DirectX::XMVector3Length(DirectX::XMVectorSubtract(endPos, startPos));
 			float distance;
 			XMStoreFloat(&distance, distVector);
-			float step = (gravity.speed * deltaTime) / distance;
+			float step = (gravity.speed * deltaTime) / max(distance, 0.000001f);
 
 			// Прибавляем шаг к общему прогрессу
 			gravity.progress += step;
@@ -604,6 +1137,7 @@ struct hero_ : AliveCreation {
 				gravity.mode = false;
 				gravity.progress = 0.0f;
 				pos = endPos;
+				jumpSourceLine = -1;
 				respawnInProgress = false;
 				axisAngle = 0;
 				axisAngleSpeed = 0;
@@ -619,6 +1153,12 @@ struct hero_ : AliveCreation {
 
 		if (gravity.mode)
 		{
+			mesh->StopAnimation(1);
+			mesh->StopAnimation(3);
+			mesh->StopAnimation(4);
+			mesh->StopAnimation(6);
+			mesh->StopAnimation(7, 0);
+			mesh->StopAnimation(8);
 			mesh->PlayAnimation(5);
 			landingTimer = 0;
 		}
@@ -628,6 +1168,15 @@ struct hero_ : AliveCreation {
 			}
 
 			mesh->StopAnimation(5);
+			if (railEndBraking && railEndBrakeTime < RailEndBrakeDuration)
+			{
+				mesh->StopAnimation(1);
+				mesh->StopAnimation(3);
+				mesh->StopAnimation(4);
+				mesh->StopAnimation(7, 0);
+				mesh->StopAnimation(8);
+				mesh->PlayAnimation(6);
+			}
 		}
 
 		float landindDur = .5;
@@ -656,9 +1205,9 @@ struct hero_ : AliveCreation {
 		//}
 	}
 
-	void Respawn()
+	void Respawn(bool force = false)
 	{
-		if (firstRun || ((!firstRun) && GetAsyncKeyState('R')))
+		if (firstRun || force || GetAsyncKeyState('R'))
 		{
 			if (dead)
 			{
@@ -673,12 +1222,29 @@ struct hero_ : AliveCreation {
 				}
 			}
 
-			if (!firstRun)
+			if (!firstRun && !force)
 			{
 				while (GetAsyncKeyState('R')) { Sleep(16); };
 			}
 
 			respawnInProgress = true;
+			railEndFlight = false;
+			railEndTargetLine = -1;
+			departureVelocity = XMVectorZero();
+			railEndFlightTime = 0.0f;
+			railEndStepConsumed = 0.0f;
+			railEndBraking = false;
+			railEndBrakeTime = 0.0f;
+			railEndBrakeSpeed = 0.0f;
+			jumpSourceLine = -1;
+			speed = 0.0f;
+			jump = false;
+			jumpHeight = 0.0f;
+			isCharging = false;
+			chargeTimer = 0.0f;
+			jumpChargeProgress = 1.0f;
+			axisAngleSpeed = 0.0f;
+			gravity.acceleratedT = 0.0f;
 
 			cameraFirstFrame = true;
 			srand(timer::frameBeginTime);
@@ -689,14 +1255,18 @@ struct hero_ : AliveCreation {
 			//int startLine = rand()% Object::starLineList.lineCount;
 			//int startPoint = rand() % (Object::starLineList.line[startLine].pointCount-2)+1;
 
-			int startLine = 1;
-			int startPoint = 1;
+			int startLine = min(1, Object::starLineList.lineCount - 1);
+			if (startLine < 0 || Object::starLineList.line[startLine].pointCount == 0) return;
+			int startPoint = min(1, Object::starLineList.line[startLine].pointCount - 1);
+			lineIndex = startLine;
+			pointIndex = (float)startPoint;
 
 			float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
 
 			//destPoint = { 25455 /100., 15806 / 100., 25800 / 100. };
 
 			pos += F2V(destPoint);
+			posOnLine = F2V(destPoint);
 			gravity.mode = true;
 			gravity.progress = 0.0f;
 
@@ -773,6 +1343,8 @@ struct hero_ : AliveCreation {
 
 	void ProcessJump(float deltaTime)
 	{
+		if (railEndFlight) return;
+
 		// Настройки баланса зарядки (ПЕРЕВЕДЕНЫ В МИЛЛИСЕКУНДЫ)
 		const float MIN_JUMP_IMPULSE = jumpStartImpulse / 20.0f;
 		const float MAX_JUMP_IMPULSE = jumpStartImpulse;
@@ -841,6 +1413,8 @@ struct hero_ : AliveCreation {
 				jumpHeight = MIN_JUMP_IMPULSE + (MAX_JUMP_IMPULSE - MIN_JUMP_IMPULSE) * smoothProgress;
 
 				jump = true;
+				jumpSourceLine = lineIndex;
+				railEndBraking = false;
 				gravity.mode = true;
 				gravity.progress = 0.0f;
 
@@ -875,7 +1449,9 @@ struct hero_ : AliveCreation {
 		// 3. АДАПТИРОВАННАЯ ЛОГИКА ПЕРЕМЕЩЕНИЯ
 		if (jump || gravity.mode)
 		{
-			pos += (jumpHeight * upVector + forwardVector * speed * airSpeedAmp + rightVector*axisAngleSpeed ) * deltaTime;
+			XMVECTOR velocity = jumpHeight * upVector + forwardVector * speed * airSpeedAmp + rightVector * axisAngleSpeed;
+			if (!TryStartRailEndFlightFromJump(velocity, deltaTime))
+				pos += velocity * deltaTime;
 		}
 
 		// 4. ВАША ОРИГИНАЛЬНАЯ ЛОГИКА ЗАТУХАНИЯ СКОРОСТИ ПРЫЖКА
@@ -899,6 +1475,43 @@ struct hero_ : AliveCreation {
 			mesh->StopAnimation(1);
 
 			return;
+		}
+
+		if (railEndBraking)
+		{
+			float input = ((inputController.isForwardPressed() ? 1.0f : 0.0f) -
+				(inputController.isBackwardPressed() ? 1.0f : 0.0f)) * sign(speedFactor);
+			if (input * railEndBrakeSpeed < 0.0f)
+			{
+				railEndBraking = false;
+				speed = 0.0f;
+				mesh->StopAnimation(6);
+			}
+			else
+			{
+				railEndBrakeTime = min(railEndBrakeTime + deltaTime, RailEndBrakeDuration);
+				if (railEndBrakeTime >= RailEndBrakeDuration - 0.00001f) railEndBrakeTime = RailEndBrakeDuration;
+				float progress = railEndBrakeTime / RailEndBrakeDuration;
+				speed = railEndBrakeSpeed * (1.0f - progress);
+				mesh->StopAnimation(3);
+				mesh->StopAnimation(4);
+				mesh->StopAnimation(8);
+				mesh->animations[6].currentTime = progress * mesh->animations[6].duration;
+				if (progress < 1.0f)
+				{
+					mesh->StopAnimation(1);
+					mesh->PlayAnimation(6);
+				}
+				else
+				{
+					mesh->StopAnimation(6);
+					mesh->PlayAnimation(1);
+				}
+				dx11::Audio::SetVolume(glideVoice, 0.0f);
+				stepTime = 0.0f;
+				ProcessAxisRotation(deltaTime);
+				return;
+			}
 		}
 
 		bool pressingMove = false;
@@ -1030,6 +1643,11 @@ struct hero_ : AliveCreation {
 		}
 
 		// --- Логика вращения вокруг нити (A / D) ---
+		ProcessAxisRotation(deltaTime);
+	}
+
+	void ProcessAxisRotation(float deltaTime)
+	{
 		bool pressingRotation = false;
 		if (inputController.isLeftPressed())
 		{
@@ -1058,11 +1676,10 @@ struct hero_ : AliveCreation {
 		const auto& currentLine = Object::starLineList.line[lineIndex];
 		int maxPointIdx = currentLine.pointCount - 1;
 		// Вычисление индексов и непрерывной дробной части
-		int currIdx = clamp((int)floorf(pointIndex), 0, maxPointIdx);
-		int nextIdx = clamp(currIdx + 1, 0, maxPointIdx);
+		int currIdx = clamp((int)floorf(pointIndex), 0, maxPointIdx - 1);
+		int nextIdx = currIdx + 1;
 
-		float t = pointIndex - floorf(pointIndex);
-		if (currIdx == maxPointIdx) t = 0.0f;
+		float t = clamp(pointIndex - (float)currIdx, 0.0f, 1.0f);
 
 		XMVECTOR pCurrent = F2V(currentLine.point[currIdx]);
 		XMVECTOR pNext = F2V(currentLine.point[nextIdx]);
@@ -1105,6 +1722,13 @@ struct hero_ : AliveCreation {
 
 	void OrientHeroTowardsLineInAir(float deltaTime)
 	{
+		if (railEndFlight)
+		{
+			Object::heroOnRails.r[3] = XMVectorSetW(pos, 1.0f);
+			mesh->model = inputController.mouse.getLookMatrix(Object::heroOnRails, upVector, deltaTime, changeDirSpeed, mesh);
+			return;
+		}
+
 		// Проверяем, что индекс линии валиден и она существует
 		if (lineIndex < 0 || lineIndex >= Object::starLineList.lineCount) return;
 		const auto& currentLine = Object::starLineList.line[lineIndex];
@@ -1184,30 +1808,64 @@ struct hero_ : AliveCreation {
 		const auto& currentLine = Object::starLineList.line[lineIndex];
 		if (currentLine.pointCount < 2) return;
 
-		int maxPointIdx = currentLine.pointCount - 2;
+		int maxPointIdx = currentLine.pointCount - 1;
+		pointIndex = clamp(pointIndex, 0.0f, (float)maxPointIdx);
 
-		int currIdxCheck = clamp((int)floorf(pointIndex), 2, maxPointIdx);
-		int nextIdxCheck = clamp(currIdxCheck + 1, 0, maxPointIdx);
-		XMVECTOR pCurrCheck = F2V(currentLine.point[currIdxCheck]);
-		XMVECTOR pNextCheck = F2V(currentLine.point[nextIdxCheck]);
+		const bool movingForward = speed > 0.0f;
+		float remainingDistance = fabsf(speed) * deltaTime;
+		bool leavesRail = false;
 
-		float segLenCheck = XMVectorGetX(XMVector3Length(XMVectorSubtract(pNextCheck, pCurrCheck)));
-		if (segLenCheck < 0.001f) segLenCheck = 1.0f;
+		while (remainingDistance > 0.0f)
+		{
+			int segmentIdx = movingForward ? (int)floorf(pointIndex) : (int)ceilf(pointIndex) - 1;
+			segmentIdx = clamp(segmentIdx, 0, maxPointIdx - 1);
+			XMVECTOR segment = F2V(currentLine.point[segmentIdx + 1]) - F2V(currentLine.point[segmentIdx]);
+			float segmentLength = XMVectorGetX(XMVector3Length(segment));
+			float endIndex = (float)(movingForward ? segmentIdx + 1 : segmentIdx);
+			float distanceToEnd = fabsf(endIndex - pointIndex) * segmentLength;
 
-		pointIndex += (speed * deltaTime) / segLenCheck;
+			if (remainingDistance < distanceToEnd)
+			{
+				pointIndex += (movingForward ? remainingDistance : -remainingDistance) / segmentLength;
+				remainingDistance = 0.0f;
+				break;
+			}
 
-		pointIndex = clamp(pointIndex, 2.f, (float)maxPointIdx);
+			remainingDistance -= distanceToEnd;
+			pointIndex = endIndex;
+			if (pointIndex == (movingForward ? (float)maxPointIdx : 0.0f))
+			{
+				leavesRail = true;
+				break;
+			}
+		}
 
-		int currIdx = clamp((int)floorf(pointIndex), 0, maxPointIdx);
-		int nextIdx = clamp(currIdx + 1, 0, maxPointIdx);
+		int currIdx = clamp((int)floorf(pointIndex), 0, maxPointIdx - 1);
+		int nextIdx = currIdx + 1;
 
 		XMVECTOR pCurrent = F2V(currentLine.point[currIdx]);
 		XMVECTOR pNext = F2V(currentLine.point[nextIdx]);
 
 		XMVECTOR tangentSmooth = getSmoothTangent();
+		if (leavesRail)
+		{
+			XMVECTOR endpoint;
+			GetRailEnd(lineIndex, movingForward, endpoint, tangentSmooth);
+			lineTangent = tangentSmooth;
+			if (fabsf(speed) <= maxSpeed * RailEndMinSpeedRatio)
+			{
+				if (!railEndBraking)
+				{
+					railEndBraking = true;
+					railEndBrakeTime = 0.0f;
+					railEndBrakeSpeed = speed;
+					dx11::Audio::Play("Braking", false, 0.5f);
+				}
+				leavesRail = false;
+			}
+		}
 
-		float t = pointIndex - floorf(pointIndex);
-		if (currIdx == maxPointIdx) t = 0.0f;
+		float t = clamp(pointIndex - (float)currIdx, 0.0f, 1.0f);
 		posOnLine = XMVectorLerp(pCurrent, pNext, t);
 
 		// ====================================================================
@@ -1253,7 +1911,14 @@ struct hero_ : AliveCreation {
 		forwardVector = heroForward;
 		pos = XMVectorLerp(pCurrent, pNext, t);
 
+		if (leavesRail)
+		{
+			BeginRailEndFlight(tangentSmooth);
+			ProcessGravity(remainingDistance / fabsf(speed));
+		}
+
 		Object::heroOnRails = getHeroOnRailsMatrix(heroForward, HeroRealUp, HeroRight);
+		if (leavesRail) Object::heroOnRails.r[3] = XMVectorSetW(pos, 1.0f);
 		mesh->model = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime, changeDirSpeed, mesh);
 	}
 
@@ -2722,7 +3387,7 @@ namespace Loop
 
 					if (hero.gravity.mode)
 					{
-						hero.ProcessGravity(FIXED_DT);
+						hero.ProcessGravity(FIXED_DT, gameCamera.finalCameraAt - gameCamera.finalCameraEye);
 						hero.OrientHeroTowardsLineInAir(FIXED_DT);
 					}
 					else
