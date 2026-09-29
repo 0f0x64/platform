@@ -184,6 +184,17 @@ float3 CartesianToSpherical(float3 p)
     return float3(radius, theta, phi);
 }
 
+float3 SurfaceRandom(uint particleId)
+{
+    uint3 value = particleId * 3u + uint3(0u, 1u, 2u);
+    value ^= value >> 16u;
+    value *= 0x7feb352du;
+    value ^= value >> 15u;
+    value *= 0x846ca68bu;
+    value ^= value >> 16u;
+    return float3(value >> 8u) * (1.0f / 16777216.0f);
+}
+
 pos_color CalcParticles(uint vid,uint iid,float4 grid)
 {
 
@@ -191,7 +202,14 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
     pos_color p1;
 
     //uint4 ind4 = meshInd[iid%4046];
-    uint4 ind4 = ibf[iid%(int)triCount.x].i;
+    float3 surfaceRandom = 0.0f;
+    uint triangleIndex = iid % (uint)triCount.x;
+    if (triCount.y > 0.0f)
+    {
+        surfaceRandom = SurfaceRandom(iid);
+        triangleIndex = min((uint)(surfaceRandom.x * triCount.x), (uint)triCount.x - 1);
+    }
+    uint4 ind4 = ibf[triangleIndex].i;
     uint ind[] = {ind4.x,ind4.y,ind4.z};
 //  float3 _p0 = mesh[ind[0]].xyz;
 //  float3 _p1 = mesh[ind[1]].xyz;
@@ -203,7 +221,16 @@ pos_color CalcParticles(uint vid,uint iid,float4 grid)
 
 
     float s =CalculateTriangleArea(_p0,_p1,_p2);
-    pos = getRandomPointInTriangle(_p0,_p1,_p2,iid/11231.,iid,s);
+    if (triCount.y > 0.0f)
+    {
+        float sqrtR = sqrt(surfaceRandom.y);
+        pos = (1.0f - sqrtR) * _p0 + sqrtR * surfaceRandom.z * _p1
+            + sqrtR * (1.0f - surfaceRandom.z) * _p2;
+    }
+    else
+    {
+        pos = getRandomPointInTriangle(_p0,_p1,_p2,iid/11231.,iid,s);
+    }
     float3 nrml = CalculateNormal(_p0,_p1,_p2);
     pos+=nrml*tickness.xxx/100;
 

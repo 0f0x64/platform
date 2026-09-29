@@ -16,6 +16,7 @@ namespace Enemies
 				Log("Enemy renderer: model failed to load; enemies cannot be displayed.\n");
 				return;
 			}
+			mesh_.randomSurfaceSampling = true;
 			mesh_.Update(0.0f);
 		}
 

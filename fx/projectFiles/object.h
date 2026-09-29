@@ -71,6 +71,7 @@ namespace Object {
 
 		XMMATRIX model = XMMatrixIdentity();
 		float4 color = float4(1, 1, 1, 1);
+		bool randomSurfaceSampling = false;
 
 		ConstBuf::vertex* vArray = nullptr;
 		ConstBuf::index* iArray = nullptr;
@@ -1631,7 +1632,7 @@ namespace Object {
 				.base_color = float4(r / 100.,g / 100.,b / 100.,1),
 				.colorMultiplier = obj->color,
 				.modelPos = float4(xPos / 10000.,yPos / 10000.,zPos / 10000.,0),
-				.triCount = float4(triCnt,0,0,0),
+				.triCount = float4(triCnt, obj->randomSurfaceSampling ? 1.0f : 0.0f, 0, 0),
 				.brightness = float4(brightness,0,0,0),
 				.tickness = float4(tickness,0,0,0),
 				.modelCenterScale = centerScale,
