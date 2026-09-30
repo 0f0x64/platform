@@ -3167,12 +3167,9 @@ namespace Object {
 		AddPointToLine({ 455, 91, -517 });
 		AddPointToLine({ 456, 81, -519 });
 		AddPointToLine({ 458, 70, -520 });
-		AddPointToLine({ 460, 59, -516 });
-		AddPointToLine({ 468, 34, -524 });
+		
 
 		NewLine();
-		AddPointToLine({ 475, 43, -499 });
-		AddPointToLine({ 461, 53, -520 });
 		AddPointToLine({ 459, 47, -522 });
 		AddPointToLine({ 457, 45, -521 });
 		AddPointToLine({ 457, 44, -518 });
@@ -3194,7 +3191,7 @@ namespace Object {
 		AddPointToLine({ 434, 29, -494 });
 		AddPointToLine({ 430, 31, -492 });
 		AddPointToLine({ 426, 34, -491 });
-		AddPointToLine({ 423, 36, -490 });
+		AddPointToLine({ 424, 36, -490 });
 
 
 		// ============================================================
@@ -3202,7 +3199,7 @@ namespace Object {
 		// ============================================================
 
 		NewLine();
-		AddPointToLine({ 457, 123, -520 });
+		AddPointToLine({ 456, 123, -520 });
 		AddPointToLine({ 455, 120, -520 });
 		AddPointToLine({ 454, 118, -518 });
 		AddPointToLine({ 455, 114, -515 });
@@ -3214,9 +3211,7 @@ namespace Object {
 		AddPointToLine({ 459, 60, -520 });
 
 		NewLine();
-		AddPointToLine({ 452, 51, -532 });
-		AddPointToLine({ 457, 54, -522 });
-		AddPointToLine({ 457, 52, -519 });
+		AddPointToLine({ 458, 52, -519 });
 		AddPointToLine({ 458, 47, -515 });
 		AddPointToLine({ 458, 43, -512 });
 		AddPointToLine({ 458, 37, -511 });
