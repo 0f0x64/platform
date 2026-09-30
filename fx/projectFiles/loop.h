@@ -2200,7 +2200,7 @@ namespace Loop
 					hero.processLanding(FIXED_DT);
 
 					gameCamera.Update(FIXED_DT);
-
+					
 					accumulator -= FIXED_DT;
 				}
 
@@ -2208,7 +2208,7 @@ namespace Loop
 				alpha = std::clamp(alpha, 0.0f, 1.0f);
 				//TODO: implement characters and camera matrix interpolation (render only)
 			}
-
+			
 			//---------
 			//RENDERING
 			//---------
