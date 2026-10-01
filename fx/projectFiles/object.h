@@ -3022,8 +3022,10 @@ namespace Object {
 
 #endif
 
-#define Tisha
+//#define Tisha
 #ifdef Tisha
+
+
 		//============================================================
 // БЛИЗНЕЦЫ
 //
@@ -3117,80 +3119,78 @@ namespace Object {
 		AddPointToLine({ -89, -210, -163 });
 
 		// ============================================================
-		// УЧАСТОК 1 — СЖАТИЕ В 2 РАЗА + ОБЩАЯ ВОЛНА ПО Y
-		// ============================================================
-		//
-		// Начало:
-		// звезда 3 = { 508, 110, -550 }
-		//
-		// Продольный размер уменьшен примерно в 2 раза.
-		// Потерянная длина компенсирована изгибом.
-		// Все Л1–Л5 деформируются одной общей волной.
-		//
-		// ============================================================
+// УЧАСТОК 1 — ЕЩЁ БОЛЕЕ ПЛАВНАЯ ВОЛНА
+// ============================================================
 
 
-		// ============================================================
-		// Л1
-		// ============================================================
+// ============================================================
+// Л1
+// ============================================================
 
 		NewLine();
 		AddPointToLine({ 508, 110, -550 });
-		AddPointToLine({ 504, 117, -544 });
-		AddPointToLine({ 501, 125, -538 });
-		AddPointToLine({ 496, 132, -534 });
-		AddPointToLine({ 491, 138, -531 });
-		AddPointToLine({ 475, 138, -522 });
-		AddPointToLine({ 464, 150, -509 });
-		AddPointToLine({ 459, 145, -514 });
-		//AddPointToLine({ 457, 148, -519 });
-		//AddPointToLine({ 454, 135, -519 });
+		AddPointToLine({ 505, 116, -546 });
+		AddPointToLine({ 502, 122, -542 });
+		AddPointToLine({ 498, 128, -538 });
+		AddPointToLine({ 493, 134, -534 });
+		AddPointToLine({ 487, 139, -530 });
+		AddPointToLine({ 480, 144, -525 });
+		AddPointToLine({ 472, 149, -518 });
+		AddPointToLine({ 465, 151, -512 });
+		AddPointToLine({ 458, 144, -516 });
 
 		NewLine();
 		AddPointToLine({ 477, 145, -526 });
+		AddPointToLine({ 473, 145, -523 });
 		AddPointToLine({ 470, 146, -520 });
-		AddPointToLine({ 468, 149, -516 });
-		AddPointToLine({ 466, 151, -514 });
-		AddPointToLine({ 462, 150, -514 });
-		AddPointToLine({ 460, 146, -516 });
-		AddPointToLine({ 458, 140, -519 });
-		AddPointToLine({ 458, 133, -520 });
-		AddPointToLine({ 460, 126, -518 });
+		AddPointToLine({ 468, 147, -517 });
+		AddPointToLine({ 466, 148, -515 });
+		AddPointToLine({ 464, 147, -514 });
+		AddPointToLine({ 462, 145, -515 });
+		AddPointToLine({ 460, 142, -517 });
+		AddPointToLine({ 459, 138, -519 });
+		AddPointToLine({ 459, 133, -520 });
+		AddPointToLine({ 459, 128, -519 });
+		AddPointToLine({ 459, 121, -518 });
+		AddPointToLine({ 459, 114, -517 });
 		AddPointToLine({ 459, 110, -516 });
 
 		NewLine();
-		AddPointToLine({ 460, 117, -516 });
-		AddPointToLine({ 461, 113, -511 });
-		AddPointToLine({ 460, 109, -511 });
-		AddPointToLine({ 458, 105, -512 });
-		AddPointToLine({ 456, 99, -515 });
-		AddPointToLine({ 455, 91, -517 });
-		AddPointToLine({ 456, 81, -519 });
-		AddPointToLine({ 458, 70, -520 });
-		
+		AddPointToLine({ 465, 119, -521 });
+		AddPointToLine({ 463, 113, -514 });
+		AddPointToLine({ 461, 109, -512 });
+		AddPointToLine({ 460, 104, -512 });
+		AddPointToLine({ 458, 99, -514 });
+		AddPointToLine({ 457, 93, -516 });
+		AddPointToLine({ 456, 86, -518 });
+		AddPointToLine({ 456, 79, -519 });
+		AddPointToLine({ 457, 72, -520 });
+		AddPointToLine({ 458, 66, -520 });
 
 		NewLine();
 		AddPointToLine({ 459, 47, -522 });
-		AddPointToLine({ 457, 45, -521 });
-		AddPointToLine({ 457, 44, -518 });
-		AddPointToLine({ 458, 39, -514 });
-		AddPointToLine({ 460, 35, -511 });
-		AddPointToLine({ 461, 29, -510 });
-		AddPointToLine({ 460, 23, -510 });
-		AddPointToLine({ 458, 18, -511 });
-		AddPointToLine({ 456, 14, -513 });
-		AddPointToLine({ 453, 12, -514 });
+		AddPointToLine({ 458, 44, -520 });
+		AddPointToLine({ 457, 41, -518 });
+		AddPointToLine({ 458, 38, -515 });
+		AddPointToLine({ 459, 35, -513 });
+		AddPointToLine({ 460, 31, -511 });
+		AddPointToLine({ 460, 27, -510 });
+		AddPointToLine({ 459, 23, -510 });
+		AddPointToLine({ 457, 19, -511 });
+		AddPointToLine({ 455, 15, -512 });
+		AddPointToLine({ 449, 17, -510 });
 
 		NewLine();
-		AddPointToLine({ 449, 13, -515 });
-		AddPointToLine({ 445, 16, -514 });
+		AddPointToLine({ 447, 13, -515 });
+		AddPointToLine({ 446, 15, -514 });
+		AddPointToLine({ 444, 17, -512 });
 		AddPointToLine({ 442, 20, -509 });
-		AddPointToLine({ 440, 23, -505 });
-		AddPointToLine({ 439, 26, -500 });
-		AddPointToLine({ 437, 27, -496 });
-		AddPointToLine({ 434, 29, -494 });
-		AddPointToLine({ 430, 31, -492 });
-		AddPointToLine({ 426, 34, -491 });
+		AddPointToLine({ 440, 23, -506 });
+		AddPointToLine({ 439, 26, -502 });
+		AddPointToLine({ 437, 28, -499 });
+		AddPointToLine({ 434, 30, -496 });
+		AddPointToLine({ 431, 32, -494 });
+		AddPointToLine({ 428, 34, -492 });
 		AddPointToLine({ 424, 36, -490 });
 
 
@@ -3199,38 +3199,48 @@ namespace Object {
 		// ============================================================
 
 		NewLine();
-		AddPointToLine({ 456, 123, -520 });
-		AddPointToLine({ 455, 120, -520 });
-		AddPointToLine({ 454, 118, -518 });
-		AddPointToLine({ 455, 114, -515 });
-		AddPointToLine({ 456, 109, -512 });
-		AddPointToLine({ 458, 101, -511 });
-		AddPointToLine({ 459, 92, -511 });
-		AddPointToLine({ 459, 81, -514 });
-		AddPointToLine({ 459, 70, -518 });
+		AddPointToLine({ 453, 123, -515 });
+		AddPointToLine({ 456, 120, -519 });
+		AddPointToLine({ 455, 117, -518 });
+		AddPointToLine({ 455, 114, -516 });
+		AddPointToLine({ 456, 110, -514 });
+		AddPointToLine({ 457, 105, -512 });
+		AddPointToLine({ 458, 100, -511 });
+		AddPointToLine({ 459, 94, -511 });
+		AddPointToLine({ 459, 87, -512 });
+		AddPointToLine({ 459, 80, -514 });
+		AddPointToLine({ 459, 73, -516 });
+		AddPointToLine({ 459, 66, -518 });
 		AddPointToLine({ 459, 60, -520 });
 
 		NewLine();
-		AddPointToLine({ 458, 52, -519 });
-		AddPointToLine({ 458, 47, -515 });
-		AddPointToLine({ 458, 43, -512 });
-		AddPointToLine({ 458, 37, -511 });
-		AddPointToLine({ 457, 31, -513 });
-		AddPointToLine({ 456, 26, -514 });
-		AddPointToLine({ 454, 21, -516 });
-		AddPointToLine({ 452, 17, -516 });
+		AddPointToLine({ 457, 52, -519 });
+		AddPointToLine({ 458, 49, -517 });
+		AddPointToLine({ 458, 46, -515 });
+		AddPointToLine({ 458, 43, -513 });
+		AddPointToLine({ 458, 39, -512 });
+		AddPointToLine({ 458, 35, -511 });
+		AddPointToLine({ 457, 31, -512 });
+		AddPointToLine({ 456, 27, -513 });
+		AddPointToLine({ 456, 22, -514 });
+		AddPointToLine({ 452, 20, -515 });
+		AddPointToLine({ 448, 20, -512 });
 
 		NewLine();
-		AddPointToLine({ 452, 15, -513 });
-		AddPointToLine({ 451, 16, -509 });
-		AddPointToLine({ 449, 19, -504 });
-		AddPointToLine({ 446, 23, -501 });
-		AddPointToLine({ 441, 26, -500 });
-		AddPointToLine({ 437, 28, -500 });
-		AddPointToLine({ 432, 30, -500 });
-		AddPointToLine({ 428, 32, -500 });
-		AddPointToLine({ 425, 34, -498 });
+		AddPointToLine({ 450, 15, -513 });
+		AddPointToLine({ 451, 16, -511 });
+		AddPointToLine({ 450, 18, -508 });
+		AddPointToLine({ 448, 20, -505 });
+		AddPointToLine({ 446, 23, -503 });
+		AddPointToLine({ 443, 25, -501 });
+		AddPointToLine({ 440, 27, -500 });
+		AddPointToLine({ 437, 29, -500 });
+		AddPointToLine({ 433, 31, -500 });
+		AddPointToLine({ 429, 33, -499 });
+		AddPointToLine({ 425, 35, -498 });
 		AddPointToLine({ 422, 36, -496 });
+		AddPointToLine({ 420, 43, -488 });
+		AddPointToLine({ 418, 50, -480 });
 		AddPointToLine({ 416, 58, -472 });
 
 
@@ -3239,40 +3249,50 @@ namespace Object {
 		// ============================================================
 
 		NewLine();
-		AddPointToLine({ 455, 121, -520 });
-		AddPointToLine({ 454, 117, -520 });
-		AddPointToLine({ 453, 114, -519 });
-		AddPointToLine({ 454, 110, -516 });
-		AddPointToLine({ 455, 104, -514 });
-		AddPointToLine({ 457, 95, -512 });
-		AddPointToLine({ 459, 85, -512 });
-		AddPointToLine({ 461, 75, -513 });
+		AddPointToLine({ 450, 121, -525 });
+		AddPointToLine({ 455, 118, -519 });
+		AddPointToLine({ 454, 115, -518 });
+		AddPointToLine({ 454, 112, -517 });
+		AddPointToLine({ 455, 108, -515 });
+		AddPointToLine({ 456, 103, -514 });
+		AddPointToLine({ 457, 98, -512 });
+		AddPointToLine({ 458, 92, -512 });
+		AddPointToLine({ 459, 86, -512 });
+		AddPointToLine({ 460, 79, -513 });
+		AddPointToLine({ 461, 72, -514 });
 		AddPointToLine({ 461, 65, -516 });
+		AddPointToLine({ 460, 59, -518 });
 		AddPointToLine({ 460, 56, -518 });
 
 		NewLine();
 		AddPointToLine({ 457, 53, -522 });
-		AddPointToLine({ 456, 50, -521 });
+		AddPointToLine({ 456, 50, -520 });
 		AddPointToLine({ 456, 47, -518 });
-		AddPointToLine({ 457, 43, -515 });
+		AddPointToLine({ 457, 44, -516 });
+		AddPointToLine({ 457, 41, -514 });
 		AddPointToLine({ 458, 38, -513 });
-		AddPointToLine({ 458, 32, -512 });
-		AddPointToLine({ 458, 26, -512 });
-		AddPointToLine({ 456, 20, -514 });
-		AddPointToLine({ 454, 16, -516 });
-		AddPointToLine({ 451, 13, -516 });
+		AddPointToLine({ 458, 34, -512 });
+		AddPointToLine({ 458, 30, -512 });
+		AddPointToLine({ 457, 26, -512 });
+		AddPointToLine({ 456, 22, -513 });
+		AddPointToLine({ 454, 19, -515 });
+		AddPointToLine({ 449, 16, -514 });
+		AddPointToLine({ 446, 17, -511 });
 
 		NewLine();
 		AddPointToLine({ 448, 14, -515 });
-		AddPointToLine({ 445, 17, -512 });
-		AddPointToLine({ 443, 21, -508 });
-		AddPointToLine({ 440, 24, -504 });
-		AddPointToLine({ 438, 26, -500 });
-		AddPointToLine({ 435, 28, -498 });
-		AddPointToLine({ 432, 29, -497 });
-		AddPointToLine({ 427, 31, -497 });
-		AddPointToLine({ 423, 34, -496 });
-		AddPointToLine({ 419, 37, -494 });
+		AddPointToLine({ 446, 16, -513 });
+		AddPointToLine({ 444, 18, -511 });
+		AddPointToLine({ 443, 20, -509 });
+		AddPointToLine({ 441, 23, -506 });
+		AddPointToLine({ 439, 25, -503 });
+		AddPointToLine({ 437, 27, -501 });
+		AddPointToLine({ 435, 28, -499 });
+		AddPointToLine({ 432, 30, -498 });
+		AddPointToLine({ 429, 31, -497 });
+		AddPointToLine({ 426, 33, -497 });
+		AddPointToLine({ 423, 35, -496 });
+		AddPointToLine({ 420, 37, -494 });
 
 
 		// ============================================================
@@ -3281,26 +3301,33 @@ namespace Object {
 
 		NewLine();
 		AddPointToLine({ 459, 49, -522 });
-		AddPointToLine({ 457, 46, -522 });
-		AddPointToLine({ 457, 43, -519 });
-		AddPointToLine({ 457, 40, -516 });
-		AddPointToLine({ 459, 33, -513 });
-		AddPointToLine({ 460, 28, -511 });
-		AddPointToLine({ 460, 22, -511 });
-		AddPointToLine({ 459, 17, -511 });
-		AddPointToLine({ 457, 13, -512 });
-		AddPointToLine({ 454, 11, -513 });
+		AddPointToLine({ 458, 46, -521 });
+		AddPointToLine({ 457, 44, -519 });
+		AddPointToLine({ 457, 41, -517 });
+		AddPointToLine({ 458, 38, -515 });
+		AddPointToLine({ 458, 35, -513 });
+		AddPointToLine({ 459, 32, -512 });
+		AddPointToLine({ 460, 29, -511 });
+		AddPointToLine({ 460, 26, -511 });
+		AddPointToLine({ 460, 23, -511 });
+		AddPointToLine({ 459, 20, -511 });
+		AddPointToLine({ 458, 17, -512 });
+		AddPointToLine({ 456, 15, -512 });
+		AddPointToLine({ 452, 14, -510 });
 
 		NewLine();
 		AddPointToLine({ 450, 12, -514 });
-		AddPointToLine({ 445, 15, -514 });
-		AddPointToLine({ 441, 18, -512 });
-		AddPointToLine({ 438, 22, -509 });
-		AddPointToLine({ 437, 24, -504 });
-		AddPointToLine({ 435, 25, -501 });
-		AddPointToLine({ 433, 27, -497 });
-		AddPointToLine({ 430, 29, -494 });
-		AddPointToLine({ 427, 32, -492 });
+		AddPointToLine({ 447, 14, -514 });
+		AddPointToLine({ 445, 16, -513 });
+		AddPointToLine({ 442, 18, -512 });
+		AddPointToLine({ 440, 21, -510 });
+		AddPointToLine({ 438, 23, -507 });
+		AddPointToLine({ 437, 25, -504 });
+		AddPointToLine({ 436, 27, -501 });
+		AddPointToLine({ 434, 29, -498 });
+		AddPointToLine({ 431, 31, -496 });
+		AddPointToLine({ 428, 33, -494 });
+		AddPointToLine({ 425, 34, -492 });
 		AddPointToLine({ 422, 35, -491 });
 
 
@@ -3309,28 +3336,35 @@ namespace Object {
 		// ============================================================
 
 		NewLine();
-		AddPointToLine({ 462, 41, -523 });
-		AddPointToLine({ 462, 37, -522 });
-		AddPointToLine({ 462, 33, -520 });
-		AddPointToLine({ 462, 28, -518 });
-		AddPointToLine({ 463, 22, -516 });
-		AddPointToLine({ 463, 16, -516 });
-		AddPointToLine({ 462, 11, -516 });
-		AddPointToLine({ 459, 9, -518 });
-		AddPointToLine({ 456, 8, -518 });
-		AddPointToLine({ 453, 10, -516 });
+		AddPointToLine({ 463, 41, -523 });
+		AddPointToLine({ 462, 38, -522 });
+		AddPointToLine({ 462, 35, -521 });
+		AddPointToLine({ 462, 32, -519 });
+		AddPointToLine({ 462, 29, -518 });
+		AddPointToLine({ 463, 26, -517 });
+		AddPointToLine({ 463, 23, -516 });
+		AddPointToLine({ 463, 20, -516 });
+		AddPointToLine({ 463, 17, -516 });
+		AddPointToLine({ 462, 14, -516 });
+		AddPointToLine({ 460, 11, -517 });
+		AddPointToLine({ 457, 9, -518 });
+		AddPointToLine({ 450, 10, -516 });
 
 		NewLine();
 		AddPointToLine({ 451, 12, -514 });
-		AddPointToLine({ 449, 13, -510 });
-		AddPointToLine({ 447, 14, -507 });
-		AddPointToLine({ 445, 15, -504 });
-		AddPointToLine({ 442, 16, -502 });
-		AddPointToLine({ 439, 18, -501 });
-		AddPointToLine({ 434, 21, -501 });
-		AddPointToLine({ 428, 26, -500 });
-		AddPointToLine({ 423, 33, -497 });
-		AddPointToLine({ 419, 40, -493 });
+		AddPointToLine({ 450, 13, -512 });
+		AddPointToLine({ 448, 14, -510 });
+		AddPointToLine({ 446, 15, -508 });
+		AddPointToLine({ 444, 16, -506 });
+		AddPointToLine({ 442, 17, -504 });
+		AddPointToLine({ 439, 19, -502 });
+		AddPointToLine({ 436, 21, -501 });
+		AddPointToLine({ 433, 24, -500 });
+		AddPointToLine({ 430, 27, -499 });
+		AddPointToLine({ 427, 30, -498 });
+		AddPointToLine({ 424, 34, -496 });
+		AddPointToLine({ 421, 38, -494 });
+		AddPointToLine({ 418, 40, -493 });
 
 
 		////====================
@@ -3644,6 +3678,477 @@ namespace Object {
 #endif
 
 
+#define Stepa
+#ifdef Stepa
+
+
+		//============================================================
+// БЛИЗНЕЦЫ
+//
+// Масштаб относительно текущей версии:
+// ещё ×1/500.
+//
+// Общий масштаб относительно исходной большой версии:
+// ×1/2000.
+//
+// Центр: 0, 0, 0
+// Все координаты — целые.
+//============================================================
+
+
+//====================
+// 1 -> 14
+//====================
+		//NewLine();
+		//AddPointToLine({ -740, 30, 800 });
+		//AddPointToLine({ -729, -4, 781 });
+		//AddPointToLine({ -718, -37, 762 });
+		//AddPointToLine({ -706, -70, 743 });
+		//AddPointToLine({ -695, -104, 724 });
+		//AddPointToLine({ -684, -137, 705 });
+		//AddPointToLine({ -673, -170, 686 });
+		//
+		//
+		////====================
+		//// 14 -> 9
+		////====================
+		//NewLine();
+		//AddPointToLine({ -673, -170, 686 });
+		//AddPointToLine({ -695, -134, 660 });
+		//AddPointToLine({ -718, -97, 635 });
+		//AddPointToLine({ -740, -60, 610 });
+		//AddPointToLine({ -763, -24, 585 });
+		//AddPointToLine({ -786, 13, 559 });
+		//AddPointToLine({ -809, 50, 534 });
+		//
+		//
+		////====================
+		//// 14 -> 8
+		////====================
+		//NewLine();
+		//AddPointToLine({ -673, -170, 686 });
+		//AddPointToLine({ -628, -124, 573 });
+		//AddPointToLine({ -583, -77, 460 });
+		//AddPointToLine({ -538, -30, 348 });
+		//AddPointToLine({ -492, 16, 235 });
+		//AddPointToLine({ -447, 63, 122 });
+		//AddPointToLine({ -402, 110, 10 });
+		//
+		//
+		////====================
+		//// 8 -> 10
+		////====================
+		//NewLine();
+		//AddPointToLine({ -402, 110, 10 });
+		//AddPointToLine({ -402, 43, -90 });
+		//AddPointToLine({ -402, -24, -190 });
+		//AddPointToLine({ -402, -90, -290 });
+		//AddPointToLine({ -402, -157, -389 });
+		//AddPointToLine({ -402, -224, -489 });
+		//AddPointToLine({ -402, -290, -589 });
+		//
+		//
+		////====================
+		//// 10 -> 7
+		////====================
+		//NewLine();
+		//AddPointToLine({ -402, -290, -589 });
+		//AddPointToLine({ -289, -224, -680 });
+		//AddPointToLine({ -175, -157, -771 });
+		//AddPointToLine({ -62, -90, -862 });
+		//AddPointToLine({ 52, -24, -952 });
+		//AddPointToLine({ 166, 43, -1043 });
+		//AddPointToLine({ 279, 110, -1134 });
+
+
+		//====================
+		// 8 -> 13
+		//====================Э
+		//чистая линия
+		NewLine();
+		AddPointToLine({ -402, 110, 10 });
+		AddPointToLine({ -350, 56, -19 });
+		AddPointToLine({ -298, 3, -48 });
+		AddPointToLine({ -246, -50, -76 });
+		AddPointToLine({ -193, -104, -105 });
+		AddPointToLine({ -141, -157, -134 });
+		AddPointToLine({ -89, -210, -163 });
+
+		// ============================================================
+// УЧАСТОК 1 — ЕЩЁ БОЛЕЕ ПЛАВНАЯ ВОЛНА
+// ============================================================
+
+
+// ============================================================
+// Л1
+// ============================================================
+
+		NewLine();
+		AddPointToLine({ 508, 110, -550 });
+		AddPointToLine({ 507, 116, -546 });
+		AddPointToLine({ 506, 122, -542 });
+		AddPointToLine({ 504, 128, -538 });
+		AddPointToLine({ 499, 134, -534 });
+		AddPointToLine({ 494, 139, -530 });
+		AddPointToLine({ 487, 144, -525 });
+		AddPointToLine({ 487, 144, -525 });
+		AddPointToLine({ 480, 149, -518 });
+		AddPointToLine({ 465, 151, -512 });
+		AddPointToLine({ 457, 144, -516 });
+
+
+		NewLine();
+		AddPointToLine({ 457, 144, -516 });
+		AddPointToLine({ 607, 116, -546 });
+		AddPointToLine({ 606, 122, -542 });
+		AddPointToLine({ 604, 128, -538 });
+		AddPointToLine({ 599, 134, -534 });
+		AddPointToLine({ 594, 139, -530 });
+		AddPointToLine({ 587, 144, -525 });
+		AddPointToLine({ 587, 144, -525 });
+		AddPointToLine({ 580, 149, -518 });
+		AddPointToLine({ 565, 151, -512 });
+		AddPointToLine({ 557, 144, -516 });
+		
+
+
+		// ============================================================
+		// Л2
+		// ============================================================
+
+		
+
+		// ============================================================
+		// Л3
+		// ============================================================
+
+	
+
+
+		// ============================================================
+		// Л4
+		// ============================================================
+
+		
+
+
+		// ============================================================
+		// Л5
+		// ============================================================
+
+		
+
+
+		////====================
+		//// 14 -> 12
+		////====================
+		//NewLine();
+		//AddPointToLine({ -673, -170, 686 });
+		//AddPointToLine({ -653, -137, 696 });
+		//AddPointToLine({ -633, -104, 705 });
+		//AddPointToLine({ -613, -70, 715 });
+		//AddPointToLine({ -594, -37, 725 });
+		//AddPointToLine({ -574, -4, 735 });
+		//AddPointToLine({ -554, 30, 745 });
+		//
+		//
+		////====================
+		//// 12 -> 17
+		////====================
+		//NewLine();
+		//AddPointToLine({ -554, 30, 745 });
+		//AddPointToLine({ -506, -44, 766 });
+		//AddPointToLine({ -459, -117, 794 });
+		//AddPointToLine({ -411, -190, 804 });
+		//AddPointToLine({ -363, -264, 830 });
+		//AddPointToLine({ -316, -337, 851 });
+		//AddPointToLine({ -268, -410, 872 });
+		//
+		//
+		////====================
+		//// 2 -> 17
+		////====================
+		//NewLine();
+		//AddPointToLine({ -560, 110, 1060 });
+		//AddPointToLine({ -511, 23, 1036 });
+		//AddPointToLine({ -463, -64, 1012 });
+		//AddPointToLine({ -414, -150, 988 });
+		//AddPointToLine({ -365, -237, 964 });
+		//AddPointToLine({ -317, -324, 940 });
+		//AddPointToLine({ -268, -410, 872 });
+		//
+		//
+		////====================
+		//// 17 -> 11
+		////====================
+		//NewLine();
+		//AddPointToLine({ -268, -410, 872 });
+		//AddPointToLine({ -183, -317, 902 });
+		//AddPointToLine({ -117, -224, 932 });
+		//AddPointToLine({ -38, -130, 962 });
+		//AddPointToLine({ 74, -37, 992 });
+		//AddPointToLine({ 159, 56, 1022 });
+		//AddPointToLine({ 244, 150, 1051 });
+		//
+		//
+		////====================
+		//// 17 -> 5
+		////====================
+		//NewLine();
+		//AddPointToLine({ -268, -410, 872 });
+		//AddPointToLine({ -210, -290, 786 });
+		//AddPointToLine({ -152, -170, 701 });
+		//AddPointToLine({ -94, -50, 615 });
+		//AddPointToLine({ -36, 70, 530 });
+		//AddPointToLine({ 22, 190, 444 });
+		//AddPointToLine({ 80, 310, 360 });
+		//
+		//
+		////====================
+		//// 5 -> 15
+		////====================
+		//NewLine();
+		//AddPointToLine({ 80, 310, 360 });
+		//AddPointToLine({ 205, 190, 207 });
+		//AddPointToLine({ 331, 70, 53 });
+		//AddPointToLine({ 456, -50, -100 });
+		//AddPointToLine({ 581, -170, -253 });
+		//AddPointToLine({ 707, -290, -407 });
+		//AddPointToLine({ 832, -410, -560 });
+		//
+		//
+		////====================
+		//// 5 -> 4
+		////====================
+		//NewLine();
+		//AddPointToLine({ 80, 310, 360 });
+		//AddPointToLine({ 166, 233, 340 });
+		//AddPointToLine({ 251, 156, 310 });
+		//AddPointToLine({ 337, 80, 270 });
+		//AddPointToLine({ 423, 3, 220 });
+		//AddPointToLine({ 528, -74, 140 });
+		//AddPointToLine({ 620, -150, 50 });
+		//
+		//
+		////====================
+		//// 4 -> 6
+		////====================
+		//NewLine();
+		//AddPointToLine({ 620, -150, 50 });
+		//AddPointToLine({ 627, -130, 70 });
+		//AddPointToLine({ 633, -110, 100 });
+		//AddPointToLine({ 640, -90, 120 });
+		//AddPointToLine({ 647, -70, 140 });
+		//AddPointToLine({ 653, -50, 150 });
+		//AddPointToLine({ 660, -30, 160 });
+		//
+		//
+		////====================
+		//// 6 -> 16
+		////====================
+		//NewLine();
+		//AddPointToLine({ 660, -30, 160 });
+		//AddPointToLine({ 727, -60, 180 });
+		//AddPointToLine({ 793, -90, 200 });
+		//AddPointToLine({ 860, -120, 220 });
+		//AddPointToLine({ 927, -150, 240 });
+		//AddPointToLine({ 993, -180, 255 });
+		//AddPointToLine({ 920, -210, 260 });
+
+
+		//============================================================
+		// ЗВЁЗДЫ
+		//============================================================
+
+		//NewStar({
+		//	.x = -740,
+		//	.y = 30,
+		//	.z = 800,
+		//	.rad = 7,
+		//	.r = 100,
+		//	.g = 0,
+		//	.b = 0,
+		//	.brightness = 100
+		//	});
+		//
+		//NewStar({
+		//	.x = -560,
+		//	.y = 110,
+		//	.z = 1060,
+		//	.rad = 7,
+		//	.r = 100,
+		//	.g = 0,
+		//	.b = 0,
+		//	.brightness = 100
+		//	});
+
+		NewStar({
+			.x = 508,
+			.y = 110,
+			.z = -550,
+			.rad = 7,
+			.r = 100,
+			.g = 0,
+			.b = 0,
+			.brightness = 100
+			});
+
+		//NewStar({
+		//	.x = 620,
+		//	.y = -150,
+		//	.z = 50,
+		//	.rad = 7,
+		//	.r = 100,
+		//	.g = 100,
+		//	.b = 0,
+		//	.brightness = 100
+		//	});
+		//
+		//NewStar({
+		//	.x = 80,
+		//	.y = 310,
+		//	.z = 360,
+		//	.rad = 7,
+		//	.r = 0,
+		//	.g = 100,
+		//	.b = 0,
+		//	.brightness = 100
+		//	});
+		//
+		//NewStar({
+		//	.x = 660,
+		//	.y = -30,
+		//	.z = 160,
+		//	.rad = 7,
+		//	.r = 100,
+		//	.g = 100,
+		//	.b = 0,
+		//	.brightness = 100
+		//	});
+		//
+		//NewStar({
+		//	.x = 279,
+		//	.y = 110,
+		//	.z = -1134,
+		//	.rad = 7,
+		//	.r = 100,
+		//	.g = 0,
+		//	.b = 0,
+		//	.brightness = 100
+		//	});
+
+		NewStar({
+			.x = -402,
+			.y = 110,
+			.z = 10,
+			.rad = 7,
+			.r = 0,
+			.g = 100,
+			.b = 0,
+			.brightness = 100
+			});
+
+		//NewStar({
+		//	.x = -809,
+		//	.y = 50,
+		//	.z = 534,
+		//	.rad = 7,
+		//	.r = 100,
+		//	.g = 0,
+		//	.b = 0,
+		//	.brightness = 100
+		//	});
+		//
+		//NewStar({
+		//	.x = -402,
+		//	.y = -290,
+		//	.z = -589,
+		//	.rad = 7,
+		//	.r = 100,
+		//	.g = 100,
+		//	.b = 0,
+		//	.brightness = 100
+		//	});
+		//
+		//NewStar({
+		//	.x = 244,
+		//	.y = 150,
+		//	.z = 1051,
+		//	.rad = 7,
+		//	.r = 100,
+		//	.g = 0,
+		//	.b = 0,
+		//	.brightness = 100
+		//	});
+
+		//NewStar({
+		//	.x = -554,
+		//	.y = 30,
+		//	.z = 745,
+		//	.rad = 7,
+		//	.r = 0,
+		//	.g = 0,
+		//	.b = 100,
+		//	.brightness = 100
+		//	});
+
+		NewStar({
+			.x = -89,
+			.y = -210,
+			.z = -163,
+			.rad = 7,
+			.r = 100,
+			.g = 100,
+			.b = 0,
+			.brightness = 100
+			});
+
+		//NewStar({
+		//	.x = -673,
+		//	.y = -170,
+		//	.z = 686,
+		//	.rad = 7,
+		//	.r = 0,
+		//	.g = 0,
+		//	.b = 100,
+		//	.brightness = 100
+		//	});
+		//
+		//NewStar({
+		//	.x = 832,
+		//	.y = -410,
+		//	.z = -560,
+		//	.rad = 7,
+		//	.r = 100,
+		//	.g = 0,
+		//	.b = 0,
+		//	.brightness = 100
+		//	});
+		//
+		//NewStar({
+		//	.x = 920,
+		//	.y = -210,
+		//	.z = 260,
+		//	.rad = 7,
+		//	.r = 100,
+		//	.g = 0,
+		//	.b = 0,
+		//	.brightness = 100
+		//	});
+		//
+		//NewStar({
+		//	.x = -268,
+		//	.y = -410,
+		//	.z = 872,
+		//	.rad = 7,
+		//	.r = 0,
+		//	.g = 0,
+		//	.b = 100,
+		//	.brightness = 100
+		//	});
+
+
+#endif
 		/*for (int i = 0; i < starsCount; i++)
 		{
 			// Начинаем с i + 1, чтобы не проверять i==j и не дублировать пары (j,i)
