@@ -268,6 +268,7 @@ float fov = 110;
 struct hero_ : AliveCreation {
 
 	Object::mesh* mesh = new Object::mesh;
+	Object::mesh* arrowMesh = new Object::mesh;
 	
 	//
 	collision::SphereCollider* collider = []()
@@ -2073,6 +2074,26 @@ struct hero_ : AliveCreation {
 			}
 		}
 	}
+
+	void DrawArrows(float deltaTime) {
+		for (arrow& arrow : arrows) {
+			float4 p = arrow.position * 10000.f;
+			Object::Mesh({
+				.obj = arrowMesh,
+				.quality = 1,
+				.xPos = (int)(p.x),
+				.yPos = (int)(p.y),
+				.zPos = (int)(p.z),
+				.brightness = 9,
+				.tickness = 4,
+				.stencil = switcher::on,
+				.zoom = -75,
+				.onLineOfs = 0,
+				.jumpCharge = 100,
+				.deltaTime = deltaTime
+				});
+		}
+	}
 };
 
 hero_ hero;
@@ -3497,6 +3518,7 @@ namespace Loop
 			//Object::MeshPtr = nullptr;
 
 			hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
+			hero.arrowMesh->LoadObj("..//fx//projectFiles//Arrow.glb");
 
 			static bool heroAnimsLoaded = false;
 			if (!heroAnimsLoaded) {
@@ -3566,9 +3588,9 @@ namespace Loop
 
 		enemyRenderer.RenderDepth(enemySystem, V2F(gameCamera.finalCameraEye), deltaTime);
 
-		float4 p = V2F(hero.pos * 10000.);
 
 		if (!hero.dead) {
+			float4 p = V2F(hero.pos * 10000.);
 			Object::Mesh({
 				.obj = hero.mesh,
 				.quality = 1,
@@ -3584,6 +3606,7 @@ namespace Loop
 				.deltaTime = deltaTime
 				});
 		}
+		hero.DrawArrows(deltaTime);
 
 		enemyRenderer.RenderColor(enemySystem, V2F(gameCamera.finalCameraEye), deltaTime);
 
