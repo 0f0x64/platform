@@ -542,7 +542,7 @@ namespace Object {
 
 		bool LoadObjToPointersGLTF(const ::std::string& filename, ConstBuf::vertex** outVertices, ConstBuf::index** outIndices)
 		{
-			ConstBuf::cgltf_options options = { 0 };
+			ConstBuf::cgltf_options options = {};
 			ConstBuf::cgltf_data* data = NULL;
 			ConstBuf::cgltf_result result = cgltf_parse_file(&options, filename.c_str(), &data);
 
@@ -1955,6 +1955,7 @@ namespace Object {
 		if (line.pointCount <= 0)
 		{
 			line.aabbValid = false;
+			OutputDebugStringA("BuildLineAABB: pointCount <= 0, skipping\n");
 			return;
 		}
 
@@ -1983,6 +1984,11 @@ namespace Object {
 		line.aabbMax = XMFLOAT3(maxX, maxY, maxZ);
 
 		line.aabbValid = true;
+
+		char buf[256];
+		sprintf_s(buf, sizeof(buf), "BuildLineAABB: OK pointCount=%d min=(%.1f,%.1f,%.1f) max=(%.1f,%.1f,%.1f)\n",
+			line.pointCount, minX, minY, minZ, maxX, maxY, maxZ);
+		OutputDebugStringA(buf);
 	}
 
 	void Starline(starline& line, int stepsPerSegment) {
@@ -3592,6 +3598,10 @@ namespace Object {
 			//Starline(starLineList.line[j], 3*12. / starLineList.line[j].basePointCount);
 		}
 
+		char msg[256];
+		sprintf_s(msg, sizeof(msg), "initPatches: Processed %d lines\n", starLineList.lineCount);
+		OutputDebugStringA(msg);
+
 		/*pathTime /= 100.;
 
 		for (int j = 0; j < 3; j++)
@@ -3628,8 +3638,13 @@ namespace Object {
 
 	bool IsLineInsideFrustum(const starline& line)
 	{
+		// ОТЛАДКА: проверяем инициализацию AABB
 		if (!line.aabbValid)
-			return false;
+		{
+			// Линия не имеет валидный AABB, значит BuildLineAABB не был вызван
+			// или pointCount == 0. Включаем её всё равно для отладки.
+			return true;  // Временно: включаем все линии
+		}
 
 		const float minX = line.aabbMin.x;
 		const float minY = line.aabbMin.y;
@@ -3754,6 +3769,7 @@ namespace Object {
 
 		for (int i = 0; i < starLineList.lineCount; i++)
 		{
+			// Frustum culling: пропускаем линии вне видимой области
 			if (!IsLineInsideFrustum(starLineList.line[i]))
 				continue;
 
@@ -3781,7 +3797,6 @@ namespace Object {
 
 			Drawer::NullDrawer({ 1,in.count / in.skipper });
 		}
-
 
 	}
 

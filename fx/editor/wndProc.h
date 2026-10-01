@@ -132,6 +132,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case VK_ESCAPE:
 				//editor::ViewCam::ToggleViewMode();
 				gameCam = !gameCam;
+				// Синхронизируем viewCam.overRide с gameCam:
+				// когда gameCam == true (игра), overRide должен быть false (используем камеру персонажа)
+				// когда gameCam == false (редактор), overRide должен быть true (используем редакторскую камеру)
+				#if EditMode
+				Camera::viewCam.overRide = !gameCam;
+				#endif
 				//SetCursor(Loop::gameCam ? NULL : LoadCursor(NULL, IDC_ARROW));
 				break;
 			case 'A':
