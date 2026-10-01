@@ -1960,13 +1960,14 @@ struct hero_ : AliveCreation {
 		float4 position;
 		float4 direction;
 		float charge;
+		XMMATRIX rotation;
 
 		arrow()
-			: startPosition(float4()), position(float4()), direction(float4()), charge(0)
+			: startPosition(float4()), position(float4()), direction(float4()), charge(0), rotation(XMMatrixIdentity())
 		{}
 
-		arrow(float4 Position, float4 Direction, float Charge)
-			: startPosition(Position), position(Position), direction(Direction), charge(Charge)
+		arrow(float4 Position, float4 Direction, float Charge, XMMATRIX& Rotation)
+			: startPosition(Position), position(Position), direction(Direction), charge(Charge), rotation(Rotation)
 		{}
 	};
 	std::vector<arrow> arrows;
@@ -2005,7 +2006,28 @@ struct hero_ : AliveCreation {
 					float4 heroPos = V2F(pos);
 					float4 direction = result.hit ? normalize(result.position - heroPos) : camForward;
 
-					arrows.push_back(arrow(heroPos, direction, bowCharge));
+					XMVECTOR Forward = XMVector3Normalize(F2V(direction));
+					XMVECTOR Up = XMVectorSet(0, 1, 0, 0);
+
+					// Проверка на коллинеарность
+					if (fabs(XMVectorGetX(XMVector3Dot(Forward, Up))) > 0.99f)
+						Up = XMVectorSet(1, 0, 0, 0);
+
+					XMVECTOR Right = XMVector3Normalize(XMVector3Cross(Up, Forward));
+					Up = XMVector3Cross(Forward, Right);
+
+					XMMATRIX arrowRotation = XMMATRIX(
+						Right,   // 1-я строка
+						Up,      // 2-я строка
+						Forward, // 3-я строка
+						XMVectorSet(0, 0, 0, 1)
+					);
+					XMMATRIX arrowTranslation = XMMatrixTranslation(heroPos.x, heroPos.y, heroPos.z);
+					XMMATRIX arrowScale = XMMatrixScaling(1, 1, 1);
+
+					XMMATRIX arrowWorld = arrowScale * arrowRotation * arrowTranslation;
+
+					arrows.push_back(arrow(heroPos, direction, bowCharge, arrowWorld));
 				}
 
 				ConstBuf::interp::DeleteExistingTween(bowCharge);
@@ -2090,7 +2112,8 @@ struct hero_ : AliveCreation {
 				.zoom = -75,
 				.onLineOfs = 0,
 				.jumpCharge = 100,
-				.deltaTime = deltaTime
+				.deltaTime = deltaTime,
+				.model = &arrow.rotation
 				});
 		}
 	}

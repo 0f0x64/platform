@@ -1609,7 +1609,7 @@ namespace Object {
 	XMMATRIX heroOnRails;
 	//XMMATRIX heroWorld;
 
-	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness, int zoom, int onLineOfs, int jumpCharge, float deltaTime)
+	void ShowMesh(mesh* obj, int count, int skipper, pMode mode, int r, int g, int b, triMode tMode, int xPos, int yPos, int zPos, int brightness, int tickness, int zoom, int onLineOfs, int jumpCharge, float deltaTime, XMMATRIX* model = nullptr)
 	{
 
 		int gX = sqrt(count / skipper);
@@ -1624,7 +1624,7 @@ namespace Object {
 		vs::girl = {
 			.params =
 			{
-				.model = obj->model,
+				.model = model != nullptr ? *model : obj->model,
 				.gX = gX,
 				.gY = gY,
 				.mode = (int)mode,
@@ -1678,7 +1678,7 @@ namespace Object {
 
 	}
 
-	cmd(Mesh, mesh* obj, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs, int jumpCharge, float deltaTime)
+	cmd(Mesh, mesh* obj, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil,int zoom, int onLineOfs, int jumpCharge, float deltaTime, XMMATRIX* model = nullptr)
 	{
 		reflect;
 
@@ -1694,7 +1694,7 @@ namespace Object {
 		if (in.stencil == switcher::on)
 		{
 			uint32_t triCnt = (in.obj && in.obj->loaded) ? in.obj->triangleCount : ConstBuf::triangleCount;
-			ShowMesh(in.obj, (int)triCnt,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs, in.jumpCharge, in.deltaTime);
+			ShowMesh(in.obj, (int)triCnt,1,pMode::point,0,0,0, triMode::on, in.xPos, in.yPos, in.zPos,in.brightness,in.tickness,in.zoom,in.onLineOfs, in.jumpCharge, in.deltaTime, in.model);
 		}
 
 		Culling::Set({ cullmode::off });
@@ -1704,7 +1704,7 @@ namespace Object {
 			.op = blendop::add
 			});
 
-		ShowMesh(in.obj, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom, in.onLineOfs, in.jumpCharge, in.deltaTime);
+		ShowMesh(in.obj, count, 1, pMode::point, 100, 252, 1400, triMode::off, in.xPos, in.yPos, in.zPos, in.brightness, in.tickness,in.zoom, in.onLineOfs, in.jumpCharge, in.deltaTime, in.model);
 	}
 
 #endif
@@ -1986,10 +1986,10 @@ namespace Object {
 
 		line.aabbValid = true;
 
-		char buf[256];
+		/*char buf[256];
 		sprintf_s(buf, sizeof(buf), "BuildLineAABB: OK pointCount=%d min=(%.1f,%.1f,%.1f) max=(%.1f,%.1f,%.1f)\n",
 			line.pointCount, minX, minY, minZ, maxX, maxY, maxZ);
-		OutputDebugStringA(buf);
+		OutputDebugStringA(buf);*/
 	}
 
 	void Starline(starline& line, int stepsPerSegment) {
@@ -3599,9 +3599,9 @@ namespace Object {
 			//Starline(starLineList.line[j], 3*12. / starLineList.line[j].basePointCount);
 		}
 
-		char msg[256];
+		/*char msg[256];
 		sprintf_s(msg, sizeof(msg), "initPatches: Processed %d lines\n", starLineList.lineCount);
-		OutputDebugStringA(msg);
+		OutputDebugStringA(msg);*/
 
 		/*pathTime /= 100.;
 
