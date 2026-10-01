@@ -543,7 +543,7 @@ namespace Object {
 
 		bool LoadObjToPointersGLTF(const ::std::string& filename, ConstBuf::vertex** outVertices, ConstBuf::index** outIndices)
 		{
-			ConstBuf::cgltf_options options = { 0 };
+			ConstBuf::cgltf_options options = {};
 			ConstBuf::cgltf_data* data = NULL;
 			ConstBuf::cgltf_result result = cgltf_parse_file(&options, filename.c_str(), &data);
 
@@ -1855,6 +1855,10 @@ namespace Object {
 		float4 upVector[smoothPointMAX];
 		int basePointCount = 0;
 		int pointCount = 0;
+
+		XMFLOAT3 aabbMin; // Минимальные координаты AABB (Axis-Aligned Bounding Box)
+		XMFLOAT3 aabbMax; // Максимальные координаты AABB (Axis-Aligned Bounding Box)
+		bool aabbValid = false; // Флаг, указывающий, что AABB был вычислен и действителен
 	};
 
 	struct {
@@ -1947,7 +1951,46 @@ namespace Object {
 		}
 	}
 
-	
+	void BuildLineAABB(starline& line) // Функция для вычисления AABB (Axis-Aligned Bounding Box) линии
+	{
+		if (line.pointCount <= 0)
+		{
+			line.aabbValid = false;
+			OutputDebugStringA("BuildLineAABB: pointCount <= 0, skipping\n");
+			return;
+		}
+
+		float minX = line.point[0].x;
+		float minY = line.point[0].y;
+		float minZ = line.point[0].z;
+
+		float maxX = line.point[0].x;
+		float maxY = line.point[0].y;
+		float maxZ = line.point[0].z;
+
+		for (int i = 1; i < line.pointCount; ++i)
+		{
+			const float4& p = line.point[i];
+
+			minX = min(minX, p.x);
+			minY = min(minY, p.y);
+			minZ = min(minZ, p.z);
+
+			maxX = max(maxX, p.x);
+			maxY = max(maxY, p.y);
+			maxZ = max(maxZ, p.z);
+		}
+
+		line.aabbMin = XMFLOAT3(minX, minY, minZ);
+		line.aabbMax = XMFLOAT3(maxX, maxY, maxZ);
+
+		line.aabbValid = true;
+
+		char buf[256];
+		sprintf_s(buf, sizeof(buf), "BuildLineAABB: OK pointCount=%d min=(%.1f,%.1f,%.1f) max=(%.1f,%.1f,%.1f)\n",
+			line.pointCount, minX, minY, minZ, maxX, maxY, maxZ);
+		OutputDebugStringA(buf);
+	}
 
 	void Starline(starline& line, int stepsPerSegment) {
 		line.pointCount = 0; // Сбрасываем старый результат сглаживания
@@ -3552,8 +3595,13 @@ namespace Object {
 		for (int j = 0; j < starLineList.lineCount; j++)
 		{
 			smoothStarline(starLineList.line[j]);
+			BuildLineAABB(starLineList.line[j]);
 			//Starline(starLineList.line[j], 3*12. / starLineList.line[j].basePointCount);
 		}
+
+		char msg[256];
+		sprintf_s(msg, sizeof(msg), "initPatches: Processed %d lines\n", starLineList.lineCount);
+		OutputDebugStringA(msg);
 
 		/*pathTime /= 100.;
 
@@ -3589,6 +3637,128 @@ namespace Object {
 
 	float4 hero_pos;
 
+	bool IsLineInsideFrustum(const starline& line)
+	{
+		// ОТЛАДКА: проверяем инициализацию AABB
+		if (!line.aabbValid)
+		{
+			// Линия не имеет валидный AABB, значит BuildLineAABB не был вызван
+			// или pointCount == 0. Включаем её всё равно для отладки.
+			return true;  // Временно: включаем все линии
+		}
+
+		const float minX = line.aabbMin.x;
+		const float minY = line.aabbMin.y;
+		const float minZ = line.aabbMin.z;
+
+		const float maxX = line.aabbMax.x;
+		const float maxY = line.aabbMax.y;
+		const float maxZ = line.aabbMax.z;
+
+		XMVECTOR corners[8] =
+		{
+			XMVectorSet(minX, minY, minZ, 1.0f),
+			XMVectorSet(maxX, minY, minZ, 1.0f),
+			XMVectorSet(minX, maxY, minZ, 1.0f),
+			XMVectorSet(maxX, maxY, minZ, 1.0f),
+
+			XMVectorSet(minX, minY, maxZ, 1.0f),
+			XMVectorSet(maxX, minY, maxZ, 1.0f),
+			XMVectorSet(minX, maxY, maxZ, 1.0f),
+			XMVectorSet(maxX, maxY, maxZ, 1.0f)
+		};
+
+		// Рендер использует либо камеру редактора, либо матрицы, записанные в
+		// constant buffer. Не следует всегда брать viewCam: при отключённом
+		// override она содержит неактуальную матрицу.
+		XMMATRIX view;
+		XMMATRIX proj;
+
+#if EditMode
+		if (Camera::viewCam.overRide)
+		{
+			view = Camera::viewCam.view;
+			proj = Camera::viewCam.proj;
+		}
+		else
+#endif
+		{
+			// В constant buffer матрицы транспонированы для HLSL mul(vector, matrix).
+			view = XMMatrixTranspose(ConstBuf::camera.view[0]);
+			proj = XMMatrixTranspose(ConstBuf::camera.proj[0]);
+		}
+
+		// World -> View -> Clip
+		for (int i = 0; i < 8; ++i)
+		{
+			corners[i] = XMVector4Transform(corners[i], view);
+			corners[i] = XMVector4Transform(corners[i], proj);
+		}
+
+		// DirectX LH clip space:
+		//
+		// -w <= x <= w
+		// -w <= y <= w
+		//    0 <= z <= w
+		//
+		// Если все 8 углов находятся за одной
+		// плоскостью — весь AABB снаружи.
+
+		for (int plane = 0; plane < 6; ++plane)
+		{
+			bool allOutside = true;
+
+			for (int i = 0; i < 8; ++i)
+			{
+				float x = XMVectorGetX(corners[i]);
+				float y = XMVectorGetY(corners[i]);
+				float z = XMVectorGetZ(corners[i]);
+				float w = XMVectorGetW(corners[i]);
+
+				bool inside = false;
+
+				switch (plane)
+				{
+				case 0: // left
+					inside = x >= -w;
+					break;
+
+				case 1: // right
+					inside = x <= w;
+					break;
+
+				case 2: // bottom
+					inside = y >= -w;
+					break;
+
+				case 3: // top
+					inside = y <= w;
+					break;
+
+				case 4: // near
+					inside = z >= 0.0f;
+					break;
+
+				case 5: // far
+					inside = z <= w;
+					break;
+				}
+
+				if (inside)
+				{
+					allOutside = false;
+					break;
+				}
+			}
+
+			if (allOutside)
+				return false;
+		}
+
+		return true;
+	}
+	
+
 	cmd(Maze, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
@@ -3600,6 +3770,9 @@ namespace Object {
 
 		for (int i = 0; i < starLineList.lineCount; i++)
 		{
+			// Frustum culling: пропускаем линии вне видимой области.
+			if (!IsLineInsideFrustum(starLineList.line[i]))
+				continue;
 
 			vs::maze = {
 				.params = {
@@ -3625,7 +3798,6 @@ namespace Object {
 
 			Drawer::NullDrawer({ 1,in.count / in.skipper });
 		}
-
 
 	}
 
