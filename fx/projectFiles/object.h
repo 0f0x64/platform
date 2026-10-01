@@ -3769,7 +3769,7 @@ namespace Object {
 
 		for (int i = 0; i < starLineList.lineCount; i++)
 		{
-			// Frustum culling: пропускаем линии вне видимой области
+			// Frustum culling: пропускаем линии вне видимой области.
 			if (!IsLineInsideFrustum(starLineList.line[i]))
 				continue;
 
