@@ -3639,12 +3639,84 @@ namespace Object {
 		AddPointToLine({ 354, 110, -506 });
 		AddPointToLine({ 358, 110, -494 });
 		
-		
-
 
 		// ============================================================
 		// Л2
 		// ============================================================
+		// Главная трасса: Ландмарк
+		NewLine();
+		AddPointToLine({ 375, 62, -425 });
+		AddPointToLine({ 355, 66, -438 });
+		AddPointToLine({ 330, 70, -455 });
+		AddPointToLine({ 302, 68, -478 });
+		AddPointToLine({ 275, 64, -495 });
+		AddPointToLine({ 248, 64, -502 });
+		AddPointToLine({ 220, 60, -492 });
+		AddPointToLine({ 194, 58, -470 });
+		AddPointToLine({ 172, 56, -445 });
+		AddPointToLine({ 155, 54, -418 });
+
+		// Верхняя дуга:
+		NewLine();
+		AddPointToLine({ 365, 70, -405 });
+		AddPointToLine({ 342, 82, -375 });
+		AddPointToLine({ 315, 96, -352 });
+		AddPointToLine({ 285, 108, -340 });
+		AddPointToLine({ 255, 110, -345 });
+		AddPointToLine({ 225, 102, -360 });
+		AddPointToLine({ 198, 88, -382 });
+		AddPointToLine({ 172, 70, -410 });
+
+		// Правая ветвь:
+		NewLine();
+		AddPointToLine({ 355, 66, -438 });
+		AddPointToLine({ 365, 76, -420 });
+		AddPointToLine({ 370, 88, -395 });
+		AddPointToLine({ 358, 84, -378 });
+		AddPointToLine({ 342, 82, -375 });
+
+		// Левая ветвь: 
+		NewLine();
+		AddPointToLine({ 225, 102, -360 });
+		AddPointToLine({ 205, 92, -378 });
+		AddPointToLine({ 190, 78, -405 });
+		AddPointToLine({ 188, 68, -432 });
+		AddPointToLine({ 194, 58, -470 });
+
+		// Центральная спираль: 
+		NewLine();
+		AddPointToLine({ 302, 68, -478 });
+		AddPointToLine({ 300, 78, -500 });
+		AddPointToLine({ 286, 92, -520 });
+		AddPointToLine({ 264, 102, -530 });
+		AddPointToLine({ 242, 108, -522 });
+		AddPointToLine({ 230, 106, -502 });
+		AddPointToLine({ 234, 98, -482 });
+		AddPointToLine({ 250, 90, -468 });
+		AddPointToLine({ 270, 88, -470 });
+		AddPointToLine({ 282, 93, -485 });
+		AddPointToLine({ 278, 100, -502 });
+
+		// Нижняя петля:
+		NewLine();
+		AddPointToLine({ 330, 70, -455 });
+		AddPointToLine({ 345, 58, -480 });
+		AddPointToLine({ 340, 50, -512 });
+		AddPointToLine({ 320, 48, -545 });
+		AddPointToLine({ 290, 50, -565 });
+		AddPointToLine({ 255, 54, -572 });
+		AddPointToLine({ 222, 56, -560 });
+		AddPointToLine({ 198, 58, -535 });
+		AddPointToLine({ 190, 60, -505 });
+		AddPointToLine({ 220, 60, -492 });
+
+		// Северный луч:
+		NewLine();
+		AddPointToLine({ 285, 108, -340 });
+		AddPointToLine({ 290, 114, -318 });
+		AddPointToLine({ 296, 116, -300 });
+		AddPointToLine({ 302, 112, -282 });
+		
 
 		
 
