@@ -1966,7 +1966,7 @@ struct hero_ : AliveCreation {
 			: startPosition(float4()), position(float4()), direction(float4()), charge(0), rotation(XMMatrixIdentity())
 		{}
 
-		arrow(float4 Position, float4 Direction, float Charge, XMMATRIX& Rotation)
+		arrow(float4 Position, float4 Direction, float Charge, XMMATRIX Rotation)
 			: startPosition(Position), position(Position), direction(Direction), charge(Charge), rotation(Rotation)
 		{}
 	};
@@ -2007,11 +2007,7 @@ struct hero_ : AliveCreation {
 					float4 direction = result.hit ? normalize(result.position - heroPos) : camForward;
 
 					XMVECTOR Forward = XMVector3Normalize(F2V(direction));
-					XMVECTOR Up = XMVectorSet(0, 1, 0, 0);
-
-					// Проверка на коллинеарность
-					if (fabs(XMVectorGetX(XMVector3Dot(Forward, Up))) > 0.99f)
-						Up = XMVectorSet(1, 0, 0, 0);
+					XMVECTOR Up = upVector;
 
 					XMVECTOR Right = XMVector3Normalize(XMVector3Cross(Up, Forward));
 					Up = XMVector3Cross(Forward, Right);
@@ -2022,12 +2018,9 @@ struct hero_ : AliveCreation {
 						Forward, // 3-я строка
 						XMVectorSet(0, 0, 0, 1)
 					);
-					XMMATRIX arrowTranslation = XMMatrixTranslation(heroPos.x, heroPos.y, heroPos.z);
-					XMMATRIX arrowScale = XMMatrixScaling(1, 1, 1);
+					arrowRotation = XMMatrixRotationX(PI / 2) * arrowRotation;
 
-					XMMATRIX arrowWorld = arrowScale * arrowRotation * arrowTranslation;
-
-					arrows.push_back(arrow(heroPos, direction, bowCharge, arrowWorld));
+					arrows.push_back(arrow(heroPos, direction, bowCharge, arrowRotation));
 				}
 
 				ConstBuf::interp::DeleteExistingTween(bowCharge);
