@@ -268,6 +268,7 @@ float fov = 110;
 struct hero_ : AliveCreation {
 
 	Object::mesh* mesh = new Object::mesh;
+	Object::mesh* arrowMesh = new Object::mesh;
 	
 	//
 	collision::SphereCollider* collider = []()
@@ -1959,13 +1960,14 @@ struct hero_ : AliveCreation {
 		float4 position;
 		float4 direction;
 		float charge;
+		XMMATRIX rotation;
 
 		arrow()
-			: startPosition(float4()), position(float4()), direction(float4()), charge(0)
+			: startPosition(float4()), position(float4()), direction(float4()), charge(0), rotation(XMMatrixIdentity())
 		{}
 
-		arrow(float4 Position, float4 Direction, float Charge)
-			: startPosition(Position), position(Position), direction(Direction), charge(Charge)
+		arrow(float4 Position, float4 Direction, float Charge, XMMATRIX Rotation)
+			: startPosition(Position), position(Position), direction(Direction), charge(Charge), rotation(Rotation)
 		{}
 	};
 	std::vector<arrow> arrows;
@@ -2004,7 +2006,21 @@ struct hero_ : AliveCreation {
 					float4 heroPos = V2F(pos);
 					float4 direction = result.hit ? normalize(result.position - heroPos) : camForward;
 
-					arrows.push_back(arrow(heroPos, direction, bowCharge));
+					XMVECTOR Forward = XMVector3Normalize(F2V(direction));
+					XMVECTOR Up = upVector;
+
+					XMVECTOR Right = XMVector3Normalize(XMVector3Cross(Up, Forward));
+					Up = XMVector3Cross(Forward, Right);
+
+					XMMATRIX arrowRotation = XMMATRIX(
+						Right,   // 1-я строка
+						Up,      // 2-я строка
+						Forward, // 3-я строка
+						XMVectorSet(0, 0, 0, 1)
+					);
+					arrowRotation = XMMatrixRotationX(PI / 2) * arrowRotation;
+
+					arrows.push_back(arrow(heroPos, direction, bowCharge, arrowRotation));
 				}
 
 				ConstBuf::interp::DeleteExistingTween(bowCharge);
@@ -2071,6 +2087,27 @@ struct hero_ : AliveCreation {
 					it = arrows.erase(it);
 				}
 			}
+		}
+	}
+
+	void DrawArrows(float deltaTime) {
+		for (arrow& arrow : arrows) {
+			float4 p = arrow.position * 10000.f;
+			Object::Mesh({
+				.obj = arrowMesh,
+				.quality = 1,
+				.xPos = (int)(p.x),
+				.yPos = (int)(p.y),
+				.zPos = (int)(p.z),
+				.brightness = 9,
+				.tickness = 4,
+				.stencil = switcher::on,
+				.zoom = -75,
+				.onLineOfs = 0,
+				.jumpCharge = 100,
+				.deltaTime = deltaTime,
+				.model = &arrow.rotation
+				});
 		}
 	}
 };
@@ -3497,6 +3534,7 @@ namespace Loop
 			//Object::MeshPtr = nullptr;
 
 			hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
+			hero.arrowMesh->LoadObj("..//fx//projectFiles//Arrow.glb");
 
 			static bool heroAnimsLoaded = false;
 			if (!heroAnimsLoaded) {
@@ -3566,9 +3604,9 @@ namespace Loop
 
 		enemyRenderer.RenderDepth(enemySystem, V2F(gameCamera.finalCameraEye), deltaTime);
 
-		float4 p = V2F(hero.pos * 10000.);
 
 		if (!hero.dead) {
+			float4 p = V2F(hero.pos * 10000.);
 			Object::Mesh({
 				.obj = hero.mesh,
 				.quality = 1,
@@ -3584,6 +3622,7 @@ namespace Loop
 				.deltaTime = deltaTime
 				});
 		}
+		hero.DrawArrows(deltaTime);
 
 		enemyRenderer.RenderColor(enemySystem, V2F(gameCamera.finalCameraEye), deltaTime);
 
