@@ -3525,18 +3525,18 @@ namespace Object {
 		//AddPointToLine({ 279, 110, -1134 });
 
 
-		//====================
-		// 8 -> 13
-		//====================Э
-		//чистая линия
-		NewLine();
-		AddPointToLine({ -402, 110, 10 });
-		AddPointToLine({ -350, 56, -19 });
-		AddPointToLine({ -298, 3, -48 });
-		AddPointToLine({ -246, -50, -76 });
-		AddPointToLine({ -193, -104, -105 });
-		AddPointToLine({ -141, -157, -134 });
-		AddPointToLine({ -89, -210, -163 });
+		////====================
+		//// 8 -> 13
+		////====================Э
+		////чистая линия
+		//NewLine();
+		//AddPointToLine({ -402, 110, 10 });
+		//AddPointToLine({ -350, 56, -19 });
+		//AddPointToLine({ -298, 3, -48 });
+		//AddPointToLine({ -246, -50, -76 });
+		//AddPointToLine({ -193, -104, -105 });
+		//AddPointToLine({ -141, -157, -134 });
+		//AddPointToLine({ -89, -210, -163 });
 
 		//====================
 		// 13 -> 3
@@ -3551,16 +3551,11 @@ namespace Object {
 		AddPointToLine({ 508, 110, -550 });
 
 		// ============================================================
-// УЧАСТОК 1 — ЕЩЁ БОЛЕЕ ПЛАВНАЯ ВОЛНА
-// ============================================================
-
-
-// ============================================================
-// Л1
+// Л1 — исходный сегмент
 // ============================================================
 
 		NewLine();
-		AddPointToLine({ 508, 110, -551 });
+		AddPointToLine({ 508, 110, -545 });
 		AddPointToLine({ 507, 110, -540 });
 		AddPointToLine({ 506, 110, -535 });
 		AddPointToLine({ 504, 110, -525 });
@@ -3570,8 +3565,8 @@ namespace Object {
 		AddPointToLine({ 471, 110, -484 });
 		AddPointToLine({ 458, 110, -476 });
 		AddPointToLine({ 436, 110, -470 });
-		AddPointToLine({ 426, 110, -478 });
-		AddPointToLine({ 427, 110, -489 });
+		AddPointToLine({ 426, 82, -478 });
+		AddPointToLine({ 426, 107, -505 });
 
 		NewLine();
 		AddPointToLine({ 476, 110, -491 });
@@ -3598,6 +3593,51 @@ namespace Object {
 		AddPointToLine({ 499, 110, -495 });
 
 
+		// ============================================================
+// Л1 — ВТОРАЯ ПОЛОВИНА
+// Сдвиг:
+// X -= 21
+// Y без изменений
+// Z += 11
+// ============================================================
+
+		NewLine();
+		AddPointToLine({ 327, 58, -439 });
+		AddPointToLine({ 346, 80, -449 });
+		AddPointToLine({ 351, 96, -454 });
+		AddPointToLine({ 353, 118, -464 });
+		AddPointToLine({ 364, 143, -481 });
+		AddPointToLine({ 376, 149, -496 });
+		AddPointToLine({ 381, 151, -501 });
+		AddPointToLine({ 386, 152, -505 });
+		AddPointToLine({ 399, 151, -513 });
+		AddPointToLine({ 421, 137, -519 });
+		AddPointToLine({ 428, 123, -511 });
+		AddPointToLine({ 427, 110, -500 });
+
+		NewLine();
+		AddPointToLine({ 381, 110, -498 });
+		AddPointToLine({ 385, 110, -502 });
+		AddPointToLine({ 411, 110, -513 });
+		AddPointToLine({ 418, 110, -505 });
+		AddPointToLine({ 415, 110, -498 });
+		AddPointToLine({ 407, 110, -499 });
+
+		NewLine();
+		AddPointToLine({ 387, 110, -508 });
+		AddPointToLine({ 417, 110, -529 });
+		AddPointToLine({ 429, 110, -528 });
+		AddPointToLine({ 432, 110, -526 });
+		AddPointToLine({ 438, 110, -520 });
+		AddPointToLine({ 439, 110, -513 });
+
+		NewLine();
+		AddPointToLine({ 357, 110, -481 });
+		AddPointToLine({ 365, 110, -490 });
+		AddPointToLine({ 370, 110, -504 });
+		AddPointToLine({ 363, 110, -512 });
+		AddPointToLine({ 354, 110, -506 });
+		AddPointToLine({ 358, 110, -494 });
 		
 		
 
