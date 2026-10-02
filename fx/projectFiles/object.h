@@ -4015,28 +4015,41 @@ namespace Object {
 		AddPointToLine({ 507, 110, -540 });
 		AddPointToLine({ 506, 110, -535 });
 		AddPointToLine({ 504, 110, -525 });
-		AddPointToLine({ 499, 110, -508 });
-		AddPointToLine({ 483, 110, -515 });
-		AddPointToLine({ 476, 110, -504 });
-		AddPointToLine({ 468, 110, -499 });
-		AddPointToLine({ 449, 110, -494 });
-		AddPointToLine({ 430, 110, -521 });
-		AddPointToLine({ 435, 110, -531 });
-		AddPointToLine({ 439, 110, -543 });
-
+		AddPointToLine({ 497, 110, -508 });
+		AddPointToLine({ 482, 110, -493 });
+		AddPointToLine({ 476, 110, -488 });
+		AddPointToLine({ 471, 110, -484 });
+		AddPointToLine({ 458, 110, -476 });
+		AddPointToLine({ 436, 110, -470 });
+		AddPointToLine({ 426, 110, -478 });
+		AddPointToLine({ 427, 110, -489 });
 
 		NewLine();
-		AddPointToLine({ 457, 144, -516 });
-		AddPointToLine({ 607, 116, -546 });
-		AddPointToLine({ 606, 122, -542 });
-		AddPointToLine({ 604, 128, -538 });
-		AddPointToLine({ 599, 134, -534 });
-		AddPointToLine({ 594, 139, -530 });
-		AddPointToLine({ 587, 144, -525 });
-		AddPointToLine({ 587, 144, -525 });
-		AddPointToLine({ 580, 149, -518 });
-		AddPointToLine({ 565, 151, -512 });
-		AddPointToLine({ 557, 144, -516 });
+		AddPointToLine({ 476, 110, -491 });
+		AddPointToLine({ 472, 110, -487 });
+		AddPointToLine({ 446, 110, -476 });
+		AddPointToLine({ 439, 110, -484 });
+		AddPointToLine({ 442, 110, -491 });
+		AddPointToLine({ 450, 110, -490 });
+
+		NewLine();
+		AddPointToLine({ 470, 110, -481 });
+		AddPointToLine({ 440, 110, -460 });
+		AddPointToLine({ 428, 110, -461 });
+		AddPointToLine({ 425, 110, -463 });
+		AddPointToLine({ 419, 110, -469 });
+		AddPointToLine({ 418, 110, -476 });
+
+		NewLine();
+		AddPointToLine({ 500, 110, -508 });
+		AddPointToLine({ 492, 110, -499 });
+		AddPointToLine({ 487, 110, -485 });
+		AddPointToLine({ 494, 110, -477 });
+		AddPointToLine({ 503, 110, -483 });
+		AddPointToLine({ 499, 110, -495 });
+
+
+		
 		
 
 
