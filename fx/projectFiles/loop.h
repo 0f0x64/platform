@@ -268,6 +268,7 @@ float fov = 110;
 struct hero_ : AliveCreation {
 
 	Object::mesh* mesh = new Object::mesh;
+	Object::mesh* arrowMesh = new Object::mesh;
 	
 	//
 	collision::SphereCollider* collider = []()
@@ -343,6 +344,8 @@ struct hero_ : AliveCreation {
 	float airSpeedAmp = 1.f;
 
 	static constexpr float RailCaptureMinRadius = 2.0f;
+	float railCaptureRadiusScale = 1.2f;
+	float railAttractionSpeed = 1.32f;
 	static constexpr float RailEndMinSpeedRatio = 0.4f;
 	static constexpr float RailEndBrakeDuration = 2.0f;
 	static constexpr float RailEndFlightDuration = 4.0f;
@@ -759,7 +762,7 @@ struct hero_ : AliveCreation {
 	float GetRailEndCaptureRadius() const
 	{
 		float jumpDistance = max(jumpStartImpulse, 0.0f) / (60.0f * max(1.0f - jumpDeAccel, 0.0001f));
-		return max(RailCaptureMinRadius, 2.0f * jumpDistance);
+		return railCaptureRadiusScale * max(RailCaptureMinRadius, 2.0f * jumpDistance);
 	}
 
 	int FindRailEndTargetLine(int& targetSegment) const
@@ -938,7 +941,7 @@ struct hero_ : AliveCreation {
 		landingUp = CalculateAndSpreadLandingUp(pos, landing.position, lineIndex, pointIndex);
 		float distance = sqrtf(landing.distanceSq);
 		startAirDistance = max(startAirDistance, max(distance, 0.001f));
-		gravity.progress += gravity.speed * deltaTime / max(distance, RailGeometryEpsilon);
+		gravity.progress += railAttractionSpeed * deltaTime / max(distance, RailGeometryEpsilon);
 		if (landing.touching) gravity.progress = 1.0f;
 		float progress = clamp(gravity.progress, 0.0f, 1.0f);
 		gravity.acceleratedT = progress * progress;
@@ -1959,13 +1962,14 @@ struct hero_ : AliveCreation {
 		float4 position;
 		float4 direction;
 		float charge;
+		XMMATRIX rotation;
 
 		arrow()
-			: startPosition(float4()), position(float4()), direction(float4()), charge(0)
+			: startPosition(float4()), position(float4()), direction(float4()), charge(0), rotation(XMMatrixIdentity())
 		{}
 
-		arrow(float4 Position, float4 Direction, float Charge)
-			: startPosition(Position), position(Position), direction(Direction), charge(Charge)
+		arrow(float4 Position, float4 Direction, float Charge, XMMATRIX Rotation)
+			: startPosition(Position), position(Position), direction(Direction), charge(Charge), rotation(Rotation)
 		{}
 	};
 	std::vector<arrow> arrows;
@@ -2004,7 +2008,21 @@ struct hero_ : AliveCreation {
 					float4 heroPos = V2F(pos);
 					float4 direction = result.hit ? normalize(result.position - heroPos) : camForward;
 
-					arrows.push_back(arrow(heroPos, direction, bowCharge));
+					XMVECTOR Forward = XMVector3Normalize(F2V(direction));
+					XMVECTOR Up = upVector;
+
+					XMVECTOR Right = XMVector3Normalize(XMVector3Cross(Up, Forward));
+					Up = XMVector3Cross(Forward, Right);
+
+					XMMATRIX arrowRotation = XMMATRIX(
+						Right,   // 1-я строка
+						Up,      // 2-я строка
+						Forward, // 3-я строка
+						XMVectorSet(0, 0, 0, 1)
+					);
+					arrowRotation = XMMatrixRotationX(PI / 2) * arrowRotation;
+
+					arrows.push_back(arrow(heroPos, direction, bowCharge, arrowRotation));
 				}
 
 				ConstBuf::interp::DeleteExistingTween(bowCharge);
@@ -2071,6 +2089,27 @@ struct hero_ : AliveCreation {
 					it = arrows.erase(it);
 				}
 			}
+		}
+	}
+
+	void DrawArrows(float deltaTime) {
+		for (arrow& arrow : arrows) {
+			float4 p = arrow.position * 10000.f;
+			Object::Mesh({
+				.obj = arrowMesh,
+				.quality = 1,
+				.xPos = (int)(p.x),
+				.yPos = (int)(p.y),
+				.zPos = (int)(p.z),
+				.brightness = 9,
+				.tickness = 4,
+				.stencil = switcher::on,
+				.zoom = -75,
+				.onLineOfs = 0,
+				.jumpCharge = 100,
+				.deltaTime = deltaTime,
+				.model = &arrow.rotation
+				});
 		}
 	}
 };
@@ -3247,7 +3286,8 @@ namespace Loop
 
 
 	cmd(SetHeroParams, int accel, int maxSpeed, int autoBrake, int axisAngleAccel, int maxAxisSpeed, int changeDirSpeed,
-		int jumpStartImpulse, int jumpLandingTreshold, int jumpDeAccel,  int gravitySpeed, int airSpeedAmp, int autoBrakeAxis)
+		int jumpStartImpulse, int jumpLandingTreshold, int jumpDeAccel,  int gravitySpeed, int airSpeedAmp, int autoBrakeAxis,
+		int railCaptureRadiusScale, int railAttractionSpeed)
 	{
 		reflect;
 		float denom = 100;
@@ -3263,6 +3303,8 @@ namespace Loop
 		hero.gravity.speed = in.gravitySpeed / denom;
 		hero.airSpeedAmp = in.airSpeedAmp / denom;
 		hero.autoBrakeAxis = in.autoBrakeAxis / denom;
+		hero.railCaptureRadiusScale = max(in.railCaptureRadiusScale / denom, 0.0f);
+		hero.railAttractionSpeed = max(in.railAttractionSpeed / denom, 0.0f);
 	}
 
 	cmd(SetCameraParams, int angle, int posInertion, int rotInertion)
@@ -3289,7 +3331,9 @@ namespace Loop
 			.jumpDeAccel = 90,
 			.gravitySpeed = 88,
 			.airSpeedAmp = 100,
-			.autoBrakeAxis = 30
+			.autoBrakeAxis = 30,
+			.railCaptureRadiusScale = 120,
+			.railAttractionSpeed = 132
 			});
 
 		SetCameraParams({
@@ -3497,6 +3541,7 @@ namespace Loop
 			//Object::MeshPtr = nullptr;
 
 			hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
+			hero.arrowMesh->LoadObj("..//fx//projectFiles//Arrow.glb");
 
 			static bool heroAnimsLoaded = false;
 			if (!heroAnimsLoaded) {
@@ -3566,9 +3611,9 @@ namespace Loop
 
 		enemyRenderer.RenderDepth(enemySystem, V2F(gameCamera.finalCameraEye), deltaTime);
 
-		float4 p = V2F(hero.pos * 10000.);
 
 		if (!hero.dead) {
+			float4 p = V2F(hero.pos * 10000.);
 			Object::Mesh({
 				.obj = hero.mesh,
 				.quality = 1,
@@ -3584,6 +3629,7 @@ namespace Loop
 				.deltaTime = deltaTime
 				});
 		}
+		hero.DrawArrows(deltaTime);
 
 		enemyRenderer.RenderColor(enemySystem, V2F(gameCamera.finalCameraEye), deltaTime);
 
