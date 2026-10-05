@@ -3602,17 +3602,17 @@ namespace Object {
 		// ============================================================
 		
 		NewLine();
-		AddPointToLine({ 508, 110, -545 });
-		AddPointToLine({ 507, 110, -540 });
-		AddPointToLine({ 506, 110, -535 });
-		AddPointToLine({ 504, 110, -525 });
-		AddPointToLine({ 497, 110, -508 });
-		AddPointToLine({ 482, 110, -493 });
-		AddPointToLine({ 476, 110, -488 });
-		AddPointToLine({ 471, 110, -484 });
-		AddPointToLine({ 458, 110, -476 });
-		AddPointToLine({ 447, 110, -472 });
-		AddPointToLine({ 436, 110, -470 });
+		AddPointToLine({ 507, 110, -550 });
+		AddPointToLine({ 507, 92, -540 });
+		AddPointToLine({ 506, 80, -535 });
+		AddPointToLine({ 504, 66, -525 });
+		AddPointToLine({ 497, 60, -508 });
+		AddPointToLine({ 482, 72, -493 });
+		AddPointToLine({ 476, 86, -488 });
+		AddPointToLine({ 471, 102, -484 });
+		AddPointToLine({ 458, 115, -476 });
+		AddPointToLine({ 447, 122, -472 });
+		AddPointToLine({ 436, 118, -470 });
 		AddPointToLine({ 430, 96, -474 });
 		AddPointToLine({ 426, 82, -478 });
 		AddPointToLine({ 426, 94, -491 });
