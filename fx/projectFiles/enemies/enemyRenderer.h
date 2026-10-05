@@ -38,9 +38,9 @@ namespace Enemies
 			mesh_.randomSurfaceSampling = true;
 			mesh_.Update(0.0f);
 
-			for (Enemy& enemy : system.EditableItems()) {
+			for (Enemy& enemy : system.enemies_) {
 				enemy.mesh_ = &mesh_;
-				enemy.Initialize();
+				enemy.InitializeAnims();
 			}
 		}
 

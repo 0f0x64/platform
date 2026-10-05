@@ -22,6 +22,7 @@ namespace Enemies
 	public:
 		static constexpr std::size_t Count = 100;
 		static constexpr auto DefaultSeed = std::mt19937::default_seed;
+		std::vector<Enemy> enemies_{};
 
 		EnemySystem() = default;
 		EnemySystem(const EnemySystem&) = delete;
@@ -31,7 +32,6 @@ namespace Enemies
 
 		bool IsInitialized() const { return initialized_; }
 		const std::vector<Enemy>& Items() const { return enemies_; }
-		std::vector<Enemy>& EditableItems() { return enemies_; }
 
 		void Reset(float4 center, float4 right, float4 forward,
 			std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
@@ -125,6 +125,7 @@ namespace Enemies
 					value.movementCenter = spawn;
 					value.movementTarget = spawn;
 					};
+				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
 				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
 			}
@@ -285,7 +286,6 @@ namespace Enemies
 			}
 		}
 
-		std::vector<Enemy> enemies_{};
 		std::mt19937 random_{ DefaultSeed };
 		bool initialized_ = false;
 	};

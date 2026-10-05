@@ -50,9 +50,11 @@ namespace Enemies
 			attackCollider->isTouchable = false;
 			attackCollider->radius = attackRadius;
 
-			//mesh_->PlayAnimation(1);
-
 			if (initializeCallback) initializeCallback(*this);
+		}
+
+		void InitializeAnims() {
+			mesh_->PlayAnimation(1);
 		}
 
 		void Update(float deltaTime, collision::SphereCollider* heroCollider, AliveCreation& hero)
