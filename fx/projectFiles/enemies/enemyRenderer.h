@@ -7,17 +7,41 @@ namespace Enemies
 	class EnemyRenderer
 	{
 	public:
-		void Load()
+		Object::mesh mesh_;
+
+		void Load(EnemySystem& system)
 		{
+			if (loaded) return;
+
 			//mesh_.LoadObj("..//fx//projectFiles//Sphere.glb");
-			mesh_.LoadObj("..//fx//projectFiles//Swarm_idle.glb");
+			mesh_.LoadObj("..//fx//projectFiles//Swarm_Retop_A_pos.glb");
 			if (!mesh_.loaded)
 			{
 				Log("Enemy renderer: model failed to load; enemies cannot be displayed.\n");
 				return;
 			}
+			loaded = true;
+
+			mesh_.LoadAnimationFile("..//fx//projectFiles//Swarm_Retop_Idle.glb", true); // 1 Бездействие
+			mesh_.LoadAnimationFile("..//fx//projectFiles//Swarm_Retop_Move.glb", true); // 2 Движение
+			mesh_.LoadAnimationFile("..//fx//projectFiles//Swarm_Retop_Attack.glb", true); // 3 Атака
+			mesh_.LoadAnimationFile("..//fx//projectFiles//Swarm_Retop_Getting_Damage.glb", true); // 4 Получение урона
+			
+			mesh_.animations[1].looped = true;
+
+			mesh_.animations[2].looped = true;
+
+			mesh_.animations[3].weight = 100;
+
+			mesh_.animations[4].weight = 1000;
+
 			mesh_.randomSurfaceSampling = true;
 			mesh_.Update(0.0f);
+
+			for (Enemy& enemy : system.EditableItems()) {
+				enemy.mesh_ = &mesh_;
+				enemy.Initialize();
+			}
 		}
 
 		void RenderDepth(const EnemySystem& system, const float4& cameraPos, float deltaTime)
@@ -35,6 +59,8 @@ namespace Enemies
 		}
 
 	private:
+		bool loaded = false;
+
 		void SetPassState(bool depthPass)
 		{
 			RenderTarget::Set({ texture::pBuf, 0 });
@@ -110,6 +136,5 @@ namespace Enemies
 		static constexpr int ParticleCount = 50000;
 		static constexpr int Brightness = 27;
 		static constexpr int Thickness = 4;
-		Object::mesh mesh_;
 	};
 }

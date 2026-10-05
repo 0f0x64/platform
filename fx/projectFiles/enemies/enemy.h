@@ -16,6 +16,8 @@ namespace Enemies
 		InitializeCallback initializeCallback;
 		UpdateCallback updateCallback;
 
+		Object::mesh* mesh_;
+
 		// === HP ===
 		float maxHealth = 100.0f;
 		float health = 100.0f;
@@ -47,6 +49,8 @@ namespace Enemies
 			attackCollider->collisionGroup = collision::CollisionGroup::Enemy;
 			attackCollider->isTouchable = false;
 			attackCollider->radius = attackRadius;
+
+			//mesh_->PlayAnimation(1);
 
 			if (initializeCallback) initializeCallback(*this);
 		}

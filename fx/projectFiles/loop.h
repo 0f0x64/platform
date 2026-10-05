@@ -3597,7 +3597,7 @@ namespace Loop
 				hero.mesh->animations[12].looped = true;
 			}
 
-			enemyRenderer.Load();
+			enemyRenderer.Load(enemySystem);
 
 			hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
 			hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);

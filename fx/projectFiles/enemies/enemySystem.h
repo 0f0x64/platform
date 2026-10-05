@@ -31,6 +31,7 @@ namespace Enemies
 
 		bool IsInitialized() const { return initialized_; }
 		const std::vector<Enemy>& Items() const { return enemies_; }
+		std::vector<Enemy>& EditableItems() { return enemies_; }
 
 		void Reset(float4 center, float4 right, float4 forward,
 			std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
@@ -124,7 +125,6 @@ namespace Enemies
 					value.movementCenter = spawn;
 					value.movementTarget = spawn;
 					};
-				enemy.Initialize();
 				enemy.movementTarget = RandomTarget(enemy);
 				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
 			}
