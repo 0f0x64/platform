@@ -3541,6 +3541,10 @@ namespace Object {
 		//====================
 		// 13 -> 3
 		//====================
+		// ============================================================
+		// Входная трасса
+		// ============================================================
+		
 		NewLine();
 		AddPointToLine({ -89, -210, -163 });
 		AddPointToLine({ 11, -157, -227 });
@@ -3549,11 +3553,11 @@ namespace Object {
 		AddPointToLine({ 309, 3, -421 });
 		AddPointToLine({ 408, 56, -486 });
 		AddPointToLine({ 508, 110, -550 });
-
+		
 		// ============================================================
-// Л1 — исходный сегмент
-// ============================================================
-
+		// Л1 — внешний правый элемент
+		// ============================================================
+		
 		NewLine();
 		AddPointToLine({ 508, 110, -545 });
 		AddPointToLine({ 507, 110, -540 });
@@ -3564,158 +3568,322 @@ namespace Object {
 		AddPointToLine({ 476, 110, -488 });
 		AddPointToLine({ 471, 110, -484 });
 		AddPointToLine({ 458, 110, -476 });
+		AddPointToLine({ 447, 110, -472 });
 		AddPointToLine({ 436, 110, -470 });
+		AddPointToLine({ 430, 96, -474 });
 		AddPointToLine({ 426, 82, -478 });
+		AddPointToLine({ 426, 94, -491 });
 		AddPointToLine({ 426, 107, -505 });
-
+		
+		// Внутренний контур Л1
 		NewLine();
 		AddPointToLine({ 476, 110, -491 });
 		AddPointToLine({ 472, 110, -487 });
+		AddPointToLine({ 459, 110, -481 });
 		AddPointToLine({ 446, 110, -476 });
 		AddPointToLine({ 439, 110, -484 });
 		AddPointToLine({ 442, 110, -491 });
 		AddPointToLine({ 450, 110, -490 });
-
+		AddPointToLine({ 458, 110, -487 });
+		
+		// Верхний зубец
 		NewLine();
 		AddPointToLine({ 470, 110, -481 });
+		AddPointToLine({ 456, 110, -471 });
 		AddPointToLine({ 440, 110, -460 });
 		AddPointToLine({ 428, 110, -461 });
 		AddPointToLine({ 425, 110, -463 });
 		AddPointToLine({ 419, 110, -469 });
 		AddPointToLine({ 418, 110, -476 });
-
+		AddPointToLine({ 425, 110, -480 });
+		
+		// Малая правая петля
 		NewLine();
 		AddPointToLine({ 500, 110, -508 });
 		AddPointToLine({ 492, 110, -499 });
 		AddPointToLine({ 487, 110, -485 });
 		AddPointToLine({ 494, 110, -477 });
 		AddPointToLine({ 503, 110, -483 });
+		AddPointToLine({ 506, 110, -494 });
 		AddPointToLine({ 499, 110, -495 });
-
-
+		
 		// ============================================================
-// Л1 — ВТОРАЯ ПОЛОВИНА
-// Сдвиг:
-// X -= 21
-// Y без изменений
-// Z += 11
-// ============================================================
-
+		// Л1 — левая / вторая половина
+		// ============================================================
+		
 		NewLine();
 		AddPointToLine({ 327, 58, -439 });
+		AddPointToLine({ 337, 69, -444 });
 		AddPointToLine({ 346, 80, -449 });
 		AddPointToLine({ 351, 96, -454 });
 		AddPointToLine({ 353, 118, -464 });
+		AddPointToLine({ 358, 132, -472 });
 		AddPointToLine({ 364, 143, -481 });
 		AddPointToLine({ 376, 149, -496 });
 		AddPointToLine({ 381, 151, -501 });
 		AddPointToLine({ 386, 152, -505 });
 		AddPointToLine({ 399, 151, -513 });
+		AddPointToLine({ 412, 145, -517 });
 		AddPointToLine({ 421, 137, -519 });
 		AddPointToLine({ 428, 123, -511 });
 		AddPointToLine({ 427, 110, -500 });
-
+		
+		// Внутренняя петля второй половины
 		NewLine();
 		AddPointToLine({ 381, 110, -498 });
 		AddPointToLine({ 385, 110, -502 });
+		AddPointToLine({ 398, 110, -508 });
 		AddPointToLine({ 411, 110, -513 });
 		AddPointToLine({ 418, 110, -505 });
 		AddPointToLine({ 415, 110, -498 });
 		AddPointToLine({ 407, 110, -499 });
-
+		AddPointToLine({ 396, 110, -495 });
+		
+		// Нижний зубец второй половины
 		NewLine();
 		AddPointToLine({ 387, 110, -508 });
+		AddPointToLine({ 402, 110, -519 });
 		AddPointToLine({ 417, 110, -529 });
 		AddPointToLine({ 429, 110, -528 });
 		AddPointToLine({ 432, 110, -526 });
 		AddPointToLine({ 438, 110, -520 });
 		AddPointToLine({ 439, 110, -513 });
-
+		AddPointToLine({ 429, 110, -509 });
+		
+		// Малая левая петля
 		NewLine();
 		AddPointToLine({ 357, 110, -481 });
 		AddPointToLine({ 365, 110, -490 });
 		AddPointToLine({ 370, 110, -504 });
 		AddPointToLine({ 363, 110, -512 });
 		AddPointToLine({ 354, 110, -506 });
+		AddPointToLine({ 351, 110, -497 });
 		AddPointToLine({ 358, 110, -494 });
 		
-
 		// ============================================================
-		// Л2
+		// Л2 — внешний контур ландмарка
 		// ============================================================
-		// Главная трасса: Ландмарк
+		
 		NewLine();
 		AddPointToLine({ 375, 62, -425 });
+		AddPointToLine({ 365, 64, -431 });
 		AddPointToLine({ 355, 66, -438 });
+		AddPointToLine({ 342, 68, -446 });
 		AddPointToLine({ 330, 70, -455 });
+		AddPointToLine({ 316, 69, -466 });
 		AddPointToLine({ 302, 68, -478 });
+		AddPointToLine({ 288, 66, -488 });
 		AddPointToLine({ 275, 64, -495 });
+		AddPointToLine({ 262, 64, -499 });
 		AddPointToLine({ 248, 64, -502 });
+		AddPointToLine({ 234, 62, -498 });
 		AddPointToLine({ 220, 60, -492 });
+		AddPointToLine({ 207, 59, -482 });
 		AddPointToLine({ 194, 58, -470 });
+		AddPointToLine({ 182, 57, -458 });
 		AddPointToLine({ 172, 56, -445 });
+		AddPointToLine({ 163, 55, -431 });
 		AddPointToLine({ 155, 54, -418 });
-
-		// Верхняя дуга:
+		
+		// ============================================================
+		// Внешняя верхняя дуга
+		// ============================================================
+		
 		NewLine();
 		AddPointToLine({ 365, 70, -405 });
+		AddPointToLine({ 354, 76, -390 });
 		AddPointToLine({ 342, 82, -375 });
+		AddPointToLine({ 329, 89, -362 });
 		AddPointToLine({ 315, 96, -352 });
+		AddPointToLine({ 300, 102, -344 });
 		AddPointToLine({ 285, 108, -340 });
+		AddPointToLine({ 270, 110, -341 });
 		AddPointToLine({ 255, 110, -345 });
+		AddPointToLine({ 240, 106, -351 });
 		AddPointToLine({ 225, 102, -360 });
+		AddPointToLine({ 211, 95, -370 });
 		AddPointToLine({ 198, 88, -382 });
+		AddPointToLine({ 184, 79, -396 });
 		AddPointToLine({ 172, 70, -410 });
-
-		// Правая ветвь:
+		
+		// Правая связующая ветвь
 		NewLine();
 		AddPointToLine({ 355, 66, -438 });
+		AddPointToLine({ 362, 71, -429 });
 		AddPointToLine({ 365, 76, -420 });
 		AddPointToLine({ 370, 88, -395 });
+		AddPointToLine({ 366, 88, -386 });
 		AddPointToLine({ 358, 84, -378 });
+		AddPointToLine({ 350, 83, -376 });
 		AddPointToLine({ 342, 82, -375 });
-
-		// Левая ветвь: 
+		
+		// Левая связующая ветвь
 		NewLine();
 		AddPointToLine({ 225, 102, -360 });
+		AddPointToLine({ 214, 97, -368 });
 		AddPointToLine({ 205, 92, -378 });
+		AddPointToLine({ 196, 85, -391 });
 		AddPointToLine({ 190, 78, -405 });
 		AddPointToLine({ 188, 68, -432 });
+		AddPointToLine({ 190, 62, -451 });
 		AddPointToLine({ 194, 58, -470 });
-
-		// Центральная спираль: 
+		
+		// ============================================================
+		// СПИРАЛЬ №1 — верхняя правая, закручивается к центру
+		// Центр: примерно { 275, 86, -485 }
+		// ============================================================
+		
 		NewLine();
-		AddPointToLine({ 302, 68, -478 });
-		AddPointToLine({ 300, 78, -500 });
-		AddPointToLine({ 286, 92, -520 });
-		AddPointToLine({ 264, 102, -530 });
-		AddPointToLine({ 242, 108, -522 });
-		AddPointToLine({ 230, 106, -502 });
-		AddPointToLine({ 234, 98, -482 });
-		AddPointToLine({ 250, 90, -468 });
-		AddPointToLine({ 270, 88, -470 });
-		AddPointToLine({ 282, 93, -485 });
-		AddPointToLine({ 278, 100, -502 });
-
-		// Нижняя петля:
+		AddPointToLine({ 365, 70, -405 });
+		AddPointToLine({ 358, 76, -417 });
+		AddPointToLine({ 350, 82, -430 });
+		AddPointToLine({ 342, 88, -444 });
+		AddPointToLine({ 334, 94, -459 });
+		AddPointToLine({ 326, 99, -474 });
+		AddPointToLine({ 315, 102, -488 });
+		AddPointToLine({ 302, 103, -500 });
+		AddPointToLine({ 288, 102, -508 });
+		AddPointToLine({ 274, 99, -511 });
+		AddPointToLine({ 261, 94, -508 });
+		AddPointToLine({ 251, 89, -500 });
+		AddPointToLine({ 245, 84, -490 });
+		AddPointToLine({ 244, 80, -480 });
+		AddPointToLine({ 248, 78, -472 });
+		AddPointToLine({ 256, 78, -467 });
+		AddPointToLine({ 266, 80, -466 });
+		AddPointToLine({ 274, 83, -470 });
+		AddPointToLine({ 279, 87, -477 });
+		AddPointToLine({ 280, 90, -484 });
+		AddPointToLine({ 277, 91, -489 });
+		AddPointToLine({ 272, 89, -491 });
+		AddPointToLine({ 270, 86, -488 });
+		AddPointToLine({ 272, 84, -484 });
+		AddPointToLine({ 275, 86, -485 });
+		
+		// ============================================================
+		// СПИРАЛЬ №2 — нижняя левая, закручивается к тому же центру
+		// ============================================================
+		
+		NewLine();
+		AddPointToLine({ 190, 60, -505 });
+		AddPointToLine({ 198, 63, -518 });
+		AddPointToLine({ 208, 67, -532 });
+		AddPointToLine({ 220, 72, -544 });
+		AddPointToLine({ 234, 77, -553 });
+		AddPointToLine({ 249, 82, -558 });
+		AddPointToLine({ 265, 85, -560 });
+		AddPointToLine({ 281, 87, -557 });
+		AddPointToLine({ 296, 88, -550 });
+		AddPointToLine({ 308, 88, -540 });
+		AddPointToLine({ 316, 87, -528 });
+		AddPointToLine({ 320, 84, -515 });
+		AddPointToLine({ 320, 81, -503 });
+		AddPointToLine({ 316, 79, -494 });
+		AddPointToLine({ 309, 78, -487 });
+		AddPointToLine({ 300, 79, -482 });
+		AddPointToLine({ 291, 81, -480 });
+		AddPointToLine({ 284, 84, -481 });
+		AddPointToLine({ 280, 87, -484 });
+		AddPointToLine({ 277, 89, -487 });
+		AddPointToLine({ 274, 89, -489 });
+		AddPointToLine({ 272, 87, -488 });
+		AddPointToLine({ 273, 85, -486 });
+		AddPointToLine({ 275, 86, -485 });
+		
+		// ============================================================
+		// Внешняя нижняя петля
+		// ============================================================
+		
 		NewLine();
 		AddPointToLine({ 330, 70, -455 });
+		AddPointToLine({ 339, 63, -467 });
 		AddPointToLine({ 345, 58, -480 });
+		AddPointToLine({ 344, 54, -496 });
 		AddPointToLine({ 340, 50, -512 });
+		AddPointToLine({ 332, 49, -529 });
 		AddPointToLine({ 320, 48, -545 });
+		AddPointToLine({ 305, 49, -557 });
 		AddPointToLine({ 290, 50, -565 });
+		AddPointToLine({ 273, 52, -570 });
 		AddPointToLine({ 255, 54, -572 });
+		AddPointToLine({ 238, 55, -568 });
 		AddPointToLine({ 222, 56, -560 });
+		AddPointToLine({ 208, 57, -548 });
 		AddPointToLine({ 198, 58, -535 });
+		AddPointToLine({ 192, 59, -520 });
 		AddPointToLine({ 190, 60, -505 });
+		AddPointToLine({ 202, 60, -498 });
 		AddPointToLine({ 220, 60, -492 });
-
-		// Северный луч:
+		
+		// ============================================================
+		// Соединительные линии между спиралями
+		// ============================================================
+		
+		// Верхняя перемычка к первой спирали
+		NewLine();
+		AddPointToLine({ 302, 68, -478 });
+		AddPointToLine({ 307, 76, -482 });
+		AddPointToLine({ 308, 84, -489 });
+		AddPointToLine({ 303, 91, -496 });
+		AddPointToLine({ 294, 96, -500 });
+		AddPointToLine({ 285, 97, -496 });
+		
+		// Нижняя перемычка ко второй спирали
+		NewLine();
+		AddPointToLine({ 248, 64, -502 });
+		AddPointToLine({ 252, 71, -510 });
+		AddPointToLine({ 259, 76, -516 });
+		AddPointToLine({ 268, 79, -518 });
+		AddPointToLine({ 278, 80, -514 });
+		AddPointToLine({ 285, 81, -507 });
+		
+		// Горизонтальная внутренняя связка
+		NewLine();
+		AddPointToLine({ 234, 98, -482 });
+		AddPointToLine({ 245, 96, -484 });
+		AddPointToLine({ 256, 94, -486 });
+		AddPointToLine({ 267, 92, -488 });
+		AddPointToLine({ 277, 91, -489 });
+		AddPointToLine({ 288, 90, -488 });
+		
+		// Центральный символ / ядро ландмарка
+		NewLine();
+		AddPointToLine({ 275, 86, -485 });
+		AddPointToLine({ 280, 88, -485 });
+		AddPointToLine({ 281, 91, -489 });
+		AddPointToLine({ 278, 94, -492 });
+		AddPointToLine({ 274, 94, -493 });
+		AddPointToLine({ 270, 91, -491 });
+		AddPointToLine({ 269, 87, -488 });
+		AddPointToLine({ 271, 84, -484 });
+		AddPointToLine({ 275, 86, -485 });
+		
+		// ============================================================
+		// Северный луч с дополнительными ответвлениями
+		// ============================================================
+		
 		NewLine();
 		AddPointToLine({ 285, 108, -340 });
+		AddPointToLine({ 288, 111, -329 });
 		AddPointToLine({ 290, 114, -318 });
+		AddPointToLine({ 293, 115, -309 });
 		AddPointToLine({ 296, 116, -300 });
+		AddPointToLine({ 299, 114, -291 });
 		AddPointToLine({ 302, 112, -282 });
+		
+		// Левая ветвь северного луча
+		NewLine();
+		AddPointToLine({ 290, 114, -318 });
+		AddPointToLine({ 280, 116, -310 });
+		AddPointToLine({ 269, 116, -305 });
+		AddPointToLine({ 258, 114, -304 });
+		
+		// Правая ветвь северного луча
+		NewLine();
+		AddPointToLine({ 296, 116, -300 });
+		AddPointToLine({ 307, 118, -295 });
+		AddPointToLine({ 318, 116, -292 });
+		AddPointToLine({ 327, 112, -286 });
 		
 
 		
