@@ -425,17 +425,29 @@ namespace Object {
 			ConstBuf::cgltf_options opts{};
 			ConstBuf::cgltf_data* data = nullptr;
 
-			if (ConstBuf::cgltf_parse_file(&opts, path, &data) != ConstBuf::cgltf_result_success)
+			if (ConstBuf::cgltf_parse_file(&opts, path, &data) != ConstBuf::cgltf_result_success) {
+				Log("Failed to parse file path: ");
+				Log(path);
+				Log("\n");
 				return false;
+			}
 
 			if (ConstBuf::cgltf_load_buffers(&opts, data, path) != ConstBuf::cgltf_result_success)
 			{
+				Log("Failed to load buffers: ");
+				Log(path);
+				Log("\n");
 				ConstBuf::cgltf_free(data);
 				return false;
 			}
 
 			bool added = ReadAnimations(data, false, remapToCurrentSkeleton);
 			ConstBuf::cgltf_free(data);
+
+			Log("Animation ");
+			Log(path);
+			Log(" loaded successfully\n");
+
 			return added;
 		}
 

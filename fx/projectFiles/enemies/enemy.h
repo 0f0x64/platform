@@ -78,6 +78,7 @@ namespace Enemies
 		{
 			if (!alive || amount <= 0.0f) return;
 
+			mesh_->PlayAnimation(4);
 			dx11::Audio::Play("Swarm_hit", false, 1.0f);
 
 			health -= amount;
