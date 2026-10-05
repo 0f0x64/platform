@@ -344,6 +344,8 @@ struct hero_ : AliveCreation {
 	float airSpeedAmp = 1.f;
 
 	static constexpr float RailCaptureMinRadius = 2.0f;
+	float railCaptureRadiusScale = 1.2f;
+	float railAttractionSpeed = 1.32f;
 	static constexpr float RailEndMinSpeedRatio = 0.4f;
 	static constexpr float RailEndBrakeDuration = 2.0f;
 	static constexpr float RailEndFlightDuration = 4.0f;
@@ -760,7 +762,7 @@ struct hero_ : AliveCreation {
 	float GetRailEndCaptureRadius() const
 	{
 		float jumpDistance = max(jumpStartImpulse, 0.0f) / (60.0f * max(1.0f - jumpDeAccel, 0.0001f));
-		return max(RailCaptureMinRadius, 2.0f * jumpDistance);
+		return railCaptureRadiusScale * max(RailCaptureMinRadius, 2.0f * jumpDistance);
 	}
 
 	int FindRailEndTargetLine(int& targetSegment) const
@@ -939,7 +941,7 @@ struct hero_ : AliveCreation {
 		landingUp = CalculateAndSpreadLandingUp(pos, landing.position, lineIndex, pointIndex);
 		float distance = sqrtf(landing.distanceSq);
 		startAirDistance = max(startAirDistance, max(distance, 0.001f));
-		gravity.progress += gravity.speed * deltaTime / max(distance, RailGeometryEpsilon);
+		gravity.progress += railAttractionSpeed * deltaTime / max(distance, RailGeometryEpsilon);
 		if (landing.touching) gravity.progress = 1.0f;
 		float progress = clamp(gravity.progress, 0.0f, 1.0f);
 		gravity.acceleratedT = progress * progress;
@@ -3284,7 +3286,8 @@ namespace Loop
 
 
 	cmd(SetHeroParams, int accel, int maxSpeed, int autoBrake, int axisAngleAccel, int maxAxisSpeed, int changeDirSpeed,
-		int jumpStartImpulse, int jumpLandingTreshold, int jumpDeAccel,  int gravitySpeed, int airSpeedAmp, int autoBrakeAxis)
+		int jumpStartImpulse, int jumpLandingTreshold, int jumpDeAccel,  int gravitySpeed, int airSpeedAmp, int autoBrakeAxis,
+		int railCaptureRadiusScale, int railAttractionSpeed)
 	{
 		reflect;
 		float denom = 100;
@@ -3300,6 +3303,8 @@ namespace Loop
 		hero.gravity.speed = in.gravitySpeed / denom;
 		hero.airSpeedAmp = in.airSpeedAmp / denom;
 		hero.autoBrakeAxis = in.autoBrakeAxis / denom;
+		hero.railCaptureRadiusScale = max(in.railCaptureRadiusScale / denom, 0.0f);
+		hero.railAttractionSpeed = max(in.railAttractionSpeed / denom, 0.0f);
 	}
 
 	cmd(SetCameraParams, int angle, int posInertion, int rotInertion)
@@ -3326,7 +3331,9 @@ namespace Loop
 			.jumpDeAccel = 90,
 			.gravitySpeed = 88,
 			.airSpeedAmp = 100,
-			.autoBrakeAxis = 30
+			.autoBrakeAxis = 30,
+			.railCaptureRadiusScale = 120,
+			.railAttractionSpeed = 132
 			});
 
 		SetCameraParams({
