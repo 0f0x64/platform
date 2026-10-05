@@ -1257,10 +1257,11 @@ struct hero_ : AliveCreation {
 			startAirDistance = length3(V2F(pos));
 			//int startLine = rand()% Object::starLineList.lineCount;
 			//int startPoint = rand() % (Object::starLineList.line[startLine].pointCount-2)+1;
-
-			int startLine = min(1, Object::starLineList.lineCount - 1);
+			int startLine = 10;
+			int startPoint = 1;
+			//int startLine = min(1, Object::starLineList.lineCount - 1);
 			if (startLine < 0 || Object::starLineList.line[startLine].pointCount == 0) return;
-			int startPoint = min(1, Object::starLineList.line[startLine].pointCount - 1);
+			//int startPoint = min(1, Object::starLineList.line[startLine].pointCount - 1);
 			lineIndex = startLine;
 			pointIndex = (float)startPoint;
 

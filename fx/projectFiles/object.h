@@ -3707,230 +3707,235 @@ namespace Object {
 		// Л2 — внешний контур ландмарка
 		// ============================================================
 		
-		NewLine();
-		AddPointToLine({ 375, 62, -425 });
-		AddPointToLine({ 365, 64, -431 });
-		AddPointToLine({ 355, 66, -438 });
-		AddPointToLine({ 342, 68, -446 });
-		AddPointToLine({ 330, 70, -455 });
-		AddPointToLine({ 316, 69, -466 });
-		AddPointToLine({ 302, 68, -478 });
-		AddPointToLine({ 288, 66, -488 });
-		AddPointToLine({ 275, 64, -495 });
-		AddPointToLine({ 262, 64, -499 });
-		AddPointToLine({ 248, 64, -502 });
-		AddPointToLine({ 234, 62, -498 });
-		AddPointToLine({ 220, 60, -492 });
-		AddPointToLine({ 207, 59, -482 });
-		AddPointToLine({ 194, 58, -470 });
-		AddPointToLine({ 182, 57, -458 });
-		AddPointToLine({ 172, 56, -445 });
-		AddPointToLine({ 163, 55, -431 });
-		AddPointToLine({ 155, 54, -418 });
-		
 		// ============================================================
-		// Внешняя верхняя дуга
-		// ============================================================
-		
-		NewLine();
-		AddPointToLine({ 365, 70, -405 });
-		AddPointToLine({ 354, 76, -390 });
-		AddPointToLine({ 342, 82, -375 });
-		AddPointToLine({ 329, 89, -362 });
-		AddPointToLine({ 315, 96, -352 });
-		AddPointToLine({ 300, 102, -344 });
-		AddPointToLine({ 285, 108, -340 });
-		AddPointToLine({ 270, 110, -341 });
-		AddPointToLine({ 255, 110, -345 });
-		AddPointToLine({ 240, 106, -351 });
-		AddPointToLine({ 225, 102, -360 });
-		AddPointToLine({ 211, 95, -370 });
-		AddPointToLine({ 198, 88, -382 });
-		AddPointToLine({ 184, 79, -396 });
-		AddPointToLine({ 172, 70, -410 });
-		
-		// Правая связующая ветвь
-		NewLine();
-		AddPointToLine({ 355, 66, -438 });
-		AddPointToLine({ 362, 71, -429 });
-		AddPointToLine({ 365, 76, -420 });
-		AddPointToLine({ 370, 88, -395 });
-		AddPointToLine({ 366, 88, -386 });
-		AddPointToLine({ 358, 84, -378 });
-		AddPointToLine({ 350, 83, -376 });
-		AddPointToLine({ 342, 82, -375 });
-		
-		// Левая связующая ветвь
-		NewLine();
-		AddPointToLine({ 225, 102, -360 });
-		AddPointToLine({ 214, 97, -368 });
-		AddPointToLine({ 205, 92, -378 });
-		AddPointToLine({ 196, 85, -391 });
-		AddPointToLine({ 190, 78, -405 });
-		AddPointToLine({ 188, 68, -432 });
-		AddPointToLine({ 190, 62, -451 });
-		AddPointToLine({ 194, 58, -470 });
-		
-		// ============================================================
-		// СПИРАЛЬ №1 — верхняя правая, закручивается к центру
-		// Центр: примерно { 275, 86, -485 }
-		// ============================================================
-		
-		NewLine();
-		AddPointToLine({ 365, 70, -405 });
-		AddPointToLine({ 358, 76, -417 });
-		AddPointToLine({ 350, 82, -430 });
-		AddPointToLine({ 342, 88, -444 });
-		AddPointToLine({ 334, 94, -459 });
-		AddPointToLine({ 326, 99, -474 });
-		AddPointToLine({ 315, 102, -488 });
-		AddPointToLine({ 302, 103, -500 });
-		AddPointToLine({ 288, 102, -508 });
-		AddPointToLine({ 274, 99, -511 });
-		AddPointToLine({ 261, 94, -508 });
-		AddPointToLine({ 251, 89, -500 });
-		AddPointToLine({ 245, 84, -490 });
-		AddPointToLine({ 244, 80, -480 });
-		AddPointToLine({ 248, 78, -472 });
-		AddPointToLine({ 256, 78, -467 });
-		AddPointToLine({ 266, 80, -466 });
-		AddPointToLine({ 274, 83, -470 });
-		AddPointToLine({ 279, 87, -477 });
-		AddPointToLine({ 280, 90, -484 });
-		AddPointToLine({ 277, 91, -489 });
-		AddPointToLine({ 272, 89, -491 });
-		AddPointToLine({ 270, 86, -488 });
-		AddPointToLine({ 272, 84, -484 });
-		AddPointToLine({ 275, 86, -485 });
-		
-		// ============================================================
-		// СПИРАЛЬ №2 — нижняя левая, закручивается к тому же центру
-		// ============================================================
-		
-		NewLine();
-		AddPointToLine({ 190, 60, -505 });
-		AddPointToLine({ 198, 63, -518 });
-		AddPointToLine({ 208, 67, -532 });
-		AddPointToLine({ 220, 72, -544 });
-		AddPointToLine({ 234, 77, -553 });
-		AddPointToLine({ 249, 82, -558 });
-		AddPointToLine({ 265, 85, -560 });
-		AddPointToLine({ 281, 87, -557 });
-		AddPointToLine({ 296, 88, -550 });
-		AddPointToLine({ 308, 88, -540 });
-		AddPointToLine({ 316, 87, -528 });
-		AddPointToLine({ 320, 84, -515 });
-		AddPointToLine({ 320, 81, -503 });
-		AddPointToLine({ 316, 79, -494 });
-		AddPointToLine({ 309, 78, -487 });
-		AddPointToLine({ 300, 79, -482 });
-		AddPointToLine({ 291, 81, -480 });
-		AddPointToLine({ 284, 84, -481 });
-		AddPointToLine({ 280, 87, -484 });
-		AddPointToLine({ 277, 89, -487 });
-		AddPointToLine({ 274, 89, -489 });
-		AddPointToLine({ 272, 87, -488 });
-		AddPointToLine({ 273, 85, -486 });
-		AddPointToLine({ 275, 86, -485 });
-		
-		// ============================================================
-		// Внешняя нижняя петля
-		// ============================================================
-		
-		NewLine();
-		AddPointToLine({ 330, 70, -455 });
-		AddPointToLine({ 339, 63, -467 });
-		AddPointToLine({ 345, 58, -480 });
-		AddPointToLine({ 344, 54, -496 });
-		AddPointToLine({ 340, 50, -512 });
-		AddPointToLine({ 332, 49, -529 });
-		AddPointToLine({ 320, 48, -545 });
-		AddPointToLine({ 305, 49, -557 });
-		AddPointToLine({ 290, 50, -565 });
-		AddPointToLine({ 273, 52, -570 });
-		AddPointToLine({ 255, 54, -572 });
-		AddPointToLine({ 238, 55, -568 });
-		AddPointToLine({ 222, 56, -560 });
-		AddPointToLine({ 208, 57, -548 });
-		AddPointToLine({ 198, 58, -535 });
-		AddPointToLine({ 192, 59, -520 });
-		AddPointToLine({ 190, 60, -505 });
-		AddPointToLine({ 202, 60, -498 });
-		AddPointToLine({ 220, 60, -492 });
-		
-		// ============================================================
-		// Соединительные линии между спиралями
-		// ============================================================
-		
-		// Верхняя перемычка к первой спирали
-		NewLine();
-		AddPointToLine({ 302, 68, -478 });
-		AddPointToLine({ 307, 76, -482 });
-		AddPointToLine({ 308, 84, -489 });
-		AddPointToLine({ 303, 91, -496 });
-		AddPointToLine({ 294, 96, -500 });
-		AddPointToLine({ 285, 97, -496 });
-		
-		// Нижняя перемычка ко второй спирали
-		NewLine();
-		AddPointToLine({ 248, 64, -502 });
-		AddPointToLine({ 252, 71, -510 });
-		AddPointToLine({ 259, 76, -516 });
-		AddPointToLine({ 268, 79, -518 });
-		AddPointToLine({ 278, 80, -514 });
-		AddPointToLine({ 285, 81, -507 });
-		
-		// Горизонтальная внутренняя связка
-		NewLine();
-		AddPointToLine({ 234, 98, -482 });
-		AddPointToLine({ 245, 96, -484 });
-		AddPointToLine({ 256, 94, -486 });
-		AddPointToLine({ 267, 92, -488 });
-		AddPointToLine({ 277, 91, -489 });
-		AddPointToLine({ 288, 90, -488 });
-		
-		// Центральный символ / ядро ландмарка
-		NewLine();
-		AddPointToLine({ 275, 86, -485 });
-		AddPointToLine({ 280, 88, -485 });
-		AddPointToLine({ 281, 91, -489 });
-		AddPointToLine({ 278, 94, -492 });
-		AddPointToLine({ 274, 94, -493 });
-		AddPointToLine({ 270, 91, -491 });
-		AddPointToLine({ 269, 87, -488 });
-		AddPointToLine({ 271, 84, -484 });
-		AddPointToLine({ 275, 86, -485 });
-		
-		// ============================================================
-		// Северный луч с дополнительными ответвлениями
-		// ============================================================
-		
-		NewLine();
-		AddPointToLine({ 285, 108, -340 });
-		AddPointToLine({ 288, 111, -329 });
-		AddPointToLine({ 290, 114, -318 });
-		AddPointToLine({ 293, 115, -309 });
-		AddPointToLine({ 296, 116, -300 });
-		AddPointToLine({ 299, 114, -291 });
-		AddPointToLine({ 302, 112, -282 });
-		
-		// Левая ветвь северного луча
-		NewLine();
-		AddPointToLine({ 290, 114, -318 });
-		AddPointToLine({ 280, 116, -310 });
-		AddPointToLine({ 269, 116, -305 });
-		AddPointToLine({ 258, 114, -304 });
-		
-		// Правая ветвь северного луча
-		NewLine();
-		AddPointToLine({ 296, 116, -300 });
-		AddPointToLine({ 307, 118, -295 });
-		AddPointToLine({ 318, 116, -292 });
-		AddPointToLine({ 327, 112, -286 });
-		
+// ============================================================
+// LANDMARK — ЗАМКНУТОЕ КОЛЬЦО + 2 КОНИЧЕСКИЕ СПИРАЛИ
+//
+// Центр основания кольца: { 265, 55, -465 }
+// Вершина конуса:         { 265, 205, -465 }
+//
+// Структура:
+// 1. Замкнутое горизонтальное кольцо
+// 2. Первая спираль — идёт вверх по конусу
+// 3. Вторая спираль — напротив первой, также идёт вверх
+//
+// Спирали делают 2.5 оборота и плавно сужаются к вершине.
+// ============================================================
 
-		
 
+		const float Pi = 3.14159265359f;
+
+
+		// ============================================================
+		// 1. НИЖНЕЕ ЗАМКНУТОЕ КОЛЬЦО
+		//
+		// Кольцо лежит в плоскости XZ на Y = 55.
+		// Первая и последняя точки совпадают — линия гарантированно
+		// возвращается в точку старта и замыкается.
+		// ============================================================
+
+		NewLine();
+
+		AddPointToLine({ 375, 55, -465 });
+		AddPointToLine({ 373, 55, -444 });
+		AddPointToLine({ 367, 55, -425 });
+		AddPointToLine({ 357, 55, -406 });
+		AddPointToLine({ 344, 55, -389 });
+		AddPointToLine({ 328, 55, -376 });
+		AddPointToLine({ 310, 55, -366 });
+		AddPointToLine({ 289, 55, -359 });
+		AddPointToLine({ 265, 55, -357 });
+		AddPointToLine({ 242, 55, -359 });
+		AddPointToLine({ 221, 55, -366 });
+		AddPointToLine({ 202, 55, -376 });
+		AddPointToLine({ 186, 55, -389 });
+		AddPointToLine({ 173, 55, -406 });
+		AddPointToLine({ 163, 55, -425 });
+		AddPointToLine({ 157, 55, -444 });
+		AddPointToLine({ 155, 55, -465 });
+		AddPointToLine({ 157, 55, -486 });
+		AddPointToLine({ 163, 55, -505 });
+		AddPointToLine({ 173, 55, -524 });
+		AddPointToLine({ 186, 55, -541 });
+		AddPointToLine({ 202, 55, -554 });
+		AddPointToLine({ 221, 55, -564 });
+		AddPointToLine({ 242, 55, -571 });
+		AddPointToLine({ 265, 55, -573 });
+		AddPointToLine({ 289, 55, -571 });
+		AddPointToLine({ 310, 55, -564 });
+		AddPointToLine({ 328, 55, -554 });
+		AddPointToLine({ 344, 55, -541 });
+		AddPointToLine({ 357, 55, -524 });
+		AddPointToLine({ 367, 55, -505 });
+		AddPointToLine({ 373, 55, -486 });
+
+		// Точное замыкание кольца: та же точка, что и первая.
+		AddPointToLine({ 375, 55, -465 });
+
+
+		// ============================================================
+		// 2. ПЕРВАЯ КОНИЧЕСКАЯ СПИРАЛЬ
+		//
+		// Стартует на кольце справа: { 373, 57, -465 }
+		// Поднимается вверх, делает 2.5 оборота,
+		// сужается и приходит в вершину конуса.
+		// ============================================================
+
+		NewLine();
+
+		int SpiralPointCount = 96;
+		float BaseRadius = 78.0f;
+		float TopRadius = 0.0f;
+		float BaseY = 57.0f;
+		float TopY = 405.0f;
+		float Turns = 20.5f;
+
+		for (int i = 0; i <= SpiralPointCount; ++i)
+		{
+			
+			// Радиус плавно уменьшается к вершине.
+			float t = (float)i / (float)SpiralPointCount;
+
+			// 2.2f — степень сужения.
+			// Чем значение больше 1.0f, тем быстрее спираль сужается при подъёме.
+			float taper = pow(1.0f - t, 10.5f);
+
+			float radius = TopRadius + (BaseRadius - TopRadius) * taper;
+			int y = BaseY + (TopY - BaseY) * t;
+
+			// 2.5 оборота вокруг вертикальной оси Y.
+			float angle = t * Turns * 2.0f * Pi;
+
+			int x = 265.0f + cos(angle) * radius;
+			int z = -465.0f + sin(angle) * radius;
+
+			AddPointToLine({ x, y, z });
+		}
+
+
+		// ============================================================
+		// 3. ВТОРАЯ КОНИЧЕСКАЯ СПИРАЛЬ
+		//
+		// Начинается с противоположной стороны кольца:
+		// { 157, 57, -465 }
+		//
+		// Эта спираль смещена на 180 градусов относительно первой.
+		// Визуально две линии будут обвивать один конус,
+		// как двойная закрученная ёлка.
+		// ============================================================
+
+		NewLine();
+
+		for (int i = 0; i <= SpiralPointCount; ++i)
+		{
+			float t = (float)i / (float)SpiralPointCount;
+
+			// 2.2f — степень сужения.
+			// Чем значение больше 1.0f, тем быстрее спираль сужается при подъёме.
+			float taper = pow(1.0f - t, 10.5f);
+
+			float radius = TopRadius + (BaseRadius - TopRadius) * taper;
+			int y = BaseY + (TopY - BaseY) * t;
+
+			// Смещение Pi = 180 градусов относительно первой спирали.
+			float angle = Pi + t * Turns * 2.0f * Pi;
+
+			int x = 265.0f + cos(angle) * radius;
+			int z = -465.0f + sin(angle) * radius;
+
+			AddPointToLine({ x, y, z });
+		}
+
+	
+		// ============================================================
+		// ЛИНИЯ ОТ ПЕРВОЙ ТОЧКИ СТРОГО ВНИЗ ПО Y
+		// X и Z не изменяются
+		// ============================================================
+
+		NewLine();
+
+		AddPointToLine({ 264, 147, -465 });
+		AddPointToLine({ 265, 130, -465 });
+		AddPointToLine({ 265, 120, -465 });
+		AddPointToLine({ 265, 110, -465 });
+		AddPointToLine({ 265, 100, -465 });
+		AddPointToLine({ 265, 90, -465 });
+		AddPointToLine({ 265, 80, -465 });
+		AddPointToLine({ 265, 70, -465 });
+		AddPointToLine({ 265, 60, -465 });
+		AddPointToLine({ 265, 50, -465 });
+		AddPointToLine({ 265, 40, -465 });
+		AddPointToLine({ 265, 30, -465 });
+		AddPointToLine({ 265, 20, -465 });
+		AddPointToLine({ 265, 10, -465 });
+		AddPointToLine({ 265, 0, -465 });
+		AddPointToLine({ 265, -10, -465 });
+		AddPointToLine({ 265, -20, -465 });
+		AddPointToLine({ 265, -30, -465 });
+		AddPointToLine({ 265, -40, -465 });
+		AddPointToLine({ 265, -50, -465 });
+		AddPointToLine({ 265, -60, -465 });
+		AddPointToLine({ 265, -70, -465 });
+		AddPointToLine({ 265, -80, -465 });
+		AddPointToLine({ 265, -90, -465 });
+		AddPointToLine({ 265, -100, -465 });
+		AddPointToLine({ 265, -110, -465 });
+		AddPointToLine({ 265, -120, -465 });
+		AddPointToLine({ 265, -130, -465 });
+		AddPointToLine({ 265, -140, -465 });
+		AddPointToLine({ 265, -150, -465 });
+		AddPointToLine({ 265, -160, -465 });
+		AddPointToLine({ 265, -170, -465 });
+		AddPointToLine({ 265, -180, -465 });
+		AddPointToLine({ 265, -190, -465 });
+		AddPointToLine({ 265, -200, -465 });
+
+
+		// ============================================================
+		// ВТОРАЯ ЛИНИЯ ОТ ВТОРОЙ ТОЧКИ СТРОГО ВНИЗ ПО Y
+		//
+		// Она почти совпадает с первой, поскольку X/Z одинаковые.
+		// Начинается на Y = 141, поэтому не будет иметь разрыва
+		// с твоей второй стартовой точкой.
+		// ============================================================
+
+		NewLine();
+
+		AddPointToLine({ 265, 141, -465 });
+		AddPointToLine({ 265, 130, -465 });
+		AddPointToLine({ 265, 120, -465 });
+		AddPointToLine({ 265, 110, -465 });
+		AddPointToLine({ 265, 100, -465 });
+		AddPointToLine({ 265, 90, -465 });
+		AddPointToLine({ 265, 80, -465 });
+		AddPointToLine({ 265, 70, -465 });
+		AddPointToLine({ 265, 60, -465 });
+		AddPointToLine({ 265, 50, -465 });
+		AddPointToLine({ 265, 40, -465 });
+		AddPointToLine({ 265, 30, -465 });
+		AddPointToLine({ 265, 20, -465 });
+		AddPointToLine({ 265, 10, -465 });
+		AddPointToLine({ 265, 0, -465 });
+		AddPointToLine({ 265, -10, -465 });
+		AddPointToLine({ 265, -20, -465 });
+		AddPointToLine({ 265, -30, -465 });
+		AddPointToLine({ 265, -40, -465 });
+		AddPointToLine({ 265, -50, -465 });
+		AddPointToLine({ 265, -60, -465 });
+		AddPointToLine({ 265, -70, -465 });
+		AddPointToLine({ 265, -80, -465 });
+		AddPointToLine({ 265, -90, -465 });
+		AddPointToLine({ 265, -100, -465 });
+		AddPointToLine({ 265, -110, -465 });
+		AddPointToLine({ 265, -120, -465 });
+		AddPointToLine({ 265, -130, -465 });
+		AddPointToLine({ 265, -140, -465 });
+		AddPointToLine({ 265, -150, -465 });
+		AddPointToLine({ 265, -160, -465 });
+		AddPointToLine({ 265, -170, -465 });
+		AddPointToLine({ 265, -180, -465 });
+		AddPointToLine({ 265, -190, -465 });
+		AddPointToLine({ 265, -200, -465 });
 		// ============================================================
 		// Л3
 		// ============================================================
