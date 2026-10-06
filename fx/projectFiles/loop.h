@@ -655,14 +655,14 @@ struct hero_ {
 		if (!enemySystem.IsInitialized())
 			return;
 
-		// Та же линия и стартовая точка, которые используются при появлении героя.
+		// taze line i tochka dlya spawna protivnika
 		constexpr int startLine = 1;
 		constexpr int startPoint = 1;
 
-		// Противник будет на 5 точек дальше по этой же линии.
+		// protivnik budet spavnit'sya na 5 tochek vpered po etoy zhe linii
 		constexpr int enemyPoint = startPoint + 5;
 
-		// Проверяем, что такая точка существует.
+		// proverka 4to tochka sushchestvuet
 		if (enemyPoint >= Object::starLineList.line[startLine].pointCount)
 			return;
 
@@ -2520,7 +2520,7 @@ namespace Loop
 
 	}
 
-	void CheckVictoryTrigger() //проверка столкновения игрока с триггером победы
+	void CheckVictoryTrigger() //check if player collides with victory trigger
 	{
 		if (hero.victory)
 			return;
@@ -2585,7 +2585,7 @@ namespace Loop
 
 		for (const Enemies::Enemy& enemy : enemies)
 		{
-			if (&enemy == &enemies[0])
+			if (&enemy == &enemies[0]) // enemies[0] — trigger (no damage)
 				continue;
 
 			if (!enemy.collider)
@@ -2705,7 +2705,7 @@ namespace Loop
 			dx11::Audio::LoadOggFile("Bow_bowstring", "..//fx//projectFiles//Bow_bowstring.ogg");
 
 			dx11::Audio::LoadOggFile("Music", "..//fx//projectFiles//Music.ogg");
-			dx11::Audio::LoadWavFile("win_character", "..//fx//projectFiles//win_character.wav"); //добавил звук победы персонажа
+			dx11::Audio::LoadWavFile("win_character", "..//fx//projectFiles//win_character.wav"); //add win sound
 		}
 
 
@@ -2780,7 +2780,7 @@ namespace Loop
 				CheckVictoryTrigger();
 				CheckPlayerEnemyCollisions();
 
-				//enemySystem.Update(FIXED_DT); //по идее убрать надо, дублируется
+				//enemySystem.Update(FIXED_DT); //Dubliruetsya po idee nado ybrat'
 				gameCamera.Update(FIXED_DT);
 
 				processAmbient();
