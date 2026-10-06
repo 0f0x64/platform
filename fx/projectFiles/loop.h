@@ -277,6 +277,7 @@ struct hero_ {
 	float invulnerabilityTimer = 0.0f;
 
 	bool dead = false;
+	bool victory = false; //флаг состо€ни€ победы
 	//
 
 	XMVECTOR pos = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -649,9 +650,38 @@ struct hero_ {
 		//}
 	}
 
-	void Respawn()
+	void SpawnTestEnemyInFrontOfHero(Enemies::EnemySystem& enemySystem)
 	{
-		if (firstRun || ((!firstRun) && GetAsyncKeyState('R')))
+		if (!enemySystem.IsInitialized())
+			return;
+
+		// “а же лини€ и стартова€ точка, которые используютс€ при по€влении геро€.
+		constexpr int startLine = 1;
+		constexpr int startPoint = 1;
+
+		// ѕротивник будет на 5 точек дальше по этой же линии.
+		constexpr int enemyPoint = startPoint + 5;
+
+		// ѕровер€ем, что така€ точка существует.
+		if (enemyPoint >= Object::starLineList.line[startLine].pointCount)
+			return;
+
+		const float4 spawnPoint =
+			Object::starLineList.line[startLine].point[enemyPoint];
+
+		Enemies::Position position;
+
+		position.x = spawnPoint.x;
+		position.y = spawnPoint.y;
+		position.z = spawnPoint.z;
+
+		enemySystem.SetEnemyPosition(0, position);
+	}
+
+	void Respawn(Enemies::EnemySystem& enemySystem)
+	{
+		if (firstRun || ((!firstRun) && !victory && GetAsyncKeyState('R')))
+
 		{
 			if (dead)
 			{
@@ -698,6 +728,9 @@ struct hero_ {
 			rightVector = XMVECTOR{ 1,0,0 };
 
 			lastJumpAmpPercent = 1;
+
+			SpawnTestEnemyInFrontOfHero(enemySystem);
+			
 		}
 
 	}
@@ -2487,6 +2520,51 @@ namespace Loop
 
 	}
 
+	void CheckVictoryTrigger() //проверка столкновени€ игрока с триггером победы
+	{
+		if (hero.victory)
+			return;
+
+		if (hero.dead)
+			return;
+
+		if (!hero.collider)
+			return;
+
+		const auto& enemies = enemySystem.Items();
+
+		if (enemies.empty())
+			return;
+
+		// Enemy 0 Ч специальный триггер победы.
+		const Enemies::Enemy& trigger = enemies[0];
+
+		if (!trigger.collider)
+			return;
+
+		// —инхронизируем позицию коллайдера
+		// с актуальной позицией тестового врага.
+		trigger.collider->position.x = trigger.position.x;
+		trigger.collider->position.y = trigger.position.y;
+		trigger.collider->position.z = trigger.position.z;
+
+		collision::CollisionResult result =
+			collision::sphere_vs_sphere(
+				hero.collider->position,
+				hero.collider->radius,
+				trigger.collider->position,
+				trigger.collider->radius
+			);
+
+		if (result.collided)
+		{
+			hero.victory = true;
+
+			dx11::Audio::Play("win_character", false, 1.0f);
+
+			Log("PLAYER VICTORY!\n");
+		}
+	}
 
 	void CheckPlayerEnemyCollisions()
 	{
@@ -2507,6 +2585,9 @@ namespace Loop
 
 		for (const Enemies::Enemy& enemy : enemies)
 		{
+			if (&enemy == &enemies[0])
+				continue;
+
 			if (!enemy.collider)
 				continue;
 
@@ -2624,6 +2705,7 @@ namespace Loop
 			dx11::Audio::LoadOggFile("Bow_bowstring", "..//fx//projectFiles//Bow_bowstring.ogg");
 
 			dx11::Audio::LoadOggFile("Music", "..//fx//projectFiles//Music.ogg");
+			dx11::Audio::LoadWavFile("win_character", "..//fx//projectFiles//win_character.wav"); //добавил звук победы персонажа
 		}
 
 
@@ -2650,7 +2732,7 @@ namespace Loop
 			inputController.mouse.processInput();
 
 			const bool initialEnemySpawn = hero.firstRun;
-			hero.Respawn();
+			hero.Respawn(enemySystem);
 			if (initialEnemySpawn)
 			{
 				//enemySystem.Reset(ToEnemyPosition(hero.pos), ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
@@ -2668,7 +2750,7 @@ namespace Loop
 
 			while (accumulator >= FIXED_DT) {
 
-				if (!hero.dead) {
+				if (!hero.dead && !hero.victory) {
 					hero.pathControl.Process();
 					hero.ProcessMove(FIXED_DT);
 					hero.ProcessJump(FIXED_DT);
@@ -2695,10 +2777,10 @@ namespace Loop
 
 				enemySystem.Update(FIXED_DT);
 
-				// NEW
+				CheckVictoryTrigger();
 				CheckPlayerEnemyCollisions();
 
-				enemySystem.Update(FIXED_DT);
+				//enemySystem.Update(FIXED_DT); //по идее убрать надо, дублируетс€
 				gameCamera.Update(FIXED_DT);
 
 				processAmbient();
