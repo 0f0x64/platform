@@ -3854,14 +3854,14 @@ namespace Object {
 
 		NewLine();
 
-		AddPointToLine({ 264, 147, -465 });
-		AddPointToLine({ 265, 130, -465 });
-		AddPointToLine({ 265, 120, -465 });
-		AddPointToLine({ 265, 110, -465 });
+		AddPointToLine({ 261, 143, -465 });
+		AddPointToLine({ 269, 153, -484 });
+		AddPointToLine({ 278, 139, -482 });
+		AddPointToLine({ 255, 110, -465 });
 		AddPointToLine({ 265, 100, -465 });
-		AddPointToLine({ 265, 90, -465 });
+		AddPointToLine({ 268, 90, -465 });
 		AddPointToLine({ 265, 80, -465 });
-		AddPointToLine({ 265, 70, -465 });
+		AddPointToLine({ 263, 70, -465 });
 		AddPointToLine({ 265, 60, -465 });
 		AddPointToLine({ 265, 50, -465 });
 		AddPointToLine({ 265, 40, -465 });
@@ -3901,12 +3901,12 @@ namespace Object {
 
 		NewLine();
 
-		AddPointToLine({ 265, 141, -465 });
-		AddPointToLine({ 265, 130, -465 });
-		AddPointToLine({ 265, 120, -465 });
-		AddPointToLine({ 265, 110, -465 });
-		AddPointToLine({ 265, 100, -465 });
-		AddPointToLine({ 265, 90, -465 });
+		AddPointToLine({ 268, 142, -465 });
+		AddPointToLine({ 264, 153, -441 });
+		AddPointToLine({ 245, 103, -484 });
+		AddPointToLine({ 273, 107, -465 });
+		AddPointToLine({ 268, 95, -465 });
+		AddPointToLine({ 265, 86, -465 });
 		AddPointToLine({ 265, 80, -465 });
 		AddPointToLine({ 265, 70, -465 });
 		AddPointToLine({ 265, 60, -465 });
