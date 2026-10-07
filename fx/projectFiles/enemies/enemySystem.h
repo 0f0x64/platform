@@ -280,9 +280,13 @@ namespace Enemies
 				enemy.isCharging = true;
 				enemy.position = enemy.movementTarget;
 				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
+				enemy.mesh.PlayAnimation(1);
+				enemy.mesh.StopAnimation(3);
 			}
 			else {
 				enemy.position += step;
+				enemy.mesh.PlayAnimation(3);
+				enemy.mesh.StopAnimation(1);
 			}
 		}
 
