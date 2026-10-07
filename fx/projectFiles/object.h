@@ -51,6 +51,854 @@ namespace Object {
 #define BoneLimit 256
 #define DefaultBlendTime 0.35f
 
+	// ============================================================
+	// IMMUTABLE: Asset — общий на все экземпляры
+	// ============================================================
+	struct MeshAsset {
+		bool loaded = false;
+
+		// --- Immutable anim data ---
+		struct ClipData {
+			::std::string name;
+			float duration = 0.0f;
+			::std::vector<ConstBuf::gltfAnim::AnimationChannel> channels;
+		};
+
+		::std::vector<ConstBuf::gltfAnim::Joint> bindJoints;   // bind pose (name/parent/local/global/inverseBind)
+		::std::vector<XMFLOAT4X4> bindLocal;
+		::std::vector<ClipData> clips;
+
+		float4 modelCenterScale = float4(0, 0, 0, 0);
+
+		// --- Geometry ---
+		ConstBuf::vertex* vArray = nullptr;
+		ConstBuf::index* iArray = nullptr;
+
+		uint32_t vertexCount = 0;
+		uint32_t triangleCount = 0;
+
+		ID3D11Buffer* pSBuffer[2] = { nullptr, nullptr };
+		ID3D11ShaderResourceView* pSB_SRV[2] = { nullptr, nullptr };
+
+		// ============================================================
+		// Геометрия: создание буферов
+		// ============================================================
+		void CreateSB(int slot, int size, int count, auto& data)
+		{
+			if (pSBuffer[slot]) { pSBuffer[slot]->Release(); pSBuffer[slot] = nullptr; }
+			if (pSB_SRV[slot]) { pSB_SRV[slot]->Release(); pSB_SRV[slot] = nullptr; }
+
+			D3D11_SUBRESOURCE_DATA initData = {};
+			initData.pSysMem = data;
+
+			D3D11_BUFFER_DESC bufferDesc = {};
+			bufferDesc.ByteWidth = size * count;
+			bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+			bufferDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			bufferDesc.CPUAccessFlags = 0;
+			bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+			bufferDesc.StructureByteStride = size;
+
+			device->CreateBuffer(&bufferDesc, &initData, &pSBuffer[slot]);
+
+			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+			srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
+			srvDesc.Buffer.FirstElement = 0;
+			srvDesc.Buffer.NumElements = count;
+
+			device->CreateShaderResourceView(pSBuffer[slot], &srvDesc, &pSB_SRV[slot]);
+		}
+
+		void BindSB(int slot) const
+		{
+			context->VSSetShaderResources(slot, 1, &pSB_SRV[slot]);
+		}
+
+		void LoadToShaders() const {
+			BindSB(0);
+			BindSB(1);
+		}
+
+		// ============================================================
+		// Загрузка скелета и клипов (immutable)
+		// ============================================================
+		inline int NodeIndex(ConstBuf::cgltf_data* data, const ConstBuf::cgltf_node* node) const
+		{
+			if (!node) return -1;
+			return static_cast<int>(node - data->nodes);
+		}
+
+		inline int FindJointByName(const char* name) const
+		{
+			if (!name || !name[0]) return -1;
+			for (size_t i = 0; i < bindJoints.size(); ++i)
+				if (bindJoints[i].name == name) return static_cast<int>(i);
+			return -1;
+		}
+
+		inline ::std::string CanonicalizeJointName(const ::std::string& name) const
+		{
+			if (name.size() > 4) {
+				const size_t dot = name.size() - 4;
+				if (name[dot] == '.' &&
+					name[dot + 1] >= '0' && name[dot + 1] <= '9' &&
+					name[dot + 2] >= '0' && name[dot + 2] <= '9' &&
+					name[dot + 3] >= '0' && name[dot + 3] <= '9')
+					return name.substr(0, dot);
+			}
+			return name;
+		}
+
+		inline int ResolveAnimationTargetJoint(ConstBuf::cgltf_data* data, ConstBuf::cgltf_node* node, bool remap) const
+		{
+			if (!remap) return NodeIndex(data, node);
+
+			const int byName = FindJointByName(node ? node->name : nullptr);
+			if (byName >= 0) return byName;
+
+			if (node && node->name) {
+				const ::std::string canonical = CanonicalizeJointName(node->name);
+				for (size_t i = 0; i < bindJoints.size(); ++i)
+					if (CanonicalizeJointName(bindJoints[i].name) == canonical)
+						return static_cast<int>(i);
+			}
+
+			const int byIndex = NodeIndex(data, node);
+			if (byIndex >= 0 && byIndex < static_cast<int>(bindJoints.size()))
+				return byIndex;
+
+			return -1;
+		}
+
+		inline XMMATRIX ReadNodeLocal(const ConstBuf::cgltf_node& node) const
+		{
+			if (node.has_matrix) {
+				XMFLOAT4X4 m{};
+				for (int r = 0; r < 4; ++r)
+					for (int c = 0; c < 4; ++c)
+						m.m[r][c] = node.matrix[r * 4 + c];
+				return XMLoadFloat4x4(&m);
+			}
+
+			XMVECTOR translation = XMVectorZero();
+			if (node.has_translation)
+				translation = XMVectorSet(node.translation[0], node.translation[1], node.translation[2], 0.0f);
+
+			XMVECTOR rotation = XMQuaternionIdentity();
+			if (node.has_rotation)
+				rotation = XMQuaternionNormalize(
+					XMVectorSet(node.rotation[0], node.rotation[1], node.rotation[2], node.rotation[3]));
+
+			XMVECTOR scale = XMVectorSet(1, 1, 1, 1);
+			if (node.has_scale)
+				scale = XMVectorSet(node.scale[0], node.scale[1], node.scale[2], 1.0f);
+
+			return XMMatrixScalingFromVector(scale) *
+				XMMatrixRotationQuaternion(rotation) *
+				XMMatrixTranslationFromVector(translation);
+		}
+
+		inline void FillSkinDefaults(ConstBuf::vertex& out) const
+		{
+			out.joints = XMUINT4(0, 0, 0, 0);
+			out.weights = XMFLOAT4(1.0f, 0.0f, 0.0f, 0.0f);
+		}
+
+		// Загрузка скелета в bindJoints (immutable)
+		inline void ReadSkeleton(ConstBuf::cgltf_data* data)
+		{
+			bindJoints.clear();
+			bindLocal.clear();
+
+			bindJoints.resize(data->nodes_count);
+			bindLocal.resize(data->nodes_count);
+
+			for (ConstBuf::cgltf_size i = 0; i < data->nodes_count; ++i) {
+				ConstBuf::cgltf_node& node = data->nodes[i];
+				ConstBuf::gltfAnim::Joint& joint = bindJoints[i];
+				joint.name = node.name ? node.name : "";
+				joint.parent = -1;
+				XMMATRIX local = ReadNodeLocal(node);
+				XMStoreFloat4x4(&joint.local, local);
+				XMStoreFloat4x4(&joint.global, local);
+				XMStoreFloat4x4(&joint.inverseBind, XMMatrixIdentity());
+				bindLocal[i] = joint.local;
+			}
+
+			for (ConstBuf::cgltf_size i = 0; i < data->nodes_count; ++i) {
+				ConstBuf::cgltf_node& node = data->nodes[i];
+				for (ConstBuf::cgltf_size c = 0; c < node.children_count; ++c) {
+					const int child = NodeIndex(data, node.children[c]);
+					if (child >= 0 && child < static_cast<int>(bindJoints.size()))
+						bindJoints[child].parent = static_cast<int>(i);
+				}
+			}
+
+			// global pose (упрощённо, без стека)
+			for (size_t i = 0; i < bindJoints.size(); ++i) {
+				const int p = bindJoints[i].parent;
+				if (p < 0) bindJoints[i].global = bindJoints[i].local;
+				else {
+					const XMMATRIX parent = XMLoadFloat4x4(&bindJoints[p].global);
+					const XMMATRIX local = XMLoadFloat4x4(&bindJoints[i].local);
+					XMStoreFloat4x4(&bindJoints[i].global, local * parent);
+				}
+			}
+
+			for (size_t i = 0; i < bindJoints.size(); ++i) {
+				const XMMATRIX global = XMLoadFloat4x4(&bindJoints[i].global);
+				XMStoreFloat4x4(&bindJoints[i].inverseBind, XMMatrixInverse(nullptr, global));
+			}
+
+			// Перезапись inverseBind из скина (если есть)
+			if (data->skins_count > 0) {
+				ConstBuf::cgltf_skin& skin = data->skins[0];
+				if (skin.inverse_bind_matrices) {
+					for (ConstBuf::cgltf_size i = 0; i < skin.joints_count; ++i) {
+						const int nodeIndex = NodeIndex(data, skin.joints[i]);
+						if (nodeIndex < 0 || nodeIndex >= static_cast<int>(bindJoints.size()))
+							continue;
+
+						float values[16]{};
+						if (cgltf_accessor_read_float(skin.inverse_bind_matrices, i, values, 16)) {
+							XMFLOAT4X4 ib{};
+							for (int r = 0; r < 4; ++r)
+								for (int c = 0; c < 4; ++c)
+									ib.m[r][c] = values[r * 4 + c];
+							bindJoints[nodeIndex].inverseBind = ib;
+						}
+					}
+				}
+			}
+		}
+
+		// Загрузка клипов (только ключи, без runtime полей)
+		inline bool ReadClips(ConstBuf::cgltf_data* data, bool replaceExisting = true, bool remapToCurrentSkeleton = false)
+		{
+			if (replaceExisting) clips.clear();
+
+			const size_t oldCount = clips.size();
+
+			for (ConstBuf::cgltf_size ai = 0; ai < data->animations_count; ++ai) {
+				ConstBuf::cgltf_animation& src = data->animations[ai];
+				ClipData clip;
+				clip.name = src.name ? src.name : "";
+
+				for (ConstBuf::cgltf_size ci = 0; ci < src.channels_count; ++ci) {
+					ConstBuf::cgltf_animation_channel& srcChannel = src.channels[ci];
+					if (!srcChannel.sampler || !srcChannel.target_node) continue;
+
+					ConstBuf::cgltf_animation_sampler& sampler = *srcChannel.sampler;
+					if (!sampler.input || !sampler.output) continue;
+
+					ConstBuf::gltfAnim::AnimationChannel channel;
+					channel.joint = remapToCurrentSkeleton
+						? ResolveAnimationTargetJoint(data, srcChannel.target_node, true)
+						: ResolveAnimationTargetJoint(data, srcChannel.target_node, false);
+					if (channel.joint < 0) continue;
+
+					channel.path = srcChannel.target_path;
+					channel.times.resize(sampler.input->count);
+
+					for (ConstBuf::cgltf_size i = 0; i < sampler.input->count; ++i) {
+						float value = 0.0f;
+						ConstBuf::cgltf_accessor_read_float(sampler.input, i, &value, 1);
+						channel.times[i] = value;
+						clip.duration = (::std::max)(clip.duration, value);
+					}
+
+					const bool isRotation = channel.path == ConstBuf::cgltf_animation_path_type_rotation;
+					const bool isCubicSpline = sampler.interpolation == ConstBuf::cgltf_interpolation_type_cubic_spline;
+					channel.values.resize(channel.times.size());
+
+					for (size_t i = 0; i < channel.times.size(); ++i) {
+						ConstBuf::cgltf_size sampleIndex = isCubicSpline
+							? static_cast<ConstBuf::cgltf_size>(i * 3 + 1)
+							: static_cast<ConstBuf::cgltf_size>(i);
+						if (sampleIndex >= sampler.output->count)
+							sampleIndex = sampler.output->count - 1;
+
+						float values[4]{ 0.0f, 0.0f, 0.0f, isRotation ? 1.0f : 0.0f };
+						ConstBuf::cgltf_accessor_read_float(sampler.output, sampleIndex, values, isRotation ? 4 : 3);
+						channel.values[i] = XMFLOAT4(values[0], values[1], values[2], values[3]);
+					}
+
+					clip.channels.push_back(::std::move(channel));
+				}
+
+				if (!clip.channels.empty())
+					clips.push_back(::std::move(clip));
+			}
+
+			return clips.size() > oldCount;
+		}
+
+		// Загрузка геометрии
+		bool LoadGeometry(const ::std::string& filename)
+		{
+			ConstBuf::cgltf_options options = {};
+			ConstBuf::cgltf_data* data = NULL;
+			ConstBuf::cgltf_result result = cgltf_parse_file(&options, filename.c_str(), &data);
+			if (result != ConstBuf::cgltf_result_success) {
+				Log("cgltf error in LoadGeometry: %s\n", filename.c_str());
+				return false;
+			}
+
+			if (cgltf_load_buffers(&options, data, filename.c_str()) != ConstBuf::cgltf_result_success) {
+				ConstBuf::cgltf_free(data);
+				return false;
+			}
+
+			ReadSkeleton(data);
+			ReadClips(data);
+
+			vertexCount = 0;
+			triangleCount = 0;
+
+			for (size_t i = 0; i < data->meshes_count; ++i) {
+				ConstBuf::cgltf_mesh* mesh = &data->meshes[i];
+				for (size_t j = 0; j < mesh->primitives_count; ++j) {
+					ConstBuf::cgltf_primitive* prim = &mesh->primitives[j];
+
+					for (size_t k = 0; k < prim->attributes_count; ++k) {
+						if (prim->attributes[k].type == ConstBuf::cgltf_attribute_type_position) {
+							vertexCount += prim->attributes[k].data->count;
+							break;
+						}
+					}
+					if (prim->indices) {
+						triangleCount += (uint32_t)(prim->indices->count / 3);
+					}
+					else {
+						for (size_t k = 0; k < prim->attributes_count; ++k) {
+							if (prim->attributes[k].type == ConstBuf::cgltf_attribute_type_position) {
+								triangleCount += (uint32_t)(prim->attributes[k].data->count / 3);
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			if (vArray) { delete[] vArray; vArray = nullptr; }
+			if (iArray) { delete[] iArray; iArray = nullptr; }
+
+			if (vertexCount == 0) { ConstBuf::cgltf_free(data); return false; }
+
+			vArray = new ConstBuf::vertex[vertexCount];
+			if (triangleCount > 0) iArray = new ConstBuf::index[triangleCount];
+
+			size_t vertexOffset = 0;
+			size_t indexOffset = 0;
+
+			for (size_t i = 0; i < data->meshes_count; ++i) {
+				ConstBuf::cgltf_mesh* mesh = &data->meshes[i];
+				for (size_t j = 0; j < mesh->primitives_count; ++j) {
+					ConstBuf::cgltf_primitive* prim = &mesh->primitives[j];
+					size_t prim_vertex_count = 0;
+
+					for (size_t k = 0; k < prim->attributes_count; ++k) {
+						if (prim->attributes[k].type == ConstBuf::cgltf_attribute_type_position) {
+							ConstBuf::cgltf_accessor* acc = prim->attributes[k].data;
+							prim_vertex_count = acc->count;
+
+							for (size_t v = 0; v < prim_vertex_count; ++v) {
+								FillSkinDefaults(vArray[vertexOffset + v]);
+								float position_element[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+								if (cgltf_accessor_read_float(acc, v, position_element, 4)) {
+									vArray[vertexOffset + v].position = float4{
+										position_element[0], position_element[1], position_element[2], (float)i
+									};
+								}
+								else {
+									vArray[vertexOffset + v].position = float4{ 0, 0, 0, 1 };
+								}
+							}
+							break;
+						}
+					}
+
+					for (size_t k = 0; k < prim->attributes_count; ++k) {
+						ConstBuf::cgltf_attribute* attr = &prim->attributes[k];
+						if (attr->type == ConstBuf::cgltf_attribute_type_joints) {
+							ConstBuf::cgltf_accessor* acc = attr->data;
+							for (size_t v = 0; v < acc->count && v < prim_vertex_count; ++v) {
+								ConstBuf::cgltf_uint joints[4] = { 0, 0, 0, 0 };
+								if (cgltf_accessor_read_uint(acc, v, joints, 4)) {
+									XMUINT4 mapped(0, 0, 0, 0);
+									for (int c = 0; c < 4; ++c) {
+										uint32_t jointIndex = joints[c];
+										if (data->skins_count > 0 && jointIndex < data->skins[0].joints_count)
+											jointIndex = NodeIndex(data, data->skins[0].joints[jointIndex]);
+										if (c == 0) mapped.x = jointIndex;
+										else if (c == 1) mapped.y = jointIndex;
+										else if (c == 2) mapped.z = jointIndex;
+										else mapped.w = jointIndex;
+									}
+									vArray[vertexOffset + v].joints = mapped;
+								}
+							}
+						}
+						else if (attr->type == ConstBuf::cgltf_attribute_type_weights) {
+							ConstBuf::cgltf_accessor* acc = attr->data;
+							for (size_t v = 0; v < acc->count && v < prim_vertex_count; ++v) {
+								float weights[4] = { 1.0f, 0, 0, 0 };
+								if (ConstBuf::cgltf_accessor_read_float(acc, v, weights, 4)) {
+									float sum = weights[0] + weights[1] + weights[2] + weights[3];
+									if (sum > 0.000001f) {
+										weights[0] /= sum; weights[1] /= sum;
+										weights[2] /= sum; weights[3] /= sum;
+									}
+									vArray[vertexOffset + v].weights = XMFLOAT4(weights[0], weights[1], weights[2], weights[3]);
+								}
+							}
+						}
+					}
+
+					if (prim->indices) {
+						ConstBuf::cgltf_accessor* acc = prim->indices;
+						char* buffer_base = (char*)acc->buffer_view->buffer->data;
+						size_t total_offset = acc->buffer_view->offset + acc->offset;
+						void* index_ptr = (void*)(buffer_base + total_offset);
+						size_t stride = acc->buffer_view->stride;
+
+						for (size_t idx = 0; idx < acc->count; ++idx) {
+							uint32_t raw_index = 0;
+							if (acc->component_type == ConstBuf::cgltf_component_type_r_16u)
+								raw_index = *(uint16_t*)((char*)index_ptr + idx * (stride ? stride : sizeof(uint16_t)));
+							else if (acc->component_type == ConstBuf::cgltf_component_type_r_32u)
+								raw_index = *(uint32_t*)((char*)index_ptr + idx * (stride ? stride : sizeof(uint32_t)));
+							else if (acc->component_type == ConstBuf::cgltf_component_type_r_8u)
+								raw_index = *(uint8_t*)((char*)index_ptr + idx * (stride ? stride : sizeof(uint8_t)));
+
+							uint32_t final_index = raw_index + (uint32_t)vertexOffset;
+							if (idx % 3 == 0) iArray[indexOffset / 3 + idx / 3].index.x = (float)final_index;
+							if (idx % 3 == 1) iArray[indexOffset / 3 + idx / 3].index.y = (float)final_index;
+							if (idx % 3 == 2) iArray[indexOffset / 3 + idx / 3].index.z = (float)final_index;
+							iArray[indexOffset / 3 + idx / 3].index.w = 0;
+						}
+						indexOffset += acc->count;
+					}
+					else if (prim_vertex_count >= 3) {
+						for (size_t tri = 0; tri < prim_vertex_count / 3; ++tri) {
+							iArray[indexOffset / 3 + tri].index = float4{
+								(float)(vertexOffset + tri * 3 + 0),
+								(float)(vertexOffset + tri * 3 + 1),
+								(float)(vertexOffset + tri * 3 + 2),
+								0.0f
+							};
+						}
+						indexOffset += (prim_vertex_count / 3) * 3;
+					}
+
+					vertexOffset += prim_vertex_count;
+				}
+			}
+
+			ConstBuf::cgltf_free(data);
+
+			// Центрирование и масштаб
+			if (vertexCount > 0) {
+				float xMax = vArray[0].position.x, xMin = vArray[0].position.x;
+				float yMax = vArray[0].position.y, yMin = vArray[0].position.y;
+				float zMax = vArray[0].position.z, zMin = vArray[0].position.z;
+
+				for (int i = 1; i < (int)vertexCount; ++i) {
+					xMax = max(xMax, vArray[i].position.x); xMin = min(xMin, vArray[i].position.x);
+					yMax = max(yMax, vArray[i].position.y); yMin = min(yMin, vArray[i].position.y);
+					zMax = max(zMax, vArray[i].position.z); zMin = min(zMin, vArray[i].position.z);
+				}
+
+				float xCenter = (xMax + xMin) / 2.0f;
+				float yCenter = (yMax + yMin) / 2.0f;
+				float zCenter = (zMax + zMin) / 2.0f;
+				float xSize = xMax - xMin, ySize = yMax - yMin, zSize = zMax - zMin;
+				float maxSize = max(max(xSize, ySize), zSize);
+				float scale = maxSize > 0.00001f ? (4.0f / maxSize) : 1.0f;
+				modelCenterScale = float4(xCenter, yCenter, zCenter, scale);
+			}
+
+			CreateSB(0, sizeof(ConstBuf::vertex), vertexCount, vArray);
+			CreateSB(1, sizeof(ConstBuf::index), triangleCount, iArray);
+
+			loaded = true;
+			Log("Mesh asset "); Log(filename.c_str()); Log(" loaded\n");
+			return true;
+		}
+	};
+
+	// ============================================================
+	// PER-INSTANCE: Instance — своя поза, свои playStates, свой boneBuffer
+	// ============================================================
+	struct MeshInstance {
+		MeshAsset* asset = nullptr;
+
+		// Runtime-состояние анимаций (индекс соответствует asset->clips)
+		struct ClipPlayState {
+			float currentTime = 0.0f;
+			float realWeight = 0.0f;
+			float weight = 1.0f;
+			float speed = 1.0f;
+			bool  isPlaying = false;
+			bool  looped = false;
+		};
+		::std::vector<ClipPlayState> playStates;
+
+		// Текущая поза (копия bind pose, мутируется анимацией)
+		::std::vector<ConstBuf::gltfAnim::Joint> joints;
+
+		XMMATRIX bonePalette[BoneLimit];
+		ID3D11Buffer* boneBuffer = nullptr;
+
+		XMMATRIX model = XMMatrixIdentity();
+		float4 color = float4(1, 1, 1, 1);
+		bool randomSurfaceSampling = false;
+
+		float lookYawTarget = 0.0f, lookYawCurrent = 0.0f;
+		float lookPitchTarget = 0.0f, lookPitchCurrent = 0.0f;
+		bool lookAtEnabled = true;
+
+		// ---------- Привязка к asset ----------
+		void Attach(MeshAsset* a)
+		{
+			asset = a;
+			if (!asset) return;
+
+			joints = asset->bindJoints;                       // копия bind pose
+			playStates.assign(asset->clips.size(), {});       // свои состояния
+			CreateBoneBuffer(device);
+		}
+
+		void CreateBoneBuffer(ID3D11Device* device)
+		{
+			if (boneBuffer) return;
+			D3D11_BUFFER_DESC desc{};
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.ByteWidth = sizeof(bonePalette);
+			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			desc.CPUAccessFlags = 0;
+			desc.StructureByteStride = 16;
+			device->CreateBuffer(&desc, nullptr, &boneBuffer);
+		}
+
+		// ---------- Geometry bind (через asset) ----------
+		void LoadToShaders() const {
+			if (asset) asset->LoadToShaders();
+		}
+
+		void BindBones(ID3D11DeviceContext* ctx)
+		{
+			if (!boneBuffer) return;
+			ctx->UpdateSubresource(boneBuffer, 0, nullptr, bonePalette, 0, 0);
+			ctx->VSSetConstantBuffers(4, 1, &boneBuffer);
+		}
+
+		// ---------- Pose helpers ----------
+		inline void ResolveGlobalPoseJoint(size_t idx, ::std::vector<char>& resolved, ::std::vector<char>& inStack)
+		{
+			if (idx >= joints.size() || resolved[idx]) return;
+			if (inStack[idx]) { joints[idx].global = joints[idx].local; resolved[idx] = 1; return; }
+
+			inStack[idx] = 1;
+			const int p = joints[idx].parent;
+			if (p < 0 || (size_t)p >= joints.size()) joints[idx].global = joints[idx].local;
+			else {
+				ResolveGlobalPoseJoint((size_t)p, resolved, inStack);
+				const XMMATRIX parent = XMLoadFloat4x4(&joints[p].global);
+				const XMMATRIX local = XMLoadFloat4x4(&joints[idx].local);
+				XMStoreFloat4x4(&joints[idx].global, local * parent);
+			}
+			inStack[idx] = 0;
+			resolved[idx] = 1;
+		}
+
+		inline void UpdateGlobalPose()
+		{
+			if (joints.empty()) return;
+			::std::vector<char> resolved(joints.size(), 0);
+			::std::vector<char> inStack(joints.size(), 0);
+			for (size_t i = 0; i < joints.size(); ++i) ResolveGlobalPoseJoint(i, resolved, inStack);
+		}
+
+		inline void BuildBonePalette()
+		{
+			for (int i = 0; i < BoneLimit; ++i) bonePalette[i] = XMMatrixIdentity();
+			const size_t count = ::std::min<size_t>(joints.size(), BoneLimit);
+			for (size_t i = 0; i < count; ++i) {
+				const XMMATRIX global = XMLoadFloat4x4(&joints[i].global);
+				const XMMATRIX inverseBind = XMLoadFloat4x4(&joints[i].inverseBind);
+				bonePalette[i] = XMMatrixTranspose(inverseBind * global);
+			}
+		}
+
+		inline void ResetToBindPose()
+		{
+			if (!asset) return;
+			for (size_t i = 0; i < joints.size() && i < asset->bindLocal.size(); ++i)
+				joints[i].local = asset->bindLocal[i];
+			UpdateGlobalPose();
+		}
+
+		// ---------- LookAt (как было) ----------
+		inline void ApplyLookAtRotation(float deltaTime)
+		{
+			if (!lookAtEnabled || joints.empty()) return;
+			ConstBuf::gltfAnim::lookAtConfig.Resolve(joints);
+			if (ConstBuf::gltfAnim::lookAtConfig.headIdx < 0 ||
+				ConstBuf::gltfAnim::lookAtConfig.headIdx >= (int)joints.size()) return;
+
+			lookYawTarget = std::clamp(lookYawTarget,
+				-ConstBuf::gltfAnim::lookAtConfig.maxYaw, ConstBuf::gltfAnim::lookAtConfig.maxYaw);
+			lookPitchTarget = std::clamp(lookPitchTarget,
+				-ConstBuf::gltfAnim::lookAtConfig.maxPitch, ConstBuf::gltfAnim::lookAtConfig.maxPitch);
+			lookYawCurrent = lookYawTarget;
+			lookPitchCurrent = lookPitchTarget;
+
+			::std::vector<int> chain;
+			int jointIdx = ConstBuf::gltfAnim::lookAtConfig.headIdx;
+			while (jointIdx >= 0 && jointIdx < (int)joints.size()) {
+				chain.push_back(jointIdx);
+				if (jointIdx == ConstBuf::gltfAnim::lookAtConfig.hipsIdx) break;
+				jointIdx = joints[jointIdx].parent;
+			}
+			if (chain.empty()) return;
+
+			const float lastIndex = (float)(chain.size() - 1);
+			const float bodyFollowPower = 0.55f;
+
+			for (int ci = (int)chain.size() - 1; ci >= 0; --ci) {
+				jointIdx = chain[ci];
+				const float linearPosition = lastIndex > 0.0f ? 1.0f - (float)ci / lastIndex : 1.0f;
+				const float position = powf(linearPosition, bodyFollowPower);
+				const float parentLinearPosition = ci + 1 < (int)chain.size()
+					? 1.0f - (float)(ci + 1) / lastIndex : 0.0f;
+				const float parentPosition = powf(parentLinearPosition, bodyFollowPower);
+				const float segmentWeight = position - parentPosition;
+
+				XMMATRIX local = XMLoadFloat4x4(&joints[jointIdx].local);
+				XMVECTOR s, r, t;
+				if (!XMMatrixDecompose(&s, &r, &t, local)) continue;
+
+				const float yaw = -lookYawTarget * segmentWeight;
+				const float pitch = lookPitchTarget * segmentWeight;
+				XMVECTOR qYaw = XMQuaternionRotationAxis(XMVectorSet(0, 1, 0, 0), yaw);
+				XMVECTOR qPitch = XMQuaternionRotationAxis(XMVectorSet(1, 0, 0, 0), pitch);
+				XMVECTOR delta = XMQuaternionNormalize(XMQuaternionMultiply(qYaw, qPitch));
+				XMVECTOR newR = XMQuaternionNormalize(XMQuaternionMultiply(r, delta));
+
+				XMMATRIX newLocal = XMMatrixScalingFromVector(s) *
+					XMMatrixRotationQuaternion(newR) *
+					XMMatrixTranslationFromVector(t);
+				XMStoreFloat4x4(&joints[jointIdx].local, newLocal);
+			}
+		}
+
+		inline bool IsLookAtUpperBodyJoint(int jointIndex) const
+		{
+			ConstBuf::gltfAnim::lookAtConfig.Resolve(joints);
+			int current = ConstBuf::gltfAnim::lookAtConfig.headIdx;
+			while (current >= 0 && current < (int)joints.size()) {
+				if (current == jointIndex) return true;
+				current = joints[current].parent;
+			}
+			return false;
+		}
+
+		// ---------- Play / Stop (per-instance) ----------
+		inline void PlayAnimation(int id, float time = DefaultBlendTime) {
+			if (!asset || id < 0 || id >= (int)playStates.size()) return;
+			auto& st = playStates[id];
+			if (st.isPlaying) return;
+
+			st.currentTime = 0.0f;
+			st.isPlaying = true;
+			st.realWeight = 0.0f;
+			ConstBuf::interp::Animate(st.realWeight, 1.0f, time);
+		}
+
+		inline void StopAnimation(int id, float time = DefaultBlendTime) {
+			if (!asset || id < 0 || id >= (int)playStates.size()) return;
+			auto& st = playStates[id];
+			if (!st.isPlaying) return;
+			st.isPlaying = false;
+			ConstBuf::interp::Animate(st.realWeight, 0.0f, time);
+		}
+
+		// Прямой доступ к состоянию клипа — совместимо со старым кодом
+		ClipPlayState& Animation(int id) { return playStates[id]; }
+		const ClipPlayState& Animation(int id) const { return playStates[id]; }
+
+		// ---------- Update (per-instance) ----------
+		inline void Update(float deltaTime)
+		{
+			if (!asset) return;
+
+			ResetToBindPose();
+
+			if (asset->clips.empty() || joints.empty()) {
+				BuildBonePalette();
+				return;
+			}
+
+			bool anyPlaying = false;
+			for (size_t i = 0; i < playStates.size(); ++i) {
+				const auto& st = playStates[i];
+				if ((st.isPlaying || st.realWeight > 0.0f) && st.weight > 0.0f && asset->clips[i].duration > 0.0f)
+					anyPlaying = true;
+			}
+			if (!anyPlaying) { BuildBonePalette(); return; }
+
+			::std::vector<XMVECTOR> accumScale(joints.size(), XMVectorSet(1, 1, 1, 1));
+			::std::vector<XMVECTOR> accumRotation(joints.size(), XMQuaternionIdentity());
+			::std::vector<XMVECTOR> accumTranslation(joints.size(), XMVectorZero());
+			::std::vector<bool> jointAnimated(joints.size(), false);
+			::std::vector<float> jointWeightSum(joints.size(), 0.0f);
+
+			struct OverridePose {
+				float priority = 0.0f, blend = 0.0f;
+				::std::vector<XMVECTOR> scale, rotation, translation;
+				::std::vector<bool> animated;
+			};
+			::std::vector<OverridePose> overridePoses;
+
+			for (size_t i = 0; i < asset->clips.size(); ++i)
+			{
+				const auto& clipData = asset->clips[i];
+				auto& st = playStates[i];
+
+				if ((!st.isPlaying && st.realWeight <= 0.0f) || st.weight <= 0.0f || clipData.duration <= 0.0f)
+					continue;
+
+				if (st.looped)
+					st.currentTime = fmodf(st.currentTime + deltaTime * st.speed, clipData.duration);
+				else {
+					st.currentTime += deltaTime * st.speed;
+					if (st.currentTime > clipData.duration || st.currentTime < 0.0f) {
+						st.currentTime = clamp(st.currentTime, 0.0f, clipData.duration);
+						StopAnimation((int)i);
+					}
+				}
+
+				const float realWeight = clamp(st.realWeight, 0.0f, 1.0f);
+				const bool isOverride = st.weight > 1.0f;
+				const float effectiveWeight = st.weight * realWeight;
+				if (realWeight <= 0.0f) continue;
+
+				OverridePose* overridePose = nullptr;
+				if (isOverride) {
+					overridePoses.emplace_back();
+					overridePose = &overridePoses.back();
+					overridePose->priority = st.weight;
+					overridePose->blend = realWeight;
+					overridePose->scale.assign(joints.size(), XMVectorSet(1, 1, 1, 1));
+					overridePose->rotation.assign(joints.size(), XMQuaternionIdentity());
+					overridePose->translation.assign(joints.size(), XMVectorZero());
+					overridePose->animated.assign(joints.size(), false);
+				}
+
+				for (size_t jointIdx = 0; jointIdx < joints.size(); ++jointIdx) {
+					if (i == 7 && IsLookAtUpperBodyJoint((int)jointIdx)) continue;
+
+					XMVECTOR scale = XMVectorSet(1, 1, 1, 1);
+					XMVECTOR rotation = XMQuaternionIdentity();
+					XMVECTOR translation = XMVectorZero();
+					XMVECTOR ds, dr, dt;
+					const XMMATRIX currentLocal = XMLoadFloat4x4(&joints[jointIdx].local);
+					if (XMMatrixDecompose(&ds, &dr, &dt, currentLocal)) {
+						scale = ds; rotation = dr; translation = dt;
+					}
+
+					bool animated = false;
+					for (const auto& channel : clipData.channels) {
+						if (channel.joint != (int)jointIdx || channel.times.empty() || channel.values.empty()) continue;
+						animated = true;
+
+						size_t key = 0;
+						for (size_t k = 0; k + 1 < channel.times.size(); ++k) {
+							key = k;
+							if (st.currentTime < channel.times[k + 1]) break;
+						}
+
+						float alpha = 0.0f;
+						XMVECTOR a = XMLoadFloat4(&channel.values[key]);
+						XMVECTOR b = a;
+						if (key + 1 < channel.times.size()) {
+							const float t0 = channel.times[key], t1 = channel.times[key + 1];
+							if (t1 - t0 > 0.0001f) {
+								alpha = std::clamp((st.currentTime - t0) / (t1 - t0), 0.0f, 1.0f);
+								b = XMLoadFloat4(&channel.values[key + 1]);
+							}
+						}
+
+						if (channel.path == ConstBuf::cgltf_animation_path_type_translation)
+							translation = XMVectorLerp(a, b, alpha);
+						else if (channel.path == ConstBuf::cgltf_animation_path_type_rotation) {
+							a = XMQuaternionNormalize(a);
+							b = XMQuaternionNormalize(b);
+							if (XMVectorGetX(XMQuaternionDot(a, b)) < 0.0f) b = XMVectorNegate(b);
+							rotation = XMQuaternionNormalize(XMQuaternionSlerp(a, b, alpha));
+						}
+					}
+
+					if (animated) {
+						if (isOverride) {
+							overridePose->scale[jointIdx] = scale;
+							overridePose->rotation[jointIdx] = rotation;
+							overridePose->translation[jointIdx] = translation;
+							overridePose->animated[jointIdx] = true;
+							continue;
+						}
+						if (!jointAnimated[jointIdx]) {
+							accumScale[jointIdx] = scale;
+							accumRotation[jointIdx] = rotation;
+							accumTranslation[jointIdx] = translation;
+							jointAnimated[jointIdx] = true;
+							jointWeightSum[jointIdx] = effectiveWeight;
+						}
+						else {
+							float blend = effectiveWeight / (jointWeightSum[jointIdx] + effectiveWeight);
+							accumTranslation[jointIdx] = XMVectorLerp(accumTranslation[jointIdx], translation, blend);
+							accumRotation[jointIdx] = XMQuaternionSlerp(accumRotation[jointIdx], rotation, blend);
+							jointWeightSum[jointIdx] += effectiveWeight;
+						}
+					}
+				}
+			}
+
+			std::stable_sort(overridePoses.begin(), overridePoses.end(),
+				[](const OverridePose& a, const OverridePose& b) { return a.priority < b.priority; });
+
+			for (const auto& pose : overridePoses)
+				for (size_t jointIdx = 0; jointIdx < joints.size(); ++jointIdx) {
+					if (!pose.animated[jointIdx]) continue;
+					if (!jointAnimated[jointIdx]) {
+						XMVECTOR cs = XMVectorSet(1, 1, 1, 1), cr = XMQuaternionIdentity(), ct = XMVectorZero();
+						if (!XMMatrixDecompose(&cs, &cr, &ct, XMLoadFloat4x4(&joints[jointIdx].local))) {
+							cs = XMVectorSet(1, 1, 1, 1); cr = XMQuaternionIdentity(); ct = XMVectorZero();
+						}
+						accumScale[jointIdx] = cs; accumRotation[jointIdx] = cr;
+						accumTranslation[jointIdx] = ct; jointAnimated[jointIdx] = true;
+					}
+					accumScale[jointIdx] = XMVectorLerp(accumScale[jointIdx], pose.scale[jointIdx], pose.blend);
+					accumRotation[jointIdx] = XMQuaternionSlerp(accumRotation[jointIdx], pose.rotation[jointIdx], pose.blend);
+					accumTranslation[jointIdx] = XMVectorLerp(accumTranslation[jointIdx], pose.translation[jointIdx], pose.blend);
+				}
+
+			for (size_t jointIdx = 0; jointIdx < joints.size(); ++jointIdx) {
+				if (!jointAnimated[jointIdx]) continue;
+				const XMMATRIX local = XMMatrixScalingFromVector(accumScale[jointIdx]) *
+					XMMatrixRotationQuaternion(accumRotation[jointIdx]) *
+					XMMatrixTranslationFromVector(accumTranslation[jointIdx]);
+				XMStoreFloat4x4(&joints[jointIdx].local, local);
+			}
+
+			ApplyLookAtRotation(deltaTime);
+			UpdateGlobalPose();
+			BuildBonePalette();
+		}
+	};
+
 	struct mesh {
 		bool loaded = false;
 
