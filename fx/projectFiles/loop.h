@@ -1230,6 +1230,8 @@ struct hero_ : AliveCreation {
 				while (GetAsyncKeyState('R')) { Sleep(16); };
 			}
 
+			dx11::Audio::Play("PlayerSpawn");
+
 			respawnInProgress = true;
 			railEndFlight = false;
 			railEndTargetLine = -1;
@@ -1294,6 +1296,17 @@ struct hero_ : AliveCreation {
 		collider->position.w = 1.0f;
 	}
 
+	void Death()
+	{
+		dead = true;
+
+		dx11::Audio::Play("PlayerDeath");
+		if (collider)
+			collider->isTouchable = false;
+
+		Log("PLAYER DEAD\n");
+	}
+
 	void TakeDamage(float damage) override
 	{
 		if (dead)
@@ -1323,12 +1336,7 @@ struct hero_ : AliveCreation {
 
 		if (health <= 0.0f)
 		{
-			dead = true;
-
-			if (collider)
-				collider->isTouchable = false;
-
-			Log("PLAYER DEAD\n");
+			Death();
 		}
 	}
 
@@ -3376,6 +3384,10 @@ namespace Loop
 			dx11::Audio::LoadOggFile("Bow_bowstring", "..//fx//projectFiles//Bow_bowstring.ogg");
 
 			dx11::Audio::LoadOggFile("Music", "..//fx//projectFiles//Music.ogg");
+
+			dx11::Audio::LoadOggFile("PlayerSpawn", "..//fx//projectFiles//spawn_character.ogg");
+			dx11::Audio::LoadOggFile("PlayerDeath", "..//fx//projectFiles//death_character.ogg");
+			dx11::Audio::LoadOggFile("GameWin", "..//fx//projectFiles//win_character.ogg");
 		}
 
 
