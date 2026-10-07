@@ -3865,30 +3865,7 @@ namespace Object {
 		AddPointToLine({ 265, 60, -465 });
 		AddPointToLine({ 265, 50, -465 });
 		AddPointToLine({ 265, 40, -465 });
-		AddPointToLine({ 265, 30, -465 });
-		AddPointToLine({ 265, 20, -465 });
-		AddPointToLine({ 265, 10, -465 });
-		AddPointToLine({ 265, 0, -465 });
-		AddPointToLine({ 265, -10, -465 });
-		AddPointToLine({ 265, -20, -465 });
-		AddPointToLine({ 265, -30, -465 });
-		AddPointToLine({ 265, -40, -465 });
-		AddPointToLine({ 265, -50, -465 });
-		AddPointToLine({ 265, -60, -465 });
-		AddPointToLine({ 265, -70, -465 });
-		AddPointToLine({ 265, -80, -465 });
-		AddPointToLine({ 265, -90, -465 });
-		AddPointToLine({ 265, -100, -465 });
-		AddPointToLine({ 265, -110, -465 });
-		AddPointToLine({ 265, -120, -465 });
-		AddPointToLine({ 265, -130, -465 });
-		AddPointToLine({ 265, -140, -465 });
-		AddPointToLine({ 265, -150, -465 });
-		AddPointToLine({ 265, -160, -465 });
-		AddPointToLine({ 265, -170, -465 });
-		AddPointToLine({ 265, -180, -465 });
-		AddPointToLine({ 265, -190, -465 });
-		AddPointToLine({ 265, -200, -465 });
+		
 
 
 		// ============================================================
@@ -3905,39 +3882,145 @@ namespace Object {
 		AddPointToLine({ 264, 153, -441 });
 		AddPointToLine({ 245, 103, -484 });
 		AddPointToLine({ 273, 107, -465 });
-		AddPointToLine({ 268, 95, -465 });
-		AddPointToLine({ 265, 86, -465 });
-		AddPointToLine({ 265, 80, -465 });
-		AddPointToLine({ 265, 70, -465 });
-		AddPointToLine({ 265, 60, -465 });
-		AddPointToLine({ 265, 50, -465 });
-		AddPointToLine({ 265, 40, -465 });
-		AddPointToLine({ 265, 30, -465 });
-		AddPointToLine({ 265, 20, -465 });
-		AddPointToLine({ 265, 10, -465 });
-		AddPointToLine({ 265, 0, -465 });
-		AddPointToLine({ 265, -10, -465 });
-		AddPointToLine({ 265, -20, -465 });
-		AddPointToLine({ 265, -30, -465 });
-		AddPointToLine({ 265, -40, -465 });
-		AddPointToLine({ 265, -50, -465 });
-		AddPointToLine({ 265, -60, -465 });
-		AddPointToLine({ 265, -70, -465 });
-		AddPointToLine({ 265, -80, -465 });
-		AddPointToLine({ 265, -90, -465 });
-		AddPointToLine({ 265, -100, -465 });
-		AddPointToLine({ 265, -110, -465 });
-		AddPointToLine({ 265, -120, -465 });
-		AddPointToLine({ 265, -130, -465 });
+		AddPointToLine({ 268, 57, -465 });
+		AddPointToLine({ 265, 41, -473 });
+		AddPointToLine({ 265, 36, -475 });
+		AddPointToLine({ 265, 26, -476 });
+		AddPointToLine({ 265, 20, -476 });
+		AddPointToLine({ 265, 10, -475 });
+		AddPointToLine({ 265, 0, -474 });
+		AddPointToLine({ 265, -21, -460 });
+		AddPointToLine({ 265, -51, -469 });
+		AddPointToLine({ 265, -70, -452 });
+		AddPointToLine({ 265, -90, -459 });
+		AddPointToLine({ 265, -100, -463 });
+		AddPointToLine({ 265, -110, -459 });
 		AddPointToLine({ 265, -140, -465 });
-		AddPointToLine({ 265, -150, -465 });
-		AddPointToLine({ 265, -160, -465 });
-		AddPointToLine({ 265, -170, -465 });
-		AddPointToLine({ 265, -180, -465 });
-		AddPointToLine({ 265, -190, -465 });
-		AddPointToLine({ 265, -200, -465 });
-		// ============================================================
-		// Л3
+		AddPointToLine({ 265, -158, -465 });
+		AddPointToLine({ 312, -171, -526 });
+		AddPointToLine({ 274, -176, -556 });
+		AddPointToLine({ 236, -176, -512 });
+		
+		// === ЧАСТЬ 1: Старт → Разгон → Выбор пути (основной/левый/правый) ===
+		NewLine();  // Основная линия
+		AddPointToLine({ 236, -176, -512 });   // START (не меняем)
+		AddPointToLine({ 220, -190, -480 });   // Резкий спуск вниз
+		AddPointToLine({ 200, -210, -445 });   // Ускорение + наклон
+		AddPointToLine({ 175, -225, -405 });   // Поворот влево с разгоном
+		AddPointToLine({ 145, -235, -365 });   // Набор скорости перед прыжком
+		AddPointToLine({ 98, -240, -330 });    // Конец платформы (инерция для прыжка!)
+
+		NewLine();  // Левая альтернатива (выше, короче)
+		AddPointToLine({ 236, -160, -500 });   // Параллельный старт слева
+		AddPointToLine({ 210, -175, -460 });   // Плавный спуск
+		AddPointToLine({ 180, -190, -420 });   // Прямой разгон
+		AddPointToLine({ 120, -210, -370 });   // Короткий путь к прыжку
+
+		NewLine();  // Правая альтернатива (ниже, длиннее)
+		AddPointToLine({ 236, -195, -520 });   // Параллельный старт справа
+		AddPointToLine({ 225, -215, -495 });   // Крутой спуск
+		AddPointToLine({ 210, -235, -465 });   // Поворот
+		AddPointToLine({ 190, -250, -430 });   // Разгон вбок
+		AddPointToLine({ 160, -260, -395 });   // Длинный путь
+		AddPointToLine({ 110, -265, -355 });   // Выход к прыжку
+
+		// === ЧАСТЬ 2: Приземление → Зигзаг → Тройное ветвление ===
+		NewLine();  // Основная линия
+		AddPointToLine({ 70, -245, -305 });    // Приземление (разрыв ~45 ед.)
+		AddPointToLine({ 58, -238, -295 });    // Короткий разгон
+		AddPointToLine({ 45, -252, -282 });    // Резкий поворот вправо (тормоз!)
+		AddPointToLine({ 32, -248, -268 });    // Микро-коррекция
+		AddPointToLine({ 18, -260, -252 });    // Поворот влево + ускорение
+		AddPointToLine({ 4, -258, -239 });    // Подготовка к прыжку вверх
+
+		NewLine();  // Левая линия (для точных прыжков)
+		AddPointToLine({ 68, -230, -298 });    // Приземление слева
+		AddPointToLine({ 52, -225, -285 });    // Прямой путь
+		AddPointToLine({ 35, -235, -270 });    // Плавный поворот
+		AddPointToLine({ 20, -240, -258 });    // Выход к прыжку
+
+		NewLine();  // Правая линия (для скоростного прохождения)
+		AddPointToLine({ 72, -260, -310 });    // Приземление справа
+		AddPointToLine({ 60, -270, -295 });    // Быстрый спуск
+		AddPointToLine({ 48, -278, -278 });    // Разгон
+		AddPointToLine({ 30, -282, -262 });    // Прямая к прыжку
+
+		// === ЧАСТЬ 3: Вертикальный прыжок → Высокая платформа → Спуск с выбором ===
+		NewLine();  // Основная линия
+		AddPointToLine({ -5, -248, -232 });    // Приземление выше (разрыв ~35 ед.)
+		AddPointToLine({ -12, -245, -225 });   // Короткий разбег
+		AddPointToLine({ -18, -255, -215 });   // Спуск с поворотом
+		AddPointToLine({ -24, -262, -205 });   // Ускорение вниз
+		AddPointToLine({ -32, -268, -198 });   // Резкий поворот направо
+		AddPointToLine({ -40, -272, -195 });   // Выпрыгивание вперёд
+
+		NewLine();  // Верхняя линия (короткий путь, требует точного прыжка)
+		AddPointToLine({ -8, -235, -228 });    // Высокое приземление
+		AddPointToLine({ -15, -238, -218 });   // Прямой спуск
+		AddPointToLine({ -25, -245, -205 });   // Быстрый выход
+		AddPointToLine({ -35, -252, -197 });   // К финишу
+
+		NewLine();  // Нижняя линия (длинный путь с препятствиями)
+		AddPointToLine({ -3, -265, -238 });    // Низкое приземление
+		AddPointToLine({ -10, -275, -228 });   // Зигзаг вниз
+		AddPointToLine({ -20, -285, -218 });   // Поворот
+		AddPointToLine({ -30, -290, -208 });   // Разгон
+		AddPointToLine({ -42, -292, -198 });   // Выход к финишу
+
+		// === ЧАСТЬ 4: Узкий мост → Разворот → Параллельные пути ===
+		NewLine();  // Основная линия
+		AddPointToLine({ -54, -270, -186 });   // Приземление (разрыв ~20 ед., узко!)
+		AddPointToLine({ -57, -268, -183 });   // Микро-разбег
+		AddPointToLine({ -60, -272, -180 });   // Поворот на 90°
+		AddPointToLine({ -63, -275, -177 });   // Разворот на 180° в прыжке
+
+		NewLine();  // Левая линия (широкая, для новичков)
+		AddPointToLine({ -52, -255, -184 });   // Широкое приземление
+		AddPointToLine({ -56, -258, -181 });   // Прямой путь
+		AddPointToLine({ -61, -262, -178 });   // Плавный разворот
+
+		NewLine();  // Правая линия (узкая, для экспертов)
+		AddPointToLine({ -56, -285, -188 });   // Узкое приземление
+		AddPointToLine({ -59, -288, -184 });   // Точный разбег
+		AddPointToLine({ -64, -292, -180 });   // Сложный разворот
+		AddPointToLine({ -66, -295, -176 });   // Выход
+
+		// === ЧАСТЬ 5: Обратное движение → Серия прыжков → Выбор направления ===
+		NewLine();  // Основная линия
+		AddPointToLine({ -74, -273, -171 });   // Приземление спиной (разрыв ~16 ед.)
+		AddPointToLine({ -77, -272, -169 });   // Короткий разбег назад
+		AddPointToLine({ -80, -274, -168 });   // Прыжок назад с коррекцией
+		AddPointToLine({ -83, -275, -167 });   // Второй прыжок назад
+
+		NewLine();  // Прямая линия (быстрый путь)
+		AddPointToLine({ -73, -265, -170 });   // Приземление
+		AddPointToLine({ -76, -266, -168 });   // Прямой разбег
+		AddPointToLine({ -81, -267, -166 });   // Прыжок к финишу
+
+		NewLine();  // Зигзаг (медленный, но безопасный)
+		AddPointToLine({ -75, -282, -172 });   // Приземление справа
+		AddPointToLine({ -78, -283, -170 });   // Поворот
+		AddPointToLine({ -82, -284, -168 });   // Коррекция
+		AddPointToLine({ -85, -285, -166 });   // Выход
+
+		// === ЧАСТЬ 6: Финальный рывок → Точное приземление ===
+		NewLine();  // Основная линия
+		AddPointToLine({ -87, -273, -166 });   // Приземление (разрыв ~12 ед.)
+		AddPointToLine({ -90, -272, -165 });   // Микро-коррекция перед финишем
+		AddPointToLine({ -93, -271, -164 });   // Финальный рывок
+		AddPointToLine({ -96, -210, -163 });   // FINISH (не меняем)
+
+		NewLine();  // Левый финиш (альтернативный)
+		AddPointToLine({ -86, -260, -165 });   // Приземление слева
+		AddPointToLine({ -90, -255, -164 });   // Прямой путь
+		AddPointToLine({ -94, -230, -163 });   // К финишу
+
+		NewLine();  // Правый финиш (альтернативный)
+		AddPointToLine({ -88, -288, -167 });   // Приземление справа
+		AddPointToLine({ -92, -280, -165 });   // Поворот к финишу
+		AddPointToLine({ -96, -210, -163 });   // FINISH (сходится)
+		// ============= ===============================================
+		// Л3			 
 		// ============================================================
 
 	
@@ -4111,6 +4194,19 @@ namespace Object {
 			.brightness = 100
 			});
 
+		
+		NewStar({
+			.x = 277,
+			.y = -181,
+			.z = -510,
+			.rad = 27,
+			.r = 100,
+			.g = 4,
+			.b = 1,
+			.brightness = 100
+			});
+
+		  
 		//NewStar({
 		//	.x = 620,
 		//	.y = -150,
@@ -5149,7 +5245,7 @@ namespace Object {
 		starStencilTarget = 0;
 		AllStars({ 100000,1,pMode::point,1000,200,10,triMode::on });
 
-		vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
+		//vrg({ pillars_cnt/2,1,pMode::point,1390,925,111 });
 		Maze({ 200000,1,pMode::point,1390,925,111 });
 
 		OuterSpace(outerSpace_cnt, 1, pMode::point);
@@ -5167,7 +5263,7 @@ namespace Object {
 
 		//mid
 		RenderTarget::Set({ texture::pBufMid,0 });
-		vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
+		//vrg({ pillars_cnt,94,pMode::glow,20,30,75 });
 		Maze({ 200000,94,pMode::glow,20,30,75 });
 
 		//Galaxy({ galaxy_cnt, 4, pMode::glow ,100,200,300 });
