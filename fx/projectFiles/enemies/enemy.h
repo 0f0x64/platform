@@ -16,7 +16,7 @@ namespace Enemies
 		InitializeCallback initializeCallback;
 		UpdateCallback updateCallback;
 
-		Object::mesh* mesh_;
+		Object::MeshInstance mesh = Object::MeshInstance();
 
 		// === HP ===
 		float maxHealth = 100.0f;
@@ -54,7 +54,18 @@ namespace Enemies
 		}
 
 		void InitializeAnims() {
-			mesh_->PlayAnimation(1);
+			mesh.playStates[1].looped = true;
+
+			mesh.playStates[2].looped = true;
+
+			mesh.playStates[3].weight = 100;
+
+			mesh.playStates[4].weight = 1000;
+
+			mesh.randomSurfaceSampling = true;
+			mesh.Update(0.0f);
+
+			mesh.PlayAnimation(1);
 		}
 
 		void Update(float deltaTime, collision::SphereCollider* heroCollider, AliveCreation& hero)
@@ -78,7 +89,7 @@ namespace Enemies
 		{
 			if (!alive || amount <= 0.0f) return;
 
-			mesh_->PlayAnimation(4);
+			mesh.PlayAnimation(4);
 			dx11::Audio::Play("Swarm_hit", false, 1.0f);
 
 			health -= amount;
