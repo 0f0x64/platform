@@ -85,7 +85,7 @@ namespace Enemies
 			const int zoom = static_cast<int>(std::lround(
 				(enemy.movementRadius / NormalizedMeshRadius - 1.0f) * ZoomPercent));
 
-			enemy.mesh.model = XMMatrixIdentity();
+			//enemy.mesh.model = XMMatrixIdentity();
 
 			// Базовый цвет
 			float r = 3.0f, g = 0.45f, b = 0.15f;

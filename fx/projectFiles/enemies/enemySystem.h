@@ -287,6 +287,21 @@ namespace Enemies
 				enemy.position += step;
 				enemy.mesh.PlayAnimation(3);
 				enemy.mesh.StopAnimation(1);
+
+				XMVECTOR Forward = XMVector3Normalize(F2V(direction));
+				XMVECTOR Up = XMVectorSet(0, 1, 0, 0);
+
+				XMVECTOR Right = XMVector3Normalize(XMVector3Cross(Up, Forward));
+				Up = XMVector3Cross(Forward, Right);
+
+				XMMATRIX enemyRotation = XMMATRIX(
+					Right,   // 1-я строка
+					Up,      // 2-я строка
+					Forward, // 3-я строка
+					XMVectorSet(0, 0, 0, 1)
+				);
+
+				enemy.mesh.model = LerpMatrix(enemy.mesh.model, enemyRotation, 0.05f);
 			}
 		}
 
