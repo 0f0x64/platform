@@ -1262,9 +1262,8 @@ struct hero_ : AliveCreation {
 			//int startLine = rand()% Object::starLineList.lineCount;
 			//int startPoint = rand() % (Object::starLineList.line[startLine].pointCount-2)+1;
 
-			int startLine = min(1, Object::starLineList.lineCount - 1);
-			if (startLine < 0 || Object::starLineList.line[startLine].pointCount == 0) return;
-			int startPoint = min(1, Object::starLineList.line[startLine].pointCount - 1);
+			int startLine = 0;
+			int startPoint = 0;
 			lineIndex = startLine;
 			pointIndex = (float)startPoint;
 
@@ -2273,6 +2272,15 @@ struct gameCamera_ {
 gameCamera_ gameCamera;
 
 
+struct LevelEnd
+{
+	Object::MeshInstance mesh = Object::MeshInstance();
+	collision::SphereCollider* collider;
+};
+
+LevelEnd levelEnd;
+
+
 
 
 float processTimer()
@@ -3258,23 +3266,15 @@ namespace Loop
 		if (!hero.collider)
 			return;
 
-		const auto& enemies = enemySystem.Items();
-
-		if (enemies.empty())
-			return;
-
-		// Enemy 0 — специальный триггер победы.
-		const Enemies::Enemy& trigger = enemies[0];
-
-		if (!trigger.collider)
+		if (!levelEnd.collider)
 			return;
 
 		collision::CollisionResult result =
 			collision::sphere_vs_sphere(
 				hero.collider->position,
 				hero.collider->radius,
-				trigger.collider->position,
-				trigger.collider->radius
+				levelEnd.collider->position,
+				levelEnd.collider->radius
 			);
 
 		if (result.collided)
@@ -3298,17 +3298,10 @@ namespace Loop
 		if (hero.invulnerabilityTimer > 0.0f)
 			return;
 
-		const float playerX = hero.collider->position.x;
-		const float playerY = hero.collider->position.y;
-		const float playerZ = hero.collider->position.z;
-
 		const auto& enemies = enemySystem.Items();
 
 		for (const Enemies::Enemy& enemy : enemies)
 		{
-			if (&enemy == &enemies[0]) // enemies[0] — trigger (no damage)
-				continue;
-
 			if (!enemy.collider)
 				continue;
 
@@ -3584,9 +3577,11 @@ namespace Loop
 
 			Object::MeshAsset* heroMeshAsset = new Object::MeshAsset;
 			Object::MeshAsset* arrowMeshAsset = new Object::MeshAsset;
+			Object::MeshAsset* sphereMeshAsset = new Object::MeshAsset;
 
 			heroMeshAsset->LoadGeometry("..//fx//projectFiles//A-Pose.glb");
 			arrowMeshAsset->LoadGeometry("..//fx//projectFiles//Arrow.glb");
+			sphereMeshAsset->LoadGeometry("..//fx//projectFiles//Sphere.glb");
 
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
@@ -3603,6 +3598,7 @@ namespace Loop
 
 			hero.mesh.Attach(heroMeshAsset);
 			hero.arrowMesh.Attach(arrowMeshAsset);
+			levelEnd.mesh.Attach(sphereMeshAsset);
 
 			hero.mesh.playStates[0].isPlaying = false;
 
@@ -3643,6 +3639,10 @@ namespace Loop
 			enemySystem.ResetRandomOnLines();
 			enemyRenderer.Load(enemySystem);
 
+			levelEnd.collider = collision::CreateSphereCollider();
+			levelEnd.collider->collisionGroup = collision::CollisionGroup::Enemy;
+			levelEnd.collider->position = float4(-96, -210, -163);
+
 			hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
 			hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
 			hero.bowstringVoice = dx11::Audio::Play("Bow_bowstring", true, 0.0f);
@@ -3676,6 +3676,22 @@ namespace Loop
 		hero.DrawArrows(deltaTime);
 
 		enemyRenderer.RenderColor(enemySystem, V2F(gameCamera.finalCameraEye), deltaTime);
+
+		float4 p = levelEnd.collider->position * 10000.f;
+		Object::Mesh({
+			.obj = &levelEnd.mesh,
+			.quality = 1,
+			.xPos = (int)(p.x),
+			.yPos = (int)(p.y),
+			.zPos = (int)(p.z),
+			.brightness = 9,
+			.tickness = 4,
+			.stencil = switcher::on,
+			.zoom = -75,
+			.onLineOfs = 0,
+			.jumpCharge = 100,
+			.deltaTime = deltaTime
+			});
 
 		/*for (std::pair<float4, float4>& ray : hero.rays) {
 			Object::RayHit({

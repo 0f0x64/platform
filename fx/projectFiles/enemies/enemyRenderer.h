@@ -13,7 +13,6 @@ namespace Enemies
 		{
 			if (loaded) return;
 
-			//mesh_.LoadObj("..//fx//projectFiles//Sphere.glb");
 			meshAsset->LoadGeometry("..//fx//projectFiles//Swarm_Retop_A_pos.glb");
 			if (!meshAsset->loaded)
 			{
