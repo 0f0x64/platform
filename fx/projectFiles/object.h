@@ -3618,37 +3618,33 @@ namespace Object {
 		AddPointToLine({ 426, 94, -491 });
 		AddPointToLine({ 426, 107, -505 });
 		
-		// Внутренний контур Л1
-		NewLine();
-		AddPointToLine({ 476, 110, -491 });
-		AddPointToLine({ 472, 110, -487 });
-		AddPointToLine({ 459, 110, -481 });
-		AddPointToLine({ 446, 110, -476 });
-		AddPointToLine({ 439, 110, -484 });
-		AddPointToLine({ 442, 110, -491 });
-		AddPointToLine({ 450, 110, -490 });
-		AddPointToLine({ 458, 110, -487 });
+		
 		
 		// Верхний зубец
 		NewLine();
-		AddPointToLine({ 470, 110, -481 });
-		AddPointToLine({ 456, 110, -471 });
-		AddPointToLine({ 440, 110, -460 });
-		AddPointToLine({ 428, 110, -461 });
-		AddPointToLine({ 425, 110, -463 });
-		AddPointToLine({ 419, 110, -469 });
-		AddPointToLine({ 418, 110, -476 });
-		AddPointToLine({ 425, 110, -480 });
+		AddPointToLine({ 478, 111, -481 });
+		AddPointToLine({ 466, 117, -471 });
+		AddPointToLine({ 457, 113, -467 });
+		AddPointToLine({ 446, 103, -460 });
+		AddPointToLine({ 438, 100, -458 });
+		AddPointToLine({ 434, 100, -458 });
+		AddPointToLine({ 429, 100, -460 });
+		AddPointToLine({ 422, 101, -466 });
+		AddPointToLine({ 419, 103, -472 });
+		AddPointToLine({ 419, 105, -476 });
+		AddPointToLine({ 422, 110, -486 });
 		
 		// Малая правая петля
 		NewLine();
-		AddPointToLine({ 500, 110, -508 });
-		AddPointToLine({ 492, 110, -499 });
-		AddPointToLine({ 487, 110, -485 });
-		AddPointToLine({ 494, 110, -477 });
-		AddPointToLine({ 503, 110, -483 });
-		AddPointToLine({ 506, 110, -494 });
-		AddPointToLine({ 499, 110, -495 });
+		AddPointToLine({ 494, 63, -500 });
+		AddPointToLine({ 485, 71, -490 });
+		AddPointToLine({ 484, 79, -485 });
+		AddPointToLine({ 487, 87, -481 });
+		AddPointToLine({ 495, 95, -485 });
+		AddPointToLine({ 503, 102, -494 });
+		AddPointToLine({ 505, 108, -496 });
+		AddPointToLine({ 502, 114, -494 });
+		AddPointToLine({ 485, 114, -485 });
 		
 		// ============================================================
 		// Л1 — левая / вторая половина
@@ -3671,37 +3667,32 @@ namespace Object {
 		AddPointToLine({ 428, 123, -511 });
 		AddPointToLine({ 427, 110, -500 });
 		
-		// Внутренняя петля второй половины
-		NewLine();
-		AddPointToLine({ 381, 110, -498 });
-		AddPointToLine({ 385, 110, -502 });
-		AddPointToLine({ 398, 110, -508 });
-		AddPointToLine({ 411, 110, -513 });
-		AddPointToLine({ 418, 110, -505 });
-		AddPointToLine({ 415, 110, -498 });
-		AddPointToLine({ 407, 110, -499 });
-		AddPointToLine({ 396, 110, -495 });
+
 		
 		// Нижний зубец второй половины
 		NewLine();
-		AddPointToLine({ 387, 110, -508 });
-		AddPointToLine({ 402, 110, -519 });
-		AddPointToLine({ 417, 110, -529 });
-		AddPointToLine({ 429, 110, -528 });
-		AddPointToLine({ 432, 110, -526 });
-		AddPointToLine({ 438, 110, -520 });
-		AddPointToLine({ 439, 110, -513 });
-		AddPointToLine({ 429, 110, -509 });
+		AddPointToLine({ 387, 116, -508 });
+		AddPointToLine({ 402, 118, -519 });
+		AddPointToLine({ 408, 120, -524 });
+		AddPointToLine({ 415, 121, -526 });
+		AddPointToLine({ 423, 121, -526 });
+		AddPointToLine({ 428, 119, -521 });
+		AddPointToLine({ 428, 102, -501 });
+		AddPointToLine({ 427, 98, -497 });
 		
 		// Малая левая петля
 		NewLine();
-		AddPointToLine({ 357, 110, -481 });
-		AddPointToLine({ 365, 110, -490 });
-		AddPointToLine({ 370, 110, -504 });
-		AddPointToLine({ 363, 110, -512 });
-		AddPointToLine({ 354, 110, -506 });
-		AddPointToLine({ 351, 110, -497 });
-		AddPointToLine({ 358, 110, -494 });
+		AddPointToLine({ 331, 102, -481 });
+		AddPointToLine({ 365, 105, -487 });
+		AddPointToLine({ 372, 104, -493 });
+		AddPointToLine({ 372, 104, -499 });
+		AddPointToLine({ 369, 104, -504 });
+		AddPointToLine({ 363, 105, -508 });
+		AddPointToLine({ 358, 109, -508 });
+		AddPointToLine({ 354, 116, -502 });
+		AddPointToLine({ 354, 120, -493 });
+		AddPointToLine({ 364, 120, -488 });
+		AddPointToLine({ 389, 114, -507 });
 		
 		// ============================================================
 		// Л2 — внешний контур ландмарка
