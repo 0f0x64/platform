@@ -3588,14 +3588,7 @@ namespace Object {
 		// Входная трасса
 		// ============================================================
 		
-		NewLine();
-		AddPointToLine({ -89, -210, -163 });
-		AddPointToLine({ 11, -157, -227 });
-		AddPointToLine({ 110, -104, -292 });
-		AddPointToLine({ 209, -50, -357 });
-		AddPointToLine({ 309, 3, -421 });
-		AddPointToLine({ 408, 56, -486 });
-		AddPointToLine({ 508, 110, -550 });
+		
 		
 		// ============================================================
 		// Л1 — внешний правый элемент
@@ -3616,7 +3609,7 @@ namespace Object {
 		AddPointToLine({ 430, 96, -474 });
 		AddPointToLine({ 426, 82, -478 });
 		AddPointToLine({ 426, 94, -491 });
-		AddPointToLine({ 426, 107, -505 });
+		AddPointToLine({ 425, 107, -505 });
 		
 		
 		
@@ -3651,21 +3644,21 @@ namespace Object {
 		// ============================================================
 		
 		NewLine();
-		AddPointToLine({ 327, 58, -439 });
-		AddPointToLine({ 337, 69, -444 });
-		AddPointToLine({ 346, 80, -449 });
-		AddPointToLine({ 351, 96, -454 });
-		AddPointToLine({ 353, 118, -464 });
-		AddPointToLine({ 358, 132, -472 });
-		AddPointToLine({ 364, 143, -481 });
-		AddPointToLine({ 376, 149, -496 });
-		AddPointToLine({ 381, 151, -501 });
-		AddPointToLine({ 386, 152, -505 });
-		AddPointToLine({ 399, 151, -513 });
+		AddPointToLine({ 425, 97, -500 });
+		AddPointToLine({ 424, 111, -513 });
+		AddPointToLine({ 421, 136, -519 });
 		AddPointToLine({ 412, 145, -517 });
-		AddPointToLine({ 421, 137, -519 });
-		AddPointToLine({ 428, 123, -511 });
-		AddPointToLine({ 427, 110, -500 });
+		AddPointToLine({ 399, 151, -513 });
+		AddPointToLine({ 386, 152, -505 });
+		AddPointToLine({ 381, 151, -501 });
+		AddPointToLine({ 376, 149, -496 });
+		AddPointToLine({ 364, 143, -481 });
+		AddPointToLine({ 358, 132, -472 });
+		AddPointToLine({ 353, 118, -464 });
+		AddPointToLine({ 351, 96, -454 });
+		AddPointToLine({ 346, 80, -449 });
+		AddPointToLine({ 337, 69, -444 });
+		AddPointToLine({ 327, 61, -439 });
 		
 
 		
@@ -3676,9 +3669,9 @@ namespace Object {
 		AddPointToLine({ 408, 120, -524 });
 		AddPointToLine({ 415, 121, -526 });
 		AddPointToLine({ 423, 121, -526 });
-		AddPointToLine({ 428, 119, -521 });
-		AddPointToLine({ 428, 102, -501 });
-		AddPointToLine({ 427, 98, -497 });
+		AddPointToLine({ 433, 119, -521 });
+		AddPointToLine({ 442, 99, -501 });
+		AddPointToLine({ 437, 92, -497 });
 		
 		// Малая левая петля
 		NewLine();
