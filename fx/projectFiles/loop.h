@@ -285,6 +285,7 @@ struct hero_ : AliveCreation {
 	float invulnerabilityTimer = 0.0f;
 
 	bool dead = false;
+	bool victory = false; //флаг состо€ни€ победы
 	//
 
 	XMVECTOR pos = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -1210,7 +1211,8 @@ struct hero_ : AliveCreation {
 
 	void Respawn(bool force = false)
 	{
-		if (firstRun || force || GetAsyncKeyState('R'))
+		if (firstRun || force || (!victory && GetAsyncKeyState('R'))))
+
 		{
 			if (dead)
 			{
@@ -3245,6 +3247,51 @@ namespace Loop
 
 	}
 
+	void CheckVictoryTrigger() //check if player collides with victory trigger
+	{
+		if (hero.victory)
+			return;
+
+		if (hero.dead)
+			return;
+
+		if (!hero.collider)
+			return;
+
+		const auto& enemies = enemySystem.Items();
+
+		if (enemies.empty())
+			return;
+
+		// Enemy 0 Ч специальный триггер победы.
+		const Enemies::Enemy& trigger = enemies[0];
+
+		if (!trigger.collider)
+			return;
+
+		// —инхронизируем позицию коллайдера
+		// с актуальной позицией тестового врага.
+		trigger.collider->position.x = trigger.position.x;
+		trigger.collider->position.y = trigger.position.y;
+		trigger.collider->position.z = trigger.position.z;
+
+		collision::CollisionResult result =
+			collision::sphere_vs_sphere(
+				hero.collider->position,
+				hero.collider->radius,
+				trigger.collider->position,
+				trigger.collider->radius
+			);
+
+		if (result.collided)
+		{
+			hero.victory = true;
+
+			dx11::Audio::Play("win_character", false, 1.0f);
+
+			Log("PLAYER VICTORY!\n");
+		}
+	}
 
 	void CheckPlayerEnemyCollisions()
 	{
@@ -3265,6 +3312,9 @@ namespace Loop
 
 		for (const Enemies::Enemy& enemy : enemies)
 		{
+			if (&enemy == &enemies[0]) // enemies[0] Ч trigger (no damage)
+				continue;
+
 			if (!enemy.collider)
 				continue;
 
@@ -3424,7 +3474,7 @@ namespace Loop
 
 			while (accumulator >= FIXED_DT) {
 
-				if (!hero.dead) {
+				if (!hero.dead && !hero.victory) {
 					hero.pathControl.Process();
 					hero.ProcessMove(FIXED_DT);
 					hero.ProcessJump(FIXED_DT);
@@ -3452,7 +3502,7 @@ namespace Loop
 
 				enemySystem.Update(FIXED_DT, hero.collider, hero);
 
-				// NEW
+				CheckVictoryTrigger();
 				CheckPlayerEnemyCollisions();
 
 				//enemySystem.Update(FIXED_DT, hero.collider);
