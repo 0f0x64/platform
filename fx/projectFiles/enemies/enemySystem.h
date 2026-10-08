@@ -22,6 +22,7 @@ namespace Enemies
 	public:
 		static constexpr std::size_t Count = 100;
 		static constexpr auto DefaultSeed = std::mt19937::default_seed;
+		std::vector<Enemy> enemies_{};
 
 		EnemySystem() = default;
 		EnemySystem(const EnemySystem&) = delete;
@@ -215,10 +216,16 @@ namespace Enemies
 			if (enemy.isCharging) {
 				enemy.charge += deltaTime;
 				enemy.colorCharge = enemy.charge / enemy.chargeTime;
+
+				enemy.mesh.PlayAnimation(3);
+				enemy.mesh.playStates[3].currentTime = enemy.colorCharge * enemy.mesh.playStates[3].duration;
+
 				if (enemy.charge >= enemy.chargeTime) {
 					enemy.charge = 0.f;
 					enemy.colorCharge = 3.f;
 					enemy.isCharging = false;
+
+					enemy.mesh.StopAnimation(3);
 
 					enemy.attackCollider->position = enemy.position;
 					collision::CollisionResult result =
@@ -279,13 +286,31 @@ namespace Enemies
 				enemy.isCharging = true;
 				enemy.position = enemy.movementTarget;
 				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
+				enemy.mesh.PlayAnimation(1);
+				enemy.mesh.StopAnimation(2);
 			}
 			else {
 				enemy.position += step;
+				enemy.mesh.PlayAnimation(2);
+				enemy.mesh.StopAnimation(1);
+
+				XMVECTOR Forward = XMVector3Normalize(F2V(direction));
+				XMVECTOR Up = XMVectorSet(0, 1, 0, 0);
+
+				XMVECTOR Right = XMVector3Normalize(XMVector3Cross(Up, Forward));
+				Up = XMVector3Cross(Forward, Right);
+
+				XMMATRIX enemyRotation = XMMATRIX(
+					Right,   // 1-я строка
+					Up,      // 2-я строка
+					Forward, // 3-я строка
+					XMVectorSet(0, 0, 0, 1)
+				);
+
+				enemy.mesh.model = LerpMatrix(enemy.mesh.model, enemyRotation, 0.05f);
 			}
 		}
 
-		std::vector<Enemy> enemies_{};
 		std::mt19937 random_{ DefaultSeed };
 		bool initialized_ = false;
 	};

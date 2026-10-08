@@ -100,7 +100,6 @@ float getRandomFloat(float min, float max) {
 	return ::std::uniform_real_distribution<float>(min, max)(gen);
 }
 
-
 float4 getRandomDirection() {
 	float r1 = getRandomFloat(0.0f, 1.0f);
 	float r2 = getRandomFloat(0.0f, 1.0f);
@@ -113,4 +112,14 @@ float4 getRandomDirection() {
 	float y = r * sinf(theta);
 
 	return float4(x, y, z, 0);
+}
+
+dx11::DirectX::XMMATRIX LerpMatrix(const dx11::DirectX::XMMATRIX& from, const dx11::DirectX::XMMATRIX& to, float t)
+{
+	dx11::DirectX::XMVECTOR fromQuat = dx11::DirectX::XMQuaternionRotationMatrix(from);
+	dx11::DirectX::XMVECTOR toQuat = dx11::DirectX::XMQuaternionRotationMatrix(to);
+
+	dx11::DirectX::XMVECTOR resultQuat = dx11::DirectX::XMQuaternionSlerp(fromQuat, toQuat, t);
+
+	return dx11::DirectX::XMMatrixRotationQuaternion(resultQuat);
 }

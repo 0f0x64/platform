@@ -103,7 +103,7 @@ struct inputController_ {
 			XMVECTOR HeroRealUp,
 			float deltaTime,
 			float heroChangeDirSpeed,
-			Object::mesh* mesh)
+			Object::MeshInstance& mesh)
 		{
 			static bool animStarted = false;
 			static float yawInner = yaw;
@@ -129,7 +129,7 @@ struct inputController_ {
 			const float turnThreshold = XMConvertToRadians(110.0f);
 			const int frames = 30;
 
-			ConstBuf::gltfAnim::AnimationClip& clip = mesh->animations[7];
+			Object::MeshInstance::ClipPlayState& clip = mesh.playStates[7];
 
 			if (fabs(mouseDiff) > turnThreshold && !animStarted)
 			{
@@ -142,7 +142,7 @@ struct inputController_ {
 				turnLookStart = mouseDiff;
 				turnLookTarget = turnLookStart;
 
-				mesh->PlayAnimation(7, 0);
+				mesh.PlayAnimation(7, 0);
 
 				if (mouseDiff < 0)
 					Log("right\n");
@@ -161,11 +161,11 @@ struct inputController_ {
 				skeletonYaw = atan2f(
 					sinf(yaw - yawInner),
 					cosf(yaw - yawInner));
-				mesh->SetLookAtEnabled(true);
+				mesh.SetLookAtEnabled(true);
 
 				heroRotateAngleAnim = 0;
 
-				mesh->StopAnimation(7, 0);
+				mesh.StopAnimation(7, 0);
 			}
 
 			if (animStarted)
@@ -201,13 +201,13 @@ struct inputController_ {
 					skeletonYaw = atan2f(
 						sinf(yaw - yawInner),
 						cosf(yaw - yawInner));
-					mesh->StopAnimation(7, 0);
+					mesh.StopAnimation(7, 0);
 				}
 			}
 
-			mesh->SetLookAtYaw(skeletonYaw);
-			mesh->SetLookAtPitch(pitch);
-			mesh->SetLookAtEnabled(true);
+			mesh.SetLookAtYaw(skeletonYaw);
+			mesh.SetLookAtPitch(pitch);
+			mesh.SetLookAtEnabled(true);
 
 			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, lastTargetA);
 
@@ -267,8 +267,8 @@ float fov = 110;
 
 struct hero_ : AliveCreation {
 
-	Object::mesh* mesh = new Object::mesh;
-	Object::mesh* arrowMesh = new Object::mesh;
+	Object::MeshInstance mesh = Object::MeshInstance();
+	Object::MeshInstance arrowMesh = Object::MeshInstance();
 	
 	//
 	collision::SphereCollider* collider = []()
@@ -285,6 +285,7 @@ struct hero_ : AliveCreation {
 	float invulnerabilityTimer = 0.0f;
 
 	bool dead = false;
+	bool victory = false; //флаг состояния победы
 	//
 
 	XMVECTOR pos = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -1156,29 +1157,29 @@ struct hero_ : AliveCreation {
 
 		if (gravity.mode)
 		{
-			mesh->StopAnimation(1);
-			mesh->StopAnimation(3);
-			mesh->StopAnimation(4);
-			mesh->StopAnimation(6);
-			mesh->StopAnimation(7, 0);
-			mesh->StopAnimation(8);
-			mesh->PlayAnimation(5);
+			mesh.StopAnimation(1);
+			mesh.StopAnimation(3);
+			mesh.StopAnimation(4);
+			mesh.StopAnimation(6);
+			mesh.StopAnimation(7, 0);
+			mesh.StopAnimation(8);
+			mesh.PlayAnimation(5);
 			landingTimer = 0;
 		}
 		else {
-			if (mesh->animations[5].isPlaying) {
+			if (mesh.playStates[5].isPlaying) {
 				dx11::Audio::Play("Landing");
 			}
 
-			mesh->StopAnimation(5);
+			mesh.StopAnimation(5);
 			if (railEndBraking && railEndBrakeTime < RailEndBrakeDuration)
 			{
-				mesh->StopAnimation(1);
-				mesh->StopAnimation(3);
-				mesh->StopAnimation(4);
-				mesh->StopAnimation(7, 0);
-				mesh->StopAnimation(8);
-				mesh->PlayAnimation(6);
+				mesh.StopAnimation(1);
+				mesh.StopAnimation(3);
+				mesh.StopAnimation(4);
+				mesh.StopAnimation(7, 0);
+				mesh.StopAnimation(8);
+				mesh.PlayAnimation(6);
 			}
 		}
 
@@ -1195,22 +1196,23 @@ struct hero_ : AliveCreation {
 		}
 
 		//if (!gravity.mode && jumpChargeProgress != 1.0f) {
-			ConstBuf::gltfAnim::AnimationClip& clip = mesh->animations[2];
+			Object::MeshInstance::ClipPlayState& clip = mesh.playStates[2];
 
 			clip.currentTime = (1 - jumpChargeProgress) * clip.duration;
 
 			if (jumpChargeProgress != 1.0f) {
-				mesh->PlayAnimation(2);
+				mesh.PlayAnimation(2);
 			}
 			else {
-				mesh->StopAnimation(2);
+				mesh.StopAnimation(2);
 			}
 		//}
 	}
 
 	void Respawn(bool force = false)
 	{
-		if (firstRun || force || GetAsyncKeyState('R'))
+		if (firstRun || force || (!victory && GetAsyncKeyState('R')))
+
 		{
 			if (dead)
 			{
@@ -1229,6 +1231,8 @@ struct hero_ : AliveCreation {
 			{
 				while (GetAsyncKeyState('R')) { Sleep(16); };
 			}
+
+			dx11::Audio::Play("Player_Spawn");
 
 			respawnInProgress = true;
 			railEndFlight = false;
@@ -1258,9 +1262,8 @@ struct hero_ : AliveCreation {
 			//int startLine = rand()% Object::starLineList.lineCount;
 			//int startPoint = rand() % (Object::starLineList.line[startLine].pointCount-2)+1;
 
-			int startLine = min(1, Object::starLineList.lineCount - 1);
-			if (startLine < 0 || Object::starLineList.line[startLine].pointCount == 0) return;
-			int startPoint = min(1, Object::starLineList.line[startLine].pointCount - 1);
+			int startLine = 0;
+			int startPoint = 0;
 			lineIndex = startLine;
 			pointIndex = (float)startPoint;
 
@@ -1294,6 +1297,17 @@ struct hero_ : AliveCreation {
 		collider->position.w = 1.0f;
 	}
 
+	void Death()
+	{
+		dead = true;
+
+		dx11::Audio::Play("Player_Death");
+		if (collider)
+			collider->isTouchable = false;
+
+		Log("PLAYER DEAD\n");
+	}
+
 	void TakeDamage(float damage) override
 	{
 		if (dead)
@@ -1323,12 +1337,7 @@ struct hero_ : AliveCreation {
 
 		if (health <= 0.0f)
 		{
-			dead = true;
-
-			if (collider)
-				collider->isTouchable = false;
-
-			Log("PLAYER DEAD\n");
+			Death();
 		}
 	}
 
@@ -1473,9 +1482,9 @@ struct hero_ : AliveCreation {
 	void ProcessMove(float deltaTime)
 	{
 		if (jump || gravity.mode) {
-			mesh->StopAnimation(3);
-			mesh->StopAnimation(4);
-			mesh->StopAnimation(1);
+			mesh.StopAnimation(3);
+			mesh.StopAnimation(4);
+			mesh.StopAnimation(1);
 
 			return;
 		}
@@ -1488,7 +1497,7 @@ struct hero_ : AliveCreation {
 			{
 				railEndBraking = false;
 				speed = 0.0f;
-				mesh->StopAnimation(6);
+				mesh.StopAnimation(6);
 			}
 			else
 			{
@@ -1496,19 +1505,22 @@ struct hero_ : AliveCreation {
 				if (railEndBrakeTime >= RailEndBrakeDuration - 0.00001f) railEndBrakeTime = RailEndBrakeDuration;
 				float progress = railEndBrakeTime / RailEndBrakeDuration;
 				speed = railEndBrakeSpeed * (1.0f - progress);
-				mesh->StopAnimation(3);
-				mesh->StopAnimation(4);
-				mesh->StopAnimation(8);
-				mesh->animations[6].currentTime = progress * mesh->animations[6].duration;
+				mesh.StopAnimation(3);
+				mesh.StopAnimation(4);
+				mesh.StopAnimation(8);
+
+				Object::MeshInstance::ClipPlayState& clip = mesh.playStates[6];
+				clip.currentTime = progress * clip.duration;
+
 				if (progress < 1.0f)
 				{
-					mesh->StopAnimation(1);
-					mesh->PlayAnimation(6);
+					mesh.StopAnimation(1);
+					mesh.PlayAnimation(6);
 				}
 				else
 				{
-					mesh->StopAnimation(6);
-					mesh->PlayAnimation(1);
+					mesh.StopAnimation(6);
+					mesh.PlayAnimation(1);
 				}
 				dx11::Audio::SetVolume(glideVoice, 0.0f);
 				stepTime = 0.0f;
@@ -1532,12 +1544,12 @@ struct hero_ : AliveCreation {
 					brakingSound = true;
 					dx11::Audio::Play("Braking", false, 0.5f);
 				}
-				mesh->PlayAnimation(6);
+				mesh.PlayAnimation(6);
 			}
 			else {
 				speed += accel * sign(speedFactor) * deltaTime;
 
-				mesh->StopAnimation(6);
+				mesh.StopAnimation(6);
 			}
 
 			pressingMove = true;
@@ -1554,12 +1566,12 @@ struct hero_ : AliveCreation {
 					brakingSound = true;
 					dx11::Audio::Play("Braking", false, 0.5f);
 				}
-				mesh->PlayAnimation(6);
+				mesh.PlayAnimation(6);
 			}
 			else {
 				speed -= accel * sign(speedFactor) * deltaTime;
 
-				mesh->StopAnimation(6);
+				mesh.StopAnimation(6);
 			}
 
 			pressingMove = true;
@@ -1569,7 +1581,7 @@ struct hero_ : AliveCreation {
 		if (!pressingMove && !gravity.mode)
 		{
 			brakingSound = false;
-			mesh->StopAnimation(6);
+			mesh.StopAnimation(6);
 
 			float newSpeed = speed - accel * sign(speed) * deltaTime;
 			if (sign(speed) == sign(newSpeed)) {
@@ -1584,20 +1596,20 @@ struct hero_ : AliveCreation {
 			if (absSpeed < 0.001f) speed = 0.0f;
 
 			if (absSpeed > 0.1f) {
-				ConstBuf::gltfAnim::AnimationClip& clip = mesh->animations[8];
 
+				Object::MeshInstance::ClipPlayState& clip = mesh.playStates[8];
 				clip.currentTime = (1 - absSpeed / maxSpeed) * clip.duration;
 
-				mesh->PlayAnimation(8);
+				mesh.PlayAnimation(8);
 			}
 			else {
-				mesh->StopAnimation(8);
+				mesh.StopAnimation(8);
 			}
 		}
 		else {
-			mesh->StopAnimation(8);
+			mesh.StopAnimation(8);
 
-			ConstBuf::gltfAnim::AnimationClip& clip = mesh->animations[6];
+			Object::MeshInstance::ClipPlayState& clip = mesh.playStates[6];
 			clip.currentTime = (1 - fabsf(speed) / maxSpeed) * clip.duration;
 		}
 
@@ -1605,7 +1617,7 @@ struct hero_ : AliveCreation {
 		speed = clamp(speed, -maxSpeed, maxSpeed);
 		float absSpeed = fabsf(speed);
 
-		if (mesh->animations[8].isPlaying || mesh->animations[2].isPlaying) {
+		if (mesh.playStates[8].isPlaying || mesh.playStates[2].isPlaying) {
 			dx11::Audio::SetVolume(glideVoice, absSpeed / maxSpeed);
 		}
 		else {
@@ -1616,31 +1628,31 @@ struct hero_ : AliveCreation {
 		// Логика включения анимаций ходьбы и бега
 		if (pressingMove && absSpeed > 0.1f) {
 			float weight = min(max(absSpeed - 5.0f, 0.0f) / 12.0f, 1.0f);
-			mesh->animations[4].weight = weight;
-			mesh->animations[3].weight = 1 - weight;
+			mesh.playStates[4].weight = weight;
+			mesh.playStates[3].weight = 1 - weight;
 
 			float animSpeed = pow(absSpeed / 12.0f, 0.25f);
-			mesh->animations[4].speed = animSpeed;
-			mesh->animations[3].speed = animSpeed;
+			mesh.playStates[4].speed = animSpeed;
+			mesh.playStates[3].speed = animSpeed;
 
-			mesh->PlayAnimation(3);
-			mesh->PlayAnimation(4);
+			mesh.PlayAnimation(3);
+			mesh.PlayAnimation(4);
 
-			mesh->StopAnimation(1);
+			mesh.StopAnimation(1);
 
 			stepTime += deltaTime;
 			if (stepTime > 0.37f / animSpeed) {
 				stepTime = 0.0f;
-				if (!mesh->animations[2].isPlaying) {
+				if (!mesh.playStates[2].isPlaying) {
 					dx11::Audio::Play("Step", false, 0.5f);
 				}
 			}
 		}
 		else {
-			mesh->StopAnimation(3);
-			mesh->StopAnimation(4);
+			mesh.StopAnimation(3);
+			mesh.StopAnimation(4);
 
-			mesh->PlayAnimation(1);
+			mesh.PlayAnimation(1);
 
 			stepTime = 0.0f;
 		}
@@ -1728,7 +1740,7 @@ struct hero_ : AliveCreation {
 		if (railEndFlight)
 		{
 			Object::heroOnRails.r[3] = XMVectorSetW(pos, 1.0f);
-			mesh->model = inputController.mouse.getLookMatrix(Object::heroOnRails, upVector, deltaTime, changeDirSpeed, mesh);
+			mesh.model = inputController.mouse.getLookMatrix(Object::heroOnRails, upVector, deltaTime, changeDirSpeed, mesh);
 			return;
 		}
 
@@ -1758,7 +1770,7 @@ struct hero_ : AliveCreation {
 
 		XMVECTOR targetQuat = XMQuaternionRotationMatrix(targetAirMatrix);
 
-		// 7. Извлекаем текущую ориентацию из hero.mesh->model (чистый Row-Major без Transpose!)
+		// 7. Извлекаем текущую ориентацию из hero.mesh.model (чистый Row-Major без Transpose!)
 		XMMATRIX currentWorldRow = Object::heroOnRails;
 		currentWorldRow.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f); // Зануляем позицию для честного Decompose
 
@@ -1796,7 +1808,7 @@ struct hero_ : AliveCreation {
 
 		//----------------
 
-		mesh->model = inputController.mouse.getLookMatrix(finalAirRot, upVector, deltaTime, changeDirSpeed, mesh);
+		mesh.model = inputController.mouse.getLookMatrix(finalAirRot, upVector, deltaTime, changeDirSpeed, mesh);
 		axisAngle = lerp(axisAngle, 0, blendStep);
 		axisAngleSpeed = lerp(axisAngleSpeed, 0, blendStep);
 		//hero.axisAngle = 0;
@@ -1922,7 +1934,7 @@ struct hero_ : AliveCreation {
 
 		Object::heroOnRails = getHeroOnRailsMatrix(heroForward, HeroRealUp, HeroRight);
 		if (leavesRail) Object::heroOnRails.r[3] = XMVectorSetW(pos, 1.0f);
-		mesh->model = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime, changeDirSpeed, mesh);
+		mesh.model = inputController.mouse.getLookMatrix(Object::heroOnRails, HeroRealUp, deltaTime, changeDirSpeed, mesh);
 	}
 
 	struct {
@@ -1987,7 +1999,7 @@ struct hero_ : AliveCreation {
 				ConstBuf::interp::Animate(fov, 60, 1.5f, ConstBuf::interp::Curve::EaseOutExpo);
 				ConstBuf::interp::Animate(bowCharge, 1.0f, 1.5f);
 
-				mesh->PlayAnimation(9);
+				mesh.PlayAnimation(9);
 			}
 		}
 		else {
@@ -1996,11 +2008,11 @@ struct hero_ : AliveCreation {
 
 				ConstBuf::interp::Animate(fov, 110, 1.5f, ConstBuf::interp::Curve::EaseOutExpo);
 
-				mesh->StopAnimation(9);
+				mesh.StopAnimation(9);
 
 				if (bowCharge >= 0.35f) {
 					dx11::Audio::Play("Bow_shoot", false, 1.0f);
-					mesh->PlayAnimation(10, 0.1f);
+					mesh.PlayAnimation(10, 0.1f);
 
 					collision::RayInfo ray = collision::RayInfo(camPos, camForward * arrowMaxDistance, collision::CollisionGroup::Player, true);
 					collision::RaycastResult result = collision::Raycast(ray);
@@ -2020,7 +2032,7 @@ struct hero_ : AliveCreation {
 						Forward, // 3-я строка
 						XMVectorSet(0, 0, 0, 1)
 					);
-					arrowRotation = XMMatrixRotationX(PI / 2) * arrowRotation;
+					arrowRotation = XMMatrixRotationX(-PI / 2) * arrowRotation;
 
 					arrows.push_back(arrow(heroPos, direction, bowCharge, arrowRotation));
 				}
@@ -2039,16 +2051,16 @@ struct hero_ : AliveCreation {
 			if (!blocking) {
 				blocking = true;
 
-				mesh->PlayAnimation(11);
-				mesh->PlayAnimation(12);
+				mesh.PlayAnimation(11);
+				mesh.PlayAnimation(12);
 			}
 		}
 		else {
 			if (blocking) {
 				blocking = false;
 
-				mesh->StopAnimation(11);
-				mesh->StopAnimation(12);
+				mesh.StopAnimation(11);
+				mesh.StopAnimation(12);
 			}
 		}
 	}
@@ -2096,7 +2108,7 @@ struct hero_ : AliveCreation {
 		for (arrow& arrow : arrows) {
 			float4 p = arrow.position * 10000.f;
 			Object::Mesh({
-				.obj = arrowMesh,
+				.obj = &arrowMesh,
 				.quality = 1,
 				.xPos = (int)(p.x),
 				.yPos = (int)(p.y),
@@ -2258,6 +2270,15 @@ struct gameCamera_ {
 };
 
 gameCamera_ gameCamera;
+
+
+struct LevelEnd
+{
+	Object::MeshInstance mesh = Object::MeshInstance();
+	collision::SphereCollider* collider;
+};
+
+LevelEnd levelEnd;
 
 
 
@@ -3234,6 +3255,37 @@ namespace Loop
 
 	}
 
+	void CheckVictoryTrigger() //check if player collides with victory trigger
+	{
+		if (hero.victory)
+			return;
+
+		if (hero.dead)
+			return;
+
+		if (!hero.collider)
+			return;
+
+		if (!levelEnd.collider)
+			return;
+
+		collision::CollisionResult result =
+			collision::sphere_vs_sphere(
+				hero.collider->position,
+				hero.collider->radius,
+				levelEnd.collider->position,
+				levelEnd.collider->radius
+			);
+
+		if (result.collided)
+		{
+			hero.victory = true;
+
+			dx11::Audio::Play("Game_Win");
+
+			Log("PLAYER VICTORY!\n");
+		}
+	}
 
 	void CheckPlayerEnemyCollisions()
 	{
@@ -3246,10 +3298,6 @@ namespace Loop
 		if (hero.invulnerabilityTimer > 0.0f)
 			return;
 
-		const float playerX = hero.collider->position.x;
-		const float playerY = hero.collider->position.y;
-		const float playerZ = hero.collider->position.z;
-
 		const auto& enemies = enemySystem.Items();
 
 		for (const Enemies::Enemy& enemy : enemies)
@@ -3259,12 +3307,6 @@ namespace Loop
 
 			if (!enemy.collider->isTouchable)
 				continue;
-
-			// Enemy::Update() обновляет collider ДО движения врага,
-			// поэтому здесь синхронизируем его с актуальной позицией.
-			enemy.collider->position.x = enemy.position.x;
-			enemy.collider->position.y = enemy.position.y;
-			enemy.collider->position.z = enemy.position.z;
 
 			collision::CollisionResult result =
 				collision::sphere_vs_sphere(
@@ -3376,6 +3418,10 @@ namespace Loop
 			dx11::Audio::LoadOggFile("Bow_bowstring", "..//fx//projectFiles//Bow_bowstring.ogg");
 
 			dx11::Audio::LoadOggFile("Music", "..//fx//projectFiles//Music.ogg");
+
+			dx11::Audio::LoadOggFile("Player_Spawn", "..//fx//projectFiles//spawn_character.ogg");
+			dx11::Audio::LoadOggFile("Player_Death", "..//fx//projectFiles//death_character.ogg");
+			dx11::Audio::LoadOggFile("Game_Win", "..//fx//projectFiles//win_character.ogg");
 		}
 
 
@@ -3386,11 +3432,6 @@ namespace Loop
 
 		Object::initPatches(hero.pathControl.Time);
 
-		if (!enemySystem.IsInitialized())
-		{
-			//enemySystem.Reset(ToEnemyPosition(hero.pos), ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
-			enemySystem.ResetRandomOnLines();
-		}
 		float deltaTime = processTimer();
 
 
@@ -3401,13 +3442,7 @@ namespace Loop
 
 			inputController.mouse.processInput();
 
-			const bool initialEnemySpawn = hero.firstRun;
 			hero.Respawn();
-			if (initialEnemySpawn)
-			{
-				//enemySystem.Reset(ToEnemyPosition(hero.pos), ToEnemyPosition(hero.rightVector), ToEnemyPosition(hero.forwardVector));
-				enemySystem.ResetRandomOnLines();
-			}
 
 			const float FIXED_DT = 1.0f / 60.0f; // Строго 16.66 мс для физики
 			static float accumulator = 0.0f;
@@ -3420,7 +3455,7 @@ namespace Loop
 
 			while (accumulator >= FIXED_DT) {
 
-				if (!hero.dead) {
+				if (!hero.dead && !hero.victory) {
 					hero.pathControl.Process();
 					hero.ProcessMove(FIXED_DT);
 					hero.ProcessJump(FIXED_DT);
@@ -3448,7 +3483,7 @@ namespace Loop
 
 				enemySystem.Update(FIXED_DT, hero.collider, hero);
 
-				// NEW
+				CheckVictoryTrigger();
 				CheckPlayerEnemyCollisions();
 
 				//enemySystem.Update(FIXED_DT, hero.collider);
@@ -3540,64 +3575,73 @@ namespace Loop
 			//ConstBuf::LoadObj("..//fx//projectFiles//A-Pose.glb");
 			//Object::MeshPtr = nullptr;
 
-			hero.mesh->LoadObj("..//fx//projectFiles//A-Pose.glb");
-			hero.arrowMesh->LoadObj("..//fx//projectFiles//Arrow.glb");
+			Object::MeshAsset* heroMeshAsset = new Object::MeshAsset;
+			Object::MeshAsset* arrowMeshAsset = new Object::MeshAsset;
+			Object::MeshAsset* sphereMeshAsset = new Object::MeshAsset;
 
-			static bool heroAnimsLoaded = false;
-			if (!heroAnimsLoaded) {
-				heroAnimsLoaded = true;
+			heroMeshAsset->LoadGeometry("..//fx//projectFiles//A-Pose.glb");
+			arrowMeshAsset->LoadGeometry("..//fx//projectFiles//Arrow.glb");
+			sphereMeshAsset->LoadGeometry("..//fx//projectFiles//Sphere.glb");
 
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 3 Ходьба
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 4 Бег
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 5 Падение
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_holding.glb", true); // 9 Удержание лука
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Bow_shot.glb", true); // 10 Выстрел из лука
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Start_Aspid.glb", true); // 11 Начало блока
-				hero.mesh->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Hold_Aspid.glb", true); // 12 Удержание блока
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 3 Ходьба
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Run.glb", true); // 4 Бег
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Falling.glb", true); // 5 Падение
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Braking.glb", true); // 6 Торможение
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//TurnAroundRight.glb", true); // 7 Разворот через правое плечо
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Sliding.glb", true); // 8 Скольжение
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Bow_holding.glb", true); // 9 Удержание лука
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Bow_shot.glb", true); // 10 Выстрел из лука
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Start_Aspid.glb", true); // 11 Начало блока
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Hold_Aspid.glb", true); // 12 Удержание блока
 
-				hero.mesh->animations[0].isPlaying = false;
+			hero.mesh.Attach(heroMeshAsset);
+			hero.arrowMesh.Attach(arrowMeshAsset);
+			levelEnd.mesh.Attach(sphereMeshAsset);
 
-				hero.mesh->animations[1].looped = true;
+			hero.mesh.playStates[0].isPlaying = false;
 
-				hero.mesh->animations[2].speed = 0.0f;
-				hero.mesh->animations[2].weight = 100000.0f;
+			hero.mesh.playStates[1].looped = true;
 
-				hero.mesh->animations[3].looped = true;
+			hero.mesh.playStates[2].speed = 0.0f;
+			hero.mesh.playStates[2].weight = 100000.0f;
 
-				hero.mesh->animations[4].looped = true;
+			hero.mesh.playStates[3].looped = true;
 
-				hero.mesh->animations[5].looped = true;
-				hero.mesh->animations[5].speed = 0.1f;
+			hero.mesh.playStates[4].looped = true;
 
-				hero.mesh->animations[6].speed = 0.0f;
-				hero.mesh->animations[6].weight = 10000.0f;
+			hero.mesh.playStates[5].looped = true;
+			hero.mesh.playStates[5].speed = 0.1f;
 
-				hero.mesh->animations[7].speed = 0.0f;
-				hero.mesh->animations[7].weight = 10000000.0f;
+			hero.mesh.playStates[6].speed = 0.0f;
+			hero.mesh.playStates[6].weight = 10000.0f;
 
-				hero.mesh->animations[8].speed = 0.0f;
-				hero.mesh->animations[8].weight = 10000.0f;
+			hero.mesh.playStates[7].speed = 0.0f;
+			hero.mesh.playStates[7].weight = 10000000.0f;
 
-				hero.mesh->animations[9].weight = 100000000.0f;
-				hero.mesh->animations[9].speed = 0.25f;
-				hero.mesh->animations[9].looped = true;
+			hero.mesh.playStates[8].speed = 0.0f;
+			hero.mesh.playStates[8].weight = 10000.0f;
 
-				hero.mesh->animations[10].weight = 100000000.0f;
+			hero.mesh.playStates[9].weight = 100000000.0f;
+			hero.mesh.playStates[9].speed = 0.25f;
+			hero.mesh.playStates[9].looped = true;
 
-				hero.mesh->animations[11].weight = 1000000000.0f;
-				hero.mesh->animations[11].speed = 0.5f;
+			hero.mesh.playStates[10].weight = 100000000.0f;
 
-				hero.mesh->animations[12].weight = 100000000.0f;
-				hero.mesh->animations[12].speed = 0.5f;
-				hero.mesh->animations[12].looped = true;
-			}
+			hero.mesh.playStates[11].weight = 1000000000.0f;
+			hero.mesh.playStates[11].speed = 0.5f;
 
-			enemyRenderer.Load();
+			hero.mesh.playStates[12].weight = 100000000.0f;
+			hero.mesh.playStates[12].speed = 0.5f;
+			hero.mesh.playStates[12].looped = true;
+
+			enemySystem.ResetRandomOnLines();
+			enemyRenderer.Load(enemySystem);
+
+			levelEnd.collider = collision::CreateSphereCollider();
+			levelEnd.collider->collisionGroup = collision::CollisionGroup::Enemy;
+			levelEnd.collider->position = float4(-96, -210, -163);
 
 			hero.glideVoice = dx11::Audio::Play("Glide", true, 0.0f);
 			hero.idleVoice = dx11::Audio::Play("Character", true, 0.0f);
@@ -3615,7 +3659,7 @@ namespace Loop
 		if (!hero.dead) {
 			float4 p = V2F(hero.pos * 10000.);
 			Object::Mesh({
-				.obj = hero.mesh,
+				.obj = &hero.mesh,
 				.quality = 1,
 				.xPos = (int)(p.x),
 				.yPos = (int)(p.y),
@@ -3633,6 +3677,22 @@ namespace Loop
 
 		enemyRenderer.RenderColor(enemySystem, V2F(gameCamera.finalCameraEye), deltaTime);
 
+		float4 p = levelEnd.collider->position * 10000.f;
+		Object::Mesh({
+			.obj = &levelEnd.mesh,
+			.quality = 1,
+			.xPos = (int)(p.x),
+			.yPos = (int)(p.y),
+			.zPos = (int)(p.z),
+			.brightness = 9,
+			.tickness = 4,
+			.stencil = switcher::on,
+			.zoom = -75,
+			.onLineOfs = 0,
+			.jumpCharge = 100,
+			.deltaTime = deltaTime
+			});
+
 		/*for (std::pair<float4, float4>& ray : hero.rays) {
 			Object::RayHit({
 				.pos1 = ray.first,
@@ -3642,7 +3702,7 @@ namespace Loop
 
 		//.jumpCharge = (int)(hero.jumpChargeProgress*100.)
 
-		//hero.mesh->model = XMMatrixTranspose(XMMatrixIdentity());
+		//hero.mesh.model = XMMatrixTranspose(XMMatrixIdentity());
 
 		/*Object::BossMesh.Load("..//fx//projectFiles//edged.obj");
 		Object::MeshPtr = &Object::BossMesh;
