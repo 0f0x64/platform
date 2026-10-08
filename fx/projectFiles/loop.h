@@ -1211,7 +1211,7 @@ struct hero_ : AliveCreation {
 
 	void Respawn(bool force = false)
 	{
-		if (firstRun || force || (!victory && GetAsyncKeyState('R'))))
+		if (firstRun || force || (!victory && GetAsyncKeyState('R')))
 
 		{
 			if (dead)
