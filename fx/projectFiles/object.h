@@ -919,6 +919,9 @@ namespace Object {
 							if (XMVectorGetX(XMQuaternionDot(a, b)) < 0.0f) b = XMVectorNegate(b);
 							rotation = XMQuaternionNormalize(XMQuaternionSlerp(a, b, alpha));
 						}
+						else if (channel.path == ConstBuf::cgltf_animation_path_type_scale) {
+							scale = XMVectorLerp(a, b, alpha);
+						}
 					}
 
 					if (animated) {
@@ -938,6 +941,7 @@ namespace Object {
 						}
 						else {
 							float blend = effectiveWeight / (jointWeightSum[jointIdx] + effectiveWeight);
+							accumScale[jointIdx] = XMVectorLerp(accumScale[jointIdx], scale, blend);
 							accumTranslation[jointIdx] = XMVectorLerp(accumTranslation[jointIdx], translation, blend);
 							accumRotation[jointIdx] = XMQuaternionSlerp(accumRotation[jointIdx], rotation, blend);
 							jointWeightSum[jointIdx] += effectiveWeight;

@@ -216,10 +216,16 @@ namespace Enemies
 			if (enemy.isCharging) {
 				enemy.charge += deltaTime;
 				enemy.colorCharge = enemy.charge / enemy.chargeTime;
+
+				enemy.mesh.PlayAnimation(3);
+				enemy.mesh.playStates[3].currentTime = enemy.colorCharge * enemy.mesh.playStates[3].duration;
+
 				if (enemy.charge >= enemy.chargeTime) {
 					enemy.charge = 0.f;
 					enemy.colorCharge = 3.f;
 					enemy.isCharging = false;
+
+					enemy.mesh.StopAnimation(3);
 
 					enemy.attackCollider->position = enemy.position;
 					collision::CollisionResult result =
@@ -281,11 +287,11 @@ namespace Enemies
 				enemy.position = enemy.movementTarget;
 				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
 				enemy.mesh.PlayAnimation(1);
-				enemy.mesh.StopAnimation(3);
+				enemy.mesh.StopAnimation(2);
 			}
 			else {
 				enemy.position += step;
-				enemy.mesh.PlayAnimation(3);
+				enemy.mesh.PlayAnimation(2);
 				enemy.mesh.StopAnimation(1);
 
 				XMVECTOR Forward = XMVector3Normalize(F2V(direction));
