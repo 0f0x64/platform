@@ -3269,12 +3269,6 @@ namespace Loop
 		if (!trigger.collider)
 			return;
 
-		// Синхронизируем позицию коллайдера
-		// с актуальной позицией тестового врага.
-		trigger.collider->position.x = trigger.position.x;
-		trigger.collider->position.y = trigger.position.y;
-		trigger.collider->position.z = trigger.position.z;
-
 		collision::CollisionResult result =
 			collision::sphere_vs_sphere(
 				hero.collider->position,
@@ -3287,7 +3281,7 @@ namespace Loop
 		{
 			hero.victory = true;
 
-			dx11::Audio::Play("win_character", false, 1.0f);
+			dx11::Audio::Play("Game_Win");
 
 			Log("PLAYER VICTORY!\n");
 		}
@@ -3320,12 +3314,6 @@ namespace Loop
 
 			if (!enemy.collider->isTouchable)
 				continue;
-
-			// Enemy::Update() обновляет collider ДО движения врага,
-			// поэтому здесь синхронизируем его с актуальной позицией.
-			enemy.collider->position.x = enemy.position.x;
-			enemy.collider->position.y = enemy.position.y;
-			enemy.collider->position.z = enemy.position.z;
 
 			collision::CollisionResult result =
 				collision::sphere_vs_sphere(
