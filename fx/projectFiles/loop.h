@@ -2031,7 +2031,7 @@ struct hero_ : AliveCreation {
 						Forward, // 3-я строка
 						XMVectorSet(0, 0, 0, 1)
 					);
-					arrowRotation = XMMatrixRotationX(PI / 2) * arrowRotation;
+					arrowRotation = XMMatrixRotationX(-PI / 2) * arrowRotation;
 
 					arrows.push_back(arrow(heroPos, direction, bowCharge, arrowRotation));
 				}
