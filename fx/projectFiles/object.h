@@ -46,6 +46,8 @@ float4 cross(const float4& a, const float4& b) {
 	};
 }
 
+
+
 namespace Object {
 
 #define BoneLimit 256
@@ -3048,6 +3050,183 @@ namespace Object {
 		return XMVectorSet(nx, ny, nz, 0.0f);
 	}
 
+	// Постобработка линии: зафиксированные концы + искривления в середине.
+// coefficient = 0   — без искажений (кривая = сглаженная basePoint)
+// coefficient = 1   — «умеренно не скучно»
+// coefficient = 2.. — сильные и частые изгибы
+	// Постобработка уже сглаженной линии: мягкие волны вдоль пути.
+// Концы (point[0] и point[pointCount-1]) остаются на месте.
+// coefficient: 1 — спокойно, 2 — сильнее и чаще, 0.5 — почти незаметно.
+// Замечание: при coefficient > ~2.5 начнёт алиаситься в «зубья»,
+// потому что шаг между точками point[] фиксирован smoothStarline.
+	void PostProcessLine(starline& line, float coefficient)
+	{
+		if (line.pointCount < 4 || coefficient <= 0.0f)
+			return;
+
+		// === Параметры эффектов (крути их) ===
+		const float bendFreq = 2.0f;                          // крупные изгибы
+		const float bendAmp = 40.0f * coefficient;           // в стороны
+		const float bendUpAmp = 24.0f * coefficient;           // вверх-вниз
+
+		const float rollFreq = 1.2f;                          // частота крена
+		const float rollAmp = XMConvertToRadians(35.0f);     // макс угол крена
+
+		const float roughFreq = 6.0f;                          // мелкая дрожь
+		const float roughAmp = 2.0f * coefficient;
+
+		const int N = line.pointCount;
+
+		// === 1. Тангенсы через центральную разность ===
+		std::vector<XMVECTOR> tangents(N);
+		const int R = 5;
+		for (int i = 0; i < N; ++i) {
+			int a = max(0, i - R);
+			int b = min(N - 1, i + R);
+			XMVECTOR t = XMVectorSubtract(F2V(line.point[b]), F2V(line.point[a]));
+			float lenSq = XMVectorGetX(XMVector3LengthSq(t));
+			tangents[i] = (lenSq > 1e-8f) ? XMVector3Normalize(t)
+				: XMVectorSet(0, 0, 1, 0);
+		}
+
+		// === 1.5. Лапласиан по тангенсам (2 прохода) ===
+		std::vector<XMVECTOR> tangentsSmoothed(N);
+		for (int pass = 0; pass < 2; ++pass) {
+			for (int i = 0; i < N; ++i) {
+				XMVECTOR a = tangents[(::std::max)(0, i - 1)];
+				XMVECTOR b = tangents[i];
+				XMVECTOR c = tangents[(::std::min)(N - 1, i + 1)];
+				XMVECTOR avg = XMVectorAdd(XMVectorAdd(a, c), XMVectorScale(b, 2.0f));
+				tangentsSmoothed[i] = XMVector3Normalize(XMVectorScale(avg, 0.25f));
+			}
+			// копируем обратно, чтобы следующий проход и дальнейший код видели сглаженное
+			tangents = tangentsSmoothed;
+		}
+
+		// === 2. Параллельный перенос (без порогов!) ===
+		XMVECTOR prevTangent = tangents[0];
+		XMVECTOR refUp;
+		{
+			XMVECTOR world = XMVectorSet(0, 1, 0, 0);
+			XMVECTOR proj = XMVectorMultiply(prevTangent,
+				XMVectorReplicate(XMVectorGetX(XMVector3Dot(world, prevTangent))));
+			XMVECTOR perp = XMVectorSubtract(world, proj);
+			if (XMVectorGetX(XMVector3LengthSq(perp)) < 1e-6f)
+				perp = XMVectorSet(1, 0, 0, 0)
+				- prevTangent * XMVectorGetX(XMVector3Dot(XMVectorSet(1, 0, 0, 0), prevTangent));
+			refUp = XMVector3Normalize(perp);
+		}
+
+		std::vector<XMVECTOR> ups(N);
+		ups[0] = refUp;
+
+		for (int i = 1; i < N; ++i) {
+			XMVECTOR currTangent = tangents[i];
+			XMVECTOR axis = XMVector3Cross(prevTangent, currTangent);
+			float axisLenSq = XMVectorGetX(XMVector3LengthSq(axis));
+			if (axisLenSq > 1e-8f) {
+				float dot = clamp(XMVectorGetX(XMVector3Dot(prevTangent, currTangent)), -1.0f, 1.0f);
+				float angle = acosf(dot);
+				XMVECTOR rot = XMQuaternionRotationAxis(XMVector3Normalize(axis), angle);
+				refUp = XMVector3Rotate(refUp, rot);
+			}
+			XMVECTOR proj = XMVectorMultiply(currTangent,
+				XMVectorReplicate(XMVectorGetX(XMVector3Dot(refUp, currTangent))));
+			refUp = XMVector3Normalize(XMVectorSubtract(refUp, proj));
+			ups[i] = refUp;
+			prevTangent = currTangent;
+		}
+
+		// === 3. Эффекты: bend + roll + roughness ===
+		for (int i = 1; i < N - 1; ++i) {
+			const float t = (float)i / (float)(N - 1);
+			const float w = sinf(PI * t);              // окно: 0 на концах
+			if (w < 0.001f) continue;
+
+			XMVECTOR tangent = tangents[i];
+			XMVECTOR up = ups[i];
+			XMVECTOR side = XMVector3Normalize(XMVector3Cross(up, tangent));
+
+			// --- ROLL: поворот up вокруг касательной ---
+			// Отдельный шум со сдвигом фазы, чтобы крен не совпадал с изгибами.
+			float rollAngle = GetSinglePerlinNoise3D(t * rollFreq, 7.3f, 0.0f)
+				* rollAmp * w;
+			XMVECTOR rotQ = XMQuaternionRotationAxis(tangent, rollAngle);
+			up = XMVector3Rotate(up, rotQ);
+			side = XMVector3Normalize(XMVector3Cross(up, tangent));
+
+			// --- BEND: 2 канала Perlin — side + up ---
+			XMVECTOR n = GetPerlinNoiseVector3(t * bendFreq, 0.0f, 0.0f);
+			float offSide = XMVectorGetX(n) * bendAmp * w;
+			float offUp = XMVectorGetY(n) * bendUpAmp * w;
+
+			// --- ROUGHNESS: мелкая дрожь ---
+			float rough = GetSinglePerlinNoise3D(t * roughFreq, 31.7f, 0.0f)
+				* roughAmp * w;
+
+			float totalSide = offSide + rough;
+
+			line.point[i].x += XMVectorGetX(side) * totalSide + XMVectorGetX(up) * offUp;
+			line.point[i].y += XMVectorGetY(side) * totalSide + XMVectorGetY(up) * offUp;
+			line.point[i].z += XMVectorGetZ(side) * totalSide + XMVectorGetZ(up) * offUp;
+
+
+
+			// сохраняем up для hero (см. следующий раздел)
+			line.upVector[i] = V2F(up);
+		}
+
+		// === 4. Округление углов (Chaikin, 2 прохода) ===
+// Не сжимает линию, а срезает углы: ребро заменяется двумя короткими.
+// Крупные изгибы (десятки точек) сохраняются, углы из 2-3 точек — округляются.
+// Концы линии остаются на месте.
+// upVector[] интерполируется вместе с позицией, чтобы hero_ получал
+// непрерывный базис и на новых точках.
+		{
+			const int passes = 2;
+
+			for (int pass = 0; pass < passes; ++pass) {
+				const int M = line.pointCount;
+				// Каждый проход удваивает число точек. Предохранитель на переполнение.
+				if (M * 2 + 2 > smoothPointMAX) break;
+
+				std::vector<XMVECTOR> src(M), srcUp(M);
+				for (int i = 0; i < M; ++i) {
+					src[i] = F2V(line.point[i]);
+					srcUp[i] = F2V(line.upVector[i]);
+				}
+
+				std::vector<XMVECTOR> dst, dstUp;
+				dst.reserve((M - 1) * 2 + 2);
+				dstUp.reserve((M - 1) * 2 + 2);
+
+				// Начало не сдвигаем
+				dst.push_back(src[0]);
+				dstUp.push_back(srcUp[0]);
+
+				for (int i = 0; i + 1 < M; ++i) {
+					dst.push_back(XMVectorLerp(src[i], src[i + 1], 0.25f));
+					dstUp.push_back(XMVectorLerp(srcUp[i], srcUp[i + 1], 0.25f));
+
+					dst.push_back(XMVectorLerp(src[i], src[i + 1], 0.75f));
+					dstUp.push_back(XMVectorLerp(srcUp[i], srcUp[i + 1], 0.75f));
+				}
+
+				// Конец не сдвигаем
+				dst.push_back(src[M - 1]);
+				dstUp.push_back(srcUp[M - 1]);
+
+				const int newCount = (int)dst.size();
+				for (int i = 0; i < newCount; ++i) {
+					line.point[i] = V2F(dst[i]);
+					line.upVector[i] = V2F(dstUp[i]);
+				}
+				line.pointCount = newCount;
+			}
+		}
+	}
+
+
 	void NewLine()
 	{
 		currentLine++;
@@ -5497,7 +5676,7 @@ namespace Object {
 				float4 start = gemini[i];
 				float4 end = gemini[j];
 
-				// Проверка дистанции в исходном диапазоне -1...1
+				// Проверка дистанции в исходном диапаоне -1...1
 				if (distance(start, end) < .75)
 				{
 					NewLine();
@@ -5527,9 +5706,13 @@ namespace Object {
 		//------------end user space---------------
 		//-----------------------------------------
 
+		double tSec = timer::GetCounter() * 0.001;   // секунды
+		float lineDistortion = 1.0f + 1.0f * sinf((float)tSec * 0.25f);
+
 		for (int j = 0; j < starLineList.lineCount; j++)
 		{
 			smoothStarline(starLineList.line[j]);
+			PostProcessLine(starLineList.line[j], lineDistortion);
 			BuildLineAABB(starLineList.line[j]);
 			//Starline(starLineList.line[j], 3*12. / starLineList.line[j].basePointCount);
 		}
