@@ -3065,12 +3065,12 @@ namespace Object {
 			return;
 
 		// === Параметры эффектов (крути их) ===
-		const float bendFreq = 2.0f;                          // крупные изгибы
+		const float bendFreq = 1.7f;                          // крупные изгибы
 		const float bendAmp = 40.0f * coefficient;           // в стороны
 		const float bendUpAmp = 24.0f * coefficient;           // вверх-вниз
 
 		const float rollFreq = 1.2f;                          // частота крена
-		const float rollAmp = XMConvertToRadians(35.0f);     // макс угол крена
+		const float rollAmp = XMConvertToRadians(32.0f);     // макс угол крена
 
 		const float roughFreq = 6.0f;                          // мелкая дрожь
 		const float roughAmp = 2.0f * coefficient;
