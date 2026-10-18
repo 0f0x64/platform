@@ -191,7 +191,7 @@ namespace Enemies
 					value.movementCenter = spawn;
 					value.movementTarget = spawn;
 					};
-				swarm.Initialize();
+				swarm.Initialize(10);
 				enemy.movementTarget = RandomTarget(enemy);
 				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
 			}
