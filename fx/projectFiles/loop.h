@@ -1632,7 +1632,7 @@ struct hero_ : AliveCreation {
 			mesh.playStates[3].weight = 1 - weight;
 
 			float animSpeed = pow(absSpeed / 12.0f, 0.25f);
-			mesh.playStates[4].speed = animSpeed;
+			mesh.playStates[4].speed = animSpeed * 0.5f;
 			mesh.playStates[3].speed = animSpeed;
 
 			mesh.PlayAnimation(3);
@@ -3595,6 +3595,7 @@ namespace Loop
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Bow_shot.glb", true); // 10 Выстрел из лука
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Start_Aspid.glb", true); // 11 Начало блока
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Hold_Aspid.glb", true); // 12 Удержание блока
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Roaling.glb", true); // 13 Бег с скольжением
 
 			hero.mesh.Attach(heroMeshAsset);
 			hero.arrowMesh.Attach(arrowMeshAsset);

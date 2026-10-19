@@ -136,67 +136,67 @@ namespace Enemies
 			initialized_ = true;
 		}
 
-		void ResetSwarmRandomOnLines(std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
-		{
-			swarms.clear();
-			swarms.resize(swarmCount);
-			random_.seed(seed);
+		//void ResetSwarmRandomOnLines(std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
+		//{
+		//	swarms.clear();
+		//	swarms.resize(swarmCount);
+		//	random_.seed(seed);
 
-			// Соберём валидные линии заранее
-			std::vector<int> validLines;
-			validLines.reserve(Object::starLineList.lineCount);
-			for (int i = 0; i < Object::starLineList.lineCount; ++i)
-			{
-				const auto& line = Object::starLineList.line[i];
-				if (line.pointCount > 1)
-					validLines.push_back(i);
-			}
+		//	// Соберём валидные линии заранее
+		//	std::vector<int> validLines;
+		//	validLines.reserve(Object::starLineList.lineCount);
+		//	for (int i = 0; i < Object::starLineList.lineCount; ++i)
+		//	{
+		//		const auto& line = Object::starLineList.line[i];
+		//		if (line.pointCount > 1)
+		//			validLines.push_back(i);
+		//	}
 
-			if (validLines.empty())
-			{
-				initialized_ = false;
-				return;
-			}
+		//	if (validLines.empty())
+		//	{
+		//		initialized_ = false;
+		//		return;
+		//	}
 
-			std::uniform_int_distribution<int> lineDist(0, (int)validLines.size() - 1);
+		//	std::uniform_int_distribution<int> lineDist(0, (int)validLines.size() - 1);
 
-			for (std::size_t i = 0; i < swarmCount; ++i)
-			{
-				EnemySwarm& swarm = swarms[i];
-				swarm = EnemySwarm{};
+		//	for (std::size_t i = 0; i < swarmCount; ++i)
+		//	{
+		//		EnemySwarm& swarm = swarms[i];
+		//		swarm = EnemySwarm{};
 
-				const int lineIdx = validLines[lineDist(random_)];
-				const auto& line = Object::starLineList.line[lineIdx];
+		//		const int lineIdx = validLines[lineDist(random_)];
+		//		const auto& line = Object::starLineList.line[lineIdx];
 
-				std::uniform_int_distribution<int> pointDist(0, line.pointCount - 1);
-				const int pointIdx = pointDist(random_);
+		//		std::uniform_int_distribution<int> pointDist(0, line.pointCount - 1);
+		//		const int pointIdx = pointDist(random_);
 
-				const float4& p = line.point[pointIdx];
-				const float4& up = line.upVector[pointIdx];
+		//		const float4& p = line.point[pointIdx];
+		//		const float4& up = line.upVector[pointIdx];
 
-				const float spawnOffset = 0.5f;
+		//		const float spawnOffset = 0.5f;
 
-				float4 spawn = {
-					p.x + up.x * spawnOffset,
-					p.y + up.y * spawnOffset,
-					p.z + up.z * spawnOffset
-				};
+		//		float4 spawn = {
+		//			p.x + up.x * spawnOffset,
+		//			p.y + up.y * spawnOffset,
+		//			p.z + up.z * spawnOffset
+		//		};
 
-				enemy.movementRadius = config.radius > 0.0f ? config.radius : 0.0f;
-				const float speed = config.baseSpeed + config.speedVariation * (i % 4);
-				//enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
+		//		enemy.movementRadius = config.radius > 0.0f ? config.radius : 0.0f;
+		//		const float speed = config.baseSpeed + config.speedVariation * (i % 4);
+		//		//enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
 
-				enemy.initializeCallback = [spawn](Enemy& value) {
-					value.position = spawn;
-					value.movementCenter = spawn;
-					value.movementTarget = spawn;
-					};
-				swarm.Initialize(10);
-				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
-			}
-			initialized_ = true;
-		}
+		//		enemy.initializeCallback = [spawn](Enemy& value) {
+		//			value.position = spawn;
+		//			value.movementCenter = spawn;
+		//			value.movementTarget = spawn;
+		//			};
+		//		swarm.Initialize(10);
+		//		enemy.movementTarget = RandomTarget(enemy);
+		//		enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
+		//	}
+		//	initialized_ = true;
+		//}
 
 		void Update(float deltaTime, collision::SphereCollider* heroCollider, AliveCreation& hro)
 		{
