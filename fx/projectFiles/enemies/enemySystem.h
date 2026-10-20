@@ -1,6 +1,7 @@
 #pragma once
 
 #include "enemySwarm.h"
+#include "enemyQueen.h"
 #include <random>
 
 namespace Enemies
@@ -31,7 +32,7 @@ namespace Enemies
 
     class EnemySystem
     {
-      public:
+    public:
         static constexpr std::size_t Count = 100;
         static constexpr std::size_t MaxEnemies = 512;
         static constexpr auto DefaultSeed = std::mt19937::default_seed;
@@ -66,15 +67,51 @@ namespace Enemies
 
         void SetQueenAlive(bool alive)
         {
+            Enemy* queen = Queen();
+            if (alive && queen && !queen->alive)
+            {
+                return;
+            }
             queenAlive_ = alive;
             if (!alive)
             {
+                if (queen)
+                {
+                    queen->Kill();
+                }
                 for (auto& swarm : swarms)
                 {
                     swarm.Kill(enemies_);
                 }
                 RemoveDead();
             }
+        }
+
+        Enemy* Queen()
+        {
+            return queenIndex_ < enemies_.size() ? &enemies_[queenIndex_] : nullptr;
+        }
+
+        bool InitializeQueen(float4 position, const QueenConfig& config = {})
+        {
+            if (!initialized_ || Queen() || !queenAlive_ || !config.IsValid() || !std::isfinite(position.x) ||
+                !std::isfinite(position.y) || !std::isfinite(position.z) ||
+                enemies_.size() - freeSlots_.size() >= MaxEnemies)
+            {
+                return false;
+            }
+            queen_ = EnemyQueen{};
+            queen_.config = config;
+            queen_.home = {position.x, position.y, position.z, 0};
+            queenIndex_ = CreateEnemy(position);
+            auto& queen = enemies_[queenIndex_];
+            queen.maxHealth = queen.health = config.health;
+            queen.movementRadius = config.radius;
+            queen.collider->radius = config.radius;
+            queen.movementSpeed = config.patrolSpeed;
+            queen.contactDamage = 0;
+            queen.baseColor = {1.4f, 0.4f, 4.0f, 1};
+            return true;
         }
 
         void SetMeshAsset(Object::MeshAsset* asset)
@@ -182,6 +219,23 @@ namespace Enemies
                 return;
             }
             RemoveDead();
+            if (Enemy* queen = Queen())
+            {
+                if (!queen->alive)
+                {
+                    SetQueenAlive(false);
+                }
+                else if (queen_.Update(*queen, heroCollider, hero, deltaTime))
+                {
+                    for (std::size_t i = 0; i < queen_.config.swarmsPerWave; ++i)
+                    {
+                        if (!SpawnSwarm(queen_.NextSpawnPosition(queen->position), queen_.config.swarmDetectionRadius))
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
             for (auto& swarm : swarms)
             {
                 swarm.Update(enemies_, heroCollider, hero, deltaTime);
@@ -237,13 +291,15 @@ namespace Enemies
             return nullptr;
         }
 
-      private:
+    private:
         SpawnConfig config_;
         Object::MeshAsset* meshAsset_ = nullptr;
         std::vector<std::size_t> freeSlots_;
         std::mt19937 random_{DefaultSeed};
         bool initialized_ = false;
         bool queenAlive_ = true;
+        std::size_t queenIndex_ = MaxEnemies;
+        EnemyQueen queen_;
 
         void Clear()
         {
@@ -255,6 +311,8 @@ namespace Enemies
             swarms.clear();
             freeSlots_.clear();
             initialized_ = false;
+            queenIndex_ = MaxEnemies;
+            queen_ = EnemyQueen{};
         }
 
         void BeginReset(std::mt19937::result_type seed, const SpawnConfig& config)

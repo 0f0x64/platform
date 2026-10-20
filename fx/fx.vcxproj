@@ -358,6 +358,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="projectFiles\enemies\enemySwarm.h" />
+    <ClInclude Include="projectFiles\enemies\enemyQueen.h" />
     <ClInclude Include="projectFiles\collision.h" />
     <ClInclude Include="dx11\audio.h" />
     <ClInclude Include="dx11\blend.h" />

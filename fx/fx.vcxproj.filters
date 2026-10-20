@@ -236,6 +236,9 @@
     <ClInclude Include="projectFiles\enemies\enemySwarm.h">
       <Filter>Source Files\projectFiles\enemies</Filter>
     </ClInclude>
+    <ClInclude Include="projectFiles\enemies\enemyQueen.h">
+      <Filter>Source Files\projectFiles\enemies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">

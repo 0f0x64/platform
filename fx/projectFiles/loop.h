@@ -1259,17 +1259,27 @@ struct hero_ : AliveCreation {
 			int range = 2;
 			pos = getRandVector4() * range;
 			startAirDistance = length3(V2F(pos));
-			//int startLine = rand()% Object::starLineList.lineCount;
-			//int startPoint = rand() % (Object::starLineList.line[startLine].pointCount-2)+1;
-
-			int startLine = 0;
-			int startPoint = 0;
-			lineIndex = startLine;
-			pointIndex = (float)startPoint;
-
-			float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
-
-			//destPoint = { 25455 /100., 15806 / 100., 25800 / 100. };
+            const float4 spawnPosition{-100, -212, -150, 0};
+            float closestDistance = INFINITY;
+            for (int candidateLine = 0; candidateLine < Object::starLineList.lineCount; ++candidateLine)
+            {
+                const auto& line = Object::starLineList.line[candidateLine];
+                if (line.pointCount < 2)
+                {
+                    continue;
+                }
+                for (int candidatePoint = 0; candidatePoint < line.pointCount; ++candidatePoint)
+                {
+                    const float distance = length3(line.point[candidatePoint] - spawnPosition);
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        lineIndex = candidateLine;
+                        pointIndex = static_cast<float>(candidatePoint);
+                    }
+                }
+            }
+            const float4 destPoint = Object::starLineList.line[lineIndex].point[static_cast<int>(pointIndex)];
 
 			pos += F2V(destPoint);
 			posOnLine = F2V(destPoint);
@@ -3302,8 +3312,10 @@ namespace Loop
 
 		for (const Enemies::Enemy& enemy : enemies)
 		{
-			if (!enemy.collider)
+			if (!enemy.collider || enemy.contactDamage <= 0)
+			{
 				continue;
+			}
 
 			if (!enemy.collider->isTouchable)
 				continue;
@@ -3638,6 +3650,8 @@ namespace Loop
 			hero.mesh.playStates[12].looped = true;
 
 			enemySystem.ResetRandomOnLines();
+			enemySystem.InitializeQueen(float4(-96, -206, -163));
+			enemySystem.SpawnSwarm(float4(-105, -209, -152));
 			enemyRenderer.Load(enemySystem);
 
 			levelEnd.collider = collision::CreateSphereCollider();
