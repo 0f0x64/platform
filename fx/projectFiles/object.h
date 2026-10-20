@@ -3051,145 +3051,170 @@ namespace Object {
 	}
 
 	// Постобработка линии: зафиксированные концы + искривления в середине.
-// coefficient = 0   — без искажений (кривая = сглаженная basePoint)
-// coefficient = 1   — «умеренно не скучно»
-// coefficient = 2.. — сильные и частые изгибы
-	// Постобработка уже сглаженной линии: мягкие волны вдоль пути.
-// Концы (point[0] и point[pointCount-1]) остаются на месте.
-// coefficient: 1 — спокойно, 2 — сильнее и чаще, 0.5 — почти незаметно.
-// Замечание: при coefficient > ~2.5 начнёт алиаситься в «зубья»,
-// потому что шаг между точками point[] фиксирован smoothStarline.
 	void PostProcessLine(starline& line, float coefficient)
 	{
+		// Защита от вырожденных линий (нужно хотя бы 4 точки для волн и сглаживания)
+		// и от нулевого/отрицательного коэффициента искажений.
 		if (line.pointCount < 4 || coefficient <= 0.0f)
 			return;
 
-		// === Параметры эффектов (крути их) ===
-		const float bendFreq = 1.7f;                          // крупные изгибы
-		const float bendAmp = 40.0f * coefficient;           // в стороны
-		const float bendUpAmp = 24.0f * coefficient;           // вверх-вниз
+		// ========================================================================
+		// ПАРАМЕТРЫ ЭФФЕКТОВ (крути их для настройки внешнего вида)
+		// ========================================================================
+		const float bendFreq = 1.7f;                        // Частота крупных изгибов
+		const float bendAmp = 40.0f * coefficient;          // Амплитуда изгибов в стороны
+		const float bendUpAmp = 24.0f * coefficient;        // Амплитуда изгибов вверх-вниз
 
-		const float rollFreq = 1.2f;                          // частота крена
-		const float rollAmp = XMConvertToRadians(32.0f);     // макс угол крена
+		const float rollFreq = 1.2f;                        // Частота крена вокруг оси пути
+		const float rollAmp = XMConvertToRadians(32.0f);    // Максимальный угол крена (32 градуса)
 
-		const float roughFreq = 6.0f;                          // мелкая дрожь
-		const float roughAmp = 2.0f * coefficient;
+		const float roughFreq = 6.0f;                       // Частота мелкой дрожи
+		const float roughAmp = 2.0f * coefficient;          // Амплитуда мелкой дрожи
 
-		const int N = line.pointCount;
+		const int N = line.pointCount;                      // Кэшируем количество точек
 
-		// === 1. Тангенсы через центральную разность ===
+		// ========================================================================
+		// ШАГ 1: ВЫЧИСЛЕНИЕ ТАНГЕНСОВ (направлений линии)
+		// ========================================================================
 		std::vector<XMVECTOR> tangents(N);
-		const int R = 5;
+		const int R = 5; // Радиус окна: берем точки на расстоянии 5, чтобы сгладить микроповороты
 		for (int i = 0; i < N; ++i) {
-			int a = max(0, i - R);
-			int b = min(N - 1, i + R);
+			int a = max(0, i - R);      // Индекс левой границы окна
+			int b = min(N - 1, i + R);  // Индекс правой границы окна
+
+			// Вектор направления от точки A к точке B
 			XMVECTOR t = XMVectorSubtract(F2V(line.point[b]), F2V(line.point[a]));
 			float lenSq = XMVectorGetX(XMVector3LengthSq(t));
+
+			// Нормализуем. Если точки совпали (длина ~0), ставим дефолтный вектор (0,0,1)
 			tangents[i] = (lenSq > 1e-8f) ? XMVector3Normalize(t)
 				: XMVectorSet(0, 0, 1, 0);
 		}
 
-		// === 1.5. Лапласиан по тангенсам (2 прохода) ===
+		// ========================================================================
+		// ШАГ 1.5: СГЛАЖИВАНИЕ ТАНГЕНСОВ (Лапласиан, 2 прохода)
+		// ========================================================================
 		std::vector<XMVECTOR> tangentsSmoothed(N);
 		for (int pass = 0; pass < 2; ++pass) {
 			for (int i = 0; i < N; ++i) {
+				// Берем соседние тангенсы (используем (::std::max) чтобы обойти макрос max)
 				XMVECTOR a = tangents[(::std::max)(0, i - 1)];
 				XMVECTOR b = tangents[i];
 				XMVECTOR c = tangents[(::std::min)(N - 1, i + 1)];
+
+				// Взвешенное среднее (1:2:1), где текущий тангенс весит больше
 				XMVECTOR avg = XMVectorAdd(XMVectorAdd(a, c), XMVectorScale(b, 2.0f));
+
+				// Усредненный вектор теряет длину 1, поэтому нормализуем обратно
 				tangentsSmoothed[i] = XMVector3Normalize(XMVectorScale(avg, 0.25f));
 			}
-			// копируем обратно, чтобы следующий проход и дальнейший код видели сглаженное
+			// Копируем результат для следующего прохода и дальнейшего использования
 			tangents = tangentsSmoothed;
 		}
 
-		// === 2. Параллельный перенос (без порогов!) ===
+		// ========================================================================
+		// ШАГ 2: ПАРАЛЛЕЛЬНЫЙ ПЕРЕНОС (строим базис Up/Side вдоль линии)
+		// ========================================================================
 		XMVECTOR prevTangent = tangents[0];
 		XMVECTOR refUp;
+
+		// Находим начальный вектор "вверх", перпендикулярный первому тангенсу
 		{
 			XMVECTOR world = XMVectorSet(0, 1, 0, 0);
-			XMVECTOR proj = XMVectorMultiply(prevTangent,
-				XMVectorReplicate(XMVectorGetX(XMVector3Dot(world, prevTangent))));
+			// Проекция мирового Up на тангенс
+			XMVECTOR proj = XMVectorMultiply(prevTangent, XMVectorReplicate(XMVectorGetX(XMVector3Dot(world, prevTangent))));
 			XMVECTOR perp = XMVectorSubtract(world, proj);
+
+			// Если тангенс смотрит строго вверх (длина ~0), берем резервный вектор (1,0,0)
 			if (XMVectorGetX(XMVector3LengthSq(perp)) < 1e-6f)
-				perp = XMVectorSet(1, 0, 0, 0)
-				- prevTangent * XMVectorGetX(XMVector3Dot(XMVectorSet(1, 0, 0, 0), prevTangent));
+				perp = XMVectorSet(1, 0, 0, 0) - prevTangent * XMVectorGetX(XMVector3Dot(XMVectorSet(1, 0, 0, 0), prevTangent));
+
 			refUp = XMVector3Normalize(perp);
 		}
 
 		std::vector<XMVECTOR> ups(N);
 		ups[0] = refUp;
 
+		// Идем вдоль линии и плавно поворачиваем вектор Up вместе с поворотом тангенса
 		for (int i = 1; i < N; ++i) {
 			XMVECTOR currTangent = tangents[i];
+			// Ось, вокруг которой повернулся тангенс (векторное произведение)
 			XMVECTOR axis = XMVector3Cross(prevTangent, currTangent);
 			float axisLenSq = XMVectorGetX(XMVector3LengthSq(axis));
+
+			// Если тангенс действительно повернулся
 			if (axisLenSq > 1e-8f) {
 				float dot = clamp(XMVectorGetX(XMVector3Dot(prevTangent, currTangent)), -1.0f, 1.0f);
 				float angle = acosf(dot);
+				// Создаем кватернион поворота и применяем его к вектору Up
 				XMVECTOR rot = XMQuaternionRotationAxis(XMVector3Normalize(axis), angle);
 				refUp = XMVector3Rotate(refUp, rot);
 			}
-			XMVECTOR proj = XMVectorMultiply(currTangent,
-				XMVectorReplicate(XMVectorGetX(XMVector3Dot(refUp, currTangent))));
+
+			// Ортогонализация Грамма-Шмидта (убираем накопление ошибки float)
+			XMVECTOR proj = XMVectorMultiply(currTangent, XMVectorReplicate(XMVectorGetX(XMVector3Dot(refUp, currTangent))));
 			refUp = XMVector3Normalize(XMVectorSubtract(refUp, proj));
+
 			ups[i] = refUp;
 			prevTangent = currTangent;
 		}
 
-		// === 3. Эффекты: bend + roll + roughness ===
-		for (int i = 1; i < N - 1; ++i) {
-			const float t = (float)i / (float)(N - 1);
-			const float w = sinf(PI * t);              // окно: 0 на концах
+		// ========================================================================
+		// ШАГ 3: НАЛОЖЕНИЕ ЭФФЕКТОВ (Bend, Roll, Roughness)
+		// ========================================================================
+		for (int i = 1; i < N - 1; ++i) { // Пропускаем концы (0 и N-1)
+			const float t = (float)i / (float)(N - 1); // Нормализованный параметр (0..1)
+
+			// Окно: 0 на концах, 1 в середине. Гарантирует, что концы останутся на месте.
+			const float w = sinf(PI * t);
 			if (w < 0.001f) continue;
 
 			XMVECTOR tangent = tangents[i];
 			XMVECTOR up = ups[i];
-			XMVECTOR side = XMVector3Normalize(XMVector3Cross(up, tangent));
+			XMVECTOR side = XMVector3Normalize(XMVector3Cross(up, tangent)); // Вектор "вправо"
 
-			// --- ROLL: поворот up вокруг касательной ---
-			// Отдельный шум со сдвигом фазы, чтобы крен не совпадал с изгибами.
-			float rollAngle = GetSinglePerlinNoise3D(t * rollFreq, 7.3f, 0.0f)
-				* rollAmp * w;
+			// --- ROLL (крен вокруг касательной) ---
+			// Используем шум Перлина со смещением фазы, чтобы крен не совпадал с изгибами
+			float rollAngle = GetSinglePerlinNoise3D(t * rollFreq, 7.3f, 0.0f) * rollAmp * w;
 			XMVECTOR rotQ = XMQuaternionRotationAxis(tangent, rollAngle);
 			up = XMVector3Rotate(up, rotQ);
-			side = XMVector3Normalize(XMVector3Cross(up, tangent));
+			side = XMVector3Normalize(XMVector3Cross(up, tangent)); // Пересчитываем Side после крена
 
-			// --- BEND: 2 канала Perlin — side + up ---
+			// --- BEND (изгибы) ---
+			// Используем 2 канала шума: один для смещения вбок, другой для смещения вверх
 			XMVECTOR n = GetPerlinNoiseVector3(t * bendFreq, 0.0f, 0.0f);
 			float offSide = XMVectorGetX(n) * bendAmp * w;
 			float offUp = XMVectorGetY(n) * bendUpAmp * w;
 
-			// --- ROUGHNESS: мелкая дрожь ---
-			float rough = GetSinglePerlinNoise3D(t * roughFreq, 31.7f, 0.0f)
-				* roughAmp * w;
+			// --- ROUGHNESS (мелкая дрожь) ---
+			float rough = GetSinglePerlinNoise3D(t * roughFreq, 31.7f, 0.0f) * roughAmp * w;
 
+			// Итоговое смещение по Side
 			float totalSide = offSide + rough;
 
+			// Применяем смещения к позиции точки в мировых координатах
 			line.point[i].x += XMVectorGetX(side) * totalSide + XMVectorGetX(up) * offUp;
 			line.point[i].y += XMVectorGetY(side) * totalSide + XMVectorGetY(up) * offUp;
 			line.point[i].z += XMVectorGetZ(side) * totalSide + XMVectorGetZ(up) * offUp;
 
-
-
-			// сохраняем up для hero (см. следующий раздел)
+			// Сохраняем вектор Up для героя (чтобы он правильно ориентировался на кренах)
 			line.upVector[i] = V2F(up);
 		}
 
-		// === 4. Округление углов (Chaikin, 2 прохода) ===
-// Не сжимает линию, а срезает углы: ребро заменяется двумя короткими.
-// Крупные изгибы (десятки точек) сохраняются, углы из 2-3 точек — округляются.
-// Концы линии остаются на месте.
-// upVector[] интерполируется вместе с позицией, чтобы hero_ получал
-// непрерывный базис и на новых точках.
+		// ========================================================================
+		// ШАГ 4: ОКРУГЛЕНИЕ УГЛОВ (Chaikin, 2 прохода)
+		// ========================================================================
+		// Срезает острые углы, не сжимая линию.
 		{
 			const int passes = 2;
 
 			for (int pass = 0; pass < passes; ++pass) {
 				const int M = line.pointCount;
-				// Каждый проход удваивает число точек. Предохранитель на переполнение.
+
+				// Предохранитель: каждый проход удваивает точки. Если памяти не хватит — выходим.
 				if (M * 2 + 2 > smoothPointMAX) break;
 
+				// Копируем текущие точки в локальные буферы для безопасного чтения
 				std::vector<XMVECTOR> src(M), srcUp(M);
 				for (int i = 0; i < M; ++i) {
 					src[i] = F2V(line.point[i]);
@@ -3200,10 +3225,11 @@ namespace Object {
 				dst.reserve((M - 1) * 2 + 2);
 				dstUp.reserve((M - 1) * 2 + 2);
 
-				// Начало не сдвигаем
+				// Первую точку оставляем как есть (фиксируем начало)
 				dst.push_back(src[0]);
 				dstUp.push_back(srcUp[0]);
 
+				// Для каждого сегмента добавляем две новые точки (на 25% и 75% пути)
 				for (int i = 0; i + 1 < M; ++i) {
 					dst.push_back(XMVectorLerp(src[i], src[i + 1], 0.25f));
 					dstUp.push_back(XMVectorLerp(srcUp[i], srcUp[i + 1], 0.25f));
@@ -3212,16 +3238,17 @@ namespace Object {
 					dstUp.push_back(XMVectorLerp(srcUp[i], srcUp[i + 1], 0.75f));
 				}
 
-				// Конец не сдвигаем
+				// Последнюю точку оставляем как есть (фиксируем конец)
 				dst.push_back(src[M - 1]);
 				dstUp.push_back(srcUp[M - 1]);
 
+				// Записываем новые точки обратно в starline
 				const int newCount = (int)dst.size();
 				for (int i = 0; i < newCount; ++i) {
 					line.point[i] = V2F(dst[i]);
 					line.upVector[i] = V2F(dstUp[i]);
 				}
-				line.pointCount = newCount;
+				line.pointCount = newCount; // Обновляем количество точек для следующего прохода
 			}
 		}
 	}
@@ -5707,7 +5734,7 @@ namespace Object {
 		//-----------------------------------------
 
 		double tSec = timer::GetCounter() * 0.001;   // секунды
-		float lineDistortion = 1.0f + 1.0f * sinf((float)tSec * 0.25f);
+		float lineDistortion = 2.0f + 0.45f * sinf((float)tSec * 0.25f); // таймер
 
 		for (int j = 0; j < starLineList.lineCount; j++)
 		{
