@@ -1259,27 +1259,9 @@ struct hero_ : AliveCreation {
 			int range = 2;
 			pos = getRandVector4() * range;
 			startAirDistance = length3(V2F(pos));
-            const float4 spawnPosition{-100, -212, -150, 0};
-            float closestDistance = INFINITY;
-            for (int candidateLine = 0; candidateLine < Object::starLineList.lineCount; ++candidateLine)
-            {
-                const auto& line = Object::starLineList.line[candidateLine];
-                if (line.pointCount < 2)
-                {
-                    continue;
-                }
-                for (int candidatePoint = 0; candidatePoint < line.pointCount; ++candidatePoint)
-                {
-                    const float distance = length3(line.point[candidatePoint] - spawnPosition);
-                    if (distance < closestDistance)
-                    {
-                        closestDistance = distance;
-                        lineIndex = candidateLine;
-                        pointIndex = static_cast<float>(candidatePoint);
-                    }
-                }
-            }
-            const float4 destPoint = Object::starLineList.line[lineIndex].point[static_cast<int>(pointIndex)];
+			lineIndex = 0;
+			pointIndex = 0.0f;
+			const float4 destPoint = Object::starLineList.line[0].point[0];
 
 			pos += F2V(destPoint);
 			posOnLine = F2V(destPoint);
@@ -3651,7 +3633,6 @@ namespace Loop
 
 			enemySystem.ResetRandomOnLines();
 			enemySystem.InitializeQueen(float4(-96, -206, -163));
-			enemySystem.SpawnSwarm(float4(-105, -209, -152));
 			enemyRenderer.Load(enemySystem);
 
 			levelEnd.collider = collision::CreateSphereCollider();
