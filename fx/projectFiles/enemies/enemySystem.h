@@ -1,384 +1,302 @@
 #pragma once
 
-#include "enemy.h"
 #include "enemySwarm.h"
-#include <vector>
-#include <cmath>
 #include <random>
 
 namespace Enemies
 {
-	struct SpawnConfig
-	{
-		float spacing = 2.0f;
-		float forwardDistance = 8.0f;
-		float rowSpacing = 2.0f;
-		float radius = 0.65f;
-		float baseSpeed = 0.18f;
-		float speedVariation = 0.03f;
-	};
+    struct SpawnConfig
+    {
+        std::size_t swarmCount = 10;
+        std::size_t minSwarmSize = 8;
+        std::size_t maxSwarmSize = 12;
+        std::size_t maxSwarms = 32;
+        float spacing = 8.0f;
+        float forwardDistance = 8.0f;
+        float rowSpacing = 2.0f;
+        float radius = 0.65f;
+        float baseSpeed = 2.0f;
+        float speedVariation = 0.1f;
+        SwarmConfig swarm;
 
-	class EnemySystem
-	{
-	public:
-		static constexpr std::size_t Count = 100;
-		static constexpr std::size_t swarmCount = 50;
+        bool IsValid() const
+        {
+            return minSwarmSize > 0 && maxSwarmSize >= minSwarmSize && maxSwarmSize <= 12 && swarmCount <= maxSwarms &&
+                   maxSwarms > 0 && maxSwarms <= 32 && std::isfinite(spacing) && spacing >= 0 &&
+                   std::isfinite(forwardDistance) && std::isfinite(rowSpacing) && std::isfinite(radius) && radius > 0 &&
+                   std::isfinite(baseSpeed) && baseSpeed > 0 && std::isfinite(speedVariation) && speedVariation >= 0 &&
+                   swarm.IsValid();
+        }
+    };
 
-		static constexpr auto DefaultSeed = std::mt19937::default_seed;
-		std::vector<Enemy> enemies_{};
-		std::vector<EnemySwarm> swarms{};
+    class EnemySystem
+    {
+      public:
+        static constexpr std::size_t Count = 100;
+        static constexpr std::size_t MaxEnemies = 512;
+        static constexpr auto DefaultSeed = std::mt19937::default_seed;
+        std::vector<Enemy> enemies_;
+        std::vector<EnemySwarm> swarms;
 
-		EnemySystem() = default;
-		EnemySystem(const EnemySystem&) = delete;
-		EnemySystem& operator=(const EnemySystem&) = delete;
-		EnemySystem(EnemySystem&&) = delete;
-		EnemySystem& operator=(EnemySystem&&) = delete;
+        EnemySystem() = default;
+        EnemySystem(const EnemySystem&) = delete;
+        EnemySystem& operator=(const EnemySystem&) = delete;
+        EnemySystem(EnemySystem&&) = delete;
+        EnemySystem& operator=(EnemySystem&&) = delete;
 
-		bool IsInitialized() const { return initialized_; }
-		const std::vector<Enemy>& Items() const { return enemies_; }
+        ~EnemySystem()
+        {
+            Clear();
+        }
 
-		void Reset(float4 center, float4 right, float4 forward,
-			std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
-		{
+        bool IsInitialized() const
+        {
+            return initialized_;
+        }
 
-			for (Enemy& e : enemies_)
-				if (e.collider) { collision::DestroySphereCollider(e.collider);e.collider = nullptr; }
-			enemies_.clear();
-			enemies_.resize(Count);
-			random_.seed(seed);
-			for (std::size_t i = 0; i < Count; ++i)
-			{
-				Enemy& enemy = enemies_[i];
-				enemy = Enemy{};
-				const float lateral = (static_cast<float>(i) - (Count - 1) * 0.5f) * config.spacing;
-				const float depth = config.forwardDistance + (i % 2) * config.rowSpacing;
-				const float4 spawn = {
-					center.x + right.x * lateral + forward.x * depth,
-					center.y + right.y * lateral + forward.y * depth,
-					center.z + right.z * lateral + forward.z * depth
-				};
-				enemy.movementRadius = config.radius > 0.0f ? config.radius : 0.0f;
-				const float speed = config.baseSpeed + config.speedVariation * (i % 4);
-				//enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
-				enemy.initializeCallback = [spawn](Enemy& value) {
-					value.position = spawn;
-					value.movementCenter = spawn;
-					value.movementTarget = spawn;
-					};
-				enemy.Initialize();
-				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
-			}
-			initialized_ = true;
-		}
+        const std::vector<Enemy>& Items() const
+        {
+            return enemies_;
+        }
 
-		void ResetRandomOnLines(std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
-		{
-			for (Enemy& e : enemies_)
-				if (e.collider) { collision::DestroySphereCollider(e.collider);e.collider = nullptr; }
-			enemies_.clear();
-			enemies_.resize(Count);
-			random_.seed(seed);
+        bool IsQueenAlive() const
+        {
+            return queenAlive_;
+        }
 
-			// Соберём валидные линии заранее
-			std::vector<int> validLines;
-			validLines.reserve(Object::starLineList.lineCount);
-			for (int i = 0; i < Object::starLineList.lineCount; ++i)
-			{
-				const auto& line = Object::starLineList.line[i];
-				if (line.pointCount > 1)
-					validLines.push_back(i);
-			}
+        void SetQueenAlive(bool alive)
+        {
+            queenAlive_ = alive;
+            if (!alive)
+            {
+                for (auto& swarm : swarms)
+                {
+                    swarm.Kill(enemies_);
+                }
+                RemoveDead();
+            }
+        }
 
-			if (validLines.empty())
-			{
-				initialized_ = false;
-				return;
-			}
+        void SetMeshAsset(Object::MeshAsset* asset)
+        {
+            meshAsset_ = asset;
+            for (auto& enemy : enemies_)
+            {
+                BindMesh(enemy);
+            }
+        }
 
-			std::uniform_int_distribution<int> lineDist(0, (int)validLines.size() - 1);
+        void Reset(float4 center, float4 right, float4 forward, std::mt19937::result_type seed = DefaultSeed,
+                   const SpawnConfig& config = {})
+        {
+            BeginReset(seed, config);
+            if (!config.IsValid())
+            {
+                return;
+            }
+            for (std::size_t i = 0; i < config.swarmCount; ++i)
+            {
+                const float lateral = (static_cast<float>(i) - (config.swarmCount - 1) * 0.5f) * config.spacing;
+                const float depth = config.forwardDistance + (i % 2) * config.rowSpacing;
+                SpawnSwarm(center + right * lateral + forward * depth);
+            }
+            initialized_ = true;
+        }
 
-			for (std::size_t i = 0; i < Count; ++i)
-			{
-				Enemy& enemy = enemies_[i];
-				enemy = Enemy{};
+        void ResetRandomOnLines(std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
+        {
+            BeginReset(seed, config);
+            if (!config.IsValid())
+            {
+                return;
+            }
+            std::vector<int> lines;
+            for (int i = 0; i < Object::starLineList.lineCount; ++i)
+            {
+                if (Object::starLineList.line[i].pointCount > 1)
+                {
+                    lines.push_back(i);
+                }
+            }
+            if (lines.empty())
+            {
+                return;
+            }
+            std::uniform_int_distribution<std::size_t> lineIndex(0, lines.size() - 1);
+            for (std::size_t i = 0; i < config.swarmCount; ++i)
+            {
+                const auto& line = Object::starLineList.line[lines[lineIndex(random_)]];
+                std::uniform_int_distribution<int> pointIndex(0, line.pointCount - 1);
+                const int point = pointIndex(random_);
+                float4 up = line.upVector[point];
+                const float upLength = length3(up);
+                up = upLength > 0.0001f ? up / upLength : float4{0, 1, 0, 0};
+                SpawnSwarm(line.point[point] + up * 0.5f);
+            }
+            initialized_ = true;
+        }
 
-				const int lineIdx = validLines[lineDist(random_)];
-				const auto& line = Object::starLineList.line[lineIdx];
+        bool SpawnSwarm(float4 position, float detectionRadius = 0)
+        {
+            RemoveDead();
+            if (!queenAlive_ || !config_.IsValid() || swarms.size() >= config_.maxSwarms ||
+                !std::isfinite(position.x) || !std::isfinite(position.y) || !std::isfinite(position.z) ||
+                !std::isfinite(detectionRadius) || detectionRadius < 0)
+            {
+                return false;
+            }
+            std::uniform_int_distribution<std::size_t> size(config_.minSwarmSize, config_.maxSwarmSize);
+            const auto count = size(random_);
+            if (count > MaxEnemies - enemies_.size() + freeSlots_.size())
+            {
+                return false;
+            }
+            EnemySwarm swarm;
+            swarm.home = swarm.center = {position.x, position.y, position.z, 0};
+            swarm.config = config_.swarm;
+            if (detectionRadius > 0)
+            {
+                swarm.config.detectionRadius = detectionRadius;
+            }
+            swarm.phase = static_cast<float>(random_() % 10000) * 0.001f;
+            swarm.members.reserve(count);
+            for (std::size_t i = 0; i < count; ++i)
+            {
+                const auto index = CreateEnemy(position);
+                auto& enemy = enemies_[index];
+                const float angle = static_cast<float>(i) * 2.39996323f + swarm.phase;
+                const float4 offset{cosf(angle), sinf(angle * 1.7f) * 0.5f, sinf(angle), 0};
+                enemy.SetPosition(swarm.center + offset * (swarm.config.cloudRadius * 0.5f));
+                enemy.contactDamage = swarm.config.damagePerMember;
+                enemy.chargeTime = swarm.config.chargeDuration;
+                swarm.members.push_back(index);
+            }
+            swarms.push_back(std::move(swarm));
+            return true;
+        }
 
-				std::uniform_int_distribution<int> pointDist(0, line.pointCount - 1);
-				const int pointIdx = pointDist(random_);
+        void Update(float deltaTime, collision::SphereCollider* heroCollider, AliveCreation& hero)
+        {
+            if (!initialized_ || !std::isfinite(deltaTime) || deltaTime <= 0)
+            {
+                return;
+            }
+            RemoveDead();
+            for (auto& swarm : swarms)
+            {
+                swarm.Update(enemies_, heroCollider, hero, deltaTime);
+            }
+            for (auto& enemy : enemies_)
+            {
+                enemy.Update(deltaTime, heroCollider, hero);
+            }
+            RemoveDead();
+        }
 
-				const float4& p = line.point[pointIdx];
-				const float4& up = line.upVector[pointIdx];
+        void SetEnemyPosition(std::size_t index, float4 position)
+        {
+            if (index < enemies_.size())
+            {
+                enemies_[index].movementCenter = position;
+                enemies_[index].movementTarget = position;
+                enemies_[index].SetPosition(position);
+            }
+        }
 
-				const float spawnOffset = 0.5f;
+        void RemoveDead()
+        {
+            for (auto it = swarms.begin(); it != swarms.end();)
+            {
+                if (it->IsAlive(enemies_))
+                {
+                    ++it;
+                    continue;
+                }
+                for (auto index : it->members)
+                {
+                    enemies_[index].Release();
+                    freeSlots_.push_back(index);
+                }
+                it = swarms.erase(it);
+            }
+        }
 
-				float4 spawn = {
-					p.x + up.x * spawnOffset,
-					p.y + up.y * spawnOffset,
-					p.z + up.z * spawnOffset
-				};
+        Enemy* FindByCollider(collision::SphereCollider* collider)
+        {
+            if (!collider)
+            {
+                return nullptr;
+            }
+            for (auto& enemy : enemies_)
+            {
+                if (enemy.alive && enemy.collider == collider)
+                {
+                    return &enemy;
+                }
+            }
+            return nullptr;
+        }
 
-				enemy.movementRadius = config.radius > 0.0f ? config.radius : 0.0f;
-				const float speed = config.baseSpeed + config.speedVariation * (i % 4);
-				//enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
+      private:
+        SpawnConfig config_;
+        Object::MeshAsset* meshAsset_ = nullptr;
+        std::vector<std::size_t> freeSlots_;
+        std::mt19937 random_{DefaultSeed};
+        bool initialized_ = false;
+        bool queenAlive_ = true;
 
-				enemy.initializeCallback = [spawn](Enemy& value) {
-					value.position = spawn;
-					value.movementCenter = spawn;
-					value.movementTarget = spawn;
-					};
-				enemy.Initialize();
-				enemy.movementTarget = RandomTarget(enemy);
-				enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
-			}
-			initialized_ = true;
-		}
+        void Clear()
+        {
+            for (auto& enemy : enemies_)
+            {
+                enemy.Release();
+            }
+            enemies_.clear();
+            swarms.clear();
+            freeSlots_.clear();
+            initialized_ = false;
+        }
 
-		//void ResetSwarmRandomOnLines(std::mt19937::result_type seed = DefaultSeed, const SpawnConfig& config = {})
-		//{
-		//	swarms.clear();
-		//	swarms.resize(swarmCount);
-		//	random_.seed(seed);
+        void BeginReset(std::mt19937::result_type seed, const SpawnConfig& config)
+        {
+            Clear();
+            config_ = config;
+            random_.seed(seed);
+            queenAlive_ = true;
+            enemies_.reserve(MaxEnemies);
+            swarms.reserve(32);
+        }
 
-		//	// Соберём валидные линии заранее
-		//	std::vector<int> validLines;
-		//	validLines.reserve(Object::starLineList.lineCount);
-		//	for (int i = 0; i < Object::starLineList.lineCount; ++i)
-		//	{
-		//		const auto& line = Object::starLineList.line[i];
-		//		if (line.pointCount > 1)
-		//			validLines.push_back(i);
-		//	}
+        std::size_t CreateEnemy(float4 position)
+        {
+            std::size_t index = enemies_.size();
+            if (!freeSlots_.empty())
+            {
+                index = freeSlots_.back();
+                freeSlots_.pop_back();
+                enemies_[index].Release();
+                enemies_[index] = Enemy{};
+            }
+            else
+            {
+                enemies_.emplace_back();
+            }
+            auto& enemy = enemies_[index];
+            enemy.position = enemy.movementCenter = enemy.movementTarget = {position.x, position.y, position.z, 0};
+            enemy.movementRadius = config_.radius;
+            enemy.movementSpeed = config_.baseSpeed + config_.speedVariation * static_cast<float>(index % 4);
+            enemy.Initialize();
+            BindMesh(enemy);
+            return index;
+        }
 
-		//	if (validLines.empty())
-		//	{
-		//		initialized_ = false;
-		//		return;
-		//	}
-
-		//	std::uniform_int_distribution<int> lineDist(0, (int)validLines.size() - 1);
-
-		//	for (std::size_t i = 0; i < swarmCount; ++i)
-		//	{
-		//		EnemySwarm& swarm = swarms[i];
-		//		swarm = EnemySwarm{};
-
-		//		const int lineIdx = validLines[lineDist(random_)];
-		//		const auto& line = Object::starLineList.line[lineIdx];
-
-		//		std::uniform_int_distribution<int> pointDist(0, line.pointCount - 1);
-		//		const int pointIdx = pointDist(random_);
-
-		//		const float4& p = line.point[pointIdx];
-		//		const float4& up = line.upVector[pointIdx];
-
-		//		const float spawnOffset = 0.5f;
-
-		//		float4 spawn = {
-		//			p.x + up.x * spawnOffset,
-		//			p.y + up.y * spawnOffset,
-		//			p.z + up.z * spawnOffset
-		//		};
-
-		//		enemy.movementRadius = config.radius > 0.0f ? config.radius : 0.0f;
-		//		const float speed = config.baseSpeed + config.speedVariation * (i % 4);
-		//		//enemy.movementSpeed = speed > 0.0f ? speed : 0.0f;
-
-		//		enemy.initializeCallback = [spawn](Enemy& value) {
-		//			value.position = spawn;
-		//			value.movementCenter = spawn;
-		//			value.movementTarget = spawn;
-		//			};
-		//		swarm.Initialize(10);
-		//		enemy.movementTarget = RandomTarget(enemy);
-		//		enemy.updateCallback = [this](Enemy& value, collision::SphereCollider* hc, AliveCreation& hro, float dt) { SwarmUpdate(value, hc, hro, dt); };
-		//	}
-		//	initialized_ = true;
-		//}
-
-		void Update(float deltaTime, collision::SphereCollider* heroCollider, AliveCreation& hro)
-		{
-			if (!initialized_ || !std::isfinite(deltaTime) || deltaTime <= 0.0f) return;
-			for (Enemy& enemy : enemies_) enemy.Update(deltaTime, heroCollider, hro);
-		}
-
-		// для спавна противника перед игроком.
-		void SetEnemyPosition(std::size_t index, float4 position)
-		{
-			if (index >= Count)
-				return;
-
-			Enemy& enemy = enemies_[index];
-
-			enemy.position = position;
-			enemy.movementCenter = position;
-			enemy.movementTarget = position;
-
-			if (enemy.collider)
-			{
-				enemy.collider->radius = 1;
-				enemy.collider->position.x = position.x;
-				enemy.collider->position.y = position.y;
-				enemy.collider->position.z = position.z;
-				enemy.collider->isTouchable = true;
-			}
-		}
-		void RemoveDead()
-		{
-			for (auto it = enemies_.begin();it != enemies_.end();)
-			{
-				if (!it->alive)
-				{
-					if (it->collider)
-					{
-						collision::DestroySphereCollider(it->collider);
-						it->collider = nullptr;
-					}
-					it = enemies_.erase(it);
-				}
-				else ++it;
-			}
-		}
-		Enemy* FindByCollider(collision::SphereCollider* col)
-		{
-			if (!col) return nullptr;
-			for (Enemy& e : enemies_)
-				if (e.collider == col) return &e;
-			return nullptr;
-		}
-
-	private:
-		float4 RandomTarget(const Enemy& enemy)
-		{
-			std::uniform_real_distribution<float> coordinate(-1.0f, 1.0f);
-			float4 offset;
-			float squaredLength;
-			do {
-				offset = { coordinate(random_), coordinate(random_), coordinate(random_) };
-				squaredLength = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
-			} while (squaredLength > 1.0f);
-			return {
-				enemy.movementCenter.x + offset.x * enemy.movementRadius,
-				enemy.movementCenter.y + offset.y * enemy.movementRadius,
-				enemy.movementCenter.z + offset.z * enemy.movementRadius
-			};
-		}
-
-		float4 PointAroundPlayer(const float4& playerPos)
-		{
-			float4 direction = getRandomDirection();
-			return playerPos + direction * 2.f;
-		}
-
-		void SwarmUpdate(Enemy& enemy, collision::SphereCollider* heroCollider, AliveCreation& hero, float deltaTime)
-		{
-			if (!enemy.alive) return;
-			if (!heroCollider) return;
-
-			constexpr float PlayerDetectDistance = 10.f;
-
-			if (enemy.isCharging) {
-				enemy.charge += deltaTime;
-				enemy.colorCharge = enemy.charge / enemy.chargeTime;
-
-				enemy.mesh.PlayAnimation(3);
-				enemy.mesh.playStates[3].currentTime = enemy.colorCharge * enemy.mesh.playStates[3].duration;
-
-				if (enemy.charge >= enemy.chargeTime) {
-					enemy.charge = 0.f;
-					enemy.colorCharge = 3.f;
-					enemy.isCharging = false;
-
-					enemy.mesh.StopAnimation(3);
-
-					enemy.attackCollider->position = enemy.position;
-					collision::CollisionResult result =
-						collision::sphere_vs_sphere(
-							heroCollider->position,
-							heroCollider->radius,
-							enemy.attackCollider->position,
-							enemy.attackCollider->radius
-						);
-					if (result.collided) {
-						hero.TakeDamage(15.f);
-					}
-				}
-				return;
-			}
-
-			if (enemy.colorCharge > 0.f) {
-				enemy.colorCharge = max(enemy.colorCharge - deltaTime * 4.f, 0.f);
-			}
-
-			if (length(heroCollider->position - enemy.position) > PlayerDetectDistance) {
-				if (enemy.position == enemy.movementCenter)
-					return;
-
-				enemy.movementTarget = enemy.movementCenter;
-
-				float4 direction = enemy.movementTarget - enemy.position;
-				float distance = length(direction);
-				float4 step = normalize(direction) * enemy.movementSpeed * deltaTime;
-
-				if (length(step) >= distance)
-				{
-					enemy.position = enemy.movementTarget;
-				}
-				else {
-					enemy.position += step;
-				}
-				return;
-			}
-
-			if (enemy.movementTarget == enemy.position) {
-				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
-			}
-				
-			float4 direction = enemy.movementTarget - enemy.position;
-			float distance = length(direction);
-
-			/*while (distance <= 0.01f) {
-				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
-				direction = enemy.movementTarget - enemy.position;
-				distance = length(direction);
-			}*/
-
-			float4 step = normalize(direction) * enemy.movementSpeed * deltaTime;
-
-			if (length(step) >= distance)
-			{
-				enemy.isCharging = true;
-				enemy.position = enemy.movementTarget;
-				enemy.movementTarget = PointAroundPlayer(heroCollider->position);
-				enemy.mesh.PlayAnimation(1);
-				enemy.mesh.StopAnimation(2);
-			}
-			else {
-				enemy.position += step;
-				enemy.mesh.PlayAnimation(2);
-				enemy.mesh.StopAnimation(1);
-
-				XMVECTOR Forward = XMVector3Normalize(F2V(direction));
-				XMVECTOR Up = XMVectorSet(0, 1, 0, 0);
-
-				XMVECTOR Right = XMVector3Normalize(XMVector3Cross(Up, Forward));
-				Up = XMVector3Cross(Forward, Right);
-
-				XMMATRIX enemyRotation = XMMATRIX(
-					Right,   // 1-я строка
-					Up,      // 2-я строка
-					Forward, // 3-я строка
-					XMVectorSet(0, 0, 0, 1)
-				);
-
-				enemy.mesh.model = LerpMatrix(enemy.mesh.model, enemyRotation, 0.05f);
-			}
-		}
-
-		std::mt19937 random_{ DefaultSeed };
-		bool initialized_ = false;
-	};
-
+        void BindMesh(Enemy& enemy)
+        {
+            if (enemy.alive && meshAsset_ && meshAsset_->loaded && enemy.mesh.asset != meshAsset_)
+            {
+                enemy.mesh.Attach(meshAsset_);
+                enemy.InitializeAnims();
+            }
+        }
+    };
 }

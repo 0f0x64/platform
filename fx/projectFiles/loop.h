@@ -3318,7 +3318,7 @@ namespace Loop
 
 			if (result.collided)
 			{
-				hero.TakeDamage(15.0f);
+				hero.TakeDamage(enemy.contactDamage);
 
 				// “олько один враг наносит урон за один кадр.
 				break;
@@ -3462,7 +3462,7 @@ namespace Loop
 
 					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
 					hero.ProcessDefense();
-					hero.ProcessArrows(enemySystem, deltaTime);
+					hero.ProcessArrows(enemySystem, FIXED_DT);
 
 					if (hero.gravity.mode)
 					{
