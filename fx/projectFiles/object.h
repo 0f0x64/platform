@@ -5718,7 +5718,7 @@ namespace Object {
 	int CalculateParticlesCount(
 		const starline& line,
 		int baseParticles,
-		float referenceLength = 600.0f) //длинна базовой линии, на которую приходится baseParticles (чем больше число, тем менее четкие линии)
+		float referenceLength = 500.0f) //длинна базовой линии, на которую приходится baseParticles (чем больше число, тем менее четкие линии)
 		// на 1000 видно слабовато, но эффект будто линии из туманностей создаются, меньше 300 уже лагает сильно
 	{
 		if (line.pointCount < 2 || baseParticles <= 0)
