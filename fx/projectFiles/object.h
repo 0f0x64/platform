@@ -1,3 +1,5 @@
+#include "systems/starGenerationSystem.h"
+
 float distance(const float4& p1, const float4& p2) {
 	float dx = p2.x - p1.x;
 	float dy = p2.y - p1.y;
@@ -6704,3 +6706,5 @@ namespace Object {
 	}
 
 }
+
+#include "systems/starGenerationAdapter.h"
