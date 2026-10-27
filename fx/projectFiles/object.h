@@ -5677,7 +5677,7 @@ namespace Object {
 					break;
 
 				case 5: // far
-					inside = z <= w;
+					inside = z <= w * 1.2f;
 					break;
 				}
 
@@ -5696,6 +5696,109 @@ namespace Object {
 	}
 	
 
+	float CalculateLineLength(const starline& line)
+	{
+		float length = 0.0f;
+
+		for (int j = 1; j < line.pointCount; ++j)
+		{
+			const float4& a = line.point[j - 1];
+			const float4& b = line.point[j];
+
+			const float dx = b.x - a.x;
+			const float dy = b.y - a.y;
+			const float dz = b.z - a.z;
+
+			length += sqrtf(dx * dx + dy * dy + dz * dz);
+		}
+
+		return length;
+	}
+
+	int CalculateParticlesCount(
+		const starline& line,
+		int baseParticles,
+		float referenceLength = 600.0f) //длинна базовой линии, на которую приходится baseParticles (чем больше число, тем менее четкие линии)
+		// на 1000 видно слабовато, но эффект будто линии из туманностей создаются, меньше 300 уже лагает сильно
+	{
+		if (line.pointCount < 2 || baseParticles <= 0)
+			return 1;
+
+		const float length = CalculateLineLength(line);
+
+		if (length <= 0.0f)
+			return 1;
+
+		const float scaled =
+			baseParticles * length / referenceLength;
+
+		return static_cast<int>(ceilf(scaled)) > 1
+			? static_cast<int>(ceilf(scaled))
+			: 1;
+	}
+	
+
+	cmd(Maze, int count, int skipper, pMode mode, int r, int g, int b)
+	{
+		reflect;
+
+		psModeSet(in.mode);
+
+		for (int i = 0; i < starLineList.lineCount; i++)
+		{
+			// Frustum culling: пропускаем невидимые линии.
+			if (!IsLineInsideFrustum(starLineList.line[i]))
+				continue;
+
+			const auto& line = starLineList.line[i];
+
+			// Рассчитываем число частиц отдельно для каждой линии.
+			const int particlesCount =
+				CalculateParticlesCount(line, in.count);
+
+			const int drawCount =
+				particlesCount / (in.skipper > 0 ? in.skipper : 1);
+
+			const int safeDrawCount = drawCount > 0 ? drawCount : 1;
+
+			const int gX = static_cast<int>(
+				sqrtf(static_cast<float>(safeDrawCount)));
+
+			const int gY = gX;
+
+			vs::maze = {
+				.params = {
+					.model = XMMatrixTranspose(
+						XMMatrixTranslation(0, 0, 0)),
+					.gX = gX,
+					.gY = gY,
+					.mode = (int)in.mode,
+					.skipper = in.skipper,
+					.heroPosition = hero_pos,
+					.base_color = float4(
+						in.r / 100.0f,
+						in.g / 100.0f,
+						in.b / 100.0f,
+						1),
+				},
+			};
+
+			vs::maze.params.particlesCount = particlesCount;
+			vs::maze.params.basePointsCount = line.pointCount;
+
+			for (int j = 0; j < line.pointCount; j++)
+			{
+				vs::maze.params.basePoint[j] = line.point[j];
+			}
+
+			vs::maze.set();
+
+			Drawer::NullDrawer({ 1, safeDrawCount });
+		}
+	}
+
+
+	/*
 	cmd(Maze, int count, int skipper, pMode mode, int r, int g, int b)
 	{
 		reflect;
@@ -5737,6 +5840,7 @@ namespace Object {
 		}
 
 	}
+	*/
 
 	int starStencilTarget = 0;
 
@@ -6349,9 +6453,6 @@ namespace Object {
 		
 	}
 
-
-	
-	
 
 
 	cmd(Girl, int quality, int xPos, int yPos, int zPos, int brightness, int tickness, switcher stencil)
