@@ -1162,7 +1162,7 @@ struct hero_ : AliveCreation {
 		{
 			mesh.StopAnimation(1);
 			mesh.StopAnimation(3);
-			mesh.StopAnimation(4);
+			mesh.StopAnimation(13);
 			mesh.StopAnimation(6);
 			mesh.StopAnimation(7, 0);
 			mesh.StopAnimation(8);
@@ -1179,7 +1179,7 @@ struct hero_ : AliveCreation {
 			{
 				mesh.StopAnimation(1);
 				mesh.StopAnimation(3);
-				mesh.StopAnimation(4);
+				mesh.StopAnimation(13);
 				mesh.StopAnimation(7, 0);
 				mesh.StopAnimation(8);
 				mesh.PlayAnimation(6);
@@ -1514,7 +1514,7 @@ struct hero_ : AliveCreation {
 	{
 		if (jump || gravity.mode) {
 			mesh.StopAnimation(3);
-			mesh.StopAnimation(4);
+			mesh.StopAnimation(13);
 			mesh.StopAnimation(1);
 
 			return;
@@ -1537,7 +1537,7 @@ struct hero_ : AliveCreation {
 				float progress = railEndBrakeTime / RailEndBrakeDuration;
 				speed = railEndBrakeSpeed * (1.0f - progress);
 				mesh.StopAnimation(3);
-				mesh.StopAnimation(4);
+				mesh.StopAnimation(13);
 				mesh.StopAnimation(8);
 
 				Object::MeshInstance::ClipPlayState& clip = mesh.playStates[6];
@@ -1659,15 +1659,15 @@ struct hero_ : AliveCreation {
 		// Логика включения анимаций ходьбы и бега
 		if (pressingMove && absSpeed > 0.1f) {
 			float weight = min(max(absSpeed - 5.0f, 0.0f) / 12.0f, 1.0f);
-			mesh.playStates[4].weight = weight;
+			mesh.playStates[13].weight = weight;
 			mesh.playStates[3].weight = 1 - weight;
 
 			float animSpeed = pow(absSpeed / 12.0f, 0.25f);
-			mesh.playStates[4].speed = animSpeed * 0.5f;
+			mesh.playStates[13].speed = animSpeed * 0.5f;
 			mesh.playStates[3].speed = animSpeed;
 
 			mesh.PlayAnimation(3);
-			mesh.PlayAnimation(4);
+			mesh.PlayAnimation(13);
 
 			mesh.StopAnimation(1);
 
@@ -1681,7 +1681,7 @@ struct hero_ : AliveCreation {
 		}
 		else {
 			mesh.StopAnimation(3);
-			mesh.StopAnimation(4);
+			mesh.StopAnimation(13);
 
 			mesh.PlayAnimation(1);
 
@@ -3633,7 +3633,7 @@ namespace Loop
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Bow_shot.glb", true); // 10 Выстрел из лука
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Start_Aspid.glb", true); // 11 Начало блока
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Hold_Aspid.glb", true); // 12 Удержание блока
-			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Roaling.glb", true); // 13 Бег с скольжением
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Rolling.glb", true); // 13 Бег с скольжением
 
 			hero.mesh.Attach(heroMeshAsset);
 			hero.arrowMesh.Attach(arrowMeshAsset);
@@ -3674,6 +3674,8 @@ namespace Loop
 			hero.mesh.playStates[12].weight = 100000000.0f;
 			hero.mesh.playStates[12].speed = 0.5f;
 			hero.mesh.playStates[12].looped = true;
+
+			hero.mesh.playStates[13].looped = true;
 
 			enemySystem.ResetRandomOnLines();
 			enemySystem.InitializeQueen(float4(-96, -206, -163));
