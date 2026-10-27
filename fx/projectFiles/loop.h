@@ -299,6 +299,8 @@ struct hero_ : AliveCreation {
 	float startAirDistance = 0;
 	int lineIndex = 0;
 	float pointIndex = 0;
+	int lastLineIndex = 1; //id for previous line
+	bool fellOffLine = false; // флаг дл€ схода с линии(возможно railendfligth можно юзать)
 
 	float speedFactor = 1;
 	float speed = 0;
@@ -1211,6 +1213,10 @@ struct hero_ : AliveCreation {
 
 	void Respawn(bool force = false)
 	{
+		const bool wasDead = dead;
+		const bool wasFalling = fellOffLine;
+		const bool wasFirstRun = firstRun;
+
 		if (firstRun || force || (!victory && GetAsyncKeyState('R')))
 
 		{
@@ -1264,10 +1270,34 @@ struct hero_ : AliveCreation {
 
 			int startLine = 0;
 			int startPoint = 0;
+
+			if (!wasFirstRun && (wasDead || wasFalling))
+			{
+				startLine = lastLineIndex;
+			}
+
+			const int lineCount = Object::starLineList.lineCount;
+
+			if (lineCount <= 0)
+				return;
+
+			startLine = clamp(startLine, 0, lineCount - 1);
+
+			const int pointCount = Object::starLineList.line[startLine].pointCount;
+
+			if (pointCount <= 0)
+				return;
+
+			startPoint = 0;
+
 			lineIndex = startLine;
 			pointIndex = (float)startPoint;
+			lastLineIndex = startLine;
 
 			float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
+
+			// —брос причины предыдущего схода.
+			fellOffLine = false;
 
 			//destPoint = { 25455 /100., 15806 / 100., 25800 / 100. };
 
@@ -1820,6 +1850,8 @@ struct hero_ : AliveCreation {
 	{
 		if (lineIndex < 0 || lineIndex >= Object::starLineList.lineCount) return;
 
+		lastLineIndex = lineIndex; //take last line index
+
 		const auto& currentLine = Object::starLineList.line[lineIndex];
 		if (currentLine.pointCount < 2) return;
 
@@ -1928,6 +1960,9 @@ struct hero_ : AliveCreation {
 
 		if (leavesRail)
 		{
+			lastLineIndex = lineIndex;
+			fellOffLine = true;
+
 			BeginRailEndFlight(tangentSmooth);
 			ProcessGravity(remainingDistance / fabsf(speed));
 		}
