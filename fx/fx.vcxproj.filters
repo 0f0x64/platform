@@ -233,6 +233,12 @@
     <ClInclude Include="projectFiles\collision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="projectFiles\enemies\enemySwarm.h">
+      <Filter>Source Files\projectFiles\enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="projectFiles\enemies\enemyQueen.h">
+      <Filter>Source Files\projectFiles\enemies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt">
@@ -397,6 +403,10 @@
     <None Include="projectFiles\shaders\ps\color.shader">
       <Filter>Source Files\projectFiles\shadersSource\ps</Filter>
     </None>
+    <None Include="projectFiles\shaders\ps\basic2.shader" />
+    <None Include="projectFiles\shaders\ps\basicLow2.shader" />
+    <None Include="projectFiles\shaders\ps\starTri.shader" />
+    <None Include="projectFiles\shaders\vs\star.shader" />
   </ItemGroup>
   <ItemGroup>
     <Object Include="projectFiles\hero.obj">

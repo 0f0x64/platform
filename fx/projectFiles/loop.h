@@ -1663,7 +1663,7 @@ struct hero_ : AliveCreation {
 			mesh.playStates[3].weight = 1 - weight;
 
 			float animSpeed = pow(absSpeed / 12.0f, 0.25f);
-			mesh.playStates[4].speed = animSpeed;
+			mesh.playStates[4].speed = animSpeed * 0.5f;
 			mesh.playStates[3].speed = animSpeed;
 
 			mesh.PlayAnimation(3);
@@ -3338,8 +3338,10 @@ namespace Loop
 
 		for (const Enemies::Enemy& enemy : enemies)
 		{
-			if (!enemy.collider)
+			if (!enemy.collider || enemy.contactDamage <= 0)
+			{
 				continue;
+			}
 
 			if (!enemy.collider->isTouchable)
 				continue;
@@ -3354,7 +3356,7 @@ namespace Loop
 
 			if (result.collided)
 			{
-				hero.TakeDamage(15.0f);
+				hero.TakeDamage(enemy.contactDamage);
 
 				// Только один враг наносит урон за один кадр.
 				break;
@@ -3498,7 +3500,7 @@ namespace Loop
 
 					hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
 					hero.ProcessDefense();
-					hero.ProcessArrows(enemySystem, deltaTime);
+					hero.ProcessArrows(enemySystem, FIXED_DT);
 
 					if (hero.gravity.mode)
 					{
@@ -3631,6 +3633,7 @@ namespace Loop
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Bow_shot.glb", true); // 10 Выстрел из лука
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Start_Aspid.glb", true); // 11 Начало блока
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Hold_Aspid.glb", true); // 12 Удержание блока
+			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Roaling.glb", true); // 13 Бег с скольжением
 
 			hero.mesh.Attach(heroMeshAsset);
 			hero.arrowMesh.Attach(arrowMeshAsset);
@@ -3673,6 +3676,7 @@ namespace Loop
 			hero.mesh.playStates[12].looped = true;
 
 			enemySystem.ResetRandomOnLines();
+			enemySystem.InitializeQueen(float4(-96, -206, -163));
 			enemyRenderer.Load(enemySystem);
 
 			levelEnd.collider = collision::CreateSphereCollider();
