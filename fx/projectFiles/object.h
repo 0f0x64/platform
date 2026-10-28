@@ -3053,25 +3053,25 @@ namespace Object {
 	}
 
 	// Постобработка линии: зафиксированные концы + искривления в середине.
-	void PostProcessLine(starline& line, float coefficient)
+	void PostProcessLine(starline& line, double coefficient) // <-- float изменён на double
 	{
 		// Защита от вырожденных линий (нужно хотя бы 4 точки для волн и сглаживания)
 		// и от нулевого/отрицательного коэффициента искажений.
-		if (line.pointCount < 4 || coefficient <= 0.0f)
+		if (line.pointCount < 4 || coefficient <= 0.0) // <-- 0.0f изменено на 0.0
 			return;
 
 		// ========================================================================
 		// ПАРАМЕТРЫ ЭФФЕКТОВ (крути их для настройки внешнего вида)
 		// ========================================================================
-		const float bendFreq = 1.7f;                        // Частота крупных изгибов
-		const float bendAmp = 40.0f * coefficient;          // Амплитуда изгибов в стороны
-		const float bendUpAmp = 24.0f * coefficient;        // Амплитуда изгибов вверх-вниз
+		const double bendFreq = 1.7;                        // Частота крупных изгибов
+		const double bendAmp = 40.0 * coefficient;          // Амплитуда изгибов в стороны
+		const double bendUpAmp = 24.0 * coefficient;        // Амплитуда изгибов вверх-вниз
 
-		const float rollFreq = 1.2f;                        // Частота крена вокруг оси пути
-		const float rollAmp = XMConvertToRadians(32.0f);    // Максимальный угол крена (32 градуса)
+		const double rollFreq = 1.2;                        // Частота крена вокруг оси пути
+		const double rollAmp = (double)XMConvertToRadians(32.0f);    // Максимальный угол крена (32 градуса)
 
-		const float roughFreq = 6.0f;                       // Частота мелкой дрожи
-		const float roughAmp = 2.0f * coefficient;          // Амплитуда мелкой дрожи
+		const double roughFreq = 6.0;                       // Частота мелкой дрожи
+		const double roughAmp = 2.0 * coefficient;          // Амплитуда мелкой дрожи
 
 		const int N = line.pointCount;                      // Кэшируем количество точек
 
@@ -3165,11 +3165,11 @@ namespace Object {
 		// ШАГ 3: НАЛОЖЕНИЕ ЭФФЕКТОВ (Bend, Roll, Roughness)
 		// ========================================================================
 		for (int i = 1; i < N - 1; ++i) { // Пропускаем концы (0 и N-1)
-			const float t = (float)i / (float)(N - 1); // Нормализованный параметр (0..1)
+			const double t = (double)i / (double)(N - 1); // <-- float изменён на double (Нормализованный параметр 0..1)
 
 			// Окно: 0 на концах, 1 в середине. Гарантирует, что концы останутся на месте.
-			const float w = sinf(PI * t);
-			if (w < 0.001f) continue;
+			const double w = sin(PI * t); // <-- sinf заменён на sin, float на double
+			if (w < 0.001) continue;
 
 			XMVECTOR tangent = tangents[i];
 			XMVECTOR up = ups[i];
@@ -3177,27 +3177,27 @@ namespace Object {
 
 			// --- ROLL (крен вокруг касательной) ---
 			// Используем шум Перлина со смещением фазы, чтобы крен не совпадал с изгибами
-			float rollAngle = GetSinglePerlinNoise3D(t * rollFreq, 7.3f, 0.0f) * rollAmp * w;
-			XMVECTOR rotQ = XMQuaternionRotationAxis(tangent, rollAngle);
+			double rollAngle = (double)GetSinglePerlinNoise3D((float)(t * rollFreq), 7.3f, 0.0f) * rollAmp * w; // <-- double
+			XMVECTOR rotQ = XMQuaternionRotationAxis(tangent, (float)rollAngle); // <-- каст в float для XM
 			up = XMVector3Rotate(up, rotQ);
 			side = XMVector3Normalize(XMVector3Cross(up, tangent)); // Пересчитываем Side после крена
 
 			// --- BEND (изгибы) ---
 			// Используем 2 канала шума: один для смещения вбок, другой для смещения вверх
-			XMVECTOR n = GetPerlinNoiseVector3(t * bendFreq, 0.0f, 0.0f);
-			float offSide = XMVectorGetX(n) * bendAmp * w;
-			float offUp = XMVectorGetY(n) * bendUpAmp * w;
+			XMVECTOR n = GetPerlinNoiseVector3((float)(t * bendFreq), 0.0f, 0.0f);
+			double offSide = (double)XMVectorGetX(n) * bendAmp * w; // <-- double
+			double offUp = (double)XMVectorGetY(n) * bendUpAmp * w; // <-- double
 
 			// --- ROUGHNESS (мелкая дрожь) ---
-			float rough = GetSinglePerlinNoise3D(t * roughFreq, 31.7f, 0.0f) * roughAmp * w;
+			double rough = (double)GetSinglePerlinNoise3D((float)(t * roughFreq), 31.7f, 0.0f) * roughAmp * w; // <-- double
 
 			// Итоговое смещение по Side
-			float totalSide = offSide + rough;
+			double totalSide = offSide + rough; // <-- double
 
-			// Применяем смещения к позиции точки в мировых координатах
-			line.point[i].x += XMVectorGetX(side) * totalSide + XMVectorGetX(up) * offUp;
-			line.point[i].y += XMVectorGetY(side) * totalSide + XMVectorGetY(up) * offUp;
-			line.point[i].z += XMVectorGetZ(side) * totalSide + XMVectorGetZ(up) * offUp;
+			// Применяем смещения к позиции точки в мировых координатах (каст в float только при записи)
+			line.point[i].x += (float)((double)XMVectorGetX(side) * totalSide + (double)XMVectorGetX(up) * offUp);
+			line.point[i].y += (float)((double)XMVectorGetY(side) * totalSide + (double)XMVectorGetY(up) * offUp);
+			line.point[i].z += (float)((double)XMVectorGetZ(side) * totalSide + (double)XMVectorGetZ(up) * offUp);
 
 			// Сохраняем вектор Up для героя (чтобы он правильно ориентировался на кренах)
 			line.upVector[i] = V2F(up);
@@ -5735,8 +5735,8 @@ namespace Object {
 		//------------end user space---------------
 		//-----------------------------------------
 
-		double tSec = timer::GetCounter() * 0.001;   // секунды
-		float lineDistortion = 2.0f + 0.45f * sinf((float)tSec * 0.25f); // таймер
+		double tSec = timer::GetCounter() * 0.001;    // секунды
+		double lineDistortion = 2.0 + 0.45 * sin(tSec * 0.25); // таймер
 
 		for (int j = 0; j < starLineList.lineCount; j++)
 		{

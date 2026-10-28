@@ -3468,31 +3468,96 @@ namespace Loop
 		
 		//
 
+		//Object::initPatches(hero.pathControl.Time);
+
+		//float deltaTime = processTimer();
+
+
+		//if (GetActiveWindow() == hWnd && gameCam)
+		//{
+
+		//	//float deltaTime = processTimer();
+
+		//	inputController.mouse.processInput();
+
+		//	hero.Respawn();
+
+		//	const float FIXED_DT = 1.0f / 60.0f; // Строго 16.66 мс для физики
+		//	static float accumulator = 0.0f;
+		//	static float smoothedCameraDT = FIXED_DT;
+		//	const float EMA_SMOOTH_FACTOR = 0.15f; // Коэффициент фильтра времени
+
+		//	accumulator += deltaTime;
+
+		//	if (accumulator > 0.1f) accumulator = 0.1f;
+
+		//	while (accumulator >= FIXED_DT) {
+
+		//		if (!hero.dead && !hero.victory) {
+		//			hero.pathControl.Process();
+		//			hero.ProcessMove(FIXED_DT);
+		//			hero.ProcessJump(FIXED_DT);
+
+		//			hero.ProcessAttack(V2F(gameCamera.finalCameraEye), V2F(XMVector3Normalize(XMVectorSubtract(gameCamera.finalCameraAt, gameCamera.finalCameraEye))));
+		//			hero.ProcessDefense();
+		//			hero.ProcessArrows(enemySystem, deltaTime);
+
+		//			if (hero.gravity.mode)
+		//			{
+		//				hero.ProcessGravity(FIXED_DT, gameCamera.finalCameraAt - gameCamera.finalCameraEye);
+		//				hero.OrientHeroTowardsLineInAir(FIXED_DT);
+		//			}
+		//			else
+		//			{
+		//				hero.UpdateHeroOnLine(FIXED_DT);
+		//			}
+
+		//			hero.processLanding(FIXED_DT);
+		//		}
+
+		//		// NEW
+		//		hero.UpdateCollider();
+		//		hero.UpdateDamageState(FIXED_DT);
+
+		//		enemySystem.Update(FIXED_DT, hero.collider, hero);
+
+		//		CheckVictoryTrigger();
+		//		CheckPlayerEnemyCollisions();
+
+		//		//enemySystem.Update(FIXED_DT, hero.collider);
+		//		gameCamera.Update(FIXED_DT);
+
+		//		processAmbient();
+
+		//		accumulator -= FIXED_DT;
+		//	}
+
+		//	ConstBuf::interp::UpdateTweens(deltaTime);
+		//	collision::UpdateColliders();
+
+		//	float alpha = accumulator / FIXED_DT;
+		//	alpha = ::std::clamp(alpha, 0.0f, 1.0f);
+		//	//TODO: implement characters and camera matrix interpolation (render only)
+		//}
+
+				// 1. Вызываем initPatches ОДИН РАЗ ЗА КАДР (как было изначально)
 		Object::initPatches(hero.pathControl.Time);
 
 		float deltaTime = processTimer();
 
-
 		if (GetActiveWindow() == hWnd && gameCam)
 		{
-
-			//float deltaTime = processTimer();
-
 			inputController.mouse.processInput();
-
 			hero.Respawn();
 
-			const float FIXED_DT = 1.0f / 60.0f; // Строго 16.66 мс для физики
+			const float FIXED_DT = 1.0f / 60.0f;
 			static float accumulator = 0.0f;
-			static float smoothedCameraDT = FIXED_DT;
-			const float EMA_SMOOTH_FACTOR = 0.15f; // Коэффициент фильтра времени
 
 			accumulator += deltaTime;
-
 			if (accumulator > 0.1f) accumulator = 0.1f;
 
+			// --- ФИКСИРОВАННЫЙ ШАГ (ТОЛЬКО ФИЗИКА) ---
 			while (accumulator >= FIXED_DT) {
-
 				if (!hero.dead && !hero.victory) {
 					hero.pathControl.Process();
 					hero.ProcessMove(FIXED_DT);
@@ -3502,20 +3567,17 @@ namespace Loop
 					hero.ProcessDefense();
 					hero.ProcessArrows(enemySystem, FIXED_DT);
 
+					// Гравитацию и прыжки оставляем в фиксед-шаге
 					if (hero.gravity.mode)
 					{
 						hero.ProcessGravity(FIXED_DT, gameCamera.finalCameraAt - gameCamera.finalCameraEye);
 						hero.OrientHeroTowardsLineInAir(FIXED_DT);
 					}
-					else
-					{
-						hero.UpdateHeroOnLine(FIXED_DT);
-					}
+					// ВНИМАНИЕ: UpdateHeroOnLine(FIXED_DT) мы ОТСЮДА УБРАЛИ
 
 					hero.processLanding(FIXED_DT);
 				}
 
-				// NEW
 				hero.UpdateCollider();
 				hero.UpdateDamageState(FIXED_DT);
 
@@ -3524,20 +3586,26 @@ namespace Loop
 				CheckVictoryTrigger();
 				CheckPlayerEnemyCollisions();
 
-				//enemySystem.Update(FIXED_DT, hero.collider);
-				gameCamera.Update(FIXED_DT);
+				// Камеру тоже убрали отсюда
+				// gameCamera.Update(FIXED_DT); 
 
 				processAmbient();
 
 				accumulator -= FIXED_DT;
 			}
 
+			// --- ПЕРЕМЕННЫЙ ШАГ (РЕНДЕР И РЕЛЬС) ---
+			// Обновляем позицию на рельсе с частотой кадров, чтобы совпадало с initPatches
+			if (!hero.dead && !hero.victory && !hero.gravity.mode)
+			{
+				hero.UpdateHeroOnLine(deltaTime);
+			}
+
+			// Камеру обновляем каждый кадр, чтобы сглаживание было плавным
+			gameCamera.Update(deltaTime);
+
 			ConstBuf::interp::UpdateTweens(deltaTime);
 			collision::UpdateColliders();
-
-			float alpha = accumulator / FIXED_DT;
-			alpha = ::std::clamp(alpha, 0.0f, 1.0f);
-			//TODO: implement characters and camera matrix interpolation (render only)
 		}
 
 		if (!isPrecalc)
