@@ -3657,6 +3657,64 @@ namespace Loop
 
 
 		if (!hero.dead) {
+
+			float heroHP = 0.0f;
+
+			if (hero.maxHealth > 0.0f)
+				heroHP = hero.health / hero.maxHealth;
+
+			heroHP = (std::max)(0.0f, (std::min)(1.0f, heroHP));
+
+			if (heroHP >= 0.75f)
+			{
+				// 100% голубой -> 75% жёлтый
+				float t = (1.0f - heroHP) / 0.25f;
+
+				hero.mesh.color = float4(
+					t,
+					1.0f,
+					1.0f - t,
+					1.0f
+				);
+			}
+			else if (heroHP >= 0.50f)
+			{
+				// 75% жёлтый -> 50% оранжевый
+				float t = (0.75f - heroHP) / 0.25f;
+
+				hero.mesh.color = float4(
+					1.0f,
+					1.0f - 0.5f * t,
+					0.0f,
+					1.0f
+				);
+			}
+			else if (heroHP >= 0.25f)
+			{
+				// 50% оранжевый -> 25% красный
+				float t = (0.50f - heroHP) / 0.25f;
+
+				hero.mesh.color = float4(
+					1.0f,
+					0.5f * (1.0f - t),
+					0.0f,
+					1.0f
+				);
+			}
+			else
+			{
+				// 25% красный -> 0% чёрный
+				float t = heroHP / 0.25f;
+
+				hero.mesh.color = float4(
+					t,
+					0.0f,
+					0.0f,
+					1.0f
+				);
+			}
+			
+
 			float4 p = V2F(hero.pos * 10000.);
 			Object::Mesh({
 				.obj = &hero.mesh,
