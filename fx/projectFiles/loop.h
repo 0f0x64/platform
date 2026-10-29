@@ -2165,30 +2165,29 @@ struct hero_ : AliveCreation {
 	}
 
 	void DrawBow(float deltaTime) {
-		if (!aiming)
-			return;
+		if (aiming) {
+			XMMATRIX& matrix = inputController.mouse.lastLookMatrix;
+			float4 position = V2F(pos) + GetUpVectorFromMatrix(matrix) * 0.8f + GetLookVectorFromMatrix(matrix) * 0.7f;
+			float4 p = position * 10000.f;
 
-		XMMATRIX& matrix = inputController.mouse.lastLookMatrix;
-		float4 position = V2F(pos) + GetUpVectorFromMatrix(matrix) * 0.8f + GetLookVectorFromMatrix(matrix) * 0.7f;
-		float4 p = position * 10000.f;
+			bowMesh.model = matrix;
 
-		bowMesh.model = matrix;
-
-		Object::Mesh({
-			.obj = &bowMesh,
-			.quality = 1,
-			.xPos = (int)(p.x),
-			.yPos = (int)(p.y),
-			.zPos = (int)(p.z),
-			.brightness = 9,
-			.tickness = 4,
-			.stencil = switcher::on,
-			.zoom = -75,
-			.onLineOfs = 0,
-			.jumpCharge = 100,
-			.deltaTime = deltaTime
-			//.model = &arrow.rotation
-			});
+			Object::Mesh({
+				.obj = &bowMesh,
+				.quality = 1,
+				.xPos = (int)(p.x),
+				.yPos = (int)(p.y),
+				.zPos = (int)(p.z),
+				.brightness = 9,
+				.tickness = 4,
+				.stencil = switcher::on,
+				.zoom = -75,
+				.onLineOfs = 0,
+				.jumpCharge = 100,
+				.deltaTime = deltaTime
+				//.model = &arrow.rotation
+				});
+		}
 	}
 };
 
