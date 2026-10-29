@@ -98,7 +98,6 @@ struct inputController_ {
 		//}
 
 		float heroRotateAngleAnim = 0;
-		XMMATRIX lastLookMatrix;
 
 		XMMATRIX getLookMatrix(
 			XMMATRIX rowMajorRot,
@@ -214,7 +213,6 @@ struct inputController_ {
 			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, lastTargetA);
 
 			XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
-			lastLookMatrix = result;
 
 			return result;
 		}
@@ -2166,8 +2164,23 @@ struct hero_ : AliveCreation {
 
 	void DrawBow(float deltaTime) {
 		if (aiming) {
-			XMMATRIX& matrix = inputController.mouse.lastLookMatrix;
-			float4 position = V2F(pos) + GetUpVectorFromMatrix(matrix) * 0.8f + GetLookVectorFromMatrix(matrix) * 0.7f;
+			XMMATRIX& base = mesh.model;
+
+			// Ћокальный поворот за мышкой: сначала yaw (вокруг локального up),
+			// затем pitch (вокруг локального right).
+			// «наки подобраны под то, как getLookMatrix считает yaw/pitch:
+			// yaw растЄт влево (mouseDiff), pitch растЄт вниз.
+			XMMATRIX lookRot = XMMatrixRotationRollPitchYaw(
+				inputController.mouse.pitch,          // вокруг локальной X (right)
+				-inputController.mouse.skeletonYaw,    // вокруг локальной Y (up)
+				0.0f
+			);
+
+			// ѕримен€ем локальный поворот к базису персонажа (row-major: base * rot)
+			XMMATRIX matrix = lookRot * base;
+			matrix = LerpMatrix(bowMesh.model, matrix, 0.75f);
+
+			float4 position = V2F(pos) + GetUpVectorFromMatrix(matrix) * 0.8f + GetLookVectorFromMatrix(matrix) * 0.9f;
 			float4 p = position * 10000.f;
 
 			bowMesh.model = matrix;
