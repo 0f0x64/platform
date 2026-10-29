@@ -21,23 +21,23 @@ float frac(float x) {
 	return x - floor(x);
 }
 
-float4 normalize(const float4& v) {
-	// Считаем длину вектора по формуле Пифагора
-	float length = ::std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-
-	// Защита от деления на ноль (если вектор нулевой)
-	if (length < 0.00001f) {
-		return float4{ 0.0f, 0.0f, 0.0f, v.w };
-	}
-
-	// Возвращаем нормализованный вектор
-	return float4{
-		v.x / length,
-		v.y / length,
-		v.z / length,
-		v.w // Поле w оставляем оригинальным
-	};
-}
+//float4 normalize(const float4& v) {
+//	// Считаем длину вектора по формуле Пифагора
+//	float length = ::std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+//
+//	// Защита от деления на ноль (если вектор нулевой)
+//	if (length < 0.00001f) {
+//		return float4{ 0.0f, 0.0f, 0.0f, v.w };
+//	}
+//
+//	// Возвращаем нормализованный вектор
+//	return float4{
+//		v.x / length,
+//		v.y / length,
+//		v.z / length,
+//		v.w // Поле w оставляем оригинальным
+//	};
+//}
 
 float4 cross(const float4& a, const float4& b) {
 	return float4{

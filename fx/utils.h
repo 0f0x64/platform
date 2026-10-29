@@ -74,11 +74,17 @@ float length(const float4& vec)
 	return sqrt(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z + vec.w * vec.w);
 }
 
-//float4 normalize(float4 vec)
-//{
-//	float len = length(vec);
-//	return float4(vec.x / len, vec.y / len, vec.z / len, vec.w / len);
-//}
+float4 normalize(float4 vec)
+{
+	float len = length(vec);
+ 
+	 // Защита от деления на ноль (если вектор нулевой)
+	if (len < 0.00001f) {
+		return float4{ 0.0f, 0.0f, 0.0f, vec.w };
+	}
+ 
+	return float4(vec.x / len, vec.y / len, vec.z / len, vec.w);
+}
 
 inline float dot(const float4& a, const float4& b) {
 	return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
@@ -122,4 +128,16 @@ dx11::DirectX::XMMATRIX LerpMatrix(const dx11::DirectX::XMMATRIX& from, const dx
 	dx11::DirectX::XMVECTOR resultQuat = dx11::DirectX::XMQuaternionSlerp(fromQuat, toQuat, t);
 
 	return dx11::DirectX::XMMatrixRotationQuaternion(resultQuat);
+}
+
+float4 GetLookVectorFromMatrix(const dx11::DirectX::XMMATRIX& matrix) {
+	return normalize(float4(matrix.r[2].m128_f32[0], matrix.r[2].m128_f32[1], matrix.r[2].m128_f32[2], 0));
+}
+
+float4 GetUpVectorFromMatrix(const dx11::DirectX::XMMATRIX& matrix) {
+	return normalize(float4(matrix.r[1].m128_f32[0], matrix.r[1].m128_f32[1], matrix.r[1].m128_f32[2], 0));
+}
+
+float4 GetRightVectorFromMatrix(const dx11::DirectX::XMMATRIX& matrix) {
+	return normalize(float4(matrix.r[0].m128_f32[0], matrix.r[0].m128_f32[1], matrix.r[0].m128_f32[2], 0));
 }

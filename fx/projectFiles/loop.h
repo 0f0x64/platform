@@ -98,6 +98,7 @@ struct inputController_ {
 		//}
 
 		float heroRotateAngleAnim = 0;
+		XMMATRIX lastLookMatrix;
 
 		XMMATRIX getLookMatrix(
 			XMMATRIX rowMajorRot,
@@ -213,6 +214,7 @@ struct inputController_ {
 			XMMATRIX reverseRot = XMMatrixRotationAxis(HeroRealUp, lastTargetA);
 
 			XMMATRIX result = XMMatrixMultiply(rowMajorRot, reverseRot);
+			lastLookMatrix = result;
 
 			return result;
 		}
@@ -269,6 +271,7 @@ float fov = 110;
 struct hero_ : AliveCreation {
 
 	Object::MeshInstance mesh = Object::MeshInstance();
+	Object::MeshInstance bowMesh = Object::MeshInstance();
 	Object::MeshInstance arrowMesh = Object::MeshInstance();
 	
 	//
@@ -2160,6 +2163,33 @@ struct hero_ : AliveCreation {
 				});
 		}
 	}
+
+	void DrawBow(float deltaTime) {
+		if (!aiming)
+			return;
+
+		XMMATRIX& matrix = inputController.mouse.lastLookMatrix;
+		float4 position = V2F(pos) + GetUpVectorFromMatrix(matrix) * 0.8f + GetLookVectorFromMatrix(matrix) * 0.7f;
+		float4 p = position * 10000.f;
+
+		bowMesh.model = matrix;
+
+		Object::Mesh({
+			.obj = &bowMesh,
+			.quality = 1,
+			.xPos = (int)(p.x),
+			.yPos = (int)(p.y),
+			.zPos = (int)(p.z),
+			.brightness = 9,
+			.tickness = 4,
+			.stencil = switcher::on,
+			.zoom = -75,
+			.onLineOfs = 0,
+			.jumpCharge = 100,
+			.deltaTime = deltaTime
+			//.model = &arrow.rotation
+			});
+	}
 };
 
 hero_ hero;
@@ -3684,10 +3714,12 @@ namespace Loop
 			Object::MeshAsset* heroMeshAsset = new Object::MeshAsset;
 			Object::MeshAsset* arrowMeshAsset = new Object::MeshAsset;
 			Object::MeshAsset* sphereMeshAsset = new Object::MeshAsset;
+			Object::MeshAsset* bowMeshAsset = new Object::MeshAsset;
 
 			heroMeshAsset->LoadGeometry("..//fx//projectFiles//A-Pose.glb");
 			arrowMeshAsset->LoadGeometry("..//fx//projectFiles//Arrow.glb");
 			sphereMeshAsset->LoadGeometry("..//fx//projectFiles//Sphere.glb");
+			bowMeshAsset->LoadGeometry("..//fx//projectFiles//Bow_Anim.glb");
 
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
@@ -3704,6 +3736,7 @@ namespace Loop
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Rolling.glb", true); // 13 Бег с скольжением
 
 			hero.mesh.Attach(heroMeshAsset);
+			hero.bowMesh.Attach(bowMeshAsset);
 			hero.arrowMesh.Attach(arrowMeshAsset);
 			levelEnd.mesh.Attach(sphereMeshAsset);
 
@@ -3783,6 +3816,7 @@ namespace Loop
 				.deltaTime = deltaTime
 				});
 		}
+		hero.DrawBow(deltaTime);
 		hero.DrawArrows(deltaTime);
 
 		enemyRenderer.RenderColor(enemySystem, V2F(gameCamera.finalCameraEye), deltaTime);
