@@ -1,4 +1,3 @@
-#include "systems/starGenerationSystem.h"
 
 float distance(const float4& p1, const float4& p2) {
 	float dx = p2.x - p1.x;
@@ -3327,8 +3326,9 @@ namespace Object {
 			AddPoint(p);
 		}
 	}
-
-	void initPatches(float pathTime)
+	
+	//поменял название чтобы просто выключить из обработки
+	void initPatches1(float pathTime)
 	{
 		// init maze
 		currentLine = -1;
@@ -7019,3 +7019,169 @@ namespace Object {
 }
 
 #include "systems/starGenerationAdapter.h"
+#include "systems/starGenerationSystem.h"
+#include "systems/starGenerationTypes.h"
+#include "systems/lineGenerationSystem.h"
+#include "systems/lineGenerationAdapter.h"
+namespace Object
+{
+	inline bool BuildGeminiLocation()
+	{
+		using StarGeneration::Star;
+
+		const int starsCount = sizeof(gemini) / sizeof(float4);
+
+		// Масштабируем координаты созвездия.
+		const float geminiScale = 100.0f;
+
+		std::vector<Star> source;
+
+		for (int i = 0; i < starsCount; i++)
+		{
+			source.push_back({
+				{
+					gemini[i].x * geminiScale,
+					gemini[i].y * geminiScale,
+					gemini[i].z
+				},
+				{}
+				});
+		}
+
+		// Pollux Line (Right Branch)
+		source[0].connections = { 1 };
+		source[1].connections = { 2, 12 };
+		source[2].connections = { 3 };
+		source[3].connections = { 4 };
+		source[4].connections = { 5, 16 };
+
+		// Castor Line (Left Branch)
+		source[6].connections = { 7 };
+		source[7].connections = { 8, 13 };
+		source[8].connections = { 9, 14 };
+		source[9].connections = { 10 };
+		source[10].connections = { 11, 15 };
+
+		// Connecting stars
+		source[12].connections = { 13, 14 };
+		source[13].connections = { 14 };
+		source[14].connections = { 15 };
+		source[15].connections = { 16 };
+
+		// Генерация положения звёзд
+		std::vector<Star> stars;
+
+		if (!StarGeneration::ScatterHeights(
+			source,
+			15.0f,
+			1234,
+			stars))
+		{
+			Log("Gemini: ScatterHeights failed\n");
+			return false;
+		}
+
+		// Настройки генерации линий
+		LineGeneration::Settings s;
+
+		s.segmentCount = 4;
+		s.gapCount = 2;
+
+		s.gapLength = 2.0f;
+
+		s.minSegmentLength = 2.0f;
+		s.maxSegmentLength = 60.0f;
+
+		s.overlap = 1.0f;
+		s.endBend = 0.06f;
+
+		s.samplesPerSegment = 17;
+		s.seed = 1234;
+
+		// Генерация соединений
+		std::vector<LineGeneration::Connection> connections;
+
+		if (!LineGeneration::GenerateConnections(stars, s, connections))
+		{
+			Log("Gemini: GenerateConnections failed\n");
+			return false;
+		}
+
+		Log("Gemini: GenerateConnections OK\n");
+
+		// Сбрасываем старые линии
+		starLineList.lineCount = 0;
+
+		// Добавляем линии
+		if (!AppendConnections(connections))
+		{
+			Log("Gemini: AppendConnections failed\n");
+			starLineList.lineCount = 0;
+			return false;
+		}
+
+		Log("Gemini: AppendConnections OK\n");
+
+		// Добавляем звёзды
+		if (!AppendStars(stars, 7.0f))
+		{
+			Log("Gemini: AppendStars failed\n");
+			starLineList.lineCount = 0;
+			return false;
+		}
+
+		Log("Gemini: AppendStars OK\n");
+
+		return true;
+	}
+
+	void GenerateLocation()
+	{
+		static bool ready = false;
+		static bool attempted = false;
+
+		// Генерируем мир только один раз
+		if (!attempted)
+		{
+			attempted = true;
+
+			ready = BuildGeminiLocation();
+
+			if (!ready)
+			{
+				Log("GenerateLocation: BuildGeminiLocation failed\n");
+				return;
+			}
+
+			Log("GenerateLocation: Gemini world generated\n");
+		}
+
+		if (!ready)
+			return;
+
+		// Покадровая обработка линий
+		double tSec = timer::GetCounter() * 0.001;
+
+		double lineDistortion =
+			2.0 + 0.45 * sin(tSec * 0.25);
+
+		for (int j = 0; j < starLineList.lineCount; j++)
+		{
+			smoothStarline(starLineList.line[j]);
+
+			PostProcessLine(
+				starLineList.line[j],
+				lineDistortion
+			);
+
+			BuildLineAABB(starLineList.line[j]);
+		}
+	}
+
+	void initPatches(float pathTime)
+	{
+		currentLine = -1;
+
+		GenerateLocation();
+	}
+}
