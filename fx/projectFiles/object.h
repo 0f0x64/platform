@@ -7212,7 +7212,10 @@ inline float4 GetStarPos(int starIndex)
 	p.w = 0;   // в w лежит радиус звезды, для позиции он не нужен
 	return p;
 }
-
+inline void SetStarColor(int starIndex, float4 color)
+{
+	starLineList.line[firstStarLine + starIndex].baseColor = color;
+}
 // Точка на пути между двумя звёздами (индексы 0-based).
 // t = 0 у звезды a, t = 1 у звезды b.
 inline float4 GetPathPointBetweenStars(int a, int b, float t = 0.5f, int* outLine = nullptr)
@@ -7316,9 +7319,10 @@ inline bool BuildGeminiLocation()
 	starLineList.lineCount = 0;
 	if (!AppendConnections(connections)) { starLineList.lineCount = 0; return false; }
 
-	firstStarLine = starLineList.lineCount;   // <-- добавить
-
+	firstStarLine = starLineList.lineCount;
 	if (!AppendStars(stars, 7.0f)) { starLineList.lineCount = 0; return false; }
+	SetStarColor(14, float4{ 0.6f, 0.1f, 1.0f, 1.0f });   // звезда №15, фиолетовая
+
 	return true;
 
 }

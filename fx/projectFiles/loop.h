@@ -3955,7 +3955,7 @@ namespace Loop
 				
 
 		Object::hero_pos = V2F(hero.pos);
-			
+		
 		Object::Girl({
 				.quality = 1,
 				.xPos = 0,
