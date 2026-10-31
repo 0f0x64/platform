@@ -1225,7 +1225,6 @@ struct hero_ : AliveCreation {
 			{
 				dead = false;
 
-				health = maxHealth;
 				invulnerabilityTimer = 0.0f;
 
 				if (collider)
@@ -1233,6 +1232,7 @@ struct hero_ : AliveCreation {
 					collider->isTouchable = true;
 				}
 			}
+			health = maxHealth;
 
 			if (!firstRun && !force)
 			{
@@ -1264,11 +1264,18 @@ struct hero_ : AliveCreation {
 			srand(timer::frameBeginTime);
 			firstRun = false;
 			int range = 2;
+
+			//float4 sp = Object::GetStarPos(Object::START_STAR);
+			//pos = getRandVector4() * 5 + F2V(sp);   // небольшой разброс вокруг звезды
+			//startAirDistance = length3(V2F(pos - F2V(sp))) + 1.0f;
+
 			pos = getRandVector4() * range;
 			startAirDistance = length3(V2F(pos));
+			
 			//int startLine = rand()% Object::starLineList.lineCount;
 			//int startPoint = rand() % (Object::starLineList.line[startLine].pointCount-2)+1;
 
+			/*
 			int startLine = 0;
 			int startPoint = 0;
 
@@ -1303,6 +1310,52 @@ struct hero_ : AliveCreation {
 			//destPoint = { 25455 /100., 15806 / 100., 25800 / 100. };
 
 			pos += F2V(destPoint);
+
+			*/
+
+			int startLine = 0;
+			int startPoint = 0;
+
+			const bool returnToLastLine = !wasFirstRun && (wasDead || wasFalling);
+
+			if (returnToLastLine)
+			{
+				startLine = lastLineIndex;
+			}
+
+			const int lineCount = Object::starLineList.lineCount;
+
+			if (lineCount <= 0)
+				return;
+
+			startLine = clamp(startLine, 0, lineCount - 1);
+
+			const int pointCount = Object::starLineList.line[startLine].pointCount;
+
+			if (pointCount <= 0)
+				return;
+
+			startPoint = 0;
+
+			lineIndex = startLine;
+			pointIndex = (float)startPoint;
+			lastLineIndex = startLine;
+
+			float4 destPoint = Object::starLineList.line[startLine].point[startPoint];
+
+			// Начальный спавн (и ручной респавн по R) идёт на стартовой звезде №3.
+			// После смерти или падения возвращаемся к последней линии, как раньше.
+			if (!returnToLastLine)
+			{
+				destPoint = Object::GetStarPos(Object::START_STAR);
+			}
+
+			// Сброс причины предыдущего схода.
+			fellOffLine = false;
+
+			pos += F2V(destPoint);
+			posOnLine = F2V(destPoint);
+
 			posOnLine = F2V(destPoint);
 			gravity.mode = true;
 			gravity.progress = 0.0f;
@@ -3746,7 +3799,22 @@ namespace Loop
 			hero.mesh.playStates[13].looped = true;
 
 			enemySystem.ResetRandomOnLines();
-			enemySystem.InitializeQueen(float4(-96, -206, -163));
+
+
+			//блок для спавна в звезде
+			//float4 qp = Object::GetStarPos(Object::Queen_STAR);
+			//const float QUEEN_SPAWN_OFFSET = 5.0f;   
+			//qp.y += QUEEN_SPAWN_OFFSET*2;
+			//qp.x += QUEEN_SPAWN_OFFSET;
+			//qp.z += QUEEN_SPAWN_OFFSET;
+			//блок для спавна на линии
+			int queenLine = -1;
+			float4 qp = Object::GetPathPointBetweenStars(4, 14, 0.5f, &queenLine);   // звёзды 5 и 15
+			qp.y += 2.0f;
+			//
+			enemySystem.InitializeQueen(qp);
+			//enemySystem.InitializeQueen(float4(-96, -206, -163));
+				
 			enemyRenderer.Load(enemySystem);
 
 			levelEnd.collider = collision::CreateSphereCollider();

@@ -38,8 +38,8 @@ namespace LineGeneration
 
         bool IsValid() const
         {
-            return segmentCount >= 1 && segmentCount <= 2000 && gapCount >= 0 && gapCount < segmentCount &&
-                   samplesPerSegment >= 5 && samplesPerSegment <= 1000 && std::isfinite(gapLength) && gapLength >= 0 &&
+            return segmentCount >= 1 && segmentCount <= 4000 && gapCount >= 0 && gapCount < segmentCount &&
+                   samplesPerSegment >= 5 && samplesPerSegment <= 2000 && std::isfinite(gapLength) && gapLength >= 0 &&
                    (gapCount == 0 || gapLength > 0) && std::isfinite(minSegmentLength) && minSegmentLength > 0 &&
                    std::isfinite(maxSegmentLength) && maxSegmentLength >= minSegmentLength && std::isfinite(overlap) &&
                    overlap >= 0 && overlap < minSegmentLength && std::isfinite(endBend) && endBend >= 0;
@@ -68,10 +68,11 @@ namespace LineGeneration
         const int overlapCount = settings.segmentCount - 1 - settings.gapCount;
         double remainingLength = distance - settings.gapCount * static_cast<double>(settings.gapLength) +
                                  overlapCount * static_cast<double>(settings.overlap);
-        if (remainingLength < settings.segmentCount * minLength || remainingLength > settings.segmentCount * maxLength)
+        /*if (remainingLength < settings.segmentCount * minLength || remainingLength > settings.segmentCount * maxLength)
         {
             return false;
         }
+        */
 
         std::mt19937 random(settings.seed);
         const auto nextRandom = [&] { return static_cast<double>(random()) / (std::mt19937::max)(); };

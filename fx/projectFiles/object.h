@@ -2809,7 +2809,7 @@ namespace Object {
 	};
 
 	struct {
-		starline line[2000];
+		starline line[3000];
 		int lineCount = 0;
 	} starLineList;
 
@@ -3058,7 +3058,7 @@ namespace Object {
 		// и от нулевого/отрицательного коэффициента искажений.
 		if (line.pointCount < 4 || coefficient <= 0.0) // <-- 0.0f изменено на 0.0
 			return;
-
+		
 		// ========================================================================
 		// ПАРАМЕТРЫ ЭФФЕКТОВ (крути их для настройки внешнего вида)
 		// ========================================================================
@@ -3279,6 +3279,7 @@ namespace Object {
 	}
 
 	float4 gemini[] = {
+		
 		// Pollux Line (Right Branch)
 		{  0.95f,  0.72f,  0.0f,  0.0f }, // Pollux
 		{  0.58f,  0.41f,  0.0f,  1.0f }, // Wasat
@@ -7025,18 +7026,26 @@ namespace Object {
 #include "systems/lineGenerationAdapter.h"
 namespace Object
 {
+	/*
 	inline bool BuildGeminiLocation()
 	{
 		using StarGeneration::Star;
 
 		const int starsCount = sizeof(gemini) / sizeof(float4);
+		//const int starsCount = 11.0f;
 
 		// Масштабируем координаты созвездия.
 		const float geminiScale = 100.0f;
 
-		std::vector<Star> source;
+		std::vector<StarGeneration::Star> source = {
+			{ { 0,0,0 },{ 1 } },
+			{ { 100,0,0 },{ 2 } },
+			{ { 200,0,50 },{} }
 
-		for (int i = 0; i < starsCount; i++)
+		};
+
+
+		/*for (int i = 0; i < starsCount; i++)
 		{
 			source.push_back({
 				{
@@ -7047,23 +7056,23 @@ namespace Object
 				{}
 				});
 		}
-
+		
 		// Pollux Line (Right Branch)
 		source[0].connections = { 1 };
-		source[1].connections = { 2, 12 };
+		source[1].connections = { 2 };
 		source[2].connections = { 3 };
 		source[3].connections = { 4 };
-		source[4].connections = { 5, 16 };
+		source[4].connections = { 5 };
 
 		// Castor Line (Left Branch)
 		source[6].connections = { 7 };
-		source[7].connections = { 8, 13 };
-		source[8].connections = { 9, 14 };
+		source[7].connections = { 8 };
+		source[8].connections = { 9 };
 		source[9].connections = { 10 };
-		source[10].connections = { 11, 15 };
+		source[10].connections = { 11 };
 
 		// Connecting stars
-		source[12].connections = { 13, 14 };
+		source[12].connections = { 13 };
 		source[13].connections = { 14 };
 		source[14].connections = { 15 };
 		source[15].connections = { 16 };
@@ -7073,7 +7082,7 @@ namespace Object
 
 		if (!StarGeneration::ScatterHeights(
 			source,
-			15.0f,
+			30.0f,
 			1234,
 			stars))
 		{
@@ -7084,12 +7093,12 @@ namespace Object
 		// Настройки генерации линий
 		LineGeneration::Settings s;
 
-		s.segmentCount = 4;
+		s.segmentCount = 6;
 		s.gapCount = 2;
 
-		s.gapLength = 2.0f;
+		s.gapLength = 6.0f;
 
-		s.minSegmentLength = 2.0f;
+		s.minSegmentLength = 12.0f;
 		s.maxSegmentLength = 60.0f;
 
 		s.overlap = 1.0f;
@@ -7134,6 +7143,185 @@ namespace Object
 
 		return true;
 	}
+	*/
+/*
+inline bool BuildGeminiLocation()
+{
+	using namespace StarGeneration;
+
+	// ===== ПАРАМЕТРЫ =====
+	const float K = 0.8f;   // масштаб: пиксели картинки -> мир
+	const float HEIGHT = 12.0f;  // разброс по высоте
+	const unsigned SEED = 1234;
+	// =====================
+
+	struct PX { float x, y; };
+	static const PX px[17] = {
+		{ 178,258 },{ 294,101 },{ 761,783 },{ 926,556 },{ 730,434 },{ 1009,563 },
+		{ 668,962 },{ 356,530 },{ 147,387 },{ 353,769 },{ 667,54 },{ 340,270 },
+		{ 515,614 },{ 237,305 },{ 862,657 },{ 1130,531 },{ 491,195 }
+	}; // звёзды 1..17
+
+	static const int edges[][2] = {
+		{ 2,17 },{ 11,17 },{ 12,17 },{ 17,5 },
+		{ 1,14 },{ 14,12 },{ 9,14 },{ 14,8 },
+		{ 8,13 },{ 13,3 },{ 8,10 },{ 10,7 },
+		{ 5,4 },{ 4,6 },{ 6,16 },{ 5,15 }
+	};
+
+	std::vector<Star> source(17);
+	for (int i = 0; i < 17; i++)
+		source[i].position = { (px[i].x - 640.f) * K, 0.f, (640.f - px[i].y) * K };
+
+	for (auto& e : edges)
+		source[e[0] - 1].connections.push_back(e[1] - 1);
+
+	std::vector<Star> stars;
+	if (!ScatterHeights(source, HEIGHT, SEED, stars))
+		return false;
+
+	LineGeneration::Settings s;
+	s.segmentCount = 2;
+	s.gapCount = 1;      // один разрыв на связь
+	s.gapLength = 4.0f;
+	s.minSegmentLength = 4.0f;
+	s.maxSegmentLength = 60.0f;
+	s.overlap = 0.0f;
+	s.endBend = 0.04f;
+	s.samplesPerSegment = 17;
+	s.seed = SEED;
+
+	std::vector<LineGeneration::Connection> connections;
+	if (!LineGeneration::GenerateConnections(stars, s, connections))
+		return false;
+
+	starLineList.lineCount = 0;
+	if (!AppendConnections(connections)) { starLineList.lineCount = 0; return false; }
+	if (!AppendStars(stars, 7.0f)) { starLineList.lineCount = 0; return false; }
+	return true;
+}
+*/
+
+inline int firstStarLine = 0;
+inline const int START_STAR = 2;   // звезда #Start_star+1 с картинки для первого спавна выбирается
+//inline const int Queen_STAR = 14;
+
+inline float4 GetStarPos(int starIndex)
+{
+	float4 p = starLineList.line[firstStarLine + starIndex].basePoint[0];
+	p.w = 0;   // в w лежит радиус звезды, для позиции он не нужен
+	return p;
+}
+
+// Точка на пути между двумя звёздами (индексы 0-based).
+// t = 0 у звезды a, t = 1 у звезды b.
+inline float4 GetPathPointBetweenStars(int a, int b, float t = 0.5f, int* outLine = nullptr)
+{
+	float4 pa = GetStarPos(a);
+	float4 pb = GetStarPos(b);
+
+	// ориентир: точка на прямой между звёздами
+	float4 target = lerp3(pa, pb, t);
+
+	float best = 1e30f;
+	float4 bestPoint = target;
+	int bestLine = -1;
+
+	// firstStarLine: все линии до него это пути, дальше идут звёзды
+	for (int i = 0; i < firstStarLine; i++)
+	{
+		const starline& line = starLineList.line[i];
+		for (int j = 0; j < line.basePointCount; j++)
+		{
+			float d = distance(line.basePoint[j], target);
+			if (d < best)
+			{
+				best = d;
+				bestPoint = line.basePoint[j];
+				bestLine = i;
+			}
+		}
+	}
+
+	if (outLine) *outLine = bestLine;
+	bestPoint.w = 0;
+	return bestPoint;
+}
+
+inline bool BuildGeminiLocation()
+{
+	using namespace StarGeneration;
+
+	// ===== ПАРАМЕТРЫ =====
+	const float K = 0.8f;    // масштаб: единицы картинки -> мир
+	const float HEIGHT = 12.0f;   // разброс по высоте (Y)
+	const unsigned SEED = 1234;
+	// =====================
+
+	// Центрированные координаты (x, z). Центр созвездия = (0, 0).
+	struct P2 { float x, z; };
+	static const P2 pos[17] = {
+		{ -460.5f,  250.f },  // 1
+		{ -344.5f,  407.f },  // 2
+		{ 122.5f, -275.f },  // 3  (СТАРТ)
+		{ 287.5f,  -48.f },  // 4
+		{ 91.5f,   74.f },  // 5
+		{ 370.5f,  -55.f },  // 6
+		{ 29.5f, -454.f },  // 7
+		{ -282.5f,  -22.f },  // 8
+		{ -491.5f,  121.f },  // 9
+		{ -285.5f, -261.f },  // 10
+		{ 28.5f,  454.f },  // 11
+		{ -298.5f,  238.f },  // 12
+		{ -123.5f, -106.f },  // 13
+		{ -401.5f,  203.f },  // 14
+		{ 223.5f, -149.f },  // 15
+		{ 491.5f,  -23.f },  // 16
+		{ -147.5f,  313.f }   // 17
+	};
+
+	static const int edges[][2] = {
+		{ 2,17 },{ 11,17 },{ 12,17 },{ 17,5 },
+		{ 1,14 },{ 14,12 },{ 9,14 },{ 14,8 },
+		{ 8,13 },{ 13,3 },{ 8,10 },{ 10,7 },
+		{ 5,4 },{ 4,6 },{ 6,16 },{ 5,15 }
+	};
+
+	std::vector<Star> source(17);
+	for (int i = 0; i < 17; i++)
+		source[i].position = { pos[i].x * K, 0.f, pos[i].z * K };
+
+	for (auto& e : edges)
+		source[e[0] - 1].connections.push_back(e[1] - 1);
+
+	std::vector<Star> stars;
+	if (!ScatterHeights(source, HEIGHT, SEED, stars))
+		return false;
+
+	LineGeneration::Settings s;
+	s.segmentCount = 2;
+	s.gapCount = 1;       // один разрыв на связь
+	s.gapLength = 6.0f;
+	s.minSegmentLength = 4.0f;
+	s.maxSegmentLength = 200.0f;  // с запасом под самые длинные связи
+	s.overlap = 0.0f;
+	s.endBend = 0.04f;
+	s.samplesPerSegment = 17;
+	s.seed = SEED;
+
+	std::vector<LineGeneration::Connection> connections;
+	if (!LineGeneration::GenerateConnections(stars, s, connections))
+		return false;
+
+	starLineList.lineCount = 0;
+	if (!AppendConnections(connections)) { starLineList.lineCount = 0; return false; }
+
+	firstStarLine = starLineList.lineCount;   // <-- добавить
+
+	if (!AppendStars(stars, 7.0f)) { starLineList.lineCount = 0; return false; }
+	return true;
+
+}
 
 	void GenerateLocation()
 	{
@@ -7162,8 +7350,9 @@ namespace Object
 		// Покадровая обработка линий
 		double tSec = timer::GetCounter() * 0.001;
 
-		double lineDistortion =
-			2.0 + 0.45 * sin(tSec * 0.25);
+		double lineDistortion = 0;
+			//0.5 + 0.1 * sin(tSec * 0.25);
+			//2.0 + 0.45 * sin(tSec * 0.25);
 
 		for (int j = 0; j < starLineList.lineCount; j++)
 		{
