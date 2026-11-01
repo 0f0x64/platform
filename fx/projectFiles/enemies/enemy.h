@@ -16,8 +16,8 @@ namespace Enemies
         InitializeCallback initializeCallback;
         UpdateCallback updateCallback;
         Object::MeshInstance mesh;
-        float maxHealth = 100.0f;
-        float health = 100.0f;
+        float maxHealth = 40.0f;
+        float health = 40.0f;
         bool alive = true;
         float attackRadius = 4.0f;
         float contactDamage = 1.5f;
