@@ -3830,11 +3830,6 @@ namespace Loop
 			Object::MeshAsset* shieldMeshAsset = new Object::MeshAsset;
 
 			heroMeshAsset->LoadGeometry("..//fx//projectFiles//A-Pose.glb");
-			arrowMeshAsset->LoadGeometry("..//fx//projectFiles//Arrow.glb");
-			sphereMeshAsset->LoadGeometry("..//fx//projectFiles//Sphere.glb");
-			bowMeshAsset->LoadGeometry("..//fx//projectFiles//Bow_anim_hold.glb");
-			shieldMeshAsset->LoadGeometry("..//fx//projectFiles//Shield.glb");
-
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Walk.glb", true); // 3 Ходьба
@@ -3848,6 +3843,11 @@ namespace Loop
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Start_Aspid.glb", true); // 11 Начало блока
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Shield_Block_Hold_Aspid.glb", true); // 12 Удержание блока
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Rolling.glb", true); // 13 Бег с скольжением
+
+			arrowMeshAsset->LoadGeometry("..//fx//projectFiles//Arrow.glb");
+			sphereMeshAsset->LoadGeometry("..//fx//projectFiles//Sphere.glb");
+			bowMeshAsset->LoadGeometry("..//fx//projectFiles//Bow_anim_hold.glb");
+			shieldMeshAsset->LoadGeometry("..//fx//projectFiles//Shield.glb");
 
 			hero.mesh.Attach(heroMeshAsset);
 			hero.bowMesh.Attach(bowMeshAsset);
