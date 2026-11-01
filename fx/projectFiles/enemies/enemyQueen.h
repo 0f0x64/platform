@@ -12,7 +12,7 @@ namespace Enemies
         float patrolSpeed = 0.8f;
         float detectionRadius = 20.0f;
         float spawnRadius = 3.5f;
-        float spawnInterval = 6.0f;
+        float spawnInterval = 30.0f;
         float swarmDetectionRadius = 60.0f;
         std::size_t swarmsPerWave = 2;
 

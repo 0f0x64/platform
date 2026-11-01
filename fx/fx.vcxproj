@@ -416,6 +416,11 @@
     <ClInclude Include="projectFiles\sound\trackData.h" />
     <ClInclude Include="projectFiles\sound\tracker.h" />
     <ClInclude Include="projectFiles\sound\trackStruct.h" />
+    <ClInclude Include="projectFiles\systems\lineGenerationAdapter.h" />
+    <ClInclude Include="projectFiles\systems\lineGenerationSystem.h" />
+    <ClInclude Include="projectFiles\systems\starGenerationAdapter.h" />
+    <ClInclude Include="projectFiles\systems\starGenerationSystem.h" />
+    <ClInclude Include="projectFiles\systems\starGenerationTypes.h" />
     <ClInclude Include="projectFiles\texList.h" />
     <ClInclude Include="reflector.h" />
     <ClInclude Include="settings.h" />
