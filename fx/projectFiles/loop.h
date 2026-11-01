@@ -270,6 +270,7 @@ struct hero_ : AliveCreation {
 
 	Object::MeshInstance mesh = Object::MeshInstance();
 	Object::MeshInstance bowMesh = Object::MeshInstance();
+	Object::MeshInstance shieldMesh = Object::MeshInstance();
 	Object::MeshInstance arrowMesh = Object::MeshInstance();
 	
 	//
@@ -2183,10 +2184,56 @@ struct hero_ : AliveCreation {
 			float4 position = V2F(pos) + GetUpVectorFromMatrix(matrix) * 0.8f + GetLookVectorFromMatrix(matrix) * 0.9f;
 			float4 p = position * 10000.f;
 
+			bowMesh.PlayAnimation(0);
+
 			bowMesh.model = matrix;
 
 			Object::Mesh({
 				.obj = &bowMesh,
+				.quality = 1,
+				.xPos = (int)(p.x),
+				.yPos = (int)(p.y),
+				.zPos = (int)(p.z),
+				.brightness = 9,
+				.tickness = 4,
+				.stencil = switcher::on,
+				.zoom = -75,
+				.onLineOfs = 0,
+				.jumpCharge = 100,
+				.deltaTime = deltaTime
+				//.model = &arrow.rotation
+				});
+		}
+		else {
+			bowMesh.StopAnimation(0);
+		}
+	}
+
+	void DrawShield(float deltaTime) {
+		if (blocking) {
+			XMMATRIX& base = mesh.model;
+
+			// Локальный поворот за мышкой: сначала yaw (вокруг локального up),
+			// затем pitch (вокруг локального right).
+			// Знаки подобраны под то, как getLookMatrix считает yaw/pitch:
+			// yaw растёт влево (mouseDiff), pitch растёт вниз.
+			XMMATRIX lookRot = XMMatrixRotationRollPitchYaw(
+				inputController.mouse.pitch,          // вокруг локальной X (right)
+				-inputController.mouse.skeletonYaw,    // вокруг локальной Y (up)
+				0.0f
+			);
+
+			// Применяем локальный поворот к базису персонажа (row-major: base * rot)
+			XMMATRIX matrix = lookRot * base;
+			matrix = LerpMatrix(shieldMesh.model, matrix, 0.4f);
+
+			float4 position = V2F(pos) + GetUpVectorFromMatrix(matrix) * 0.8f + GetLookVectorFromMatrix(matrix) * 0.9f;
+			float4 p = position * 10000.f;
+
+			shieldMesh.model = matrix;
+
+			Object::Mesh({
+				.obj = &shieldMesh,
 				.quality = 1,
 				.xPos = (int)(p.x),
 				.yPos = (int)(p.y),
@@ -3727,11 +3774,13 @@ namespace Loop
 			Object::MeshAsset* arrowMeshAsset = new Object::MeshAsset;
 			Object::MeshAsset* sphereMeshAsset = new Object::MeshAsset;
 			Object::MeshAsset* bowMeshAsset = new Object::MeshAsset;
+			Object::MeshAsset* shieldMeshAsset = new Object::MeshAsset;
 
 			heroMeshAsset->LoadGeometry("..//fx//projectFiles//A-Pose.glb");
 			arrowMeshAsset->LoadGeometry("..//fx//projectFiles//Arrow.glb");
 			sphereMeshAsset->LoadGeometry("..//fx//projectFiles//Sphere.glb");
-			bowMeshAsset->LoadGeometry("..//fx//projectFiles//Bow_Anim.glb");
+			bowMeshAsset->LoadGeometry("..//fx//projectFiles//Bow_anim_hold.glb");
+			shieldMeshAsset->LoadGeometry("..//fx//projectFiles//Shield.glb");
 
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Idle.glb", true); // 1 Бездействие
 			heroMeshAsset->LoadAnimationFile("..//fx//projectFiles//Landing_Misha.glb", true); // 2 Присяд
@@ -3749,6 +3798,7 @@ namespace Loop
 
 			hero.mesh.Attach(heroMeshAsset);
 			hero.bowMesh.Attach(bowMeshAsset);
+			hero.shieldMesh.Attach(shieldMeshAsset);
 			hero.arrowMesh.Attach(arrowMeshAsset);
 			levelEnd.mesh.Attach(sphereMeshAsset);
 
@@ -3790,6 +3840,9 @@ namespace Loop
 
 			hero.mesh.playStates[13].looped = true;
 
+			hero.bowMesh.playStates[0].looped = true;
+			hero.bowMesh.playStates[0].speed = 0.4f;
+
 			enemySystem.ResetRandomOnLines();
 			enemySystem.InitializeQueen(float4(-96, -206, -163));
 			enemyRenderer.Load(enemySystem);
@@ -3828,6 +3881,7 @@ namespace Loop
 				.deltaTime = deltaTime
 				});
 		}
+		hero.DrawShield(deltaTime);
 		hero.DrawBow(deltaTime);
 		hero.DrawArrows(deltaTime);
 
