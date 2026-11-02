@@ -5929,7 +5929,7 @@ namespace Object {
 	int CalculateParticlesCount(
 		const starline& line,
 		int baseParticles,
-		float referenceLength = 500.0f) //длинна базовой линии, на которую приходится baseParticles (чем больше число, тем менее четкие линии)
+		float referenceLength = 200.0f) //длинна базовой линии, на которую приходится baseParticles (чем больше число, тем менее четкие линии)
 		// на 1000 видно слабовато, но эффект будто линии из туманностей создаются, меньше 300 уже лагает сильно
 	{
 		if (line.pointCount < 2 || baseParticles <= 0)
@@ -7287,7 +7287,7 @@ inline bool BuildGeminiLocation()
 		{ 2,17 },{ 11,17 },{ 12,17 },{ 17,5 },
 		{ 1,14 },{ 14,12 },{ 9,14 },{ 14,8 },
 		{ 8,13 },{ 13,3 },{ 8,10 },{ 10,7 },
-		{ 5,4 },{ 4,6 },{ 6,16 },{ 5,15 }
+		{ 5,4 },{ 4,6 },{ 6,16 },{ 5,15 },{ 3,15 }
 	};
 
 	std::vector<Star> source(17);
@@ -7307,7 +7307,7 @@ inline bool BuildGeminiLocation()
 	s.gapLength = 6.0f;
 	s.minSegmentLength = 4.0f;
 	s.maxSegmentLength = 200.0f;  // с запасом под самые длинные связи
-	s.overlap = 0.0f;
+	s.overlap = 0.8f;
 	s.endBend = 0.04f;
 	s.samplesPerSegment = 17;
 	s.seed = SEED;
