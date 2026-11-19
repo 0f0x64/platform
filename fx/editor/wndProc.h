@@ -1,5 +1,6 @@
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	if (GameUI::ui.HandleMessage(hWnd, message, wParam, lParam)) return 0;
 	switch (message)
 	{
 	/*case WM_CREATE:
@@ -75,7 +76,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		if (LOWORD(lParam) == HTCLIENT)
 		{
 			// Устанавливаем NULL (скрыт) или IDC_ARROW (стрелка)
-			SetCursor(gameCam ? NULL : LoadCursor(NULL, IDC_ARROW));
+			SetCursor(gameCam && !gameUiCapturesInput ? NULL : LoadCursor(NULL, IDC_ARROW));
 			return TRUE; // Сообщаем Windows, что обработали курсор сами
 		}
 		break;

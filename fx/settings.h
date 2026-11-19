@@ -38,6 +38,11 @@
 #endif
 
 
+// Set to 0 to build the reusable UI without the NPC example.
+#ifndef PLATFORM_UI_DEMO
+#define PLATFORM_UI_DEMO 1
+#endif
+
 #define FRAMES_PER_SECOND 60
 #define SAMPLING_FREQ 44100
 #define SAMPLES_IN_FRAME (SAMPLING_FREQ/FRAMES_PER_SECOND)

@@ -8,6 +8,11 @@
 #define WINDOWS_IGNORE_PACKING_MISMATCH
 
 #include <windows.h>
+#include <commdlg.h>
+#include <dxgi.h>
+#include <wincodec.h>
+#include <cstring>
+#include "projectFiles/ui/ui.h"
 
 HINSTANCE hInst;
 HWND hWnd;
@@ -63,6 +68,8 @@ using namespace dx11;
     void name(CAT(name,_params) in)
 
 bool gameCam = false;
+bool gameUiCapturesInput = false;
+bool gameUiEscapeConsumed = false;
 #if EditMode
 	#include "editor\editor.h"
 #endif
@@ -104,9 +111,10 @@ void UpdateFrame(double time)
 		Loop::mainLoop();
 
 		#if EditMode
-			editor::Process();
+			editor::Process(!gameUiCapturesInput);
 		#endif	
 
+		GameUI::ui.Render(dx11::width, dx11::height);
 		Draw::Present();
 
 		timer::frameEndTime = timer::GetCounter();
@@ -137,6 +145,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	ShowCursor(EditMode);
 	
 	dx11::Init();
+	GameUI::ui.Initialize(dx11::device, dx11::context);
 	
 
 	#if EditMode
@@ -181,7 +190,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			}
 
 			//PeekMessageA(&msg, NULL, 0, 0, PM_REMOVE);
-			if (GetAsyncKeyState(VK_ESCAPE) || timer::frameBeginTime / 1000. > DEMO_DURATION)
+			if ((!gameUiCapturesInput && !gameUiEscapeConsumed && GetAsyncKeyState(VK_ESCAPE)) || timer::frameBeginTime / 1000. > DEMO_DURATION)
 			{
 				break;
 			}
@@ -210,6 +219,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		CoUninitialize();
 	#endif
 
+	#if PLATFORM_UI_DEMO
+	GameUI::npcInteraction.Shutdown();
+	#endif
+	GameUI::ui.Shutdown();
 	ExitProcess(0);
 }
 
@@ -220,6 +233,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #else
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	if (GameUI::ui.HandleMessage(hWnd, message, wParam, lParam)) return 0;
 	switch (message) {
 	case WM_DESTROY:
 		PostQuitMessage(0);

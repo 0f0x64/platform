@@ -539,6 +539,17 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Reflector|Win32'">true</ExcludedFromBuild>
     </Object>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="projectFiles\ui\ui.h" />
+    <ClInclude Include="projectFiles\ui\uiRuntime.h" />
+    <ClInclude Include="projectFiles\ui\uiCore.h" />
+    <ClInclude Include="projectFiles\ui\uiRenderer.h" />
+    <ClInclude Include="projectFiles\ui\dialogue.h" />
+    <ClInclude Include="projectFiles\ui\subtitles.h" />
+    <ClInclude Include="projectFiles\ui\modalInput.h" />
+    <ClInclude Include="projectFiles\examples\ui\npcCube.h" />
+    <ClInclude Include="projectFiles\examples\ui\npcInteraction.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\ImeSense.Packages.LibOgg.1.3.5.5\build\native\ImeSense.Packages.LibOgg.targets" Condition="Exists('..\packages\ImeSense.Packages.LibOgg.1.3.5.5\build\native\ImeSense.Packages.LibOgg.targets')" />

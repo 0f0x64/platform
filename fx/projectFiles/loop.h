@@ -31,6 +31,10 @@ XMVECTOR getRandVector4()
 #include "object.h"
 #include "systems/lineGenerationAdapter.h"
 #include "collision.h"
+#include "ui/uiRuntime.h"
+#if PLATFORM_UI_DEMO
+#include "examples/ui/npcInteraction.h"
+#endif
 
 
 struct AliveCreation {
@@ -3687,7 +3691,46 @@ namespace Loop
 
 		float deltaTime = processTimer();
 
-		if (GetActiveWindow() == hWnd && gameCam)
+		#if PLATFORM_UI_DEMO
+		const int spawnLine = Object::firstStarLine + Object::START_STAR;
+		if (spawnLine >= 0 && spawnLine < Object::starLineList.lineCount)
+		{
+			const float starRadius = Object::starLineList.line[spawnLine].basePoint[0].w;
+			const XMVECTOR npcPosition = F2V(Object::GetStarPos(Object::START_STAR))
+				+ XMVectorSet(starRadius + 2.0f, 2.0f, 0.0f, 0.0f);
+			GameUI::npcInteraction.Initialize(npcPosition);
+		}
+		#endif
+		const bool uiWasOpen = gameUiCapturesInput;
+		GameUI::ui.BeginFrame(hWnd);
+		#if PLATFORM_UI_DEMO
+		GameUI::npcInteraction.Update(hWnd, gameCam, hero.pos, !hero.dead && !hero.victory);
+		#endif
+		GameUI::ui.Update();
+		if (uiWasOpen != gameUiCapturesInput)
+		{
+			inputController.mouse.isInitialized = false;
+		}
+		if (!uiWasOpen && gameUiCapturesInput && hero.aiming)
+		{
+			ConstBuf::interp::DeleteExistingTween(fov);
+			fov = 110.0f;
+			hero.mesh.StopAnimation(9);
+			dx11::Audio::SetVolume(hero.bowstringVoice, 0.0f);
+		}
+		if (gameUiCapturesInput)
+		{
+			deltaTime = 0.0f;
+			inputController.jumpKeyIsDown = false;
+			hero.isCharging = false;
+			hero.chargeTimer = 0.0f;
+			hero.jumpChargeProgress = 1.0f;
+			hero.aiming = false;
+			ConstBuf::interp::DeleteExistingTween(hero.bowCharge);
+			hero.bowCharge = 0.0f;
+		}
+
+		if (GetActiveWindow() == hWnd && gameCam && !gameUiCapturesInput)
 		{
 			inputController.mouse.processInput();
 			hero.Respawn();
@@ -4068,6 +4111,9 @@ namespace Loop
 
 
 		Compose();
+		#if PLATFORM_UI_DEMO
+		GameUI::npcInteraction.Render();
+		#endif
 
 	}
 

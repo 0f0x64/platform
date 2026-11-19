@@ -1347,18 +1347,28 @@ namespace editor
 
 	float step = 0;
 
-	void Process()
+	void Process(bool acceptInput = true)
 	{
 		ui::mousePos = ui::GetCusorPos();
 		paramsAreLoaded = true;
 
+		if (!acceptInput)
+		{
+			drag.setFree();
+			click = mPressed = false;
+			paramEdit::action = false;
+			ui::dblClk = false;
+			TimeLine::clickRb = false;
+			ViewCam::stepAmp = ViewCam::slideAmp = 0.f;
+		}
+
 		POINT pt;
 		GetCursorPos(&pt);
 
-		bool ctrl = GetAsyncKeyState(VK_CONTROL);
-		bool shift = GetAsyncKeyState(VK_SHIFT);
+		bool ctrl = acceptInput && GetAsyncKeyState(VK_CONTROL);
+		bool shift = acceptInput && GetAsyncKeyState(VK_SHIFT);
 
-		if (GetAsyncKeyState(VK_MBUTTON))
+		if (acceptInput && GetAsyncKeyState(VK_MBUTTON))
 		{
 			if (!click && WindowFromPoint(pt) == vsHWND)
 			{
@@ -1530,18 +1540,23 @@ namespace editor
 
 		if (TimeLine::play) TimeLine::playMode();
 
-		ProcessContext();
+		if (acceptInput) ProcessContext();
 
+		ui::mouseAngle = -atan2f(ui::mousePos.y - .5f, ui::mousePos.x - .5f);
+		if (!acceptInput)
+		{
+			ui::mouseLastPos = ui::mousePos;
+			ui::mouseLastAngle = ui::mouseAngle;
+		}
 		ui::mouseDelta.x = ui::mousePos.x - ui::mouseLastPos.x;
 		ui::mouseDelta.y = ui::mousePos.y - ui::mouseLastPos.y;
-		ui::mouseAngle = -atan2f(ui::mousePos.y - .5f, ui::mousePos.x - .5f);
 		ui::mouseAngleDelta = ui::mouseAngle - ui::mouseLastAngle;
 
-		ui::lbDown = isKeyDown(VK_LBUTTON);
-		ui::rbDown = isKeyDown(VK_RBUTTON);
-		ui::mbDown = isKeyDown(VK_MBUTTON);
-		ui::LeftDown = isKeyDown(VK_LEFT);
-		ui::RightDown = isKeyDown(VK_RIGHT);
+		ui::lbDown = acceptInput && isKeyDown(VK_LBUTTON);
+		ui::rbDown = acceptInput && isKeyDown(VK_RBUTTON);
+		ui::mbDown = acceptInput && isKeyDown(VK_MBUTTON);
+		ui::LeftDown = acceptInput && isKeyDown(VK_LEFT);
+		ui::RightDown = acceptInput && isKeyDown(VK_RIGHT);
 
 		if (!ui::lbDown)
 		{
@@ -1552,16 +1567,16 @@ namespace editor
 		Rasterizer::Cull(cullmode::off);
 		Depth::Depth(depthmode::off);
 
-		if (isKeyDown(TIME_KEY)|| timeAlwaysOn)
+		if ((acceptInput && isKeyDown(TIME_KEY)) || timeAlwaysOn)
 		{
-			TimeLine::ProcessInput();
+			if (acceptInput) TimeLine::ProcessInput();
 			TimeLine::Draw();
 			paramEdit::showTrack();
 		}
 
 		//game mode
 
-		if (!gameCam)
+		if (acceptInput && !gameCam)
 		{
 			if (!GetAsyncKeyState(VK_CONTROL))
 			{
@@ -1585,7 +1600,7 @@ namespace editor
 		ViewCam::setup();
 		ViewCam::setCamMat();
 
-		if (isKeyDown(CAM_KEY)|| ViewCam::flyToCam < 1.f)
+		if ((acceptInput && isKeyDown(CAM_KEY)) || ViewCam::flyToCam < 1.f)
 		{
 			ViewCam::Draw();
 		}
@@ -1607,7 +1622,7 @@ namespace editor
 		ui::style::button::selected = modelMenuOpen;
 		bool modelPressed = paramEdit::ButtonPressed(modelMenuOpen ? "Model        ^" : "Model        v", 0, modelY, bw, bh);
 		ui::style::button::selected = false;
-		if (modelPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
+		if (acceptInput && modelPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
 		{
 			modelMenuOpen = !modelMenuOpen;
 		}
@@ -1634,7 +1649,8 @@ namespace editor
 			float ux = panelX + gap;
 			float uy = panelY + gap;
 
-			if (paramEdit::ButtonPressed("Load Model", ux, uy, bw, bh))
+			bool loadModelPressed = paramEdit::ButtonPressed("Load Model", ux, uy, bw, bh);
+			if (acceptInput && loadModelPressed)
 			{
 				loadFlag = true;
 			}
@@ -1645,21 +1661,21 @@ namespace editor
 			ux += bw + gap;
 
 			bool loadAnimPressed = paramEdit::ButtonPressed("Load Anims", ux, uy, bw, bh);
-			if (loadAnimPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
+			if (acceptInput && loadAnimPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
 			{
 				OpenAnimationDialog();
 			}
 			ux += bw + gap;
 
 			bool prevAnimPressed = paramEdit::ButtonPressed("Prev", ux, uy, bw * 0.55f, bh);
-			if (prevAnimPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
+			if (acceptInput && prevAnimPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
 			{
 				ConstBuf::gltfAnim::PrevAnimation();
 			}
 			ux += bw * 0.55f + gap;
 
 			bool nextAnimPressed = paramEdit::ButtonPressed("Next", ux, uy, bw * 0.55f, bh);
-			if (nextAnimPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
+			if (acceptInput && nextAnimPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
 			{
 				ConstBuf::gltfAnim::NextAnimation();
 			}
@@ -1667,7 +1683,7 @@ namespace editor
 			uy += bh + gap;
 			::std::string animDropLabel = ::std::string(ConstBuf::gltfAnim::CurrentAnimationLabel()) + "        v";
 			bool animMenuPressed = paramEdit::ButtonPressed(animDropLabel.c_str(), panelX + gap, uy, panelW - gap * 2.0f, bh);
-			if (animMenuPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
+			if (acceptInput && animMenuPressed && (GetAsyncKeyState(VK_LBUTTON) & 1))
 			{
 				OpenAnimationMenu();
 			}
